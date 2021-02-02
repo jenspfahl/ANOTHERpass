@@ -31,6 +31,10 @@ class SecretService {
         return Key(bytes)
     }
 
+    fun generateSecretKey(key: Key, salt: Key): SecretKey {
+        return generateSecretKey(Password(key.toCharArray()), salt)
+    }
+
     fun generateSecretKey(password: Password, salt: Key): SecretKey {
         val keySpec = PBEKeySpec(password.data, salt.data, 65536, 128)
         val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
@@ -66,20 +70,36 @@ class SecretService {
         return Password(result)
     }
 
-    fun encryptData(secretKey: SecretKey, data: ByteArray): Encrypted {
+    fun encryptKey(secretKey: SecretKey, key: Key): Encrypted {
+        return encryptData(secretKey, key.data)
+    }
+
+    fun decryptKey(secretKey: SecretKey, encryptedIvAndData: Encrypted): Key {
+        return Key(decryptData(secretKey, encryptedIvAndData))
+    }
+
+    fun encryptPassword(secretKey: SecretKey, password: Password): Encrypted {
+        return encryptData(secretKey, password.toByteArray())
+    }
+
+    fun decryptPassword(secretKey: SecretKey, encryptedIvAndData: Encrypted): Password {
+        return Password(decryptData(secretKey, encryptedIvAndData))
+    }
+
+    private fun encryptData(secretKey: SecretKey, data: ByteArray): Encrypted {
         val cipher: Cipher = Cipher.getInstance(CIPHER_AES_GCM)
         cipher.init(Cipher.ENCRYPT_MODE, secretKey)
         return Encrypted(cipher.getIV(), cipher.doFinal(data))
     }
 
-    fun decryptData(secretKey: SecretKey, encryptedIvAndData: Encrypted): Key {
+    private fun decryptData(secretKey: SecretKey, encryptedIvAndData: Encrypted): ByteArray {
 
         val encryptionIv = encryptedIvAndData.iv
         val encryptedData = encryptedIvAndData.data
         val cipher = Cipher.getInstance(CIPHER_AES_GCM)
         val spec = GCMParameterSpec(128, encryptionIv)
         cipher.init(Cipher.DECRYPT_MODE, secretKey, spec)
-        return Key(cipher.doFinal(encryptedData))
+        return cipher.doFinal(encryptedData)
     }
 
     fun getAndroidSecretKey(alias: String): SecretKey {

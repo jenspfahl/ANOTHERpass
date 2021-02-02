@@ -4,6 +4,9 @@ data class Password(val data: CharArray) : Clearable {
     constructor(passwd: String) : this(passwd.toCharArray()) {
     }
 
+    constructor(passwd: ByteArray) : this(passwd.map { it.toChar() }.toCharArray()) {
+    }
+
     fun toByteArray(): ByteArray {
         return data.map { it.toByte() }.toByteArray();
     }
