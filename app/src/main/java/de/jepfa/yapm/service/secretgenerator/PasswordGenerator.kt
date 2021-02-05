@@ -12,7 +12,7 @@ class PasswordGenerator {
 
     private val random = SecureRandom()
 
-    fun generatePassword(spec: GeneratorSpec): Password {
+    fun generatePassword(spec: PasswordGeneratorSpec): Password {
         val buffer = CharArray(spec.strength.passwordLength)
         val material = extractMaterial(spec)
 
@@ -22,7 +22,7 @@ class PasswordGenerator {
         return Password(buffer)
     }
 
-    private fun extractMaterial(spec: GeneratorSpec): String {
+    private fun extractMaterial(spec: PasswordGeneratorSpec): String {
         var material = ALPHA_CHARS_UPPER_CASE + DIGITS
         if (!spec.excludeSpecialChars) {
             material += SPECIAL_CHARS_1

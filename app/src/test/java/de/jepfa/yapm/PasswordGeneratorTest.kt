@@ -1,9 +1,7 @@
 package de.jepfa.yapm
 
 import de.jepfa.yapm.model.Credential
-import de.jepfa.yapm.model.Password
-import de.jepfa.yapm.service.encrypt.SecretService
-import de.jepfa.yapm.service.secretgenerator.GeneratorSpec
+import de.jepfa.yapm.service.secretgenerator.PasswordGeneratorSpec
 import de.jepfa.yapm.service.secretgenerator.PasswordGenerator
 import de.jepfa.yapm.service.secretgenerator.PasswordStrength
 import org.junit.Test
@@ -14,7 +12,7 @@ class PasswordGeneratorTest {
 
     @Test
     fun generateAndClearPassword() {
-        val spec = GeneratorSpec(PasswordStrength.SUPER_STRONG, onlyCommonSpecialChars = true)
+        val spec = PasswordGeneratorSpec(PasswordStrength.SUPER_STRONG, onlyCommonSpecialChars = true)
         val password = passwordGenerator.generatePassword(spec)
         println("password=${password.debugToString()}")
 
