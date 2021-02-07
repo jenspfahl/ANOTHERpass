@@ -12,7 +12,7 @@ class PassphraseGeneratorTest {
     @Test
     fun generateAndClearPassphrase() {
         val spec = PassphraseGeneratorSpec(PasswordStrength.STRONG,
-                wordBeginningUpperCase = true, addDigit = false, addSpecialChar = false)
+                wordBeginningUpperCase = true, addDigit = false, addSpecialChar = true)
         for (i in 0..100) {
             val passphrase = passphraseGenerator.generatePassphrase(spec)
             println("passphrase=${passphrase.debugToString()}")

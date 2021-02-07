@@ -21,10 +21,7 @@ class PassphraseGenerator {
 
         for (i in 0 until spec.strength.passwordLength/4) {
             val word = generateWord(spec)
-            val next = buffer.add(word)
-            buffer.clear()
-            word.clear()
-            buffer = next
+            buffer.add(word)
         }
 
         if (spec.wordBeginningUpperCase) {
@@ -32,28 +29,22 @@ class PassphraseGenerator {
         }
 
         if (spec.addDigit) {
-            val next = buffer.add(random(DIGITS))
-            buffer.clear()
-            buffer = next
+            buffer.add(random(DIGITS))
         }
 
         if (spec.addSpecialChar) {
-            val next = buffer.add(random(SPECIAL_CHARS))
-            buffer.clear()
-            buffer = next
+            buffer.add(random(SPECIAL_CHARS))
         }
 
         return buffer
     }
 
     private fun generateWord(spec: PassphraseGeneratorSpec): Password {
-        val tuble1 = generateTuple()
-        val allowDuplicateConsonants = isVocal(tuble1.data[tuble1.data.lastIndex])
-        val tuble2 = generateTuple(true, allowDuplicateConsonants)
+        val word = generateTuple()
+        val allowDuplicateConsonants = isVocal(word.data[word.data.lastIndex])
+        val next = generateTuple(true, allowDuplicateConsonants)
 
-        val word = tuble1.add(tuble2)
-        tuble1.clear()
-        tuble2.clear()
+        word.add(next)
 
         return word
     }

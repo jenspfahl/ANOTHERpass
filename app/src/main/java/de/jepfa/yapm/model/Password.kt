@@ -2,20 +2,24 @@ package de.jepfa.yapm.model
 
 import java.nio.CharBuffer
 
-data class Password(val data: CharArray) : Clearable {
+data class Password(var data: CharArray) : Clearable {
     constructor(passwd: String) : this(passwd.toCharArray()) {
     }
 
     constructor(passwd: ByteArray) : this(passwd.map { it.toChar() }.toCharArray()) {
     }
 
-    fun add(other: Password): Password {
+    fun add(other: Password) {
         val buffer = data + other.data
-        return Password(buffer)
+        clear()
+        other.clear()
+        data = buffer
     }
-    fun add(other: Char): Password {
+
+    fun add(other: Char) {
         val buffer = data + other
-        return Password(buffer)
+        clear()
+        data = buffer
     }
 
     fun toByteArray(): ByteArray {
