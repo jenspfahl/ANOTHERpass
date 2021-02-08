@@ -86,6 +86,14 @@ class SecretService {
         return Password(decryptData(secretKey, encryptedIvAndData))
     }
 
+    fun encryptCommonString(secretKey: SecretKey, string: String): Encrypted {
+        return encryptData(secretKey, string.toByteArray())
+    }
+
+    fun decryptCommonString(secretKey: SecretKey, encryptedIvAndData: Encrypted): String {
+        return String(decryptData(secretKey, encryptedIvAndData))
+    }
+
     private fun encryptData(secretKey: SecretKey, data: ByteArray): Encrypted {
         val cipher: Cipher = Cipher.getInstance(CIPHER_AES_GCM)
         cipher.init(Cipher.ENCRYPT_MODE, secretKey)
