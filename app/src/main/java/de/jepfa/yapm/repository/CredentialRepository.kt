@@ -1,16 +1,12 @@
 package de.jepfa.yapm.repository
 
 import androidx.annotation.WorkerThread
-import androidx.lifecycle.LiveData
 import de.jepfa.yapm.database.dao.EncCredentialDao
 import de.jepfa.yapm.database.entity.EncCredentialEntity
 import de.jepfa.yapm.model.EncCredential
-import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.util.Base64Util
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.flow.transform
 
 class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
 
@@ -47,17 +43,17 @@ class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
 
     private fun mapToCredential(entity: EncCredentialEntity): EncCredential {
         return EncCredential(entity.id,
-                Base64Util.stringToEncrypted(entity.name),
-                Base64Util.stringToEncrypted(entity.additionalInfo),
-                Base64Util.stringToEncrypted(entity.password),
+                Base64Util.base64StringToEncrypted(entity.name),
+                Base64Util.base64StringToEncrypted(entity.additionalInfo),
+                Base64Util.base64StringToEncrypted(entity.password),
                 entity.extraPinRequired)
     }
 
     private fun mapToEntity(encCredential: EncCredential): EncCredentialEntity {
         return EncCredentialEntity(encCredential.id,
-                Base64Util.encryptedToString(encCredential.name),
-                Base64Util.encryptedToString(encCredential.additionalInfo),
-                Base64Util.encryptedToString(encCredential.password),
+                Base64Util.encryptedToBase64String(encCredential.name),
+                Base64Util.encryptedToBase64String(encCredential.additionalInfo),
+                Base64Util.encryptedToBase64String(encCredential.password),
                 encCredential.extraPinRequired)
     }
 

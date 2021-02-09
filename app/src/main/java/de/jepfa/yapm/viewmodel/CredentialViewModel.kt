@@ -23,7 +23,7 @@ class CredentialViewModel(private val repository: CredentialRepository) : ViewMo
 }
 
 
-class WordViewModelFactory(private val repository: CredentialRepository) : ViewModelProvider.Factory {
+class CredentialViewModelFactory(private val repository: CredentialRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CredentialViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
