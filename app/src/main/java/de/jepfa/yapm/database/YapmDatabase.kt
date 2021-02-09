@@ -5,10 +5,10 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import de.jepfa.yapm.database.dao.EncCredentialDao
-import de.jepfa.yapm.model.EncCredential
+import de.jepfa.yapm.database.entity.EncCredentialEntity
 
 @Database(
-    entities = [EncCredential::class],
+    entities = [EncCredentialEntity::class],
     version = 1,
     exportSchema = false
 )
