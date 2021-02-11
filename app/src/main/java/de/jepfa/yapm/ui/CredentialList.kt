@@ -9,8 +9,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
+import de.jepfa.yapm.service.encrypt.SecretService
 
 class CredentialListAdapter : ListAdapter<EncCredential, CredentialListAdapter.CredentialViewHolder>(CredentialsComparator()) {
+
+    val secretService = SecretService()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CredentialViewHolder {
         return CredentialViewHolder.create(parent)
@@ -18,13 +21,15 @@ class CredentialListAdapter : ListAdapter<EncCredential, CredentialListAdapter.C
 
     override fun onBindViewHolder(holder: CredentialViewHolder, position: Int) {
         val current = getItem(position)
-        holder.bind(current.name.debugToString()) //TODO decrypt name here
+        val key = secretService.getAndroidSecretKey("test-key")
+        val encName = secretService.decryptCommonString(key, current.name)
+        holder.bind(encName)
     }
 
     class CredentialViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val credentialItemView: TextView = itemView.findViewById(R.id.textView)
 
-        fun bind(text: String?) {
+        fun bind(text: CharSequence?) {
             credentialItemView.text = text
         }
 

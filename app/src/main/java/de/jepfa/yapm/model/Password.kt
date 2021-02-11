@@ -2,7 +2,7 @@ package de.jepfa.yapm.model
 
 import java.nio.CharBuffer
 
-data class Password(var data: CharArray) : Clearable {
+data class Password(var data: CharArray) : Clearable, CharSequence {
     constructor(passwd: String) : this(passwd.toCharArray()) {
     }
 
@@ -39,5 +39,16 @@ data class Password(var data: CharArray) : Clearable {
 
     override fun clear() {
         data.fill('0', 0, data.size)
+    }
+
+    override val length: Int
+        get() = data.size
+
+    override fun get(index: Int): Char {
+        return data[index]
+    }
+
+    override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
+        return Password(data.copyOfRange(startIndex, endIndex))
     }
 }

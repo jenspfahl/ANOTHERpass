@@ -63,15 +63,37 @@ abstract class YapmDatabase : RoomDatabase() {
             val secretService = SecretService()
             val key = secretService.getAndroidSecretKey("test-key")
 
-            val encName = secretService.encryptCommonString(key, "testname")
-            val encAdditionalInfo = secretService.encryptCommonString(key, "")
-            val encPassword = secretService.encryptPassword(key, Password("1234"))
-            var entity = EncCredentialEntity(null,
-                    Base64Util.encryptedToBase64String(encName),
-                    Base64Util.encryptedToBase64String(encAdditionalInfo),
-                    Base64Util.encryptedToBase64String(encPassword),
+            val encName1 = secretService.encryptCommonString(key, "testname1")
+            val encAdditionalInfo1 = secretService.encryptCommonString(key, "")
+            val encPassword1 = secretService.encryptPassword(key, Password("1234"))
+            var entity1 = EncCredentialEntity(null,
+                    Base64Util.encryptedToBase64String(encName1),
+                    Base64Util.encryptedToBase64String(encAdditionalInfo1),
+                    Base64Util.encryptedToBase64String(encPassword1),
                     false)
-            credentialDao.insert(entity)
+
+            val encName2 = secretService.encryptCommonString(key, "testname2")
+            val encAdditionalInfo2 = secretService.encryptCommonString(key, "hints")
+            val encPassword2 = secretService.encryptPassword(key, Password("777abc"))
+            var entity2 = EncCredentialEntity(null,
+                    Base64Util.encryptedToBase64String(encName2),
+                    Base64Util.encryptedToBase64String(encAdditionalInfo2),
+                    Base64Util.encryptedToBase64String(encPassword2),
+                    false)
+
+            val encName3 = secretService.encryptCommonString(key, "testname3")
+            val encAdditionalInfo3 = secretService.encryptCommonString(key, "bla bla")
+            val encPassword3 = secretService.encryptPassword(key, Password("Abcd9!"))
+            var entity3 = EncCredentialEntity(null,
+                    Base64Util.encryptedToBase64String(encName3),
+                    Base64Util.encryptedToBase64String(encAdditionalInfo3),
+                    Base64Util.encryptedToBase64String(encPassword3),
+                    true)
+
+            credentialDao.insert(entity1)
+            credentialDao.insert(entity2)
+            credentialDao.insert(entity3)
+
 
         }
     }

@@ -1,20 +1,30 @@
 package de.jepfa.yapm.ui
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import de.jepfa.yapm.R
+import de.jepfa.yapm.model.EncCredential
+import de.jepfa.yapm.model.Password
+import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.viewmodel.CredentialViewModel
 import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
 
 class MainActivity : AppCompatActivity() {
+
+    private val newCredentialActivityRequestCode = 1
+
+    private val secretService = SecretService()
 
     private val credentialViewModel: CredentialViewModel by viewModels {
         CredentialViewModelFactory((application as YapmApp).repository)
@@ -36,10 +46,12 @@ class MainActivity : AppCompatActivity() {
         })
 
 
-        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action2", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+        val fab = findViewById<FloatingActionButton>(R.id.fab)
+        fab.setOnClickListener {
+            val intent = Intent(this@MainActivity, NewCredentialActivity::class.java)
+            startActivityForResult(intent, newCredentialActivityRequestCode)
         }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -57,4 +69,25 @@ class MainActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == newCredentialActivityRequestCode && resultCode == Activity.RESULT_OK) {
+            data?.getStringExtra(NewCredentialActivity.EXTRA_REPLY)?.let {
+                val key = secretService.getAndroidSecretKey("test-key")
+                val encName = secretService.encryptCommonString(key, it)
+                val encAdditionalInfo = secretService.encryptCommonString(key, "")
+                val encPassword = secretService.encryptPassword(key, Password("12345"))
+                val credential = EncCredential(null, encName, encAdditionalInfo, encPassword)
+                credentialViewModel.insert(credential)
+            }
+        } else {
+            Toast.makeText(
+                applicationContext,
+                R.string.empty_not_saved,
+                Toast.LENGTH_LONG).show()
+        }
+    }
+
 }

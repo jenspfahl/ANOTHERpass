@@ -22,8 +22,9 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
         tools:listitem="@layout/recyclerview_item"
         android:padding="@dimen/big_padding"
         app:layout_constraintBottom_toBottomOf="parent"

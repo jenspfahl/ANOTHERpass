@@ -10,6 +10,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.YetAnotherPasswordManager">
+        <activity android:name=".ui.NewCredentialActivity"></activity>
         <activity
             android:name=".ui.MainActivity"
             android:label="@string/app_name"
