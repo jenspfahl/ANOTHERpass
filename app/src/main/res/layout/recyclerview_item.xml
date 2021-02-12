@@ -6,7 +6,10 @@
 
     <TextView
         android:id="@+id/textView"
-        style="@style/word_title"
+        style="@style/credential_title"
+        android:clickable="true"
+        android:focusable="true"
+        android:textIsSelectable="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/holo_orange_light" />
