@@ -9,7 +9,6 @@ import de.jepfa.yapm.database.dao.EncCredentialDao
 import de.jepfa.yapm.database.entity.EncCredentialEntity
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.service.encrypt.SecretService
-import de.jepfa.yapm.util.Base64Util
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -67,27 +66,27 @@ abstract class YapmDatabase : RoomDatabase() {
             val encAdditionalInfo1 = secretService.encryptCommonString(key, "")
             val encPassword1 = secretService.encryptPassword(key, Password("1234"))
             var entity1 = EncCredentialEntity(null,
-                    Base64Util.encryptedToBase64String(encName1),
-                    Base64Util.encryptedToBase64String(encAdditionalInfo1),
-                    Base64Util.encryptedToBase64String(encPassword1),
+                    encName1,
+                    encAdditionalInfo1,
+                    encPassword1,
                     false)
 
             val encName2 = secretService.encryptCommonString(key, "testname2")
             val encAdditionalInfo2 = secretService.encryptCommonString(key, "hints")
             val encPassword2 = secretService.encryptPassword(key, Password("777abc"))
             var entity2 = EncCredentialEntity(null,
-                    Base64Util.encryptedToBase64String(encName2),
-                    Base64Util.encryptedToBase64String(encAdditionalInfo2),
-                    Base64Util.encryptedToBase64String(encPassword2),
+                    encName2,
+                    encAdditionalInfo2,
+                    encPassword2,
                     false)
 
             val encName3 = secretService.encryptCommonString(key, "testname3")
             val encAdditionalInfo3 = secretService.encryptCommonString(key, "bla bla")
             val encPassword3 = secretService.encryptPassword(key, Password("Abcd9!"))
             var entity3 = EncCredentialEntity(null,
-                    Base64Util.encryptedToBase64String(encName3),
-                    Base64Util.encryptedToBase64String(encAdditionalInfo3),
-                    Base64Util.encryptedToBase64String(encPassword3),
+                    encName3,
+                    encAdditionalInfo3,
+                    encPassword3,
                     true)
 
             credentialDao.insert(entity1)

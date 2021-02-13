@@ -74,39 +74,40 @@ class SecretService {
         return encryptData(secretKey, key.data)
     }
 
-    fun decryptKey(secretKey: SecretKey, encryptedIvAndData: Encrypted): Key {
-        return Key(decryptData(secretKey, encryptedIvAndData))
+    fun decryptKey(secretKey: SecretKey, encrypted: Encrypted): Key {
+        return Key(decryptData(secretKey, encrypted))
     }
 
     fun encryptPassword(secretKey: SecretKey, password: Password): Encrypted {
         return encryptData(secretKey, password.toByteArray())
     }
 
-    fun decryptPassword(secretKey: SecretKey, encryptedIvAndData: Encrypted): Password {
-        return Password(decryptData(secretKey, encryptedIvAndData))
+    fun decryptPassword(secretKey: SecretKey, encrypted: Encrypted): Password {
+        return Password(decryptData(secretKey, encrypted))
     }
 
     fun encryptCommonString(secretKey: SecretKey, string: String): Encrypted {
         return encryptData(secretKey, string.toByteArray())
     }
 
-    fun decryptCommonString(secretKey: SecretKey, encryptedIvAndData: Encrypted): String {
-        return String(decryptData(secretKey, encryptedIvAndData))
+    fun decryptCommonString(secretKey: SecretKey, encrypted: Encrypted): String {
+        return String(decryptData(secretKey, encrypted))
     }
 
     private fun encryptData(secretKey: SecretKey, data: ByteArray): Encrypted {
         val cipher: Cipher = Cipher.getInstance(CIPHER_AES_GCM)
         cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+
         return Encrypted(cipher.getIV(), cipher.doFinal(data))
     }
 
-    private fun decryptData(secretKey: SecretKey, encryptedIvAndData: Encrypted): ByteArray {
-
-        val encryptionIv = encryptedIvAndData.iv
-        val encryptedData = encryptedIvAndData.data
+    private fun decryptData(secretKey: SecretKey, encrypted: Encrypted): ByteArray {
+        val encryptionIv = encrypted.iv
+        val encryptedData = encrypted.data
         val cipher = Cipher.getInstance(CIPHER_AES_GCM)
         val spec = GCMParameterSpec(128, encryptionIv)
         cipher.init(Cipher.DECRYPT_MODE, secretKey, spec)
+
         return cipher.doFinal(encryptedData)
     }
 

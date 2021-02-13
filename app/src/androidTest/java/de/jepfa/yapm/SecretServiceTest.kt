@@ -16,7 +16,7 @@ class SecretServiceTest {
 
     @Test
     fun bootstrap() {
-        val salt = secretService.generateKey(16)
+        val salt = secretService.generateKey(32)
         Log.i(TAG, "salt=${salt.debugToString()}")
 
         val masterPin = Password("1234") // given by the user (knowledge)

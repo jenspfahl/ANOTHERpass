@@ -1,11 +1,16 @@
 package de.jepfa.yapm.ui
 
+import android.Manifest
 import android.app.AlertDialog
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.core.content.PermissionChecker
+import androidx.core.content.PermissionChecker.*
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -35,17 +40,30 @@ class CredentialListAdapter(val mainActivity: MainActivity) : ListAdapter<EncCre
         }
 
         holder.listenForOnLongClick { pos, type ->
-            val current = getItem(pos)
-            val key = secretService.getAndroidSecretKey("test-key")
-            val password = secretService.decryptPassword(key, current.password)
 
-            val intent = Intent(mainActivity, OverlayShowingService::class.java)
-            intent.putExtra("password", password.data)
-            mainActivity.startService(intent)
-            // minimize app: mainActivity.
-            mainActivity.moveTaskToBack(true)
-            password.clear()
-            true
+
+            if (checkCallingOrSelfPermission(mainActivity,
+                            Manifest.permission.SYSTEM_ALERT_WINDOW) != PERMISSION_GRANTED) {
+                AlertDialog.Builder(holder.itemView.context)
+                        .setTitle("Missing permission")
+                        .setMessage("Permission SYSTEM_ALERT_WINDOW not granted")
+                        .show()
+                false
+            }
+            else {
+
+                val current = getItem(pos)
+                val key = secretService.getAndroidSecretKey("test-key")
+                val password = secretService.decryptPassword(key, current.password)
+
+                val intent = Intent(mainActivity, OverlayShowingService::class.java)
+                intent.putExtra("password", password.data)
+                mainActivity.startService(intent)
+                // minimize app: mainActivity.
+                mainActivity.moveTaskToBack(true)
+                password.clear()
+                true
+            }
         }
 
         return holder

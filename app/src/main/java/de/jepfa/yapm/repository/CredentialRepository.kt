@@ -4,7 +4,6 @@ import androidx.annotation.WorkerThread
 import de.jepfa.yapm.database.dao.EncCredentialDao
 import de.jepfa.yapm.database.entity.EncCredentialEntity
 import de.jepfa.yapm.model.EncCredential
-import de.jepfa.yapm.util.Base64Util
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -43,17 +42,17 @@ class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
 
     private fun mapToCredential(entity: EncCredentialEntity): EncCredential {
         return EncCredential(entity.id,
-                Base64Util.base64StringToEncrypted(entity.name),
-                Base64Util.base64StringToEncrypted(entity.additionalInfo),
-                Base64Util.base64StringToEncrypted(entity.password),
+                entity.name,
+                entity.additionalInfo,
+                entity.password,
                 entity.extraPinRequired)
     }
 
     private fun mapToEntity(encCredential: EncCredential): EncCredentialEntity {
         return EncCredentialEntity(encCredential.id,
-                Base64Util.encryptedToBase64String(encCredential.name),
-                Base64Util.encryptedToBase64String(encCredential.additionalInfo),
-                Base64Util.encryptedToBase64String(encCredential.password),
+                encCredential.name,
+                encCredential.additionalInfo,
+                encCredential.password,
                 encCredential.extraPinRequired)
     }
 
