@@ -1,25 +1,27 @@
 package de.jepfa.yapm.ui
 
+import android.app.AlertDialog
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.service.encrypt.SecretService
+import de.jepfa.yapm.service.overlay.OverlayShowingService
 
-class CredentialListAdapter : ListAdapter<EncCredential, CredentialListAdapter.CredentialViewHolder>(CredentialsComparator()) {
+
+class CredentialListAdapter(val mainActivity: MainActivity) : ListAdapter<EncCredential, CredentialListAdapter.CredentialViewHolder>(CredentialsComparator()) {
 
     val secretService = SecretService()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CredentialViewHolder {
         val holder = CredentialViewHolder.create(parent)
-        holder.listen {pos, type ->
+        holder.listenForOnClick { pos, type ->
             val current = getItem(pos)
             val key = secretService.getAndroidSecretKey("test-key")
             val decAdditionalInfo = secretService.decryptCommonString(key, current.additionalInfo)
@@ -28,7 +30,22 @@ class CredentialListAdapter : ListAdapter<EncCredential, CredentialListAdapter.C
                     .setTitle(decAdditionalInfo)
                     .setMessage(password.debugToString())
                     .show()
+
             password.clear()
+        }
+
+        holder.listenForOnLongClick { pos, type ->
+            val current = getItem(pos)
+            val key = secretService.getAndroidSecretKey("test-key")
+            val password = secretService.decryptPassword(key, current.password)
+
+            val intent = Intent(mainActivity, OverlayShowingService::class.java)
+            intent.putExtra("password", password.data)
+            mainActivity.startService(intent)
+            // minimize app: mainActivity.
+            mainActivity.moveTaskToBack(true)
+            password.clear()
+            true
         }
 
         return holder
@@ -45,8 +62,13 @@ class CredentialListAdapter : ListAdapter<EncCredential, CredentialListAdapter.C
     class CredentialViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val credentialItemView: TextView = itemView.findViewById(R.id.textView)
 
-        fun listen(event: (position: Int, type: Int) -> Unit) {
+        fun listenForOnClick(event: (position: Int, type: Int) -> Unit) {
             credentialItemView.setOnClickListener {
+                event.invoke(adapterPosition, itemViewType)
+            }
+        }
+        fun listenForOnLongClick(event: (position: Int, type: Int) -> Boolean) {
+            credentialItemView.setOnLongClickListener {
                 event.invoke(adapterPosition, itemViewType)
             }
         }
