@@ -13,11 +13,10 @@ import android.view.View
 import android.view.View.OnTouchListener
 import android.view.WindowManager
 import android.widget.Button
-import android.widget.Toast
 import de.jepfa.yapm.model.Password
 
 class OverlayShowingService : Service(), OnTouchListener, View.OnLongClickListener {
-    private var topLeftView: View? = null
+    private var topView: View? = null
     private var overlayedButton: Button? = null
     private var offsetX = 0f
     private var offsetY = 0f
@@ -49,6 +48,7 @@ class OverlayShowingService : Service(), OnTouchListener, View.OnLongClickListen
             return
         }
         overlayedButton = Button(this)
+        overlayedButton?.setAllCaps(false)
         overlayedButton?.text = password.debugToString()
         overlayedButton?.setOnTouchListener(this)
         overlayedButton?.alpha = Math.round(0.33f * 255).toFloat()
@@ -59,14 +59,14 @@ class OverlayShowingService : Service(), OnTouchListener, View.OnLongClickListen
         params.x = 0
         params.y = 0
         wm?.addView(overlayedButton, params)
-        topLeftView = View(this)
-        val topLeftParams = WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, PixelFormat.TRANSLUCENT)
-        topLeftParams.gravity = Gravity.CENTER or Gravity.TOP
-        topLeftParams.x = 0
-        topLeftParams.y = 0
-        topLeftParams.width = 0
-        topLeftParams.height = 0
-        wm?.addView(topLeftView, topLeftParams)
+        topView = View(this)
+        val topParams = WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, PixelFormat.TRANSLUCENT)
+        topParams.gravity = Gravity.CENTER or Gravity.TOP
+        topParams.x = 0
+        topParams.y = 0
+        topParams.width = 0
+        topParams.height = 0
+        wm?.addView(topView, topParams)
     }
 
     override fun onDestroy() {
@@ -77,9 +77,9 @@ class OverlayShowingService : Service(), OnTouchListener, View.OnLongClickListen
     private fun clearIt() {
         if (overlayedButton != null) {
             wm?.removeView(overlayedButton)
-            wm?.removeView(topLeftView)
+            wm?.removeView(topView)
             overlayedButton = null
-            topLeftView = null
+            topView = null
         }
         password.clear()
     }
@@ -96,8 +96,8 @@ class OverlayShowingService : Service(), OnTouchListener, View.OnLongClickListen
             offsetX = originalXPos - x
             offsetY = originalYPos - y
         } else if (event.action == MotionEvent.ACTION_MOVE) {
-            val topLeftLocationOnScreen = IntArray(2)
-            topLeftView?.getLocationOnScreen(topLeftLocationOnScreen)
+            val topLocationOnScreen = IntArray(2)
+            topView?.getLocationOnScreen(topLocationOnScreen)
             val x = event.rawX
             val y = event.rawY
             val params = overlayedButton?.layoutParams as WindowManager.LayoutParams
@@ -106,8 +106,8 @@ class OverlayShowingService : Service(), OnTouchListener, View.OnLongClickListen
             if (Math.abs(newX - originalXPos) < 1 && Math.abs(newY - originalYPos) < 1 && !moving) {
                 return false
             }
-            params.x = newX - topLeftLocationOnScreen[0]
-            params.y = newY - topLeftLocationOnScreen[1]
+            params.x = newX - topLocationOnScreen[0]
+            params.y = newY - topLocationOnScreen[1]
             wm?.updateViewLayout(overlayedButton, params)
             moving = true
         } else if (event.action == MotionEvent.ACTION_UP) {

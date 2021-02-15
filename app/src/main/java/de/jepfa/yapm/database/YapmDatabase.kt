@@ -9,6 +9,9 @@ import de.jepfa.yapm.database.dao.EncCredentialDao
 import de.jepfa.yapm.database.entity.EncCredentialEntity
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.service.encrypt.SecretService
+import de.jepfa.yapm.service.secretgenerator.PassphraseGenerator
+import de.jepfa.yapm.service.secretgenerator.PassphraseGeneratorSpec
+import de.jepfa.yapm.service.secretgenerator.PasswordStrength
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -59,12 +62,14 @@ abstract class YapmDatabase : RoomDatabase() {
 
             val credentialDao = database.credentialDao()
 
+            val passphraseGenerator = PassphraseGenerator()
             val secretService = SecretService()
             val key = secretService.getAndroidSecretKey("test-key")
 
             val encName1 = secretService.encryptCommonString(key, "testname1")
             val encAdditionalInfo1 = secretService.encryptCommonString(key, "")
-            val encPassword1 = secretService.encryptPassword(key, Password("1234"))
+            val spec1 = PassphraseGeneratorSpec()
+            val encPassword1 = secretService.encryptPassword(key, passphraseGenerator.generatePassphrase(spec1))
             var entity1 = EncCredentialEntity(null,
                     encName1,
                     encAdditionalInfo1,
@@ -73,7 +78,8 @@ abstract class YapmDatabase : RoomDatabase() {
 
             val encName2 = secretService.encryptCommonString(key, "testname2")
             val encAdditionalInfo2 = secretService.encryptCommonString(key, "hints")
-            val encPassword2 = secretService.encryptPassword(key, Password("777abc"))
+            val spec2 = PassphraseGeneratorSpec(strength = PasswordStrength.SUPER_STRONG, addDigit = true)
+            val encPassword2 = secretService.encryptPassword(key, passphraseGenerator.generatePassphrase(spec2))
             var entity2 = EncCredentialEntity(null,
                     encName2,
                     encAdditionalInfo2,
@@ -82,7 +88,8 @@ abstract class YapmDatabase : RoomDatabase() {
 
             val encName3 = secretService.encryptCommonString(key, "testname3")
             val encAdditionalInfo3 = secretService.encryptCommonString(key, "bla bla")
-            val encPassword3 = secretService.encryptPassword(key, Password("Abcd9!"))
+            val spec3 = PassphraseGeneratorSpec(wordBeginningUpperCase = true, addDigit = true, addSpecialChar = true)
+            val encPassword3 = secretService.encryptPassword(key, passphraseGenerator.generatePassphrase(spec3))
             var entity3 = EncCredentialEntity(null,
                     encName3,
                     encAdditionalInfo3,

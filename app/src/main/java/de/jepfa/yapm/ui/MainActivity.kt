@@ -16,6 +16,9 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.service.encrypt.SecretService
+import de.jepfa.yapm.service.secretgenerator.PassphraseGenerator
+import de.jepfa.yapm.service.secretgenerator.PassphraseGeneratorSpec
+import de.jepfa.yapm.service.secretgenerator.PasswordStrength
 import de.jepfa.yapm.viewmodel.CredentialViewModel
 import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
 
@@ -77,12 +80,18 @@ class MainActivity : AppCompatActivity() {
 
         if (requestCode == newCredentialActivityRequestCode && resultCode == Activity.RESULT_OK) {
             data?.getStringExtra(NewCredentialActivity.EXTRA_REPLY)?.let {
+                val passphraseGenerator = PassphraseGenerator()
+                val passwd = passphraseGenerator.generatePassphrase(
+                        PassphraseGeneratorSpec(strength = PasswordStrength.STRONG,
+                        wordBeginningUpperCase = true, addDigit = true, addSpecialChar = true))
+
                 val key = secretService.getAndroidSecretKey("test-key")
                 val encName = secretService.encryptCommonString(key, it)
                 val encAdditionalInfo = secretService.encryptCommonString(key, "")
-                val encPassword = secretService.encryptPassword(key, Password("12345"))
+                val encPassword = secretService.encryptPassword(key, passwd)
                 val credential = EncCredential(null, encName, encAdditionalInfo, encPassword)
                 credentialViewModel.insert(credential)
+                passwd.clear()
             }
         } else {
             Toast.makeText(

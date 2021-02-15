@@ -2,14 +2,18 @@ package de.jepfa.yapm.ui
 
 import android.Manifest
 import android.app.AlertDialog
+import android.app.Application
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.PermissionGroupInfo
+import android.net.Uri
+import android.os.Binder.getCallingUid
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.content.ContextCompat
-import androidx.core.content.PermissionChecker
 import androidx.core.content.PermissionChecker.*
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -42,11 +46,20 @@ class CredentialListAdapter(val mainActivity: MainActivity) : ListAdapter<EncCre
         holder.listenForOnLongClick { pos, type ->
 
 
-            if (checkCallingOrSelfPermission(mainActivity,
-                            Manifest.permission.SYSTEM_ALERT_WINDOW) != PERMISSION_GRANTED) {
+            if (!Settings.canDrawOverlays(parent.context)) {
+                                // this check returns false true on my phone although i have granted that permission!!!!
                 AlertDialog.Builder(holder.itemView.context)
                         .setTitle("Missing permission")
-                        .setMessage("Permission SYSTEM_ALERT_WINDOW not granted")
+                        .setMessage("App cannot draw over other apps. Enable permission and try again.")
+                        .setPositiveButton("Open permission",
+                                DialogInterface.OnClickListener { dialogInterface, i ->
+                                    val intent = Intent()
+                                    intent.action = Settings.ACTION_MANAGE_OVERLAY_PERMISSION
+                                    intent.data = Uri.parse("package:" + mainActivity.applicationInfo.packageName)
+                                    mainActivity.startActivity(intent)
+                                })
+                        .setNegativeButton("Close",
+                                DialogInterface.OnClickListener { dialogInterface, i -> dialogInterface.cancel() })
                         .show()
                 false
             }
