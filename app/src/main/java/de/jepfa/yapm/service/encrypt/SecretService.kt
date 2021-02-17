@@ -86,6 +86,7 @@ class SecretService {
         return Password(decryptData(secretKey, encrypted))
     }
 
+    // TODO use CharSequence instead of String
     fun encryptCommonString(secretKey: SecretKey, string: String): Encrypted {
         return encryptData(secretKey, string.toByteArray())
     }

@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
-import de.jepfa.yapm.model.Password
+import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.service.secretgenerator.PassphraseGenerator
 import de.jepfa.yapm.service.secretgenerator.PassphraseGeneratorSpec
@@ -79,25 +79,19 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == newCredentialActivityRequestCode && resultCode == Activity.RESULT_OK) {
-            data?.getStringExtra(NewCredentialActivity.EXTRA_REPLY)?.let {
-                val passphraseGenerator = PassphraseGenerator()
-                val passwd = passphraseGenerator.generatePassphrase(
-                        PassphraseGeneratorSpec(strength = PasswordStrength.STRONG,
-                        wordBeginningUpperCase = true, addDigit = true, addSpecialChar = true))
+            data?.let {
 
-                val key = secretService.getAndroidSecretKey("test-key")
-                val encName = secretService.encryptCommonString(key, it)
-                val encAdditionalInfo = secretService.encryptCommonString(key, "")
-                val encPassword = secretService.encryptPassword(key, passwd)
+                val nameBase64 = it.getStringExtra(NewCredentialActivity.EXTRA_CREDENTIAL_NAME)
+                val additionalInfoBase64 = it.getStringExtra(NewCredentialActivity.EXTRA_CREDENTIAL_ADDITIONAL_INFO)
+                val passwordBase64 = it.getStringExtra(NewCredentialActivity.EXTRA_CREDENTIAL_PASSWORD)
+
+                val encName = Encrypted.fromBase64String(nameBase64)
+                val encAdditionalInfo = Encrypted.fromBase64String(additionalInfoBase64)
+                val encPassword = Encrypted.fromBase64String(passwordBase64)
+
                 val credential = EncCredential(null, encName, encAdditionalInfo, encPassword)
                 credentialViewModel.insert(credential)
-                passwd.clear()
             }
-        } else {
-            Toast.makeText(
-                    applicationContext,
-                    R.string.empty_not_saved,
-                    Toast.LENGTH_LONG).show()
         }
     }
 

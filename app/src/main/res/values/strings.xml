@@ -11,9 +11,18 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="add_credential">Add Credential</string>
 
-    <string name="hint_credential">Credential...</string>
+    <string name="hint_edit_credential_name">A short credential name</string>
+    <string name="hint_edit_credential_additional_info">Some optional info</string>
     <string name="button_save">Save</string>
     <string name="empty_not_saved">Credential not saved because it is empty.</string>
     <string name="save_credential">Save Credential</string>
+    <string name="error_field_required">This field is required.</string>
+    <string name="credential_input_name_explanation">Add a new credential here ...</string>
+    <string name="begin_with_upper_case">Satisfy one upper case char</string>
+    <string name="add_one_digit">Satisfy one digit</string>
+    <string name="add_one_special_char">Satisfy one special char</string>
+    <string name="credential_passwd_params">Password parameters</string>
+    <string name="passwd_strength_normal">12</string>
+    <string name="button_gen_passwd">Generate</string>
 
 </resources>
