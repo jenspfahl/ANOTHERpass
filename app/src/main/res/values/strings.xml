@@ -25,4 +25,7 @@
     <string name="passwd_strength_normal">12</string>
     <string name="button_gen_passwd">Generate</string>
 
+    <string name="search">Search</string>
+
+
 </resources>

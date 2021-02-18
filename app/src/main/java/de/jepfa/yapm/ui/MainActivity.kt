@@ -1,13 +1,20 @@
 package de.jepfa.yapm.ui
 
 import android.app.Activity
+import android.app.SearchManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
+import android.view.View
+import android.widget.EditText
+import android.widget.Filterable
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
+import androidx.core.view.MenuItemCompat
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,9 +23,6 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.service.encrypt.SecretService
-import de.jepfa.yapm.service.secretgenerator.PassphraseGenerator
-import de.jepfa.yapm.service.secretgenerator.PassphraseGeneratorSpec
-import de.jepfa.yapm.service.secretgenerator.PasswordStrength
 import de.jepfa.yapm.viewmodel.CredentialViewModel
 import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
 
@@ -28,6 +32,8 @@ class MainActivity : AppCompatActivity() {
     private val newCredentialActivityRequestCode = 1
 
     private val secretService = SecretService()
+
+    private lateinit var credentialListAdapter: CredentialListAdapter
 
     private val credentialViewModel: CredentialViewModel by viewModels {
         CredentialViewModelFactory((application as YapmApp).repository)
@@ -40,12 +46,12 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
-        val adapter = CredentialListAdapter(this)
-        recyclerView.adapter = adapter
+        credentialListAdapter = CredentialListAdapter(this)
+        recyclerView.adapter = credentialListAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        credentialViewModel.allWords.observe(this, Observer { credentials ->
-            credentials?.let { adapter.submitList(it) }
+        credentialViewModel.allCredentials.observe(this, Observer { credentials ->
+            credentials?.let { credentialListAdapter.submitOriginList(it) }
         })
 
         val fab = findViewById<FloatingActionButton>(R.id.fab)
@@ -53,17 +59,58 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this@MainActivity, NewCredentialActivity::class.java)
             startActivityForResult(intent, newCredentialActivityRequestCode)
         }
-        /*
-        val svc = Intent(this, OverlayShowingService::class.java)
-        startService(svc)*/
 
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
-        return true
+
+        val searchItem: MenuItem = menu.findItem(R.id.action_search)
+        if (searchItem != null) {
+            val searchView = MenuItemCompat.getActionView(searchItem) as SearchView
+            searchView.setOnCloseListener(object : SearchView.OnCloseListener {
+                override fun onClose(): Boolean {
+                    return true
+                }
+            })
+
+            val searchPlate =        searchView.findViewById(androidx.appcompat.R.id.search_src_text) as EditText
+            searchPlate.hint = "Search"
+            val searchPlateView: View =
+                    searchView.findViewById(androidx.appcompat.R.id.search_plate)
+            searchPlateView.setBackgroundColor(
+                    ContextCompat.getColor(
+                            this,
+                            android.R.color.transparent
+                    )
+            )
+
+            searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    searchItem.collapseActionView()
+                    return false
+                }
+
+                override fun onQueryTextChange(s: String?): Boolean {
+                    val filterable: Filterable = credentialListAdapter
+                    if (filterable != null) {
+                        filterable.filter.filter(s)
+                    }
+                    return false
+                }
+            })
+
+            val searchManager =
+                    getSystemService(Context.SEARCH_SERVICE) as SearchManager
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
+        }
+        return super.onCreateOptionsMenu(menu)
     }
+
+
+
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle action bar item clicks here. The action bar will

@@ -30,8 +30,14 @@ data class Password(var data: CharArray) : Clearable, CharSequence {
         var presentation = "";
         for (i in 0 until data.size) {
             if (i != 0 && i % 4 == 0) {
-                presentation += "-"
+                if (i % 8 == 0) {
+                    presentation += "  "
+                }
+                else {
+                    presentation += " "
+                }
             }
+
             presentation += data[i]
         }
         return presentation
