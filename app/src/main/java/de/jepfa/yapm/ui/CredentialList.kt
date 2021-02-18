@@ -130,7 +130,7 @@ class CredentialListAdapter(val mainActivity: MainActivity) :
     }
 
     class CredentialViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val credentialItemView: TextView = itemView.findViewById(R.id.textView)
+        private val credentialItemView: TextView = itemView.findViewById(R.id.credential_name)
 
         fun listenForOnClick(event: (position: Int, type: Int) -> Unit) {
             credentialItemView.setOnClickListener {

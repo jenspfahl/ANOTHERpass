@@ -52,7 +52,7 @@ class OverlayShowingService : Service(), OnTouchListener, View.OnLongClickListen
         overlayedButton?.text = password.debugToString()
         overlayedButton?.setOnTouchListener(this)
         overlayedButton?.alpha = Math.round(0.33f * 255).toFloat()
-        overlayedButton?.setBackgroundColor(0x77fe4444)
+        overlayedButton?.setBackgroundColor(0x77fecc44)
         overlayedButton?.setOnLongClickListener(this)
         val params = WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, PixelFormat.TRANSLUCENT)
         params.gravity = Gravity.CENTER or Gravity.TOP
