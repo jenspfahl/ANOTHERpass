@@ -6,6 +6,10 @@ data class EncCredential(var id: Int?,
                          var password: Encrypted,
                          var extraPinRequired: Boolean = false) {
 
+    fun isPersistent(): Boolean {
+        return id != null
+    }
+
     constructor(id: Int?,
                 nameBase64: String,
                 additionalInfoBase64: String,

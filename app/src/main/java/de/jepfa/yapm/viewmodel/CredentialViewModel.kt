@@ -14,11 +14,12 @@ class CredentialViewModel(private val repository: CredentialRepository) : ViewMo
     // - Repository is completely separated from the UI through the ViewModel.
     val allCredentials: LiveData<List<EncCredential>> = repository.getAll().asLiveData()
 
-    /**
-     * Launching a new coroutine to insert the data in a non-blocking way
-     */
     fun insert(credential: EncCredential) = viewModelScope.launch {
         repository.insert(credential)
+    }    
+
+    fun update(credential: EncCredential) = viewModelScope.launch {
+        repository.update(credential)
     }
 
     fun delete(credential: EncCredential)  = viewModelScope.launch {

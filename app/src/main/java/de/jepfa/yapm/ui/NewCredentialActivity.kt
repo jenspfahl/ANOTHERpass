@@ -30,6 +30,7 @@ class NewCredentialActivity : AppCompatActivity() {
     private lateinit var radioStrength: RadioGroup
 
     private var generatedPassword: Password = Password("")
+    private var currentId: Int = -1
 
     private val secretService = SecretService() // TODO better service resolution
     private val passphraseGenerator = PassphraseGenerator()
@@ -41,6 +42,24 @@ class NewCredentialActivity : AppCompatActivity() {
         editCredentialAdditionalInfoView = findViewById(R.id.edit_credential_additional_info)
         generatedPasswdView = findViewById(R.id.generated_passwd)
         radioStrength = findViewById(R.id.radio_strengths)
+
+        val idExtra = intent.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
+        if (idExtra != -1) {
+            val nameExtra = intent.getStringExtra(EncCredential.EXTRA_CREDENTIAL_NAME)
+            val addInfoExtra = intent.getStringExtra(EncCredential.EXTRA_CREDENTIAL_ADDITIONAL_INFO)
+            val passwdExtra = intent.getStringExtra(EncCredential.EXTRA_CREDENTIAL_PASSWORD)
+            val originCredential = EncCredential(idExtra, nameExtra, addInfoExtra, passwdExtra, false)
+
+            currentId = idExtra
+            val key = secretService.getAndroidSecretKey("test-key")
+            val name = secretService.decryptCommonString(key, originCredential.name)
+            val additionalInfo = secretService.decryptCommonString(key, originCredential.additionalInfo)
+            val password = secretService.decryptPassword(key, originCredential.password)
+            editCredentialNameView.setText(name)
+            editCredentialAdditionalInfoView.setText(additionalInfo)
+            generatedPassword = password
+            generatedPasswdView.setText(password.debugToString())
+        }
 
         val radioStrengthStrong: RadioButton = findViewById(R.id.radio_strength_strong)
         val radioStrengthSuperStrong: RadioButton = findViewById(R.id.radio_strength_super_strong)
@@ -81,6 +100,7 @@ class NewCredentialActivity : AppCompatActivity() {
                     val encPassword = secretService.encryptPassword(key, generatedPassword)
                     generatedPassword.clear()
 
+                    replyIntent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, currentId)
                     replyIntent.putExtra(EncCredential.EXTRA_CREDENTIAL_NAME, encName.toBase64String())
                     replyIntent.putExtra(EncCredential.EXTRA_CREDENTIAL_ADDITIONAL_INFO, encAdditionalInfo.toBase64String())
                     replyIntent.putExtra(EncCredential.EXTRA_CREDENTIAL_PASSWORD, encPassword.toBase64String())
@@ -91,11 +111,6 @@ class NewCredentialActivity : AppCompatActivity() {
         }
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    }
-
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        generatedPassword = Password("xxx")
     }
 
     private fun generatePassword() : Password {

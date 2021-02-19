@@ -91,12 +91,13 @@ class CredentialListAdapter(val mainActivity: MainActivity) :
                     val current = getItem(position)
                     return when (item.itemId) {
                         R.id.menu_change_credential -> {
-                            val intent = Intent(mainActivity, NewCredentialActivity::class.javareplyIntent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, current.id)
-                            replyIntent.putExtra(EncCredential.EXTRA_CREDENTIAL_NAME, current.name.toBase64String())
-                            replyIntent.putExtra(EncCredential.EXTRA_CREDENTIAL_ADDITIONAL_INFO, current.additionalInfo.toBase64String())
-                            replyIntent.putExtra(EncCredential.EXTRA_CREDENTIAL_PASSWORD, current.password.toBase64String())
+                            val intent = Intent(mainActivity, NewCredentialActivity::class.java)
+                            intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, current.id)
+                            intent.putExtra(EncCredential.EXTRA_CREDENTIAL_NAME, current.name.toBase64String())
+                            intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ADDITIONAL_INFO, current.additionalInfo.toBase64String())
+                            intent.putExtra(EncCredential.EXTRA_CREDENTIAL_PASSWORD, current.password.toBase64String())
 
-                            mainActivity.startActivityForResult(intent, mainActivity.changeCredentialActivityRequestCode)
+                            mainActivity.startActivityForResult(intent, mainActivity.newOrUpdateCredentialActivityRequestCode)
                             true
                         }
                         R.id.menu_delete_credential -> {

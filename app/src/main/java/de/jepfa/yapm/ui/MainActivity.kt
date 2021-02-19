@@ -138,7 +138,12 @@ class MainActivity : AppCompatActivity() {
                 val encPassword = Encrypted.fromBase64String(passwordBase64)
 
                 val credential = EncCredential(id, encName, encAdditionalInfo, encPassword)
-                credentialViewModel.insert(credential)
+                if (credential.isPersistent()) {
+                    credentialViewModel.update(credential)
+                }
+                else {
+                    credentialViewModel.insert(credential)
+                }
             }
         }
 
