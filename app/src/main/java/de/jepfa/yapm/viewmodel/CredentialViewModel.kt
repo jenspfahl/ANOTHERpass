@@ -20,6 +20,10 @@ class CredentialViewModel(private val repository: CredentialRepository) : ViewMo
     fun insert(credential: EncCredential) = viewModelScope.launch {
         repository.insert(credential)
     }
+
+    fun delete(credential: EncCredential)  = viewModelScope.launch {
+        repository.delete(credential)
+    }
 }
 
 

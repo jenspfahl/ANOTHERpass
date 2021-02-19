@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import de.jepfa.yapm.R
+import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.service.secretgenerator.PassphraseGenerator
@@ -18,7 +19,6 @@ import de.jepfa.yapm.ui.MainActivity as MainActivity1
 
 class NewCredentialActivity : AppCompatActivity() {
 
-    private val TAG_PASSWORD_STRENGTH = 1
     private val PASSWD_STRENGTH_DEFAULT = PasswordStrength.STRONG
 
     private lateinit var editCredentialNameView: EditText
@@ -42,12 +42,10 @@ class NewCredentialActivity : AppCompatActivity() {
         generatedPasswdView = findViewById(R.id.generated_passwd)
         radioStrength = findViewById(R.id.radio_strengths)
 
-        val radioStrengthNormal: RadioButton = findViewById(R.id.radio_strength_normal)
         val radioStrengthStrong: RadioButton = findViewById(R.id.radio_strength_strong)
         val radioStrengthSuperStrong: RadioButton = findViewById(R.id.radio_strength_super_strong)
         val radioStrengthExtreme: RadioButton = findViewById(R.id.radio_strength_extreme)
 
-        buildRadioButton(radioStrengthNormal, PasswordStrength.NORMAL)
         buildRadioButton(radioStrengthStrong, PasswordStrength.STRONG)
         buildRadioButton(radioStrengthSuperStrong, PasswordStrength.SUPER_STRONG)
         buildRadioButton(radioStrengthExtreme, PasswordStrength.EXTREME)
@@ -83,9 +81,9 @@ class NewCredentialActivity : AppCompatActivity() {
                     val encPassword = secretService.encryptPassword(key, generatedPassword)
                     generatedPassword.clear()
 
-                    replyIntent.putExtra(EXTRA_CREDENTIAL_NAME, encName.toBase64String())
-                    replyIntent.putExtra(EXTRA_CREDENTIAL_ADDITIONAL_INFO, encAdditionalInfo.toBase64String())
-                    replyIntent.putExtra(EXTRA_CREDENTIAL_PASSWORD, encPassword.toBase64String())
+                    replyIntent.putExtra(EncCredential.EXTRA_CREDENTIAL_NAME, encName.toBase64String())
+                    replyIntent.putExtra(EncCredential.EXTRA_CREDENTIAL_ADDITIONAL_INFO, encAdditionalInfo.toBase64String())
+                    replyIntent.putExtra(EncCredential.EXTRA_CREDENTIAL_PASSWORD, encPassword.toBase64String())
                     setResult(Activity.RESULT_OK, replyIntent)
                     finish()
                 }
@@ -95,9 +93,13 @@ class NewCredentialActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        generatedPassword = Password("xxx")
+    }
+
     private fun generatePassword() : Password {
         val passwordStrength = when (radioStrength.checkedRadioButtonId) {
-            R.id.radio_strength_normal -> PasswordStrength.NORMAL
             R.id.radio_strength_strong -> PasswordStrength.STRONG
             R.id.radio_strength_super_strong -> PasswordStrength.SUPER_STRONG
             R.id.radio_strength_extreme -> PasswordStrength.EXTREME
@@ -112,7 +114,8 @@ class NewCredentialActivity : AppCompatActivity() {
     }
 
     private fun buildRadioButton(radioButton: RadioButton, passwordStrength: PasswordStrength) {
-        radioButton.text = "${passwordStrength.passwordLength}"
+        val name = getResources().getString(passwordStrength.nameId)
+        radioButton.text = "${name}"
         if (PASSWD_STRENGTH_DEFAULT == passwordStrength) {
             radioButton.setChecked(true)
         }
@@ -126,12 +129,6 @@ class NewCredentialActivity : AppCompatActivity() {
             return true
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    companion object {
-        const val EXTRA_CREDENTIAL_NAME = "de.jepfa.yapm.ui.save_credential.name"
-        const val EXTRA_CREDENTIAL_ADDITIONAL_INFO = "de.jepfa.yapm.ui.save_credential.additionalInfo"
-        const val EXTRA_CREDENTIAL_PASSWORD = "de.jepfa.yapm.ui.save_credential.password"
     }
 
 }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Yet AnotherPassword Manager</string>
+    <string name="app_name">ANOTHERpass</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
@@ -26,6 +26,16 @@
     <string name="button_gen_passwd">Generate</string>
 
     <string name="search">Search</string>
+    <string name="EASY">Easy</string>
+    <string name="NORMAL">Normal</string>
+    <string name="STRONG">Strong</string>
+    <string name="SUPER_STRONG">Super Strong</string>
+    <string name="EXTREME">Extreme</string>
+    <string name="change">Change</string>
+    <string name="delete">Delete</string>
+    <string name="title_delete_credential">Delete credential</string>
+    <string name="message_delete_credential">Are you sure deleting credential \'%1$s\'?</string>
+
 
 
 </resources>

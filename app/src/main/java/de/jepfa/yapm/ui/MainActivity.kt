@@ -29,7 +29,7 @@ import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
 
 class MainActivity : AppCompatActivity() {
 
-    private val newCredentialActivityRequestCode = 1
+    val newOrUpdateCredentialActivityRequestCode = 1
 
     private val secretService = SecretService()
 
@@ -38,7 +38,6 @@ class MainActivity : AppCompatActivity() {
     private val credentialViewModel: CredentialViewModel by viewModels {
         CredentialViewModelFactory((application as YapmApp).repository)
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
             val intent = Intent(this@MainActivity, NewCredentialActivity::class.java)
-            startActivityForResult(intent, newCredentialActivityRequestCode)
+            startActivityForResult(intent, newOrUpdateCredentialActivityRequestCode)
         }
 
     }
@@ -75,7 +74,7 @@ class MainActivity : AppCompatActivity() {
                 }
             })
 
-            val searchPlate =        searchView.findViewById(androidx.appcompat.R.id.search_src_text) as EditText
+            val searchPlate = searchView.findViewById(androidx.appcompat.R.id.search_src_text) as EditText
             searchPlate.hint = "Search"
             val searchPlateView: View =
                     searchView.findViewById(androidx.appcompat.R.id.search_plate)
@@ -108,10 +107,6 @@ class MainActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-
-
-
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -122,24 +117,35 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == newCredentialActivityRequestCode && resultCode == Activity.RESULT_OK) {
+        if (requestCode == newOrUpdateCredentialActivityRequestCode && resultCode == Activity.RESULT_OK) {
             data?.let {
 
-                val nameBase64 = it.getStringExtra(NewCredentialActivity.EXTRA_CREDENTIAL_NAME)
-                val additionalInfoBase64 = it.getStringExtra(NewCredentialActivity.EXTRA_CREDENTIAL_ADDITIONAL_INFO)
-                val passwordBase64 = it.getStringExtra(NewCredentialActivity.EXTRA_CREDENTIAL_PASSWORD)
+                var id: Int? = null
+                val idExtra = it.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
+                if (idExtra != -1) {
+                    id = idExtra
+                }
+                val nameBase64 = it.getStringExtra(EncCredential.EXTRA_CREDENTIAL_NAME)
+                val additionalInfoBase64 = it.getStringExtra(EncCredential.EXTRA_CREDENTIAL_ADDITIONAL_INFO)
+                val passwordBase64 = it.getStringExtra(EncCredential.EXTRA_CREDENTIAL_PASSWORD)
 
                 val encName = Encrypted.fromBase64String(nameBase64)
                 val encAdditionalInfo = Encrypted.fromBase64String(additionalInfoBase64)
                 val encPassword = Encrypted.fromBase64String(passwordBase64)
 
-                val credential = EncCredential(null, encName, encAdditionalInfo, encPassword)
+                val credential = EncCredential(id, encName, encAdditionalInfo, encPassword)
                 credentialViewModel.insert(credential)
             }
         }
+
+    }
+
+    fun deleteCredential(credential: EncCredential) {
+        credentialViewModel.delete(credential)
     }
 
 }

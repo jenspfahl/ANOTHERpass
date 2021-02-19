@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
     android:stretchColumns="0,1"
     android:shrinkColumns="0,1"
+    android:paddingTop="4dp"
     android:orientation="horizontal">
     <TableRow>
 
@@ -25,7 +26,7 @@
             android:src="@drawable/ic_baseline_north_east_24" />
 
         <ImageView
-            android:id="@+id/credential_list_menu_popup"
+            android:id="@+id/credential_menu_popup"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:clickable="true"

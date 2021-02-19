@@ -16,4 +16,11 @@ data class EncCredential(var id: Int?,
                     Encrypted.fromBase64String(additionalInfoBase64),
                     Encrypted.fromBase64String(passwordBase64),
                     extraPinRequired)
+
+    companion object {
+        const val EXTRA_CREDENTIAL_ID = "de.jepfa.yapm.ui.save_credential.id"
+        const val EXTRA_CREDENTIAL_NAME = "de.jepfa.yapm.ui.save_credential.name"
+        const val EXTRA_CREDENTIAL_ADDITIONAL_INFO = "de.jepfa.yapm.ui.save_credential.additionalInfo"
+        const val EXTRA_CREDENTIAL_PASSWORD = "de.jepfa.yapm.ui.save_credential.password"
+    }
 }
