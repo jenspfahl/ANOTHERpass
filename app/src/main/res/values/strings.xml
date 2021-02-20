@@ -31,10 +31,19 @@
     <string name="STRONG">Strong</string>
     <string name="SUPER_STRONG">Super Strong</string>
     <string name="EXTREME">Extreme</string>
+
     <string name="change">Change</string>
     <string name="delete">Delete</string>
+
     <string name="title_delete_credential">Delete credential</string>
     <string name="message_delete_credential">Are you sure deleting credential \'%1$s\'?</string>
+
+    <string name="title_encryption_pin_required">Pin required</string>
+    <string name="message_encrypt_pin_required">Please enter your pin to encrypt your credentials.</string>
+    <string name="wrong_pin">Wrong pin</string>
+    <string name="title_encryption_passphrase_required">Passphrase required</string>
+    <string name="message_encrypt_passphrase_required">Please enter your passphrase to encrypt your credentials.</string>
+
 
 
 

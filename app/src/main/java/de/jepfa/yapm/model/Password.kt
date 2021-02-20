@@ -9,6 +9,10 @@ data class Password(var data: CharArray) : Clearable, CharSequence {
     constructor(passwd: ByteArray) : this(passwd.map { it.toChar() }.toCharArray()) {
     }
 
+    fun isEmpty() : Boolean {
+        return data.isEmpty()
+    }
+
     fun add(other: Password) {
         val buffer = data + other.data
         clear()

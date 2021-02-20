@@ -1,6 +1,5 @@
 package de.jepfa.yapm.ui
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
@@ -31,7 +30,7 @@ class CredentialListAdapter(val mainActivity: MainActivity) :
 
     private lateinit var originList: List<EncCredential>
 
-    val secretService = SecretService()
+    val secretService = mainActivity.getApp().secretService
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CredentialViewHolder {
         val holder = CredentialViewHolder.create(parent)
@@ -91,7 +90,7 @@ class CredentialListAdapter(val mainActivity: MainActivity) :
                     val current = getItem(position)
                     return when (item.itemId) {
                         R.id.menu_change_credential -> {
-                            val intent = Intent(mainActivity, NewCredentialActivity::class.java)
+                            val intent = Intent(mainActivity, NewOrChangeCredentialActivity::class.java)
                             intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, current.id)
                             intent.putExtra(EncCredential.EXTRA_CREDENTIAL_NAME, current.name.toBase64String())
                             intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ADDITIONAL_INFO, current.additionalInfo.toBase64String())

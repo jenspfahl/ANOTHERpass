@@ -8,6 +8,7 @@ import de.jepfa.yapm.model.Key
 import de.jepfa.yapm.model.Password
 import java.security.*
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
@@ -17,13 +18,60 @@ import javax.crypto.spec.PBEKeySpec
 
 class SecretService {
 
+    val ALIAS_KEY_MK = "YAPM/keyAlias:MK"
+    val ALIAS_KEY_HPIN = "YAPM/keyAlias:HPIN"
+
     private val CIPHER_AES_GCM = "AES/GCM/NoPadding"
     private val ANDROID_KEY_STORE = "AndroidKeyStore"
 
     private val random = SecureRandom()
     private val androidKeyStore = KeyStore.getInstance(ANDROID_KEY_STORE)
 
-    val ALIAS_KEY_CREDENTIALS = "YAPM/Credentials"
+    val secret = Secret()
+
+    data class Secret(
+            private var masterSecretKey: SecretKey? = null,
+            private var lastUpdated: Long = System.currentTimeMillis()) : Clearable {
+
+        /**
+         * After this period of time of inactivity the secret is outdated.
+         */
+        private val SECRET_KEEP_VALID: Long = TimeUnit.SECONDS.toMillis(60)
+
+        fun get() : SecretKey {
+            return masterSecretKey!!
+        }
+
+        fun update(secretKey: SecretKey) {
+            masterSecretKey = secretKey
+            update()
+        }
+
+        fun update() {
+            lastUpdated = System.currentTimeMillis()
+        }
+
+        fun isDeclined() : Boolean {
+            return masterSecretKey == null || isOutdated()
+        }
+
+        fun decline() {
+            clear()
+            update()
+        }
+
+        override fun clear() {
+            //masterSecretKey?.destroy()
+            masterSecretKey = null
+        }
+
+        private fun isOutdated(): Boolean {
+            val age: Long = System.currentTimeMillis() - lastUpdated
+
+            return age > SECRET_KEEP_VALID
+        }
+
+    }
 
     fun generateKey(length: Int): Key {
         val bytes = ByteArray(length)
@@ -95,6 +143,14 @@ class SecretService {
         return String(decryptData(secretKey, encrypted))
     }
 
+    fun encryptEncrypted(secretKey: SecretKey, encrypted: Encrypted): Encrypted {
+        return encryptData(secretKey, encrypted.toBase64())
+    }
+
+    fun decryptEncrypted(secretKey: SecretKey, encrypted: Encrypted): Encrypted {
+        return Encrypted.fromBase64(decryptData(secretKey, encrypted))
+    }
+
     private fun encryptData(secretKey: SecretKey, data: ByteArray): Encrypted {
         val cipher: Cipher = Cipher.getInstance(CIPHER_AES_GCM)
         cipher.init(Cipher.ENCRYPT_MODE, secretKey)
@@ -132,6 +188,48 @@ class SecretService {
         keyGenerator.init(spec)
 
         return keyGenerator.generateKey();
+    }
+
+    fun login(masterPin: Password, masterPassword: Password, salt: Key) {
+
+        val masterPassPhraseSK = getMasterPassPhraseSK(masterPin, masterPassword, salt)
+        val masterSecretKey = getMasterSK(masterPassPhraseSK, salt)
+        secret.update(masterSecretKey)
+    }
+
+    /**
+     * Returns the Master passphrase which is calculated of the users Master Pin and his Master password
+     */
+    private fun getMasterPassPhraseSK(masterPin: Password, masterPassword: Password, salt: Key): SecretKey {
+        val masterPassPhrase = conjunctPasswords(masterPin, masterPassword, salt)
+        masterPin.clear()
+        masterPassword.clear()
+
+        val masterPassPhraseSK = generateSecretKey(masterPassPhrase, salt)
+        masterPassPhrase.clear()
+
+        return masterPassPhraseSK
+    }
+
+    /**
+     * Returns the Master Secret Key which is encrypted twice, first with the Android key
+     * and second with the PassPhrase key.
+     */
+    private fun getMasterSK(masterPassPhraseSK: SecretKey, salt: Key): SecretKey {
+        val androidSK = getAndroidSecretKey(ALIAS_KEY_MK)
+
+        val storedEncMasterKey = getStoredMasterKey()
+        val encMasterKey = decryptEncrypted(androidSK, storedEncMasterKey)
+
+        val masterKey = decryptKey(masterPassPhraseSK, encMasterKey)
+        val masterSK = generateSecretKey(masterKey, salt)
+        masterKey.clear()
+
+        return masterSK
+    }
+
+    private fun getStoredMasterKey(): Encrypted {
+        TODO()
     }
 
 

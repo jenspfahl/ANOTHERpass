@@ -17,9 +17,7 @@ import de.jepfa.yapm.service.secretgenerator.PassphraseGeneratorSpec
 import de.jepfa.yapm.service.secretgenerator.PasswordStrength
 import de.jepfa.yapm.ui.MainActivity as MainActivity1
 
-class NewCredentialActivity : AppCompatActivity() {
-
-    private val PASSWD_STRENGTH_DEFAULT = PasswordStrength.STRONG
+class NewOrChangeCredentialActivity : SecureActivity() {
 
     private lateinit var editCredentialNameView: EditText
     private lateinit var editCredentialAdditionalInfoView: EditText
@@ -32,26 +30,29 @@ class NewCredentialActivity : AppCompatActivity() {
     private var generatedPassword: Password = Password("")
     private var currentId: Int = -1
 
-    private val secretService = SecretService() // TODO better service resolution
     private val passphraseGenerator = PassphraseGenerator()
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_new_credential)
+        setContentView(R.layout.activity_new_or_change_credential)
         editCredentialNameView = findViewById(R.id.edit_credential_name)
         editCredentialAdditionalInfoView = findViewById(R.id.edit_credential_additional_info)
         generatedPasswdView = findViewById(R.id.generated_passwd)
         radioStrength = findViewById(R.id.radio_strengths)
 
+        val secretService = getApp().secretService
+
         val idExtra = intent.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
         if (idExtra != -1) {
+            currentId = idExtra
             val nameExtra = intent.getStringExtra(EncCredential.EXTRA_CREDENTIAL_NAME)
             val addInfoExtra = intent.getStringExtra(EncCredential.EXTRA_CREDENTIAL_ADDITIONAL_INFO)
             val passwdExtra = intent.getStringExtra(EncCredential.EXTRA_CREDENTIAL_PASSWORD)
             val originCredential = EncCredential(idExtra, nameExtra, addInfoExtra, passwdExtra, false)
 
-            currentId = idExtra
             val key = secretService.getAndroidSecretKey("test-key")
+            //TODO val key = secretService.secret.getOrAsk()
+
             val name = secretService.decryptCommonString(key, originCredential.name)
             val additionalInfo = secretService.decryptCommonString(key, originCredential.additionalInfo)
             val password = secretService.decryptPassword(key, originCredential.password)
@@ -144,6 +145,13 @@ class NewCredentialActivity : AppCompatActivity() {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun refresh(before: Boolean) {
+        //TODO
+        if (!before) {
+            recreate()
+        }
     }
 
 }

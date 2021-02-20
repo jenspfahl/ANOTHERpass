@@ -22,16 +22,13 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Encrypted
-import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.viewmodel.CredentialViewModel
 import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : SecureActivity() {
 
     val newOrUpdateCredentialActivityRequestCode = 1
-
-    private val secretService = SecretService()
 
     private lateinit var credentialListAdapter: CredentialListAdapter
 
@@ -55,7 +52,7 @@ class MainActivity : AppCompatActivity() {
 
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
-            val intent = Intent(this@MainActivity, NewCredentialActivity::class.java)
+            val intent = Intent(this@MainActivity, NewOrChangeCredentialActivity::class.java)
             startActivityForResult(intent, newOrUpdateCredentialActivityRequestCode)
         }
 
@@ -147,6 +144,13 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+    override fun refresh(before: Boolean) {
+        //TODO
+        if (!before) {
+            recreate()
+        }
     }
 
     fun deleteCredential(credential: EncCredential) {
