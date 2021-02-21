@@ -50,16 +50,16 @@ class NewOrChangeCredentialActivity : SecureActivity() {
             val passwdExtra = intent.getStringExtra(EncCredential.EXTRA_CREDENTIAL_PASSWORD)
             val originCredential = EncCredential(idExtra, nameExtra, addInfoExtra, passwdExtra, false)
 
-            val key = secretService.getAndroidSecretKey("test-key")
-            //TODO val key = secretService.secret.getOrAsk()
-
-            val name = secretService.decryptCommonString(key, originCredential.name)
-            val additionalInfo = secretService.decryptCommonString(key, originCredential.additionalInfo)
-            val password = secretService.decryptPassword(key, originCredential.password)
-            editCredentialNameView.setText(name)
-            editCredentialAdditionalInfoView.setText(additionalInfo)
-            generatedPassword = password
-            generatedPasswdView.setText(password.debugToString())
+            val key = masterSecretKey
+            if (key != null) {
+                val name = secretService.decryptCommonString(key, originCredential.name)
+                val additionalInfo = secretService.decryptCommonString(key, originCredential.additionalInfo)
+                val password = secretService.decryptPassword(key, originCredential.password)
+                editCredentialNameView.setText(name)
+                editCredentialAdditionalInfoView.setText(additionalInfo)
+                generatedPassword = password
+                generatedPasswdView.setText(password.debugToString())
+            }
         }
 
         val radioStrengthStrong: RadioButton = findViewById(R.id.radio_strength_strong)
@@ -91,22 +91,23 @@ class NewOrChangeCredentialActivity : SecureActivity() {
                     editCredentialNameView.setError(getString(R.string.error_field_required))
                     editCredentialNameView.requestFocus()
                 } else {
-                    val key = secretService.getAndroidSecretKey("test-key")
+                    val key = masterSecretKey
+                    if (key != null) {
+                        val name = editCredentialNameView.text.toString()
+                        val additionalInfo = editCredentialAdditionalInfoView.text.toString()
 
-                    val name = editCredentialNameView.text.toString()
-                    val additionalInfo = editCredentialAdditionalInfoView.text.toString()
+                        val encName = secretService.encryptCommonString(key, name)
+                        val encAdditionalInfo = secretService.encryptCommonString(key, additionalInfo)
+                        val encPassword = secretService.encryptPassword(key, generatedPassword)
+                        generatedPassword.clear()
 
-                    val encName = secretService.encryptCommonString(key, name)
-                    val encAdditionalInfo = secretService.encryptCommonString(key, additionalInfo)
-                    val encPassword = secretService.encryptPassword(key, generatedPassword)
-                    generatedPassword.clear()
-
-                    replyIntent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, currentId)
-                    replyIntent.putExtra(EncCredential.EXTRA_CREDENTIAL_NAME, encName.toBase64String())
-                    replyIntent.putExtra(EncCredential.EXTRA_CREDENTIAL_ADDITIONAL_INFO, encAdditionalInfo.toBase64String())
-                    replyIntent.putExtra(EncCredential.EXTRA_CREDENTIAL_PASSWORD, encPassword.toBase64String())
-                    setResult(Activity.RESULT_OK, replyIntent)
-                    finish()
+                        replyIntent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, currentId)
+                        replyIntent.putExtra(EncCredential.EXTRA_CREDENTIAL_NAME, encName.toBase64String())
+                        replyIntent.putExtra(EncCredential.EXTRA_CREDENTIAL_ADDITIONAL_INFO, encAdditionalInfo.toBase64String())
+                        replyIntent.putExtra(EncCredential.EXTRA_CREDENTIAL_PASSWORD, encPassword.toBase64String())
+                        setResult(Activity.RESULT_OK, replyIntent)
+                        finish()
+                    }
                 }
             }
         }

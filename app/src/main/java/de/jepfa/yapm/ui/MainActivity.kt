@@ -5,13 +5,13 @@ import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import android.widget.Filterable
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuItemCompat
@@ -22,6 +22,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Encrypted
+import de.jepfa.yapm.service.encrypt.SecretService
+import de.jepfa.yapm.ui.SecureActivity.SecretChecker
 import de.jepfa.yapm.viewmodel.CredentialViewModel
 import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
 
@@ -101,8 +103,23 @@ class MainActivity : SecureActivity() {
                     getSystemService(Context.SEARCH_SERVICE) as SearchManager
             searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
         }
+
+        val lockItem = menu.findItem(R.id.menu_lock_items)
+        refreshMenuLockItem(lockItem)
+
         return super.onCreateOptionsMenu(menu)
     }
+
+
+    protected fun refreshMenuLockItem(lockItem: MenuItem) {
+        val secret: SecretService.Secret = SecretChecker.getOrAskForSecret(this)
+        if (secret.isLockedOrOutdated()) {
+            lockItem.setIcon(R.drawable.ic_lock_outline_white_24dp)
+        } else {
+            lockItem.setIcon(R.drawable.ic_lock_open_white_24dp)
+        }
+    }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle action bar item clicks here. The action bar will
@@ -110,6 +127,17 @@ class MainActivity : SecureActivity() {
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
             R.id.action_settings -> true
+            R.id.menu_lock_items -> {
+                val secret: SecretService.Secret = SecretChecker.getOrAskForSecret(this)
+                if (secret.isLockedOrOutdated()) {
+                    SecretChecker.getOrAskForSecret(this)
+                }
+                else {
+                    secret.lock()
+                }
+                refreshMenuLockItem(item)
+                return true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }

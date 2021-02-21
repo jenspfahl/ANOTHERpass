@@ -36,16 +36,18 @@ class CredentialListAdapter(val mainActivity: MainActivity) :
         val holder = CredentialViewHolder.create(parent)
         holder.listenForShowCredential { pos, type ->
             val current = getItem(pos)
-            val key = secretService.getAndroidSecretKey("test-key")
-            val decName = secretService.decryptCommonString(key, current.name)
-            val decAdditionalInfo = secretService.decryptCommonString(key, current.additionalInfo)
-            val password = secretService.decryptPassword(key, current.password)
-            AlertDialog.Builder(holder.itemView.context)
-                    .setTitle(decName)
-                    .setMessage(decAdditionalInfo + System.lineSeparator() + password.debugToString())
-                    .show()
+            val key = mainActivity.masterSecretKey
+            if (key != null) {
+                val decName = secretService.decryptCommonString(key, current.name)
+                val decAdditionalInfo = secretService.decryptCommonString(key, current.additionalInfo)
+                val password = secretService.decryptPassword(key, current.password)
+                AlertDialog.Builder(holder.itemView.context)
+                        .setTitle(decName)
+                        .setMessage(decAdditionalInfo + System.lineSeparator() + password.debugToString())
+                        .show()
 
-            password.clear()
+                password.clear()
+            }
         }
 
         holder.listenForDetachPasswd { pos, type ->
@@ -70,15 +72,17 @@ class CredentialListAdapter(val mainActivity: MainActivity) :
             else {
 
                 val current = getItem(pos)
-                val key = secretService.getAndroidSecretKey("test-key")
-                val password = secretService.decryptPassword(key, current.password)
+                val key = mainActivity.masterSecretKey
+                if (key != null) {
+                    val password = secretService.decryptPassword(key, current.password)
 
-                val intent = Intent(mainActivity, OverlayShowingService::class.java)
-                intent.putExtra("password", password.data)
-                mainActivity.startService(intent)
-                // minimize app: mainActivity.
-                mainActivity.moveTaskToBack(true)
-                password.clear()
+                    val intent = Intent(mainActivity, OverlayShowingService::class.java)
+                    intent.putExtra("password", password.data)
+                    mainActivity.startService(intent)
+                    // minimize app: mainActivity.
+                    mainActivity.moveTaskToBack(true)
+                    password.clear()
+                }
                 true
             }
         }
@@ -100,18 +104,20 @@ class CredentialListAdapter(val mainActivity: MainActivity) :
                             true
                         }
                         R.id.menu_delete_credential -> {
-                            val key = secretService.getAndroidSecretKey("test-key")
-                            val decName = secretService.decryptCommonString(key, current.name)
+                            val key = mainActivity.masterSecretKey
+                            if (key != null) {
+                                val decName = secretService.decryptCommonString(key, current.name)
 
-                            AlertDialog.Builder(mainActivity)
-                                    .setTitle(R.string.title_delete_credential)
-                                    .setMessage(mainActivity.getString(R.string.message_delete_credential, decName))
-                                    .setIcon(android.R.drawable.ic_dialog_alert)
-                                    .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
-                                        mainActivity.deleteCredential(current)
-                                    }
-                                    .setNegativeButton(android.R.string.no, null)
-                                    .show()
+                                AlertDialog.Builder(mainActivity)
+                                        .setTitle(R.string.title_delete_credential)
+                                        .setMessage(mainActivity.getString(R.string.message_delete_credential, decName))
+                                        .setIcon(android.R.drawable.ic_dialog_alert)
+                                        .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                                            mainActivity.deleteCredential(current)
+                                        }
+                                        .setNegativeButton(android.R.string.no, null)
+                                        .show()
+                            }
                             true
                         }
                         else -> false
@@ -127,9 +133,12 @@ class CredentialListAdapter(val mainActivity: MainActivity) :
 
     override fun onBindViewHolder(holder: CredentialViewHolder, position: Int) {
         val current = getItem(position)
-        val key = secretService.getAndroidSecretKey("test-key")
-        val decName = secretService.decryptCommonString(key, current.name)
-        holder.bind(decName)
+        val key = mainActivity.masterSecretKey
+        var name = "-----"
+        if (key != null) {
+            name = secretService.decryptCommonString(key, current.name)
+        }
+        holder.bind(name)
 
     }
 
@@ -142,12 +151,16 @@ class CredentialListAdapter(val mainActivity: MainActivity) :
                     filterResults.values = originList
                 } else {
                     val filteredList: MutableList<EncCredential> = ArrayList<EncCredential>()
-                    val key = secretService.getAndroidSecretKey("test-key")
+                    val key = mainActivity.masterSecretKey
                     for (credential in originList) {
-                        val decName = secretService.decryptCommonString(key, credential.name)
-                        if (decName.toLowerCase().contains(charString.toLowerCase())) {
-                            filteredList.add(credential)
+                        var name = ""
+                        if (key != null) {
+                            name = secretService.decryptCommonString(key, credential.name)
+                            if (name.toLowerCase().contains(charString.toLowerCase())) {
+                                filteredList.add(credential)
+                            }
                         }
+
                     }
                     filterResults.values = filteredList
                 }

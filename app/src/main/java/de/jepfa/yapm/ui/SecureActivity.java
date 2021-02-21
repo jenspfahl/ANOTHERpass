@@ -36,7 +36,7 @@ public abstract class SecureActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        securityCheck();
+        checkSecret();
     }
 
     @Override
@@ -51,13 +51,23 @@ public abstract class SecureActivity extends BaseActivity {
         super.onResume();
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
 
-        securityCheck();
+        checkSecret();
     }
 
     protected abstract void refresh(boolean before);
 
 
-    protected synchronized void securityCheck() {
+    protected synchronized SecretKey getMasterSecretKey() {
+        SecretService.Secret secret =  SecretChecker.getOrAskForSecret(this);
+        if (secret.isDeclined()) {
+            return null;
+        }
+        else {
+            return secret.get();
+        }
+    }
+
+    private synchronized void checkSecret() {
         SecretChecker.getOrAskForSecret(this);
     }
 
@@ -67,8 +77,8 @@ public abstract class SecureActivity extends BaseActivity {
      */
     public static class SecretChecker {
 
-        public static final String PREF_PIN = "YAPM/pref:pin";
-        public static final String PREF_PASSPHRASE = "YAPM/pref:passphrase";
+        public static final String PREF_HASHED_PIN = "YAPM/pref:hpin";
+        public static final String PREF_MASTER_PASSWORD = "YAPM/pref:mpwd";
         private static final String PREF_SALT = "YAPM/pref:application.salt";
 
         private static final long DELTA_DIALOG_OPENED = TimeUnit.SECONDS.toMillis(5);
@@ -76,20 +86,20 @@ public abstract class SecureActivity extends BaseActivity {
 
         private static volatile long secretDialogOpened;
 
-        public static synchronized SecretKey getOrAskForSecret(BaseActivity activity) {
+        public static synchronized SecretService.Secret getOrAskForSecret(BaseActivity activity) {
 
             SecretService.Secret secret = activity.getApp().getSecretService().getSecret();
 
-            if (secret.isDeclined()) {
+            if (secret.isLockedOrOutdated()) {
                 // make all not readable by setting key as invalid
-                secret.clear();
-                // open user secret dialoh
+                secret.lock();
+                // open user secret dialog
                 openDialog(secret, activity);
             } else {
                 secret.update();
             }
 
-            return secret.get();
+            return secret;
 
         }
 
@@ -183,16 +193,16 @@ public abstract class SecureActivity extends BaseActivity {
                                         return; // try again
                                     }
                                 } else {
-                                    Password masterPassphrase;
+                                    Password masterPassword;
                                     if (isPasspraseStored(activity)) {
-                                        masterPassphrase = getStoredPassphrase(activity);
+                                        masterPassword = getStoredPassword(activity);
                                     }
                                     else {
-                                        masterPassphrase = getPassphraseFromUser(activity);
+                                        masterPassword = getPasswordFromUser(activity);
                                     }
-                                    secretService.login(masterPin, masterPassphrase, getSalt(activity));
+                                    secretService.login(masterPin, masterPassword, getSalt(activity));
                                     if (activity instanceof SecureActivity) {
-                                        ((SecureActivity)activity).refresh(true); // show correct encrypted data
+                                        ((SecureActivity)activity).refresh(false); // show correct encrypted data
                                     }
                                 }
                             } finally {
@@ -215,23 +225,23 @@ public abstract class SecureActivity extends BaseActivity {
         public static boolean isPasspraseStored(Activity activity) {
             SharedPreferences defaultSharedPreferences = PreferenceManager
                     .getDefaultSharedPreferences(activity);
-            return defaultSharedPreferences.getString(PREF_PASSPHRASE, null) != null;
+            return defaultSharedPreferences.getString(PREF_MASTER_PASSWORD, null) != null;
         }
 
-        public static Password getStoredPassphrase(BaseActivity activity) {
+        public static Password getStoredPassword(BaseActivity activity) {
             SharedPreferences defaultSharedPreferences = PreferenceManager
                     .getDefaultSharedPreferences(activity);
-            String storedPassphraseBase64 =  defaultSharedPreferences.getString(PREF_PASSPHRASE, null);
+            String storedPasswordBase64 =  defaultSharedPreferences.getString(PREF_MASTER_PASSWORD, null);
 
             SecretService secretService = activity.getApp().getSecretService();
 
             SecretKey androidSecretKey = secretService.getAndroidSecretKey(secretService.getALIAS_KEY_HPIN());
-            Encrypted storedEncPassphrase = Encrypted.Companion.fromBase64String(storedPassphraseBase64);
+            Encrypted storedEncPassword = Encrypted.Companion.fromBase64String(storedPasswordBase64);
 
-            return secretService.decryptPassword(androidSecretKey, storedEncPassphrase);
+            return secretService.decryptPassword(androidSecretKey, storedEncPassword);
         }
 
-        public static Password getPassphraseFromUser(BaseActivity activity) {
+        public static Password getPasswordFromUser(BaseActivity activity) {
             //TODO another dialog to input that
             return new Password(""); // mockup
         }
@@ -239,7 +249,7 @@ public abstract class SecureActivity extends BaseActivity {
         public static boolean isPinStored(Activity activity) {
             SharedPreferences defaultSharedPreferences = PreferenceManager
                     .getDefaultSharedPreferences(activity);
-            return defaultSharedPreferences.getString(PREF_PIN, null) != null;
+            return defaultSharedPreferences.getString(PREF_HASHED_PIN, null) != null;
         }
 
         public static boolean isPinValid(Password userPin, BaseActivity activity, Key salt) {
@@ -247,7 +257,7 @@ public abstract class SecureActivity extends BaseActivity {
             SharedPreferences defaultSharedPreferences = PreferenceManager
                     .getDefaultSharedPreferences(activity);
             String storedPinBase64 = defaultSharedPreferences
-                    .getString(PREF_PIN, null);
+                    .getString(PREF_HASHED_PIN, null);
 
             SecretService secretService = activity.getApp().getSecretService();
             Key hashedPin = secretService.hashPassword(userPin, salt);

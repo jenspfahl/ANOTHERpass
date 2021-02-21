@@ -1,11 +1,15 @@
 package de.jepfa.yapm.service.encrypt
 
+import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import androidx.room.Room
+import de.jepfa.yapm.database.YapmDatabase
 import de.jepfa.yapm.model.Clearable
 import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Key
 import de.jepfa.yapm.model.Password
+import kotlinx.coroutines.CoroutineScope
 import java.security.*
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -29,14 +33,31 @@ class SecretService {
 
     val secret = Secret()
 
-    data class Secret(
+    companion object {
+        @Volatile
+        private var INSTANCE: SecretService? = null
+        fun getInstance(): SecretService {
+            if (INSTANCE == null) {
+                synchronized(SecretService::class.java) {
+                    if (INSTANCE == null) {
+                        INSTANCE = SecretService()
+                    }
+                }
+            }
+            return INSTANCE!!
+        }
+    }
+
+
+    class Secret (
             private var masterSecretKey: SecretKey? = null,
-            private var lastUpdated: Long = System.currentTimeMillis()) : Clearable {
+            private var masterPassword: Encrypted? = null,
+            private var lastUpdated: Long = 0) {
 
         /**
          * After this period of time of inactivity the secret is outdated.
          */
-        private val SECRET_KEEP_VALID: Long = TimeUnit.SECONDS.toMillis(60)
+        private val SECRET_KEEP_VALID: Long = TimeUnit.SECONDS.toMillis(600) // TODO 60
 
         fun get() : SecretKey {
             return masterSecretKey!!
@@ -51,18 +72,27 @@ class SecretService {
             lastUpdated = System.currentTimeMillis()
         }
 
-        fun isDeclined() : Boolean {
+        fun isLockedOrOutdated() : Boolean {
             return masterSecretKey == null || isOutdated()
         }
 
-        fun decline() {
-            clear()
+        fun isLoggedOut() : Boolean {
+            // TODOD return masterPassword == null
+            return false //mockup
+        }
+
+        fun isDeclined() : Boolean {
+            return isLoggedOut() || isLockedOrOutdated()
+        }
+
+        fun lock() {
+            masterSecretKey = null
             update()
         }
 
-        override fun clear() {
-            //masterSecretKey?.destroy()
-            masterSecretKey = null
+        fun logout() {
+            lock()
+            masterPassword = null
         }
 
         private fun isOutdated(): Boolean {
@@ -218,10 +248,10 @@ class SecretService {
     private fun getMasterSK(masterPassPhraseSK: SecretKey, salt: Key): SecretKey {
         val androidSK = getAndroidSecretKey(ALIAS_KEY_MK)
 
-        val storedEncMasterKey = getStoredMasterKey()
-        val encMasterKey = decryptEncrypted(androidSK, storedEncMasterKey)
-
-        val masterKey = decryptKey(masterPassPhraseSK, encMasterKey)
+        //val storedEncMasterKey = getStoredMasterKey()
+        //val encMasterKey = decryptEncrypted(androidSK, storedEncMasterKey)
+        // val masterKey = decryptKey(masterPassPhraseSK, encMasterKey)
+val masterKey = Key("xyz".toByteArray())
         val masterSK = generateSecretKey(masterKey, salt)
         masterKey.clear()
 
@@ -230,6 +260,7 @@ class SecretService {
 
     private fun getStoredMasterKey(): Encrypted {
         TODO()
+
     }
 
 
