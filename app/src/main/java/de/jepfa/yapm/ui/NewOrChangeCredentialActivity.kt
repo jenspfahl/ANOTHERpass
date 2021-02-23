@@ -15,7 +15,7 @@ import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.service.secretgenerator.PassphraseGenerator
 import de.jepfa.yapm.service.secretgenerator.PassphraseGeneratorSpec
 import de.jepfa.yapm.service.secretgenerator.PasswordStrength
-import de.jepfa.yapm.ui.MainActivity as MainActivity1
+import de.jepfa.yapm.ui.ListCredentialsActivity
 
 class NewOrChangeCredentialActivity : SecureActivity() {
 
@@ -141,7 +141,7 @@ class NewOrChangeCredentialActivity : SecureActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         if (id == android.R.id.home) {
-            val upIntent = Intent(this, MainActivity1::class.java)
+            val upIntent = Intent(this, ListCredentialsActivity::class.java)
             navigateUpTo(upIntent)
             return true
         }

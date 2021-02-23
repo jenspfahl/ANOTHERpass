@@ -27,6 +27,7 @@ class SecretService {
 
     private val CIPHER_AES_GCM = "AES/GCM/NoPadding"
     private val ANDROID_KEY_STORE = "AndroidKeyStore"
+    private val FAILED_BYTE_ARRAY = "<<LOCKED>>".toByteArray()
 
     private val random = SecureRandom()
     private val androidKeyStore = KeyStore.getInstance(ANDROID_KEY_STORE)
@@ -195,7 +196,11 @@ class SecretService {
         val spec = GCMParameterSpec(128, encryptionIv)
         cipher.init(Cipher.DECRYPT_MODE, secretKey, spec)
 
-        return cipher.doFinal(encryptedData)
+        try {
+            return cipher.doFinal(encryptedData)
+        } catch (e: GeneralSecurityException) {
+            return FAILED_BYTE_ARRAY;
+        }
     }
 
     fun getAndroidSecretKey(alias: String): SecretKey {
@@ -248,14 +253,16 @@ class SecretService {
     private fun getMasterSK(masterPassPhraseSK: SecretKey, salt: Key): SecretKey {
         val androidSK = getAndroidSecretKey(ALIAS_KEY_MK)
 
+        // TODO mockup here
         //val storedEncMasterKey = getStoredMasterKey()
         //val encMasterKey = decryptEncrypted(androidSK, storedEncMasterKey)
         // val masterKey = decryptKey(masterPassPhraseSK, encMasterKey)
-val masterKey = Key("xyz".toByteArray())
-        val masterSK = generateSecretKey(masterKey, salt)
-        masterKey.clear()
+        //val masterSK = generateSecretKey(masterKey, salt)
+        //masterKey.clear()
 
-        return masterSK
+        //return masterSK
+
+        return masterPassPhraseSK
     }
 
     private fun getStoredMasterKey(): Encrypted {

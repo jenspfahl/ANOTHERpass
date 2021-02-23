@@ -44,6 +44,7 @@
     <string name="title_encryption_passphrase_required">Passphrase required</string>
     <string name="message_encrypt_passphrase_required">Please enter your passphrase to encrypt your credentials.</string>
     <string name="lock_items">Lock credentials</string>
+    <string name="logout">Logout</string>
 
 
 </resources>

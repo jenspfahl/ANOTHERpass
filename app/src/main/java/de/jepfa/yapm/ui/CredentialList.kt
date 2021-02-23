@@ -24,19 +24,19 @@ import de.jepfa.yapm.service.overlay.OverlayShowingService
 import java.util.*
 
 
-class CredentialListAdapter(val mainActivity: MainActivity) :
+class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity) :
         ListAdapter<EncCredential, CredentialListAdapter.CredentialViewHolder>(CredentialsComparator()),
         Filterable {
 
     private lateinit var originList: List<EncCredential>
 
-    val secretService = mainActivity.getApp().secretService
+    val secretService = listCredentialsActivity.getApp().secretService
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CredentialViewHolder {
         val holder = CredentialViewHolder.create(parent)
-        holder.listenForShowCredential { pos, type ->
+        holder.listenForShowCredential { pos, _ ->
             val current = getItem(pos)
-            val key = mainActivity.masterSecretKey
+            val key = listCredentialsActivity.masterSecretKey
             if (key != null) {
                 val decName = secretService.decryptCommonString(key, current.name)
                 val decAdditionalInfo = secretService.decryptCommonString(key, current.additionalInfo)
@@ -50,7 +50,7 @@ class CredentialListAdapter(val mainActivity: MainActivity) :
             }
         }
 
-        holder.listenForDetachPasswd { pos, type ->
+        holder.listenForDetachPasswd { pos, _ ->
 
             if (!Settings.canDrawOverlays(parent.context)) {
                                 // this check returns false true on my phone although i have granted that permission!!!!
@@ -58,11 +58,11 @@ class CredentialListAdapter(val mainActivity: MainActivity) :
                         .setTitle("Missing permission")
                         .setMessage("App cannot draw over other apps. Enable permission and try again.")
                         .setPositiveButton("Open permission",
-                                DialogInterface.OnClickListener { dialogInterface, i ->
+                                DialogInterface.OnClickListener { _, i ->
                                     val intent = Intent()
                                     intent.action = Settings.ACTION_MANAGE_OVERLAY_PERMISSION
-                                    intent.data = Uri.parse("package:" + mainActivity.applicationInfo.packageName)
-                                    mainActivity.startActivity(intent)
+                                    intent.data = Uri.parse("package:" + listCredentialsActivity.applicationInfo.packageName)
+                                    listCredentialsActivity.startActivity(intent)
                                 })
                         .setNegativeButton("Close",
                                 { dialogInterface, i -> dialogInterface.cancel() })
@@ -72,15 +72,15 @@ class CredentialListAdapter(val mainActivity: MainActivity) :
             else {
 
                 val current = getItem(pos)
-                val key = mainActivity.masterSecretKey
+                val key = listCredentialsActivity.masterSecretKey
                 if (key != null) {
                     val password = secretService.decryptPassword(key, current.password)
 
-                    val intent = Intent(mainActivity, OverlayShowingService::class.java)
+                    val intent = Intent(listCredentialsActivity, OverlayShowingService::class.java)
                     intent.putExtra("password", password.data)
-                    mainActivity.startService(intent)
-                    // minimize app: mainActivity.
-                    mainActivity.moveTaskToBack(true)
+                    listCredentialsActivity.startService(intent)
+
+                    listCredentialsActivity.moveTaskToBack(true)
                     password.clear()
                 }
                 true
@@ -88,32 +88,32 @@ class CredentialListAdapter(val mainActivity: MainActivity) :
         }
 
         holder.listenForOpenMenu { position, type, view ->
-            val popup = PopupMenu(mainActivity, view)
+            val popup = PopupMenu(listCredentialsActivity, view)
             popup.setOnMenuItemClickListener(object : PopupMenu.OnMenuItemClickListener {
                 override fun onMenuItemClick(item: MenuItem): Boolean {
                     val current = getItem(position)
                     return when (item.itemId) {
                         R.id.menu_change_credential -> {
-                            val intent = Intent(mainActivity, NewOrChangeCredentialActivity::class.java)
+                            val intent = Intent(listCredentialsActivity, NewOrChangeCredentialActivity::class.java)
                             intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, current.id)
                             intent.putExtra(EncCredential.EXTRA_CREDENTIAL_NAME, current.name.toBase64String())
                             intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ADDITIONAL_INFO, current.additionalInfo.toBase64String())
                             intent.putExtra(EncCredential.EXTRA_CREDENTIAL_PASSWORD, current.password.toBase64String())
 
-                            mainActivity.startActivityForResult(intent, mainActivity.newOrUpdateCredentialActivityRequestCode)
+                            listCredentialsActivity.startActivityForResult(intent, listCredentialsActivity.newOrUpdateCredentialActivityRequestCode)
                             true
                         }
                         R.id.menu_delete_credential -> {
-                            val key = mainActivity.masterSecretKey
+                            val key = listCredentialsActivity.masterSecretKey
                             if (key != null) {
                                 val decName = secretService.decryptCommonString(key, current.name)
 
-                                AlertDialog.Builder(mainActivity)
+                                AlertDialog.Builder(listCredentialsActivity)
                                         .setTitle(R.string.title_delete_credential)
-                                        .setMessage(mainActivity.getString(R.string.message_delete_credential, decName))
+                                        .setMessage(listCredentialsActivity.getString(R.string.message_delete_credential, decName))
                                         .setIcon(android.R.drawable.ic_dialog_alert)
                                         .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
-                                            mainActivity.deleteCredential(current)
+                                            listCredentialsActivity.deleteCredential(current)
                                         }
                                         .setNegativeButton(android.R.string.no, null)
                                         .show()
@@ -133,7 +133,7 @@ class CredentialListAdapter(val mainActivity: MainActivity) :
 
     override fun onBindViewHolder(holder: CredentialViewHolder, position: Int) {
         val current = getItem(position)
-        val key = mainActivity.masterSecretKey
+        val key = listCredentialsActivity.masterSecretKey
         var name = "-----"
         if (key != null) {
             name = secretService.decryptCommonString(key, current.name)
@@ -151,7 +151,7 @@ class CredentialListAdapter(val mainActivity: MainActivity) :
                     filterResults.values = originList
                 } else {
                     val filteredList: MutableList<EncCredential> = ArrayList<EncCredential>()
-                    val key = mainActivity.masterSecretKey
+                    val key = listCredentialsActivity.masterSecretKey
                     for (credential in originList) {
                         var name = ""
                         if (key != null) {

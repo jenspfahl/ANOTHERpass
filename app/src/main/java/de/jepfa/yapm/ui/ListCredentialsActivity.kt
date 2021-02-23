@@ -28,7 +28,7 @@ import de.jepfa.yapm.viewmodel.CredentialViewModel
 import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
 
 
-class MainActivity : SecureActivity() {
+class ListCredentialsActivity : SecureActivity() {
 
     val newOrUpdateCredentialActivityRequestCode = 1
 
@@ -40,7 +40,7 @@ class MainActivity : SecureActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_list_credentials)
         setSupportActionBar(findViewById(R.id.toolbar))
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
@@ -54,7 +54,7 @@ class MainActivity : SecureActivity() {
 
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
-            val intent = Intent(this@MainActivity, NewOrChangeCredentialActivity::class.java)
+            val intent = Intent(this@ListCredentialsActivity, NewOrChangeCredentialActivity::class.java)
             startActivityForResult(intent, newOrUpdateCredentialActivityRequestCode)
         }
 
@@ -135,6 +135,12 @@ class MainActivity : SecureActivity() {
                 else {
                     secret.lock()
                 }
+                refreshMenuLockItem(item)
+                return true
+            }
+            R.id.menu_logout -> {
+                val secret: SecretService.Secret = SecretChecker.getOrAskForSecret(this)
+                secret.logout()
                 refreshMenuLockItem(item)
                 return true
             }
