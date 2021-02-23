@@ -1,0 +1,12 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="de.jepfa.yapm.ui.LoginActivity">
+
+    <item
+        android:id="@+id/action_login_help"
+        android:icon="@drawable/ic_baseline_help_outline_24"
+        app:showAsAction="always"
+        android:title="@string/login_help">
+    </item>
+</menu>

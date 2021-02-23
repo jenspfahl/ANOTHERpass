@@ -45,6 +45,11 @@
     <string name="message_encrypt_passphrase_required">Please enter your passphrase to encrypt your credentials.</string>
     <string name="lock_items">Lock credentials</string>
     <string name="logout">Logout</string>
+    <string name="login_help">Help</string>
+    <string name="button_create_new_vault">Create vault</string>
+    <string name="text_create_new_vault">Create a new vault here. </string>
+    <string name="button_import_new_vault">Import vault</string>
+    <string name="text_import_new_vault">Import an existing vault here, if you have a vault file.</string>
 
 
 </resources>

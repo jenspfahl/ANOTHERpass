@@ -3,7 +3,6 @@ package de.jepfa.yapm.ui
 import android.app.Activity
 import android.content.DialogInterface
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.text.Editable
 import android.text.InputType
 import android.util.Base64
@@ -17,6 +16,7 @@ import de.jepfa.yapm.model.Encrypted.Companion.fromBase64String
 import de.jepfa.yapm.model.Key
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.service.encrypt.SecretService.Secret
+import de.jepfa.yapm.util.PreferenceUtil
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import javax.crypto.SecretKey
@@ -60,9 +60,6 @@ abstract class SecureActivity : BaseActivity() {
      * Helper class to check the user secret.
      */
     object SecretChecker {
-        const val PREF_HASHED_PIN = "YAPM/pref:hpin"
-        const val PREF_MASTER_PASSWORD = "YAPM/pref:mpwd"
-        private const val PREF_SALT = "YAPM/pref:application.salt"
         private val DELTA_DIALOG_OPENED = TimeUnit.SECONDS.toMillis(5)
         private const val MAX_PASSWD_ATTEMPTS = 3
 
@@ -85,18 +82,13 @@ abstract class SecureActivity : BaseActivity() {
 
         @Synchronized
         fun getOrCreateSalt(activity: BaseActivity): Key {
-            val context = activity.applicationContext
-            val defaultSharedPreferences = PreferenceManager
-                    .getDefaultSharedPreferences(context)
-            val saltBase64 = defaultSharedPreferences
-                    .getString(PREF_SALT, null)
-            val secretService = activity.getApp().secretService
+            var saltBase64 = PreferenceUtil.get(PreferenceUtil.PREF_SALT, activity)
             val salt: Key
             if (saltBase64 == null) {
-                val editor = defaultSharedPreferences.edit()
+                val secretService = activity.getApp().secretService
                 salt = secretService.generateKey(128)
-                editor.putString(PREF_SALT, Base64.encodeToString(salt.data, Base64.DEFAULT))
-                editor.commit()
+                saltBase64 = Base64.encodeToString(salt.data, Base64.DEFAULT)
+                PreferenceUtil.put(PreferenceUtil.PREF_SALT, saltBase64, activity)
             } else {
                 salt = Key(Base64.decode(saltBase64, 0))
             }
@@ -142,7 +134,7 @@ abstract class SecureActivity : BaseActivity() {
                             input.error = activity.getString(R.string.error_field_required)
                             return@OnClickListener
                         } else if (isPinStored(activity) &&
-                                !isPinValid(masterPin, activity, getOrCreateSalt(activity))) {
+                                !isPinValid(masterPin, getOrCreateSalt(activity), activity)) {
                             input.error = activity.getString(R.string.wrong_pin)
                             if (failCounter.incrementAndGet() < MAX_PASSWD_ATTEMPTS) {
                                 return@OnClickListener  // try again
@@ -170,16 +162,12 @@ abstract class SecureActivity : BaseActivity() {
             dialog.show()
         }
 
-        fun isPasspraseStored(activity: Activity?): Boolean {
-            val defaultSharedPreferences = PreferenceManager
-                    .getDefaultSharedPreferences(activity)
-            return defaultSharedPreferences.getString(PREF_MASTER_PASSWORD, null) != null
+        fun isPasspraseStored(activity: Activity): Boolean {
+            return PreferenceUtil.get(PreferenceUtil.PREF_MASTER_PASSWORD, activity) != null
         }
 
         fun getStoredPassword(activity: BaseActivity): Password {
-            val defaultSharedPreferences = PreferenceManager
-                    .getDefaultSharedPreferences(activity)
-            val storedPasswordBase64 = defaultSharedPreferences.getString(PREF_MASTER_PASSWORD, null)
+            val storedPasswordBase64 = PreferenceUtil.get(PreferenceUtil.PREF_MASTER_PASSWORD, activity)
             val secretService = activity.getApp().secretService
             val androidSecretKey = secretService.getAndroidSecretKey(secretService.ALIAS_KEY_HPIN)
             val storedEncPassword = fromBase64String(storedPasswordBase64!!)
@@ -191,17 +179,12 @@ abstract class SecureActivity : BaseActivity() {
             return Password("") // mockup
         }
 
-        fun isPinStored(activity: Activity?): Boolean {
-            val defaultSharedPreferences = PreferenceManager
-                    .getDefaultSharedPreferences(activity)
-            return defaultSharedPreferences.getString(PREF_HASHED_PIN, null) != null
+        fun isPinStored(activity: Activity): Boolean {
+            return PreferenceUtil.get(PreferenceUtil.PREF_HASHED_MASTER_PIN, activity) != null
         }
 
-        fun isPinValid(userPin: Password?, activity: BaseActivity, salt: Key?): Boolean {
-            val defaultSharedPreferences = PreferenceManager
-                    .getDefaultSharedPreferences(activity)
-            val storedPinBase64 = defaultSharedPreferences
-                    .getString(PREF_HASHED_PIN, null)
+        fun isPinValid(userPin: Password?, salt: Key?, activity: BaseActivity): Boolean {
+            val storedPinBase64 = PreferenceUtil.get(PreferenceUtil.PREF_HASHED_MASTER_PIN, activity)
             val secretService = activity.getApp().secretService
             val hashedPin = secretService.hashPassword(userPin!!, salt!!)
             val androidSecretKey = secretService.getAndroidSecretKey(secretService.ALIAS_KEY_HPIN)
