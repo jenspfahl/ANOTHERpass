@@ -3,7 +3,6 @@ package de.jepfa.yapm.ui
 import android.app.Activity
 import android.content.DialogInterface
 import android.os.Bundle
-import android.text.Editable
 import android.text.InputType
 import android.util.Base64
 import android.view.View
@@ -128,7 +127,7 @@ abstract class SecureActivity : BaseActivity() {
                 val buttonPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                 buttonPositive.setOnClickListener(View.OnClickListener {
                     val secretService = activity.getApp().secretService
-                    val masterPin = toPassword(input.text)
+                    val masterPin = Password.fromEditable(input.text)
                     try {
                         if (masterPin!!.isEmpty()) {
                             input.error = activity.getString(R.string.error_field_required)
@@ -198,14 +197,5 @@ abstract class SecureActivity : BaseActivity() {
             return secretDialogOpened >= current - DELTA_DIALOG_OPENED
         }
 
-        private fun toPassword(editable: Editable?): Password? {
-            if (editable == null) {
-                return null
-            }
-            val l = editable.length
-            val chararray = CharArray(l)
-            editable.getChars(0, l, chararray, 0)
-            return Password(chararray)
-        }
     }
 }

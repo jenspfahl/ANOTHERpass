@@ -50,6 +50,20 @@
     <string name="text_create_new_vault">Create a new vault here. </string>
     <string name="button_import_new_vault">Import vault</string>
     <string name="text_import_new_vault">Import an existing vault here, if you have a vault file.</string>
+    <string name="create_vault_explanation_1">First, you need to generate the master passphrase. This is used to login into your vault.</string>
+    <string name="button_next">Next</string>
+    <string name="create_vault_enter_passphrase_fragment_label">Create Vault 1/3</string>
+    <string name="create_vault_explanation_2">Create a PIN or short password used to unlock your vault.</string>
+    <string name="pin">Enter a PIN</string>
+    <string name="repeat_pin">Repeat the PIN</string>
+    <string name="create_vault_enter_pin_fragment_label">Create vault 2/3</string>
+    <string name="pin_required">A pin is required</string>
+    <string name="pin_too_short">Pin is too short</string>
+    <string name="pin_not_equal">Pin repetition not equal</string>
+    <string name="button_create_vault">Create vault</string>
+    <string name="create_vault_explanation_3">Here you have  should write the master password down and store it savely (later export it as QR). You can also store it on this device.</string>
+    <string name="store_master_password">Store master password on this device</string>
+    <string name="create_vault_summarize_fragment_label">Create vault 3/3</string>
 
 
 </resources>

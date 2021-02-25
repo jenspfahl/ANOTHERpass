@@ -22,6 +22,7 @@ import javax.crypto.spec.PBEKeySpec
 
 class SecretService {
 
+    val ALIAS_KEY_TEMP = "YAPM/keyAlias:TMP"
     val ALIAS_KEY_MK = "YAPM/keyAlias:MK"
     val ALIAS_KEY_HPIN = "YAPM/keyAlias:HPIN"
 

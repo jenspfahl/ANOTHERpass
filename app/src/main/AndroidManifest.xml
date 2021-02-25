@@ -11,6 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.YetAnotherPasswordManager">
         <activity android:name=".ui.NewOrChangeCredentialActivity"></activity>
+        <activity android:name=".ui.CreateVaultActivity"></activity>
         <activity
             android:name=".ui.ListCredentialsActivity"
             android:label="@string/app_name"

@@ -1,5 +1,6 @@
 package de.jepfa.yapm.model
 
+import android.text.Editable
 import java.nio.CharBuffer
 
 data class Password(var data: CharArray) : Clearable, CharSequence {
@@ -60,5 +61,15 @@ data class Password(var data: CharArray) : Clearable, CharSequence {
 
     override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
         return Password(data.copyOfRange(startIndex, endIndex))
+    }
+
+    companion object {
+        fun fromEditable(editable: Editable): Password {
+
+            val l = editable.length
+            val chararray = CharArray(l)
+            editable.getChars(0, l, chararray, 0)
+            return Password(chararray)
+        }
     }
 }

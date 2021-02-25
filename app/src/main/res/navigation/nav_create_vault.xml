@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/CreateVaultEnterPassphraseFragment">
+
+    <fragment
+        android:id="@+id/CreateVaultEnterPassphraseFragment"
+        android:name="de.jepfa.yapm.ui.CreateVaultEnterPassphraseFragment"
+        android:label="@string/create_vault_enter_passphrase_fragment_label"
+        tools:layout="@layout/fragment_create_vault_enter_passphrase">
+
+        <action
+            android:id="@+id/action_Create_Vault_FirstFragment_to_SecondFragment"
+            app:destination="@id/CreateVaultEnterPinFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/CreateVaultEnterPinFragment"
+        android:name="de.jepfa.yapm.ui.CreateVaultEnterPinFragment"
+        android:label="@string/create_vault_enter_pin_fragment_label"
+        tools:layout="@layout/fragment_create_vault_enter_pin">
+        <argument
+            android:name="encPassword"
+            app:argType="string" />
+
+        <action
+               android:id="@+id/action_Create_Vault_SecondFragment_to_ThirdFragment"
+               app:destination="@id/CreateVaultSummarizeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/CreateVaultSummarizeFragment"
+        android:name="de.jepfa.yapm.ui.CreateVaultSummarizeFragment"
+        android:label="@string/create_vault_summarize_fragment_label"
+        tools:layout="@layout/fragment_create_vault_summarize">
+        <argument
+            android:name="encPassword"
+            app:argType="string" />
+        <argument
+            android:name="encPin"
+            app:argType="string" />
+
+
+    </fragment>
+</navigation>
