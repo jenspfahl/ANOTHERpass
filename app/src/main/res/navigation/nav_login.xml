@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_login"
+    app:startDestination="@id/FirstFragment">
+
+    <fragment
+        android:id="@+id/FirstFragment"
+        android:name="de.jepfa.yapm.ui.login.LoginEnterPinFragment"
+        android:label="@string/first_fragment_label"
+        tools:layout="@layout/fragment_login_enter_pin">
+
+        <action
+            android:id="@+id/action_Login_FirstFragment_to_SecondFragment"
+            app:destination="@id/SecondFragment" />
+
+        <action
+            android:id="@+id/action_Login_SecondFragment_to_List"
+            app:destination="@id/ListCredentialsActivity" />
+    </fragment>
+    <fragment
+        android:id="@+id/SecondFragment"
+        android:name="de.jepfa.yapm.ui.login.SecondFragment"
+        android:label="@string/second_fragment_label"
+        tools:layout="@layout/fragment_second">
+
+        <action
+            android:id="@+id/action_Login_SecondFragment_to_List"
+            app:destination="@id/ListCredentialsActivity" />
+    </fragment>
+
+    <activity
+        android:id="@+id/ListCredentialsActivity"
+        android:name="de.jepfa.yapm.ui.credential.ListCredentialsActivity"
+        android:label="List Credentials Activity"/>
+
+</navigation>

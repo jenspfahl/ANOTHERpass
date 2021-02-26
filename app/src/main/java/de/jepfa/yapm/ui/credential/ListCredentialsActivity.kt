@@ -1,4 +1,4 @@
-package de.jepfa.yapm.ui
+package de.jepfa.yapm.ui.credential
 
 import android.app.Activity
 import android.app.SearchManager
@@ -22,6 +22,8 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.service.encrypt.SecretService
+import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.viewmodel.CredentialViewModel
 import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
 

@@ -2,12 +2,12 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/nav_graph"
+    android:id="@+id/nav_create_vault"
     app:startDestination="@id/CreateVaultEnterPassphraseFragment">
 
     <fragment
         android:id="@+id/CreateVaultEnterPassphraseFragment"
-        android:name="de.jepfa.yapm.ui.CreateVaultEnterPassphraseFragment"
+        android:name="de.jepfa.yapm.ui.createvault.CreateVaultEnterPassphraseFragment"
         android:label="@string/create_vault_enter_passphrase_fragment_label"
         tools:layout="@layout/fragment_create_vault_enter_passphrase">
 
@@ -17,7 +17,7 @@
     </fragment>
     <fragment
         android:id="@+id/CreateVaultEnterPinFragment"
-        android:name="de.jepfa.yapm.ui.CreateVaultEnterPinFragment"
+        android:name="de.jepfa.yapm.ui.createvault.CreateVaultEnterPinFragment"
         android:label="@string/create_vault_enter_pin_fragment_label"
         tools:layout="@layout/fragment_create_vault_enter_pin">
         <argument
@@ -30,7 +30,7 @@
     </fragment>
     <fragment
         android:id="@+id/CreateVaultSummarizeFragment"
-        android:name="de.jepfa.yapm.ui.CreateVaultSummarizeFragment"
+        android:name="de.jepfa.yapm.ui.createvault.CreateVaultSummarizeFragment"
         android:label="@string/create_vault_summarize_fragment_label"
         tools:layout="@layout/fragment_create_vault_summarize">
         <argument
@@ -40,15 +40,15 @@
             android:name="encPin"
             app:argType="string" />
 
+        <action
+            android:id="@+id/action_Create_Vault_to_ThirdFragment_to_Root"
+            app:destination="@id/LoginActivity" />
+
     </fragment>
 
     <activity
         android:id="@+id/LoginActivity"
-        android:name="de.jepfa.yapm.ui.LoginActivity"
-        android:label="Login Activity">
+        android:name="de.jepfa.yapm.ui.login.LoginActivity"
+        android:label="Login Activity"/>
 
-        <action
-            android:id="@+id/action_Create_Vault_to_ThirdFragment_to_Root"
-            app:destination="@id/LoginActivity" />
-    </activity>
 </navigation>

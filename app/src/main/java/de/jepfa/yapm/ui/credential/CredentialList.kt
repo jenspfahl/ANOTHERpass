@@ -1,4 +1,4 @@
-package de.jepfa.yapm.ui
+package de.jepfa.yapm.ui.credential
 
 import android.app.AlertDialog
 import android.content.DialogInterface
@@ -19,7 +19,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
-import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.service.overlay.OverlayShowingService
 import java.util.*
 

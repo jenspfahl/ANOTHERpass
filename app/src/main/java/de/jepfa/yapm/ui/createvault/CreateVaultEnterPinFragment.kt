@@ -1,16 +1,15 @@
-package de.jepfa.yapm.ui
+package de.jepfa.yapm.ui.createvault
 
 import android.os.Bundle
-import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import androidx.navigation.Navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Password
+import de.jepfa.yapm.ui.BaseFragment
 import java.util.*
 
 class CreateVaultEnterPinFragment : BaseFragment() {
@@ -50,14 +49,14 @@ class CreateVaultEnterPinFragment : BaseFragment() {
 
                 val secretService = getApp().secretService
 
-                val key = secretService.getAndroidSecretKey(secretService.ALIAS_KEY_TEMP)
-                val encPin = secretService.encryptPassword(key, Password.fromEditable(pin1.text))
+                val androidTempKey = secretService.getAndroidSecretKey(secretService.ALIAS_KEY_TEMP)
+                val encPin = secretService.encryptPassword(androidTempKey, Password.fromEditable(pin1.text))
                 val encPasswd = arguments?.getString(CreateVaultActivity.ARG_ENC_PASSWD)
                 val args = Bundle()
                 args.putString(CreateVaultActivity.ARG_ENC_PASSWD, encPasswd)
                 args.putString(CreateVaultActivity.ARG_ENC_PIN, encPin.toBase64String())
 
-                findNavController().navigate(R.id.action_Create_Vault_SecondFragment_to_ThirdFragment)
+                findNavController().navigate(R.id.action_Create_Vault_SecondFragment_to_ThirdFragment, args)
             }
 
             p1.clear()

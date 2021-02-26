@@ -1,4 +1,4 @@
-package de.jepfa.yapm.ui
+package de.jepfa.yapm.ui.login
 
 import android.app.Activity
 import android.content.Intent
@@ -8,8 +8,8 @@ import android.view.MenuItem
 import android.widget.Button
 import android.widget.Toast
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.EncCredential
-import de.jepfa.yapm.model.Encrypted
+import de.jepfa.yapm.ui.BaseActivity
+import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.util.PreferenceUtil
 
 

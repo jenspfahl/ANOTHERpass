@@ -60,10 +60,12 @@
     <string name="pin_required">A pin is required</string>
     <string name="pin_too_short">Pin is too short</string>
     <string name="pin_not_equal">Pin repetition not equal</string>
+    <string name="pin_wrong">Wrong pin</string>
     <string name="button_create_vault">Create vault</string>
     <string name="create_vault_explanation_3">Here you have  should write the master password down and store it savely (later export it as QR). You can also store it on this device.</string>
     <string name="store_master_password">Store master password on this device</string>
     <string name="create_vault_summarize_fragment_label">Create vault 3/3</string>
+    <string name="login_explanation_1">Enter your Pin to login into your vault.</string>
 
 
 </resources>

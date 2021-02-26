@@ -1,17 +1,19 @@
-package de.jepfa.yapm.ui
+package de.jepfa.yapm.ui.createvault
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.Switch
 import android.widget.TextView
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Key
 import de.jepfa.yapm.model.Password
-import de.jepfa.yapm.service.encrypt.SecretService
+import de.jepfa.yapm.ui.BaseActivity
+import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.util.PreferenceUtil
 import javax.crypto.SecretKey
 
@@ -35,6 +37,9 @@ class CreateVaultSummarizeFragment : BaseFragment() {
         val encPasswd = Encrypted.fromBase64String(encPasswordBase64)
         val passwd = secretService.decryptPassword(key, encPasswd)
 
+        val switchStorePasswd: Switch = view.findViewById(R.id.switch_store_master_password)
+        switchStorePasswd.setChecked(true) // TODO false per default ?
+
         val generatedPasswdView: TextView = view.findViewById(R.id.generated_passwd)
         generatedPasswdView.text = passwd.debugToString()
 
@@ -42,11 +47,17 @@ class CreateVaultSummarizeFragment : BaseFragment() {
 
             val keyForMK = secretService.getAndroidSecretKey(secretService.ALIAS_KEY_MK)
 
-            val salt = secretService.getOrCreateSalt(activity as BaseActivity)
+            val salt = secretService.getOrCreateSalt(getBaseActivity())
 
-            val masterPin = extractAndStoreMasterPin(activity as BaseActivity, salt)
+            val masterPin = extractAndStoreMasterPin(getBaseActivity(), salt)
 
-            val masterPassphrase = generateAndStoreMasterKey(activity as BaseActivity, masterPin, passwd, salt, keyForMK)
+            val masterPassphrase = generateAndStoreMasterKey(getBaseActivity(), masterPin, passwd, salt, keyForMK)
+
+            if (switchStorePasswd.isChecked) {
+                val keyForMP = secretService.getAndroidSecretKey(secretService.ALIAS_KEY_MP)
+                val encPasswd = secretService.encryptPassword(keyForMP, passwd)
+                PreferenceUtil.put(PreferenceUtil.PREF_MASTER_PASSWORD, encPasswd.toBase64String(), getBaseActivity())
+            }
 
             masterPassphrase.clear()
             masterPin.clear()

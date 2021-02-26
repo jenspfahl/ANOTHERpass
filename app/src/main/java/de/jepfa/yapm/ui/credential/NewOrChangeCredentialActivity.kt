@@ -1,21 +1,20 @@
-package de.jepfa.yapm.ui
+package de.jepfa.yapm.ui.credential
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Password
-import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.service.secretgenerator.PassphraseGenerator
 import de.jepfa.yapm.service.secretgenerator.PassphraseGeneratorSpec
 import de.jepfa.yapm.service.secretgenerator.PasswordStrength
-import de.jepfa.yapm.ui.ListCredentialsActivity
+import de.jepfa.yapm.ui.SecureActivity
 
 class NewOrChangeCredentialActivity : SecureActivity() {
 
@@ -80,6 +79,19 @@ class NewOrChangeCredentialActivity : SecureActivity() {
             generatedPasswdView.text = generatedPassword.debugToString()
         })
 
+        generatedPasswdView.setOnClickListener {
+            val spec = buildGeneratorSpec()
+            val combinations = passphraseGenerator.calcCombinationCount(spec)
+            val bruteForceWithPentum = passphraseGenerator.calcBruteForceWaitingSeconds(spec, passphraseGenerator.BRUTEFORCE_ATTEMPTS_PENTIUM)
+            val bruteForceWithSupercomp = passphraseGenerator.calcBruteForceWaitingSeconds(spec, passphraseGenerator.BRUTEFORCE_ATTEMPTS_SUPERCOMP)
+            AlertDialog.Builder(it.context)
+                    .setTitle("Password strength")
+                    .setMessage("Combinations: $combinations" + System.lineSeparator() +
+                            "Years to brute force with a usual PC: $bruteForceWithPentum/60/60/24/365" + System.lineSeparator() +
+                            "Years to brute force with a super computer: $bruteForceWithSupercomp/60/60/24/365")
+                    .show()
+        }
+
         val button = findViewById<Button>(R.id.button_save)
         button.setOnClickListener {
             if (generatedPassword.data.isEmpty()) {
@@ -116,18 +128,24 @@ class NewOrChangeCredentialActivity : SecureActivity() {
     }
 
     private fun generatePassword() : Password {
+        val spec = buildGeneratorSpec()
+
+        return passphraseGenerator.generatePassphrase(spec)
+    }
+
+    private fun buildGeneratorSpec(): PassphraseGeneratorSpec {
         val passwordStrength = when (radioStrength.checkedRadioButtonId) {
             R.id.radio_strength_strong -> PasswordStrength.STRONG
             R.id.radio_strength_super_strong -> PasswordStrength.SUPER_STRONG
             R.id.radio_strength_extreme -> PasswordStrength.EXTREME
             else -> PASSWD_STRENGTH_DEFAULT // default
         }
-        return passphraseGenerator.generatePassphrase(
-            PassphraseGeneratorSpec(
+        val spec = PassphraseGeneratorSpec(
                 strength = passwordStrength,
                 wordBeginningUpperCase = switchUpperCaseChar.isChecked,
                 addDigit = switchAddDigit.isChecked,
-                addSpecialChar = switchAddSpecialChar.isChecked))
+                addSpecialChar = switchAddSpecialChar.isChecked)
+        return spec
     }
 
     private fun buildRadioButton(radioButton: RadioButton, passwordStrength: PasswordStrength) {

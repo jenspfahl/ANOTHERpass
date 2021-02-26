@@ -27,6 +27,7 @@ class SecretService {
 
     val ALIAS_KEY_TEMP = "YAPM/keyAlias:TMP"
     val ALIAS_KEY_MK = "YAPM/keyAlias:MK"
+    val ALIAS_KEY_MP = "YAPM/keyAlias:MP"
     val ALIAS_KEY_HPIN = "YAPM/keyAlias:HPIN"
 
     private val CIPHER_AES_GCM = "AES/GCM/NoPadding"

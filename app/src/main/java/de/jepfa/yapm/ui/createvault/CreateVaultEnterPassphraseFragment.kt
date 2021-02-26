@@ -1,7 +1,6 @@
-package de.jepfa.yapm.ui
+package de.jepfa.yapm.ui.createvault
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +13,7 @@ import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.service.secretgenerator.PassphraseGenerator
 import de.jepfa.yapm.service.secretgenerator.PassphraseGeneratorSpec
 import de.jepfa.yapm.service.secretgenerator.PasswordStrength
+import de.jepfa.yapm.ui.BaseFragment
 
 
 class CreateVaultEnterPassphraseFragment : BaseFragment() {
@@ -51,8 +51,8 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
                 Toast.makeText(it.context, "Generate a password first", Toast.LENGTH_LONG).show()
             }
             else {
-                val key = secretService.getAndroidSecretKey(secretService.ALIAS_KEY_TEMP)
-                val encPassword = secretService.encryptPassword(key, generatedPassword)
+                val androidTempKey = secretService.getAndroidSecretKey(secretService.ALIAS_KEY_TEMP)
+                val encPassword = secretService.encryptPassword(androidTempKey, generatedPassword)
                 generatedPassword.clear()
 
                 val args = Bundle()

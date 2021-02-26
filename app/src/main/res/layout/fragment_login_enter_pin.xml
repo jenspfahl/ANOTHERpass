@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.login.LoginActivity">
+    tools:context=".ui.login.LoginEnterPinFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -27,54 +27,44 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/textview_create_vault"
+            android:id="@+id/textview_login_vault"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/text_create_new_vault"
-            app:layout_constraintBottom_toTopOf="@id/button_create_vault"
+            android:text="@string/login_explanation_1"
+            app:layout_constraintBottom_toTopOf="@id/edittext_enter_pin"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
-            android:id="@+id/button_create_vault"
+
+        <EditText
+            android:id="@+id/edittext_enter_pin"
+            android:inputType="textPassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/button_create_new_vault"
-            android:background="@color/colorAccent"
-            android:textColor="@color/buttonLabel"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/textview_import_vault"
+            app:layout_constraintBottom_toTopOf="@id/button_login_next"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/textview_create_vault" />
+            app:layout_constraintTop_toTopOf="@id/textview_login_vault"
+            android:hint="@string/pin" />
 
-
-
-        <TextView
-            android:id="@+id/textview_import_vault"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/text_import_new_vault"
-            app:layout_constraintBottom_toBottomOf="@id/button_import_vault"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/button_create_vault" />
 
         <Button
-            android:id="@+id/button_import_vault"
+            android:id="@+id/button_login_next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/button_import_new_vault"
+            android:text="@string/button_next"
             android:background="@color/colorAccent"
             android:textColor="@color/buttonLabel"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/textview_import_vault" />
+            app:layout_constraintTop_toTopOf="@id/edittext_enter_pin" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
