@@ -79,21 +79,6 @@ abstract class SecureActivity : BaseActivity() {
             return secret
         }
 
-        @Synchronized
-        fun getOrCreateSalt(activity: BaseActivity): Key {
-            var saltBase64 = PreferenceUtil.get(PreferenceUtil.PREF_SALT, activity)
-            val salt: Key
-            if (saltBase64 == null) {
-                val secretService = activity.getApp().secretService
-                salt = secretService.generateKey(128)
-                saltBase64 = Base64.encodeToString(salt.data, Base64.DEFAULT)
-                PreferenceUtil.put(PreferenceUtil.PREF_SALT, saltBase64, activity)
-            } else {
-                salt = Key(Base64.decode(saltBase64, 0))
-            }
-            return salt
-        }
-
         private fun openDialog(secret: Secret, activity: BaseActivity) {
             if (isRecentlyOpened(secretDialogOpened)) {
                 return
@@ -133,7 +118,7 @@ abstract class SecureActivity : BaseActivity() {
                             input.error = activity.getString(R.string.error_field_required)
                             return@OnClickListener
                         } else if (isPinStored(activity) &&
-                                !isPinValid(masterPin, getOrCreateSalt(activity), activity)) {
+                                !isPinValid(masterPin, secretService.getOrCreateSalt(activity), activity)) {
                             input.error = activity.getString(R.string.wrong_pin)
                             if (failCounter.incrementAndGet() < MAX_PASSWD_ATTEMPTS) {
                                 return@OnClickListener  // try again
@@ -145,7 +130,7 @@ abstract class SecureActivity : BaseActivity() {
                             } else {
                                 getPasswordFromUser(activity)
                             }
-                            secretService.login(masterPin, masterPassword, getOrCreateSalt(activity))
+                            secretService.login(masterPin, masterPassword, secretService.getOrCreateSalt(activity))
                             if (activity is SecureActivity) {
                                 activity.refresh(false) // show correct encrypted data
                             }

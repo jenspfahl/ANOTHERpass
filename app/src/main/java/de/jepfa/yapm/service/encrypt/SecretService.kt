@@ -3,12 +3,15 @@ package de.jepfa.yapm.service.encrypt
 import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import android.util.Base64
 import androidx.room.Room
 import de.jepfa.yapm.database.YapmDatabase
 import de.jepfa.yapm.model.Clearable
 import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Key
 import de.jepfa.yapm.model.Password
+import de.jepfa.yapm.ui.BaseActivity
+import de.jepfa.yapm.util.PreferenceUtil
 import kotlinx.coroutines.CoroutineScope
 import java.security.*
 import java.util.*
@@ -269,6 +272,21 @@ class SecretService {
     private fun getStoredMasterKey(): Encrypted {
         TODO()
 
+    }
+
+    @Synchronized
+    fun getOrCreateSalt(activity: BaseActivity): Key {
+        var saltBase64 = PreferenceUtil.get(PreferenceUtil.PREF_SALT, activity)
+        val salt: Key
+        if (saltBase64 == null) {
+            val secretService = activity.getApp().secretService
+            salt = secretService.generateKey(128)
+            saltBase64 = Base64.encodeToString(salt.data, Base64.DEFAULT)
+            PreferenceUtil.put(PreferenceUtil.PREF_SALT, saltBase64, activity)
+        } else {
+            salt = Key(Base64.decode(saltBase64, 0))
+        }
+        return salt
     }
 
 

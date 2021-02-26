@@ -40,6 +40,15 @@
             android:name="encPin"
             app:argType="string" />
 
-
     </fragment>
+
+    <activity
+        android:id="@+id/LoginActivity"
+        android:name="de.jepfa.yapm.ui.LoginActivity"
+        android:label="Login Activity">
+
+        <action
+            android:id="@+id/action_Create_Vault_to_ThirdFragment_to_Root"
+            app:destination="@id/LoginActivity" />
+    </activity>
 </navigation>
