@@ -157,10 +157,10 @@ object SecretService {
         return keyGenerator.generateKey();
     }
 
-    fun login(masterPin: Password, masterPassword: Password, salt: Key) {
+    fun login(masterPin: Password, masterPassword: Password, salt: Key, storedEncMasterKey: Encrypted) {
 
         val masterPassPhraseSK = getMasterPassPhraseSK(masterPin, masterPassword, salt)
-        val masterSecretKey = getMasterSK(masterPassPhraseSK, salt)
+        val masterSecretKey = getMasterSK(masterPassPhraseSK, salt, storedEncMasterKey)
         Secret.update(masterSecretKey)
     }
 
@@ -182,23 +182,15 @@ object SecretService {
      * Returns the Master Secret Key which is encrypted twice, first with the Android key
      * and second with the PassPhrase key.
      */
-    private fun getMasterSK(masterPassPhraseSK: SecretKey, salt: Key): SecretKey {
+    private fun getMasterSK(masterPassPhraseSK: SecretKey, salt: Key, storedEncMasterKey: Encrypted): SecretKey {
         val androidSK = getAndroidSecretKey(ALIAS_KEY_MK)
 
-        // TODO mockup here
-        //val storedEncMasterKey = getStoredMasterKey()
-        //val encMasterKey = decryptEncrypted(androidSK, storedEncMasterKey)
-        // val masterKey = decryptKey(masterPassPhraseSK, encMasterKey)
-        //val masterSK = generateSecretKey(masterKey, salt)
-        //masterKey.clear()
+        val encMasterKey = decryptEncrypted(androidSK, storedEncMasterKey)
+        val masterKey = decryptKey(masterPassPhraseSK, encMasterKey)
+        val masterSK = generateSecretKey(masterKey, salt)
+        masterKey.clear()
 
-        //return masterSK
-
-        return masterPassPhraseSK
-    }
-
-    private fun getStoredMasterKey(): Encrypted {
-        TODO()
+        return masterSK
 
     }
 

@@ -32,8 +32,7 @@ object Secret {
     }
 
     fun isLoggedOut() : Boolean {
-        // TODOD return masterPassword == null
-        return false //mockup
+        return masterPassword == null
     }
 
     fun isDeclined() : Boolean {

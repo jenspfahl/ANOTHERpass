@@ -11,7 +11,6 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.service.encrypt.SecretService
-import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.util.PreferenceUtil
@@ -63,14 +62,17 @@ class LoginEnterPinFragment : BaseFragment() {
                             val encMasterPasswd = Encrypted.fromBase64String(storedMasterPasswd)
                             val decMasterPasswd = SecretService.decryptPassword(keyForMP, encMasterPasswd)
 
-                            SecretService.login(userPin, decMasterPasswd, salt)
-                            findNavController().navigate(R.id.action_Login_SecondFragment_to_List)
+                            val storedEncMasterKeyBase64 = PreferenceUtil.get(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, getBaseActivity())
+                            val storedEncMasterKey = Encrypted.fromBase64String(storedEncMasterKeyBase64!!)
+
+                            SecretService.login(userPin, decMasterPasswd, salt, storedEncMasterKey)
+                            findNavController().navigate(R.id.action_Login_MasterPasswordFragment_to_CredentialList)
                         } else {
                             val encUserPin = SecretService.encryptPassword(keyForTemp, userPin)
                             val args = Bundle()
                             args.putString(CreateVaultActivity.ARG_ENC_PIN, encUserPin.toBase64String())
 
-                            findNavController().navigate(R.id.action_Login_FirstFragment_to_SecondFragment, args)
+                            findNavController().navigate(R.id.action_Login_PinFragment_to_MasterPasswordFragment, args)
 
                         }
                     }

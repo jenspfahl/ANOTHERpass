@@ -2,8 +2,8 @@
     <string name="app_name">ANOTHERpass</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
+    <string name="login_pin_fragment_label">Unlock with your PIN</string>
+    <string name="login_masterpassword_fragment_label">Login with your master password</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
@@ -66,6 +66,10 @@
     <string name="store_master_password">Store master password on this device</string>
     <string name="create_vault_summarize_fragment_label">Create vault 3/3</string>
     <string name="login_explanation_1">Enter your Pin to login into your vault.</string>
+    <string name="login_explanation_2">Enter your master password to login into your vault.</string>
+    <string name="password">Enter your master password</string>
+    <string name="button_login">Login</string>
+    <string name="password_required">Password required</string>
 
 
 </resources>

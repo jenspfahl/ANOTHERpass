@@ -24,6 +24,7 @@ import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.YapmApp
+import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.viewmodel.CredentialViewModel
 import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
 
@@ -140,8 +141,8 @@ class ListCredentialsActivity : SecureActivity() {
             }
             R.id.menu_logout -> {
                 val secret = SecretChecker.getOrAskForSecret(this)
+                PreferenceUtil.delete(PreferenceUtil.PREF_MASTER_PASSWORD, this)
                 secret.logout()
-                refreshMenuLockItem(item)
                 return true
             }
             else -> super.onOptionsItemSelected(item)
