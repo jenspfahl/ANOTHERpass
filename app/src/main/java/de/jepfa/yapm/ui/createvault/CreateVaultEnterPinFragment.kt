@@ -9,6 +9,7 @@ import android.widget.EditText
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Password
+import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.BaseFragment
 import java.util.*
 
@@ -47,10 +48,8 @@ class CreateVaultEnterPinFragment : BaseFragment() {
             }
             else {
 
-                val secretService = getApp().secretService
-
-                val androidTempKey = secretService.getAndroidSecretKey(secretService.ALIAS_KEY_TEMP)
-                val encPin = secretService.encryptPassword(androidTempKey, Password.fromEditable(pin1.text))
+                val androidTempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
+                val encPin = SecretService.encryptPassword(androidTempKey, Password.fromEditable(pin1.text))
                 val encPasswd = arguments?.getString(CreateVaultActivity.ARG_ENC_PASSWD)
                 val args = Bundle()
                 args.putString(CreateVaultActivity.ARG_ENC_PASSWD, encPasswd)

@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
+import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.service.overlay.OverlayShowingService
 import java.util.*
 
@@ -29,17 +30,15 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
 
     private lateinit var originList: List<EncCredential>
 
-    val secretService = listCredentialsActivity.getApp().secretService
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CredentialViewHolder {
         val holder = CredentialViewHolder.create(parent)
         holder.listenForShowCredential { pos, _ ->
             val current = getItem(pos)
             val key = listCredentialsActivity.masterSecretKey
             if (key != null) {
-                val decName = secretService.decryptCommonString(key, current.name)
-                val decAdditionalInfo = secretService.decryptCommonString(key, current.additionalInfo)
-                val password = secretService.decryptPassword(key, current.password)
+                val decName = SecretService.decryptCommonString(key, current.name)
+                val decAdditionalInfo = SecretService.decryptCommonString(key, current.additionalInfo)
+                val password = SecretService.decryptPassword(key, current.password)
                 AlertDialog.Builder(holder.itemView.context)
                         .setTitle(decName)
                         .setMessage(decAdditionalInfo + System.lineSeparator() + password.debugToString())
@@ -73,7 +72,7 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
                 val current = getItem(pos)
                 val key = listCredentialsActivity.masterSecretKey
                 if (key != null) {
-                    val password = secretService.decryptPassword(key, current.password)
+                    val password = SecretService.decryptPassword(key, current.password)
 
                     val intent = Intent(listCredentialsActivity, OverlayShowingService::class.java)
                     intent.putExtra("password", password.data)
@@ -105,7 +104,7 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
                         R.id.menu_delete_credential -> {
                             val key = listCredentialsActivity.masterSecretKey
                             if (key != null) {
-                                val decName = secretService.decryptCommonString(key, current.name)
+                                val decName = SecretService.decryptCommonString(key, current.name)
 
                                 AlertDialog.Builder(listCredentialsActivity)
                                         .setTitle(R.string.title_delete_credential)
@@ -135,7 +134,7 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
         val key = listCredentialsActivity.masterSecretKey
         var name = "-----"
         if (key != null) {
-            name = secretService.decryptCommonString(key, current.name)
+            name = SecretService.decryptCommonString(key, current.name)
         }
         holder.bind(name)
 
@@ -154,7 +153,7 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
                     for (credential in originList) {
                         var name = ""
                         if (key != null) {
-                            name = secretService.decryptCommonString(key, credential.name)
+                            name = SecretService.decryptCommonString(key, credential.name)
                             if (name.toLowerCase().contains(charString.toLowerCase())) {
                                 filteredList.add(credential)
                             }

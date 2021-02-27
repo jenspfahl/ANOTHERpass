@@ -6,10 +6,8 @@ import android.security.keystore.KeyProperties
 import android.util.Base64
 import androidx.room.Room
 import de.jepfa.yapm.database.YapmDatabase
-import de.jepfa.yapm.model.Clearable
-import de.jepfa.yapm.model.Encrypted
+import de.jepfa.yapm.model.*
 import de.jepfa.yapm.model.Key
-import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.util.PreferenceUtil
 import kotlinx.coroutines.CoroutineScope
@@ -23,7 +21,7 @@ import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.PBEKeySpec
 
-class SecretService {
+object SecretService {
 
     val ALIAS_KEY_TEMP = "YAPM/keyAlias:TMP"
     val ALIAS_KEY_MK = "YAPM/keyAlias:MK"
@@ -37,77 +35,6 @@ class SecretService {
     private val random = SecureRandom()
     private val androidKeyStore = KeyStore.getInstance(ANDROID_KEY_STORE)
 
-    val secret = Secret()
-
-    companion object {
-        @Volatile
-        private var INSTANCE: SecretService? = null
-        fun getInstance(): SecretService {
-            if (INSTANCE == null) {
-                synchronized(SecretService::class.java) {
-                    if (INSTANCE == null) {
-                        INSTANCE = SecretService()
-                    }
-                }
-            }
-            return INSTANCE!!
-        }
-    }
-
-
-    class Secret (
-            private var masterSecretKey: SecretKey? = null,
-            private var masterPassword: Encrypted? = null,
-            private var lastUpdated: Long = 0) {
-
-        /**
-         * After this period of time of inactivity the secret is outdated.
-         */
-        private val SECRET_KEEP_VALID: Long = TimeUnit.SECONDS.toMillis(600) // TODO 60
-
-        fun get() : SecretKey {
-            return masterSecretKey!!
-        }
-
-        fun update(secretKey: SecretKey) {
-            masterSecretKey = secretKey
-            update()
-        }
-
-        fun update() {
-            lastUpdated = System.currentTimeMillis()
-        }
-
-        fun isLockedOrOutdated() : Boolean {
-            return masterSecretKey == null || isOutdated()
-        }
-
-        fun isLoggedOut() : Boolean {
-            // TODOD return masterPassword == null
-            return false //mockup
-        }
-
-        fun isDeclined() : Boolean {
-            return isLoggedOut() || isLockedOrOutdated()
-        }
-
-        fun lock() {
-            masterSecretKey = null
-            update()
-        }
-
-        fun logout() {
-            lock()
-            masterPassword = null
-        }
-
-        private fun isOutdated(): Boolean {
-            val age: Long = System.currentTimeMillis() - lastUpdated
-
-            return age > SECRET_KEEP_VALID
-        }
-
-    }
 
     fun generateKey(length: Int): Key {
         val bytes = ByteArray(length)
@@ -234,7 +161,7 @@ class SecretService {
 
         val masterPassPhraseSK = getMasterPassPhraseSK(masterPin, masterPassword, salt)
         val masterSecretKey = getMasterSK(masterPassPhraseSK, salt)
-        secret.update(masterSecretKey)
+        Secret.update(masterSecretKey)
     }
 
     /**
@@ -280,8 +207,7 @@ class SecretService {
         var saltBase64 = PreferenceUtil.get(PreferenceUtil.PREF_SALT, activity)
         val salt: Key
         if (saltBase64 == null) {
-            val secretService = activity.getApp().secretService
-            salt = secretService.generateKey(128)
+            salt = SecretService.generateKey(128)
             saltBase64 = Base64.encodeToString(salt.data, Base64.DEFAULT)
             PreferenceUtil.put(PreferenceUtil.PREF_SALT, saltBase64, activity)
         } else {

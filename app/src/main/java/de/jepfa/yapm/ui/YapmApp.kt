@@ -12,5 +12,4 @@ class YapmApp : Application() {
 
     val database by lazy { YapmDatabase.getDatabase(this, applicationScope) }
     val repository by lazy { CredentialRepository(database!!.credentialDao()) }
-    val secretService by lazy { SecretService.getInstance() }
 }

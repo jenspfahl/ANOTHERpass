@@ -14,6 +14,7 @@ import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.service.secretgenerator.PassphraseGenerator
 import de.jepfa.yapm.service.secretgenerator.PassphraseGeneratorSpec
 import de.jepfa.yapm.service.secretgenerator.PasswordStrength
+import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 
 class NewOrChangeCredentialActivity : SecureActivity() {
@@ -39,8 +40,6 @@ class NewOrChangeCredentialActivity : SecureActivity() {
         generatedPasswdView = findViewById(R.id.generated_passwd)
         radioStrength = findViewById(R.id.radio_strengths)
 
-        val secretService = getApp().secretService
-
         val idExtra = intent.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
         if (idExtra != -1) {
             currentId = idExtra
@@ -51,9 +50,9 @@ class NewOrChangeCredentialActivity : SecureActivity() {
 
             val key = masterSecretKey
             if (key != null) {
-                val name = secretService.decryptCommonString(key, originCredential.name)
-                val additionalInfo = secretService.decryptCommonString(key, originCredential.additionalInfo)
-                val password = secretService.decryptPassword(key, originCredential.password)
+                val name = SecretService.decryptCommonString(key, originCredential.name)
+                val additionalInfo = SecretService.decryptCommonString(key, originCredential.additionalInfo)
+                val password = SecretService.decryptPassword(key, originCredential.password)
                 editCredentialNameView.setText(name)
                 editCredentialAdditionalInfoView.setText(additionalInfo)
                 generatedPassword = password
@@ -82,13 +81,15 @@ class NewOrChangeCredentialActivity : SecureActivity() {
         generatedPasswdView.setOnClickListener {
             val spec = buildGeneratorSpec()
             val combinations = passphraseGenerator.calcCombinationCount(spec)
-            val bruteForceWithPentum = passphraseGenerator.calcBruteForceWaitingSeconds(spec, passphraseGenerator.BRUTEFORCE_ATTEMPTS_PENTIUM)
-            val bruteForceWithSupercomp = passphraseGenerator.calcBruteForceWaitingSeconds(spec, passphraseGenerator.BRUTEFORCE_ATTEMPTS_SUPERCOMP)
+            val bruteForceWithPentum = passphraseGenerator.calcBruteForceWaitingSeconds(
+                    spec, passphraseGenerator.BRUTEFORCE_ATTEMPTS_PENTIUM)
+            val bruteForceWithSupercomp = passphraseGenerator.calcBruteForceWaitingSeconds(
+                    spec, passphraseGenerator.BRUTEFORCE_ATTEMPTS_SUPERCOMP)
             AlertDialog.Builder(it.context)
                     .setTitle("Password strength")
-                    .setMessage("Combinations: $combinations" + System.lineSeparator() +
-                            "Years to brute force with a usual PC: $bruteForceWithPentum/60/60/24/365" + System.lineSeparator() +
-                            "Years to brute force with a super computer: $bruteForceWithSupercomp/60/60/24/365")
+                    .setMessage("Combinations: $combinations" + System.lineSeparator() + System.lineSeparator() +
+                            "Years to brute force with a usual PC: ${bruteForceWithPentum/60/60/24/365}" + System.lineSeparator() + System.lineSeparator() +
+                            "Years to brute force with a super computer: ${bruteForceWithSupercomp/60/60/24/365}")
                     .show()
         }
 
@@ -108,9 +109,9 @@ class NewOrChangeCredentialActivity : SecureActivity() {
                         val name = editCredentialNameView.text.toString()
                         val additionalInfo = editCredentialAdditionalInfoView.text.toString()
 
-                        val encName = secretService.encryptCommonString(key, name)
-                        val encAdditionalInfo = secretService.encryptCommonString(key, additionalInfo)
-                        val encPassword = secretService.encryptPassword(key, generatedPassword)
+                        val encName = SecretService.encryptCommonString(key, name)
+                        val encAdditionalInfo = SecretService.encryptCommonString(key, additionalInfo)
+                        val encPassword = SecretService.encryptPassword(key, generatedPassword)
                         generatedPassword.clear()
 
                         replyIntent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, currentId)

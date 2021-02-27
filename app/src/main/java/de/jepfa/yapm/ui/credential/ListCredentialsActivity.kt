@@ -112,7 +112,7 @@ class ListCredentialsActivity : SecureActivity() {
 
 
     protected fun refreshMenuLockItem(lockItem: MenuItem) {
-        val secret: SecretService.Secret = SecretChecker.getOrAskForSecret(this)
+        val secret = SecretChecker.getOrAskForSecret(this)
         if (secret.isLockedOrOutdated()) {
             lockItem.setIcon(R.drawable.ic_lock_outline_white_24dp)
         } else {
@@ -128,7 +128,7 @@ class ListCredentialsActivity : SecureActivity() {
         return when (item.itemId) {
             R.id.action_settings -> true
             R.id.menu_lock_items -> {
-                val secret: SecretService.Secret = SecretChecker.getOrAskForSecret(this)
+                val secret = SecretChecker.getOrAskForSecret(this)
                 if (secret.isLockedOrOutdated()) {
                     SecretChecker.getOrAskForSecret(this)
                 }
@@ -139,7 +139,7 @@ class ListCredentialsActivity : SecureActivity() {
                 return true
             }
             R.id.menu_logout -> {
-                val secret: SecretService.Secret = SecretChecker.getOrAskForSecret(this)
+                val secret = SecretChecker.getOrAskForSecret(this)
                 secret.logout()
                 refreshMenuLockItem(item)
                 return true

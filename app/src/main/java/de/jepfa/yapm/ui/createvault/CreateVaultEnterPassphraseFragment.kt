@@ -13,6 +13,7 @@ import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.service.secretgenerator.PassphraseGenerator
 import de.jepfa.yapm.service.secretgenerator.PassphraseGeneratorSpec
 import de.jepfa.yapm.service.secretgenerator.PasswordStrength
+import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.BaseFragment
 
 
@@ -37,8 +38,6 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
 
         generatedPasswdView = view.findViewById(R.id.generated_passwd)
 
-        val secretService = getApp().secretService
-
         val buttonGeneratePasswd: Button = view.findViewById(R.id.button_generate_passwd)
         buttonGeneratePasswd.setOnClickListener {
             generatedPassword = generatePassword()
@@ -51,8 +50,8 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
                 Toast.makeText(it.context, "Generate a password first", Toast.LENGTH_LONG).show()
             }
             else {
-                val androidTempKey = secretService.getAndroidSecretKey(secretService.ALIAS_KEY_TEMP)
-                val encPassword = secretService.encryptPassword(androidTempKey, generatedPassword)
+                val androidTempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
+                val encPassword = SecretService.encryptPassword(androidTempKey, generatedPassword)
                 generatedPassword.clear()
 
                 val args = Bundle()
