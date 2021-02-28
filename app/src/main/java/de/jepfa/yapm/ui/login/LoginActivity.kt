@@ -56,9 +56,7 @@ class LoginActivity : BaseActivity() {
         if (requestCode == createVaultActivityRequestCode && resultCode == Activity.RESULT_OK) {
             recreate()
         }
-
     }
-
 
     private fun isMasterKeyStored(activity: Activity): Boolean {
         return PreferenceUtil.get(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, activity) != null

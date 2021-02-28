@@ -142,6 +142,7 @@ class ListCredentialsActivity : SecureActivity() {
                 }
                 else {
                     secret.lock()
+                    closeOverlayDialogs()
                 }
                 refreshMenuLockItem(item)
                 return true
@@ -149,8 +150,7 @@ class ListCredentialsActivity : SecureActivity() {
             R.id.menu_logout -> {
                 Secret.logout()
 
-                val intent = Intent(this, OverlayShowingService::class.java)
-                stopService(intent)
+                closeOverlayDialogs()
 
                 finishAndRemoveTask()
                 finishAffinity()
@@ -160,12 +160,19 @@ class ListCredentialsActivity : SecureActivity() {
             R.id.delete_stored_masterkey -> {
                 PreferenceUtil.delete(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, this)
                 Secret.logout()
+                closeOverlayDialogs()
+
                 SecretChecker.getOrAskForSecret(this)
 
                 return true
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun closeOverlayDialogs() {
+        val intent = Intent(this, OverlayShowingService::class.java)
+        stopService(intent)
     }
 
 

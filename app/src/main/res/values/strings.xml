@@ -72,6 +72,7 @@
     <string name="password_required">Password required</string>
     <string name="delete_stored_masterkey">Remove stored masterkey from device</string>
     <string name="password_wrong">Master password seems wrong</string>
+    <string name="something_went_wrong">Something went wrong :-(</string>
 
 
 </resources>

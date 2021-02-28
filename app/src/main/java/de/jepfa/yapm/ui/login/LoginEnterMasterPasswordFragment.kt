@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Switch
+import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Password
-import de.jepfa.yapm.model.Secret
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
@@ -41,40 +41,48 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
             if (masterPassword.isEmpty()) {
                 masterPasswdTextView.setError(getString(R.string.password_required))
                 masterPasswdTextView.requestFocus()
-            }
-            else {
-
-                val salt = SecretService.getOrCreateSalt(getBaseActivity())
-
-                val keyForTemp = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
-
-                val encPinBase64 = arguments?.getString(CreateVaultActivity.ARG_ENC_PIN)!!
-                val encPin = Encrypted.fromBase64String(encPinBase64)
-                val masterPin = SecretService.decryptPassword(keyForTemp, encPin)
-
-                val storedEncMasterKeyBase64 = PreferenceUtil.get(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, getBaseActivity())
-                val storedEncMasterKey = Encrypted.fromBase64String(storedEncMasterKeyBase64!!)
-
-                val success = SecretService.login(masterPin, masterPassword, salt, storedEncMasterKey)
-                if (!success) {
-                    masterPasswdTextView.setError(getString(R.string.password_wrong))
-                    masterPasswdTextView.requestFocus()
-                    return@setOnClickListener
-                }
-
-                if (switchStorePasswd.isChecked) {
-                    val keyForMP = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP)
-                    val encPasswd = SecretService.encryptPassword(keyForMP, masterPassword)
-                    PreferenceUtil.put(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, encPasswd.toBase64String(), getBaseActivity())
-                }
-
-
-                findNavController().navigate(R.id.action_Login_MasterPasswordFragment_to_CredentialList)
-
-                masterPin.clear()
-                masterPassword.clear()
+                return@setOnClickListener
             }
 
+            val salt = SecretService.getOrCreateSalt(getBaseActivity())
+            val keyForTemp = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
+
+            val encPinBase64 = arguments?.getString(CreateVaultActivity.ARG_ENC_PIN)
+            if (encPinBase64 == null) {
+                Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+            val encPin = Encrypted.fromBase64String(encPinBase64)
+            val masterPin = SecretService.decryptPassword(keyForTemp, encPin)
+
+            val encStoredMasterKey = PreferenceUtil.getEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, getBaseActivity())
+            if (encStoredMasterKey == null) {
+                Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
+            val success = SecretService.login(
+                masterPin,
+                masterPassword,
+                encStoredMasterKey,
+                salt
+            )
+            if (!success) {
+                masterPasswdTextView.setError(getString(R.string.password_wrong))
+                masterPasswdTextView.requestFocus()
+                return@setOnClickListener
+            }
+
+            if (switchStorePasswd.isChecked) {
+                val keyForMP = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP)
+                val encPasswd = SecretService.encryptPassword(keyForMP, masterPassword)
+                PreferenceUtil.put(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, encPasswd.toBase64String(), getBaseActivity())
+            }
+
+            findNavController().navigate(R.id.action_Login_MasterPasswordFragment_to_CredentialList)
+
+            masterPin.clear()
+            masterPassword.clear()
 
         }
     }

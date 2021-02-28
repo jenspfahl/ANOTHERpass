@@ -152,10 +152,10 @@ object SecretService {
         return keyGenerator.generateKey();
     }
 
-    fun login(masterPin: Password, masterPassword: Password, salt: Key, storedEncMasterKey: Encrypted): Boolean {
+    fun login(masterPin: Password, masterPassword: Password, encMasterKey: Encrypted, salt: Key): Boolean {
 
         val masterPassPhraseSK = getMasterPassPhraseSK(masterPin, masterPassword, salt)
-        val masterSecretKey = getMasterSK(masterPassPhraseSK, salt, storedEncMasterKey)
+        val masterSecretKey = getMasterSK(masterPassPhraseSK, salt, encMasterKey)
         if (masterSecretKey == null) {
             return false;
         }

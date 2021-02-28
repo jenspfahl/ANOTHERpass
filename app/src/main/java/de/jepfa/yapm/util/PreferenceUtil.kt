@@ -2,6 +2,7 @@ package de.jepfa.yapm.util
 
 import android.app.Activity
 import android.preference.PreferenceManager
+import de.jepfa.yapm.model.Encrypted
 
 object PreferenceUtil {
 
@@ -11,6 +12,10 @@ object PreferenceUtil {
     const val PREF_HASHED_MASTER_PIN = PREF_PREFIX + "hmpn"
     const val PREF_ENCRYPTED_MASTER_PASSWORD = PREF_PREFIX + "mpwd"
     const val PREF_ENCRYPTED_MASTER_KEY = PREF_PREFIX + "enmk"
+
+    fun getEncrypted(prefKey: String, activity: Activity): Encrypted? {
+        return get(prefKey, activity)?.let {Encrypted.fromBase64String(it)}
+    }
 
     fun get(prefKey: String, activity: Activity): String? {
             val context = activity.applicationContext

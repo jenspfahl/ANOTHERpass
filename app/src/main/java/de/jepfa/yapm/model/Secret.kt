@@ -14,8 +14,8 @@ object Secret {
     private var masterPassword: Encrypted? = null
     private var lastUpdated: Long = 0
 
-    fun getMasterKeySK() : SecretKey {
-        return masterSecretKey!!
+    fun getMasterKeySK() : SecretKey? {
+        return masterSecretKey
     }
 
     fun getEncMasterPasswd() :Encrypted? {

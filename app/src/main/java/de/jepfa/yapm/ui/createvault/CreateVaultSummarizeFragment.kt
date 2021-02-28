@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Switch
 import android.widget.TextView
+import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Encrypted
@@ -33,12 +34,16 @@ class CreateVaultSummarizeFragment : BaseFragment() {
 
         val key = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
 
-        val encPasswordBase64 = arguments?.getString(CreateVaultActivity.ARG_ENC_PASSWD)!!
+        val encPasswordBase64 = arguments?.getString(CreateVaultActivity.ARG_ENC_PASSWD)
+        if (encPasswordBase64 == null) {
+            Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
+            return
+        }
+
         val encPasswd = Encrypted.fromBase64String(encPasswordBase64)
         val passwd = Password("abcd") // TODO  SecretService.decryptPassword(key, encPasswd)
 
         val switchStorePasswd: Switch = view.findViewById(R.id.switch_store_master_password)
-        switchStorePasswd.setChecked(true) // TODO false per default ?
 
         val generatedPasswdView: TextView = view.findViewById(R.id.generated_passwd)
         generatedPasswdView.text = passwd.debugToString()
@@ -50,6 +55,10 @@ class CreateVaultSummarizeFragment : BaseFragment() {
             val salt = SecretService.getOrCreateSalt(getBaseActivity())
 
             val masterPin = extractAndStoreMasterPin(getBaseActivity(), salt)
+            if (masterPin == null) {
+                Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
 
             val masterPassphrase = generateAndStoreMasterKey(getBaseActivity(), masterPin, passwd, salt, keyForMK)
 
@@ -81,12 +90,16 @@ class CreateVaultSummarizeFragment : BaseFragment() {
         return masterPassphrase
     }
 
-    private fun extractAndStoreMasterPin(activity: BaseActivity, salt: Key): Password {
+    private fun extractAndStoreMasterPin(activity: BaseActivity, salt: Key): Password? {
 
         val keyForTemp = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
         val keyForHPin = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_HPIN)
 
         val encPinBase64 = arguments?.getString(CreateVaultActivity.ARG_ENC_PIN)!!
+        if (encPinBase64 == null) {
+            return null
+        }
+
         val encPin = Encrypted.fromBase64String(encPinBase64)
         val masterPin = SecretService.decryptPassword(keyForTemp, encPin)
 

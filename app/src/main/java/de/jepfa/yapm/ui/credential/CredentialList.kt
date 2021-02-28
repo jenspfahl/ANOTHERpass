@@ -51,7 +51,7 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
         holder.listenForDetachPasswd { pos, _ ->
 
             if (!Settings.canDrawOverlays(parent.context)) {
-                                // this check returns false true on my phone although i have granted that permission!!!!
+
                 AlertDialog.Builder(holder.itemView.context)
                         .setTitle("Missing permission")
                         .setMessage("App cannot draw over other apps. Enable permission and try again.")
