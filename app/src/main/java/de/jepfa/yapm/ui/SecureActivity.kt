@@ -33,7 +33,7 @@ abstract class SecureActivity : BaseActivity() {
             return if (secret.isDenied()) {
                 null
             } else {
-                secret.get()
+                secret.getMasterKeySK()
             }
         }
 

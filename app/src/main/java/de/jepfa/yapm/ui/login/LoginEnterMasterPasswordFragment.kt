@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Password
+import de.jepfa.yapm.model.Secret
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
@@ -54,7 +55,12 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                 val storedEncMasterKeyBase64 = PreferenceUtil.get(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, getBaseActivity())
                 val storedEncMasterKey = Encrypted.fromBase64String(storedEncMasterKeyBase64!!)
 
-                SecretService.login(masterPin, masterPassword, salt, storedEncMasterKey)
+                val success = SecretService.login(masterPin, masterPassword, salt, storedEncMasterKey)
+                if (!success) {
+                    masterPasswdTextView.setError(getString(R.string.password_wrong))
+                    masterPasswdTextView.requestFocus()
+                    return@setOnClickListener
+                }
 
                 if (switchStorePasswd.isChecked) {
                     val keyForMP = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP)

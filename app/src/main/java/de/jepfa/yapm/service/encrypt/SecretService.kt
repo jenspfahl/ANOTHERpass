@@ -8,6 +8,7 @@ import de.jepfa.yapm.model.Key
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.util.PreferenceUtil
 import java.security.*
+import java.util.*
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
@@ -151,13 +152,18 @@ object SecretService {
         return keyGenerator.generateKey();
     }
 
-    fun login(masterPin: Password, masterPassword: Password, salt: Key, storedEncMasterKey: Encrypted) {
+    fun login(masterPin: Password, masterPassword: Password, salt: Key, storedEncMasterKey: Encrypted): Boolean {
 
         val masterPassPhraseSK = getMasterPassPhraseSK(masterPin, masterPassword, salt)
         val masterSecretKey = getMasterSK(masterPassPhraseSK, salt, storedEncMasterKey)
+        if (masterSecretKey == null) {
+            return false;
+        }
         val key = getAndroidSecretKey(ALIAS_KEY_TEMP)
         val encMasterPassword = encryptPassword(key, masterPassword)
         Secret.login(masterSecretKey, encMasterPassword)
+
+        return true
 
     }
 
@@ -177,11 +183,14 @@ object SecretService {
      * Returns the Master Secret Key which is encrypted twice, first with the Android key
      * and second with the PassPhrase key.
      */
-    private fun getMasterSK(masterPassPhraseSK: SecretKey, salt: Key, storedEncMasterKey: Encrypted): SecretKey {
+    private fun getMasterSK(masterPassPhraseSK: SecretKey, salt: Key, storedEncMasterKey: Encrypted): SecretKey? {
         val androidSK = getAndroidSecretKey(ALIAS_KEY_MK)
 
         val encMasterKey = decryptEncrypted(androidSK, storedEncMasterKey)
         val masterKey = decryptKey(masterPassPhraseSK, encMasterKey)
+        if (Arrays.equals(masterKey.data, FAILED_BYTE_ARRAY)) {
+            return null
+        }
         val masterSK = generateSecretKey(masterKey, salt)
         masterKey.clear()
 

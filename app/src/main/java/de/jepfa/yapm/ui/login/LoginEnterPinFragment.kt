@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Encrypted
@@ -66,7 +67,11 @@ class LoginEnterPinFragment : BaseFragment() {
                             val storedEncMasterKeyBase64 = PreferenceUtil.get(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, getBaseActivity())
                             val storedEncMasterKey = Encrypted.fromBase64String(storedEncMasterKeyBase64!!)
 
-                            SecretService.login(userPin, decMasterPasswd, salt, storedEncMasterKey)
+                            val success = SecretService.login(userPin, decMasterPasswd, salt, storedEncMasterKey)
+                            if (!success) {
+                                Toast.makeText(context, R.string.password_wrong, Toast.LENGTH_LONG).show()
+                                return@setOnClickListener
+                            }
 
                             decMasterPasswd.clear()
                             findNavController().navigate(R.id.action_Login_MasterPasswordFragment_to_CredentialList)
@@ -81,7 +86,12 @@ class LoginEnterPinFragment : BaseFragment() {
                             val storedEncMasterKeyBase64 = PreferenceUtil.get(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, getBaseActivity())
                             val storedEncMasterKey = Encrypted.fromBase64String(storedEncMasterKeyBase64!!)
 
-                            SecretService.login(userPin, decMasterPasswd, salt, storedEncMasterKey)
+                            val success = SecretService.login(userPin, decMasterPasswd, salt, storedEncMasterKey)
+                            if (!success) {
+                                Toast.makeText(context, R.string.password_wrong, Toast.LENGTH_LONG).show()
+                                return@setOnClickListener
+                            }
+
                             findNavController().navigate(R.id.action_Login_MasterPasswordFragment_to_CredentialList)
                         } else {
                             val encUserPin = SecretService.encryptPassword(keyForTemp, userPin)
