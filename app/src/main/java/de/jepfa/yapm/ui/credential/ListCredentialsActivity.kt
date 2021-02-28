@@ -21,7 +21,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Encrypted
-import de.jepfa.yapm.service.encrypt.SecretService
+import de.jepfa.yapm.model.Secret
+import de.jepfa.yapm.service.overlay.OverlayShowingService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.util.PreferenceUtil
@@ -108,13 +109,19 @@ class ListCredentialsActivity : SecureActivity() {
         val lockItem = menu.findItem(R.id.menu_lock_items)
         refreshMenuLockItem(lockItem)
 
+        val deleteMasterKeyItem: MenuItem = menu.findItem(R.id.delete_stored_masterkey)
+        if (deleteMasterKeyItem != null) {
+            val encMasterPasswd = PreferenceUtil.get(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, this)
+            deleteMasterKeyItem.setVisible(encMasterPasswd != null)
+        }
+
         return super.onCreateOptionsMenu(menu)
     }
 
 
     protected fun refreshMenuLockItem(lockItem: MenuItem) {
         val secret = SecretChecker.getOrAskForSecret(this)
-        if (secret.isLockedOrOutdated()) {
+        if (secret.isDenied()) {
             lockItem.setIcon(R.drawable.ic_lock_outline_white_24dp)
         } else {
             lockItem.setIcon(R.drawable.ic_lock_open_white_24dp)
@@ -130,7 +137,7 @@ class ListCredentialsActivity : SecureActivity() {
             R.id.action_settings -> true
             R.id.menu_lock_items -> {
                 val secret = SecretChecker.getOrAskForSecret(this)
-                if (secret.isLockedOrOutdated()) {
+                if (secret.isDenied()) {
                     SecretChecker.getOrAskForSecret(this)
                 }
                 else {
@@ -140,9 +147,21 @@ class ListCredentialsActivity : SecureActivity() {
                 return true
             }
             R.id.menu_logout -> {
-                val secret = SecretChecker.getOrAskForSecret(this)
-                PreferenceUtil.delete(PreferenceUtil.PREF_MASTER_PASSWORD, this)
-                secret.logout()
+                Secret.logout()
+
+                val intent = Intent(this, OverlayShowingService::class.java)
+                stopService(intent)
+
+                finishAndRemoveTask()
+                finishAffinity()
+
+                return true
+            }
+            R.id.delete_stored_masterkey -> {
+                PreferenceUtil.delete(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, this)
+                Secret.logout()
+                SecretChecker.getOrAskForSecret(this)
+
                 return true
             }
             else -> super.onOptionsItemSelected(item)

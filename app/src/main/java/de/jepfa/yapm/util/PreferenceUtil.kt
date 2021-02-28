@@ -9,7 +9,7 @@ object PreferenceUtil {
 
     const val PREF_SALT = PREF_PREFIX + "aslt"
     const val PREF_HASHED_MASTER_PIN = PREF_PREFIX + "hmpn"
-    const val PREF_MASTER_PASSWORD = PREF_PREFIX + "mpwd"
+    const val PREF_ENCRYPTED_MASTER_PASSWORD = PREF_PREFIX + "mpwd"
     const val PREF_ENCRYPTED_MASTER_KEY = PREF_PREFIX + "enmk"
 
     fun get(prefKey: String, activity: Activity): String? {

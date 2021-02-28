@@ -70,6 +70,7 @@
     <string name="password">Enter your master password</string>
     <string name="button_login">Login</string>
     <string name="password_required">Password required</string>
+    <string name="delete_stored_masterkey">Remove stored masterkey from device</string>
 
 
 </resources>

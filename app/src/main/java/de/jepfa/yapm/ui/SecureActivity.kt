@@ -30,7 +30,7 @@ abstract class SecureActivity : BaseActivity() {
     val masterSecretKey: SecretKey?
         public get() {
             val secret = SecretChecker.getOrAskForSecret(this)
-            return if (secret.isDeclined()) {
+            return if (secret.isDenied()) {
                 null
             } else {
                 secret.get()
@@ -49,14 +49,16 @@ abstract class SecureActivity : BaseActivity() {
 
         @Synchronized
         fun getOrAskForSecret(activity: BaseActivity): Secret {
-            if (Secret.isLockedOrOutdated()) {
+            if (Secret.isDenied()) {
                 // make all not readable by setting key as invalid
-                Secret.lock()
+                if (Secret.isOutdated()) {
+                    Secret.lock()
+                }
 
                 val intent = Intent(activity, LoginActivity::class.java)
                 activity.startActivity(intent)
             } else {
-                Secret.update()
+                Secret.touch()
             }
             return Secret
         }

@@ -56,7 +56,7 @@ class CreateVaultSummarizeFragment : BaseFragment() {
             if (switchStorePasswd.isChecked) {
                 val keyForMP = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP)
                 val encPasswd = SecretService.encryptPassword(keyForMP, passwd)
-                PreferenceUtil.put(PreferenceUtil.PREF_MASTER_PASSWORD, encPasswd.toBase64String(), getBaseActivity())
+                PreferenceUtil.put(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, encPasswd.toBase64String(), getBaseActivity())
             }
 
             masterPassphrase.clear()

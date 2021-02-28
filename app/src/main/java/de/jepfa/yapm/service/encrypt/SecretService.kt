@@ -1,19 +1,13 @@
 package de.jepfa.yapm.service.encrypt
 
-import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
-import androidx.room.Room
-import de.jepfa.yapm.database.YapmDatabase
 import de.jepfa.yapm.model.*
 import de.jepfa.yapm.model.Key
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.util.PreferenceUtil
-import kotlinx.coroutines.CoroutineScope
 import java.security.*
-import java.util.*
-import java.util.concurrent.TimeUnit
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
@@ -161,7 +155,10 @@ object SecretService {
 
         val masterPassPhraseSK = getMasterPassPhraseSK(masterPin, masterPassword, salt)
         val masterSecretKey = getMasterSK(masterPassPhraseSK, salt, storedEncMasterKey)
-        Secret.update(masterSecretKey)
+        val key = getAndroidSecretKey(ALIAS_KEY_TEMP)
+        val encMasterPassword = encryptPassword(key, masterPassword)
+        Secret.login(masterSecretKey, encMasterPassword)
+
     }
 
     /**
@@ -169,8 +166,6 @@ object SecretService {
      */
     private fun getMasterPassPhraseSK(masterPin: Password, masterPassword: Password, salt: Key): SecretKey {
         val masterPassPhrase = conjunctPasswords(masterPin, masterPassword, salt)
-        masterPin.clear()
-        masterPassword.clear()
 
         val masterPassPhraseSK = generateSecretKey(masterPassPhrase, salt)
         masterPassPhrase.clear()

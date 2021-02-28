@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Password
+import de.jepfa.yapm.model.Secret
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
@@ -54,8 +55,23 @@ class LoginEnterPinFragment : BaseFragment() {
                         pinTextView.setError(getString(R.string.pin_wrong))
                         pinTextView.requestFocus()
                     } else {
-                        val storedMasterPasswd = PreferenceUtil.get(PreferenceUtil.PREF_MASTER_PASSWORD, getBaseActivity())
-                        if (storedMasterPasswd != null) {
+
+                        val storedMasterPasswd = PreferenceUtil.get(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, getBaseActivity())
+
+                        if (!Secret.isLoggedOut()) {
+                            val keyForTemp = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
+
+                            val decMasterPasswd = SecretService.decryptPassword(keyForTemp, Secret.getEncMasterPasswd()!!)
+
+                            val storedEncMasterKeyBase64 = PreferenceUtil.get(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, getBaseActivity())
+                            val storedEncMasterKey = Encrypted.fromBase64String(storedEncMasterKeyBase64!!)
+
+                            SecretService.login(userPin, decMasterPasswd, salt, storedEncMasterKey)
+
+                            decMasterPasswd.clear()
+                            findNavController().navigate(R.id.action_Login_MasterPasswordFragment_to_CredentialList)
+                        }
+                        else if (storedMasterPasswd != null) {
 
                             val keyForMP = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP)
 

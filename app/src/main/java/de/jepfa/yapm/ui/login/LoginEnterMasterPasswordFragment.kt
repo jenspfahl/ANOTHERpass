@@ -15,7 +15,6 @@ import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.util.PreferenceUtil
-import java.util.*
 
 
 class LoginEnterMasterPasswordFragment : BaseFragment() {
@@ -54,14 +53,13 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
 
                 val storedEncMasterKeyBase64 = PreferenceUtil.get(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, getBaseActivity())
                 val storedEncMasterKey = Encrypted.fromBase64String(storedEncMasterKeyBase64!!)
-                
-                SecretService.login(masterPin, masterPassword, salt, storedEncMasterKey)
 
+                SecretService.login(masterPin, masterPassword, salt, storedEncMasterKey)
 
                 if (switchStorePasswd.isChecked) {
                     val keyForMP = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP)
                     val encPasswd = SecretService.encryptPassword(keyForMP, masterPassword)
-                    PreferenceUtil.put(PreferenceUtil.PREF_MASTER_PASSWORD, encPasswd.toBase64String(), getBaseActivity())
+                    PreferenceUtil.put(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, encPasswd.toBase64String(), getBaseActivity())
                 }
 
 

@@ -31,9 +31,13 @@ class OverlayShowingService : Service(), OnTouchListener, View.OnLongClickListen
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         clearIt()
-        password = Password(intent.getCharArrayExtra("password"))
+        val data = intent.getCharArrayExtra("password")
+        if (data.isEmpty()) {
+            return START_NOT_STICKY
+        }
+        password = Password(data)
         paintIt()
-        return START_NOT_STICKY
+        return STOP_FOREGROUND_REMOVE
     }
 
     override fun onCreate() {
