@@ -1,11 +1,14 @@
 package de.jepfa.yapm.ui.login
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
@@ -32,8 +35,15 @@ class LoginEnterPinFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val pinTextView: EditText = view.findViewById(R.id.edittext_enter_pin)
+        val nextButton = view.findViewById<Button>(R.id.button_login_next)
 
-        view.findViewById<Button>(R.id.button_login_next).setOnClickListener {
+        pinTextView.setImeOptions(EditorInfo.IME_ACTION_DONE)
+        pinTextView.setOnEditorActionListener{ textView, id, keyEvent ->
+            nextButton.performClick()
+            true
+        }
+
+        nextButton.setOnClickListener {
 
             val salt = SecretService.getOrCreateSalt(getBaseActivity())
             val keyForHPin = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_HPIN)
@@ -97,9 +107,9 @@ class LoginEnterPinFragment : BaseFragment() {
     }
 
     private fun login(
-        userPin: Password,
-        masterPasswd: Password,
-        salt: Key
+            userPin: Password,
+            masterPasswd: Password,
+            salt: Key
     ): Boolean {
         val encStoredMasterKey =
             PreferenceUtil.getEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, getBaseActivity())
@@ -109,10 +119,10 @@ class LoginEnterPinFragment : BaseFragment() {
         }
 
         val success = SecretService.login(
-            userPin,
-            masterPasswd,
-            encStoredMasterKey,
-            salt
+                userPin,
+                masterPasswd,
+                encStoredMasterKey,
+                salt
         )
         if (!success) {
             Toast.makeText(context, R.string.password_wrong, Toast.LENGTH_LONG).show()

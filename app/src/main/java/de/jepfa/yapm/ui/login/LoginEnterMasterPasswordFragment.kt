@@ -33,8 +33,14 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
 
         val masterPasswdTextView: EditText = view.findViewById(R.id.edittext_enter_masterpassword)
         val switchStorePasswd: Switch = view.findViewById(R.id.switch_store_master_password)
+        val loginButton = view.findViewById<Button>(R.id.button_login)
 
-        view.findViewById<Button>(R.id.button_login).setOnClickListener {
+        masterPasswdTextView.setOnEditorActionListener{ textView, id, keyEvent ->
+            loginButton.performClick()
+            true
+        }
+
+        loginButton.setOnClickListener {
 
 
             val masterPassword = Password.fromEditable(masterPasswdTextView.text)

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.WindowManager
 import de.jepfa.yapm.model.Secret
 import de.jepfa.yapm.ui.login.LoginActivity
+import java.util.concurrent.TimeUnit
 import javax.crypto.SecretKey
 
 abstract class SecureActivity : BaseActivity() {
@@ -47,6 +48,11 @@ abstract class SecureActivity : BaseActivity() {
      */
     object SecretChecker {
 
+        private val DELTA_LOGIN_ACTIVITY_INTENTED = TimeUnit.SECONDS.toMillis(3)
+
+        @Volatile
+        private var loginActivityIntented: Long = 0
+
         @Synchronized
         fun getOrAskForSecret(activity: BaseActivity): Secret {
             if (Secret.isDenied()) {
@@ -55,12 +61,24 @@ abstract class SecureActivity : BaseActivity() {
                     Secret.lock()
                 }
 
-                val intent = Intent(activity, LoginActivity::class.java)
-                activity.startActivity(intent)
+                if (!isLoginIntented()) {
+                    val intent = Intent(activity, LoginActivity::class.java)
+                    activity.startActivity(intent)
+                    loginIntented()
+                }
             } else {
                 Secret.touch()
             }
             return Secret
+        }
+
+        private fun isLoginIntented(): Boolean {
+            val current = System.currentTimeMillis()
+            return  loginActivityIntented >= current - DELTA_LOGIN_ACTIVITY_INTENTED
+        }
+
+        private fun loginIntented() {
+            loginActivityIntented = System.currentTimeMillis()
         }
     }
 }
