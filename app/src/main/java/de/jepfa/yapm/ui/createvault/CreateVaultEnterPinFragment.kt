@@ -1,16 +1,20 @@
 package de.jepfa.yapm.ui.createvault
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import androidx.core.app.NavUtils.navigateUpTo
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.BaseFragment
+import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import java.util.*
 
 class CreateVaultEnterPinFragment : BaseFragment() {
@@ -61,6 +65,16 @@ class CreateVaultEnterPinFragment : BaseFragment() {
             p1.clear()
             p2.clear()
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        if (id == android.R.id.home) {
+            val upIntent = Intent(getBaseActivity(), CreateVaultActivity::class.java)
+            getBaseActivity().navigateUpTo(upIntent)
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
 }

@@ -8,6 +8,7 @@ import android.text.TextUtils
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import androidx.activity.viewModels
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Password
@@ -16,6 +17,9 @@ import de.jepfa.yapm.service.secretgenerator.PassphraseGeneratorSpec
 import de.jepfa.yapm.service.secretgenerator.PasswordStrength
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.ui.YapmApp
+import de.jepfa.yapm.viewmodel.CredentialViewModel
+import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
 
 class NewOrChangeCredentialActivity : SecureActivity() {
 
@@ -32,6 +36,10 @@ class NewOrChangeCredentialActivity : SecureActivity() {
 
     private val passphraseGenerator = PassphraseGenerator()
 
+    private val credentialViewModel: CredentialViewModel by viewModels {
+        CredentialViewModelFactory((application as YapmApp).repository)
+    }
+
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_or_change_credential)
@@ -40,7 +48,18 @@ class NewOrChangeCredentialActivity : SecureActivity() {
         generatedPasswdView = findViewById(R.id.generated_passwd)
         radioStrength = findViewById(R.id.radio_strengths)
 
+
         val idExtra = intent.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
+     /*
+      TODO use getId instead of transport complete credential for changes
+
+        credentialViewModel.getById(idExtra).observe(this, {
+            credential = it
+
+        })
+
+        */
+
         if (idExtra != -1) {
             currentId = idExtra
             val nameExtra = intent.getStringExtra(EncCredential.EXTRA_CREDENTIAL_NAME)

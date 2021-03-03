@@ -5,6 +5,7 @@ import de.jepfa.yapm.database.dao.EncCredentialDao
 import de.jepfa.yapm.database.entity.EncCredentialEntity
 import de.jepfa.yapm.model.EncCredential
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 
 class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
@@ -24,16 +25,13 @@ class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
         encCredentialDao.delete(mapToEntity(encCredential))
     }
 
-    fun getById(id: Int): EncCredential? {
-        val entity = encCredentialDao.getById(id)
-        if (entity != null) {
-            return mapToCredential(entity)
-        }
-        return null;
+    fun getById(id: Int): Flow<EncCredential> {
+        val byId = encCredentialDao.getById(id)
+        return byId.filterNotNull().map { it -> mapToCredential(it)}
     }
 
     fun getAll(): Flow<List<EncCredential>> {
-        return encCredentialDao.getAll().map {it -> mapToCredentials(it)}
+        return encCredentialDao.getAll().filterNotNull().map {it -> mapToCredentials(it)}
     }
 
     private fun mapToCredentials(entities: List<EncCredentialEntity>): List<EncCredential> {

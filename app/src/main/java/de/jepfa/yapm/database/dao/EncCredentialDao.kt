@@ -16,7 +16,7 @@ interface EncCredentialDao {
     suspend fun delete(encCredential: EncCredentialEntity)
 
     @Query("SELECT * FROM EncCredentialEntity WHERE id = :id")
-    fun getById(id: Int): EncCredentialEntity?
+    fun getById(id: Int): Flow<EncCredentialEntity>
 
     @Query("SELECT * FROM EncCredentialEntity")
     fun getAll(): Flow<List<EncCredentialEntity>>

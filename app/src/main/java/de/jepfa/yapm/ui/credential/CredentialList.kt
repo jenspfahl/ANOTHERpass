@@ -14,6 +14,7 @@ import android.widget.Filterable
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -34,18 +35,12 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
         val holder = CredentialViewHolder.create(parent)
         holder.listenForShowCredential { pos, _ ->
             val current = getItem(pos)
-            val key = listCredentialsActivity.masterSecretKey
-            if (key != null) {
-                val decName = SecretService.decryptCommonString(key, current.name)
-                val decAdditionalInfo = SecretService.decryptCommonString(key, current.additionalInfo)
-                val password = SecretService.decryptPassword(key, current.password)
-                AlertDialog.Builder(holder.itemView.context)
-                        .setTitle(decName)
-                        .setMessage(decAdditionalInfo + System.lineSeparator() + password.debugToString())
-                        .show()
 
-                password.clear()
-            }
+            val intent = Intent(listCredentialsActivity, ShowCredentialActivity::class.java)
+
+            intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, current.id)
+
+            listCredentialsActivity.startActivity(intent)
         }
 
         holder.listenForDetachPasswd { pos, _ ->

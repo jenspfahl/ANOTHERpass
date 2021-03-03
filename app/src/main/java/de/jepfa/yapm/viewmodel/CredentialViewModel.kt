@@ -8,11 +8,11 @@ import kotlinx.coroutines.launch
 
 class CredentialViewModel(private val repository: CredentialRepository) : ViewModel() {
 
-    // Using LiveData and caching what allWords returns has several benefits:
-    // - We can put an observer on the data (instead of polling for changes) and only update the
-    //   the UI when the data actually changes.
-    // - Repository is completely separated from the UI through the ViewModel.
     val allCredentials: LiveData<List<EncCredential>> = repository.getAll().asLiveData()
+
+    fun getById(id: Int): LiveData<EncCredential> {
+        return repository.getById(id).asLiveData()
+    }
 
     fun insert(credential: EncCredential) = viewModelScope.launch {
         repository.insert(credential)

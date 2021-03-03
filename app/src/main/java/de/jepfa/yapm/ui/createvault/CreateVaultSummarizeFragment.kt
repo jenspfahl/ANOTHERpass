@@ -1,7 +1,9 @@
 package de.jepfa.yapm.ui.createvault
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -74,6 +76,16 @@ class CreateVaultSummarizeFragment : BaseFragment() {
 
             findNavController().navigate(R.id.action_Create_Vault_to_ThirdFragment_to_Root)
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        if (id == android.R.id.home) {
+            val upIntent = Intent(getBaseActivity(), CreateVaultEnterPassphraseFragment::class.java)
+            getBaseActivity().navigateUpTo(upIntent)
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun generateAndStoreMasterKey(activity: BaseActivity, masterPin: Password, passwd: Password, salt: Key, keyForMK: SecretKey): Password {
