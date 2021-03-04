@@ -12,6 +12,7 @@ import androidx.activity.viewModels
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Password
+import de.jepfa.yapm.model.Secret
 import de.jepfa.yapm.service.secretgenerator.PassphraseGenerator
 import de.jepfa.yapm.service.secretgenerator.PassphraseGeneratorSpec
 import de.jepfa.yapm.service.secretgenerator.PasswordStrength
@@ -50,33 +51,28 @@ class NewOrChangeCredentialActivity : SecureActivity() {
 
 
         val idExtra = intent.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
-     /*
-      TODO use getId instead of transport complete credential for changes
 
-        credentialViewModel.getById(idExtra).observe(this, {
-            credential = it
 
-        })
-
-        */
-
-        if (idExtra != -1) {
+        if (idExtra == -1) {
+            setTitle(R.string.title_new_credential)
+        }
+        else {
             currentId = idExtra
-            val nameExtra = intent.getStringExtra(EncCredential.EXTRA_CREDENTIAL_NAME)
-            val addInfoExtra = intent.getStringExtra(EncCredential.EXTRA_CREDENTIAL_ADDITIONAL_INFO)
-            val passwdExtra = intent.getStringExtra(EncCredential.EXTRA_CREDENTIAL_PASSWORD)
-            val originCredential = EncCredential(idExtra, nameExtra, addInfoExtra, passwdExtra, false)
+            setTitle(R.string.title_update_credential)
 
-            val key = masterSecretKey
-            if (key != null) {
-                val name = SecretService.decryptCommonString(key, originCredential.name)
-                val additionalInfo = SecretService.decryptCommonString(key, originCredential.additionalInfo)
-                val password = SecretService.decryptPassword(key, originCredential.password)
-                editCredentialNameView.setText(name)
-                editCredentialAdditionalInfoView.setText(additionalInfo)
-                generatedPassword = password
-                generatedPasswdView.setText(password.debugToString())
-            }
+            credentialViewModel.getById(idExtra).observe(this, {
+                val originCredential = it
+                val key = masterSecretKey
+                if (key != null) {
+                    val name = SecretService.decryptCommonString(key, originCredential.name)
+                    val additionalInfo = SecretService.decryptCommonString(key, originCredential.additionalInfo)
+                    val password = SecretService.decryptPassword(key, originCredential.password)
+                    editCredentialNameView.setText(name)
+                    editCredentialAdditionalInfoView.setText(additionalInfo)
+                    generatedPassword = password
+                    generatedPasswdView.setText(password.debugToString())
+                }
+            })
         }
 
         val radioStrengthStrong: RadioButton = findViewById(R.id.radio_strength_strong)
@@ -93,6 +89,7 @@ class NewOrChangeCredentialActivity : SecureActivity() {
 
         val buttonGeneratePasswd: Button = findViewById(R.id.button_generate_passwd)
         buttonGeneratePasswd.setOnClickListener(View.OnClickListener {
+            Secret.touch()
             generatedPassword = generatePassword()
             generatedPasswdView.text = generatedPassword.debugToString()
         })
@@ -114,6 +111,7 @@ class NewOrChangeCredentialActivity : SecureActivity() {
 
         val button = findViewById<Button>(R.id.button_save)
         button.setOnClickListener {
+            Secret.touch()
             if (generatedPassword.data.isEmpty()) {
                 Toast.makeText(it.context, "Generate a password first", Toast.LENGTH_LONG).show()
             }

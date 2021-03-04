@@ -1,6 +1,7 @@
 package de.jepfa.yapm.ui.credential
 
 import android.app.AlertDialog
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
@@ -14,14 +15,21 @@ import android.widget.Filterable
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
-import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.service.encrypt.SecretService
+import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.overlay.OverlayShowingService
+import de.jepfa.yapm.service.secretgenerator.PasswordGenerator
+import de.jepfa.yapm.service.secretgenerator.PasswordGeneratorSpec
+import de.jepfa.yapm.service.secretgenerator.PasswordStrength
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 
@@ -30,6 +38,8 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
         Filterable {
 
     private lateinit var originList: List<EncCredential>
+    private val passGen = PasswordGenerator()
+    private val passGenSpec = PasswordGeneratorSpec(PasswordStrength.EASY, excludeSpecialChars = true, noDigits = true)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CredentialViewHolder {
         val holder = CredentialViewHolder.create(parent)
@@ -45,39 +55,8 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
 
         holder.listenForDetachPasswd { pos, _ ->
 
-            if (!Settings.canDrawOverlays(parent.context)) {
-
-                AlertDialog.Builder(holder.itemView.context)
-                        .setTitle("Missing permission")
-                        .setMessage("App cannot draw over other apps. Enable permission and try again.")
-                        .setPositiveButton("Open permission",
-                                DialogInterface.OnClickListener { _, i ->
-                                    val intent = Intent()
-                                    intent.action = Settings.ACTION_MANAGE_OVERLAY_PERMISSION
-                                    intent.data = Uri.parse("package:" + listCredentialsActivity.applicationInfo.packageName)
-                                    listCredentialsActivity.startActivity(intent)
-                                })
-                        .setNegativeButton("Close",
-                                { dialogInterface, i -> dialogInterface.cancel() })
-                        .show()
-                false
-            }
-            else {
-
-                val current = getItem(pos)
-                val key = listCredentialsActivity.masterSecretKey
-                if (key != null) {
-                    val password = SecretService.decryptPassword(key, current.password)
-
-                    val intent = Intent(listCredentialsActivity, OverlayShowingService::class.java)
-                    intent.putExtra("password", password.data)
-                    listCredentialsActivity.startService(intent)
-
-                    listCredentialsActivity.moveTaskToBack(true)
-                    password.clear()
-                }
-                true
-            }
+            val current = getItem(pos)
+            DetachHelper.detachPassword(listCredentialsActivity, current)
         }
 
         holder.listenForOpenMenu { position, type, view ->
@@ -89,9 +68,6 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
                         R.id.menu_change_credential -> {
                             val intent = Intent(listCredentialsActivity, NewOrChangeCredentialActivity::class.java)
                             intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, current.id)
-                            intent.putExtra(EncCredential.EXTRA_CREDENTIAL_NAME, current.name.toBase64String())
-                            intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ADDITIONAL_INFO, current.additionalInfo.toBase64String())
-                            intent.putExtra(EncCredential.EXTRA_CREDENTIAL_PASSWORD, current.password.toBase64String())
 
                             listCredentialsActivity.startActivityForResult(intent, listCredentialsActivity.newOrUpdateCredentialActivityRequestCode)
                             true
@@ -124,12 +100,19 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
         return holder
     }
 
+
     override fun onBindViewHolder(holder: CredentialViewHolder, position: Int) {
         val current = getItem(position)
         val key = listCredentialsActivity.masterSecretKey
-        var name = "-----"
+        var name = passGen.generatePassword(passGenSpec).debugToString().toLowerCase() // "----"
         if (key != null) {
-            name = SecretService.decryptCommonString(key, current.name)
+
+            GlobalScope.launch(Dispatchers.IO) {
+                name = SecretService.decryptCommonString(key, current.name)
+                withContext(Dispatchers.Main) {
+                    holder.bind(name)
+                }
+            }
         }
         holder.bind(name)
 

@@ -23,7 +23,10 @@ class PasswordGenerator {
     }
 
     private fun extractMaterial(spec: PasswordGeneratorSpec): String {
-        var material = ALPHA_CHARS_UPPER_CASE + DIGITS
+        var material = ALPHA_CHARS_UPPER_CASE
+        if (!spec.noDigits) {
+            material += DIGITS
+        }
         if (!spec.excludeSpecialChars) {
             material += SPECIAL_CHARS_1
             if (!spec.onlyCommonSpecialChars) {

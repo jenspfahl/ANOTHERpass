@@ -31,7 +31,7 @@ class OverlayShowingService : Service(), OnTouchListener, View.OnLongClickListen
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         clearIt()
-        val data = intent.getCharArrayExtra("password")
+        val data = intent.getCharArrayExtra(DetachHelper.EXTRA_PASSWD)
         if (data.isEmpty()) {
             return START_NOT_STICKY
         }
