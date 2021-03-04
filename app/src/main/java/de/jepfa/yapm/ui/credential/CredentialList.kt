@@ -1,11 +1,7 @@
 package de.jepfa.yapm.ui.credential
 
 import android.app.AlertDialog
-import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
-import android.net.Uri
-import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -22,14 +18,9 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.service.overlay.DetachHelper
-import de.jepfa.yapm.service.overlay.OverlayShowingService
 import de.jepfa.yapm.service.secretgenerator.PasswordGenerator
 import de.jepfa.yapm.service.secretgenerator.PasswordGeneratorSpec
 import de.jepfa.yapm.service.secretgenerator.PasswordStrength
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.*
 
 
@@ -56,7 +47,7 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
         holder.listenForDetachPasswd { pos, _ ->
 
             val current = getItem(pos)
-            DetachHelper.detachPassword(listCredentialsActivity, current)
+            DetachHelper.detachPassword(listCredentialsActivity, current.password)
         }
 
         holder.listenForOpenMenu { position, type, view ->
@@ -104,15 +95,16 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
     override fun onBindViewHolder(holder: CredentialViewHolder, position: Int) {
         val current = getItem(position)
         val key = listCredentialsActivity.masterSecretKey
-        var name = passGen.generatePassword(passGenSpec).debugToString().toLowerCase() // "----"
+        var name = "" //passGen.generatePassword(passGenSpec).debugToString().toLowerCase() //
         if (key != null) {
-
+            name = SecretService.decryptCommonString(key, current.name)
+            /*
             GlobalScope.launch(Dispatchers.IO) {
                 name = SecretService.decryptCommonString(key, current.name)
                 withContext(Dispatchers.Main) {
                     holder.bind(name)
                 }
-            }
+            }*/
         }
         holder.bind(name)
 

@@ -6,13 +6,15 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import de.jepfa.yapm.model.EncCredential
+import de.jepfa.yapm.model.Encrypted
+import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 
 object DetachHelper {
     val EXTRA_PASSWD = "password"
 
-    fun detachPassword(activity: SecureActivity, credential: EncCredential) =
+    fun detachPassword(activity: SecureActivity, password: Encrypted) =
             if (!Settings.canDrawOverlays(activity)) {
 
                 AlertDialog.Builder(activity)
@@ -33,7 +35,7 @@ object DetachHelper {
 
                 val key = activity.masterSecretKey
                 if (key != null) {
-                    val password = SecretService.decryptPassword(key, credential.password)
+                    val password = SecretService.decryptPassword(key, password)
 
                     val intent = Intent(activity, OverlayShowingService::class.java)
                     intent.putExtra(EXTRA_PASSWD, password.data)

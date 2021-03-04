@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
@@ -17,6 +18,7 @@ import de.jepfa.yapm.service.secretgenerator.PassphraseGenerator
 import de.jepfa.yapm.service.secretgenerator.PassphraseGeneratorSpec
 import de.jepfa.yapm.service.secretgenerator.PasswordStrength
 import de.jepfa.yapm.service.encrypt.SecretService
+import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.viewmodel.CredentialViewModel
@@ -145,6 +147,13 @@ class NewOrChangeCredentialActivity : SecureActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.credential_new_or_update_menu, menu)
+
+        return super.onCreateOptionsMenu(menu)
+    }
+
     private fun generatePassword() : Password {
         val spec = buildGeneratorSpec()
 
@@ -181,6 +190,24 @@ class NewOrChangeCredentialActivity : SecureActivity() {
             navigateUpTo(upIntent)
             return true
         }
+
+        if (id == R.id.menu_detach_credential) {
+
+            val key = masterSecretKey
+            if (key != null) {
+                if (generatedPassword.data.isEmpty()) {
+                    Toast.makeText(this, "Generate a password first", Toast.LENGTH_LONG).show()
+                }
+                else {
+                    val encPassword = SecretService.encryptPassword(key, generatedPassword)
+
+                    DetachHelper.detachPassword(this, encPassword)
+                }
+            }
+
+            return true
+        }
+
         return super.onOptionsItemSelected(item)
     }
 

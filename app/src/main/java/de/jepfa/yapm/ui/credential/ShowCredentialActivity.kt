@@ -94,7 +94,7 @@ class ShowCredentialActivity : SecureActivity() {
 
         if (id == R.id.menu_detach_credential) {
 
-            DetachHelper.detachPassword(this, credential)
+            DetachHelper.detachPassword(this, credential.password)
 
             return true
         }
