@@ -18,6 +18,7 @@ import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.YapmApp
+import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.viewmodel.CredentialViewModel
 import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
 
@@ -92,19 +93,29 @@ class ShowCredentialActivity : SecureActivity() {
             return true
         }
 
-        if (id == R.id.menu_detach_credential) {
+        if (id == R.id.menu_show_as_qrcode) {
+            val intent = Intent(this, QrCodeActivity::class.java)
+            intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, credential.id)
+            intent.putExtra(EncCredential.EXTRA_CREDENTIAL_NAME, credential.name.toBase64String())
+            intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ADDITIONAL_INFO, credential.additionalInfo.toBase64String())
+            intent.putExtra(EncCredential.EXTRA_CREDENTIAL_PASSWORD, credential.password.toBase64String())
 
-            DetachHelper.detachPassword(this, credential.password)
+            startActivity(intent)
 
             return true
         }
+
+        if (id == R.id.menu_detach_credential) {
+            DetachHelper.detachPassword(this, credential.password)
+            return true
+        }
+
         if (id == R.id.menu_change_credential) {
 
             val intent = Intent(this, NewOrChangeCredentialActivity::class.java)
             intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, credential.id)
 
             startActivityForResult(intent, updateCredentialActivityRequestCode)
-
 
             return true
         }

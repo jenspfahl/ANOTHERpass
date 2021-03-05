@@ -76,6 +76,7 @@
     <string name="title_new_credential">Create new credential</string>
     <string name="title_update_credential">Update existing credential</string>
     <string name="detach">Detach</string>
+    <string name="show_as_qrcode">Show as QR Code</string>
 
 
 </resources>
