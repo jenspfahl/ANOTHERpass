@@ -11,9 +11,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.YetAnotherPasswordManager">
         <activity android:name=".ui.credential.ShowCredentialActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".ui.credential.NewOrChangeCredentialActivity" />
-        <activity android:name=".ui.createvault.CreateVaultActivity" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:noHistory="true"/>
+        <activity android:name=".ui.credential.NewOrChangeCredentialActivity"
+            android:noHistory="true"/>
+        <activity android:name=".ui.createvault.CreateVaultActivity"
+            android:noHistory="true"/>
         <activity
             android:name=".ui.credential.ListCredentialsActivity"
             android:label="@string/app_name"
@@ -26,7 +29,6 @@
             android:theme="@style/Theme.YetAnotherPasswordManager.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

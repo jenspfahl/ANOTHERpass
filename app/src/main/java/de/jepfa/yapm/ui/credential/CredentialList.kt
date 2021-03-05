@@ -95,7 +95,7 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
     override fun onBindViewHolder(holder: CredentialViewHolder, position: Int) {
         val current = getItem(position)
         val key = listCredentialsActivity.masterSecretKey
-        var name = "" //passGen.generatePassword(passGenSpec).debugToString().toLowerCase() //
+        var name = "????" //passGen.generatePassword(passGenSpec).debugToString().replace(" ","").toLowerCase()
         if (key != null) {
             name = SecretService.decryptCommonString(key, current.name)
             /*

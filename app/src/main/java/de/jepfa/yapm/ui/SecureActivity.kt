@@ -54,7 +54,7 @@ abstract class SecureActivity : BaseActivity() {
         private var loginActivityIntented: Long = 0
 
         @Synchronized
-        fun getOrAskForSecret(activity: BaseActivity): Secret {
+        fun getOrAskForSecret(activity: SecureActivity): Secret {
             if (Secret.isDenied()) {
                 // make all not readable by setting key as invalid
                 if (Secret.isOutdated()) {
@@ -65,6 +65,7 @@ abstract class SecureActivity : BaseActivity() {
                     val intent = Intent(activity, LoginActivity::class.java)
                     activity.startActivity(intent)
                     loginIntented()
+                    activity.refresh(false)
                 }
             } else {
                 Secret.touch()

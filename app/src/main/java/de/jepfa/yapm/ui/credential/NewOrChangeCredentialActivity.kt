@@ -91,7 +91,7 @@ class NewOrChangeCredentialActivity : SecureActivity() {
 
         val buttonGeneratePasswd: Button = findViewById(R.id.button_generate_passwd)
         buttonGeneratePasswd.setOnClickListener(View.OnClickListener {
-            Secret.touch()
+            Secret.safeTouch()
             generatedPassword = generatePassword()
             generatedPasswdView.text = generatedPassword.debugToString()
         })
@@ -113,7 +113,7 @@ class NewOrChangeCredentialActivity : SecureActivity() {
 
         val button = findViewById<Button>(R.id.button_save)
         button.setOnClickListener {
-            Secret.touch()
+            Secret.safeTouch()
             if (generatedPassword.data.isEmpty()) {
                 Toast.makeText(it.context, "Generate a password first", Toast.LENGTH_LONG).show()
             }

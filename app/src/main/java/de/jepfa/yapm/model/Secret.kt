@@ -32,6 +32,12 @@ object Secret {
         lastUpdated = System.currentTimeMillis()
     }
 
+    fun safeTouch() {
+        if (!isLoggedOut() && !isLocked()) {
+            touch()
+        }
+    }
+
     fun isOutdated(): Boolean {
         val age: Long = System.currentTimeMillis() - lastUpdated
 
