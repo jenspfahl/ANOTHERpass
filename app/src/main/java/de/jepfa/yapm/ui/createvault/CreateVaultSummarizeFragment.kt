@@ -43,7 +43,7 @@ class CreateVaultSummarizeFragment : BaseFragment() {
         }
 
         val encPasswd = Encrypted.fromBase64String(encPasswordBase64)
-        val passwd = Password("abcd") // TODO  SecretService.decryptPassword(key, encPasswd)
+        val passwd = SecretService.decryptPassword(key, encPasswd)
 
         val switchStorePasswd: Switch = view.findViewById(R.id.switch_store_master_password)
 

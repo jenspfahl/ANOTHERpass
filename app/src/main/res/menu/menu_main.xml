@@ -26,10 +26,25 @@
     </item>
 
     <item
-        android:id="@+id/delete_stored_masterkey"
+        android:id="@+id/delete_stored_masterpasswd"
         android:orderInCategory="50"
-        android:title="@string/delete_stored_masterkey"
+        android:title="@string/delete_stored_masterpasswd"
         app:showAsAction="never" />
+
+    <item android:title="@string/export" >
+        <menu >
+            <item
+                android:id="@+id/export_masterkey"
+                android:orderInCategory="50"
+                android:title="@string/export_masterkey"
+                app:showAsAction="never" />
+            <item
+                android:id="@+id/export_masterpasswd"
+                android:orderInCategory="50"
+                android:title="@string/export_masterpasswd"
+                app:showAsAction="never" />
+        </menu>
+    </item>
 
     <item
         android:id="@+id/action_settings"

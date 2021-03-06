@@ -35,7 +35,7 @@ class NewOrChangeCredentialActivity : SecureActivity() {
     private lateinit var radioStrength: RadioGroup
     private lateinit var buttonSave: Button
 
-    private var generatedPassword: Password = Password("")
+    private var generatedPassword: Password = Password.empty()
     private var currentId: Int = -1
 
     private val passphraseGenerator = PassphraseGenerator()

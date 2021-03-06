@@ -21,10 +21,16 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Encrypted
+import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.model.Secret
+import de.jepfa.yapm.service.encrypt.SecretService
+import de.jepfa.yapm.service.encrypt.SecretService.decryptPassword
+import de.jepfa.yapm.service.encrypt.SecretService.encryptCommonString
+import de.jepfa.yapm.service.encrypt.SecretService.encryptPassword
 import de.jepfa.yapm.service.overlay.OverlayShowingService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.YapmApp
+import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.viewmodel.CredentialViewModel
 import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
@@ -113,10 +119,10 @@ class ListCredentialsActivity : SecureActivity() {
         val lockItem = menu.findItem(R.id.menu_lock_items)
         refreshMenuLockItem(lockItem)
 
-        val deleteMasterKeyItem: MenuItem = menu.findItem(R.id.delete_stored_masterkey)
-        if (deleteMasterKeyItem != null) {
+        val deleteMasterPasswdItem: MenuItem = menu.findItem(R.id.delete_stored_masterpasswd)
+        if (deleteMasterPasswdItem != null) {
             val encMasterPasswd = PreferenceUtil.get(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, this)
-            deleteMasterKeyItem.setVisible(encMasterPasswd != null)
+            deleteMasterPasswdItem.setVisible(encMasterPasswd != null)
         }
 
         return super.onCreateOptionsMenu(menu)
@@ -161,7 +167,7 @@ class ListCredentialsActivity : SecureActivity() {
 
                 return true
             }
-            R.id.delete_stored_masterkey -> {
+            R.id.delete_stored_masterpasswd -> {
                 if (!Secret.isDenied()) {
                     PreferenceUtil.delete(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, this)
                     Secret.logout()
@@ -169,6 +175,53 @@ class ListCredentialsActivity : SecureActivity() {
                 closeOverlayDialogs()
 
                 SecretChecker.getOrAskForSecret(this)
+
+                return true
+            }
+            R.id.export_masterpasswd -> {
+
+                val key = masterSecretKey
+                val encMasterPasswd = Secret.getEncMasterPasswd()
+                if (key != null && encMasterPasswd != null) {
+                    val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
+
+                    val encHead = encryptCommonString(tempKey, "Your master password")
+                    val encSub = encryptCommonString(tempKey, "Take this code in your wallet to scan for login.")
+                    val encQrc = encMasterPasswd
+
+                    val intent = Intent(this, QrCodeActivity::class.java)
+                    intent.putExtra(QrCodeActivity.EXTRA_HEADLINE, encHead.toBase64String())
+                    intent.putExtra(QrCodeActivity.EXTRA_SUBTEXT, encSub.toBase64String())
+                    intent.putExtra(QrCodeActivity.EXTRA_QRCODE, encQrc.toBase64String())
+
+                    startActivity(intent)
+
+                }
+
+                return true
+            }
+            R.id.export_masterkey -> {
+
+                val encStoredMasterKey = PreferenceUtil.getEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, this)
+                val key = masterSecretKey
+                if (key != null && encStoredMasterKey != null) {
+
+                    val mkKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
+                    val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
+                    val encMasterKeyBase64 = SecretService.decryptEncrypted(mkKey, encStoredMasterKey).toBase64String()
+
+                    val encHead = encryptCommonString(tempKey, "Encrypted master key")
+                    val encSub = encryptCommonString(tempKey, "Store this at a safe place. Future backups don't need to include that master key.")
+                    val encQrc = encryptPassword(tempKey, Password(encMasterKeyBase64))
+
+                    val intent = Intent(this, QrCodeActivity::class.java)
+                    intent.putExtra(QrCodeActivity.EXTRA_HEADLINE, encHead.toBase64String())
+                    intent.putExtra(QrCodeActivity.EXTRA_SUBTEXT, encSub.toBase64String())
+                    intent.putExtra(QrCodeActivity.EXTRA_QRCODE, encQrc.toBase64String())
+
+                    startActivity(intent)
+
+                }
 
                 return true
             }

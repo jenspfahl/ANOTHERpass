@@ -70,13 +70,16 @@
     <string name="password">Enter your master password</string>
     <string name="button_login">Login</string>
     <string name="password_required">Password required</string>
-    <string name="delete_stored_masterkey">Remove stored masterkey from device</string>
+    <string name="delete_stored_masterpasswd">Remove master password</string>
     <string name="password_wrong">Master password seems wrong</string>
     <string name="something_went_wrong">Something went wrong :-(</string>
     <string name="title_new_credential">Create new credential</string>
     <string name="title_update_credential">Update existing credential</string>
     <string name="detach">Detach</string>
     <string name="show_as_qrcode">Show as QR Code</string>
+    <string name="export">Export</string>
+    <string name="export_masterkey">Export encrypted masterkey</string>
+    <string name="export_masterpasswd">Export master password</string>
 
 
 </resources>

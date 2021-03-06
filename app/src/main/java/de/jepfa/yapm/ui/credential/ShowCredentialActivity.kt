@@ -16,6 +16,10 @@ import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Secret
 import de.jepfa.yapm.service.encrypt.SecretService
+import de.jepfa.yapm.service.encrypt.SecretService.decryptCommonString
+import de.jepfa.yapm.service.encrypt.SecretService.decryptPassword
+import de.jepfa.yapm.service.encrypt.SecretService.encryptCommonString
+import de.jepfa.yapm.service.encrypt.SecretService.encryptPassword
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.YapmApp
@@ -99,13 +103,22 @@ class ShowCredentialActivity : SecureActivity() {
         }
 
         if (id == R.id.menu_show_as_qrcode) {
-            val intent = Intent(this, QrCodeActivity::class.java)
-            intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, credential.id)
-            intent.putExtra(EncCredential.EXTRA_CREDENTIAL_NAME, credential.name.toBase64String())
-            intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ADDITIONAL_INFO, credential.additionalInfo.toBase64String())
-            intent.putExtra(EncCredential.EXTRA_CREDENTIAL_PASSWORD, credential.password.toBase64String())
+            val key = masterSecretKey
+            if (key != null) {
+                val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
 
-            startActivity(intent)
+                val tempEncName = encryptCommonString(tempKey, decryptCommonString(key, credential.name))
+                val tempEncAddInfo = encryptCommonString(tempKey, decryptCommonString(key, credential.additionalInfo))
+                val tempEncPasswd = encryptPassword(tempKey, decryptPassword(key, credential.password))
+
+                val intent = Intent(this, QrCodeActivity::class.java)
+                intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, credential.id)
+                intent.putExtra(QrCodeActivity.EXTRA_HEADLINE, tempEncName.toBase64String())
+                intent.putExtra(QrCodeActivity.EXTRA_SUBTEXT, tempEncAddInfo.toBase64String())
+                intent.putExtra(QrCodeActivity.EXTRA_QRCODE, tempEncPasswd.toBase64String())
+
+                startActivity(intent)
+            }
 
             return true
         }

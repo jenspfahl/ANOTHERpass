@@ -23,7 +23,7 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
 
     private lateinit var generatedPasswdView: TextView
 
-    private var generatedPassword: Password = Password("")
+    private var generatedPassword: Password = Password.empty()
 
     private val passphraseGenerator = PassphraseGenerator()
 

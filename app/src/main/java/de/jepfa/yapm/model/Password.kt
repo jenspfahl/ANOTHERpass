@@ -75,5 +75,9 @@ data class Password(var data: CharArray) : Clearable, CharSequence {
             editable.getChars(0, l, chararray, 0)
             return Password(chararray)
         }
+
+        fun empty(): Password {
+            return Password("")
+        }
     }
 }
