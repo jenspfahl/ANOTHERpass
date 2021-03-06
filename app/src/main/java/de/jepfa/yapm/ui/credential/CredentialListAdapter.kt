@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
+import de.jepfa.yapm.model.Secret
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secretgenerator.PasswordGenerator
@@ -29,11 +30,14 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
         Filterable {
 
     private lateinit var originList: List<EncCredential>
-    private val passGen = PasswordGenerator()
-    private val passGenSpec = PasswordGeneratorSpec(PasswordStrength.EASY, excludeSpecialChars = true, noDigits = true)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CredentialViewHolder {
         val holder = CredentialViewHolder.create(parent)
+
+        if (Secret.isDenied()) {
+            return holder
+        }
+
         holder.listenForShowCredential { pos, _ ->
             val current = getItem(pos)
 
@@ -95,16 +99,9 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
     override fun onBindViewHolder(holder: CredentialViewHolder, position: Int) {
         val current = getItem(position)
         val key = listCredentialsActivity.masterSecretKey
-        var name = "????" //passGen.generatePassword(passGenSpec).debugToString().replace(" ","").toLowerCase()
+        var name = "????"
         if (key != null) {
             name = SecretService.decryptCommonString(key, current.name)
-            /*
-            GlobalScope.launch(Dispatchers.IO) {
-                name = SecretService.decryptCommonString(key, current.name)
-                withContext(Dispatchers.Main) {
-                    holder.bind(name)
-                }
-            }*/
         }
         holder.bind(name)
 

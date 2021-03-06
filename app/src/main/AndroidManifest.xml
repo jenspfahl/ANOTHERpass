@@ -20,7 +20,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.credential.NewOrChangeCredentialActivity"
-            android:noHistory="true" />
+            android:noHistory="false" />
         <activity
             android:name=".ui.createvault.CreateVaultActivity"
             android:noHistory="true" />

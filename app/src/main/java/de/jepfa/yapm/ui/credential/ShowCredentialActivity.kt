@@ -14,6 +14,7 @@ import com.google.android.material.appbar.CollapsingToolbarLayout
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Encrypted
+import de.jepfa.yapm.model.Secret
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.ui.SecureActivity
@@ -91,6 +92,10 @@ class ShowCredentialActivity : SecureActivity() {
             val upIntent = Intent(this, ListCredentialsActivity::class.java)
             navigateUpTo(upIntent)
             return true
+        }
+
+        if (Secret.isDenied()) {
+            return false
         }
 
         if (id == R.id.menu_show_as_qrcode) {
@@ -173,7 +178,7 @@ class ShowCredentialActivity : SecureActivity() {
 
     }
 
-    override fun refresh(before: Boolean) {
+    override fun lock() {
         recreate()
     }
 }

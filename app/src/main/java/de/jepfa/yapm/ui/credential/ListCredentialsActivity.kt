@@ -63,7 +63,11 @@ class ListCredentialsActivity : SecureActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
+
+        if (Secret.isDenied()) {
+            return false
+        }
+
         menuInflater.inflate(R.menu.menu_main, menu)
 
         val searchItem: MenuItem = menu.findItem(R.id.action_search)
@@ -158,8 +162,10 @@ class ListCredentialsActivity : SecureActivity() {
                 return true
             }
             R.id.delete_stored_masterkey -> {
-                PreferenceUtil.delete(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, this)
-                Secret.logout()
+                if (!Secret.isDenied()) {
+                    PreferenceUtil.delete(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, this)
+                    Secret.logout()
+                }
                 closeOverlayDialogs()
 
                 SecretChecker.getOrAskForSecret(this)
@@ -207,11 +213,8 @@ class ListCredentialsActivity : SecureActivity() {
 
     }
 
-    override fun refresh(before: Boolean) {
-        //TODO
-        if (!before) {
-            recreate()
-        }
+    override fun lock() {
+        recreate()
     }
 
     fun deleteCredential(credential: EncCredential) {

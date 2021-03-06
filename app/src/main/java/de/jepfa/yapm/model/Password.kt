@@ -63,6 +63,10 @@ data class Password(var data: CharArray) : Clearable, CharSequence {
         return Password(data.copyOfRange(startIndex, endIndex))
     }
 
+    override fun toString() : String {
+        return String(data)
+    }
+
     companion object {
         fun fromEditable(editable: Editable): Password {
 

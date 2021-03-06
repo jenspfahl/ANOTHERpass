@@ -3,7 +3,6 @@ package de.jepfa.yapm.ui.qrcode
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -15,10 +14,8 @@ import com.google.zxing.WriterException
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Encrypted
-import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.ui.credential.ShowCredentialActivity
 
 class QrCodeActivity : SecureActivity() {
@@ -54,7 +51,7 @@ class QrCodeActivity : SecureActivity() {
             subTextView.text = additionalInfo
 
             if (!password.isEmpty()) {
-                val bitmap = generateQRCode(password.debugToString()) //TODO
+                val bitmap = generateQRCode(password.toString())
                 qrCodeImageView.setImageBitmap(bitmap)
             }
         }
@@ -75,7 +72,7 @@ class QrCodeActivity : SecureActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun refresh(before: Boolean) {
+    override fun lock() {
         recreate()
     }
 

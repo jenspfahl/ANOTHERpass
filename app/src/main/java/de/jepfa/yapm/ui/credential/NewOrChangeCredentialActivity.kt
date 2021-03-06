@@ -33,6 +33,7 @@ class NewOrChangeCredentialActivity : SecureActivity() {
     private lateinit var switchAddDigit: Switch
     private lateinit var switchAddSpecialChar: Switch
     private lateinit var radioStrength: RadioGroup
+    private lateinit var buttonSave: Button
 
     private var generatedPassword: Password = Password("")
     private var currentId: Int = -1
@@ -45,6 +46,10 @@ class NewOrChangeCredentialActivity : SecureActivity() {
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (Secret.isDenied()) {
+            return
+        }
         setContentView(R.layout.activity_new_or_change_credential)
         editCredentialNameView = findViewById(R.id.edit_credential_name)
         editCredentialAdditionalInfoView = findViewById(R.id.edit_credential_additional_info)
@@ -111,8 +116,8 @@ class NewOrChangeCredentialActivity : SecureActivity() {
                     .show()
         }
 
-        val button = findViewById<Button>(R.id.button_save)
-        button.setOnClickListener {
+        buttonSave = findViewById(R.id.button_save)
+        buttonSave.setOnClickListener {
             Secret.safeTouch()
             if (generatedPassword.data.isEmpty()) {
                 Toast.makeText(it.context, "Generate a password first", Toast.LENGTH_LONG).show()
@@ -211,11 +216,9 @@ class NewOrChangeCredentialActivity : SecureActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun refresh(before: Boolean) {
-        //TODO
-        if (!before) {
-            recreate()
-        }
+    override fun lock() {
+        generatedPassword.clear()
+        recreate()
     }
 
 }

@@ -25,7 +25,7 @@ abstract class SecureActivity : BaseActivity() {
         checkSecret()
     }
 
-    protected abstract fun refresh(before: Boolean)
+    protected abstract fun lock()
 
     @get:Synchronized
     val masterSecretKey: SecretKey?
@@ -65,7 +65,7 @@ abstract class SecureActivity : BaseActivity() {
                     val intent = Intent(activity, LoginActivity::class.java)
                     activity.startActivity(intent)
                     loginIntented()
-                    activity.refresh(false)
+                    activity.lock()
                 }
             } else {
                 Secret.touch()
