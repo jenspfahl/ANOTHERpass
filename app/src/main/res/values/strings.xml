@@ -81,6 +81,8 @@
     <string name="export_masterkey">Encrypted masterkey</string>
     <string name="export_masterpasswd">Master password</string>
     <string name="export_vault">Vault as file</string>
+    <string name="qrc_download_as_img">Save Qr code as image</string>
+    <string name="download_as_nfc_tag">Push as NFC tag</string>
 
 
 </resources>

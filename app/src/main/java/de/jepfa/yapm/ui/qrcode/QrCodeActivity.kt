@@ -1,23 +1,28 @@
 package de.jepfa.yapm.ui.qrcode
 
 import android.app.AlertDialog
-import android.graphics.Bitmap
-import android.graphics.Color
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.MultiFormatWriter
-import com.google.zxing.WriterException
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Encrypted
+import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.model.Secret
 import de.jepfa.yapm.service.encrypt.SecretService
+import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.util.ExtPermissionChecker
+import de.jepfa.yapm.util.QRCodeUtil.generateQRCode
 
 class QrCodeActivity : SecureActivity() {
+
+    private val saveAsImage = 1
+
+    private lateinit var head: String
+    private lateinit var encQRC: Encrypted
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,10 +39,10 @@ class QrCodeActivity : SecureActivity() {
 
         val encHead = Encrypted.fromBase64String(intent.getStringExtra(EXTRA_HEADLINE))
         val encSub = Encrypted.fromBase64String(intent.getStringExtra(EXTRA_SUBTEXT))
-        val encQRC = Encrypted.fromBase64String(intent.getStringExtra(EXTRA_QRCODE))
+        encQRC = Encrypted.fromBase64String(intent.getStringExtra(EXTRA_QRCODE))
 
         val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
-        val head = SecretService.decryptCommonString(tempKey, encHead)
+        head = SecretService.decryptCommonString(tempKey, encHead)
         val sub = SecretService.decryptCommonString(tempKey, encSub)
         val qrc = SecretService.decryptPassword(tempKey, encQRC)
 
@@ -60,7 +65,17 @@ class QrCodeActivity : SecureActivity() {
 
     }
 
-   override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        if (Secret.isDenied()) {
+            return false
+        }
+
+        menuInflater.inflate(R.menu.qrcode_menu, menu)
+
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         if (id == android.R.id.home) {
 
@@ -68,27 +83,51 @@ class QrCodeActivity : SecureActivity() {
             return true
         }
 
+
+        if (Secret.isDenied()) {
+            return false
+        }
+
+        if (id == R.id.menu_download_qrc) {
+            val key = masterSecretKey
+            if (key != null) {
+
+                ExtPermissionChecker.verifyRWStoragePermissions(this) // TODO this is not enough
+
+                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+                intent.addCategory(Intent.CATEGORY_OPENABLE)
+                intent.type = "image/jpeg"
+                intent.putExtra(Intent.EXTRA_TITLE, getFileName(head))
+                startActivityForResult(Intent.createChooser(intent, "Save as"), saveAsImage)
+
+            }
+        }
+
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK && requestCode == saveAsImage) {
+
+            data?.data?.let {
+                val intent = Intent(this, FileIOService::class.java)
+                intent.action = FileIOService.ACTION_SAVE_QRC
+                intent.putExtra(FileIOService.PARAM_FILE_URI, it)
+                intent.putExtra(FileIOService.PARAM_QRC, encQRC.toBase64String())
+                startService(intent)
+            }
+
+        }
+    }
+
+    private fun getFileName(head: String): String {
+        return "${head}.jpeg"
+
     }
 
     override fun lock() {
         recreate()
-    }
-
-    private fun generateQRCode(text: String): Bitmap {
-        val width = 500
-        val height = 500
-        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        val codeWriter = MultiFormatWriter()
-        try {
-            val bitMatrix = codeWriter.encode(text, BarcodeFormat.QR_CODE, width, height)
-            for (x in 0 until width) {
-                for (y in 0 until height) {
-                    bitmap.setPixel(x, y, if (bitMatrix[x, y]) Color.BLACK else Color.WHITE)
-                }
-            }
-        } catch (e: WriterException) { Log.d("QrCodeActivity", "generateQRCode: ${e.message}") }
-        return bitmap
     }
 
     companion object {

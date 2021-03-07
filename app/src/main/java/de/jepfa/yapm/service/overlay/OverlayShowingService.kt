@@ -40,12 +40,6 @@ class OverlayShowingService : Service(), OnTouchListener, View.OnLongClickListen
         return STOP_FOREGROUND_REMOVE
     }
 
-    override fun onCreate() {
-        super.onCreate()
-
-        // paintIt();
-    }
-
     private fun paintIt() {
         wm = getSystemService(WINDOW_SERVICE) as WindowManager
         if (wm == null) {

@@ -3,6 +3,8 @@
     package="de.jepfa.yapm">
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:name=".ui.YapmApp"
@@ -13,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.YetAnotherPasswordManager">
         <activity android:name=".ui.qrcode.QrCodeActivity"
-            android:noHistory="true"/>
+            android:noHistory="false"/>
         <activity
             android:name=".ui.credential.ShowCredentialActivity"
             android:noHistory="false"
@@ -43,6 +45,9 @@
 
         <service
             android:name=".service.overlay.OverlayShowingService"
+            android:exported="false" />
+        <service
+            android:name=".service.io.FileIOService"
             android:exported="false" />
     </application>
 
