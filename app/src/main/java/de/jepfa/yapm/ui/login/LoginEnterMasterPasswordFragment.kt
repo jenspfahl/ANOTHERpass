@@ -2,6 +2,7 @@ package de.jepfa.yapm.ui.login
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -30,6 +31,9 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        getBaseActivity().supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        setHasOptionsMenu(true)
 
         val masterPasswdTextView: EditText = view.findViewById(R.id.edittext_enter_masterpassword)
         val switchStorePasswd: Switch = view.findViewById(R.id.switch_store_master_password)
@@ -91,5 +95,15 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
             masterPassword.clear()
 
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        if (id == android.R.id.home) {
+
+            findNavController().navigate(R.id.action_Login_MasterPasswordFragment_to_Login_PinFragment)
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

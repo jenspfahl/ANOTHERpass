@@ -3,6 +3,7 @@ package de.jepfa.yapm.ui.login
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
@@ -34,6 +35,8 @@ class LoginEnterPinFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        getBaseActivity().supportActionBar?.setDisplayHomeAsUpEnabled(false)
+
         val pinTextView: EditText = view.findViewById(R.id.edittext_enter_pin)
         val nextButton = view.findViewById<Button>(R.id.button_login_next)
 
@@ -63,7 +66,7 @@ class LoginEnterPinFragment : BaseFragment() {
 
                 return@setOnClickListener
             }
-
+/*
             val userPinHash = SecretService.hashPassword(userPin, salt)
 
             if (!Arrays.equals(userPinHash.data, storedMasterPinHash.data)) {
@@ -71,7 +74,7 @@ class LoginEnterPinFragment : BaseFragment() {
                 pinTextView.requestFocus()
 
                 return@setOnClickListener
-            }
+            }*/
 
             val encStoredMasterPasswd = PreferenceUtil.getEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, getBaseActivity())
 
@@ -84,14 +87,22 @@ class LoginEnterPinFragment : BaseFragment() {
                 }
                 val masterPasswd = SecretService.decryptPassword(keyForTemp, encMasterPasswd)
 
-                if (!login(userPin, masterPasswd, salt)) return@setOnClickListener
+                if (!login(userPin, masterPasswd, salt)) {
+                    pinTextView.setError(getString(R.string.pin_wrong))
+                    pinTextView.requestFocus()
+                    return@setOnClickListener
+                }
             }
             else if (encStoredMasterPasswd != null) {
 
                 val keyForMP = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP)
                 val storedMasterPasswd = SecretService.decryptPassword(keyForMP, encStoredMasterPasswd)
 
-                if (!login(userPin, storedMasterPasswd, salt)) return@setOnClickListener
+                if (!login(userPin, storedMasterPasswd, salt)) {
+                    pinTextView.setError(getString(R.string.pin_wrong))
+                    pinTextView.requestFocus()
+                    return@setOnClickListener
+                }
             } else {
                 val encUserPin = SecretService.encryptPassword(keyForTemp, userPin)
                 val args = Bundle()
@@ -100,7 +111,7 @@ class LoginEnterPinFragment : BaseFragment() {
                 findNavController().navigate(R.id.action_Login_PinFragment_to_MasterPasswordFragment, args)
             }
 
-            userPinHash.clear()
+          //  userPinHash.clear()
             userPin.clear()
             storedMasterPinHash.clear()
         }
@@ -125,7 +136,7 @@ class LoginEnterPinFragment : BaseFragment() {
                 salt
         )
         if (!success) {
-            Toast.makeText(context, R.string.password_wrong, Toast.LENGTH_LONG).show()
+           // Toast.makeText(context, R.string.password_wrong, Toast.LENGTH_LONG).show()
             return false
         }
 

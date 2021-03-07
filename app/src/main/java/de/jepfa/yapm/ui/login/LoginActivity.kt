@@ -44,10 +44,14 @@ class LoginActivity : BaseActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_login_help -> true //TODO
-            else -> super.onOptionsItemSelected(item)
+        val id = item.itemId
+        if (id == R.id.action_login_help) {
+
+            //TODO open help in browser?
+            return true
         }
+
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
