@@ -1,5 +1,6 @@
 package de.jepfa.yapm.ui.qrcode
 
+import android.app.AlertDialog
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
@@ -46,6 +47,13 @@ class QrCodeActivity : SecureActivity() {
         if (!qrc.isEmpty()) {
             val bitmap = generateQRCode(qrc.toString())
             qrCodeImageView.setImageBitmap(bitmap)
+            qrCodeImageView.setOnLongClickListener {
+                AlertDialog.Builder(this)
+                        .setTitle(head)
+                        .setMessage(qrc.toString())
+                        .show()
+                true
+            }
         }
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
