@@ -3,6 +3,7 @@ package de.jepfa.yapm.ui.login
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
@@ -18,7 +19,7 @@ class LoginActivity : BaseActivity() {
     val createVaultActivityRequestCode = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+        super.onCreate(null)
 
         if (isMasterKeyStored(this)) {
             setContentView(R.layout.activity_login)

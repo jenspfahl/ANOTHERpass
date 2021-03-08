@@ -1,15 +1,14 @@
 package de.jepfa.yapm.ui.login
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Switch
-import android.widget.Toast
+import android.widget.*
 import androidx.navigation.fragment.findNavController
+import com.google.zxing.integration.android.IntentIntegrator
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Password
@@ -17,9 +16,12 @@ import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.util.PreferenceUtil
+import de.jepfa.yapm.util.QRCodeUtil
 
 
 class LoginEnterMasterPasswordFragment : BaseFragment() {
+
+    private lateinit var masterPasswdTextView: EditText
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -30,14 +32,21 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        super.onViewCreated(view, null)
 
         getBaseActivity().supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setHasOptionsMenu(true)
 
-        val masterPasswdTextView: EditText = view.findViewById(R.id.edittext_enter_masterpassword)
+        masterPasswdTextView = view.findViewById(R.id.edittext_enter_masterpassword)
+        val scanQrCodeImageView: ImageView = view.findViewById(R.id.imageview_scan_qrcode)
         val switchStorePasswd: Switch = view.findViewById(R.id.switch_store_master_password)
         val loginButton = view.findViewById<Button>(R.id.button_login)
+
+        scanQrCodeImageView.setOnClickListener {
+            QRCodeUtil.scanQRCode(this, "Scanning Master Password")
+            true
+        }
+
 
         masterPasswdTextView.setOnEditorActionListener{ textView, id, keyEvent ->
             loginButton.performClick()
@@ -97,6 +106,12 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         }
     }
 
+
+    override fun onResume() {
+        super.onResume()
+        masterPasswdTextView.setText("")
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         if (id == android.R.id.home) {
@@ -105,5 +120,18 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
+        if (result != null) {
+            if (result.contents == null) Toast.makeText(context, "Cancelled", Toast.LENGTH_LONG).show()
+            else {
+                masterPasswdTextView.setText(result.contents)
+                Toast.makeText(context, "Scanned: " + result.contents, Toast.LENGTH_LONG).show()
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data)
+        }
     }
 }

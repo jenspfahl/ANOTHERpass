@@ -68,7 +68,7 @@ object SecretService {
     fun conjunctPasswords(password1: Password, password2: Password, salt: Key): Password {
         val message = MessageDigest.getInstance("SHA-256")
         message.update(salt.data)
-        message.update(password1.toByteArray())
+        message.update(password1.toByteArray()) //TODO better p1 + p2 ?
         message.update(password2.toByteArray())
         val digest = message.digest()
         val result = digest.map { it.toChar() }.toCharArray()

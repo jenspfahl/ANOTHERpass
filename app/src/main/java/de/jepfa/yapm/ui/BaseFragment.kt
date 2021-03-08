@@ -1,8 +1,6 @@
 package de.jepfa.yapm.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import de.jepfa.yapm.service.secretgenerator.PasswordStrength
 
 open class BaseFragment : Fragment() {
 

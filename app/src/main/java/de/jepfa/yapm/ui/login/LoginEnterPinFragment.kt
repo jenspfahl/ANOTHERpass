@@ -25,6 +25,8 @@ import java.util.*
 
 class LoginEnterPinFragment : BaseFragment() {
 
+    private lateinit var pinTextView: EditText
+
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
@@ -33,11 +35,11 @@ class LoginEnterPinFragment : BaseFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        super.onViewCreated(view, null)
 
         getBaseActivity().supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
-        val pinTextView: EditText = view.findViewById(R.id.edittext_enter_pin)
+        pinTextView = view.findViewById(R.id.edittext_enter_pin)
         val nextButton = view.findViewById<Button>(R.id.button_login_next)
 
         pinTextView.setImeOptions(EditorInfo.IME_ACTION_DONE)
@@ -115,6 +117,11 @@ class LoginEnterPinFragment : BaseFragment() {
             userPin.clear()
             //storedMasterPinHash.clear()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        pinTextView.setText("")
     }
 
     private fun login(

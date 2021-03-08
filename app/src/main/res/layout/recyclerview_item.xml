@@ -19,7 +19,6 @@
 
         <ImageView
             android:id="@+id/credential_detach"
-            android:layout_width="72dp"
             android:layout_height="match_parent"
             android:layout_gravity="end"
             android:clickable="true"
