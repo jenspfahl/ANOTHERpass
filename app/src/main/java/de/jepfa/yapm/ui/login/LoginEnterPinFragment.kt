@@ -1,15 +1,12 @@
 package de.jepfa.yapm.ui.login
 
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
-import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
@@ -25,8 +22,6 @@ import java.util.*
 
 class LoginEnterPinFragment : BaseFragment() {
 
-    private lateinit var pinTextView: EditText
-
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
@@ -39,7 +34,7 @@ class LoginEnterPinFragment : BaseFragment() {
 
         getBaseActivity().supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
-        pinTextView = view.findViewById(R.id.edittext_enter_pin)
+        val pinTextView: EditText = view.findViewById(R.id.edittext_enter_pin)
         val nextButton = view.findViewById<Button>(R.id.button_login_next)
 
         pinTextView.setImeOptions(EditorInfo.IME_ACTION_DONE)
@@ -116,13 +111,11 @@ class LoginEnterPinFragment : BaseFragment() {
             //userPinHash.clear()
             userPin.clear()
             //storedMasterPinHash.clear()
+
+            pinTextView.setText("")
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        pinTextView.setText("")
-    }
 
     private fun login(
             userPin: Password,
@@ -148,7 +141,8 @@ class LoginEnterPinFragment : BaseFragment() {
         }
 
         masterPasswd.clear()
-        findNavController().navigate(R.id.action_Login_MasterPasswordFragment_to_CredentialList)
+        findNavController().navigate(R.id.action_Login_to_CredentialList)
+        getBaseActivity().finishAffinity()
         return true
     }
 }

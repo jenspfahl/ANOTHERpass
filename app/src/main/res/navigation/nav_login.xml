@@ -16,7 +16,7 @@
             app:destination="@id/LoginEnterMasterPasswordFragment" />
 
         <action
-            android:id="@+id/action_Login_MasterPasswordFragment_to_CredentialList"
+            android:id="@+id/action_Login_to_CredentialList"
             app:destination="@id/ListCredentialsActivity" />
     </fragment>
 
@@ -27,7 +27,7 @@
         tools:layout="@layout/fragment_login_enter_masterpassword">
 
         <action
-            android:id="@+id/action_Login_MasterPasswordFragment_to_CredentialList"
+            android:id="@+id/action_Login_to_CredentialList"
             app:destination="@id/ListCredentialsActivity" />
         <action
             android:id="@+id/action_Login_MasterPasswordFragment_to_Login_PinFragment"

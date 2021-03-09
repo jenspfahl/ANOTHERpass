@@ -98,18 +98,14 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                 PreferenceUtil.put(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, encPasswd.toBase64String(), getBaseActivity())
             }
 
-            findNavController().navigate(R.id.action_Login_MasterPasswordFragment_to_CredentialList)
+            findNavController().navigate(R.id.action_Login_to_CredentialList)
 
             masterPin.clear()
             masterPassword.clear()
-
+            masterPasswdTextView.setText("")
+            arguments?.remove(CreateVaultActivity.ARG_ENC_PIN)
+            getBaseActivity().finishAffinity()
         }
-    }
-
-
-    override fun onResume() {
-        super.onResume()
-        masterPasswdTextView.setText("")
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
