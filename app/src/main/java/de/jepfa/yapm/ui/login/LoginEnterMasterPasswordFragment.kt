@@ -121,10 +121,8 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
         if (result != null) {
-            if (result.contents == null) Toast.makeText(context, "Cancelled", Toast.LENGTH_LONG).show()
-            else {
-                masterPasswdTextView.setText(result.contents)
-                Toast.makeText(context, "Scanned: " + result.contents, Toast.LENGTH_LONG).show()
+            result.contents?.let {
+                masterPasswdTextView.setText(it)
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data)

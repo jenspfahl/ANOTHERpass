@@ -146,15 +146,13 @@ class ListCredentialsActivity : SecureActivity() {
         return when (item.itemId) {
             R.id.action_settings -> true
             R.id.menu_lock_items -> {
-                val secret = SecretChecker.getOrAskForSecret(this)
-                if (secret.isDenied()) {
-                    SecretChecker.getOrAskForSecret(this)
-                }
-                else {
-                    secret.lock()
-                    closeOverlayDialogs()
-                }
+
+                Secret.lock()
+                closeOverlayDialogs()
                 refreshMenuLockItem(item)
+                finishAffinity()
+                SecretChecker.getOrAskForSecret(this)
+                
                 return true
             }
             R.id.menu_logout -> {
@@ -227,11 +225,6 @@ class ListCredentialsActivity : SecureActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
-    }
-
-    private fun closeOverlayDialogs() {
-        val intent = Intent(this, OverlayShowingService::class.java)
-        stopService(intent)
     }
 
 

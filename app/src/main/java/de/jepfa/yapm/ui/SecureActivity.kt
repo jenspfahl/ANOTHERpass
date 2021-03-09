@@ -3,7 +3,9 @@ package de.jepfa.yapm.ui
 import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
+import androidx.core.app.ActivityCompat.finishAffinity
 import de.jepfa.yapm.model.Secret
+import de.jepfa.yapm.service.overlay.OverlayShowingService
 import de.jepfa.yapm.ui.login.LoginActivity
 import java.util.concurrent.TimeUnit
 import javax.crypto.SecretKey
@@ -38,6 +40,11 @@ abstract class SecureActivity : BaseActivity() {
             }
         }
 
+    fun closeOverlayDialogs() {
+        val intent = Intent(this, OverlayShowingService::class.java)
+        stopService(intent)
+    }
+
     @Synchronized
     private fun checkSecret() {
         SecretChecker.getOrAskForSecret(this)
@@ -59,6 +66,8 @@ abstract class SecureActivity : BaseActivity() {
                 // make all not readable by setting key as invalid
                 if (Secret.isOutdated()) {
                     Secret.lock()
+                    activity.closeOverlayDialogs()
+                    finishAffinity(activity)
                 }
 
                 if (!isLoginIntented()) {
