@@ -21,4 +21,7 @@ interface EncCredentialDao {
     @Query("SELECT * FROM EncCredentialEntity")
     fun getAll(): Flow<List<EncCredentialEntity>>
 
+    @Query("SELECT * FROM EncCredentialEntity ORDER BY id")
+    fun getAllSync(): List<EncCredentialEntity>
+
 }

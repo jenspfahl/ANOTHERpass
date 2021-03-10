@@ -2,10 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.jepfa.yapm">
 
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
     <application
         android:name=".ui.YapmApp"
         android:allowBackup="false"
@@ -15,12 +11,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.YetAnotherPasswordManager">
-        <activity android:name=".ui.qrcode.QrCodeActivity"
-            android:noHistory="false"/>
-        <activity android:name=".ui.qrcode.CaptureActivity"
+        <activity android:name=".ui.export.ExportVaultActivity"></activity>
+        <activity
+            android:name=".ui.qrcode.QrCodeActivity"
+            android:noHistory="false" />
+        <activity
+            android:name=".ui.qrcode.CaptureActivity"
             android:screenOrientation="fullSensor"
             android:stateNotNeeded="true"
-            android:windowSoftInputMode="stateAlwaysHidden"/>
+            android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
             android:name=".ui.credential.ShowCredentialActivity"
             android:noHistory="false"
@@ -55,5 +54,9 @@
             android:name=".service.io.FileIOService"
             android:exported="false" />
     </application>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
 </manifest>

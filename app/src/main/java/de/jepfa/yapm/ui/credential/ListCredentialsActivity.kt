@@ -24,12 +24,11 @@ import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.model.Secret
 import de.jepfa.yapm.service.encrypt.SecretService
-import de.jepfa.yapm.service.encrypt.SecretService.decryptPassword
 import de.jepfa.yapm.service.encrypt.SecretService.encryptCommonString
 import de.jepfa.yapm.service.encrypt.SecretService.encryptPassword
-import de.jepfa.yapm.service.overlay.OverlayShowingService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.YapmApp
+import de.jepfa.yapm.ui.export.ExportVaultActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.viewmodel.CredentialViewModel
@@ -220,6 +219,12 @@ class ListCredentialsActivity : SecureActivity() {
                     startActivity(intent)
 
                 }
+
+                return true
+            }
+            R.id.export_vault -> {
+                val intent = Intent(this, ExportVaultActivity::class.java)
+                startActivity(intent)
 
                 return true
             }

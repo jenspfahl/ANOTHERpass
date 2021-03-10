@@ -1,6 +1,7 @@
 package de.jepfa.yapm.util
 
 import android.app.Activity
+import android.content.Context
 import android.preference.PreferenceManager
 import de.jepfa.yapm.model.Encrypted
 
@@ -13,20 +14,18 @@ object PreferenceUtil {
     const val PREF_ENCRYPTED_MASTER_PASSWORD = PREF_PREFIX + "mpwd"
     const val PREF_ENCRYPTED_MASTER_KEY = PREF_PREFIX + "enmk"
 
-    fun getEncrypted(prefKey: String, activity: Activity): Encrypted? {
-        return get(prefKey, activity)?.let {Encrypted.fromBase64String(it)}
+    fun getEncrypted(prefKey: String, context: Context): Encrypted? {
+        return get(prefKey, context)?.let {Encrypted.fromBase64String(it)}
     }
 
-    fun get(prefKey: String, activity: Activity): String? {
-            val context = activity.applicationContext
+    fun get(prefKey: String, context: Context): String? {
         val defaultSharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(context)
         return defaultSharedPreferences
                 .getString(prefKey, null)
     }
 
-    fun put(prefKey: String, value: String, activity: Activity) {
-        val context = activity.applicationContext
+    fun put(prefKey: String, value: String, context: Context) {
         val defaultSharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(context)
 
@@ -35,8 +34,7 @@ object PreferenceUtil {
         editor.commit()
     }
 
-    fun delete(prefKey: String, activity: Activity) {
-        val context = activity.applicationContext
+    fun delete(prefKey: String, context: Context) {
         val defaultSharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(context)
 

@@ -4,9 +4,7 @@ import androidx.annotation.WorkerThread
 import de.jepfa.yapm.database.dao.EncCredentialDao
 import de.jepfa.yapm.database.entity.EncCredentialEntity
 import de.jepfa.yapm.model.EncCredential
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 
 class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
 
@@ -32,6 +30,10 @@ class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
 
     fun getAll(): Flow<List<EncCredential>> {
         return encCredentialDao.getAll().filterNotNull().map {it -> mapToCredentials(it)}
+    }
+
+    fun getAllSync(): List<EncCredential> {
+        return encCredentialDao.getAllSync().filterNotNull().map {it -> mapToCredential(it)}
     }
 
     private fun mapToCredentials(entities: List<EncCredentialEntity>): List<EncCredential> {
