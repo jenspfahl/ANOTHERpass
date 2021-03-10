@@ -89,6 +89,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
             if (!success) {
                 masterPasswdTextView.setError(getString(R.string.password_wrong))
                 masterPasswdTextView.requestFocus()
+                (getBaseActivity() as LoginActivity).handleFailedLoginAttempt()
                 return@setOnClickListener
             }
 
@@ -104,7 +105,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
             masterPassword.clear()
             masterPasswdTextView.setText("")
             arguments?.remove(CreateVaultActivity.ARG_ENC_PIN)
-            getBaseActivity().finishAffinity()
+            (getBaseActivity() as LoginActivity).loginSuccessful()
         }
     }
 

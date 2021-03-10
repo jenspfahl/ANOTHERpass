@@ -9,6 +9,7 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Secret
 import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.util.ExtPermissionChecker
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -74,6 +75,12 @@ class ExportVaultActivity : SecureActivity() {
                 intent.putExtra(FileIOService.PARAM_INCLUDE_MK, includeMasterKeySwitch.isChecked)
                 intent.putExtra(FileIOService.PARAM_FILE_URI, it)
                 startService(intent)
+
+                finishAffinity()
+
+                val upIntent = Intent(this, ListCredentialsActivity::class.java)
+                navigateUpTo(upIntent)
+
             }
 
         }

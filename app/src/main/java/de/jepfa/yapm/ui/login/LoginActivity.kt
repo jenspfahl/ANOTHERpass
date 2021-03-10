@@ -9,12 +9,16 @@ import android.view.MenuItem
 import android.widget.Button
 import android.widget.Toast
 import de.jepfa.yapm.R
+import de.jepfa.yapm.model.Secret
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.util.PreferenceUtil
 
 
 class LoginActivity : BaseActivity() {
+
+    val MAX_LOGIN_ATTEMPTS = 3
+    var loginAttempts = 0
 
     val createVaultActivityRequestCode = 1
 
@@ -65,5 +69,21 @@ class LoginActivity : BaseActivity() {
 
     private fun isMasterKeyStored(activity: Activity): Boolean {
         return PreferenceUtil.get(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, activity) != null
+    }
+
+    fun handleFailedLoginAttempt() {
+        loginAttempts++
+        if (loginAttempts >= MAX_LOGIN_ATTEMPTS) {
+            Toast.makeText(baseContext, R.string.too_may_wrong_logins, Toast.LENGTH_LONG).show()
+            PreferenceUtil.delete(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, baseContext)
+            Secret.logout()
+            finishAffinity()
+            finishAndRemoveTask()
+        }
+    }
+
+    fun loginSuccessful() {
+        loginAttempts = 0
+        finishAffinity()
     }
 }

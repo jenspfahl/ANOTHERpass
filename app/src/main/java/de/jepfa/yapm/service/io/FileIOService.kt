@@ -32,7 +32,7 @@ class FileIOService: IntentService("FileIOService") {
         override fun serialize(src: Encrypted?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
             val json = JsonObject()
             src?.let {
-                json.addProperty("src", it.toBase64String())
+                json.addProperty("enc", it.toBase64String())
             }
 
             return json
@@ -43,7 +43,7 @@ class FileIOService: IntentService("FileIOService") {
     private val SDF_DT_MEDIUM =
         SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM)
     private val GSON = GsonBuilder()
-            .registerTypeAdapter(EncCredential::class.java, EncryptedSerializer())
+            .registerTypeAdapter(Encrypted::class.java, EncryptedSerializer())
             .create()
     private val handler = Handler()
 

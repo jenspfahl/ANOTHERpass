@@ -126,7 +126,7 @@ class LoginEnterPinFragment : BaseFragment() {
             PreferenceUtil.getEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, getBaseActivity())
         if (encStoredMasterKey == null) {
             Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
-            return true
+            return false
         }
 
         val success = SecretService.login(
@@ -136,13 +136,13 @@ class LoginEnterPinFragment : BaseFragment() {
                 salt
         )
         if (!success) {
-           // Toast.makeText(context, R.string.password_wrong, Toast.LENGTH_LONG).show()
+            (getBaseActivity() as LoginActivity).handleFailedLoginAttempt()
             return false
         }
 
         masterPasswd.clear()
         findNavController().navigate(R.id.action_Login_to_CredentialList)
-        getBaseActivity().finishAffinity()
+        (getBaseActivity() as LoginActivity).loginSuccessful()
         return true
     }
 }
