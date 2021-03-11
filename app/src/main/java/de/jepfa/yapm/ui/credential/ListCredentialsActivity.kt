@@ -28,7 +28,7 @@ import de.jepfa.yapm.service.encrypt.SecretService.encryptCommonString
 import de.jepfa.yapm.service.encrypt.SecretService.encryptPassword
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.YapmApp
-import de.jepfa.yapm.ui.export.ExportVaultActivity
+import de.jepfa.yapm.ui.exportvault.ExportVaultActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.viewmodel.CredentialViewModel
