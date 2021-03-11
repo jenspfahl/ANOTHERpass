@@ -20,7 +20,6 @@ import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.util.FileUtil
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.QRCodeUtil
-import org.json.JSONObject
 import java.lang.reflect.Type
 import java.text.SimpleDateFormat
 import java.util.*
@@ -101,7 +100,7 @@ class FileIOService: IntentService("FileIOService") {
 
     }
 
-    private fun writeExportFile(uri: Uri, jsonData: JSONObject): Boolean {
+    private fun writeExportFile(uri: Uri, jsonData: JsonObject): Boolean {
         var success = false
         try {
             success = FileUtil.writeFile(this, uri, jsonData.toString())
@@ -116,20 +115,20 @@ class FileIOService: IntentService("FileIOService") {
         return success
     }
 
-    private fun exportToJson(includeMasterkey: Boolean): JSONObject {
-        val root = JSONObject()
+    private fun exportToJson(includeMasterkey: Boolean): JsonObject {
+        val root = JsonObject()
         try {
             val pInfo = application.packageManager.getPackageInfo(application.packageName, 0)
-            root.put(JSON_APP_VERSION_CODE, pInfo.versionCode)
-            root.put(JSON_APP_VERSION_NAME, pInfo.versionName)
+            root.addProperty(JSON_APP_VERSION_CODE, pInfo.versionCode)
+            root.addProperty(JSON_APP_VERSION_NAME, pInfo.versionName)
         } catch (e: PackageManager.NameNotFoundException) {
             Log.e("BACKUPALL", "cannot get version code", e)
         }
 
-        root.put(JSON_CREATION_DATE, SDF_DT_MEDIUM.format(Date()))
+        root.addProperty(JSON_CREATION_DATE, SDF_DT_MEDIUM.format(Date()))
         val salt = PreferenceUtil.get(PreferenceUtil.PREF_SALT, this)
         salt?.let {
-            root.put(JSON_VAULT_ID, it)
+            root.addProperty(JSON_VAULT_ID, it)
         }
 
         if (includeMasterkey) {
@@ -139,7 +138,7 @@ class FileIOService: IntentService("FileIOService") {
 
                 val mkKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
                 val encMasterKeyBase64 = SecretService.decryptEncrypted(mkKey, encStoredMasterKey).toBase64String()
-                root.put(JSON_ENC_MK, encMasterKeyBase64)
+                root.addProperty(JSON_ENC_MK, encMasterKeyBase64)
             }
 
         }
@@ -147,8 +146,8 @@ class FileIOService: IntentService("FileIOService") {
 
         val credentials = getApp().repository.getAllSync()
 
-        root.put(JSON_CREDENTIALS, GSON.toJsonTree(credentials, CREDENTIALS_TYPE))
-        root.put(JSON_CREDENTIALS_COUNT, credentials.size)
+        root.add(JSON_CREDENTIALS, GSON.toJsonTree(credentials, CREDENTIALS_TYPE))
+        root.addProperty(JSON_CREDENTIALS_COUNT, credentials.size)
 
         return root
     }
