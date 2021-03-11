@@ -6,7 +6,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <fragment
-        android:id="@+id/nav_create_vault_fragment"
+        android:id="@+id/nav_import_vault_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -15,5 +15,5 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navGraph="@navigation/nav_create_vault" />
+        app:navGraph="@navigation/nav_import_vault" />
 </androidx.constraintlayout.widget.ConstraintLayout>

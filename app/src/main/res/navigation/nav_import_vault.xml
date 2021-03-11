@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_import_vault"
+    app:startDestination="@id/ImportVaultLoadFileFragment">
+
+    <fragment
+        android:id="@+id/ImportVaultLoadFileFragment"
+        android:name="de.jepfa.yapm.ui.importvault.ImportVaultLoadFileFragment"
+        android:label="@string/import_vault_load_file_fragment_label"
+        tools:layout="@layout/fragment_load_vault_file">
+
+        <action
+            android:id="@+id/action_importVault_LoadFileFragment_to_ImportFileFragment"
+            app:destination="@id/ImportVaultImportFileFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/ImportVaultImportFileFragment"
+        android:name="de.jepfa.yapm.ui.importvault.ImportVaultImportFileFragment"
+        android:label="@string/import_vault_import_file_fragment_label"
+        tools:layout="@layout/fragment_load_vault_file">
+
+        <action
+            android:id="@+id/action_import_Vault_to_Login"
+            app:destination="@id/LoginActivity" />
+    </fragment>
+
+    <activity
+        android:id="@+id/LoginActivity"
+        android:name="de.jepfa.yapm.ui.login.LoginActivity"
+        android:label="Login Activity"/>
+
+</navigation>

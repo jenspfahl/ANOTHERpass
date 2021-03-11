@@ -12,6 +12,7 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Secret
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
+import de.jepfa.yapm.ui.importvault.ImportVaultActivity
 import de.jepfa.yapm.util.PreferenceUtil
 
 
@@ -21,6 +22,7 @@ class LoginActivity : BaseActivity() {
     var loginAttempts = 0
 
     val createVaultActivityRequestCode = 1
+    val importVaultActivityRequestCode = 2
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(null)
@@ -33,11 +35,12 @@ class LoginActivity : BaseActivity() {
             val buttonCreateVault: Button = findViewById(R.id.button_create_vault)
             buttonCreateVault.setOnClickListener {
                 val intent = Intent(this@LoginActivity, CreateVaultActivity::class.java)
-                startActivityForResult(intent, createVaultActivityRequestCode)
+                startActivityForResult(intent, importVaultActivityRequestCode)
             }
             val buttonImportVault: Button = findViewById(R.id.button_import_vault)
             buttonImportVault.setOnClickListener {
-                Toast.makeText(this@LoginActivity, "not supported yet", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this@LoginActivity, ImportVaultActivity::class.java)
+                startActivityForResult(intent, createVaultActivityRequestCode)
             }
         }
         setSupportActionBar(findViewById(R.id.toolbar))
@@ -63,6 +66,9 @@ class LoginActivity : BaseActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == createVaultActivityRequestCode && resultCode == Activity.RESULT_OK) {
+            recreate()
+        }
+        if (requestCode == importVaultActivityRequestCode && resultCode == Activity.RESULT_OK) {
             recreate()
         }
     }

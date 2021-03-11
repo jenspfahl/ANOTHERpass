@@ -19,8 +19,7 @@ class CreateVaultActivity : BaseActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         if (id == android.R.id.home) {
-            val upIntent = Intent(this, ListCredentialsActivity::class.java)
-            navigateUpTo(upIntent)
+            navigateUpTo(intent)
             return true
         }
         return super.onOptionsItemSelected(item)

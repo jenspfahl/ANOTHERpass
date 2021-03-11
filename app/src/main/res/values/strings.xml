@@ -87,6 +87,14 @@
     <string name="button_export_vault">Export vault</string>
     <string name="include_enc_masterkey">Include encrypted masterkey</string>
     <string name="too_may_wrong_logins">Too many login attempts</string>
+    <string name="import_vault_explanation">Select a vault file to import. Note: You need the pin and the masterpassword and, depending on the file, the encrypted masterkey.</string>
+    <string name="import_vault_load_file_fragment_label">Import vault 1/2</string>
+    <string name="import_vault_import_file_fragment_label">Import vault 2/2</string>
+    <string name="button_load_vault">Load vault file</string>
+    <string name="button_import_vault">Import vault</string>
+    <string name="scan_mk">Scan your master key</string>
+    <string name="drop_vault">Drop vault (delete all)</string>
+    <string name="ULTRA_EXTREME">Ultra Extreme</string>
 
 
 </resources>

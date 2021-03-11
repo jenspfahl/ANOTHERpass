@@ -1,6 +1,7 @@
 package de.jepfa.yapm.ui.credential
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
@@ -228,8 +229,34 @@ class ListCredentialsActivity : SecureActivity() {
 
                 return true
             }
+            R.id.drop_vault -> {
+
+                AlertDialog.Builder(this)
+                        .setTitle("Drop vault")
+                        .setMessage("You are going to delete ALL your credentials and login data.")
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                            dropVault()
+                        }
+                        .setNegativeButton(android.R.string.no, null)
+                        .show()
+
+                return true
+            }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun dropVault() {
+        Secret.logout()
+
+        closeOverlayDialogs()
+
+        PreferenceUtil.delete(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, this)
+        PreferenceUtil.delete(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, this)
+        PreferenceUtil.delete(PreferenceUtil.PREF_SALT, this)
+        getApp().database?.clearAllTables()
+        finishAffinity()
     }
 
 
