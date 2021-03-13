@@ -95,6 +95,8 @@
     <string name="scan_mk">Scan your master key</string>
     <string name="drop_vault">Drop vault (delete all)</string>
     <string name="ULTRA_EXTREME">Ultra Extreme</string>
+    <string name="chooser_select_vault_file">Select vault file to import</string>
+    <string name="toast_import_vault_failure">The selected file cannot be imported.</string>
 
 
 </resources>

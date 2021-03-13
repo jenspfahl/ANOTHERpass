@@ -34,6 +34,10 @@ import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.viewmodel.CredentialViewModel
 import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 
 
 class ListCredentialsActivity : SecureActivity() {
@@ -236,7 +240,11 @@ class ListCredentialsActivity : SecureActivity() {
                         .setMessage("You are going to delete ALL your credentials and login data.")
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                            Secret.logout()
+                            closeOverlayDialogs()
                             dropVault()
+                            finishAffinity()
+                            SecretChecker.getOrAskForSecret(this) // restart app
                         }
                         .setNegativeButton(android.R.string.no, null)
                         .show()
@@ -248,15 +256,13 @@ class ListCredentialsActivity : SecureActivity() {
     }
 
     private fun dropVault() {
-        Secret.logout()
-
-        closeOverlayDialogs()
 
         PreferenceUtil.delete(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, this)
         PreferenceUtil.delete(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, this)
         PreferenceUtil.delete(PreferenceUtil.PREF_SALT, this)
-        getApp().database?.clearAllTables()
-        finishAffinity()
+        CoroutineScope(Dispatchers.IO).launch {
+            getApp().database?.clearAllTables()
+        }
     }
 
 

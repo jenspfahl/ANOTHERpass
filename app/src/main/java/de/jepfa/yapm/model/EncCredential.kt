@@ -26,5 +26,11 @@ data class EncCredential(var id: Int?,
         const val EXTRA_CREDENTIAL_NAME = "de.jepfa.yapm.ui.save_credential.name"
         const val EXTRA_CREDENTIAL_ADDITIONAL_INFO = "de.jepfa.yapm.ui.save_credential.additionalInfo"
         const val EXTRA_CREDENTIAL_PASSWORD = "de.jepfa.yapm.ui.save_credential.password"
+
+        const val ATTRIB_ID = "id"
+        const val ATTRIB_NAME = "name"
+        const val ATTRIB_ADDITIONAL_INFO = "additionalInfo"
+        const val ATTRIB_PASSWORD = "password"
+        const val ATTRIB_EXTRA_PIN_REQUIRED = "extraPinRequired"
     }
 }

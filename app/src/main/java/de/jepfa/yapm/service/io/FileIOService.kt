@@ -29,21 +29,14 @@ class FileIOService: IntentService("FileIOService") {
 
     class EncryptedSerializer : JsonSerializer<Encrypted> {
         override fun serialize(src: Encrypted?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
-            val json = JsonObject()
             src?.let {
-                json.addProperty("enc", it.toBase64String())
+                return JsonPrimitive(it.toBase64String())
             }
 
-            return json
+            return JsonPrimitive("")
         }
-
     }
 
-    private val SDF_DT_MEDIUM =
-        SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM)
-    private val GSON = GsonBuilder()
-            .registerTypeAdapter(Encrypted::class.java, EncryptedSerializer())
-            .create()
     private val handler = Handler()
 
     companion object {
@@ -63,6 +56,11 @@ class FileIOService: IntentService("FileIOService") {
         const val JSON_CREDENTIALS_COUNT = "credentialsCount"
 
         val CREDENTIALS_TYPE = object : TypeToken<List<EncCredential>>() {}.type
+        val SDF_DT_MEDIUM =
+                SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM)
+        val GSON = GsonBuilder()
+                .registerTypeAdapter(Encrypted::class.java, EncryptedSerializer())
+                .create()
     }
 
     override fun onHandleIntent(intent: Intent?) {

@@ -21,7 +21,7 @@
         android:id="@+id/ImportVaultImportFileFragment"
         android:name="de.jepfa.yapm.ui.importvault.ImportVaultImportFileFragment"
         android:label="@string/import_vault_import_file_fragment_label"
-        tools:layout="@layout/fragment_load_vault_file">
+        tools:layout="@layout/fragment_import_vault_file">
 
         <action
             android:id="@+id/action_import_Vault_to_Login"

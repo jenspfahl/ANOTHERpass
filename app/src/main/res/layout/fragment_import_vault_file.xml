@@ -11,6 +11,7 @@
         android:id="@+id/loaded_file_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingHorizontal="15dp"
         android:text="..."
         app:layout_constraintBottom_toTopOf="@id/load_with_mk"
         app:layout_constraintEnd_toEndOf="parent"
