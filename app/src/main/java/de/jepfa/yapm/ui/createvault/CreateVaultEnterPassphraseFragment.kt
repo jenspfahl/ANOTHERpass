@@ -76,8 +76,10 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
     }
 
     private fun generatePassword() : Password {
+        return Password("abcd") //TODO mockup
+        /*
         return passphraseGenerator.generatePassphrase(
                 PassphraseGeneratorSpec(
-                        strength = PasswordStrength.ULTRA_EXTREME))
+                        strength = PasswordStrength.ULTRA_EXTREME))*/
     }
 }

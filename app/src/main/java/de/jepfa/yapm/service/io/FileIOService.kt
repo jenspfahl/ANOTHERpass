@@ -131,8 +131,7 @@ class FileIOService: IntentService("FileIOService") {
 
         if (includeMasterkey) {
             val encStoredMasterKey = PreferenceUtil.getEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, this)
-            val key = Secret.getMasterKeySK()
-            if (key != null && encStoredMasterKey != null) {
+            if (encStoredMasterKey != null) {
 
                 val mkKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
                 val encMasterKeyBase64 = SecretService.decryptEncrypted(mkKey, encStoredMasterKey).toBase64String()
