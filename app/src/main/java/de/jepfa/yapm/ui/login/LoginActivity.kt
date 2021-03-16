@@ -82,6 +82,7 @@ class LoginActivity : BaseActivity() {
         if (loginAttempts >= MAX_LOGIN_ATTEMPTS) {
             Toast.makeText(baseContext, R.string.too_may_wrong_logins, Toast.LENGTH_LONG).show()
             PreferenceUtil.delete(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, baseContext)
+            PreferenceUtil.delete(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, baseContext)
             Secret.logout()
             finishAffinity()
             finishAndRemoveTask()
