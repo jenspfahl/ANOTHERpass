@@ -13,6 +13,7 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.service.encrypt.SecretService
+import de.jepfa.yapm.service.secretgenerator.PasswordStrength
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.util.PreferenceUtil
@@ -27,7 +28,6 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_login_enter_masterpassword, container, false)
     }
 
@@ -123,7 +123,22 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
         if (result != null) {
             result.contents?.let {
-                masterPasswdTextView.setText(it)
+                if (it.length > PasswordStrength.ULTRA_EXTREME.passwordLength
+                        && PreferenceUtil.isPresent(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, getBaseActivity())) {
+                    // decrypt obliviously encrypted master password token
+                    val encMasterPasswordTokenKey = PreferenceUtil.getEncrypted(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, getBaseActivity())
+                    encMasterPasswordTokenKey?.let {
+                        val mPTKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP_TOKEN)
+                        val masterPasswordTokenKey = SecretService.decryptKey(mPTKey, encMasterPasswordTokenKey)
+                        val mptSK = SecretService.generateSecretKey(masterPasswordTokenKey, SecretService.getOrCreateSalt(getBaseActivity()))
+
+                        val encMasterPassword = SecretService.decryptPassword(mptSK, it)
+                        masterPasswdTextView.setText(encMasterPassword)
+                    }
+                }
+                else {
+                    masterPasswdTextView.setText(it)
+                }
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data)

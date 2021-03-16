@@ -70,7 +70,7 @@
     <string name="password">Enter your master password</string>
     <string name="button_login">Login</string>
     <string name="password_required">Password required</string>
-    <string name="delete_stored_masterpasswd">Remove master password</string>
+    <string name="delete_stored_masterpasswd">Remove stored master password</string>
     <string name="password_wrong">Master password or pin wrong</string>
     <string name="something_went_wrong">Something went wrong :-(</string>
     <string name="title_new_credential">Create new credential</string>
@@ -79,7 +79,7 @@
     <string name="show_as_qrcode">Show as QR Code</string>
     <string name="export">Export</string>
     <string name="export_masterkey">Encrypted masterkey</string>
-    <string name="export_masterpasswd">Master password</string>
+    <string name="export_masterpasswd">Plain master password</string>
     <string name="export_vault">Vault as file</string>
     <string name="qrc_download_as_img">Save Qr code as image</string>
     <string name="download_as_nfc_tag">Push as NFC tag</string>
@@ -97,6 +97,8 @@
     <string name="ULTRA_EXTREME">Ultra Extreme</string>
     <string name="chooser_select_vault_file">Select vault file to import</string>
     <string name="toast_import_vault_failure">The selected file cannot be imported.</string>
+    <string name="quick_access">Quick access</string>
+    <string name="generate_encrypted_masterpasswd">Create master export token</string>
 
 
 </resources>

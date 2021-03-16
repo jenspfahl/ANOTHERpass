@@ -25,16 +25,21 @@
         app:showAsAction="always">
     </item>
 
-    <item
-        android:id="@+id/delete_stored_masterpasswd"
-        android:orderInCategory="50"
-        android:title="@string/delete_stored_masterpasswd"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/drop_vault"
-        android:orderInCategory="100"
-        android:title="@string/drop_vault"
-        app:showAsAction="never" />
+    <item android:title="@string/quick_access" >
+        <menu >
+            <item
+                android:id="@+id/generate_encrypted_masterpasswd"
+                android:orderInCategory="50"
+                android:title="@string/generate_encrypted_masterpasswd"
+                app:showAsAction="never" />
+            <item
+                android:id="@+id/delete_stored_masterpasswd"
+                android:orderInCategory="50"
+                android:title="@string/delete_stored_masterpasswd"
+                app:showAsAction="never" />
+
+        </menu>
+    </item>
 
     <item android:title="@string/export" >
         <menu >
@@ -55,6 +60,13 @@
                 app:showAsAction="never" />
         </menu>
     </item>
+
+    <!--TODO move this to settings page later-->
+    <item
+        android:id="@+id/drop_vault"
+        android:orderInCategory="100"
+        android:title="@string/drop_vault"
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_settings"

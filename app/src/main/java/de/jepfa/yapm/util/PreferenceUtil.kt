@@ -10,7 +10,7 @@ object PreferenceUtil {
     private const val PREF_PREFIX = "YAPM/pref:"
 
     const val PREF_SALT = PREF_PREFIX + "aslt"
-    const val PREF_HASHED_MASTER_PIN = PREF_PREFIX + "hmpn"
+    const val PREF_MASTER_PASSWORD_TOKEN_KEY = PREF_PREFIX + "mpt"
     const val PREF_ENCRYPTED_MASTER_PASSWORD = PREF_PREFIX + "mpwd"
     const val PREF_ENCRYPTED_MASTER_KEY = PREF_PREFIX + "enmk"
 
@@ -23,6 +23,10 @@ object PreferenceUtil {
                 .getDefaultSharedPreferences(context)
         return defaultSharedPreferences
                 .getString(prefKey, null)
+    }
+
+    fun isPresent(prefKey: String, context: Context): Boolean {
+        return get(prefKey, context) != null
     }
 
     fun put(prefKey: String, value: String, context: Context) {

@@ -25,8 +25,15 @@ import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.model.Secret
 import de.jepfa.yapm.service.encrypt.SecretService
+import de.jepfa.yapm.service.encrypt.SecretService.decryptPassword
 import de.jepfa.yapm.service.encrypt.SecretService.encryptCommonString
+import de.jepfa.yapm.service.encrypt.SecretService.encryptEncrypted
+import de.jepfa.yapm.service.encrypt.SecretService.encryptKey
 import de.jepfa.yapm.service.encrypt.SecretService.encryptPassword
+import de.jepfa.yapm.service.encrypt.SecretService.generateKey
+import de.jepfa.yapm.service.encrypt.SecretService.generateSecretKey
+import de.jepfa.yapm.service.encrypt.SecretService.getAndroidSecretKey
+import de.jepfa.yapm.service.encrypt.SecretService.getOrCreateSalt
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.ui.exportvault.ExportVaultActivity
@@ -37,7 +44,6 @@ import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
 
 
 class ListCredentialsActivity : SecureActivity() {
@@ -180,6 +186,27 @@ class ListCredentialsActivity : SecureActivity() {
 
                 return true
             }
+            R.id.generate_encrypted_masterpasswd -> {
+
+                if (PreferenceUtil.isPresent(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, this)) {
+                    AlertDialog.Builder(this)
+                            .setTitle("Generate master password token")
+                            .setMessage("All former generated tokens will be become invalid.")
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                                generateMasterPasswordToken()
+                            }
+                            .setNegativeButton(android.R.string.no, null)
+                            .show()
+
+                    return true
+                }
+                else {
+                    generateMasterPasswordToken()
+                }
+
+                return true
+            }
             R.id.export_masterpasswd -> {
 
                 val key = masterSecretKey
@@ -187,8 +214,8 @@ class ListCredentialsActivity : SecureActivity() {
                 if (key != null && encMasterPasswd != null) {
                     val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
 
-                    val encHead = encryptCommonString(tempKey, "Your master password")
-                    val encSub = encryptCommonString(tempKey, "Take this code in your wallet to scan for login.")
+                    val encHead = encryptCommonString(tempKey, "Your real master password")
+                    val encSub = encryptCommonString(tempKey, "Store this on a safe place since this is your plain master password.")
                     val encQrc = encMasterPasswd
 
                     val intent = Intent(this, QrCodeActivity::class.java)
@@ -252,6 +279,38 @@ class ListCredentialsActivity : SecureActivity() {
                 return true
             }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun generateMasterPasswordToken() {
+        val key = masterSecretKey
+        val encMasterPasswd = Secret.getEncMasterPasswd()
+        if (key != null && encMasterPasswd != null) {
+            val tempKey = getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
+            val mPTKey = getAndroidSecretKey(SecretService.ALIAS_KEY_MP_TOKEN)
+            val masterPassword = decryptPassword(tempKey, encMasterPasswd)
+
+            val masterPasswordTokenKey = generateKey(32)
+            val encMasterPasswordTokenKey = encryptKey(mPTKey, masterPasswordTokenKey)
+            val masterPasswordTokenSK = generateSecretKey(masterPasswordTokenKey, getOrCreateSalt(this))
+            val masterPasswordToken = encryptPassword(masterPasswordTokenSK, masterPassword)
+            val encMasterPasswordToken = encryptEncrypted(tempKey, masterPasswordToken)
+
+            val encHead = encryptCommonString(tempKey, "Your master password token")
+            val encSub = encryptCommonString(tempKey, "Take this token in your wallet to scan for login. If you loose it, jsut create a new one.")
+            val encQrc = encMasterPasswordToken
+
+            PreferenceUtil.put(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, encMasterPasswordTokenKey.toBase64String(), this)
+
+            val intent = Intent(this, QrCodeActivity::class.java)
+            intent.putExtra(QrCodeActivity.EXTRA_HEADLINE, encHead.toBase64String())
+            intent.putExtra(QrCodeActivity.EXTRA_SUBTEXT, encSub.toBase64String())
+            intent.putExtra(QrCodeActivity.EXTRA_QRCODE, encQrc.toBase64String())
+
+            startActivity(intent)
+
+            masterPassword.clear()
+
         }
     }
 

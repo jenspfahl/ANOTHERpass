@@ -46,15 +46,7 @@ class LoginEnterPinFragment : BaseFragment() {
         nextButton.setOnClickListener {
 
             val salt = SecretService.getOrCreateSalt(getBaseActivity())
-            //val keyForHPin = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_HPIN)
             val keyForTemp = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
-            //val encStoredMasterPinHash = PreferenceUtil.getEncrypted(PreferenceUtil.PREF_HASHED_MASTER_PIN, getBaseActivity())
-            //if (encStoredMasterPinHash == null) {
-            //    Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
-            //    return@setOnClickListener
-            //}
-
-            //val storedMasterPinHash = SecretService.decryptKey(keyForHPin, encStoredMasterPinHash)
 
             val userPin = Password.fromEditable(pinTextView.text)
             if (userPin.isEmpty()) {

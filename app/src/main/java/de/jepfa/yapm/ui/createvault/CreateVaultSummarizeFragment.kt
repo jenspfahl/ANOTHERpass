@@ -105,7 +105,6 @@ class CreateVaultSummarizeFragment : BaseFragment() {
     private fun extractAndStoreMasterPin(activity: BaseActivity, salt: Key): Password? {
 
         val keyForTemp = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
-        //val keyForHPin = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_HPIN)
 
         val encPinBase64 = arguments?.getString(CreateVaultActivity.ARG_ENC_PIN)!!
         if (encPinBase64 == null) {
@@ -115,9 +114,6 @@ class CreateVaultSummarizeFragment : BaseFragment() {
         val encPin = Encrypted.fromBase64String(encPinBase64)
         val masterPin = SecretService.decryptPassword(keyForTemp, encPin)
 
-        //val hashedMasterPin = SecretService.hashPassword(masterPin, salt)
-        //val hashedEncMasterPin = SecretService.encryptKey(keyForHPin, hashedMasterPin)
-        //PreferenceUtil.put(PreferenceUtil.PREF_HASHED_MASTER_PIN, hashedEncMasterPin.toBase64String(), activity)
         return masterPin
     }
 
