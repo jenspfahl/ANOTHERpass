@@ -12,7 +12,7 @@ import de.jepfa.yapm.ui.qrcode.CaptureActivity
 
 object QRCodeUtil {
 
-    fun generateQRCode(text: String): Bitmap {
+    fun generateQRCode(text: String, color: Int = Color.BLACK): Bitmap {
         val width = 500
         val height = 500
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
@@ -21,7 +21,7 @@ object QRCodeUtil {
             val bitMatrix = codeWriter.encode(text, BarcodeFormat.QR_CODE, width, height)
             for (x in 0 until width) {
                 for (y in 0 until height) {
-                    bitmap.setPixel(x, y, if (bitMatrix[x, y]) Color.BLACK else Color.WHITE)
+                    bitmap.setPixel(x, y, if (bitMatrix[x, y]) color else Color.WHITE)
                 }
             }
         } catch (e: WriterException) {

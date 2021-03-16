@@ -5,6 +5,7 @@ import android.app.IntentService
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.net.Uri
 import android.os.Handler
 import android.text.TextUtils
@@ -45,6 +46,7 @@ class FileIOService: IntentService("FileIOService") {
 
         const val PARAM_FILE_URI = "param_fileUrl"
         const val PARAM_QRC = "param_qrc"
+        const val PARAM_QRC_COLOR = "param_qrc_color"
         const val PARAM_INCLUDE_MK = "param_include_mk"
 
         const val JSON_APP_VERSION_CODE = "appVersionCode"
@@ -156,11 +158,12 @@ class FileIOService: IntentService("FileIOService") {
 
             val uri = intent.getParcelableExtra<Uri>(PARAM_FILE_URI)
             val encQrcBase64 = intent.getStringExtra(PARAM_QRC)
+            val qrcColor = intent.getIntExtra(PARAM_QRC_COLOR, Color.BLACK)
             val encQrc = Encrypted.fromBase64String(encQrcBase64)
             val qrc = SecretService.decryptPassword(tempKey, encQrc)
 
             val fileOutStream = contentResolver.openOutputStream(uri)
-            val bitmap = QRCodeUtil.generateQRCode(qrc.toString())
+            val bitmap = QRCodeUtil.generateQRCode(qrc.toString(), qrcColor)
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fileOutStream)
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fileOutStream)
             message = "QR code as image saved"

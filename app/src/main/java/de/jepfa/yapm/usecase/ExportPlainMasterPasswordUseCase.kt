@@ -1,6 +1,7 @@
 package de.jepfa.yapm.usecase
 
 import android.content.Intent
+import android.graphics.Color
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.model.Secret
 import de.jepfa.yapm.service.encrypt.SecretService
@@ -25,6 +26,7 @@ object ExportPlainMasterPasswordUseCase: UseCase {
             intent.putExtra(QrCodeActivity.EXTRA_HEADLINE, encHead.toBase64String())
             intent.putExtra(QrCodeActivity.EXTRA_SUBTEXT, encSub.toBase64String())
             intent.putExtra(QrCodeActivity.EXTRA_QRCODE, encQrc.toBase64String())
+            intent.putExtra(QrCodeActivity.EXTRA_COLOR, Color.RED)
             activity.startActivity(intent)
 
             return true

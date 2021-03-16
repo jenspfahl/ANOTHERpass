@@ -2,6 +2,7 @@ package de.jepfa.yapm.ui.qrcode
 
 import android.app.AlertDialog
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -40,6 +41,7 @@ class QrCodeActivity : SecureActivity() {
         val encHead = Encrypted.fromBase64String(intent.getStringExtra(EXTRA_HEADLINE))
         val encSub = Encrypted.fromBase64String(intent.getStringExtra(EXTRA_SUBTEXT))
         encQRC = Encrypted.fromBase64String(intent.getStringExtra(EXTRA_QRCODE))
+        val qrcColor = intent.getIntExtra(EXTRA_COLOR, Color.BLACK)
 
         val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
         head = SecretService.decryptCommonString(tempKey, encHead)
@@ -50,7 +52,7 @@ class QrCodeActivity : SecureActivity() {
         subTextView.text = sub
 
         if (!qrc.isEmpty()) {
-            val bitmap = generateQRCode(qrc.toString())
+            val bitmap = generateQRCode(qrc.toString(), qrcColor)
             qrCodeImageView.setImageBitmap(bitmap)
             qrCodeImageView.setOnLongClickListener {
                 AlertDialog.Builder(this)
@@ -111,10 +113,12 @@ class QrCodeActivity : SecureActivity() {
         if (resultCode == RESULT_OK && requestCode == saveAsImage) {
 
             data?.data?.let {
+                val qrcColor = intent.getIntExtra(EXTRA_COLOR, Color.BLACK)
                 val intent = Intent(this, FileIOService::class.java)
                 intent.action = FileIOService.ACTION_SAVE_QRC
                 intent.putExtra(FileIOService.PARAM_FILE_URI, it)
                 intent.putExtra(FileIOService.PARAM_QRC, encQRC.toBase64String())
+                intent.putExtra(FileIOService.PARAM_QRC_COLOR, qrcColor)
                 startService(intent)
             }
 
@@ -134,5 +138,6 @@ class QrCodeActivity : SecureActivity() {
         const val EXTRA_HEADLINE = "head"
         const val EXTRA_SUBTEXT = "sub"
         const val EXTRA_QRCODE = "qrc"
+        const val EXTRA_COLOR = "col"
     }
 }
