@@ -121,24 +121,23 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
-        if (result != null) {
-            result.contents?.let {
-                if (it.length > PasswordStrength.ULTRA_EXTREME.passwordLength
-                        && PreferenceUtil.isPresent(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, getBaseActivity())) {
-                    // decrypt obliviously encrypted master password token
-                    val encMasterPasswordTokenKey = PreferenceUtil.getEncrypted(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, getBaseActivity())
-                    encMasterPasswordTokenKey?.let {
-                        val mPTKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP_TOKEN)
-                        val masterPasswordTokenKey = SecretService.decryptKey(mPTKey, encMasterPasswordTokenKey)
-                        val mptSK = SecretService.generateSecretKey(masterPasswordTokenKey, SecretService.getOrCreateSalt(getBaseActivity()))
+        if (result != null && result.contents != null) {
+            val scanned = result.contents
+            if (scanned.length > PasswordStrength.ULTRA_EXTREME.passwordLength
+                    && PreferenceUtil.isPresent(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, getBaseActivity())) {
+                // decrypt obliviously encrypted master password token
+                val encMasterPasswordTokenKey = PreferenceUtil.getEncrypted(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, getBaseActivity())
+                encMasterPasswordTokenKey?.let {
+                    val mPTKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP_TOKEN)
+                    val masterPasswordTokenKey = SecretService.decryptKey(mPTKey, encMasterPasswordTokenKey)
+                    val mptSK = SecretService.generateSecretKey(masterPasswordTokenKey, SecretService.getOrCreateSalt(getBaseActivity()))
 
-                        val encMasterPassword = SecretService.decryptPassword(mptSK, it)
-                        masterPasswdTextView.setText(encMasterPassword)
-                    }
+                    val encMasterPassword = SecretService.decryptPassword(mptSK, Encrypted.fromBase64String(scanned))
+                    masterPasswdTextView.setText(encMasterPassword)
                 }
-                else {
-                    masterPasswdTextView.setText(it)
-                }
+            }
+            else {
+                masterPasswdTextView.setText(scanned)
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data)

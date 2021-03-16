@@ -22,7 +22,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Encrypted
-import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.model.Secret
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.service.encrypt.SecretService.decryptPassword
@@ -38,12 +37,10 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.ui.exportvault.ExportVaultActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
+import de.jepfa.yapm.usecase.*
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.viewmodel.CredentialViewModel
 import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 class ListCredentialsActivity : SecureActivity() {
@@ -138,140 +135,41 @@ class ListCredentialsActivity : SecureActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-
-    protected fun refreshMenuLockItem(lockItem: MenuItem) {
-        val secret = SecretChecker.getOrAskForSecret(this)
-        if (secret.isDenied()) {
-            lockItem.setIcon(R.drawable.ic_lock_outline_white_24dp)
-        } else {
-            lockItem.setIcon(R.drawable.ic_lock_open_white_24dp)
-        }
-    }
-
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
             R.id.action_settings -> true
             R.id.menu_lock_items -> {
-
-                Secret.lock()
-                closeOverlayDialogs()
+                LockVaultUseCase.execute(this)
                 refreshMenuLockItem(item)
-                finishAffinity()
-                SecretChecker.getOrAskForSecret(this)
-                
                 return true
             }
             R.id.menu_logout -> {
-                Secret.logout()
-
-                closeOverlayDialogs()
-
-                finishAndRemoveTask()
-                finishAffinity()
-
-                return true
+                return LogoutUseCase.execute(this)
             }
             R.id.delete_stored_masterpasswd -> {
-                if (!Secret.isDenied()) {
-                    PreferenceUtil.delete(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, this)
-                    Secret.logout()
-                }
-                closeOverlayDialogs()
-
-                SecretChecker.getOrAskForSecret(this)
-
-                return true
+                return DeleteStoredMasterPasswordUseCase.execute(this)
             }
             R.id.generate_encrypted_masterpasswd -> {
-
-                if (PreferenceUtil.isPresent(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, this)) {
-                    AlertDialog.Builder(this)
-                            .setTitle("Generate master password token")
-                            .setMessage("All former generated tokens will be become invalid.")
-                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
-                                generateMasterPasswordToken()
-                            }
-                            .setNegativeButton(android.R.string.no, null)
-                            .show()
-
-                    return true
-                }
-                else {
-                    generateMasterPasswordToken()
-                }
-
-                return true
+                return GenerateMasterPasswordTokenUseCase.execute(this)
             }
-            R.id.export_masterpasswd -> {
-
-                val key = masterSecretKey
-                val encMasterPasswd = Secret.getEncMasterPasswd()
-                if (key != null && encMasterPasswd != null) {
-                    val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
-
-                    val encHead = encryptCommonString(tempKey, "Your real master password")
-                    val encSub = encryptCommonString(tempKey, "Store this on a safe place since this is your plain master password.")
-                    val encQrc = encMasterPasswd
-
-                    val intent = Intent(this, QrCodeActivity::class.java)
-                    intent.putExtra(QrCodeActivity.EXTRA_HEADLINE, encHead.toBase64String())
-                    intent.putExtra(QrCodeActivity.EXTRA_SUBTEXT, encSub.toBase64String())
-                    intent.putExtra(QrCodeActivity.EXTRA_QRCODE, encQrc.toBase64String())
-
-                    startActivity(intent)
-
-                }
-
-                return true
+            R.id.export_plain_masterpasswd -> {
+                return ExportPlainMasterPasswordUseCase.execute(this)
             }
             R.id.export_masterkey -> {
-
-                val encStoredMasterKey = PreferenceUtil.getEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, this)
-                val key = masterSecretKey
-                if (key != null && encStoredMasterKey != null) {
-
-                    val mkKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
-                    val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
-                    val encMasterKeyBase64 = SecretService.decryptEncrypted(mkKey, encStoredMasterKey).toBase64String()
-
-                    val encHead = encryptCommonString(tempKey, "Encrypted master key")
-                    val encSub = encryptCommonString(tempKey, "Store this at a safe place. Future backups don't need to include that master key.")
-                    val encQrc = encryptPassword(tempKey, Password(encMasterKeyBase64))
-
-                    val intent = Intent(this, QrCodeActivity::class.java)
-                    intent.putExtra(QrCodeActivity.EXTRA_HEADLINE, encHead.toBase64String())
-                    intent.putExtra(QrCodeActivity.EXTRA_SUBTEXT, encSub.toBase64String())
-                    intent.putExtra(QrCodeActivity.EXTRA_QRCODE, encQrc.toBase64String())
-
-                    startActivity(intent)
-
-                }
-
-                return true
+                return ExportEncMasterKeyUseCase.execute(this)
             }
             R.id.export_vault -> {
                 val intent = Intent(this, ExportVaultActivity::class.java)
                 startActivity(intent)
-
                 return true
             }
             R.id.drop_vault -> {
-
                 AlertDialog.Builder(this)
                         .setTitle("Drop vault")
                         .setMessage("You are going to delete ALL your credentials and login data.")
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
-                            Secret.logout()
-                            closeOverlayDialogs()
-                            dropVault()
-                            finishAffinity()
-                            SecretChecker.getOrAskForSecret(this) // restart app
+                            DropVaultUseCase.execute(this)
                         }
                         .setNegativeButton(android.R.string.no, null)
                         .show()
@@ -281,49 +179,6 @@ class ListCredentialsActivity : SecureActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
-
-    private fun generateMasterPasswordToken() {
-        val key = masterSecretKey
-        val encMasterPasswd = Secret.getEncMasterPasswd()
-        if (key != null && encMasterPasswd != null) {
-            val tempKey = getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
-            val mPTKey = getAndroidSecretKey(SecretService.ALIAS_KEY_MP_TOKEN)
-            val masterPassword = decryptPassword(tempKey, encMasterPasswd)
-
-            val masterPasswordTokenKey = generateKey(32)
-            val encMasterPasswordTokenKey = encryptKey(mPTKey, masterPasswordTokenKey)
-            val masterPasswordTokenSK = generateSecretKey(masterPasswordTokenKey, getOrCreateSalt(this))
-            val masterPasswordToken = encryptPassword(masterPasswordTokenSK, masterPassword)
-            val encMasterPasswordToken = encryptEncrypted(tempKey, masterPasswordToken)
-
-            val encHead = encryptCommonString(tempKey, "Your master password token")
-            val encSub = encryptCommonString(tempKey, "Take this token in your wallet to scan for login. If you loose it, jsut create a new one.")
-            val encQrc = encMasterPasswordToken
-
-            PreferenceUtil.put(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, encMasterPasswordTokenKey.toBase64String(), this)
-
-            val intent = Intent(this, QrCodeActivity::class.java)
-            intent.putExtra(QrCodeActivity.EXTRA_HEADLINE, encHead.toBase64String())
-            intent.putExtra(QrCodeActivity.EXTRA_SUBTEXT, encSub.toBase64String())
-            intent.putExtra(QrCodeActivity.EXTRA_QRCODE, encQrc.toBase64String())
-
-            startActivity(intent)
-
-            masterPassword.clear()
-
-        }
-    }
-
-    private fun dropVault() {
-
-        PreferenceUtil.delete(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, this)
-        PreferenceUtil.delete(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, this)
-        PreferenceUtil.delete(PreferenceUtil.PREF_SALT, this)
-        CoroutineScope(Dispatchers.IO).launch {
-            getApp().database?.clearAllTables()
-        }
-    }
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -358,6 +213,15 @@ class ListCredentialsActivity : SecureActivity() {
 
     override fun lock() {
         recreate()
+    }
+
+    private fun refreshMenuLockItem(lockItem: MenuItem) {
+        val secret = SecretChecker.getOrAskForSecret(this)
+        if (secret.isDenied()) {
+            lockItem.setIcon(R.drawable.ic_lock_outline_white_24dp)
+        } else {
+            lockItem.setIcon(R.drawable.ic_lock_open_white_24dp)
+        }
     }
 
     fun deleteCredential(credential: EncCredential) {

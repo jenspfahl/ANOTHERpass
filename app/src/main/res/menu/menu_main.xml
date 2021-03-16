@@ -34,7 +34,7 @@
                 app:showAsAction="never" />
             <item
                 android:id="@+id/delete_stored_masterpasswd"
-                android:orderInCategory="50"
+                android:orderInCategory="70"
                 android:title="@string/delete_stored_masterpasswd"
                 app:showAsAction="never" />
 
@@ -44,7 +44,7 @@
     <item android:title="@string/export" >
         <menu >
             <item
-                android:id="@+id/export_masterpasswd"
+                android:id="@+id/export_plain_masterpasswd"
                 android:orderInCategory="10"
                 android:title="@string/export_masterpasswd"
                 app:showAsAction="never" />
