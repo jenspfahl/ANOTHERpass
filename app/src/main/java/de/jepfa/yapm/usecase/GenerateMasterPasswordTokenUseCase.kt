@@ -51,7 +51,7 @@ object GenerateMasterPasswordTokenUseCase: SecureActivityUseCase {
             val encSub = SecretService.encryptCommonString(tempKey, "Take this token in your wallet to scan for login. If you loose it, just create a new one.")
             val encQrc = encMasterPasswordToken
 
-            PreferenceUtil.put(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, encMasterPasswordTokenKey.toBase64String(), activity)
+            PreferenceUtil.putEncrypted(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, encMasterPasswordTokenKey, activity)
 
             val intent = Intent(activity, QrCodeActivity::class.java)
             intent.putExtra(QrCodeActivity.EXTRA_HEADLINE, encHead.toBase64String())

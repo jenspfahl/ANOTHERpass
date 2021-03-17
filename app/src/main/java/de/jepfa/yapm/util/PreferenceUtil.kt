@@ -3,6 +3,7 @@ package de.jepfa.yapm.util
 import android.app.Activity
 import android.content.Context
 import android.preference.PreferenceManager
+import android.util.Base64
 import de.jepfa.yapm.model.Encrypted
 
 object PreferenceUtil {
@@ -27,6 +28,10 @@ object PreferenceUtil {
 
     fun isPresent(prefKey: String, context: Context): Boolean {
         return get(prefKey, context) != null
+    }
+
+    fun putEncrypted(prefKey: String, encrypted: Encrypted, context: Context) {
+        put(prefKey, encrypted.toBase64String(), context)
     }
 
     fun put(prefKey: String, value: String, context: Context) {

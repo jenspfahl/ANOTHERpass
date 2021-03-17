@@ -84,7 +84,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
                 val keyForMK = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
                 val encEncryptedMasterKey = SecretService.encryptEncrypted(keyForMK, Encrypted.fromBase64String(encMasterKey!!))
 
-                PreferenceUtil.put(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, encEncryptedMasterKey.toBase64String(), getBaseActivity())
+                PreferenceUtil.putEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, encEncryptedMasterKey, getBaseActivity())
             }
 
             val credentialsJson = jsonContent.getAsJsonArray(FileIOService.JSON_CREDENTIALS)

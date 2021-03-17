@@ -13,6 +13,11 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.service.encrypt.SecretService
+import de.jepfa.yapm.service.encrypt.SecretService.ALIAS_KEY_MP_TOKEN
+import de.jepfa.yapm.service.encrypt.SecretService.decryptKey
+import de.jepfa.yapm.service.encrypt.SecretService.generateSecretKey
+import de.jepfa.yapm.service.encrypt.SecretService.getAndroidSecretKey
+import de.jepfa.yapm.service.encrypt.SecretService.getSalt
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.usecase.GenerateMasterPasswordTokenUseCase
@@ -89,7 +94,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
             if (switchStorePasswd.isChecked) {
                 val keyForMP = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP)
                 val encPasswd = SecretService.encryptPassword(keyForMP, masterPassword)
-                PreferenceUtil.put(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, encPasswd.toBase64String(), getBaseActivity())
+                PreferenceUtil.putEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, encPasswd, getBaseActivity())
             }
 
             findNavController().navigate(R.id.action_Login_to_CredentialList)
@@ -125,9 +130,9 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                 // decrypt obliviously encrypted master password token
                 val encMasterPasswordTokenKey = PreferenceUtil.getEncrypted(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, getBaseActivity())
                 encMasterPasswordTokenKey?.let {
-                    val mPTKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP_TOKEN)
-                    val masterPasswordTokenKey = SecretService.decryptKey(mPTKey, encMasterPasswordTokenKey)
-                    val mptSK = SecretService.generateSecretKey(masterPasswordTokenKey, SecretService.getSalt(getBaseActivity()))
+                    val masterPasswordTokenSK = getAndroidSecretKey(ALIAS_KEY_MP_TOKEN)
+                    val masterPasswordTokenKey = decryptKey(masterPasswordTokenSK, encMasterPasswordTokenKey)
+                    val mptSK = generateSecretKey(masterPasswordTokenKey, getSalt(getBaseActivity()))
 
                     val masterPasswordToken = scanned.substring(GenerateMasterPasswordTokenUseCase.PREFIX.length)
 
