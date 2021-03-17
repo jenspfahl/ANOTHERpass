@@ -3,6 +3,7 @@ package de.jepfa.yapm.ui.importvault
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -10,7 +11,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
-import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.google.zxing.integration.android.IntentIntegrator
 import de.jepfa.yapm.R
@@ -18,14 +18,13 @@ import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.service.io.FileIOService
-import de.jepfa.yapm.service.secretgenerator.PasswordStrength
 import de.jepfa.yapm.ui.BaseFragment
+import de.jepfa.yapm.usecase.ExportEncMasterKeyUseCase
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.QRCodeUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.File
 
 class ImportVaultImportFileFragment : BaseFragment() {
 
@@ -42,7 +41,8 @@ class ImportVaultImportFileFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, null)
 
-        getBaseActivity().supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        getBaseActivity().supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        setHasOptionsMenu(true)
 
         val loadedFileStatusTextView = view.findViewById<TextView>(R.id.loaded_file_status)
         val scanQrCodeImageView = view.findViewById<ImageView>(R.id.imageview_scan_qrcode)
@@ -95,17 +95,33 @@ class ImportVaultImportFileFragment : BaseFragment() {
                         .forEach { c -> getApp().repository.insert(c) }
             }
 
-            findNavController().navigate(R.id.action_import_Vault_to_Login)
+            findNavController().navigate(R.id.action_importVault_to_Login)
         }
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        if (id == android.R.id.home) {
+
+            findNavController().navigate(R.id.action_importVault_ImportFileFragment_to_LoadFileFragment)
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
         if (result != null && result.contents != null) {
             val scanned = result.contents
-            mkTextView.setText(scanned)
-            encMasterKey = scanned
+
+            if (scanned.startsWith(ExportEncMasterKeyUseCase.PREFIX)) {
+                encMasterKey = scanned.substring(ExportEncMasterKeyUseCase.PREFIX.length)
+                mkTextView.setText(encMasterKey)
+            }
+            else {
+                Toast.makeText(getBaseActivity(), "This is not an encrypted master key.", Toast.LENGTH_LONG).show()
+                return
+            }
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }

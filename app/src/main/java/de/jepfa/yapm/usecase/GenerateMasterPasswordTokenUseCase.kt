@@ -3,7 +3,6 @@ package de.jepfa.yapm.usecase
 import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
-import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.model.Secret
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.SecureActivity
@@ -11,6 +10,8 @@ import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.util.PreferenceUtil
 
 object GenerateMasterPasswordTokenUseCase: UseCase {
+
+    const val PREFIX = "!!!MPT!!!"
 
     override fun execute(activity: SecureActivity): Boolean {
         if (PreferenceUtil.isPresent(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, activity)) {
@@ -55,13 +56,17 @@ object GenerateMasterPasswordTokenUseCase: UseCase {
             val intent = Intent(activity, QrCodeActivity::class.java)
             intent.putExtra(QrCodeActivity.EXTRA_HEADLINE, encHead.toBase64String())
             intent.putExtra(QrCodeActivity.EXTRA_SUBTEXT, encSub.toBase64String())
-            intent.putExtra(QrCodeActivity.EXTRA_QRCODE, encQrc.toBase64String())
+            intent.putExtra(QrCodeActivity.EXTRA_QRCODE, typeString(encQrc.toBase64String()))
             intent.putExtra(QrCodeActivity.EXTRA_COLOR, Color.BLUE)
 
             activity.startActivity(intent)
 
             masterPassword.clear()
         }
+    }
+
+    private fun typeString(string: String): String {
+        return ExportEncMasterKeyUseCase.PREFIX + string
     }
 
 }

@@ -24,8 +24,11 @@
         tools:layout="@layout/fragment_import_vault_file">
 
         <action
-            android:id="@+id/action_import_Vault_to_Login"
+            android:id="@+id/action_importVault_to_Login"
             app:destination="@id/LoginActivity" />
+        <action
+            android:id="@+id/action_importVault_ImportFileFragment_to_LoadFileFragment"
+            app:destination="@id/ImportVaultLoadFileFragment" />
     </fragment>
 
     <activity

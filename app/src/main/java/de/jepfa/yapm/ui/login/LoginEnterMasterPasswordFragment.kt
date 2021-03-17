@@ -13,9 +13,9 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.service.encrypt.SecretService
-import de.jepfa.yapm.service.secretgenerator.PasswordStrength
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
+import de.jepfa.yapm.usecase.GenerateMasterPasswordTokenUseCase
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.QRCodeUtil
 
@@ -123,8 +123,12 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
         if (result != null && result.contents != null) {
             val scanned = result.contents
-            if (scanned.length > PasswordStrength.ULTRA_EXTREME.passwordLength
-                    && PreferenceUtil.isPresent(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, getBaseActivity())) {
+
+            if (scanned.startsWith(GenerateMasterPasswordTokenUseCase.PREFIX)) {
+                if (!PreferenceUtil.isPresent(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, getBaseActivity())) {
+                    Toast.makeText(getBaseActivity(), "No master password token present.", Toast.LENGTH_LONG).show()
+                    return
+                }
                 // decrypt obliviously encrypted master password token
                 val encMasterPasswordTokenKey = PreferenceUtil.getEncrypted(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, getBaseActivity())
                 encMasterPasswordTokenKey?.let {
@@ -132,7 +136,9 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                     val masterPasswordTokenKey = SecretService.decryptKey(mPTKey, encMasterPasswordTokenKey)
                     val mptSK = SecretService.generateSecretKey(masterPasswordTokenKey, SecretService.getOrCreateSalt(getBaseActivity()))
 
-                    val encMasterPassword = SecretService.decryptPassword(mptSK, Encrypted.fromBase64String(scanned))
+                    val masterPasswordToken = scanned.substring(GenerateMasterPasswordTokenUseCase.PREFIX.length)
+
+                    val encMasterPassword = SecretService.decryptPassword(mptSK, Encrypted.fromBase64String(masterPasswordToken))
                     masterPasswdTextView.setText(encMasterPassword)
                 }
             }

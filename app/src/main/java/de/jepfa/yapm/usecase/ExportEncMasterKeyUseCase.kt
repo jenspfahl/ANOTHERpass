@@ -9,6 +9,8 @@ import de.jepfa.yapm.util.PreferenceUtil
 
 object ExportEncMasterKeyUseCase: UseCase {
 
+    const val PREFIX = "!!!EMK!!!"
+
     override fun execute(activity: SecureActivity): Boolean {
         val encStoredMasterKey = PreferenceUtil.getEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, activity)
         val key = activity.masterSecretKey
@@ -25,7 +27,7 @@ object ExportEncMasterKeyUseCase: UseCase {
             val intent = Intent(activity, QrCodeActivity::class.java)
             intent.putExtra(QrCodeActivity.EXTRA_HEADLINE, encHead.toBase64String())
             intent.putExtra(QrCodeActivity.EXTRA_SUBTEXT, encSub.toBase64String())
-            intent.putExtra(QrCodeActivity.EXTRA_QRCODE, encQrc.toBase64String())
+            intent.putExtra(QrCodeActivity.EXTRA_QRCODE, typeString(encQrc.toBase64String()))
             activity.startActivity(intent)
 
             return true
@@ -33,5 +35,9 @@ object ExportEncMasterKeyUseCase: UseCase {
         else {
             return false
         }
+    }
+
+    private fun typeString(string: String): String {
+        return PREFIX + string
     }
 }
