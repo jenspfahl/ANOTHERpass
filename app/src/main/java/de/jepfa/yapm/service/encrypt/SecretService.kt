@@ -25,7 +25,7 @@ object SecretService {
 
     private val CIPHER_AES_GCM = "AES/GCM/NoPadding"
     private val ANDROID_KEY_STORE = "AndroidKeyStore"
-    private val FAILED_BYTE_ARRAY = "<<LOCKED>>".toByteArray()
+    val FAILED_BYTE_ARRAY = "<<LOCKED>>".toByteArray()
 
     private val random = SecureRandom()
     private val androidKeyStore = KeyStore.getInstance(ANDROID_KEY_STORE)
@@ -152,63 +152,10 @@ object SecretService {
         return keyGenerator.generateKey();
     }
 
-    fun login(masterPin: Password, masterPassword: Password, encMasterKey: Encrypted, salt: Key): Boolean {
-
-        val masterPassPhraseSK = getMasterPassPhraseSK(masterPin, masterPassword, salt)
-        val masterSecretKey = getMasterSK(masterPassPhraseSK, salt, encMasterKey)
-        if (masterSecretKey == null) {
-            return false;
-        }
-        val key = getAndroidSecretKey(ALIAS_KEY_TEMP)
-        val encMasterPassword = encryptPassword(key, masterPassword)
-        Session.login(masterSecretKey, encMasterPassword)
-
-        return true
-
-    }
-
-    /**
-     * Returns the Master passphrase which is calculated of the users Master Pin and his Master password
-     */
-    private fun getMasterPassPhraseSK(masterPin: Password, masterPassword: Password, salt: Key): SecretKey {
-        val masterPassPhrase = conjunctPasswords(masterPin, masterPassword, salt)
-
-        val masterPassPhraseSK = generateSecretKey(masterPassPhrase, salt)
-        masterPassPhrase.clear()
-
-        return masterPassPhraseSK
-    }
-
-    /**
-     * Returns the Master Secret Key which is encrypted twice, first with the Android key
-     * and second with the PassPhrase key.
-     */
-    private fun getMasterSK(masterPassPhraseSK: SecretKey, salt: Key, storedEncMasterKey: Encrypted): SecretKey? {
-        val androidSK = getAndroidSecretKey(ALIAS_KEY_MK)
-
-        val encMasterKey = decryptEncrypted(androidSK, storedEncMasterKey)
-        val masterKey = decryptKey(masterPassPhraseSK, encMasterKey)
-        if (Arrays.equals(masterKey.data, FAILED_BYTE_ARRAY)) {
-            return null
-        }
-        val masterSK = generateSecretKey(masterKey, salt)
-        masterKey.clear()
-
-        return masterSK
-
-    }
-
     @Synchronized
-    fun getOrCreateSalt(activity: BaseActivity): Key {
-        var saltBase64 = PreferenceUtil.get(PreferenceUtil.PREF_SALT, activity)
-        val salt: Key
-        if (saltBase64 == null) {
-            salt = SecretService.generateKey(128)
-            saltBase64 = Base64.encodeToString(salt.data, Base64.DEFAULT)
-            PreferenceUtil.put(PreferenceUtil.PREF_SALT, saltBase64, activity)
-        } else {
-            salt = Key(Base64.decode(saltBase64, 0))
-        }
+    fun getSalt(activity: BaseActivity): Key {
+        val saltBase64 = PreferenceUtil.get(PreferenceUtil.PREF_SALT, activity)
+        val salt = Key(Base64.decode(saltBase64, 0))
         return salt
     }
 

@@ -7,7 +7,7 @@ import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 
-object ExportPlainMasterPasswordUseCase: UseCase {
+object ExportPlainMasterPasswordUseCase: SecureActivityUseCase {
 
     override fun execute(activity: SecureActivity): Boolean {
 

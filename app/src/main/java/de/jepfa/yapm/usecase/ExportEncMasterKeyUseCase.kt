@@ -7,7 +7,7 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.util.PreferenceUtil
 
-object ExportEncMasterKeyUseCase: UseCase {
+object ExportEncMasterKeyUseCase: SecureActivityUseCase {
 
     const val PREFIX = "!!!EMK!!!"
 

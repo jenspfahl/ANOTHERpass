@@ -16,6 +16,7 @@ import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
+import de.jepfa.yapm.usecase.LoginUseCase
 import de.jepfa.yapm.util.PreferenceUtil
 import java.util.*
 
@@ -45,7 +46,6 @@ class LoginEnterPinFragment : BaseFragment() {
 
         nextButton.setOnClickListener {
 
-            val salt = SecretService.getOrCreateSalt(getBaseActivity())
             val keyForTemp = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
 
             val userPin = Password.fromEditable(pinTextView.text)
@@ -76,7 +76,7 @@ class LoginEnterPinFragment : BaseFragment() {
                 }
                 val masterPasswd = SecretService.decryptPassword(keyForTemp, encMasterPasswd)
 
-                if (!login(userPin, masterPasswd, salt)) {
+                if (!login(userPin, masterPasswd)) {
                     pinTextView.setError(getString(R.string.pin_wrong))
                     pinTextView.requestFocus()
                     return@setOnClickListener
@@ -87,7 +87,7 @@ class LoginEnterPinFragment : BaseFragment() {
                 val keyForMP = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP)
                 val storedMasterPasswd = SecretService.decryptPassword(keyForMP, encStoredMasterPasswd)
 
-                if (!login(userPin, storedMasterPasswd, salt)) {
+                if (!login(userPin, storedMasterPasswd)) {
                     pinTextView.setError(getString(R.string.pin_wrong))
                     pinTextView.requestFocus()
                     return@setOnClickListener
@@ -111,22 +111,14 @@ class LoginEnterPinFragment : BaseFragment() {
 
     private fun login(
             userPin: Password,
-            masterPasswd: Password,
-            salt: Key
+            masterPasswd: Password
     ): Boolean {
-        val encStoredMasterKey =
-            PreferenceUtil.getEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, getBaseActivity())
-        if (encStoredMasterKey == null) {
-            Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
-            return false
-        }
 
-        val success = SecretService.login(
+        val success = LoginUseCase.execute(
                 userPin,
                 masterPasswd,
-                encStoredMasterKey,
-                salt
-        )
+                getBaseActivity())
+
         if (!success) {
             (getBaseActivity() as LoginActivity).handleFailedLoginAttempt()
             return false

@@ -3,7 +3,7 @@ package de.jepfa.yapm.usecase
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.SecureActivity
 
-object LogoutUseCase: UseCase {
+object LogoutUseCase: SecureActivityUseCase {
 
     override fun execute(activity: SecureActivity): Boolean {
         Session.logout()

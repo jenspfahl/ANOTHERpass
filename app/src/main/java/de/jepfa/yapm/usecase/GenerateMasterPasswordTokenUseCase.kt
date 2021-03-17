@@ -9,7 +9,7 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.util.PreferenceUtil
 
-object GenerateMasterPasswordTokenUseCase: UseCase {
+object GenerateMasterPasswordTokenUseCase: SecureActivityUseCase {
 
     const val PREFIX = "!!!MPT!!!"
 
@@ -43,7 +43,7 @@ object GenerateMasterPasswordTokenUseCase: UseCase {
 
             val masterPasswordTokenKey = SecretService.generateKey(32)
             val encMasterPasswordTokenKey = SecretService.encryptKey(mPTKey, masterPasswordTokenKey)
-            val masterPasswordTokenSK = SecretService.generateSecretKey(masterPasswordTokenKey, SecretService.getOrCreateSalt(activity))
+            val masterPasswordTokenSK = SecretService.generateSecretKey(masterPasswordTokenKey, SecretService.getSalt(activity))
             val masterPasswordToken = SecretService.encryptPassword(masterPasswordTokenSK, masterPassword)
             val encMasterPasswordToken = SecretService.encryptEncrypted(tempKey, masterPasswordToken)
 

@@ -7,7 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-object DropVaultUseCase: UseCase {
+object DropVaultUseCase: SecureActivityUseCase {
 
     override fun execute(activity: SecureActivity): Boolean {
         Session.logout()

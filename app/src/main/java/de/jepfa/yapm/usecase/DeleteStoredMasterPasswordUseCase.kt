@@ -4,7 +4,7 @@ import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.util.PreferenceUtil
 
-object DeleteStoredMasterPasswordUseCase: UseCase {
+object DeleteStoredMasterPasswordUseCase: SecureActivityUseCase {
 
     override fun execute(activity: SecureActivity): Boolean {
         if (!Session.isDenied()) {

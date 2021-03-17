@@ -16,6 +16,7 @@ import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.usecase.GenerateMasterPasswordTokenUseCase
+import de.jepfa.yapm.usecase.LoginUseCase
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.QRCodeUtil
 
@@ -63,7 +64,6 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                 return@setOnClickListener
             }
 
-            val salt = SecretService.getOrCreateSalt(getBaseActivity())
             val keyForTemp = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
 
             val encPinBase64 = arguments?.getString(CreateVaultActivity.ARG_ENC_PIN)
@@ -74,18 +74,11 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
             val encPin = Encrypted.fromBase64String(encPinBase64)
             val masterPin = SecretService.decryptPassword(keyForTemp, encPin)
 
-            val encStoredMasterKey = PreferenceUtil.getEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, getBaseActivity())
-            if (encStoredMasterKey == null) {
-                Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-
-            val success = SecretService.login(
+            val success = LoginUseCase.execute(
                 masterPin,
                 masterPassword,
-                encStoredMasterKey,
-                salt
-            )
+                getBaseActivity())
+
             if (!success) {
                 masterPasswdTextView.setError(getString(R.string.password_wrong))
                 masterPasswdTextView.requestFocus()
@@ -134,7 +127,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                 encMasterPasswordTokenKey?.let {
                     val mPTKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP_TOKEN)
                     val masterPasswordTokenKey = SecretService.decryptKey(mPTKey, encMasterPasswordTokenKey)
-                    val mptSK = SecretService.generateSecretKey(masterPasswordTokenKey, SecretService.getOrCreateSalt(getBaseActivity()))
+                    val mptSK = SecretService.generateSecretKey(masterPasswordTokenKey, SecretService.getSalt(getBaseActivity()))
 
                     val masterPasswordToken = scanned.substring(GenerateMasterPasswordTokenUseCase.PREFIX.length)
 

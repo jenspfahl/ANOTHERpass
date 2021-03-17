@@ -2,6 +2,7 @@ package de.jepfa.yapm.ui.createvault
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -54,7 +55,7 @@ class CreateVaultSummarizeFragment : BaseFragment() {
 
             val keyForMK = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
 
-            val salt = SecretService.getOrCreateSalt(getBaseActivity())
+            val salt = createSalt(getBaseActivity())
 
             val masterPin = extractAndStoreMasterPin(getBaseActivity(), salt)
             if (masterPin == null) {
@@ -86,6 +87,14 @@ class CreateVaultSummarizeFragment : BaseFragment() {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun createSalt(activity: BaseActivity): Key {
+        val salt = SecretService.generateKey(128)
+        val saltBase64 = Base64.encodeToString(salt.data, Base64.DEFAULT)
+        PreferenceUtil.put(PreferenceUtil.PREF_SALT, saltBase64, activity)
+
+        return salt
     }
 
     private fun generateAndStoreMasterKey(activity: BaseActivity, masterPin: Password, passwd: Password, salt: Key, keyForMK: SecretKey): Password {
