@@ -16,12 +16,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
-import de.jepfa.yapm.model.Secret
+import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.service.overlay.DetachHelper
-import de.jepfa.yapm.service.secretgenerator.PasswordGenerator
-import de.jepfa.yapm.service.secretgenerator.PasswordGeneratorSpec
-import de.jepfa.yapm.service.secretgenerator.PasswordStrength
 import java.util.*
 
 
@@ -34,7 +31,7 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CredentialViewHolder {
         val holder = CredentialViewHolder.create(parent)
 
-        if (Secret.isDenied()) {
+        if (Session.isDenied()) {
             return holder
         }
 

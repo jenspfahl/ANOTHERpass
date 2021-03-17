@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.core.app.ActivityCompat.finishAffinity
-import de.jepfa.yapm.model.Secret
+import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.overlay.OverlayShowingService
 import de.jepfa.yapm.ui.login.LoginActivity
 import java.util.concurrent.TimeUnit
@@ -61,11 +61,11 @@ abstract class SecureActivity : BaseActivity() {
         private var loginActivityIntented: Long = 0
 
         @Synchronized
-        fun getOrAskForSecret(activity: SecureActivity): Secret {
-            if (Secret.isDenied()) {
+        fun getOrAskForSecret(activity: SecureActivity): Session {
+            if (Session.isDenied()) {
                 // make all not readable by setting key as invalid
-                if (Secret.isOutdated()) {
-                    Secret.lock()
+                if (Session.isOutdated()) {
+                    Session.lock()
                     activity.closeOverlayDialogs()
                     finishAffinity(activity)
                 }
@@ -77,9 +77,9 @@ abstract class SecureActivity : BaseActivity() {
                     activity.lock()
                 }
             } else {
-                Secret.touch()
+                Session.touch()
             }
-            return Secret
+            return Session
         }
 
         private fun isLoginIntented(): Boolean {

@@ -22,21 +22,10 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Encrypted
-import de.jepfa.yapm.model.Secret
-import de.jepfa.yapm.service.encrypt.SecretService
-import de.jepfa.yapm.service.encrypt.SecretService.decryptPassword
-import de.jepfa.yapm.service.encrypt.SecretService.encryptCommonString
-import de.jepfa.yapm.service.encrypt.SecretService.encryptEncrypted
-import de.jepfa.yapm.service.encrypt.SecretService.encryptKey
-import de.jepfa.yapm.service.encrypt.SecretService.encryptPassword
-import de.jepfa.yapm.service.encrypt.SecretService.generateKey
-import de.jepfa.yapm.service.encrypt.SecretService.generateSecretKey
-import de.jepfa.yapm.service.encrypt.SecretService.getAndroidSecretKey
-import de.jepfa.yapm.service.encrypt.SecretService.getOrCreateSalt
+import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.ui.exportvault.ExportVaultActivity
-import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.usecase.*
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.viewmodel.CredentialViewModel
@@ -77,7 +66,7 @@ class ListCredentialsActivity : SecureActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
 
-        if (Secret.isDenied()) {
+        if (Session.isDenied()) {
             return false
         }
 

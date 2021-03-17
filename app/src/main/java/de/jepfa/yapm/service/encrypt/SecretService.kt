@@ -161,7 +161,7 @@ object SecretService {
         }
         val key = getAndroidSecretKey(ALIAS_KEY_TEMP)
         val encMasterPassword = encryptPassword(key, masterPassword)
-        Secret.login(masterSecretKey, encMasterPassword)
+        Session.login(masterSecretKey, encMasterPassword)
 
         return true
 

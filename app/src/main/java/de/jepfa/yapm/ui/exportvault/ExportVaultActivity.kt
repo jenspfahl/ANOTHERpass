@@ -6,7 +6,7 @@ import android.view.MenuItem
 import android.widget.Button
 import android.widget.Switch
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.Secret
+import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
@@ -26,7 +26,7 @@ class ExportVaultActivity : SecureActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (Secret.isDenied()) {
+        if (Session.isDenied()) {
             return
         }
 

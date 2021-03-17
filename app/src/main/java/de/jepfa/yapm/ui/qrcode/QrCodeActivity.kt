@@ -10,8 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Encrypted
-import de.jepfa.yapm.model.Password
-import de.jepfa.yapm.model.Secret
+import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.ui.SecureActivity
@@ -28,7 +27,7 @@ class QrCodeActivity : SecureActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (Secret.isDenied()) {
+        if (Session.isDenied()) {
             return
         }
 
@@ -68,7 +67,7 @@ class QrCodeActivity : SecureActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        if (Secret.isDenied()) {
+        if (Session.isDenied()) {
             return false
         }
 
@@ -86,7 +85,7 @@ class QrCodeActivity : SecureActivity() {
         }
 
 
-        if (Secret.isDenied()) {
+        if (Session.isDenied()) {
             return false
         }
 

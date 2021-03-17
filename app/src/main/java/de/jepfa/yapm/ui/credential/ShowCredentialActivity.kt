@@ -14,7 +14,7 @@ import com.google.android.material.appbar.CollapsingToolbarLayout
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Encrypted
-import de.jepfa.yapm.model.Secret
+import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.service.encrypt.SecretService.decryptCommonString
 import de.jepfa.yapm.service.encrypt.SecretService.decryptPassword
@@ -98,7 +98,7 @@ class ShowCredentialActivity : SecureActivity() {
             return true
         }
 
-        if (Secret.isDenied()) {
+        if (Session.isDenied()) {
             return false
         }
 

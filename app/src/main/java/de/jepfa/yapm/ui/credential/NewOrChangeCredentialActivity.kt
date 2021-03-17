@@ -13,7 +13,7 @@ import androidx.activity.viewModels
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Password
-import de.jepfa.yapm.model.Secret
+import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.secretgenerator.PassphraseGenerator
 import de.jepfa.yapm.service.secretgenerator.PassphraseGeneratorSpec
 import de.jepfa.yapm.service.secretgenerator.PasswordStrength
@@ -47,7 +47,7 @@ class NewOrChangeCredentialActivity : SecureActivity() {
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (Secret.isDenied()) {
+        if (Session.isDenied()) {
             return
         }
         setContentView(R.layout.activity_new_or_change_credential)
@@ -96,7 +96,7 @@ class NewOrChangeCredentialActivity : SecureActivity() {
 
         val buttonGeneratePasswd: Button = findViewById(R.id.button_generate_passwd)
         buttonGeneratePasswd.setOnClickListener(View.OnClickListener {
-            Secret.safeTouch()
+            Session.safeTouch()
             generatedPassword = generatePassword()
             generatedPasswdView.text = generatedPassword.debugToString()
         })
@@ -118,7 +118,7 @@ class NewOrChangeCredentialActivity : SecureActivity() {
 
         buttonSave = findViewById(R.id.button_save)
         buttonSave.setOnClickListener {
-            Secret.safeTouch()
+            Session.safeTouch()
             if (generatedPassword.data.isEmpty()) {
                 Toast.makeText(it.context, "Generate a password first", Toast.LENGTH_LONG).show()
             }

@@ -1,6 +1,5 @@
 package de.jepfa.yapm.service.io
 
-import android.R.attr.data
 import android.app.IntentService
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -15,7 +14,6 @@ import com.google.gson.*
 import com.google.gson.reflect.TypeToken
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Encrypted
-import de.jepfa.yapm.model.Secret
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.util.FileUtil

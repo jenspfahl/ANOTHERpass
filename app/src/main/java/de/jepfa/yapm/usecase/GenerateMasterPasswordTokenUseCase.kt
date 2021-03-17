@@ -3,7 +3,7 @@ package de.jepfa.yapm.usecase
 import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
-import de.jepfa.yapm.model.Secret
+import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
@@ -35,7 +35,7 @@ object GenerateMasterPasswordTokenUseCase: UseCase {
 
     private fun generateMasterPasswordToken(activity: SecureActivity) {
         val key = activity.masterSecretKey
-        val encMasterPasswd = Secret.getEncMasterPasswd()
+        val encMasterPasswd = Session.getEncMasterPasswd()
         if (key != null && encMasterPasswd != null) {
             val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
             val mPTKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP_TOKEN)

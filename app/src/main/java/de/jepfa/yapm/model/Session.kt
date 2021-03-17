@@ -3,7 +3,7 @@ package de.jepfa.yapm.model
 import java.util.concurrent.TimeUnit
 import javax.crypto.SecretKey
 
-object Secret {
+object Session {
 
     /**
      * After this period of time of inactivity the secret is outdated.

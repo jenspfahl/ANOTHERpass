@@ -2,19 +2,17 @@ package de.jepfa.yapm.usecase
 
 import android.content.Intent
 import android.graphics.Color
-import de.jepfa.yapm.model.Password
-import de.jepfa.yapm.model.Secret
+import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
-import de.jepfa.yapm.util.PreferenceUtil
 
 object ExportPlainMasterPasswordUseCase: UseCase {
 
     override fun execute(activity: SecureActivity): Boolean {
 
         val key = activity.masterSecretKey
-        val encMasterPasswd = Secret.getEncMasterPasswd()
+        val encMasterPasswd = Session.getEncMasterPasswd()
         if (key != null && encMasterPasswd != null) {
             val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
 

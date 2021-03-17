@@ -3,13 +3,12 @@ package de.jepfa.yapm.ui.login
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.Toast
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.Secret
+import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.ui.importvault.ImportVaultActivity
@@ -83,7 +82,7 @@ class LoginActivity : BaseActivity() {
             Toast.makeText(baseContext, R.string.too_may_wrong_logins, Toast.LENGTH_LONG).show()
             PreferenceUtil.delete(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, baseContext)
             PreferenceUtil.delete(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, baseContext)
-            Secret.logout()
+            Session.logout()
             finishAffinity()
             finishAndRemoveTask()
         }

@@ -12,7 +12,7 @@ import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Key
 import de.jepfa.yapm.model.Password
-import de.jepfa.yapm.model.Secret
+import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
@@ -67,9 +67,9 @@ class LoginEnterPinFragment : BaseFragment() {
 
             val encStoredMasterPasswd = PreferenceUtil.getEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, getBaseActivity())
 
-            if (!Secret.isLoggedOut()) {
+            if (!Session.isLoggedOut()) {
                 val keyForTemp = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
-                val encMasterPasswd = Secret.getEncMasterPasswd()
+                val encMasterPasswd = Session.getEncMasterPasswd()
                 if (encMasterPasswd == null) {
                     Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
                     return@setOnClickListener

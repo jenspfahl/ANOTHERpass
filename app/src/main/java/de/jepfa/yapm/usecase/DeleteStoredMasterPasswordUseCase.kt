@@ -1,15 +1,15 @@
 package de.jepfa.yapm.usecase
 
-import de.jepfa.yapm.model.Secret
+import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.util.PreferenceUtil
 
 object DeleteStoredMasterPasswordUseCase: UseCase {
 
     override fun execute(activity: SecureActivity): Boolean {
-        if (!Secret.isDenied()) {
+        if (!Session.isDenied()) {
             PreferenceUtil.delete(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, activity)
-            Secret.logout()
+            Session.logout()
         }
         activity.closeOverlayDialogs()
         SecureActivity.SecretChecker.getOrAskForSecret(activity)
