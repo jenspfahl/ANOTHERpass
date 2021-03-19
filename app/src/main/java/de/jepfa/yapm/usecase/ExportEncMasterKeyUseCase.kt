@@ -9,7 +9,7 @@ import de.jepfa.yapm.util.PreferenceUtil
 
 object ExportEncMasterKeyUseCase: SecureActivityUseCase {
 
-    const val PREFIX = "!!!EMK!!!"
+    const val PREFIX = "EMK:"
 
     override fun execute(activity: SecureActivity): Boolean {
         val encStoredMasterKey = PreferenceUtil.getEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, activity)
@@ -17,7 +17,7 @@ object ExportEncMasterKeyUseCase: SecureActivityUseCase {
         if (key != null && encStoredMasterKey != null) {
 
             val mkKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
-            val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
+            val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
             val encMasterKeyBase64 = SecretService.decryptEncrypted(mkKey, encStoredMasterKey).toBase64String()
 
             val encHead = SecretService.encryptCommonString(tempKey, "Encrypted master key")

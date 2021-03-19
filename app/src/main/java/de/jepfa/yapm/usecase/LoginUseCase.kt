@@ -24,7 +24,7 @@ object LoginUseCase {
         if (masterSecretKey == null) {
             return false;
         }
-        val key = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
+        val key = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
         val encMasterPassword = SecretService.encryptPassword(key, masterPassword)
         Session.login(masterSecretKey, encMasterPassword)
 

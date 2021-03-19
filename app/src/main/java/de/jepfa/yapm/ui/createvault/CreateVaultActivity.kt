@@ -1,11 +1,9 @@
 package de.jepfa.yapm.ui.createvault
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import de.jepfa.yapm.R
 import de.jepfa.yapm.ui.BaseActivity
-import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 
 class CreateVaultActivity : BaseActivity() {
 
@@ -26,7 +24,7 @@ class CreateVaultActivity : BaseActivity() {
     }
 
     companion object {
-        const val ARG_ENC_PASSWD = "passwd"
+        const val ARG_ENC_MASTER_PASSWD = "masterpasswd"
         const val ARG_ENC_PIN = "pin"
     }
 }

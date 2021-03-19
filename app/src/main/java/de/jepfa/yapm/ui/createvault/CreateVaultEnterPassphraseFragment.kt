@@ -12,26 +12,24 @@ import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Password
+import de.jepfa.yapm.service.encrypt.SecretService.ALIAS_KEY_TRANSPORT
+import de.jepfa.yapm.service.encrypt.SecretService.encryptPassword
+import de.jepfa.yapm.service.encrypt.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.service.secretgenerator.PassphraseGenerator
-import de.jepfa.yapm.service.secretgenerator.PassphraseGeneratorSpec
-import de.jepfa.yapm.service.secretgenerator.PasswordStrength
-import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.BaseFragment
+import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER_PASSWD
 
 
 class CreateVaultEnterPassphraseFragment : BaseFragment() {
 
     private lateinit var generatedPasswdView: TextView
-
     private var generatedPassword: Password = Password.empty()
-
-    private val passphraseGenerator = PassphraseGenerator()
+    private var passphraseGenerator = PassphraseGenerator()
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_create_vault_enter_passphrase, container, false)
     }
 
@@ -49,20 +47,18 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
         val button = view.findViewById<Button>(R.id.button_next)
         button.setOnClickListener {
             if (generatedPassword.data.isEmpty()) {
-                Toast.makeText(it.context, "Generate a password first", Toast.LENGTH_LONG).show()
+                Toast.makeText(it.context, getString(R.string.generate_passwd_first), Toast.LENGTH_LONG).show()
             }
             else {
-                val androidTempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
-                val encPassword = SecretService.encryptPassword(androidTempKey, generatedPassword)
+                val transSK = getAndroidSecretKey(ALIAS_KEY_TRANSPORT)
+                val encPassword = encryptPassword(transSK, generatedPassword)
                 generatedPassword.clear()
 
                 val args = Bundle()
-                args.putString(CreateVaultActivity.ARG_ENC_PASSWD, encPassword.toBase64String())
+                args.putString(ARG_ENC_MASTER_PASSWD, encPassword.toBase64String())
                 findNavController().navigate(R.id.action_Create_Vault_FirstFragment_to_SecondFragment, args)
-
             }
         }
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

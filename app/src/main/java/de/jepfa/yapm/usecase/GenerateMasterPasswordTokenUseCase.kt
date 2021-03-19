@@ -11,7 +11,7 @@ import de.jepfa.yapm.util.PreferenceUtil
 
 object GenerateMasterPasswordTokenUseCase: SecureActivityUseCase {
 
-    const val PREFIX = "!!!MPT!!!"
+    const val PREFIX = "MPT:"
 
     override fun execute(activity: SecureActivity): Boolean {
         if (PreferenceUtil.isPresent(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, activity)) {
@@ -37,7 +37,7 @@ object GenerateMasterPasswordTokenUseCase: SecureActivityUseCase {
         val key = activity.masterSecretKey
         val encMasterPasswd = Session.getEncMasterPasswd()
         if (key != null && encMasterPasswd != null) {
-            val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
+            val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
             val mPTKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP_TOKEN)
             val masterPassword = SecretService.decryptPassword(tempKey, encMasterPasswd)
 

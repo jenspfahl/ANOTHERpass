@@ -42,7 +42,7 @@ class QrCodeActivity : SecureActivity() {
         encQRC = Encrypted.fromBase64String(intent.getStringExtra(EXTRA_QRCODE))
         val qrcColor = intent.getIntExtra(EXTRA_COLOR, Color.BLACK)
 
-        val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
+        val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
         head = SecretService.decryptCommonString(tempKey, encHead)
         val sub = SecretService.decryptCommonString(tempKey, encSub)
         val qrc = SecretService.decryptPassword(tempKey, encQRC)

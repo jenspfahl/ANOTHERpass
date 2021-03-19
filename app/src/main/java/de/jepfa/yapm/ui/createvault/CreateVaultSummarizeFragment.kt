@@ -3,6 +3,7 @@ package de.jepfa.yapm.ui.createvault
 import android.content.Intent
 import android.os.Bundle
 import android.util.Base64
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -17,10 +18,20 @@ import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Key
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.service.encrypt.SecretService
+import de.jepfa.yapm.service.encrypt.SecretService.ALIAS_KEY_MK
+import de.jepfa.yapm.service.encrypt.SecretService.ALIAS_KEY_MP
+import de.jepfa.yapm.service.encrypt.SecretService.ALIAS_KEY_TRANSPORT
+import de.jepfa.yapm.service.encrypt.SecretService.decryptPassword
+import de.jepfa.yapm.service.encrypt.SecretService.encryptPassword
+import de.jepfa.yapm.service.encrypt.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.BaseFragment
+import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER_PASSWD
+import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_PIN
+import de.jepfa.yapm.usecase.CreateVaultUseCase
 import de.jepfa.yapm.util.PreferenceUtil
-import javax.crypto.SecretKey
+import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD
+import de.jepfa.yapm.util.getEncrypted
 
 class CreateVaultSummarizeFragment : BaseFragment() {
 
@@ -28,54 +39,45 @@ class CreateVaultSummarizeFragment : BaseFragment() {
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_create_vault_summarize, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val key = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
-
-        val encPasswordBase64 = arguments?.getString(CreateVaultActivity.ARG_ENC_PASSWD)
-        if (encPasswordBase64 == null) {
+        val encMasterPasswd = arguments?.getEncrypted(ARG_ENC_MASTER_PASSWD)
+        if (encMasterPasswd == null) {
+            Log.e("CV", "No master passwd in extra")
             Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
             return
         }
-
-        val encPasswd = Encrypted.fromBase64String(encPasswordBase64)
-        val passwd = SecretService.decryptPassword(key, encPasswd)
+        val transSK = getAndroidSecretKey(ALIAS_KEY_TRANSPORT)
+        val masterPasswd = decryptPassword(transSK, encMasterPasswd)
 
         val switchStorePasswd: Switch = view.findViewById(R.id.switch_store_master_password)
-
         val generatedPasswdView: TextView = view.findViewById(R.id.generated_passwd)
-        generatedPasswdView.text = passwd.debugToString()
+        generatedPasswdView.text = masterPasswd.debugToString()
 
         view.findViewById<Button>(R.id.button_create_vault).setOnClickListener {
 
-            val keyForMK = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
-
-            val salt = createSalt(getBaseActivity())
-
-            val masterPin = extractAndStoreMasterPin(getBaseActivity(), salt)
-            if (masterPin == null) {
+            val encPin = arguments?.getEncrypted(CreateVaultActivity.ARG_ENC_PIN)
+            if (encPin == null) {
+                Log.e("CV", "No pin in extra")
                 Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
+            val pin = decryptPassword(transSK, encPin)
 
-            val masterPassphrase = generateAndStoreMasterKey(getBaseActivity(), masterPin, passwd, salt, keyForMK)
-
-            if (switchStorePasswd.isChecked) {
-                val keyForMP = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP)
-                val encPasswd = SecretService.encryptPassword(keyForMP, passwd)
-                PreferenceUtil.putEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, encPasswd, getBaseActivity())
+            val success = CreateVaultUseCase.execute(pin, masterPasswd, switchStorePasswd.isChecked, getBaseActivity())
+            if (!success) {
+                Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
+                return@setOnClickListener
             }
-
-            masterPassphrase.clear()
-            masterPin.clear()
-            passwd.clear()
-
-            findNavController().navigate(R.id.action_Create_Vault_to_ThirdFragment_to_Root)
+            else {
+                findNavController().navigate(R.id.action_Create_Vault_to_ThirdFragment_to_Root)
+                pin.clear()
+                masterPasswd.clear()
+            }
         }
     }
 
@@ -89,41 +91,6 @@ class CreateVaultSummarizeFragment : BaseFragment() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun createSalt(activity: BaseActivity): Key {
-        val salt = SecretService.generateKey(128)
-        val saltBase64 = Base64.encodeToString(salt.data, Base64.DEFAULT)
-        PreferenceUtil.put(PreferenceUtil.PREF_SALT, saltBase64, activity)
-
-        return salt
-    }
-
-    private fun generateAndStoreMasterKey(activity: BaseActivity, masterPin: Password, passwd: Password, salt: Key, keyForMK: SecretKey): Password {
-
-        val masterPassphrase = SecretService.conjunctPasswords(masterPin, passwd, salt)
-        val masterSK = SecretService.generateSecretKey(masterPassphrase, salt)
-
-        val masterKey = SecretService.generateKey(128)
-        val encryptedMasterKey = SecretService.encryptKey(masterSK, masterKey)
-
-        val encEncryptedMasterKey = SecretService.encryptEncrypted(keyForMK, encryptedMasterKey)
-
-        PreferenceUtil.putEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, encEncryptedMasterKey, activity)
-        return masterPassphrase
-    }
-
-    private fun extractAndStoreMasterPin(activity: BaseActivity, salt: Key): Password? {
-
-        val keyForTemp = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
-
-        val encPinBase64 = arguments?.getString(CreateVaultActivity.ARG_ENC_PIN)!!
-        if (encPinBase64 == null) {
-            return null
-        }
-
-        val encPin = Encrypted.fromBase64String(encPinBase64)
-        val masterPin = SecretService.decryptPassword(keyForTemp, encPin)
-
-        return masterPin
-    }
-
 }
+
+

@@ -2,6 +2,7 @@ package de.jepfa.yapm.model
 
 import android.text.Editable
 import java.nio.CharBuffer
+import java.util.*
 
 data class Password(var data: CharArray) : Clearable, CharSequence {
     constructor(passwd: String) : this(passwd.toCharArray()) {
@@ -12,6 +13,10 @@ data class Password(var data: CharArray) : Clearable, CharSequence {
 
     fun isEmpty() : Boolean {
         return data.isEmpty()
+    }
+
+    fun isEqual(other: Password): Boolean {
+        return Arrays.equals(data, other.data)
     }
 
     fun add(other: Password) {

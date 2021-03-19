@@ -8,14 +8,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import androidx.core.app.NavUtils.navigateUpTo
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Password
-import de.jepfa.yapm.service.encrypt.SecretService
+import de.jepfa.yapm.service.encrypt.SecretService.ALIAS_KEY_TRANSPORT
+import de.jepfa.yapm.service.encrypt.SecretService.encryptPassword
+import de.jepfa.yapm.service.encrypt.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.ui.BaseFragment
-import de.jepfa.yapm.ui.credential.ListCredentialsActivity
-import java.util.*
+import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER_PASSWD
+import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_PIN
 
 class CreateVaultEnterPinFragment : BaseFragment() {
 
@@ -23,47 +24,45 @@ class CreateVaultEnterPinFragment : BaseFragment() {
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_create_vault_enter_pin, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val pin1: EditText = view.findViewById(R.id.first_pin)
-        val pin2: EditText = view.findViewById(R.id.second_pin)
+        val pin1TextView: EditText = view.findViewById(R.id.first_pin)
+        val pin2TextView: EditText = view.findViewById(R.id.second_pin)
 
         view.findViewById<Button>(R.id.button_next).setOnClickListener {
 
-            val p1 = Password.fromEditable(pin1.text)
-            val p2 = Password.fromEditable(pin2.text)
+            val pin1 = Password.fromEditable(pin1TextView.text)
+            val pin2 = Password.fromEditable(pin2TextView.text)
 
-            if (pin1.text.isNullOrBlank()) {
-                pin1.setError(getString(R.string.pin_required))
-                pin1.requestFocus()
+            if (pin1.isEmpty()) {
+                pin1TextView.setError(getString(R.string.pin_required))
+                pin1TextView.requestFocus()
             }
-            else if (pin1.text.length < 4) {
-                pin2.setError(getString(R.string.pin_too_short))
-                pin2.requestFocus()
+            else if (pin1.length < 4) {
+                pin1TextView.setError(getString(R.string.pin_too_short))
+                pin1TextView.requestFocus()
             }
-            else if (! Arrays.equals(p1.data, p2.data)) {
-                pin2.setError(getString(R.string.pin_not_equal))
-                pin2.requestFocus()
+            else if (! pin1.isEqual(pin2)) {
+                pin2TextView.setError(getString(R.string.pin_not_equal))
+                pin2TextView.requestFocus()
             }
             else {
-
-                val androidTempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
-                val encPin = SecretService.encryptPassword(androidTempKey, Password.fromEditable(pin1.text))
-                val encPasswd = arguments?.getString(CreateVaultActivity.ARG_ENC_PASSWD)
+                val transSK = getAndroidSecretKey(ALIAS_KEY_TRANSPORT)
+                val encPin = encryptPassword(transSK, pin1)
+                val encMasterPasswd = arguments?.getString(ARG_ENC_MASTER_PASSWD)
                 val args = Bundle()
-                args.putString(CreateVaultActivity.ARG_ENC_PASSWD, encPasswd)
-                args.putString(CreateVaultActivity.ARG_ENC_PIN, encPin.toBase64String())
+                args.putString(ARG_ENC_MASTER_PASSWD, encMasterPasswd)
+                args.putString(ARG_ENC_PIN, encPin.toBase64String())
 
                 findNavController().navigate(R.id.action_Create_Vault_SecondFragment_to_ThirdFragment, args)
             }
 
-            p1.clear()
-            p2.clear()
+            pin1.clear()
+            pin2.clear()
         }
     }
 

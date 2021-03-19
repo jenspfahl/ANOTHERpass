@@ -18,7 +18,7 @@ import javax.crypto.spec.PBEKeySpec
 
 object SecretService {
 
-    val ALIAS_KEY_TEMP = "YAPM/keyAlias:TMP"
+    val ALIAS_KEY_TRANSPORT = "YAPM/keyAlias:TRANS"
     val ALIAS_KEY_MK = "YAPM/keyAlias:MK"
     val ALIAS_KEY_MP = "YAPM/keyAlias:MP"
     val ALIAS_KEY_MP_TOKEN = "YAPM/keyAlias:MPT"

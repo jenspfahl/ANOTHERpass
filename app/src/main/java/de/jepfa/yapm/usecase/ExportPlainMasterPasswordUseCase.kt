@@ -14,7 +14,7 @@ object ExportPlainMasterPasswordUseCase: SecureActivityUseCase {
         val key = activity.masterSecretKey
         val encMasterPasswd = Session.getEncMasterPasswd()
         if (key != null && encMasterPasswd != null) {
-            val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
+            val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
 
             val encHead = SecretService.encryptCommonString(tempKey, "Your real master password")
             val encSub = SecretService.encryptCommonString(tempKey, "Store this on a safe place since this is your plain master password.")

@@ -10,7 +10,6 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.Key
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.encrypt.SecretService
@@ -46,7 +45,7 @@ class LoginEnterPinFragment : BaseFragment() {
 
         nextButton.setOnClickListener {
 
-            val keyForTemp = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
+            val keyForTemp = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
 
             val userPin = Password.fromEditable(pinTextView.text)
             if (userPin.isEmpty()) {
@@ -68,7 +67,7 @@ class LoginEnterPinFragment : BaseFragment() {
             val encStoredMasterPasswd = PreferenceUtil.getEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, getBaseActivity())
 
             if (!Session.isLoggedOut()) {
-                val keyForTemp = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
+                val keyForTemp = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
                 val encMasterPasswd = Session.getEncMasterPasswd()
                 if (encMasterPasswd == null) {
                     Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()

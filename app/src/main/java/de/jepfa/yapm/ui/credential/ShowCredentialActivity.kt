@@ -105,7 +105,7 @@ class ShowCredentialActivity : SecureActivity() {
         if (id == R.id.menu_show_as_qrcode) {
             val key = masterSecretKey
             if (key != null) {
-                val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
+                val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
 
                 val tempEncName = encryptCommonString(tempKey, decryptCommonString(key, credential.name))
                 val tempEncAddInfo = encryptCommonString(tempKey, decryptCommonString(key, credential.additionalInfo))

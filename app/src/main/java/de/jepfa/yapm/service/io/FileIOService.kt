@@ -152,7 +152,7 @@ class FileIOService: IntentService("FileIOService") {
     private fun saveQrCodeAsImage(intent: Intent) {
         var message = ""
         if (FileUtil.isExternalStorageWritable()) {
-            val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
+            val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
 
             val uri = intent.getParcelableExtra<Uri>(PARAM_FILE_URI)
             val encQrcBase64 = intent.getStringExtra(PARAM_QRC)

@@ -69,7 +69,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                 return@setOnClickListener
             }
 
-            val keyForTemp = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TEMP)
+            val keyForTemp = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
 
             val encPinBase64 = arguments?.getString(CreateVaultActivity.ARG_ENC_PIN)
             if (encPinBase64 == null) {
