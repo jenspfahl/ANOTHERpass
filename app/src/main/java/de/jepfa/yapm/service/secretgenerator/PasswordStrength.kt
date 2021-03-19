@@ -8,5 +8,4 @@ enum class PasswordStrength(val passwordLength: Int, val nameId: Int) {
     STRONG(16, R.string.STRONG),
     SUPER_STRONG(20, R.string.SUPER_STRONG),
     EXTREME(24, R.string.EXTREME),
-    ULTRA_EXTREME(28, R.string.ULTRA_EXTREME),
 }

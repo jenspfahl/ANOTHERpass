@@ -2,6 +2,7 @@ package de.jepfa.yapm
 
 import de.jepfa.yapm.service.secretgenerator.PassphraseGenerator
 import de.jepfa.yapm.service.secretgenerator.PassphraseGeneratorSpec
+import de.jepfa.yapm.service.secretgenerator.PassphraseStrength
 import de.jepfa.yapm.service.secretgenerator.PasswordStrength
 import org.junit.Test
 
@@ -11,7 +12,7 @@ class PassphraseGeneratorTest {
 
     @Test
     fun generateAndClearPassphrase() {
-        val spec = PassphraseGeneratorSpec(PasswordStrength.STRONG,
+        val spec = PassphraseGeneratorSpec(PassphraseStrength.STRONG,
                 wordBeginningUpperCase = true, addDigit = false, addSpecialChar = true)
         for (i in 0..100) {
             val passphrase = passphraseGenerator.generatePassphrase(spec)

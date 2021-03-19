@@ -16,7 +16,7 @@ import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.secretgenerator.PassphraseGenerator
 import de.jepfa.yapm.service.secretgenerator.PassphraseGeneratorSpec
-import de.jepfa.yapm.service.secretgenerator.PasswordStrength
+import de.jepfa.yapm.service.secretgenerator.PassphraseStrength
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.ui.SecureActivity
@@ -25,6 +25,8 @@ import de.jepfa.yapm.viewmodel.CredentialViewModel
 import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
 
 class NewOrChangeCredentialActivity : SecureActivity() {
+
+    val PASSPHRASE_STRENGTH_DEFAULT = PassphraseStrength.STRONG
 
     private lateinit var editCredentialNameView: EditText
     private lateinit var editCredentialAdditionalInfoView: EditText
@@ -82,13 +84,15 @@ class NewOrChangeCredentialActivity : SecureActivity() {
             })
         }
 
+        val radioStrengthNormal: RadioButton = findViewById(R.id.radio_strength_normal)
         val radioStrengthStrong: RadioButton = findViewById(R.id.radio_strength_strong)
         val radioStrengthSuperStrong: RadioButton = findViewById(R.id.radio_strength_super_strong)
         val radioStrengthExtreme: RadioButton = findViewById(R.id.radio_strength_extreme)
 
-        buildRadioButton(radioStrengthStrong, PasswordStrength.STRONG)
-        buildRadioButton(radioStrengthSuperStrong, PasswordStrength.SUPER_STRONG)
-        buildRadioButton(radioStrengthExtreme, PasswordStrength.EXTREME)
+        buildRadioButton(radioStrengthNormal, PassphraseStrength.NORMAL)
+        buildRadioButton(radioStrengthStrong, PassphraseStrength.STRONG)
+        buildRadioButton(radioStrengthSuperStrong, PassphraseStrength.SUPER_STRONG)
+        buildRadioButton(radioStrengthExtreme, PassphraseStrength.EXTREME)
 
         switchUpperCaseChar = findViewById(R.id.switch_upper_case_char)
         switchAddDigit = findViewById(R.id.switch_add_digit)
@@ -166,24 +170,25 @@ class NewOrChangeCredentialActivity : SecureActivity() {
     }
 
     private fun buildGeneratorSpec(): PassphraseGeneratorSpec {
-        val passwordStrength = when (radioStrength.checkedRadioButtonId) {
-            R.id.radio_strength_strong -> PasswordStrength.STRONG
-            R.id.radio_strength_super_strong -> PasswordStrength.SUPER_STRONG
-            R.id.radio_strength_extreme -> PasswordStrength.EXTREME
-            else -> PASSWD_STRENGTH_DEFAULT // default
+        val passphraseStrength = when (radioStrength.checkedRadioButtonId) {
+            R.id.radio_strength_normal -> PassphraseStrength.NORMAL
+            R.id.radio_strength_strong -> PassphraseStrength.STRONG
+            R.id.radio_strength_super_strong -> PassphraseStrength.SUPER_STRONG
+            R.id.radio_strength_extreme -> PassphraseStrength.EXTREME
+            else -> PASSPHRASE_STRENGTH_DEFAULT // default
         }
         val spec = PassphraseGeneratorSpec(
-                strength = passwordStrength,
+                strength = passphraseStrength,
                 wordBeginningUpperCase = switchUpperCaseChar.isChecked,
                 addDigit = switchAddDigit.isChecked,
                 addSpecialChar = switchAddSpecialChar.isChecked)
         return spec
     }
 
-    private fun buildRadioButton(radioButton: RadioButton, passwordStrength: PasswordStrength) {
-        val name = getResources().getString(passwordStrength.nameId)
+    private fun buildRadioButton(radioButton: RadioButton, passphraseStrength: PassphraseStrength) {
+        val name = getResources().getString(passphraseStrength.nameId)
         radioButton.text = "${name}"
-        if (PASSWD_STRENGTH_DEFAULT == passwordStrength) {
+        if (PASSPHRASE_STRENGTH_DEFAULT == passphraseStrength) {
             radioButton.setChecked(true)
         }
     }

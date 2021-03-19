@@ -20,7 +20,7 @@ class PassphraseGenerator {
         var buffer = Password(CharArray(0));
 
         for (i in 0 until spec.strength.passwordLength/4) {
-            val word = generateWord(spec)
+            val word = generateWord()
             buffer.add(word)
         }
 
@@ -39,7 +39,7 @@ class PassphraseGenerator {
         return buffer
     }
 
-    private fun generateWord(spec: PassphraseGeneratorSpec): Password {
+    private fun generateWord(): Password {
         val word = generateTuple()
         val allowDuplicateConsonants = isVocal(word.data[word.data.lastIndex])
         val next = generateTuple(true, allowDuplicateConsonants)

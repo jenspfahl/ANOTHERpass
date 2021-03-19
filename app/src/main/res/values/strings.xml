@@ -17,7 +17,6 @@
     <string name="empty_not_saved">Credential not saved because it is empty.</string>
     <string name="save_credential">Save Credential</string>
     <string name="error_field_required">This field is required.</string>
-    <string name="credential_input_name_explanation">Add a new credential here ...</string>
     <string name="begin_with_upper_case">Satisfy one upper case char</string>
     <string name="add_one_digit">Satisfy one digit</string>
     <string name="add_one_special_char">Satisfy one special char</string>
@@ -62,7 +61,7 @@
     <string name="pin_not_equal">Pin repetition not equal</string>
     <string name="pin_wrong">Wrong pin</string>
     <string name="button_create_vault">Create vault</string>
-    <string name="create_vault_explanation_3">Here you see your master password. Note it or download as QR code and store it safely. You can also store it on this device.</string>
+    <string name="create_vault_explanation_3">Here you see your master password. Note it or download as QR code later and store it safely. You can also store it on this device.</string>
     <string name="store_master_password">Store master password on this device</string>
     <string name="create_vault_summarize_fragment_label">Create vault 3/3</string>
     <string name="login_explanation_1">Enter your pin to login into your vault.</string>
@@ -94,7 +93,6 @@
     <string name="button_import_vault">Import vault</string>
     <string name="scan_mk">Scan your master key</string>
     <string name="drop_vault">Drop vault (delete all)</string>
-    <string name="ULTRA_EXTREME">Ultra Extreme</string>
     <string name="chooser_select_vault_file">Select vault file to import</string>
     <string name="toast_import_vault_failure">The selected file cannot be imported.</string>
     <string name="quick_access">Quick access</string>

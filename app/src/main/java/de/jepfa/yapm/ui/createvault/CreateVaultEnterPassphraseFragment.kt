@@ -76,6 +76,6 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
         /*
         return passphraseGenerator.generatePassphrase(
                 PassphraseGeneratorSpec(
-                        strength = PasswordStrength.ULTRA_EXTREME))*/
+                        strength = PassphraseStrength.EXTREME))*/
     }
 }
