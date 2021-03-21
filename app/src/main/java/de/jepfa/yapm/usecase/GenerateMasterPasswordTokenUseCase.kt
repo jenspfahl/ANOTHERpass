@@ -3,6 +3,7 @@ package de.jepfa.yapm.usecase
 import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
+import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.SecureActivity
@@ -10,8 +11,6 @@ import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.util.PreferenceUtil
 
 object GenerateMasterPasswordTokenUseCase: SecureActivityUseCase {
-
-    const val PREFIX = "MPT:"
 
     override fun execute(activity: SecureActivity): Boolean {
         if (PreferenceUtil.isPresent(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, activity)) {
@@ -44,7 +43,7 @@ object GenerateMasterPasswordTokenUseCase: SecureActivityUseCase {
             val masterPasswordTokenKey = SecretService.generateKey(32)
             val encMasterPasswordTokenKey = SecretService.encryptKey(mPTKey, masterPasswordTokenKey)
             val masterPasswordTokenSK = SecretService.generateSecretKey(masterPasswordTokenKey, SecretService.getSalt(activity))
-            val masterPasswordToken = SecretService.encryptPassword(masterPasswordTokenSK, masterPassword)
+            val masterPasswordToken = SecretService.encryptPassword(Encrypted.TYPE_MASTER_PASSWD_TOKEN, masterPasswordTokenSK, masterPassword)
             val encMasterPasswordToken = SecretService.encryptEncrypted(tempKey, masterPasswordToken)
 
             val encHead = SecretService.encryptCommonString(tempKey, "Your master password token")
@@ -56,17 +55,13 @@ object GenerateMasterPasswordTokenUseCase: SecureActivityUseCase {
             val intent = Intent(activity, QrCodeActivity::class.java)
             intent.putExtra(QrCodeActivity.EXTRA_HEADLINE, encHead.toBase64String())
             intent.putExtra(QrCodeActivity.EXTRA_SUBTEXT, encSub.toBase64String())
-            intent.putExtra(QrCodeActivity.EXTRA_QRCODE, typeString(encQrc.toBase64String()))
+            intent.putExtra(QrCodeActivity.EXTRA_QRCODE, encQrc.toBase64String())
             intent.putExtra(QrCodeActivity.EXTRA_COLOR, Color.BLUE)
 
             activity.startActivity(intent)
 
             masterPassword.clear()
         }
-    }
-
-    private fun typeString(string: String): String {
-        return ExportEncMasterKeyUseCase.PREFIX + string
     }
 
 }

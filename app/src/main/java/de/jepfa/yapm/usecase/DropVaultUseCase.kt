@@ -22,6 +22,7 @@ object DropVaultUseCase: SecureActivityUseCase {
 
         PreferenceUtil.delete(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, activity)
         PreferenceUtil.delete(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, activity)
+        PreferenceUtil.delete(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, activity)
         PreferenceUtil.delete(PreferenceUtil.PREF_SALT, activity)
         CoroutineScope(Dispatchers.IO).launch {
             activity.getApp().database?.clearAllTables()

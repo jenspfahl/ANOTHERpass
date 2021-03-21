@@ -1,6 +1,7 @@
 package de.jepfa.yapm.usecase
 
 import android.util.Base64
+import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Key
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.service.encrypt.SecretService
@@ -51,7 +52,7 @@ object CreateVaultUseCase {
         masterPassphrase.clear()
 
         val masterKey = generateKey(128)
-        val encryptedMasterKey = encryptKey(masterSK, masterKey)
+        val encryptedMasterKey = encryptKey(Encrypted.TYPE_ENC_MASTER_KEY, masterSK, masterKey)
 
         val encEncryptedMasterKey = encryptEncrypted(mkSK, encryptedMasterKey)
 

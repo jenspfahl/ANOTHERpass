@@ -122,7 +122,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         if (result != null && result.contents != null) {
             val scanned = result.contents
 
-            if (scanned.startsWith(GenerateMasterPasswordTokenUseCase.PREFIX)) {
+            if (scanned.startsWith(Encrypted.TYPE_MASTER_PASSWD_TOKEN)) {
                 if (!PreferenceUtil.isPresent(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, getBaseActivity())) {
                     Toast.makeText(getBaseActivity(), "No master password token present.", Toast.LENGTH_LONG).show()
                     return
@@ -134,7 +134,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                     val masterPasswordTokenKey = decryptKey(masterPasswordTokenSK, encMasterPasswordTokenKey)
                     val mptSK = generateSecretKey(masterPasswordTokenKey, getSalt(getBaseActivity()))
 
-                    val masterPasswordToken = scanned.substring(GenerateMasterPasswordTokenUseCase.PREFIX.length)
+                    val masterPasswordToken = scanned
 
                     val encMasterPassword = SecretService.decryptPassword(mptSK, Encrypted.fromBase64String(masterPasswordToken))
                     masterPasswdTextView.setText(encMasterPassword)

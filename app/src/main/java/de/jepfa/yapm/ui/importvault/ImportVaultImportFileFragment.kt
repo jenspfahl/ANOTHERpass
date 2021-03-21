@@ -114,8 +114,8 @@ class ImportVaultImportFileFragment : BaseFragment() {
         if (result != null && result.contents != null) {
             val scanned = result.contents
 
-            if (scanned.startsWith(ExportEncMasterKeyUseCase.PREFIX)) {
-                encMasterKey = scanned.substring(ExportEncMasterKeyUseCase.PREFIX.length)
+            if (scanned.startsWith(Encrypted.TYPE_ENC_MASTER_KEY)) {
+                encMasterKey = scanned
                 mkTextView.setText(encMasterKey)
             }
             else {

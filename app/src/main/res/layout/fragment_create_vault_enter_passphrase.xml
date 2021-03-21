@@ -26,11 +26,17 @@
                 android:text="@string/create_vault_explanation_1"
                 android:layout_marginBottom="24dp"/>
 
-
-
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+
+                <Switch
+                    android:id="@+id/switch_use_pseudo_phrase"
+                    android:checked="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="24pt"
+                    android:text="@string/use_pseudo_phrase"/>
 
                 <TextView
                     android:id="@+id/generated_passwd"

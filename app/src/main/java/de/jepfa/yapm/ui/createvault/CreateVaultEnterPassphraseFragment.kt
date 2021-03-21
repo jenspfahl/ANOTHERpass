@@ -7,24 +7,29 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
+import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.service.encrypt.SecretService.ALIAS_KEY_TRANSPORT
 import de.jepfa.yapm.service.encrypt.SecretService.encryptPassword
 import de.jepfa.yapm.service.encrypt.SecretService.getAndroidSecretKey
-import de.jepfa.yapm.service.secretgenerator.PassphraseGenerator
+import de.jepfa.yapm.service.secretgenerator.*
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER_PASSWD
+import de.jepfa.yapm.util.putEncrypted
 
 
 class CreateVaultEnterPassphraseFragment : BaseFragment() {
 
+    private lateinit var pseudoPhraseSwitch: Switch
     private lateinit var generatedPasswdView: TextView
     private var generatedPassword: Password = Password.empty()
     private var passphraseGenerator = PassphraseGenerator()
+    private var passwordGenerator = PasswordGenerator()
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -36,6 +41,7 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        pseudoPhraseSwitch = view.findViewById(R.id.switch_use_pseudo_phrase)
         generatedPasswdView = view.findViewById(R.id.generated_passwd)
 
         val buttonGeneratePasswd: Button = view.findViewById(R.id.button_generate_passwd)
@@ -55,7 +61,7 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
                 generatedPassword.clear()
 
                 val args = Bundle()
-                args.putString(ARG_ENC_MASTER_PASSWD, encPassword.toBase64String())
+                args.putEncrypted(ARG_ENC_MASTER_PASSWD, encPassword)
                 findNavController().navigate(R.id.action_Create_Vault_FirstFragment_to_SecondFragment, args)
             }
         }
@@ -72,10 +78,18 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
     }
 
     private fun generatePassword() : Password {
-        return Password("abcd") //TODO mockup
-        /*
-        return passphraseGenerator.generatePassphrase(
-                PassphraseGeneratorSpec(
-                        strength = PassphraseStrength.EXTREME))*/
+        //return Password("abcd") //TODO mockup
+
+        if (pseudoPhraseSwitch.isChecked) {
+            return passphraseGenerator.generatePassphrase(
+                    PassphraseGeneratorSpec(
+                            strength = PassphraseStrength.EXTREME))
+        }
+        else {
+            return passwordGenerator.generatePassword(
+                    PasswordGeneratorSpec(
+                            strength = PasswordStrength.SUPER_STRONG))
+        }
+
     }
 }

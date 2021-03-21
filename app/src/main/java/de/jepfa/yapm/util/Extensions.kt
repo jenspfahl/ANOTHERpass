@@ -14,3 +14,8 @@ fun Bundle?.getEncrypted(key: String): Encrypted? {
         return null
     }
 }
+
+fun Bundle.putEncrypted(key: String, encrypted: Encrypted) {
+    this.putString(key, encrypted.toBase64String())
+}
+

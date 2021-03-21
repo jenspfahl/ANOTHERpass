@@ -77,7 +77,11 @@ object SecretService {
     }
 
     fun encryptKey(secretKey: SecretKey, key: Key): Encrypted {
-        return encryptData(secretKey, key.data)
+        return encryptData("", secretKey, key.data)
+    }
+
+    fun encryptKey(type: String, secretKey: SecretKey, key: Key): Encrypted {
+        return encryptData(type, secretKey, key.data)
     }
 
     fun decryptKey(secretKey: SecretKey, encrypted: Encrypted): Key {
@@ -85,7 +89,11 @@ object SecretService {
     }
 
     fun encryptPassword(secretKey: SecretKey, password: Password): Encrypted {
-        return encryptData(secretKey, password.toByteArray())
+        return encryptData("", secretKey, password.toByteArray())
+    }
+
+    fun encryptPassword(type: String, secretKey: SecretKey, password: Password): Encrypted {
+        return encryptData(type, secretKey, password.toByteArray())
     }
 
     fun decryptPassword(secretKey: SecretKey, encrypted: Encrypted): Password {
@@ -94,7 +102,7 @@ object SecretService {
 
     // TODO use CharSequence instead of String
     fun encryptCommonString(secretKey: SecretKey, string: String): Encrypted {
-        return encryptData(secretKey, string.toByteArray())
+        return encryptData("", secretKey, string.toByteArray())
     }
 
     fun decryptCommonString(secretKey: SecretKey, encrypted: Encrypted): String {
@@ -102,18 +110,18 @@ object SecretService {
     }
 
     fun encryptEncrypted(secretKey: SecretKey, encrypted: Encrypted): Encrypted {
-        return encryptData(secretKey, encrypted.toBase64())
+        return encryptData(encrypted.type, secretKey, encrypted.toBase64())
     }
 
     fun decryptEncrypted(secretKey: SecretKey, encrypted: Encrypted): Encrypted {
         return Encrypted.fromBase64(decryptData(secretKey, encrypted))
     }
 
-    private fun encryptData(secretKey: SecretKey, data: ByteArray): Encrypted {
+    private fun encryptData(type: String = "", secretKey: SecretKey, data: ByteArray): Encrypted {
         val cipher: Cipher = Cipher.getInstance(CIPHER_AES_GCM)
         cipher.init(Cipher.ENCRYPT_MODE, secretKey)
 
-        return Encrypted(cipher.getIV(), cipher.doFinal(data))
+        return Encrypted(type, cipher.getIV(), cipher.doFinal(data))
     }
 
     private fun decryptData(secretKey: SecretKey, encrypted: Encrypted): ByteArray {

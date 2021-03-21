@@ -29,6 +29,7 @@ import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER_PASSWD
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_PIN
 import de.jepfa.yapm.usecase.CreateVaultUseCase
+import de.jepfa.yapm.usecase.LoginUseCase
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD
 import de.jepfa.yapm.util.getEncrypted
@@ -74,9 +75,11 @@ class CreateVaultSummarizeFragment : BaseFragment() {
                 return@setOnClickListener
             }
             else {
-                findNavController().navigate(R.id.action_Create_Vault_to_ThirdFragment_to_Root)
+                LoginUseCase.execute(pin, masterPasswd, getBaseActivity())
                 pin.clear()
                 masterPasswd.clear()
+                getBaseActivity().finishAffinity()
+                findNavController().navigate(R.id.action_Create_Vault_to_ThirdFragment_to_Root)
             }
         }
     }
