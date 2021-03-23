@@ -17,9 +17,9 @@
     <string name="empty_not_saved">Credential not saved because it is empty.</string>
     <string name="save_credential">Save Credential</string>
     <string name="error_field_required">This field is required.</string>
-    <string name="begin_with_upper_case">Satisfy one upper case char</string>
-    <string name="add_one_digit">Satisfy one digit</string>
-    <string name="add_one_special_char">Satisfy one special char</string>
+    <string name="begin_with_upper_case">With upper case chars</string>
+    <string name="add_one_digit">With digits</string>
+    <string name="add_one_special_char">With special chars</string>
     <string name="credential_passwd_params">Password parameters</string>
     <string name="passwd_strength_normal">12</string>
     <string name="button_gen_passwd">Generate</string>

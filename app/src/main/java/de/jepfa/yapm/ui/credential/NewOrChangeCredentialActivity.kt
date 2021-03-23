@@ -10,27 +10,31 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.activity.viewModels
+import com.google.android.material.tabs.TabLayout
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.model.Session
-import de.jepfa.yapm.service.secretgenerator.PassphraseGenerator
-import de.jepfa.yapm.service.secretgenerator.PassphraseGeneratorSpec
-import de.jepfa.yapm.service.secretgenerator.PassphraseStrength
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.service.overlay.DetachHelper
+import de.jepfa.yapm.service.secretgenerator.*
+import de.jepfa.yapm.service.secretgenerator.GeneratorBase.Companion.BRUTEFORCE_ATTEMPTS_PENTIUM
+import de.jepfa.yapm.service.secretgenerator.GeneratorBase.Companion.BRUTEFORCE_ATTEMPTS_SUPERCOMP
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.viewmodel.CredentialViewModel
 import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
 
+
 class NewOrChangeCredentialActivity : SecureActivity() {
 
     val PASSPHRASE_STRENGTH_DEFAULT = PassphraseStrength.STRONG
+    val PASSWORD_STRENGTH_DEFAULT = PasswordStrength.STRONG
 
     private lateinit var editCredentialNameView: EditText
     private lateinit var editCredentialAdditionalInfoView: EditText
     private lateinit var generatedPasswdView: TextView
+    private lateinit var passwdTypeTab: TabLayout
     private lateinit var switchUpperCaseChar: Switch
     private lateinit var switchAddDigit: Switch
     private lateinit var switchAddSpecialChar: Switch
@@ -41,6 +45,7 @@ class NewOrChangeCredentialActivity : SecureActivity() {
     private var currentId: Int = -1
 
     private val passphraseGenerator = PassphraseGenerator()
+    private val passwordGenerator = PasswordGenerator()
 
     private val credentialViewModel: CredentialViewModel by viewModels {
         CredentialViewModelFactory((application as YapmApp).repository)
@@ -57,7 +62,7 @@ class NewOrChangeCredentialActivity : SecureActivity() {
         editCredentialAdditionalInfoView = findViewById(R.id.edit_credential_additional_info)
         generatedPasswdView = findViewById(R.id.generated_passwd)
         radioStrength = findViewById(R.id.radio_strengths)
-
+        passwdTypeTab = findViewById(R.id.tab_passwd_type)
 
         val idExtra = intent.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
 
@@ -106,17 +111,23 @@ class NewOrChangeCredentialActivity : SecureActivity() {
         })
 
         generatedPasswdView.setOnClickListener {
-            val spec = buildGeneratorSpec()
-            val combinations = passphraseGenerator.calcCombinationCount(spec)
+
+            val combinations = if (isPassphraseSelected()) {
+                passphraseGenerator.calcCombinationCount(buildPassphraseGeneratorSpec())
+            }
+            else {
+                passwordGenerator.calcCombinationCount(buildPasswordGeneratorSpec())
+            }
+
             val bruteForceWithPentum = passphraseGenerator.calcBruteForceWaitingSeconds(
-                    spec, passphraseGenerator.BRUTEFORCE_ATTEMPTS_PENTIUM)
+                    combinations, BRUTEFORCE_ATTEMPTS_PENTIUM)
             val bruteForceWithSupercomp = passphraseGenerator.calcBruteForceWaitingSeconds(
-                    spec, passphraseGenerator.BRUTEFORCE_ATTEMPTS_SUPERCOMP)
+                    combinations, BRUTEFORCE_ATTEMPTS_SUPERCOMP)
             AlertDialog.Builder(it.context)
                     .setTitle("Password strength")
                     .setMessage("Combinations: $combinations" + System.lineSeparator() + System.lineSeparator() +
-                            "Years to brute force with a usual PC: ${bruteForceWithPentum/60/60/24/365}" + System.lineSeparator() + System.lineSeparator() +
-                            "Years to brute force with a super computer: ${bruteForceWithSupercomp/60/60/24/365}")
+                            "Years to brute force with a usual PC: ${bruteForceWithPentum / 60 / 60 / 24 / 365}" + System.lineSeparator() + System.lineSeparator() +
+                            "Years to brute force with a super computer: ${bruteForceWithSupercomp / 60 / 60 / 24 / 365}")
                     .show()
         }
 
@@ -164,12 +175,23 @@ class NewOrChangeCredentialActivity : SecureActivity() {
     }
 
     private fun generatePassword() : Password {
-        val spec = buildGeneratorSpec()
 
-        return passphraseGenerator.generatePassphrase(spec)
+        if (isPassphraseSelected()) {
+            val spec = buildPassphraseGeneratorSpec()
+            return passphraseGenerator.generate(spec)
+        }
+        else {
+            val spec = buildPasswordGeneratorSpec()
+            return passwordGenerator.generate(spec)
+        }
+
     }
 
-    private fun buildGeneratorSpec(): PassphraseGeneratorSpec {
+    private fun isPassphraseSelected() : Boolean {
+        return passwdTypeTab.selectedTabPosition == 0
+    }
+
+    private fun buildPassphraseGeneratorSpec(): PassphraseGeneratorSpec {
         val passphraseStrength = when (radioStrength.checkedRadioButtonId) {
             R.id.radio_strength_normal -> PassphraseStrength.NORMAL
             R.id.radio_strength_strong -> PassphraseStrength.STRONG
@@ -182,6 +204,22 @@ class NewOrChangeCredentialActivity : SecureActivity() {
                 wordBeginningUpperCase = switchUpperCaseChar.isChecked,
                 addDigit = switchAddDigit.isChecked,
                 addSpecialChar = switchAddSpecialChar.isChecked)
+        return spec
+    }
+
+    private fun buildPasswordGeneratorSpec(): PasswordGeneratorSpec {
+        val passwordStrength = when (radioStrength.checkedRadioButtonId) {
+            R.id.radio_strength_normal -> PasswordStrength.NORMAL
+            R.id.radio_strength_strong -> PasswordStrength.STRONG
+            R.id.radio_strength_super_strong -> PasswordStrength.SUPER_STRONG
+            R.id.radio_strength_extreme -> PasswordStrength.EXTREME
+            else -> PASSWORD_STRENGTH_DEFAULT // default
+        }
+        val spec = PasswordGeneratorSpec(
+                strength = passwordStrength,
+                onlyLowerCase = !switchUpperCaseChar.isChecked,
+                noDigits = !switchAddDigit.isChecked,
+                excludeSpecialChars = !switchAddSpecialChar.isChecked)
         return spec
     }
 

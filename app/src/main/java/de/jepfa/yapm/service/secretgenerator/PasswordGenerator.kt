@@ -3,16 +3,15 @@ package de.jepfa.yapm.service.secretgenerator
 import de.jepfa.yapm.model.Password
 import java.security.SecureRandom
 
-class PasswordGenerator {
+class PasswordGenerator : GeneratorBase<PasswordGeneratorSpec>() {
+
     val ALPHA_CHARS_LOWER_CASE = "abcdefghijklmnopqrstuvwxyz"
     val ALPHA_CHARS_UPPER_CASE = ALPHA_CHARS_LOWER_CASE.toUpperCase()
     val DIGITS = "0123456789"
     val SPECIAL_CHARS_1 = "!?-_,.;:/"
     val SPECIAL_CHARS_2 = "$%&()[]{}"
 
-    private val random = SecureRandom()
-
-    fun generatePassword(spec: PasswordGeneratorSpec): Password {
+    override fun generate(spec: PasswordGeneratorSpec): Password {
         val buffer = CharArray(spec.strength.passwordLength)
         val material = extractMaterial(spec)
 
@@ -22,8 +21,14 @@ class PasswordGenerator {
         return Password(buffer)
     }
 
+    override fun calcCombinationCount(spec: PasswordGeneratorSpec): Double {
+        val material = extractMaterial(spec)
+
+        return Math.pow(material.length.toDouble(), spec.strength.passwordLength.toDouble())
+    }
+
     private fun extractMaterial(spec: PasswordGeneratorSpec): String {
-        var material = ALPHA_CHARS_UPPER_CASE
+        var material = ALPHA_CHARS_LOWER_CASE
         if (!spec.noDigits) {
             material += DIGITS
         }
@@ -33,8 +38,8 @@ class PasswordGenerator {
                 material += SPECIAL_CHARS_2
             }
         }
-        if (!spec.onlyUpperCase) {
-            material += ALPHA_CHARS_LOWER_CASE
+        if (!spec.onlyLowerCase) {
+            material += ALPHA_CHARS_UPPER_CASE
         }
         return material
     }

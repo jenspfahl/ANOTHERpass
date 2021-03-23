@@ -13,7 +13,7 @@ class PasswordGeneratorTest {
     @Test
     fun generateAndClearPassword() {
         val spec = PasswordGeneratorSpec(PasswordStrength.SUPER_STRONG, onlyCommonSpecialChars = true)
-        val password = passwordGenerator.generatePassword(spec)
+        val password = passwordGenerator.generate(spec)
         println("password=${password.debugToString()}")
 
         password.clear()

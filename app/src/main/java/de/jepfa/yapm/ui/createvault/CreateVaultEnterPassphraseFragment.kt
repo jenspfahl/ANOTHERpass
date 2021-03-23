@@ -81,12 +81,12 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
         //return Password("abcd") //TODO mockup
 
         if (pseudoPhraseSwitch.isChecked) {
-            return passphraseGenerator.generatePassphrase(
+            return passphraseGenerator.generate(
                     PassphraseGeneratorSpec(
                             strength = PassphraseStrength.EXTREME))
         }
         else {
-            return passwordGenerator.generatePassword(
+            return passwordGenerator.generate(
                     PasswordGeneratorSpec(
                             strength = PasswordStrength.SUPER_STRONG))
         }
