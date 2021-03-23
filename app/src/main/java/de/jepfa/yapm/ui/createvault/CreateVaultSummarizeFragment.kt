@@ -2,7 +2,6 @@ package de.jepfa.yapm.ui.createvault
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -14,24 +13,13 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.Encrypted
-import de.jepfa.yapm.model.Key
-import de.jepfa.yapm.model.Password
-import de.jepfa.yapm.service.encrypt.SecretService
-import de.jepfa.yapm.service.encrypt.SecretService.ALIAS_KEY_MK
-import de.jepfa.yapm.service.encrypt.SecretService.ALIAS_KEY_MP
 import de.jepfa.yapm.service.encrypt.SecretService.ALIAS_KEY_TRANSPORT
 import de.jepfa.yapm.service.encrypt.SecretService.decryptPassword
-import de.jepfa.yapm.service.encrypt.SecretService.encryptPassword
 import de.jepfa.yapm.service.encrypt.SecretService.getAndroidSecretKey
-import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER_PASSWD
-import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_PIN
 import de.jepfa.yapm.usecase.CreateVaultUseCase
 import de.jepfa.yapm.usecase.LoginUseCase
-import de.jepfa.yapm.util.PreferenceUtil
-import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD
 import de.jepfa.yapm.util.getEncrypted
 
 class CreateVaultSummarizeFragment : BaseFragment() {
