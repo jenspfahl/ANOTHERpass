@@ -99,6 +99,15 @@
     <string name="generate_encrypted_masterpasswd">Create master export token</string>
     <string name="generate_passwd_first">Generate a password first</string>
     <string name="use_pseudo_phrase">Use pseudo phrases to generate master password</string>
+    <string name="help">Online help</string>
+    <string name="about">About</string>
+    <string name="title_about_the_app">About the app</string>
+    <string name="change_pin">Change pin</string>
+    <string name="change_pin_explanation">Change your pin by enter your current one and a new one repeated. Note, that the encrypted master key will be changed, so you need to export it again. This also effects old vault export files with the old key.</string>
+    <string name="button_change">Change</string>
+    <string name="new_pin">Enter new pin</string>
+    <string name="repeat_new_pin">Repeat new pin</string>
+    <string name="current_pin">Enter old pin</string>
 
 
 </resources>

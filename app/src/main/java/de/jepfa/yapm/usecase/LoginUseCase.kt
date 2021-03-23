@@ -35,7 +35,7 @@ object LoginUseCase {
     /**
      * Returns the Master passphrase which is calculated of the users Master Pin and his Master password
      */
-    private fun getMasterPassPhraseSK(masterPin: Password, masterPassword: Password, salt: Key): SecretKey {
+    fun getMasterPassPhraseSK(masterPin: Password, masterPassword: Password, salt: Key): SecretKey {
         val masterPassPhrase = SecretService.conjunctPasswords(masterPin, masterPassword, salt)
 
         val masterPassPhraseSK = SecretService.generateSecretKey(masterPassPhrase, salt)
@@ -48,7 +48,15 @@ object LoginUseCase {
      * Returns the Master Secret Key which is encrypted twice, first with the Android key
      * and second with the PassPhrase key.
      */
-    private fun getMasterSK(masterPassPhraseSK: SecretKey, salt: Key, storedEncMasterKey: Encrypted): SecretKey? {
+    fun getMasterSK(masterPassPhraseSK: SecretKey, salt: Key, storedEncMasterKey: Encrypted): SecretKey? {
+        val masterKey = getMasterKey(masterPassPhraseSK, storedEncMasterKey) ?: return null
+        val masterSK = SecretService.generateSecretKey(masterKey, salt)
+        masterKey.clear()
+
+        return masterSK
+    }
+
+    fun getMasterKey(masterPassPhraseSK: SecretKey, storedEncMasterKey: Encrypted): Key? {
         val androidSK = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
 
         val encMasterKey = SecretService.decryptEncrypted(androidSK, storedEncMasterKey)
@@ -56,10 +64,6 @@ object LoginUseCase {
         if (Arrays.equals(masterKey.data, SecretService.FAILED_BYTE_ARRAY)) {
             return null
         }
-        val masterSK = SecretService.generateSecretKey(masterKey, salt)
-        masterKey.clear()
-
-        return masterSK
-
+        return masterKey
     }
 }

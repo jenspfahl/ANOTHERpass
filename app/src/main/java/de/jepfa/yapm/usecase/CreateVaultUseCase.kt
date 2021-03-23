@@ -24,7 +24,9 @@ object CreateVaultUseCase {
     fun execute(pin: Password, masterPasswd: Password, storeMasterPasswd: Boolean, activity: BaseActivity): Boolean {
 
         val salt = createAndStoreSalt(activity)
-        generateAndStoreMasterKey(pin, masterPasswd, salt, activity)
+        val masterKey = generateKey(128)
+        encryptAndStoreMasterKey(masterKey, pin, masterPasswd, salt, activity)
+        masterKey.clear()
 
         if (storeMasterPasswd) {
             val mpSK = getAndroidSecretKey(ALIAS_KEY_MP)
@@ -43,7 +45,7 @@ object CreateVaultUseCase {
         return salt
     }
 
-    private fun generateAndStoreMasterKey(pin: Password, masterPasswd: Password, salt: Key, activity: BaseActivity) {
+    fun encryptAndStoreMasterKey(masterKey: Key, pin: Password, masterPasswd: Password, salt: Key, activity: BaseActivity) {
 
         val mkSK = getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
 
@@ -51,7 +53,6 @@ object CreateVaultUseCase {
         val masterSK = generateSecretKey(masterPassphrase, salt)
         masterPassphrase.clear()
 
-        val masterKey = generateKey(128)
         val encryptedMasterKey = encryptKey(Encrypted.TYPE_ENC_MASTER_KEY, masterSK, masterKey)
 
         val encEncryptedMasterKey = encryptEncrypted(mkSK, encryptedMasterKey)

@@ -5,6 +5,9 @@ import android.app.AlertDialog
 import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -25,6 +28,7 @@ import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.YapmApp
+import de.jepfa.yapm.ui.changepin.ChangePinActivity
 import de.jepfa.yapm.ui.exportvault.ExportVaultActivity
 import de.jepfa.yapm.usecase.*
 import de.jepfa.yapm.util.PreferenceUtil
@@ -152,6 +156,11 @@ class ListCredentialsActivity : SecureActivity() {
                 startActivity(intent)
                 return true
             }
+            R.id.change_pin -> {
+                val intent = Intent(this, ChangePinActivity::class.java)
+                startActivity(intent)
+                return true
+            }
             R.id.drop_vault -> {
                 AlertDialog.Builder(this)
                         .setTitle("Drop vault")
@@ -165,8 +174,26 @@ class ListCredentialsActivity : SecureActivity() {
 
                 return true
             }
+            R.id.menu_help -> {
+                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://jepfa.de"))
+                startActivity(browserIntent)
+                return true
+            }
+
+            R.id.menu_about -> {
+                val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+                val icon: Drawable = getApplicationInfo().loadIcon(getPackageManager())
+                val message = getString(R.string.app_name) + ", Version " + getVersionName() +
+                        System.lineSeparator() + " \u00A9 Jens Pfahl 2021"
+                builder.setTitle(R.string.title_about_the_app)
+                        .setMessage(message)
+                        .setIcon(icon)
+                        .show()
+                return true
+            }
             else -> super.onOptionsItemSelected(item)
         }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -215,6 +242,16 @@ class ListCredentialsActivity : SecureActivity() {
 
     fun deleteCredential(credential: EncCredential) {
         credentialViewModel.delete(credential)
+    }
+
+    private fun getVersionName(): String {
+        try {
+            val pInfo = packageManager.getPackageInfo(packageName, 0)
+            return pInfo.versionName
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
+        }
+        return "?"
     }
 
 }

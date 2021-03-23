@@ -63,6 +63,13 @@
 
     <!--TODO move this to settings page later-->
     <item
+        android:id="@+id/change_pin"
+        android:orderInCategory="90"
+        android:title="@string/change_pin"
+        app:showAsAction="never" />
+
+    <!--TODO move this to settings page later-->
+    <item
         android:id="@+id/drop_vault"
         android:orderInCategory="100"
         android:title="@string/drop_vault"
@@ -73,4 +80,18 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_help"
+        android:orderInCategory="200"
+        android:title="@string/help"
+        app:showAsAction="never">
+    </item>
+
+    <item
+        android:id="@+id/menu_about"
+        android:orderInCategory="300"
+        android:title="@string/about"
+        app:showAsAction="never">
+    </item>
 </menu>
