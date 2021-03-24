@@ -108,6 +108,8 @@
     <string name="new_pin">Enter new pin</string>
     <string name="repeat_new_pin">Repeat new pin</string>
     <string name="current_pin">Enter old pin</string>
+    <string name="change_master_password">Change master password</string>
+    <string name="change_master_password_explanation">Change your master password by enter your current pin and generate a new master password. Note, that the encrypted master key will be changed, so you need to export it again. This also effects old vault export files with the old key. You should also export your master password (plain and token) again.</string>
 
 
 </resources>

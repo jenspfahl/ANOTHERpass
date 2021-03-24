@@ -28,7 +28,8 @@ import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.YapmApp
-import de.jepfa.yapm.ui.changepin.ChangePinActivity
+import de.jepfa.yapm.ui.changelogin.ChangeMasterPasswordActivity
+import de.jepfa.yapm.ui.changelogin.ChangePinActivity
 import de.jepfa.yapm.ui.exportvault.ExportVaultActivity
 import de.jepfa.yapm.usecase.*
 import de.jepfa.yapm.util.PreferenceUtil
@@ -158,6 +159,11 @@ class ListCredentialsActivity : SecureActivity() {
             }
             R.id.change_pin -> {
                 val intent = Intent(this, ChangePinActivity::class.java)
+                startActivity(intent)
+                return true
+            }
+            R.id.change_master_password -> {
+                val intent = Intent(this, ChangeMasterPasswordActivity::class.java)
                 startActivity(intent)
                 return true
             }

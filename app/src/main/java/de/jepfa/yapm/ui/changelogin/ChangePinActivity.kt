@@ -1,24 +1,18 @@
-package de.jepfa.yapm.ui.changepin
+package de.jepfa.yapm.ui.changelogin
 
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.EditText
-import android.widget.Switch
 import android.widget.Toast
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.model.Session
-import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.usecase.ChangePinUseCase
-import java.util.*
 
 class ChangePinActivity : SecureActivity() {
-
-    private lateinit var includeMasterKeySwitch: Switch
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

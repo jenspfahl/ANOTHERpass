@@ -14,7 +14,10 @@
         <activity android:name=".ui.importvault.ImportVaultActivity" />
         <activity android:name=".ui.exportvault.ExportVaultActivity" />
         <activity
-            android:name=".ui.changepin.ChangePinActivity"
+            android:name=".ui.changelogin.ChangePinActivity"
+            android:noHistory="true"/>
+        <activity
+            android:name=".ui.changelogin.ChangeMasterPasswordActivity"
             android:noHistory="true"/>
         <activity
             android:name=".ui.qrcode.QrCodeActivity"

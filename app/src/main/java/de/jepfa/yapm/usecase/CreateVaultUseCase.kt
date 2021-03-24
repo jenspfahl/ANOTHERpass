@@ -29,12 +29,16 @@ object CreateVaultUseCase {
         masterKey.clear()
 
         if (storeMasterPasswd) {
-            val mpSK = getAndroidSecretKey(ALIAS_KEY_MP)
-            val encMasterPasswd = encryptPassword(mpSK, masterPasswd)
-            PreferenceUtil.putEncrypted(PREF_ENCRYPTED_MASTER_PASSWORD, encMasterPasswd, activity)
+            storeMasterPassword(masterPasswd, activity)
         }
 
         return true
+    }
+
+    fun storeMasterPassword(masterPasswd: Password, activity: BaseActivity) {
+        val mpSK = getAndroidSecretKey(ALIAS_KEY_MP)
+        val encMasterPasswd = encryptPassword(mpSK, masterPasswd)
+        PreferenceUtil.putEncrypted(PREF_ENCRYPTED_MASTER_PASSWORD, encMasterPasswd, activity)
     }
 
     private fun createAndStoreSalt(activity: BaseActivity): Key {
