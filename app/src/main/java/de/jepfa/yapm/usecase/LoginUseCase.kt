@@ -1,16 +1,12 @@
 package de.jepfa.yapm.usecase
 
-import de.jepfa.yapm.model.Encrypted
-import de.jepfa.yapm.model.Key
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.model.Session
-import de.jepfa.yapm.service.encrypt.SecretService
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
-import de.jepfa.yapm.util.MasterKeyHelper.getMasterPassPhraseSK
-import de.jepfa.yapm.util.MasterKeyHelper.getMasterSK
+import de.jepfa.yapm.service.secret.MasterKeyService.getMasterPassPhraseSK
+import de.jepfa.yapm.service.secret.MasterKeyService.getMasterSK
 import de.jepfa.yapm.util.PreferenceUtil
-import java.util.*
-import javax.crypto.SecretKey
 
 object LoginUseCase {
 

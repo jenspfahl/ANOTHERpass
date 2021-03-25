@@ -12,15 +12,14 @@ import com.google.zxing.integration.android.IntentIntegrator
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Password
-import de.jepfa.yapm.service.encrypt.SecretService
-import de.jepfa.yapm.service.encrypt.SecretService.ALIAS_KEY_MP_TOKEN
-import de.jepfa.yapm.service.encrypt.SecretService.decryptKey
-import de.jepfa.yapm.service.encrypt.SecretService.generateSecretKey
-import de.jepfa.yapm.service.encrypt.SecretService.getAndroidSecretKey
-import de.jepfa.yapm.service.encrypt.SecretService.getSalt
+import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.service.secret.SecretService.ALIAS_KEY_MP_TOKEN
+import de.jepfa.yapm.service.secret.SecretService.decryptKey
+import de.jepfa.yapm.service.secret.SecretService.generateSecretKey
+import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
+import de.jepfa.yapm.service.secret.SecretService.getSalt
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
-import de.jepfa.yapm.usecase.GenerateMasterPasswordTokenUseCase
 import de.jepfa.yapm.usecase.LoginUseCase
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.QRCodeUtil
@@ -84,10 +83,11 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                 masterPassword,
                 getBaseActivity())
 
+            val loginActivity = getBaseActivity() as LoginActivity
             if (!success) {
-                masterPasswdTextView.setError(getString(R.string.password_wrong))
+                masterPasswdTextView.setError("${getString(R.string.password_wrong)} ${loginActivity.getLoginAttemptMessage()}")
                 masterPasswdTextView.requestFocus()
-                (getBaseActivity() as LoginActivity).handleFailedLoginAttempt()
+                loginActivity.handleFailedLoginAttempt()
                 return@setOnClickListener
             }
 
@@ -103,7 +103,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
             masterPassword.clear()
             masterPasswdTextView.setText("")
             arguments?.remove(CreateVaultActivity.ARG_ENC_PIN)
-            (getBaseActivity() as LoginActivity).loginSuccessful()
+            loginActivity.loginSuccessful()
         }
     }
 

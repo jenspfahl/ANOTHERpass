@@ -9,6 +9,7 @@ object Session {
      * After this period of time of inactivity the secret is outdated.
      */
     private val SECRET_KEEP_VALID: Long = TimeUnit.SECONDS.toMillis(60)
+    private val LOGOUT_AFTER: Long = TimeUnit.SECONDS.toMillis(600)
 
     private var masterSecretKey: SecretKey? = null
     private var masterPassword: Encrypted? = null
@@ -39,9 +40,11 @@ object Session {
     }
 
     fun isOutdated(): Boolean {
-        val age: Long = System.currentTimeMillis() - lastUpdated
+        return age() > SECRET_KEEP_VALID || shouldBeLoggedOut()
+    }
 
-        return age > SECRET_KEEP_VALID
+    fun shouldBeLoggedOut(): Boolean {
+        return age() > LOGOUT_AFTER
     }
 
     fun isLocked() : Boolean {
@@ -65,5 +68,7 @@ object Session {
         masterPassword = null
         lock()
     }
+
+    private fun age() = System.currentTimeMillis() - lastUpdated
 
 }

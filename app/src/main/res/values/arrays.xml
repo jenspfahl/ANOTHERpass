@@ -1,0 +1,69 @@
+<resources>
+    <string-array name="lock_timeout_entries">
+        <item>After one minute</item>
+        <item>After 2 minutes</item>
+        <item>After 3 minutes</item>
+        <item>After 5 minutes</item>
+        <item>After 10 minutes</item>
+        <item>After 15 minutes</item>
+    </string-array>
+
+    <string-array name="lock_timeout_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+    </string-array>
+
+
+
+    <string-array name="logout_timeout_entries">
+        <item>After 10 minutes</item>
+        <item>After 15 minutes</item>
+        <item>After 20 minutes</item>
+        <item>After 30 minutes</item>
+        <item>After 60 minutes</item>
+    </string-array>
+
+    <string-array name="logout_timeout_values">
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>30</item>
+        <item>60</item>
+    </string-array>
+
+    <string-array name="max_login_attempts_entries">
+        <item>1 attempt</item>
+        <item>2 attempts</item>
+        <item>3 attempts</item>
+        <item>5 attempts</item>
+        <item>10 attempts</item>
+    </string-array>
+
+    <string-array name="max_login_attempts_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>5</item>
+        <item>10</item>
+    </string-array>
+
+
+    <string-array name="default_passwd_strength_entries">
+        <item>@string/NORMAL</item>
+        <item>@string/STRONG</item>
+        <item>@string/SUPER_STRONG</item>
+        <item>@string/EXTREME</item>
+    </string-array>
+
+    <string-array name="default_passwd_strength_values">
+        <item>NORMAL</item>
+        <item>STRONG</item>
+        <item>SUPER_STRONG</item>
+        <item>EXTREME</item>
+    </string-array>
+
+</resources>

@@ -4,19 +4,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.*
-import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.model.Session
-import de.jepfa.yapm.service.encrypt.SecretService
-import de.jepfa.yapm.service.secretgenerator.PassphraseGenerator
-import de.jepfa.yapm.service.secretgenerator.PasswordGenerator
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.usecase.ChangeMasterPasswordUseCase
-import de.jepfa.yapm.usecase.ChangePinUseCase
 import de.jepfa.yapm.usecase.GenerateMasterPasswordUseCase
-import de.jepfa.yapm.util.putEncrypted
 
 class ChangeMasterPasswordActivity : SecureActivity() {
 

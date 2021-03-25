@@ -1,0 +1,30 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!--
+    <Preference
+        app:fragment="de.jepfa.yapm.ui.settings.SettingsActivity$GeneralSettingsFragment"
+        app:icon="@drawable/ic_settings_black_24dp"
+        app:key="general_header"
+        app:title="@string/pref_header_login" /> -->
+
+
+    <Preference
+        app:fragment="de.jepfa.yapm.ui.settings.SettingsActivity$LoginSettingsFragment"
+        app:icon="@drawable/ic_baseline_login_24"
+        app:key="login_header"
+        app:title="@string/pref_header_security" />
+
+
+    <Preference
+        app:fragment="de.jepfa.yapm.ui.settings.SettingsActivity$SecuritySettingsFragment"
+        app:icon="@drawable/ic_security_black_24dp"
+        app:key="security_header"
+        app:title="@string/pref_header_login" />
+
+    <Preference
+        app:fragment="de.jepfa.yapm.ui.settings.SettingsActivity$PasswordGeneratorSettingsFragment"
+        app:icon="@drawable/ic_baseline_vpn_key_24"
+        app:key="passwd_generator_header"
+        app:title="@string/pref_header_passwd" />
+
+</PreferenceScreen>

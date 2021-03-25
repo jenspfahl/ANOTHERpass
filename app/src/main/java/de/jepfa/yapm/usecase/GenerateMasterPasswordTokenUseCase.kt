@@ -5,7 +5,7 @@ import android.content.Intent
 import android.graphics.Color
 import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Session
-import de.jepfa.yapm.service.encrypt.SecretService
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.util.PreferenceUtil

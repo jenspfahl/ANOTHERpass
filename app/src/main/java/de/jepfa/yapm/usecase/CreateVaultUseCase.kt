@@ -1,24 +1,13 @@
 package de.jepfa.yapm.usecase
 
 import android.util.Base64
-import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Key
 import de.jepfa.yapm.model.Password
-import de.jepfa.yapm.service.encrypt.SecretService
-import de.jepfa.yapm.service.encrypt.SecretService.ALIAS_KEY_MP
-import de.jepfa.yapm.service.encrypt.SecretService.conjunctPasswords
-import de.jepfa.yapm.service.encrypt.SecretService.encryptEncrypted
-import de.jepfa.yapm.service.encrypt.SecretService.encryptKey
-import de.jepfa.yapm.service.encrypt.SecretService.encryptPassword
-import de.jepfa.yapm.service.encrypt.SecretService.generateKey
-import de.jepfa.yapm.service.encrypt.SecretService.generateSecretKey
-import de.jepfa.yapm.service.encrypt.SecretService.getAndroidSecretKey
+import de.jepfa.yapm.service.secret.SecretService.generateKey
 import de.jepfa.yapm.ui.BaseActivity
-import de.jepfa.yapm.util.MasterKeyHelper.encryptAndStoreMasterKey
-import de.jepfa.yapm.util.MasterPasswordHelper.storeMasterPassword
+import de.jepfa.yapm.service.secret.MasterKeyService.encryptAndStoreMasterKey
+import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
 import de.jepfa.yapm.util.PreferenceUtil
-import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY
-import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD
 import de.jepfa.yapm.util.PreferenceUtil.PREF_SALT
 
 object CreateVaultUseCase {

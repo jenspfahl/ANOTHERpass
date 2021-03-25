@@ -1,0 +1,19 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ListPreference
+        app:defaultValue="2"
+        app:entries="@array/lock_timeout_entries"
+        app:entryValues="@array/lock_timeout_values"
+        app:key="lock_timeout"
+        app:title="@string/lock_timeout_title"
+        app:useSimpleSummaryProvider="true" />
+
+    <ListPreference
+        app:defaultValue="10"
+        app:entries="@array/logout_timeout_entries"
+        app:entryValues="@array/logout_timeout_values"
+        app:key="logout_timeout"
+        app:title="@string/logout_timeout_title"
+        app:useSimpleSummaryProvider="true" />
+
+</PreferenceScreen>

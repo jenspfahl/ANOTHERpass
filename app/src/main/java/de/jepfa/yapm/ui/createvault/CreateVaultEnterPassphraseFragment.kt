@@ -12,12 +12,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Password
-import de.jepfa.yapm.service.encrypt.SecretService.ALIAS_KEY_TRANSPORT
-import de.jepfa.yapm.service.encrypt.SecretService.encryptPassword
-import de.jepfa.yapm.service.encrypt.SecretService.getAndroidSecretKey
-import de.jepfa.yapm.service.secretgenerator.*
+import de.jepfa.yapm.service.secret.SecretService.ALIAS_KEY_TRANSPORT
+import de.jepfa.yapm.service.secret.SecretService.encryptPassword
+import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER_PASSWD
 import de.jepfa.yapm.usecase.GenerateMasterPasswordUseCase

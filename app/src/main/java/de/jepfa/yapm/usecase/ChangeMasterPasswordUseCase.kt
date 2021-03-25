@@ -2,13 +2,13 @@ package de.jepfa.yapm.usecase
 
 import android.util.Log
 import de.jepfa.yapm.model.Password
-import de.jepfa.yapm.service.encrypt.SecretService
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
-import de.jepfa.yapm.util.MasterKeyHelper.encryptAndStoreMasterKey
-import de.jepfa.yapm.util.MasterKeyHelper.getMasterKey
-import de.jepfa.yapm.util.MasterKeyHelper.getMasterPassPhraseSK
-import de.jepfa.yapm.util.MasterPasswordHelper.getMasterPasswordFromSession
-import de.jepfa.yapm.util.MasterPasswordHelper.storeMasterPassword
+import de.jepfa.yapm.service.secret.MasterKeyService.encryptAndStoreMasterKey
+import de.jepfa.yapm.service.secret.MasterKeyService.getMasterKey
+import de.jepfa.yapm.service.secret.MasterKeyService.getMasterPassPhraseSK
+import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
+import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY
 import de.jepfa.yapm.util.PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY

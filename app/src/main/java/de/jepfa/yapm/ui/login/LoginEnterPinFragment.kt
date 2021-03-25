@@ -12,12 +12,13 @@ import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.model.Session
-import de.jepfa.yapm.service.encrypt.SecretService
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.usecase.LoginUseCase
 import de.jepfa.yapm.util.PreferenceUtil
 import java.util.*
+import kotlin.math.log
 
 
 class LoginEnterPinFragment : BaseFragment() {
@@ -54,15 +55,8 @@ class LoginEnterPinFragment : BaseFragment() {
 
                 return@setOnClickListener
             }
-/*
-            val userPinHash = SecretService.hashPassword(userPin, salt)
 
-            if (!Arrays.equals(userPinHash.data, storedMasterPinHash.data)) {
-                pinTextView.setError(getString(R.string.pin_wrong))
-                pinTextView.requestFocus()
-
-                return@setOnClickListener
-            }*/
+            val loginActivity = getBaseActivity() as LoginActivity
 
             val encStoredMasterPasswd = PreferenceUtil.getEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, getBaseActivity())
 
@@ -75,8 +69,8 @@ class LoginEnterPinFragment : BaseFragment() {
                 }
                 val masterPasswd = SecretService.decryptPassword(keyForTemp, encMasterPasswd)
 
-                if (!login(userPin, masterPasswd)) {
-                    pinTextView.setError(getString(R.string.pin_wrong))
+                if (!login(userPin, masterPasswd, loginActivity)) {
+                    pinTextView.setError("${getString(R.string.password_wrong)} ${loginActivity.getLoginAttemptMessage()}")
                     pinTextView.requestFocus()
                     return@setOnClickListener
                 }
@@ -86,8 +80,9 @@ class LoginEnterPinFragment : BaseFragment() {
                 val keyForMP = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP)
                 val storedMasterPasswd = SecretService.decryptPassword(keyForMP, encStoredMasterPasswd)
 
-                if (!login(userPin, storedMasterPasswd)) {
-                    pinTextView.setError(getString(R.string.pin_wrong))
+                if (!login(userPin, storedMasterPasswd, loginActivity)) {
+
+                    pinTextView.setError("${getString(R.string.password_wrong)} ${loginActivity.getLoginAttemptMessage()}")
                     pinTextView.requestFocus()
                     return@setOnClickListener
                 }
@@ -110,7 +105,8 @@ class LoginEnterPinFragment : BaseFragment() {
 
     private fun login(
             userPin: Password,
-            masterPasswd: Password
+            masterPasswd: Password,
+            loginActivity: LoginActivity
     ): Boolean {
 
         val success = LoginUseCase.execute(
@@ -119,13 +115,13 @@ class LoginEnterPinFragment : BaseFragment() {
                 getBaseActivity())
 
         if (!success) {
-            (getBaseActivity() as LoginActivity).handleFailedLoginAttempt()
+            loginActivity.handleFailedLoginAttempt()
             return false
         }
 
         masterPasswd.clear()
         findNavController().navigate(R.id.action_Login_to_CredentialList)
-        (getBaseActivity() as LoginActivity).loginSuccessful()
+        loginActivity.loginSuccessful()
         return true
     }
 }

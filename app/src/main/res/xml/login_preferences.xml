@@ -1,0 +1,17 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ListPreference
+        app:defaultValue="3"
+        app:entries="@array/max_login_attempts_entries"
+        app:entryValues="@array/max_login_attempts_values"
+        app:key="max_login_attempts"
+        app:title="@string/max_login_attempts_title"
+        app:useSimpleSummaryProvider="true" />
+
+    <SwitchPreferenceCompat
+        app:key="fast_mp_login"
+        app:summaryOff="Master password can be typed manually or scanned from QR code"
+        app:summaryOn="Opens the QR code scanner immediately if master password is not stored on device and logs in afterwards"
+        app:title="Scan master password and login immediately" />
+
+</PreferenceScreen>

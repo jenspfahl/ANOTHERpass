@@ -17,11 +17,10 @@
     <string name="empty_not_saved">Credential not saved because it is empty.</string>
     <string name="save_credential">Save Credential</string>
     <string name="error_field_required">This field is required.</string>
-    <string name="begin_with_upper_case">With upper case chars</string>
-    <string name="add_one_digit">With digits</string>
-    <string name="add_one_special_char">With special chars</string>
+    <string name="with_upper_case">With upper case chars</string>
+    <string name="with_digits">With digits</string>
+    <string name="with_special_chars">With special chars</string>
     <string name="credential_passwd_params">Password parameters</string>
-    <string name="passwd_strength_normal">12</string>
     <string name="button_gen_passwd">Generate</string>
 
     <string name="search">Search</string>
@@ -110,8 +109,19 @@
     <string name="current_pin">Enter current pin</string>
     <string name="change_master_password">Change master password</string>
     <string name="change_master_password_explanation">Change your master password by enter your current pin and generate a new master password. Note, that the encrypted master key will be changed, so you need to export it again. This also effects old vault export files with the old key. You should also export your master password (plain and token) again.</string>
-    <string name="security">Security</string>
+    <string name="security">Privacy</string>
     <string name="delete_stored_masterpasswd_confirmation">Do you want to delete the stored master password from this device? For future logins you will need the master password then.</string>
+    <string name="pref_header_general">General</string>
+    <string name="pref_header_security">Security</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <string name="lock_timeout_title">Lock vault after inactivity</string>
+    <string name="logout_timeout_title">Logout after inactivity</string>
+
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="pref_header_login">Login</string>
+    <string name="pref_header_passwd">Password generator</string>
+    <string name="max_login_attempts_title">Maximun login attempts</string>
 
 
 </resources>

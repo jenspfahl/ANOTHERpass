@@ -65,10 +65,15 @@ abstract class SecureActivity : BaseActivity() {
             if (Session.isDenied()) {
                 // make all not readable by setting key as invalid
                 if (Session.isOutdated()) {
-                    Session.lock()
+                    if (Session.shouldBeLoggedOut())
+                        Session.logout()
+                    else
+                        Session.lock()
+
                     activity.closeOverlayDialogs()
                     finishAffinity(activity)
                 }
+
 
                 if (!isLoginIntented()) {
                     val intent = Intent(activity, LoginActivity::class.java)

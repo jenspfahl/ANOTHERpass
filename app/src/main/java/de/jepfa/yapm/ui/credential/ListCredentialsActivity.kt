@@ -31,10 +31,11 @@ import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.ui.changelogin.ChangeMasterPasswordActivity
 import de.jepfa.yapm.ui.changelogin.ChangePinActivity
 import de.jepfa.yapm.ui.exportvault.ExportVaultActivity
+import de.jepfa.yapm.ui.settings.SettingsActivity
 import de.jepfa.yapm.usecase.*
 import de.jepfa.yapm.util.Constants
-import de.jepfa.yapm.util.MasterPasswordHelper.getMasterPasswordFromSession
-import de.jepfa.yapm.util.MasterPasswordHelper.storeMasterPassword
+import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
+import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD
 import de.jepfa.yapm.viewmodel.CredentialViewModel
@@ -132,7 +133,6 @@ class ListCredentialsActivity : SecureActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.action_settings -> true
             R.id.menu_lock_items -> {
                 LockVaultUseCase.execute(this)
                 refreshMenuLockItem(item)
@@ -208,6 +208,11 @@ class ListCredentialsActivity : SecureActivity() {
             R.id.menu_help -> {
                 val browserIntent = Intent(Intent.ACTION_VIEW, Constants.HOMEPAGE)
                 startActivity(browserIntent)
+                return true
+            }
+            R.id.menu_settings -> {
+                val intent = Intent(this, SettingsActivity::class.java)
+                startActivity(intent)
                 return true
             }
 

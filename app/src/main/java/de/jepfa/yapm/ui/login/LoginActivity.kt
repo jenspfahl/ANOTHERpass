@@ -90,6 +90,10 @@ class LoginActivity : BaseActivity() {
         }
     }
 
+    fun getLoginAttemptMessage(): String {
+        return "($loginAttempts / $MAX_LOGIN_ATTEMPTS)"
+    }
+
     fun loginSuccessful() {
         loginAttempts = 0
         finishAffinity()

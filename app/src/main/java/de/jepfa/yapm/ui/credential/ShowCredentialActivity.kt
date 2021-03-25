@@ -15,11 +15,11 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Session
-import de.jepfa.yapm.service.encrypt.SecretService
-import de.jepfa.yapm.service.encrypt.SecretService.decryptCommonString
-import de.jepfa.yapm.service.encrypt.SecretService.decryptPassword
-import de.jepfa.yapm.service.encrypt.SecretService.encryptCommonString
-import de.jepfa.yapm.service.encrypt.SecretService.encryptPassword
+import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
+import de.jepfa.yapm.service.secret.SecretService.decryptPassword
+import de.jepfa.yapm.service.secret.SecretService.encryptCommonString
+import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.YapmApp

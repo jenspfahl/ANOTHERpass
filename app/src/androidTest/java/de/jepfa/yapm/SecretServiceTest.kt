@@ -3,7 +3,7 @@ package de.jepfa.yapm
 import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import de.jepfa.yapm.model.Password
-import de.jepfa.yapm.service.encrypt.SecretService
+import de.jepfa.yapm.service.secret.SecretService
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -19,8 +19,6 @@ class SecretServiceTest {
         Log.i(TAG, "salt=${salt.debugToString()}")
 
         val masterPin = Password("1234") // given by the user (knowledge)
-        val masterPinHash = SecretService.hashPassword(masterPin, salt) // stored in the app to check PIN for correctness
-        Log.i(TAG, "masterPin=${masterPin.debugToString()} --> hash=${masterPinHash.debugToString()}")
 
         val masterPassword = Password("h9w4mlwmaf") // generated and securelly stored by the user (owning)
 

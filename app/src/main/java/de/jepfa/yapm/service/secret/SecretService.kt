@@ -1,4 +1,4 @@
-package de.jepfa.yapm.service.encrypt
+package de.jepfa.yapm.service.secret
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
@@ -8,7 +8,6 @@ import de.jepfa.yapm.model.Key
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.util.PreferenceUtil
 import java.security.*
-import java.util.*
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
@@ -49,19 +48,6 @@ object SecretService {
         }
         finally {
             keySpec.clearPassword()
-        }
-    }
-
-    /**
-     * Hash passwords to be securely stored
-     */
-    fun hashPassword(password: Password, salt: Key): Key {
-        val secretKey = generateSecretKey(password, salt)
-        try {
-            return Key(secretKey.encoded)
-        }
-        finally {
-          //  secretKey.destroy()
         }
     }
 

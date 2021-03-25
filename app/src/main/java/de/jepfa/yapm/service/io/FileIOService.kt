@@ -14,7 +14,7 @@ import com.google.gson.*
 import com.google.gson.reflect.TypeToken
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Encrypted
-import de.jepfa.yapm.service.encrypt.SecretService
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.util.FileUtil
 import de.jepfa.yapm.util.PreferenceUtil

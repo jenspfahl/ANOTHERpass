@@ -1,8 +1,7 @@
 package de.jepfa.yapm.usecase
 
 import android.content.Intent
-import de.jepfa.yapm.model.Password
-import de.jepfa.yapm.service.encrypt.SecretService
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.util.PreferenceUtil

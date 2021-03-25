@@ -1,15 +1,14 @@
-package de.jepfa.yapm.util
+package de.jepfa.yapm.service.secret
 
 import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Key
 import de.jepfa.yapm.model.Password
-import de.jepfa.yapm.model.Session
-import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.BaseActivity
+import de.jepfa.yapm.util.PreferenceUtil
 import java.util.*
 import javax.crypto.SecretKey
 
-object MasterKeyHelper {
+object MasterKeyService {
 
     /**
      * Returns the Master passphrase which is calculated of the users Master Pin and his Master password
@@ -57,6 +56,10 @@ object MasterKeyHelper {
 
         val encEncryptedMasterKey = SecretService.encryptEncrypted(mkSK, encryptedMasterKey)
 
-        PreferenceUtil.putEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, encEncryptedMasterKey, activity)
+        PreferenceUtil.putEncrypted(
+            PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY,
+            encEncryptedMasterKey,
+            activity
+        )
     }
 }
