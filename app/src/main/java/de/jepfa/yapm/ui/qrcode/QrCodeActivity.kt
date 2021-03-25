@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Session
@@ -102,6 +103,10 @@ class QrCodeActivity : SecureActivity() {
                 startActivityForResult(Intent.createChooser(intent, "Save as"), saveAsImage)
 
             }
+        }
+
+        if (id == R.id.menu_download_as_nfc) {
+            Toast.makeText(this, "not supported yet", Toast.LENGTH_LONG).show()
         }
 
         return super.onOptionsItemSelected(item)

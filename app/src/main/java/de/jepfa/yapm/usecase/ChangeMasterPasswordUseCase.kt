@@ -2,37 +2,41 @@ package de.jepfa.yapm.usecase
 
 import android.util.Log
 import de.jepfa.yapm.model.Password
-import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.BaseActivity
-import de.jepfa.yapm.usecase.CreateVaultUseCase.encryptAndStoreMasterKey
-import de.jepfa.yapm.usecase.CreateVaultUseCase.storeMasterPassword
-import de.jepfa.yapm.usecase.LoginUseCase.getMasterKey
-import de.jepfa.yapm.usecase.LoginUseCase.getMasterPassPhraseSK
+import de.jepfa.yapm.util.MasterKeyHelper.encryptAndStoreMasterKey
+import de.jepfa.yapm.util.MasterKeyHelper.getMasterKey
+import de.jepfa.yapm.util.MasterKeyHelper.getMasterPassPhraseSK
+import de.jepfa.yapm.util.MasterPasswordHelper.getMasterPasswordFromSession
+import de.jepfa.yapm.util.MasterPasswordHelper.storeMasterPassword
 import de.jepfa.yapm.util.PreferenceUtil
+import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY
+import de.jepfa.yapm.util.PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY
 
 object ChangeMasterPasswordUseCase {
+
+    private const val TAG = "CHANGE_MP"
 
     fun execute(pin: Password, newMasterPassword: Password, storeMasterPassword: Boolean, activity: BaseActivity): Boolean {
 
         val salt = SecretService.getSalt(activity)
-        val currentMasterPassword = getMasterPassword()
+        val currentMasterPassword = getMasterPasswordFromSession()
         if (currentMasterPassword == null) {
-            Log.e("CHANMP", "master password not at Session")
+            Log.e(TAG, "master password not at Session")
             return false;
         }
 
         val oldMasterPassphraseSK = getMasterPassPhraseSK(pin, currentMasterPassword, salt)
 
-        val encEncryptedMasterKey = PreferenceUtil.getEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, activity)
+        val encEncryptedMasterKey = PreferenceUtil.getEncrypted(PREF_ENCRYPTED_MASTER_KEY, activity)
         if (encEncryptedMasterKey == null) {
-            Log.e("CHANMP", "master key not on device")
+            Log.e(TAG, "master key not on device")
             return false;
         }
 
         val masterKey = getMasterKey(oldMasterPassphraseSK, encEncryptedMasterKey)
         if (masterKey == null) {
-            Log.e("CHANMP", "cannot decrypt master key, pin wrong?")
+            Log.e(TAG, "cannot decrypt master key, pin wrong?")
             return false;
         }
 
@@ -43,20 +47,10 @@ object ChangeMasterPasswordUseCase {
             storeMasterPassword(newMasterPassword, activity)
         }
 
-        PreferenceUtil.delete(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY)
+        PreferenceUtil.delete(PREF_MASTER_PASSWORD_TOKEN_KEY, activity)
 
         return LoginUseCase.execute(pin, newMasterPassword, activity)
 
-    }
-
-    private fun getMasterPassword() : Password? {
-        val transSK = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
-
-        val encMasterPasswd = Session.getEncMasterPasswd()
-        if (encMasterPasswd == null) {
-            return null;
-        }
-        return SecretService.decryptPassword(transSK, encMasterPasswd)
     }
 
 }

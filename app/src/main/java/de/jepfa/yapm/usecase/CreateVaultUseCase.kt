@@ -14,6 +14,8 @@ import de.jepfa.yapm.service.encrypt.SecretService.generateKey
 import de.jepfa.yapm.service.encrypt.SecretService.generateSecretKey
 import de.jepfa.yapm.service.encrypt.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.ui.BaseActivity
+import de.jepfa.yapm.util.MasterKeyHelper.encryptAndStoreMasterKey
+import de.jepfa.yapm.util.MasterPasswordHelper.storeMasterPassword
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY
 import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD
@@ -35,33 +37,12 @@ object CreateVaultUseCase {
         return true
     }
 
-    fun storeMasterPassword(masterPasswd: Password, activity: BaseActivity) {
-        val mpSK = getAndroidSecretKey(ALIAS_KEY_MP)
-        val encMasterPasswd = encryptPassword(mpSK, masterPasswd)
-        PreferenceUtil.putEncrypted(PREF_ENCRYPTED_MASTER_PASSWORD, encMasterPasswd, activity)
-    }
-
     private fun createAndStoreSalt(activity: BaseActivity): Key {
         val salt = generateKey(128)
         val saltBase64 = Base64.encodeToString(salt.data, Base64.DEFAULT)
         PreferenceUtil.put(PREF_SALT, saltBase64, activity)
 
         return salt
-    }
-
-    fun encryptAndStoreMasterKey(masterKey: Key, pin: Password, masterPasswd: Password, salt: Key, activity: BaseActivity) {
-
-        val mkSK = getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
-
-        val masterPassphrase = conjunctPasswords(pin, masterPasswd, salt)
-        val masterSK = generateSecretKey(masterPassphrase, salt)
-        masterPassphrase.clear()
-
-        val encryptedMasterKey = encryptKey(Encrypted.TYPE_ENC_MASTER_KEY, masterSK, masterKey)
-
-        val encEncryptedMasterKey = encryptEncrypted(mkSK, encryptedMasterKey)
-
-        PreferenceUtil.putEncrypted(PREF_ENCRYPTED_MASTER_KEY, encEncryptedMasterKey, activity)
     }
 
 }

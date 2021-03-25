@@ -12,6 +12,7 @@ import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.ui.importvault.ImportVaultActivity
+import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.PreferenceUtil
 
 
@@ -53,8 +54,9 @@ class LoginActivity : BaseActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         if (id == R.id.action_login_help) {
+            val browserIntent = Intent(Intent.ACTION_VIEW, Constants.HOMEPAGE)
+            startActivity(browserIntent)
 
-            //TODO open help in browser?
             return true
         }
 

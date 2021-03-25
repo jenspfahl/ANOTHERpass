@@ -1,40 +1,41 @@
 package de.jepfa.yapm.usecase
 
 import android.util.Log
-import de.jepfa.yapm.model.Encrypted
-import de.jepfa.yapm.model.Key
 import de.jepfa.yapm.model.Password
-import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.encrypt.SecretService
 import de.jepfa.yapm.ui.BaseActivity
-import de.jepfa.yapm.usecase.CreateVaultUseCase.encryptAndStoreMasterKey
-import de.jepfa.yapm.usecase.LoginUseCase.getMasterKey
-import de.jepfa.yapm.usecase.LoginUseCase.getMasterPassPhraseSK
+import de.jepfa.yapm.util.MasterKeyHelper.encryptAndStoreMasterKey
+import de.jepfa.yapm.util.MasterKeyHelper.getMasterKey
+import de.jepfa.yapm.util.MasterKeyHelper.getMasterPassPhraseSK
+import de.jepfa.yapm.util.MasterPasswordHelper.getMasterPasswordFromSession
 import de.jepfa.yapm.util.PreferenceUtil
-import javax.crypto.SecretKey
+import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY
 
 object ChangePinUseCase {
+
+    private const val TAG = "CHANGE_PIN"
+
 
     fun execute(currentPin: Password, newPin: Password, activity: BaseActivity): Boolean {
 
         val salt = SecretService.getSalt(activity)
-        val masterPassword = getMasterPassword()
+        val masterPassword = getMasterPasswordFromSession()
         if (masterPassword == null) {
-            Log.e("CHANGPIN", "master password not at Session")
+            Log.e(TAG, "master password not at Session")
             return false;
         }
 
         val oldMasterPassphraseSK = getMasterPassPhraseSK(currentPin, masterPassword, salt)
 
-        val encEncryptedMasterKey = PreferenceUtil.getEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, activity)
+        val encEncryptedMasterKey = PreferenceUtil.getEncrypted(PREF_ENCRYPTED_MASTER_KEY, activity)
         if (encEncryptedMasterKey == null) {
-            Log.e("CHANGPIN", "master key not on device")
+            Log.e(TAG, "master key not on device")
             return false;
         }
 
         val masterKey = getMasterKey(oldMasterPassphraseSK, encEncryptedMasterKey)
         if (masterKey == null) {
-            Log.e("CHANGPIN", "cannot decrypt master key, pin wrong?")
+            Log.e(TAG, "cannot decrypt master key, pin wrong?")
             return false;
         }
 
@@ -42,16 +43,6 @@ object ChangePinUseCase {
 
         return LoginUseCase.execute(newPin, masterPassword, activity)
 
-    }
-
-    private fun getMasterPassword() : Password? {
-        val transSK = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
-
-        val encMasterPasswd = Session.getEncMasterPasswd()
-        if (encMasterPasswd == null) {
-            return null;
-        }
-        return SecretService.decryptPassword(transSK, encMasterPasswd)
     }
 
 }

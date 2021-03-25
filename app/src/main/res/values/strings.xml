@@ -82,7 +82,7 @@
     <string name="export_vault">Vault as file</string>
     <string name="qrc_download_as_img">Save Qr code as image</string>
     <string name="download_as_nfc_tag">Push as NFC tag</string>
-    <string name="export_vault_explanation">Here you can export your complete vault into a file for backup purposes. Use this file to import your vault after a fresh new app installation without data. You have the choice to include or exclude the encrypted masterkey. If you exlude it, export the masterkey by your own and store it on a safe place. You need it to import the vault file. The separation of encrypted master key and vault file might be sense to make the vault file useless for hackers even if they guess your pin and mater password.</string>
+    <string name="export_vault_explanation">Here you can export your complete vault into a file for backup purposes. Use this file to import your vault after a fresh new app installation without data. You have the choice to include or exclude the encrypted masterkey. If you exlude it, export the masterkey by your own and store it on a safe place. You need it to import the vault file. The separation of encrypted master key and vault file might be sense to make the vault file useless for hackers even if they guess your pin and master password.</string>
     <string name="button_export_vault">Export vault</string>
     <string name="include_enc_masterkey">Include encrypted masterkey</string>
     <string name="too_may_wrong_logins">Too many login attempts, all tokens declined</string>
@@ -107,9 +107,11 @@
     <string name="button_change">Change</string>
     <string name="new_pin">Enter new pin</string>
     <string name="repeat_new_pin">Repeat new pin</string>
-    <string name="current_pin">Enter old pin</string>
+    <string name="current_pin">Enter current pin</string>
     <string name="change_master_password">Change master password</string>
     <string name="change_master_password_explanation">Change your master password by enter your current pin and generate a new master password. Note, that the encrypted master key will be changed, so you need to export it again. This also effects old vault export files with the old key. You should also export your master password (plain and token) again.</string>
+    <string name="security">Security</string>
+    <string name="delete_stored_masterpasswd_confirmation">Do you want to delete the stored master password from this device? For future logins you will need the master password then.</string>
 
 
 </resources>

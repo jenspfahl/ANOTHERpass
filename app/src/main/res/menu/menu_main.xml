@@ -37,7 +37,11 @@
                 android:orderInCategory="70"
                 android:title="@string/delete_stored_masterpasswd"
                 app:showAsAction="never" />
-
+            <item
+                android:id="@+id/store_masterpasswd"
+                android:orderInCategory="70"
+                android:title="@string/store_master_password"
+                app:showAsAction="never" />
         </menu>
     </item>
 
@@ -61,26 +65,30 @@
         </menu>
     </item>
 
+    <item android:title="@string/security" >
+        <menu >
     <!--TODO move this to settings page later-->
-    <item
-        android:id="@+id/change_pin"
-        android:orderInCategory="90"
-        android:title="@string/change_pin"
-        app:showAsAction="never" />
+        <item
+            android:id="@+id/change_pin"
+            android:orderInCategory="90"
+            android:title="@string/change_pin"
+            app:showAsAction="never" />
 
-    <!--TODO move this to settings page later-->
-    <item
-        android:id="@+id/change_master_password"
-        android:orderInCategory="90"
-        android:title="@string/change_master_password"
-        app:showAsAction="never" />
+        <!--TODO move this to settings page later-->
+        <item
+            android:id="@+id/change_master_password"
+            android:orderInCategory="90"
+            android:title="@string/change_master_password"
+            app:showAsAction="never" />
 
-    <!--TODO move this to settings page later-->
-    <item
-        android:id="@+id/drop_vault"
-        android:orderInCategory="100"
-        android:title="@string/drop_vault"
-        app:showAsAction="never" />
+        <!--TODO move this to settings page later-->
+        <item
+            android:id="@+id/drop_vault"
+            android:orderInCategory="100"
+            android:title="@string/drop_vault"
+            app:showAsAction="never" />
+        </menu>
+    </item>
 
     <item
         android:id="@+id/action_settings"

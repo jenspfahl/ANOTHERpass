@@ -7,13 +7,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import android.widget.Filterable
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
@@ -32,13 +32,18 @@ import de.jepfa.yapm.ui.changelogin.ChangeMasterPasswordActivity
 import de.jepfa.yapm.ui.changelogin.ChangePinActivity
 import de.jepfa.yapm.ui.exportvault.ExportVaultActivity
 import de.jepfa.yapm.usecase.*
+import de.jepfa.yapm.util.Constants
+import de.jepfa.yapm.util.MasterPasswordHelper.getMasterPasswordFromSession
+import de.jepfa.yapm.util.MasterPasswordHelper.storeMasterPassword
 import de.jepfa.yapm.util.PreferenceUtil
+import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD
 import de.jepfa.yapm.viewmodel.CredentialViewModel
 import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
 
 
 class ListCredentialsActivity : SecureActivity() {
 
+    private lateinit var mainMenu: Menu
     val newOrUpdateCredentialActivityRequestCode = 1
 
     private lateinit var credentialListAdapter: CredentialListAdapter
@@ -76,6 +81,8 @@ class ListCredentialsActivity : SecureActivity() {
         }
 
         menuInflater.inflate(R.menu.menu_main, menu)
+
+        mainMenu = menu
 
         val searchItem: MenuItem = menu.findItem(R.id.action_search)
         if (searchItem != null) {
@@ -117,14 +124,8 @@ class ListCredentialsActivity : SecureActivity() {
             searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
         }
 
-        val lockItem = menu.findItem(R.id.menu_lock_items)
-        refreshMenuLockItem(lockItem)
-
-        val deleteMasterPasswdItem: MenuItem = menu.findItem(R.id.delete_stored_masterpasswd)
-        if (deleteMasterPasswdItem != null) {
-            val encMasterPasswd = PreferenceUtil.get(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, this)
-            deleteMasterPasswdItem.setVisible(encMasterPasswd != null)
-        }
+        refreshMenuLockItem(menu.findItem(R.id.menu_lock_items))
+        refreshMenuMasterPasswordItem(menu)
 
         return super.onCreateOptionsMenu(menu)
     }
@@ -140,8 +141,32 @@ class ListCredentialsActivity : SecureActivity() {
             R.id.menu_logout -> {
                 return LogoutUseCase.execute(this)
             }
+            R.id.store_masterpasswd -> {
+                val masterPasswd = getMasterPasswordFromSession()
+                if (masterPasswd != null) {
+                    storeMasterPassword(masterPasswd, this)
+                    refreshMenuMasterPasswordItem(mainMenu)
+                    masterPasswd.clear()
+                    return true
+                }
+                else {
+                    return false
+                }
+            }
             R.id.delete_stored_masterpasswd -> {
-                return DeleteStoredMasterPasswordUseCase.execute(this)
+                AlertDialog.Builder(this)
+                        .setTitle(getString(R.string.delete_stored_masterpasswd))
+                        .setMessage(getString(R.string.delete_stored_masterpasswd_confirmation))
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                            PreferenceUtil.delete(PREF_ENCRYPTED_MASTER_PASSWORD, this)
+                            refreshMenuMasterPasswordItem(mainMenu)
+                            Toast.makeText(this, "Master password stored on device", Toast.LENGTH_LONG).show()
+                        }
+                        .setNegativeButton(android.R.string.no, null)
+                        .show()
+
+                return true
             }
             R.id.generate_encrypted_masterpasswd -> {
                 return GenerateMasterPasswordTokenUseCase.execute(this)
@@ -181,7 +206,7 @@ class ListCredentialsActivity : SecureActivity() {
                 return true
             }
             R.id.menu_help -> {
-                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://jepfa.de"))
+                val browserIntent = Intent(Intent.ACTION_VIEW, Constants.HOMEPAGE)
                 startActivity(browserIntent)
                 return true
             }
@@ -243,6 +268,20 @@ class ListCredentialsActivity : SecureActivity() {
             lockItem.setIcon(R.drawable.ic_lock_outline_white_24dp)
         } else {
             lockItem.setIcon(R.drawable.ic_lock_open_white_24dp)
+        }
+    }
+
+
+    private fun refreshMenuMasterPasswordItem(menu: Menu) {
+        val storedMasterPasswdPresent = PreferenceUtil.isPresent(PREF_ENCRYPTED_MASTER_PASSWORD, this)
+
+        val storeMasterPasswdItem: MenuItem = menu.findItem(R.id.store_masterpasswd)
+        if (storeMasterPasswdItem != null) {
+            storeMasterPasswdItem.setVisible(!storedMasterPasswdPresent)
+        }
+        val deleteMasterPasswdItem: MenuItem = menu.findItem(R.id.delete_stored_masterpasswd)
+        if (deleteMasterPasswdItem != null) {
+            deleteMasterPasswdItem.setVisible(storedMasterPasswdPresent)
         }
     }
 
