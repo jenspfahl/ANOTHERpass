@@ -5,11 +5,13 @@ import javax.crypto.SecretKey
 
 object Session {
 
+    const val DEFAULT_LOCK_TIMEOUT = 2
+    const val DEFAULT_LOGOUT_TIMEOUT = 10
     /**
      * After this period of time of inactivity the secret is outdated.
      */
-    private val SECRET_KEEP_VALID: Long = TimeUnit.SECONDS.toMillis(60)
-    private val LOGOUT_AFTER: Long = TimeUnit.SECONDS.toMillis(600)
+    private var lock_timeout: Long = minutesToMillis(DEFAULT_LOCK_TIMEOUT)
+    private var logout_timeout: Long = minutesToMillis(DEFAULT_LOGOUT_TIMEOUT)
 
     private var masterSecretKey: SecretKey? = null
     private var masterPassword: Encrypted? = null
@@ -21,6 +23,11 @@ object Session {
 
     fun getEncMasterPasswd() :Encrypted? {
         return masterPassword
+    }
+
+    fun setTimeouts(lockTimeoutMinutes: Int?, logoutTimeoutMinutes: Int?) {
+        if (lockTimeoutMinutes != null) lock_timeout = minutesToMillis(lockTimeoutMinutes)
+        if (logoutTimeoutMinutes != null)logout_timeout = minutesToMillis(logoutTimeoutMinutes)
     }
 
     fun login(secretKey: SecretKey, encMasterPasswd: Encrypted) {
@@ -40,11 +47,11 @@ object Session {
     }
 
     fun isOutdated(): Boolean {
-        return age() > SECRET_KEEP_VALID || shouldBeLoggedOut()
+        return age() > lock_timeout || shouldBeLoggedOut()
     }
 
     fun shouldBeLoggedOut(): Boolean {
-        return age() > LOGOUT_AFTER
+        return age() > logout_timeout
     }
 
     fun isLocked() : Boolean {
@@ -70,5 +77,7 @@ object Session {
     }
 
     private fun age() = System.currentTimeMillis() - lastUpdated
+
+    private fun minutesToMillis(value: Int) = TimeUnit.MINUTES.toMillis(value.toLong())
 
 }

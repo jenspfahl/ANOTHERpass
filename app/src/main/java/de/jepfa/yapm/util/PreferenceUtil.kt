@@ -1,9 +1,7 @@
 package de.jepfa.yapm.util
 
-import android.app.Activity
 import android.content.Context
-import android.preference.PreferenceManager
-import android.util.Base64
+import androidx.preference.PreferenceManager
 import de.jepfa.yapm.model.Encrypted
 
 object PreferenceUtil {
@@ -14,9 +12,34 @@ object PreferenceUtil {
     const val PREF_MASTER_PASSWORD_TOKEN_KEY = PREF_PREFIX + "mpt"
     const val PREF_ENCRYPTED_MASTER_PASSWORD = PREF_PREFIX + "mpwd"
     const val PREF_ENCRYPTED_MASTER_KEY = PREF_PREFIX + "enmk"
+    const val PREF_MAX_LOGIN_ATTEMPTS = PREF_PREFIX + "max_login_attempts"
+    const val PREF_LOCK_TIMEOUT = PREF_PREFIX + "lock_timeout"
+    const val PREF_LOGOUT_TIMEOUT = PREF_PREFIX + "logout_timeout"
+    const val PREF_USE_PREUDO_PHRASE = PREF_PREFIX + "use_pseudo_prase_all_time"
+    const val PREF_PASSWD_STRENGTH = PREF_PREFIX + "default_passwd_strength"
+    const val PREF_WITH_UPPER_CASE = PREF_PREFIX + "with_upper_case"
+    const val PREF_WITH_DIGITS = PREF_PREFIX + "with_digits"
+    const val PREF_WITH_SPECIAL_CHARS = PREF_PREFIX + "with_special_chars"
 
     fun getEncrypted(prefKey: String, context: Context): Encrypted? {
         return get(prefKey, context)?.let {Encrypted.fromBase64String(it)}
+    }
+
+    fun getInt(prefKey: String, default: Int, context: Context): Int {
+        val value = get(prefKey, context) ?: return default
+        return value.toInt()
+    }
+
+    fun getInt(prefKey: String, context: Context): Int? {
+        val value = get(prefKey, context) ?: return null
+        return value.toInt()
+    }
+
+    fun getBool(prefKey: String, default: Boolean, context: Context): Boolean {
+        val defaultSharedPreferences = PreferenceManager
+            .getDefaultSharedPreferences(context)
+        return defaultSharedPreferences
+            .getBoolean(prefKey, default)
     }
 
     fun get(prefKey: String, context: Context): String? {

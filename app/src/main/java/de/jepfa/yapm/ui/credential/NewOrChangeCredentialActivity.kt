@@ -1,5 +1,6 @@
 package de.jepfa.yapm.ui.credential
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
@@ -22,6 +23,11 @@ import de.jepfa.yapm.service.secretgenerator.GeneratorBase.Companion.BRUTEFORCE_
 import de.jepfa.yapm.service.secretgenerator.GeneratorBase.Companion.BRUTEFORCE_ATTEMPTS_SUPERCOMP
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.YapmApp
+import de.jepfa.yapm.util.PreferenceUtil
+import de.jepfa.yapm.util.PreferenceUtil.PREF_USE_PREUDO_PHRASE
+import de.jepfa.yapm.util.PreferenceUtil.PREF_WITH_DIGITS
+import de.jepfa.yapm.util.PreferenceUtil.PREF_WITH_SPECIAL_CHARS
+import de.jepfa.yapm.util.PreferenceUtil.PREF_WITH_UPPER_CASE
 import de.jepfa.yapm.viewmodel.CredentialViewModel
 import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
 
@@ -51,6 +57,7 @@ class NewOrChangeCredentialActivity : SecureActivity() {
         CredentialViewModelFactory((application as YapmApp).repository)
     }
 
+    @SuppressLint("ResourceType")
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -64,9 +71,10 @@ class NewOrChangeCredentialActivity : SecureActivity() {
         radioStrength = findViewById(R.id.radio_strengths)
         passwdTypeTab = findViewById(R.id.tab_passwd_type)
 
+        var tab = getPreferedTab()
+        if (tab != null) passwdTypeTab.selectTab(tab)
+
         val idExtra = intent.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
-
-
         if (idExtra == -1) {
             setTitle(R.string.title_new_credential)
         }
@@ -102,6 +110,10 @@ class NewOrChangeCredentialActivity : SecureActivity() {
         switchUpperCaseChar = findViewById(R.id.switch_upper_case_char)
         switchAddDigit = findViewById(R.id.switch_add_digit)
         switchAddSpecialChar = findViewById(R.id.switch_add_special_char)
+
+        switchUpperCaseChar.isChecked = getPref(PREF_WITH_UPPER_CASE, true)
+        switchAddDigit.isChecked = getPref(PREF_WITH_DIGITS, false)
+        switchAddSpecialChar.isChecked = getPref(PREF_WITH_SPECIAL_CHARS, false)
 
         val buttonGeneratePasswd: Button = findViewById(R.id.button_generate_passwd)
         buttonGeneratePasswd.setOnClickListener(View.OnClickListener {
@@ -191,6 +203,15 @@ class NewOrChangeCredentialActivity : SecureActivity() {
         return passwdTypeTab.selectedTabPosition == 0
     }
 
+    private fun getPreferedTab(): TabLayout.Tab? {
+        if (getPref(PREF_USE_PREUDO_PHRASE, true)) {
+            return passwdTypeTab.getTabAt(0)
+        }
+        else {
+            return passwdTypeTab.getTabAt(1)
+        }
+    }
+
     private fun buildPassphraseGeneratorSpec(): PassphraseGeneratorSpec {
         val passphraseStrength = when (radioStrength.checkedRadioButtonId) {
             R.id.radio_strength_normal -> PassphraseStrength.NORMAL
@@ -229,6 +250,10 @@ class NewOrChangeCredentialActivity : SecureActivity() {
         if (PASSPHRASE_STRENGTH_DEFAULT == passphraseStrength) {
             radioButton.setChecked(true)
         }
+    }
+
+    private fun getPref(key: String, default: Boolean): Boolean {
+        return PreferenceUtil.getBool(key, default, this)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

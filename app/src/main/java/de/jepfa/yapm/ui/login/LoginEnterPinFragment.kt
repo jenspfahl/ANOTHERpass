@@ -18,7 +18,6 @@ import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.usecase.LoginUseCase
 import de.jepfa.yapm.util.PreferenceUtil
 import java.util.*
-import kotlin.math.log
 
 
 class LoginEnterPinFragment : BaseFragment() {

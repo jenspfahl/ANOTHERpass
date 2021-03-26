@@ -1,10 +1,14 @@
 package de.jepfa.yapm.ui.settings
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import de.jepfa.yapm.R
+import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.util.Constants
 
 private const val TITLE_TAG = "settingsActivityTitle"
 
@@ -26,6 +30,7 @@ class SettingsActivity : AppCompatActivity(),
             if (supportFragmentManager.backStackEntryCount == 0) {
                 setTitle(R.string.title_activity_settings)
             }
+            Session.safeTouch()
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
@@ -40,6 +45,7 @@ class SettingsActivity : AppCompatActivity(),
         if (supportFragmentManager.popBackStackImmediate()) {
             return true
         }
+        navigateUpTo(intent)
         return super.onSupportNavigateUp()
     }
 

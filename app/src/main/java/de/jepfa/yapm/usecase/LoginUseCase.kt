@@ -7,6 +7,8 @@ import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.service.secret.MasterKeyService.getMasterPassPhraseSK
 import de.jepfa.yapm.service.secret.MasterKeyService.getMasterSK
 import de.jepfa.yapm.util.PreferenceUtil
+import de.jepfa.yapm.util.PreferenceUtil.PREF_LOCK_TIMEOUT
+import de.jepfa.yapm.util.PreferenceUtil.PREF_LOGOUT_TIMEOUT
 
 object LoginUseCase {
 
@@ -25,6 +27,10 @@ object LoginUseCase {
         val key = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
         val encMasterPassword = SecretService.encryptPassword(key, masterPassword)
         Session.login(masterSecretKey, encMasterPassword)
+        Session.setTimeouts(
+            PreferenceUtil.getInt(PREF_LOCK_TIMEOUT, activity),
+            PreferenceUtil.getInt(PREF_LOGOUT_TIMEOUT, activity)
+        )
 
         return true
 

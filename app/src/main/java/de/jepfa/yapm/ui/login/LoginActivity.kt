@@ -14,11 +14,13 @@ import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.ui.importvault.ImportVaultActivity
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.PreferenceUtil
+import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY
+import de.jepfa.yapm.util.PreferenceUtil.PREF_MAX_LOGIN_ATTEMPTS
 
 
 class LoginActivity : BaseActivity() {
 
-    val MAX_LOGIN_ATTEMPTS = 3
+    val DEFAULT_MAX_LOGIN_ATTEMPTS = 3
     var loginAttempts = 0
 
     val createVaultActivityRequestCode = 1
@@ -27,7 +29,7 @@ class LoginActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(null)
 
-        if (isMasterKeyStored(this)) {
+        if (PreferenceUtil.isPresent(PREF_ENCRYPTED_MASTER_KEY, this)) {
             setContentView(R.layout.activity_login)
         }
         else {
@@ -56,7 +58,6 @@ class LoginActivity : BaseActivity() {
         if (id == R.id.action_login_help) {
             val browserIntent = Intent(Intent.ACTION_VIEW, Constants.HOMEPAGE)
             startActivity(browserIntent)
-
             return true
         }
 
@@ -74,13 +75,9 @@ class LoginActivity : BaseActivity() {
         }
     }
 
-    private fun isMasterKeyStored(activity: Activity): Boolean {
-        return PreferenceUtil.get(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, activity) != null
-    }
-
     fun handleFailedLoginAttempt() {
         loginAttempts++
-        if (loginAttempts >= MAX_LOGIN_ATTEMPTS) {
+        if (loginAttempts >= getMaxLoginAttempts()) {
             Toast.makeText(baseContext, R.string.too_may_wrong_logins, Toast.LENGTH_LONG).show()
             PreferenceUtil.delete(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, baseContext)
             PreferenceUtil.delete(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, baseContext)
@@ -91,11 +88,15 @@ class LoginActivity : BaseActivity() {
     }
 
     fun getLoginAttemptMessage(): String {
-        return "($loginAttempts / $MAX_LOGIN_ATTEMPTS)"
+        return "(attempt $loginAttempts of ${getMaxLoginAttempts()})"
     }
 
     fun loginSuccessful() {
         loginAttempts = 0
         finishAffinity()
+    }
+
+    private fun getMaxLoginAttempts(): Int {
+        return PreferenceUtil.getInt(PREF_MAX_LOGIN_ATTEMPTS, DEFAULT_MAX_LOGIN_ATTEMPTS, this)
     }
 }

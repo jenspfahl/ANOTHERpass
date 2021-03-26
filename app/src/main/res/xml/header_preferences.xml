@@ -12,14 +12,14 @@
         app:fragment="de.jepfa.yapm.ui.settings.SettingsActivity$LoginSettingsFragment"
         app:icon="@drawable/ic_baseline_login_24"
         app:key="login_header"
-        app:title="@string/pref_header_security" />
+        app:title="@string/pref_header_login" />
 
 
     <Preference
         app:fragment="de.jepfa.yapm.ui.settings.SettingsActivity$SecuritySettingsFragment"
         app:icon="@drawable/ic_security_black_24dp"
         app:key="security_header"
-        app:title="@string/pref_header_login" />
+        app:title="@string/pref_header_security" />
 
     <Preference
         app:fragment="de.jepfa.yapm.ui.settings.SettingsActivity$PasswordGeneratorSettingsFragment"
