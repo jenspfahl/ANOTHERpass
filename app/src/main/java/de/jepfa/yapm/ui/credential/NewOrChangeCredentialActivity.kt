@@ -116,11 +116,11 @@ class NewOrChangeCredentialActivity : SecureActivity() {
         switchAddSpecialChar.isChecked = getPref(PREF_WITH_SPECIAL_CHARS, false)
 
         val buttonGeneratePasswd: Button = findViewById(R.id.button_generate_passwd)
-        buttonGeneratePasswd.setOnClickListener(View.OnClickListener {
+        buttonGeneratePasswd.setOnClickListener {
             Session.safeTouch()
             generatedPassword = generatePassword()
             generatedPasswdView.text = generatedPassword.debugToString()
-        })
+        }
 
         generatedPasswdView.setOnClickListener {
 
@@ -247,13 +247,21 @@ class NewOrChangeCredentialActivity : SecureActivity() {
     private fun buildRadioButton(radioButton: RadioButton, passphraseStrength: PassphraseStrength) {
         val name = getResources().getString(passphraseStrength.nameId)
         radioButton.text = "${name}"
-        if (PASSPHRASE_STRENGTH_DEFAULT == passphraseStrength) {
+
+        val prefDefaultPasswdStrength = PreferenceUtil.get(PreferenceUtil.PREF_PASSWD_STRENGTH, this)
+        val defaultPasswdStrength = getStrengthEnum(prefDefaultPasswdStrength)
+        if (defaultPasswdStrength == passphraseStrength) {
             radioButton.setChecked(true)
         }
     }
 
     private fun getPref(key: String, default: Boolean): Boolean {
         return PreferenceUtil.getBool(key, default, this)
+    }
+
+    private fun getStrengthEnum(name: String?) : PassphraseStrength {
+        name ?: return PASSPHRASE_STRENGTH_DEFAULT
+        return PassphraseStrength.valueOf(name)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -22,12 +22,14 @@ import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.usecase.LoginUseCase
 import de.jepfa.yapm.util.PreferenceUtil
+import de.jepfa.yapm.util.PreferenceUtil.PREF_FAST_MASTERPASSWD_LOGIN
 import de.jepfa.yapm.util.QRCodeUtil
 
 
 class LoginEnterMasterPasswordFragment : BaseFragment() {
 
     private lateinit var masterPasswdTextView: EditText
+    private lateinit var loginButton: Button
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -45,13 +47,16 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         masterPasswdTextView = view.findViewById(R.id.edittext_enter_masterpassword)
         val scanQrCodeImageView: ImageView = view.findViewById(R.id.imageview_scan_qrcode)
         val switchStorePasswd: Switch = view.findViewById(R.id.switch_store_master_password)
-        val loginButton = view.findViewById<Button>(R.id.button_login)
+        loginButton = view.findViewById(R.id.button_login)
 
         scanQrCodeImageView.setOnClickListener {
             QRCodeUtil.scanQRCode(this, "Scanning Master Password")
             true
         }
 
+        if (isFastLogin()) {
+            scanQrCodeImageView.performClick()
+        }
 
         masterPasswdTextView.setOnEditorActionListener{ textView, id, keyEvent ->
             loginButton.performClick()
@@ -68,7 +73,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                 return@setOnClickListener
             }
 
-            val keyForTemp = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
+            val keyForTemp = getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
 
             val encPinBase64 = arguments?.getString(CreateVaultActivity.ARG_ENC_PIN)
             if (encPinBase64 == null) {
@@ -138,6 +143,10 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
 
                     val encMasterPassword = SecretService.decryptPassword(mptSK, Encrypted.fromBase64String(masterPasswordToken))
                     masterPasswdTextView.setText(encMasterPassword)
+
+                    if (isFastLogin()) {
+                        loginButton.performClick()
+                    }
                 }
             }
             else {
@@ -147,4 +156,10 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
             super.onActivityResult(requestCode, resultCode, data)
         }
     }
+
+
+    private fun isFastLogin(): Boolean {
+        return  PreferenceUtil.getBool(PREF_FAST_MASTERPASSWD_LOGIN, false, getBaseActivity())
+    }
+
 }

@@ -161,7 +161,7 @@ class ListCredentialsActivity : SecureActivity() {
                         .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
                             PreferenceUtil.delete(PREF_ENCRYPTED_MASTER_PASSWORD, this)
                             refreshMenuMasterPasswordItem(mainMenu)
-                            Toast.makeText(this, "Master password stored on device", Toast.LENGTH_LONG).show()
+                            Toast.makeText(this, "Stored master password removed on device", Toast.LENGTH_LONG).show()
                         }
                         .setNegativeButton(android.R.string.no, null)
                         .show()

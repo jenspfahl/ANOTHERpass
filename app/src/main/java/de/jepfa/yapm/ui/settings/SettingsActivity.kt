@@ -8,15 +8,21 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.util.Constants
 
 private const val TITLE_TAG = "settingsActivityTitle"
 
-class SettingsActivity : AppCompatActivity(),
+class SettingsActivity : SecureActivity(),
     PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (Session.isDenied()) {
+            return
+        }
+
         setContentView(R.layout.settings_activity)
         if (savedInstanceState == null) {
             supportFragmentManager
@@ -33,6 +39,10 @@ class SettingsActivity : AppCompatActivity(),
             Session.safeTouch()
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun lock() {
+        recreate()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
