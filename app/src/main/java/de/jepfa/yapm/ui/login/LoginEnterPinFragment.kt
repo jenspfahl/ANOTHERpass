@@ -1,5 +1,6 @@
 package de.jepfa.yapm.ui.login
 
+import android.os.AsyncTask
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +8,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
@@ -17,6 +19,7 @@ import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.usecase.LoginUseCase
 import de.jepfa.yapm.util.PreferenceUtil
+import de.jepfa.yapm.util.AsyncWithProgressBar
 import java.util.*
 
 
@@ -68,23 +71,14 @@ class LoginEnterPinFragment : BaseFragment() {
                 }
                 val masterPasswd = SecretService.decryptPassword(keyForTemp, encMasterPasswd)
 
-                if (!login(userPin, masterPasswd, loginActivity)) {
-                    pinTextView.setError("${getString(R.string.password_wrong)} ${loginActivity.getLoginAttemptMessage()}")
-                    pinTextView.requestFocus()
-                    return@setOnClickListener
-                }
+                login(pinTextView, userPin, masterPasswd, loginActivity)
             }
             else if (encStoredMasterPasswd != null) {
 
                 val keyForMP = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP)
                 val storedMasterPasswd = SecretService.decryptPassword(keyForMP, encStoredMasterPasswd)
 
-                if (!login(userPin, storedMasterPasswd, loginActivity)) {
-
-                    pinTextView.setError("${getString(R.string.password_wrong)} ${loginActivity.getLoginAttemptMessage()}")
-                    pinTextView.requestFocus()
-                    return@setOnClickListener
-                }
+                login(pinTextView, userPin, storedMasterPasswd, loginActivity)
             } else {
                 val encUserPin = SecretService.encryptPassword(keyForTemp, userPin)
                 val args = Bundle()
@@ -93,34 +87,41 @@ class LoginEnterPinFragment : BaseFragment() {
                 findNavController().navigate(R.id.action_Login_PinFragment_to_MasterPasswordFragment, args)
             }
 
-            //userPinHash.clear()
-            userPin.clear()
-            //storedMasterPinHash.clear()
-
-            pinTextView.setText("")
         }
     }
 
 
     private fun login(
-            userPin: Password,
-            masterPasswd: Password,
-            loginActivity: LoginActivity
-    ): Boolean {
+        pinTextView: TextView,
+        userPin: Password,
+        masterPasswd: Password,
+        loginActivity: LoginActivity
+    ) {
+        AsyncWithProgressBar(loginActivity, loginActivity.getProgressBar(),
+            {
+                val success = LoginUseCase.execute(
+                    userPin,
+                    masterPasswd,
+                    getBaseActivity())
 
-        val success = LoginUseCase.execute(
-                userPin,
-                masterPasswd,
-                getBaseActivity())
+                pinTextView.post{
+                    if (!success) {
+                        loginActivity.handleFailedLoginAttempt()
+                        pinTextView.setError("${getString(R.string.password_wrong)} ${loginActivity.getLoginAttemptMessage()}")
+                        pinTextView.requestFocus()
+                        false
+                    }
+                    else {
+                        userPin.clear()
+                        masterPasswd.clear()
+                        pinTextView.setText("")
+                        findNavController().navigate(R.id.action_Login_to_CredentialList)
+                        loginActivity.loginSuccessful()
+                        true
+                    }
+                }
+        })
 
-        if (!success) {
-            loginActivity.handleFailedLoginAttempt()
-            return false
-        }
-
-        masterPasswd.clear()
-        findNavController().navigate(R.id.action_Login_to_CredentialList)
-        loginActivity.loginSuccessful()
-        return true
+       
     }
 }

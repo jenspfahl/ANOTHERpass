@@ -5,7 +5,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.Toast
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
@@ -26,11 +28,15 @@ class LoginActivity : BaseActivity() {
     val createVaultActivityRequestCode = 1
     val importVaultActivityRequestCode = 2
 
+    private lateinit var viewProgressBar: ProgressBar
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(null)
 
         if (PreferenceUtil.isPresent(PREF_ENCRYPTED_MASTER_KEY, this)) {
             setContentView(R.layout.activity_login)
+            viewProgressBar = findViewById(R.id.progressBar);
+
         }
         else {
             setContentView(R.layout.activity_create_or_import_vault)
@@ -94,6 +100,10 @@ class LoginActivity : BaseActivity() {
     fun loginSuccessful() {
         loginAttempts = 0
         finishAffinity()
+    }
+
+    fun getProgressBar(): ProgressBar {
+        return viewProgressBar
     }
 
     private fun getMaxLoginAttempts(): Int {
