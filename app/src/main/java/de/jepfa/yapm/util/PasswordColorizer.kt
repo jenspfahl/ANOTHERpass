@@ -1,5 +1,6 @@
 package de.jepfa.yapm.util
 
+import android.content.Context
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
@@ -14,17 +15,17 @@ object PasswordColorizer {
     private const val STEP_WIDTH = 11
     private const val WORD_WIDTH = 4
 
-    fun spannableString(password: Password, activity: BaseActivity): CharSequence {
-        val colorizePasswd = PreferenceUtil.getBool(PREF_COLORED_PASSWORD, true, activity)
+    fun spannableString(password: Password, context: Context): CharSequence {
+        val colorizePasswd = PreferenceUtil.getBool(PREF_COLORED_PASSWORD, true, context)
         if (colorizePasswd) {
-            return colorizePassword(password, activity)
+            return colorizePassword(password, context)
         }
         return password.debugToString()
     }
 
     private fun colorizePassword(
         password: Password,
-        activity: BaseActivity
+        context: Context
     ): SpannableString {
         var spannedString = SpannableString(password.debugToString())
         val length = spannedString.length
@@ -33,7 +34,7 @@ object PasswordColorizer {
             val start2 = ensureLength(start1 + WORD_WIDTH, length)
 
             spannedString.setSpan(
-                ForegroundColorSpan(activity.getColor(R.color.colorAccent)),
+                ForegroundColorSpan(context.getColor(R.color.colorAccent)),
                 start1,
                 start2,
                 Spanned.SPAN_MARK_MARK
@@ -42,7 +43,7 @@ object PasswordColorizer {
             val start3 = ensureLength(start2 + 1, length)
             val start4 = ensureLength(start3 + WORD_WIDTH, length)
             spannedString.setSpan(
-                ForegroundColorSpan(activity.getColor(R.color.colorPrimaryDark)),
+                ForegroundColorSpan(context.getColor(R.color.colorPrimaryDark)),
                 start3,
                 start4,
                 Spanned.SPAN_MARK_MARK
