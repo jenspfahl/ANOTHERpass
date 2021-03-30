@@ -23,6 +23,7 @@ import de.jepfa.yapm.service.secretgenerator.GeneratorBase.Companion.BRUTEFORCE_
 import de.jepfa.yapm.service.secretgenerator.GeneratorBase.Companion.BRUTEFORCE_ATTEMPTS_SUPERCOMP
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.YapmApp
+import de.jepfa.yapm.util.PasswordColorizer.spannableString
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.PREF_USE_PREUDO_PHRASE
 import de.jepfa.yapm.util.PreferenceUtil.PREF_WITH_DIGITS
@@ -92,7 +93,8 @@ class NewOrChangeCredentialActivity : SecureActivity() {
                     editCredentialNameView.setText(name)
                     editCredentialAdditionalInfoView.setText(additionalInfo)
                     generatedPassword = password
-                    generatedPasswdView.setText(password.debugToString())
+                    var spannedString = spannableString(generatedPassword, this)
+                    generatedPasswdView.setText(spannedString)
                 }
             })
         }
@@ -119,7 +121,8 @@ class NewOrChangeCredentialActivity : SecureActivity() {
         buttonGeneratePasswd.setOnClickListener {
             Session.safeTouch()
             generatedPassword = generatePassword()
-            generatedPasswdView.text = generatedPassword.debugToString()
+            var spannedString = spannableString(generatedPassword, this)
+            generatedPasswdView.setText(spannedString)
         }
 
         generatedPasswdView.setOnClickListener {

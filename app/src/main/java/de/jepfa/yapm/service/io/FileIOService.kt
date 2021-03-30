@@ -74,7 +74,7 @@ class FileIOService: IntentService("FileIOService") {
     }
 
     private fun exportVault(intent: Intent) {
-        var message = ""
+        var message: String
         if (FileUtil.isExternalStorageWritable()) {
             val jsonData = exportToJson(intent.getBooleanExtra(PARAM_INCLUDE_MK, false))
             val uri = intent.getParcelableExtra<Uri>(PARAM_FILE_URI)
@@ -150,7 +150,7 @@ class FileIOService: IntentService("FileIOService") {
     }
 
     private fun saveQrCodeAsImage(intent: Intent) {
-        var message = ""
+        var message: String
         if (FileUtil.isExternalStorageWritable()) {
             val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
 

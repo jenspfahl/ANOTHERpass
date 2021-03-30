@@ -19,6 +19,7 @@ import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER_PASSWD
 import de.jepfa.yapm.usecase.GenerateMasterPasswordUseCase
+import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.putEncrypted
 
 
@@ -42,7 +43,8 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
         val buttonGeneratePasswd: Button = view.findViewById(R.id.button_generate_passwd)
         buttonGeneratePasswd.setOnClickListener {
             generatedPassword = GenerateMasterPasswordUseCase.execute(pseudoPhraseSwitch.isChecked)
-            generatedPasswdView.text = generatedPassword.debugToString()
+            var spannedString = PasswordColorizer.spannableString(generatedPassword, getBaseActivity())
+            generatedPasswdView.setText(spannedString)
         }
 
         val button = view.findViewById<Button>(R.id.button_next)

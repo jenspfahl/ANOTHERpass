@@ -1,0 +1,8 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:colored_passwords"
+        app:title="Colorize showed passwords to improve readability"
+        app:defaultValue="true"/>
+
+</PreferenceScreen>

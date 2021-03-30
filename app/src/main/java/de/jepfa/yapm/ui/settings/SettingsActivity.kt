@@ -87,6 +87,12 @@ class SettingsActivity : SecureActivity(),
         }
     }
 
+    class GeneralSettingsFragment : PreferenceFragmentCompat() {
+        override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            setPreferencesFromResource(R.xml.general_preferences, rootKey)
+        }
+    }
+
     class LoginSettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.login_preferences, rootKey)

@@ -51,7 +51,7 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
             DetachHelper.detachPassword(listCredentialsActivity, current.password)
         }
 
-        holder.listenForOpenMenu { position, type, view ->
+        holder.listenForOpenMenu { position, _, view ->
             val popup = PopupMenu(listCredentialsActivity, view)
             popup.setOnMenuItemClickListener(object : PopupMenu.OnMenuItemClickListener {
                 override fun onMenuItemClick(item: MenuItem): Boolean {
@@ -115,7 +115,7 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
                     val filteredList: MutableList<EncCredential> = ArrayList<EncCredential>()
                     val key = listCredentialsActivity.masterSecretKey
                     for (credential in originList) {
-                        var name = ""
+                        var name: String
                         if (key != null) {
                             name = SecretService.decryptCommonString(key, credential.name)
                             if (name.toLowerCase().contains(charString.toLowerCase())) {

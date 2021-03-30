@@ -31,7 +31,7 @@ abstract class SecureActivity : BaseActivity() {
 
     @get:Synchronized
     val masterSecretKey: SecretKey?
-        public get() {
+        get() {
             val secret = SecretChecker.getOrAskForSecret(this)
             return if (secret.isDenied()) {
                 null

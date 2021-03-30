@@ -9,6 +9,6 @@ import kotlinx.coroutines.SupervisorJob
 class YapmApp : Application() {
     val applicationScope = CoroutineScope(SupervisorJob())
 
-    val database by lazy { YapmDatabase.getDatabase(this, applicationScope) }
+    val database by lazy { YapmDatabase.getDatabase(this) }
     val repository by lazy { CredentialRepository(database!!.credentialDao()) }
 }

@@ -1,11 +1,10 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!--
     <Preference
         app:fragment="de.jepfa.yapm.ui.settings.SettingsActivity$GeneralSettingsFragment"
         app:icon="@drawable/ic_settings_black_24dp"
         app:key="general_header"
-        app:title="@string/pref_header_login" /> -->
+        app:title="@string/pref_header_general" />
 
 
     <Preference

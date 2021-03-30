@@ -24,6 +24,7 @@ object PreferenceUtil {
     const val PREF_WITH_SPECIAL_CHARS = PREF_PREFIX + "with_special_chars"
 
     const val PREF_FAST_MASTERPASSWD_LOGIN = PREF_PREFIX + "fast_mp_login"
+    const val PREF_COLORED_PASSWORD = PREF_PREFIX + "colored_passwords"
 
 
     fun getEncrypted(prefKey: String, context: Context): Encrypted? {

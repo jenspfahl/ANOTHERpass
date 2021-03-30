@@ -13,6 +13,8 @@ import android.view.View
 import android.view.View.OnTouchListener
 import android.view.WindowManager
 import android.widget.Button
+import android.widget.ImageView
+import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Password
 
 class OverlayShowingService : Service(), OnTouchListener, View.OnLongClickListener {
@@ -48,8 +50,11 @@ class OverlayShowingService : Service(), OnTouchListener, View.OnLongClickListen
         overlayedButton = Button(this)
         overlayedButton?.setAllCaps(false)
         overlayedButton?.text = password.debugToString()
+        overlayedButton?.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_baseline_close_12, 0)
+        overlayedButton?.compoundDrawablePadding = 12
         overlayedButton?.setOnTouchListener(this)
-        overlayedButton?.alpha = Math.round(0.33f * 255).toFloat()
+        overlayedButton?.setPadding(24, 12, 24, 12)
+        overlayedButton?.alpha = Math.round(0.50f * 255).toFloat()
         overlayedButton?.setBackgroundColor(0x77fecc44)
         overlayedButton?.setOnLongClickListener(this)
         val params = WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, PixelFormat.TRANSLUCENT)

@@ -6,7 +6,6 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import de.jepfa.yapm.database.dao.EncCredentialDao
 import de.jepfa.yapm.database.entity.EncCredentialEntity
-import kotlinx.coroutines.CoroutineScope
 
 @Database(
     entities = [EncCredentialEntity::class],
@@ -19,7 +18,7 @@ abstract class YapmDatabase : RoomDatabase() {
     companion object {
         @Volatile
         private var INSTANCE: YapmDatabase? = null
-        fun getDatabase(context: Context, scope: CoroutineScope): YapmDatabase? {
+        fun getDatabase(context: Context): YapmDatabase? {
             if (INSTANCE == null) {
                 synchronized(YapmDatabase::class.java) {
                     if (INSTANCE == null) {
