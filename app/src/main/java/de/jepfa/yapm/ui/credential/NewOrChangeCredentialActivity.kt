@@ -23,6 +23,7 @@ import de.jepfa.yapm.service.secretgenerator.GeneratorBase.Companion.BRUTEFORCE_
 import de.jepfa.yapm.service.secretgenerator.GeneratorBase.Companion.BRUTEFORCE_ATTEMPTS_SUPERCOMP
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.YapmApp
+import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.PasswordColorizer.spannableString
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.PREF_USE_PREUDO_PHRASE
@@ -58,11 +59,11 @@ class NewOrChangeCredentialActivity : SecureActivity() {
         CredentialViewModelFactory((application as YapmApp).repository)
     }
 
-    @SuppressLint("ResourceType")
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         if (Session.isDenied()) {
+            LockVaultUseCase.execute(this)
             return
         }
         setContentView(R.layout.activity_new_or_change_credential)

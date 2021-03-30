@@ -10,6 +10,7 @@ import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.ChangeMasterPasswordUseCase
 import de.jepfa.yapm.usecase.GenerateMasterPasswordUseCase
+import de.jepfa.yapm.usecase.LockVaultUseCase
 
 class ChangeMasterPasswordActivity : SecureActivity() {
 
@@ -19,6 +20,7 @@ class ChangeMasterPasswordActivity : SecureActivity() {
         super.onCreate(savedInstanceState)
 
         if (Session.isDenied()) {
+            LockVaultUseCase.execute(this)
             return
         }
 

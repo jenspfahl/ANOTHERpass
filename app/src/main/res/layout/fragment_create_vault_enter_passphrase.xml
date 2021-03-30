@@ -42,10 +42,15 @@
                     android:id="@+id/generated_passwd"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:textAlignment="center"
-                    android:textSize="24dp"
                     android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"/>
+                    android:layout_marginBottom="16dp"
+                    android:fontFamily="monospace"
+                    android:paddingHorizontal="24dp"
+                    android:text=".."
+                    android:textAlignment="center"
+                    android:textIsSelectable="true"
+                    android:textSize="24dp"
+                    android:textStyle="bold" />
 
                 <Button
                     android:id="@+id/button_generate_passwd"

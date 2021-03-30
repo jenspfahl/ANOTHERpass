@@ -4,9 +4,6 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.style.ForegroundColorSpan
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -17,7 +14,6 @@ import com.google.android.material.appbar.CollapsingToolbarLayout
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Encrypted
-import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SecretService
@@ -28,6 +24,7 @@ import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
+import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.PasswordColorizer.spannableString
 import de.jepfa.yapm.viewmodel.CredentialViewModel
 import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
@@ -106,6 +103,7 @@ class ShowCredentialActivity : SecureActivity() {
         }
 
         if (Session.isDenied()) {
+            LockVaultUseCase.execute(this)
             return false
         }
 

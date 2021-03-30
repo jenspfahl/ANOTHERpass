@@ -78,6 +78,7 @@ class ListCredentialsActivity : SecureActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
 
         if (Session.isDenied()) {
+            LockVaultUseCase.execute(this)
             return false
         }
 

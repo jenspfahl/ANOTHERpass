@@ -15,6 +15,7 @@ import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.ExtPermissionChecker
 import de.jepfa.yapm.util.QRCodeUtil.generateQRCode
 
@@ -29,6 +30,7 @@ class QrCodeActivity : SecureActivity() {
         super.onCreate(savedInstanceState)
 
         if (Session.isDenied()) {
+            LockVaultUseCase.execute(this)
             return
         }
 
@@ -87,6 +89,7 @@ class QrCodeActivity : SecureActivity() {
 
 
         if (Session.isDenied()) {
+            LockVaultUseCase.execute(this)
             return false
         }
 

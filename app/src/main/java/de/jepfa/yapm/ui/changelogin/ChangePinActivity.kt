@@ -11,6 +11,7 @@ import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.ChangePinUseCase
+import de.jepfa.yapm.usecase.LockVaultUseCase
 
 class ChangePinActivity : SecureActivity() {
 
@@ -18,6 +19,7 @@ class ChangePinActivity : SecureActivity() {
         super.onCreate(savedInstanceState)
 
         if (Session.isDenied()) {
+            LockVaultUseCase.execute(this)
             return
         }
 

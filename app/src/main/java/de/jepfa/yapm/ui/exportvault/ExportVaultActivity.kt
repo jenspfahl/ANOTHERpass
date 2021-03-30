@@ -10,6 +10,7 @@ import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
+import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.ExtPermissionChecker
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -27,6 +28,7 @@ class ExportVaultActivity : SecureActivity() {
         super.onCreate(savedInstanceState)
 
         if (Session.isDenied()) {
+            LockVaultUseCase.execute(this)
             return
         }
 
