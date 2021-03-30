@@ -11,6 +11,7 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.ChangeMasterPasswordUseCase
 import de.jepfa.yapm.usecase.GenerateMasterPasswordUseCase
 import de.jepfa.yapm.usecase.LockVaultUseCase
+import de.jepfa.yapm.util.PasswordColorizer
 
 class ChangeMasterPasswordActivity : SecureActivity() {
 
@@ -36,7 +37,7 @@ class ChangeMasterPasswordActivity : SecureActivity() {
         val buttonGeneratePasswd: Button = findViewById(R.id.button_generate_passwd)
         buttonGeneratePasswd.setOnClickListener {
             generatedPassword = GenerateMasterPasswordUseCase.execute(pseudoPhraseSwitch.isChecked)
-            generatedPasswdView.text = generatedPassword.debugToString()
+            generatedPasswdView.text = PasswordColorizer.spannableString(generatedPassword, this)
         }
 
         val button = findViewById<Button>(R.id.button_change)

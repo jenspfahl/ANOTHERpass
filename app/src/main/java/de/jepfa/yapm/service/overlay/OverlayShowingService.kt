@@ -61,8 +61,6 @@ class OverlayShowingService : Service(), OnTouchListener {
 
         overlayedButton?.setOnTouchListener(this)
 
-        overlayedButton?.setTypeface(Typeface.MONOSPACE)
-
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -164,10 +162,12 @@ class OverlayShowingService : Service(), OnTouchListener {
     private fun updateContent() {
         overlayedButton?.text = PasswordColorizer.spannableString(password, this)
         overlayedButton?.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+        overlayedButton?.setTypeface(Typeface.MONOSPACE, Typeface.BOLD)
     }
     private fun updateRemove() {
         overlayedButton?.text = "DROP TO REMOVE"
         overlayedButton?.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_close_12, 0, 0)
+        overlayedButton?.setTypeface(null)
     }
 
 }

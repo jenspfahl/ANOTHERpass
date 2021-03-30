@@ -20,6 +20,7 @@ import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER_PASSWD
 import de.jepfa.yapm.usecase.CreateVaultUseCase
 import de.jepfa.yapm.usecase.LoginUseCase
+import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.getEncrypted
 
 class CreateVaultSummarizeFragment : BaseFragment() {
@@ -45,7 +46,7 @@ class CreateVaultSummarizeFragment : BaseFragment() {
 
         val switchStorePasswd: Switch = view.findViewById(R.id.switch_store_master_password)
         val generatedPasswdView: TextView = view.findViewById(R.id.generated_passwd)
-        generatedPasswdView.text = masterPasswd.debugToString()
+        generatedPasswdView.text = PasswordColorizer.spannableString(masterPasswd, getBaseActivity())
 
         view.findViewById<Button>(R.id.button_create_vault).setOnClickListener {
 
