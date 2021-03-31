@@ -15,13 +15,16 @@ import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.ALIAS_KEY_MP_TOKEN
 import de.jepfa.yapm.service.secret.SecretService.decryptKey
+import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.service.secret.SecretService.generateSecretKey
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.service.secret.SecretService.getSalt
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.usecase.LoginUseCase
+import de.jepfa.yapm.util.AsyncWithProgressBar
 import de.jepfa.yapm.util.PreferenceUtil
+import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD
 import de.jepfa.yapm.util.PreferenceUtil.PREF_FAST_MASTERPASSWD_LOGIN
 import de.jepfa.yapm.util.QRCodeUtil
 
@@ -82,33 +85,9 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
             }
             val encPin = Encrypted.fromBase64String(encPinBase64)
             val masterPin = SecretService.decryptPassword(keyForTemp, encPin)
-
-            val success = LoginUseCase.execute(
-                masterPin,
-                masterPassword,
-                getBaseActivity())
-
             val loginActivity = getBaseActivity() as LoginActivity
-            if (!success) {
-                masterPasswdTextView.setError("${getString(R.string.password_wrong)} ${loginActivity.getLoginAttemptMessage()}")
-                masterPasswdTextView.requestFocus()
-                loginActivity.handleFailedLoginAttempt()
-                return@setOnClickListener
-            }
 
-            if (switchStorePasswd.isChecked) {
-                val keyForMP = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP)
-                val encPasswd = SecretService.encryptPassword(keyForMP, masterPassword)
-                PreferenceUtil.putEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, encPasswd, getBaseActivity())
-            }
-
-            findNavController().navigate(R.id.action_Login_to_CredentialList)
-
-            masterPin.clear()
-            masterPassword.clear()
-            masterPasswdTextView.setText("")
-            arguments?.remove(CreateVaultActivity.ARG_ENC_PIN)
-            loginActivity.loginSuccessful()
+            login( masterPin, masterPassword, switchStorePasswd.isChecked, loginActivity)
         }
     }
 
@@ -157,9 +136,53 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         }
     }
 
+    private fun login(
+        userPin: Password,
+        masterPassword: Password,
+        isStoreMasterPassword: Boolean,
+        loginActivity: LoginActivity
+    ) {
+
+        getBaseActivity().hideKeyboard(masterPasswdTextView)
+
+        AsyncWithProgressBar(loginActivity, loginActivity.getProgressBar()
+        ) {
+            val success = LoginUseCase.execute(
+                userPin,
+                masterPassword,
+                getBaseActivity()
+            )
+
+            masterPasswdTextView.post {
+                if (!success) {
+                    loginActivity.handleFailedLoginAttempt()
+                    masterPasswdTextView.setError("${getString(R.string.password_wrong)} ${loginActivity.getLoginAttemptMessage()}")
+                    masterPasswdTextView.requestFocus()
+                    false
+                } else {
+                    if (isStoreMasterPassword) {
+                        val keyForMP = getAndroidSecretKey(SecretService.ALIAS_KEY_MP)
+                        val encPasswd = encryptPassword(keyForMP, masterPassword)
+                        PreferenceUtil.putEncrypted(PREF_ENCRYPTED_MASTER_PASSWORD, encPasswd, getBaseActivity())
+                    }
+
+                    findNavController().navigate(R.id.action_Login_to_CredentialList)
+
+                    userPin.clear()
+                    masterPassword.clear()
+                    masterPasswdTextView.setText("")
+                    arguments?.remove(CreateVaultActivity.ARG_ENC_PIN)
+                    loginActivity.loginSuccessful()
+                    true
+                }
+            }
+        }
+
+
+    }
 
     private fun isFastLogin(): Boolean {
-        return  PreferenceUtil.getBool(PREF_FAST_MASTERPASSWD_LOGIN, false, getBaseActivity())
+        return  PreferenceUtil.getAsBool(PREF_FAST_MASTERPASSWD_LOGIN, false, getBaseActivity())
     }
 
 }

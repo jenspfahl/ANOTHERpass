@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.Toast
@@ -18,6 +17,7 @@ import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY
 import de.jepfa.yapm.util.PreferenceUtil.PREF_MAX_LOGIN_ATTEMPTS
+import de.jepfa.yapm.util.PreferenceUtil.STATE_LOGIN_ATTEMPTS
 
 
 class LoginActivity : BaseActivity() {
@@ -32,6 +32,8 @@ class LoginActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(null)
+
+        loginAttempts = PreferenceUtil.getAsInt(STATE_LOGIN_ATTEMPTS, 0, this)
 
         if (PreferenceUtil.isPresent(PREF_ENCRYPTED_MASTER_KEY, this)) {
             setContentView(R.layout.activity_login)
@@ -83,6 +85,7 @@ class LoginActivity : BaseActivity() {
 
     fun handleFailedLoginAttempt() {
         loginAttempts++
+        PreferenceUtil.put(STATE_LOGIN_ATTEMPTS, loginAttempts.toString(), this)
         if (loginAttempts >= getMaxLoginAttempts()) {
             Toast.makeText(baseContext, R.string.too_may_wrong_logins, Toast.LENGTH_LONG).show()
             PreferenceUtil.delete(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, baseContext)
@@ -99,6 +102,7 @@ class LoginActivity : BaseActivity() {
 
     fun loginSuccessful() {
         loginAttempts = 0
+        PreferenceUtil.delete(STATE_LOGIN_ATTEMPTS, this)
         finishAffinity()
     }
 
@@ -107,6 +111,6 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun getMaxLoginAttempts(): Int {
-        return PreferenceUtil.getInt(PREF_MAX_LOGIN_ATTEMPTS, DEFAULT_MAX_LOGIN_ATTEMPTS, this)
+        return PreferenceUtil.getAsInt(PREF_MAX_LOGIN_ATTEMPTS, DEFAULT_MAX_LOGIN_ATTEMPTS, this)
     }
 }

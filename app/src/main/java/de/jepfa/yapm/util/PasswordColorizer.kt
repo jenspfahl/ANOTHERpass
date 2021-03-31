@@ -6,7 +6,6 @@ import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Password
-import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.util.PreferenceUtil.PREF_COLORED_PASSWORD
 import java.lang.Integer.min
 
@@ -16,7 +15,7 @@ object PasswordColorizer {
     private const val WORD_WIDTH = 4
 
     fun spannableString(password: Password, context: Context): CharSequence {
-        val colorizePasswd = PreferenceUtil.getBool(PREF_COLORED_PASSWORD, true, context)
+        val colorizePasswd = PreferenceUtil.getAsBool(PREF_COLORED_PASSWORD, true, context)
         if (colorizePasswd) {
             return colorizePassword(password, context)
         }

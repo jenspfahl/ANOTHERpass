@@ -5,6 +5,7 @@ package de.jepfa.yapm.service.overlay
 
 import android.app.Service
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Typeface
 import android.os.IBinder
@@ -16,6 +17,8 @@ import androidx.core.content.res.ResourcesCompat
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.util.PasswordColorizer
+import de.jepfa.yapm.util.PreferenceUtil
+import de.jepfa.yapm.util.PreferenceUtil.PREF_TRANSPARENT_OVERLAY
 
 
 class OverlayShowingService : Service(), OnTouchListener {
@@ -41,7 +44,7 @@ class OverlayShowingService : Service(), OnTouchListener {
         }
         password = Password(data)
         paintIt()
-        return STOP_FOREGROUND_REMOVE
+        return START_STICKY // STOP_FOREGROUND_REMOVE
     }
 
     private fun paintIt() {
@@ -51,15 +54,18 @@ class OverlayShowingService : Service(), OnTouchListener {
         }
 
         overlayedButton = Button(this)
-        overlayedButton?.setAllCaps(false)
-        overlayedButton?.setPadding(24, 12, 24, 12)
-        overlayedButton?.alpha = Math.round(0.50f * 255).toFloat()
-        overlayedButton?.setBackgroundColor(0x77fecc44)
-        overlayedButton?.compoundDrawablePadding = 12
-
-        updateContent()
+        overlayedButton?.apply {
+            setAllCaps(false)
+            setPadding(24, 12, 24, 12)
+            val isTransparent = PreferenceUtil.getAsBool(PREF_TRANSPARENT_OVERLAY, true, this@OverlayShowingService)
+            if (isTransparent) {
+                setBackgroundColor(0x77feccff)
+            }
+            compoundDrawablePadding = 12
+        }
 
         overlayedButton?.setOnTouchListener(this)
+        updateContent()
 
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,

@@ -28,8 +28,8 @@ object LoginUseCase {
         val encMasterPassword = SecretService.encryptPassword(key, masterPassword)
         Session.login(masterSecretKey, encMasterPassword)
         Session.setTimeouts(
-            PreferenceUtil.getInt(PREF_LOCK_TIMEOUT, activity),
-            PreferenceUtil.getInt(PREF_LOGOUT_TIMEOUT, activity)
+            PreferenceUtil.getAsInt(PREF_LOCK_TIMEOUT, activity),
+            PreferenceUtil.getAsInt(PREF_LOGOUT_TIMEOUT, activity)
         )
 
         return true

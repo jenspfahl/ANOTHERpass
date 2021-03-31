@@ -14,7 +14,7 @@ object Session {
     private var logout_timeout: Long = minutesToMillis(DEFAULT_LOGOUT_TIMEOUT)
 
     private var masterSecretKey: SecretKey? = null
-    private var masterPassword: Encrypted? = null
+    private var encMasterPassword: Encrypted? = null
     private var lastUpdated: Long = 0
 
     fun getMasterKeySK() : SecretKey? {
@@ -22,7 +22,7 @@ object Session {
     }
 
     fun getEncMasterPasswd() :Encrypted? {
-        return masterPassword
+        return encMasterPassword
     }
 
     fun setTimeouts(lockTimeoutMinutes: Int?, logoutTimeoutMinutes: Int?) {
@@ -32,7 +32,7 @@ object Session {
 
     fun login(secretKey: SecretKey, encMasterPasswd: Encrypted) {
         masterSecretKey = secretKey
-        masterPassword = encMasterPasswd
+        encMasterPassword = encMasterPasswd
         touch()
     }
 
@@ -59,7 +59,7 @@ object Session {
     }
 
     fun isLoggedOut() : Boolean {
-        return masterPassword == null
+        return encMasterPassword == null
     }
 
     fun isDenied() : Boolean {
@@ -72,7 +72,7 @@ object Session {
     }
 
     fun logout() {
-        masterPassword = null
+        encMasterPassword = null
         lock()
     }
 

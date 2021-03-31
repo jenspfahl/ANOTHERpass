@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
@@ -97,31 +98,34 @@ class LoginEnterPinFragment : BaseFragment() {
         masterPasswd: Password,
         loginActivity: LoginActivity
     ) {
-        AsyncWithProgressBar(loginActivity, loginActivity.getProgressBar(),
-            {
-                val success = LoginUseCase.execute(
-                    userPin,
-                    masterPasswd,
-                    getBaseActivity())
 
-                pinTextView.post{
-                    if (!success) {
-                        loginActivity.handleFailedLoginAttempt()
-                        pinTextView.setError("${getString(R.string.password_wrong)} ${loginActivity.getLoginAttemptMessage()}")
-                        pinTextView.requestFocus()
-                        false
-                    }
-                    else {
-                        userPin.clear()
-                        masterPasswd.clear()
-                        pinTextView.setText("")
-                        findNavController().navigate(R.id.action_Login_to_CredentialList)
-                        loginActivity.loginSuccessful()
-                        true
-                    }
+        getBaseActivity().hideKeyboard(pinTextView)
+
+        AsyncWithProgressBar(loginActivity, loginActivity.getProgressBar()
+        ) {
+            val success = LoginUseCase.execute(
+                userPin,
+                masterPasswd,
+                getBaseActivity()
+            )
+
+            pinTextView.post {
+                if (!success) {
+                    loginActivity.handleFailedLoginAttempt()
+                    pinTextView.setError("${getString(R.string.password_wrong)} ${loginActivity.getLoginAttemptMessage()}")
+                    pinTextView.requestFocus()
+                    false
+                } else {
+                    userPin.clear()
+                    masterPasswd.clear()
+                    pinTextView.setText("")
+                    findNavController().navigate(R.id.action_Login_to_CredentialList)
+                    loginActivity.loginSuccessful()
+                    true
                 }
-        })
+            }
+        }
 
-       
+
     }
 }

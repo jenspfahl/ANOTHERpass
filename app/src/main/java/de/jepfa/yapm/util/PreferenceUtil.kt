@@ -7,6 +7,7 @@ import de.jepfa.yapm.model.Encrypted
 object PreferenceUtil {
 
     private const val PREF_PREFIX = "YAPM/pref:"
+    private const val STATE_PREFIX = "YAPM/state:"
 
     const val PREF_SALT = PREF_PREFIX + "aslt"
     const val PREF_MASTER_PASSWORD_TOKEN_KEY = PREF_PREFIX + "mpt"
@@ -25,23 +26,26 @@ object PreferenceUtil {
 
     const val PREF_FAST_MASTERPASSWD_LOGIN = PREF_PREFIX + "fast_mp_login"
     const val PREF_COLORED_PASSWORD = PREF_PREFIX + "colored_passwords"
+    const val PREF_TRANSPARENT_OVERLAY = PREF_PREFIX + "transparent_overlay"
+
+    const val STATE_LOGIN_ATTEMPTS = STATE_PREFIX + "login_attempts"
 
 
     fun getEncrypted(prefKey: String, context: Context): Encrypted? {
         return get(prefKey, context)?.let {Encrypted.fromBase64String(it)}
     }
 
-    fun getInt(prefKey: String, default: Int, context: Context): Int {
+    fun getAsInt(prefKey: String, default: Int, context: Context): Int {
         val value = get(prefKey, context) ?: return default
         return value.toInt()
     }
 
-    fun getInt(prefKey: String, context: Context): Int? {
+    fun getAsInt(prefKey: String, context: Context): Int? {
         val value = get(prefKey, context) ?: return null
         return value.toInt()
     }
 
-    fun getBool(prefKey: String, default: Boolean, context: Context): Boolean {
+    fun getAsBool(prefKey: String, default: Boolean, context: Context): Boolean {
         val defaultSharedPreferences = PreferenceManager
             .getDefaultSharedPreferences(context)
         return defaultSharedPreferences

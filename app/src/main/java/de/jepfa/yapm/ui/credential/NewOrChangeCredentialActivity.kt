@@ -1,6 +1,5 @@
 package de.jepfa.yapm.ui.credential
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
@@ -8,7 +7,6 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.*
 import androidx.activity.viewModels
 import com.google.android.material.tabs.TabLayout
@@ -260,7 +258,7 @@ class NewOrChangeCredentialActivity : SecureActivity() {
     }
 
     private fun getPref(key: String, default: Boolean): Boolean {
-        return PreferenceUtil.getBool(key, default, this)
+        return PreferenceUtil.getAsBool(key, default, this)
     }
 
     private fun getStrengthEnum(name: String?) : PassphraseStrength {
