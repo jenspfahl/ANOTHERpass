@@ -1,6 +1,7 @@
 package de.jepfa.yapm.model
 
 import android.text.Editable
+import de.jepfa.yapm.util.PreferenceUtil
 import java.nio.CharBuffer
 import java.util.*
 
@@ -36,12 +37,17 @@ data class Password(var data: CharArray) : Clearable, CharSequence {
         return data.map { it.toByte() }.toByteArray();
     }
 
-    fun debugToString(): String {
+    fun toStringRepresentation(multiLine: Boolean): String {
         var presentation = "";
         for (i in 0 until data.size) {
             if (i != 0 && i % 4 == 0) {
                 if (i % 8 == 0) {
-                    presentation += "  "
+                    if (multiLine) {
+                        presentation += " " + System.lineSeparator()
+                    }
+                    else {
+                        presentation += "  "
+                    }
                 }
                 else {
                     presentation += " "

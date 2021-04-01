@@ -15,7 +15,7 @@ class PassphraseGeneratorTest {
                 wordBeginningUpperCase = true, addDigit = false, addSpecialChar = true)
         for (i in 0..100) {
             val passphrase = passphraseGenerator.generate(spec)
-            println("passphrase=${passphrase.debugToString()}")
+            println("passphrase=${passphrase.toStringRepresentation(false)}")
             passphrase.clear()
         }
         val calcCombinationCount = passphraseGenerator.calcCombinationCount(spec)

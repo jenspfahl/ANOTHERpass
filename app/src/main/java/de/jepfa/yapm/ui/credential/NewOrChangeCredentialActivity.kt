@@ -284,7 +284,7 @@ class NewOrChangeCredentialActivity : SecureActivity() {
                 else {
                     val encPassword = SecretService.encryptPassword(key, generatedPassword)
 
-                    DetachHelper.detachPassword(this, encPassword)
+                    DetachHelper.detachPassword(this, encPassword, null)
                 }
             }
 

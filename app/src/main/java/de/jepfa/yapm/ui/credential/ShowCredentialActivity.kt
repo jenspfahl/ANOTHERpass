@@ -26,6 +26,8 @@ import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.PasswordColorizer.spannableString
+import de.jepfa.yapm.util.PreferenceUtil
+import de.jepfa.yapm.util.PreferenceUtil.PREF_PASSWD_WORDS_ON_NL
 import de.jepfa.yapm.viewmodel.CredentialViewModel
 import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
 
@@ -34,8 +36,12 @@ class ShowCredentialActivity : SecureActivity() {
 
     val updateCredentialActivityRequestCode = 1
 
-    private lateinit var credential: EncCredential
+    private var multiLine = false
 
+    private lateinit var credential: EncCredential
+    private lateinit var appBarLayout: CollapsingToolbarLayout
+    private lateinit var passwordTextView: TextView
+    private lateinit var additionalInfoTextView: TextView
 
     private val credentialViewModel: CredentialViewModel by viewModels {
         CredentialViewModelFactory((application as YapmApp).repository)
@@ -56,34 +62,20 @@ class ShowCredentialActivity : SecureActivity() {
             toolbar.setLayoutParams(layoutParams)
         }
 
-        val appBarLayout =
-            findViewById<CollapsingToolbarLayout>(R.id.credential_detail_toolbar_layout)
-
-        val additionalInfoTextView : TextView = findViewById(R.id.additional_info)
-        val passwordTextView : TextView = findViewById(R.id.passwd)
-
         val idExtra = intent.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
 
+        multiLine = PreferenceUtil.getAsBool(PREF_PASSWD_WORDS_ON_NL, multiLine, this)
 
-        credentialViewModel.getById(idExtra).observe(this, {
-            credential = it
-            val key = masterSecretKey
-            if (key != null) {
-                val name = decryptCommonString(key, credential.name)
-                val additionalInfo = decryptCommonString(
-                    key,
-                    credential.additionalInfo
-                )
-                val password = decryptPassword(key, credential.password)
+        appBarLayout =
+            findViewById<CollapsingToolbarLayout>(R.id.credential_detail_toolbar_layout)
+        additionalInfoTextView  = findViewById(R.id.additional_info)
+        passwordTextView = findViewById(R.id.passwd)
+        passwordTextView.setOnClickListener {
+            multiLine = !multiLine
+            updatePasswordView(idExtra)
+        }
 
-                appBarLayout?.setTitle(name)
-                additionalInfoTextView.setText(additionalInfo)
-
-                var spannedString = spannableString(password, this)
-                passwordTextView.setText(spannedString)
-            }
-        })
-
+        updatePasswordView(idExtra)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -144,7 +136,7 @@ class ShowCredentialActivity : SecureActivity() {
         }
 
         if (id == R.id.menu_detach_credential) {
-            DetachHelper.detachPassword(this, credential.password)
+            DetachHelper.detachPassword(this, credential.password, multiLine)
             return true
         }
 
@@ -213,5 +205,26 @@ class ShowCredentialActivity : SecureActivity() {
 
     override fun lock() {
         recreate()
+    }
+
+    private fun updatePasswordView(idExtra: Int) {
+        credentialViewModel.getById(idExtra).observe(this, {
+            credential = it
+            val key = masterSecretKey
+            if (key != null) {
+                val name = decryptCommonString(key, credential.name)
+                val additionalInfo = decryptCommonString(
+                    key,
+                    credential.additionalInfo
+                )
+                val password = decryptPassword(key, credential.password)
+
+                appBarLayout?.setTitle(name)
+                additionalInfoTextView.setText(additionalInfo)
+
+                var spannedString = spannableString(password, multiLine, this)
+                passwordTextView.setText(spannedString)
+            }
+        })
     }
 }

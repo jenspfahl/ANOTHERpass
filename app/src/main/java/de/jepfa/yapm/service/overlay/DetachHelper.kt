@@ -10,21 +10,23 @@ import de.jepfa.yapm.ui.SecureActivity
 
 object DetachHelper {
     val EXTRA_PASSWD = "password"
+    val EXTRA_MULTILINE = "multiline"
 
-    fun detachPassword(activity: SecureActivity, encPassword: Encrypted) =
+    fun detachPassword(activity: SecureActivity, encPassword: Encrypted, multiLine: Boolean?) =
             if (!Settings.canDrawOverlays(activity)) {
 
                 AlertDialog.Builder(activity)
                         .setTitle("Missing permission")
                         .setMessage("App cannot draw over other apps. Enable permission and try again.")
-                        .setPositiveButton("Open permission",
-                                { _, _ ->
-                                    val intent = Intent()
-                                    intent.action = Settings.ACTION_MANAGE_OVERLAY_PERMISSION
-                                    intent.data = Uri.parse("package:" + activity.applicationInfo.packageName)
-                                    activity.startActivity(intent)
-                                })
-                        .setNegativeButton("Close",
+                        .setPositiveButton("Open permission"
+                        ) { _, _ ->
+                            val intent = Intent()
+                            intent.action = Settings.ACTION_MANAGE_OVERLAY_PERMISSION
+                            intent.data =
+                                Uri.parse("package:" + activity.applicationInfo.packageName)
+                            activity.startActivity(intent)
+                        }
+                    .setNegativeButton("Close",
                                 { dialogInterface, _ -> dialogInterface.cancel() })
                         .show()
                 false
@@ -36,6 +38,7 @@ object DetachHelper {
 
                     val intent = Intent(activity, OverlayShowingService::class.java)
                     intent.putExtra(EXTRA_PASSWD, password.data)
+                    intent.putExtra(EXTRA_MULTILINE, multiLine)
                     activity.startService(intent)
 
                     activity.moveTaskToBack(true)

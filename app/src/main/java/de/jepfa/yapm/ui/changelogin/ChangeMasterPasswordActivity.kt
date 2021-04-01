@@ -12,6 +12,7 @@ import de.jepfa.yapm.usecase.ChangeMasterPasswordUseCase
 import de.jepfa.yapm.usecase.GenerateMasterPasswordUseCase
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.PasswordColorizer
+import de.jepfa.yapm.util.PreferenceUtil
 
 class ChangeMasterPasswordActivity : SecureActivity() {
 

@@ -28,12 +28,12 @@ class SecretServiceTest {
         Log.i(TAG, "encMasterPassword=${encMasterPassword.debugToString()}")
 
         val decMasterPassword = SecretService.decryptPassword(androidSecretKey, encMasterPassword)
-        Log.i(TAG, "decMasterPassword=${decMasterPassword.debugToString()}")
+        Log.i(TAG, "decMasterPassword=${decMasterPassword.toStringRepresentation(false)}")
         Assert.assertArrayEquals(masterPassword.data, decMasterPassword.data)
 
         // generate master passphrase used for master key
         val masterPassPhrase = SecretService.conjunctPasswords(masterPin, masterPassword, salt)
-        Log.i(TAG, "masterPin + masterPassword=${masterPassword.debugToString()}) --> masterPassPhrase=${masterPassPhrase.debugToString()}")
+        Log.i(TAG, "masterPin + masterPassword=${masterPassword.toStringRepresentation(false)}) --> masterPassPhrase=${masterPassPhrase.toStringRepresentation()}")
         // not needed anymore
         masterPin.clear()
         masterPassword.clear()
@@ -59,10 +59,10 @@ class SecretServiceTest {
         masterKey.clear()
 
         val encCredential = SecretService.encryptPassword(masterKeySK, credential)
-        Log.i(TAG, "credential=${credential.debugToString()} --> encCredential=${encCredential.debugToString()}")
+        Log.i(TAG, "credential=${credential.toStringRepresentation(false)} --> encCredential=${encCredential.debugToString()}")
 
         val decCredential = SecretService.decryptPassword(masterKeySK, encCredential)
-        Log.i(TAG, "decCredential=${decCredential.debugToString()}")
+        Log.i(TAG, "decCredential=${decCredential.toStringRepresentation(false)}")
         Assert.assertArrayEquals(credential.data, decCredential.data)
         
     }

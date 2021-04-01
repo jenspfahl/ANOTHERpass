@@ -20,6 +20,7 @@ import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER_PASSWD
 import de.jepfa.yapm.usecase.GenerateMasterPasswordUseCase
 import de.jepfa.yapm.util.PasswordColorizer
+import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.putEncrypted
 
 

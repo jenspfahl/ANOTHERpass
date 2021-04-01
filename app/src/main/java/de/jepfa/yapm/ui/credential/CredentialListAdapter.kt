@@ -48,7 +48,7 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
         holder.listenForDetachPasswd { pos, _ ->
 
             val current = getItem(pos)
-            DetachHelper.detachPassword(listCredentialsActivity, current.password)
+            DetachHelper.detachPassword(listCredentialsActivity, current.password, null)
         }
 
         holder.listenForOpenMenu { position, _, view ->

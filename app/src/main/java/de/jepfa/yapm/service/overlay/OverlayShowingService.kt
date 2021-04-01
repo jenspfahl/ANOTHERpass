@@ -5,33 +5,39 @@ package de.jepfa.yapm.service.overlay
 
 import android.app.Service
 import android.content.Intent
-import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Typeface
 import android.os.IBinder
-import android.util.DisplayMetrics
 import android.view.*
 import android.view.View.OnTouchListener
 import android.widget.Button
-import androidx.core.content.res.ResourcesCompat
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.PreferenceUtil
+import de.jepfa.yapm.util.PreferenceUtil.PREF_PASSWD_WORDS_ON_NL
 import de.jepfa.yapm.util.PreferenceUtil.PREF_TRANSPARENT_OVERLAY
 
 
 class OverlayShowingService : Service(), OnTouchListener {
-    private var dropToRemove = false
+
     private var topView: View? = null
     private var overlayedButton: Button? = null
+    private var wm: WindowManager? = null
+
+    private var password = Password.empty()
+    private var multiLine = false
+
     private var offsetX = 0f
     private var offsetY = 0f
     private var originalXPos = 0
     private var originalYPos = 0
+
     private var moving = false
-    private var wm: WindowManager? = null
-    private var password = Password("---")
+    private var dropToRemove = false
+
+
+
     override fun onBind(intent: Intent): IBinder? {
         return null
     }
@@ -39,10 +45,15 @@ class OverlayShowingService : Service(), OnTouchListener {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         clearIt()
         val data = intent.getCharArrayExtra(DetachHelper.EXTRA_PASSWD)
-        if (data.isEmpty()) {
+        if (data == null || data.isEmpty()) {
             return START_NOT_STICKY
         }
+
         password = Password(data)
+
+        val multiLineDefault = PreferenceUtil.getAsBool(PREF_PASSWD_WORDS_ON_NL, false, this)
+        multiLine = intent.getBooleanExtra(DetachHelper.EXTRA_MULTILINE, multiLineDefault)
+
         paintIt()
         return START_STICKY // STOP_FOREGROUND_REMOVE
     }
@@ -111,69 +122,82 @@ class OverlayShowingService : Service(), OnTouchListener {
     }
 
     override fun onTouch(v: View, event: MotionEvent): Boolean {
-        if (event.action == MotionEvent.ACTION_DOWN) {
-            val x = event.rawX
-            val y = event.rawY
-            moving = false
-            val location = IntArray(2)
-            overlayedButton?.getLocationOnScreen(location)
-            originalXPos = location[0]
-            originalYPos = location[1]
-            offsetX = originalXPos - x
-            offsetY = originalYPos - y
-        } else if (event.action == MotionEvent.ACTION_MOVE) {
-            val topLocationOnScreen = IntArray(2)
-            topView?.getLocationOnScreen(topLocationOnScreen)
-            val x = event.rawX
-            val y = event.rawY
-            val params = overlayedButton?.layoutParams as WindowManager.LayoutParams
 
-            val displayMetrics = DisplayMetrics()
-            wm?.defaultDisplay?.getMetrics(displayMetrics)
-            val screenWidth: Int = displayMetrics.widthPixels
+        when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                moving = false
+                calcOriginalPos()
 
-            val buttonWidth = overlayedButton!!.measuredWidth
-            val padding = displayMetrics.density * 24
-            val newX = (offsetX + x + (screenWidth - buttonWidth)/2 + padding).toInt()
-            val newY = (offsetY + y).toInt()
-            if (Math.abs(newX - originalXPos) < 1 && Math.abs(newY - originalYPos) < 1 && !moving) {
-                return false
-            }
-            params.x = newX - topLocationOnScreen[0]
-            params.y = newY - topLocationOnScreen[1]
-            wm?.updateViewLayout(overlayedButton, params)
-
-            if (y < 50) {
-                updateRemove()
-                dropToRemove = true
-            }
-            else if (dropToRemove) {
-                updateContent()
-                dropToRemove = false
-            }
-            moving = true
-        } else if (event.action == MotionEvent.ACTION_UP) {
-            if (dropToRemove) {
-                clearIt()
-                return true
-            }
-            if (moving) {
-                return true
+                offsetX = originalXPos - event.rawX
+                offsetY = originalYPos - event.rawY
             }
 
+            MotionEvent.ACTION_MOVE -> {
+                val newX = (offsetX + event.rawX).toInt()
+                val newY = (offsetY + event.rawY).toInt()
+                if (Math.abs(newX - originalXPos) < 1 && Math.abs(newY - originalYPos) < 1 && !moving) {
+                    return false
+                }
+
+                move(newX, newY)
+                checkUpdateAppearance(event)
+
+                moving = true
+            }
+
+            MotionEvent.ACTION_UP -> {
+                if (dropToRemove) {
+                    clearIt()
+                    return true
+                }
+                if (moving) {
+                    return true
+                }
+            }
         }
+
         return false
     }
 
+    private fun move(newX: Int, newY: Int) {
+        val topLocationOnScreen = IntArray(2)
+        topView?.getLocationOnScreen(topLocationOnScreen)
+
+        val params = overlayedButton?.layoutParams as WindowManager.LayoutParams
+        params.x = newX - topLocationOnScreen[0]
+        params.y = newY - topLocationOnScreen[1]
+        wm?.updateViewLayout(overlayedButton, params)
+    }
+
+    private fun checkUpdateAppearance(event: MotionEvent) {
+        if (event.rawY < 50) {
+            updateRemove()
+            dropToRemove = true
+        } else if (dropToRemove) {
+            updateContent()
+            dropToRemove = false
+        }
+    }
+
+    private fun calcOriginalPos() {
+        val buttonWidth = overlayedButton!!.measuredWidth
+        val location = IntArray(2)
+        overlayedButton?.getLocationOnScreen(location)
+        originalXPos = location[0] + ((buttonWidth) / 2)
+        originalYPos = location[1]
+    }
+
     private fun updateContent() {
-        overlayedButton?.text = PasswordColorizer.spannableString(password, this)
+        overlayedButton?.text = PasswordColorizer.spannableString(password, multiLine, this)
         overlayedButton?.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
         overlayedButton?.setTypeface(Typeface.MONOSPACE, Typeface.BOLD)
+        calcOriginalPos()
     }
     private fun updateRemove() {
         overlayedButton?.text = "DROP TO REMOVE"
         overlayedButton?.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_close_12, 0, 0)
         overlayedButton?.setTypeface(null)
+        calcOriginalPos()
     }
 
 }

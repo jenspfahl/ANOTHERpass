@@ -6,6 +6,11 @@
         app:defaultValue="true"/>
 
     <SwitchPreferenceCompat
+        app:key="YAPM/pref:password_words_on_nl"
+        app:title="Show passwords on multiple line"
+        app:defaultValue="false"/>
+
+    <SwitchPreferenceCompat
         app:key="YAPM/pref:transparent_overlay"
         app:title="Transparent password overlay"
         app:defaultValue="true"/>
