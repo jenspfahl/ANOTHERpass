@@ -1,14 +1,30 @@
 package de.jepfa.yapm.util
 
 import android.os.AsyncTask
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.ProgressBar
 import de.jepfa.yapm.ui.BaseActivity
 
-class AsyncWithProgressBar(val activity: BaseActivity, val progressBar: ProgressBar, val handler: () -> Boolean) : AsyncTask<Void, Void, Boolean>() {
+class AsyncWithProgressBar(
+    val activity: BaseActivity,
+    val backgroundHandler: () -> Boolean,
+    val postHandler: (backgroundResult: Boolean) -> Unit
+) : AsyncTask<Void, Void, Boolean>()
+{
+    private lateinit var progressBar: ProgressBar
     init {
-        execute()
+        val activityProgressBar = activity.getProgressBar()
+        if (activityProgressBar != null) {
+            progressBar = activityProgressBar
+            execute()
+        }
+        else {
+            Log.w("ASYNC", "no progressbar, invoke in UI thread")
+            val result = backgroundHandler.invoke()
+            postHandler.invoke(result)
+        }
     }
 
     override fun onPreExecute() {
@@ -20,7 +36,7 @@ class AsyncWithProgressBar(val activity: BaseActivity, val progressBar: Progress
     }
 
     override fun doInBackground(vararg params: Void?): Boolean {
-        return handler()
+        return backgroundHandler()
     }
 
     override fun onPostExecute(result: Boolean) {
@@ -28,5 +44,6 @@ class AsyncWithProgressBar(val activity: BaseActivity, val progressBar: Progress
         progressBar.setVisibility(View.INVISIBLE)
         activity.getWindow().clearFlags(
             WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+        postHandler.invoke(result)
     }
 }

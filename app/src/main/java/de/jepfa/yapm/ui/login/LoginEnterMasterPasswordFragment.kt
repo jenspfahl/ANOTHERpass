@@ -143,41 +143,43 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         loginActivity: LoginActivity
     ) {
 
-        getBaseActivity().hideKeyboard(masterPasswdTextView)
+        loginActivity.hideKeyboard(masterPasswdTextView)
 
-        AsyncWithProgressBar(loginActivity, loginActivity.getProgressBar()
-        ) {
-            val success = LoginUseCase.execute(
-                userPin,
-                masterPassword,
-                getBaseActivity()
+        loginActivity.getProgressBar()?.let {
+
+            AsyncWithProgressBar(
+                loginActivity,
+                {
+                    LoginUseCase.execute(
+                        userPin,
+                        masterPassword,
+                        getBaseActivity()
+                    )
+                },
+                { success ->
+                    if (!success) {
+                        loginActivity.handleFailedLoginAttempt()
+                        masterPasswdTextView.setError("${getString(R.string.password_wrong)} ${loginActivity.getLoginAttemptMessage()}")
+                        masterPasswdTextView.requestFocus()
+                    } else {
+                        if (isStoreMasterPassword) {
+                            val keyForMP = getAndroidSecretKey(SecretService.ALIAS_KEY_MP)
+                            val encPasswd = encryptPassword(keyForMP, masterPassword)
+                            PreferenceUtil.putEncrypted(PREF_ENCRYPTED_MASTER_PASSWORD, encPasswd, getBaseActivity())
+                        }
+
+                        findNavController().navigate(R.id.action_Login_to_CredentialList)
+
+                        userPin.clear()
+                        masterPassword.clear()
+                        masterPasswdTextView.setText("")
+                        arguments?.remove(CreateVaultActivity.ARG_ENC_PIN)
+                        loginActivity.loginSuccessful()
+                    }
+                }
             )
 
-            masterPasswdTextView.post {
-                if (!success) {
-                    loginActivity.handleFailedLoginAttempt()
-                    masterPasswdTextView.setError("${getString(R.string.password_wrong)} ${loginActivity.getLoginAttemptMessage()}")
-                    masterPasswdTextView.requestFocus()
-                    false
-                } else {
-                    if (isStoreMasterPassword) {
-                        val keyForMP = getAndroidSecretKey(SecretService.ALIAS_KEY_MP)
-                        val encPasswd = encryptPassword(keyForMP, masterPassword)
-                        PreferenceUtil.putEncrypted(PREF_ENCRYPTED_MASTER_PASSWORD, encPasswd, getBaseActivity())
-                    }
-
-                    findNavController().navigate(R.id.action_Login_to_CredentialList)
-
-                    userPin.clear()
-                    masterPassword.clear()
-                    masterPasswdTextView.setText("")
-                    arguments?.remove(CreateVaultActivity.ARG_ENC_PIN)
-                    loginActivity.loginSuccessful()
-                    true
-                }
-            }
         }
-
 
     }
 

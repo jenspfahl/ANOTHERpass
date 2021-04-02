@@ -11,7 +11,6 @@ import java.lang.Integer.min
 
 object PasswordColorizer {
 
-    private const val STEP_WIDTH = 11
     private const val WORD_WIDTH = 4
 
     fun spannableString(password: Password, context: Context): CharSequence {
@@ -34,7 +33,8 @@ object PasswordColorizer {
     ): SpannableString {
         var spannedString = SpannableString(password.toStringRepresentation(multiLine))
         val length = spannedString.length
-        for (i in 0 until length step STEP_WIDTH) {
+        val stepWidth = getStepWidth(multiLine)
+        for (i in 0 until length step stepWidth) {
             val start1 = i
             val start2 = ensureLength(start1 + WORD_WIDTH, length)
 
@@ -59,5 +59,10 @@ object PasswordColorizer {
 
     private fun ensureLength(index: Int, length: Int): Int {
         return min(index, length)
+    }
+
+    private fun getStepWidth(multiLine: Boolean): Int {
+        val stepWidth = (WORD_WIDTH + 1) * 2
+        return if (multiLine) stepWidth else stepWidth + 1
     }
 }

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Password
@@ -12,6 +13,8 @@ import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.ChangePinUseCase
 import de.jepfa.yapm.usecase.LockVaultUseCase
+import de.jepfa.yapm.usecase.LoginUseCase
+import de.jepfa.yapm.util.AsyncWithProgressBar
 
 class ChangePinActivity : SecureActivity() {
 
@@ -52,24 +55,8 @@ class ChangePinActivity : SecureActivity() {
                 newPin2TextView.requestFocus()
             }
             else {
-
-                val success = ChangePinUseCase.execute(currentPin, newPin1, this)
-
-                if (success) {
-                    val upIntent = Intent(intent)
-                    navigateUpTo(upIntent)
-
-                    newPin1.clear()
-                    newPin2.clear()
-
-                    Toast.makeText(baseContext, "Pin successfully changed", Toast.LENGTH_LONG).show()
-                }
-                else {
-                    currentPinTextView.setError(getString(R.string.pin_wrong))
-                    currentPinTextView.requestFocus()
-                }
+                changePin(currentPinTextView, currentPin, newPin1, newPin2)
             }
-
         }
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -87,6 +74,42 @@ class ChangePinActivity : SecureActivity() {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun changePin(
+        currentPinTextView: TextView,
+        currentPin: Password,
+        newPin1: Password,
+        newPin2: Password
+    ) {
+
+        hideKeyboard(currentPinTextView)
+
+        getProgressBar()?.let {
+
+            AsyncWithProgressBar(
+                this,
+                {
+                    ChangePinUseCase.execute(currentPin, newPin1, this)
+                },
+                { success ->
+                    if (success) {
+                        val upIntent = Intent(intent)
+                        navigateUpTo(upIntent)
+
+                        newPin1.clear()
+                        newPin2.clear()
+
+                        Toast.makeText(baseContext, "Pin successfully changed", Toast.LENGTH_LONG).show()
+                    }
+                    else {
+                        currentPinTextView.setError(getString(R.string.pin_wrong))
+                        currentPinTextView.requestFocus()
+                    }
+                }
+            )
+
+        }
     }
 
 }

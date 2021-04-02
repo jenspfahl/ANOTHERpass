@@ -13,13 +13,16 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
+import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.service.secret.SecretService.ALIAS_KEY_TRANSPORT
 import de.jepfa.yapm.service.secret.SecretService.decryptPassword
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER_PASSWD
+import de.jepfa.yapm.usecase.ChangeMasterPasswordUseCase
 import de.jepfa.yapm.usecase.CreateVaultUseCase
 import de.jepfa.yapm.usecase.LoginUseCase
+import de.jepfa.yapm.util.AsyncWithProgressBar
 import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.getEncrypted
 
@@ -58,18 +61,8 @@ class CreateVaultSummarizeFragment : BaseFragment() {
             }
             val pin = decryptPassword(transSK, encPin)
 
-            val success = CreateVaultUseCase.execute(pin, masterPasswd, switchStorePasswd.isChecked, getBaseActivity())
-            if (!success) {
-                Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-            else {
-                LoginUseCase.execute(pin, masterPasswd, getBaseActivity())
-                pin.clear()
-                masterPasswd.clear()
-                getBaseActivity().finishAffinity()
-                findNavController().navigate(R.id.action_Create_Vault_to_ThirdFragment_to_Root)
-            }
+            createVault(pin, masterPasswd, switchStorePasswd.isChecked)
+
         }
     }
 
@@ -83,6 +76,39 @@ class CreateVaultSummarizeFragment : BaseFragment() {
         return super.onOptionsItemSelected(item)
     }
 
+    private fun createVault(
+        pin: Password,
+        masterPasswd: Password,
+        storeMasterPassword: Boolean
+    ) {
+
+        getBaseActivity().getProgressBar()?.let {
+
+            AsyncWithProgressBar(
+                getBaseActivity(),
+                {
+                    val success = CreateVaultUseCase.execute(pin, masterPasswd, storeMasterPassword, getBaseActivity())
+                    if (success) {
+                        LoginUseCase.execute(pin, masterPasswd, getBaseActivity())
+                    }
+                    success
+                },
+                { success ->
+                    if (!success) {
+                        Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
+                    }
+                    else {
+                        LoginUseCase.execute(pin, masterPasswd, getBaseActivity())
+                        pin.clear()
+                        masterPasswd.clear()
+                        getBaseActivity().finishAffinity()
+                        findNavController().navigate(R.id.action_Create_Vault_to_ThirdFragment_to_Root)
+                    }
+                }
+            )
+
+        }
+    }
 }
 
 

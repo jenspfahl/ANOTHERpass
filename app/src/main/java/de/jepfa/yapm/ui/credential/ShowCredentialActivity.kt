@@ -67,7 +67,7 @@ class ShowCredentialActivity : SecureActivity() {
         multiLine = PreferenceUtil.getAsBool(PREF_PASSWD_WORDS_ON_NL, multiLine, this)
 
         appBarLayout =
-            findViewById<CollapsingToolbarLayout>(R.id.credential_detail_toolbar_layout)
+            findViewById(R.id.credential_detail_toolbar_layout)
         additionalInfoTextView  = findViewById(R.id.additional_info)
         passwordTextView = findViewById(R.id.passwd)
         passwordTextView.setOnClickListener {

@@ -28,8 +28,6 @@ class LoginActivity : BaseActivity() {
     val createVaultActivityRequestCode = 1
     val importVaultActivityRequestCode = 2
 
-    private lateinit var viewProgressBar: ProgressBar
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(null)
 
@@ -37,8 +35,6 @@ class LoginActivity : BaseActivity() {
 
         if (PreferenceUtil.isPresent(PREF_ENCRYPTED_MASTER_KEY, this)) {
             setContentView(R.layout.activity_login)
-            viewProgressBar = findViewById(R.id.progressBar);
-
         }
         else {
             setContentView(R.layout.activity_create_or_import_vault)
@@ -104,10 +100,6 @@ class LoginActivity : BaseActivity() {
         loginAttempts = 0
         PreferenceUtil.delete(STATE_LOGIN_ATTEMPTS, this)
         finishAffinity()
-    }
-
-    fun getProgressBar(): ProgressBar {
-        return viewProgressBar
     }
 
     private fun getMaxLoginAttempts(): Int {

@@ -43,7 +43,7 @@ data class Password(var data: CharArray) : Clearable, CharSequence {
             if (i != 0 && i % 4 == 0) {
                 if (i % 8 == 0) {
                     if (multiLine) {
-                        presentation += " " + System.lineSeparator()
+                        presentation += System.lineSeparator()
                     }
                     else {
                         presentation += "  "
@@ -56,6 +56,7 @@ data class Password(var data: CharArray) : Clearable, CharSequence {
 
             presentation += data[i]
         }
+
         return presentation
     }
 

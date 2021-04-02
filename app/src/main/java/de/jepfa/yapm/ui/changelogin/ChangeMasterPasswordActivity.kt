@@ -9,8 +9,10 @@ import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.ChangeMasterPasswordUseCase
+import de.jepfa.yapm.usecase.ChangePinUseCase
 import de.jepfa.yapm.usecase.GenerateMasterPasswordUseCase
 import de.jepfa.yapm.usecase.LockVaultUseCase
+import de.jepfa.yapm.util.AsyncWithProgressBar
 import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.PreferenceUtil
 
@@ -54,20 +56,10 @@ class ChangeMasterPasswordActivity : SecureActivity() {
                 Toast.makeText(it.context, getString(R.string.generate_passwd_first), Toast.LENGTH_LONG).show()
             }
             else {
-                val success = ChangeMasterPasswordUseCase.execute(currentPin, generatedPassword, switchStorePasswd.isChecked, this)
-
-                if (success) {
-                    val upIntent = Intent(intent)
-                    navigateUpTo(upIntent)
-
-                    generatedPassword.clear()
-
-                    Toast.makeText(baseContext, "Master password successfully changed", Toast.LENGTH_LONG).show()
-                }
-                else {
-                    currentPinTextView.setError(getString(R.string.pin_wrong))
-                    currentPinTextView.requestFocus()
-                }
+                changeMasterPin(
+                    currentPinTextView,
+                    currentPin,
+                    storeMasterPassword = switchStorePasswd.isChecked)
             }
         }
     }
@@ -84,6 +76,40 @@ class ChangeMasterPasswordActivity : SecureActivity() {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun changeMasterPin(
+        currentPinTextView: TextView,
+        currentPin: Password,
+        storeMasterPassword: Boolean
+    ) {
+
+        hideKeyboard(currentPinTextView)
+
+        getProgressBar()?.let {
+
+            AsyncWithProgressBar(
+                this,
+                {
+                    ChangeMasterPasswordUseCase.execute(currentPin, generatedPassword, storeMasterPassword, this)
+                },
+                { success ->
+                    if (success) {
+                        val upIntent = Intent(intent)
+                        navigateUpTo(upIntent)
+
+                        generatedPassword.clear()
+
+                        Toast.makeText(baseContext, "Master password successfully changed", Toast.LENGTH_LONG).show()
+                    }
+                    else {
+                        currentPinTextView.setError(getString(R.string.pin_wrong))
+                        currentPinTextView.requestFocus()
+                    }
+                }
+            )
+
+        }
     }
 
 }
