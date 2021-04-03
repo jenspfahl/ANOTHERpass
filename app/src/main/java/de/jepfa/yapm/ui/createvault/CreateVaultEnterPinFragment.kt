@@ -29,6 +29,7 @@ class CreateVaultEnterPinFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setHasOptionsMenu(true)
 
         val pin1TextView: EditText = view.findViewById(R.id.first_pin)
         val pin2TextView: EditText = view.findViewById(R.id.second_pin)

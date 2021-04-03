@@ -7,20 +7,23 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.Switch
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
+import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Password
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.ALIAS_KEY_TRANSPORT
 import de.jepfa.yapm.service.secret.SecretService.decryptPassword
+import de.jepfa.yapm.service.secret.SecretService.encryptCommonString
+import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER_PASSWD
+import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.usecase.ChangeMasterPasswordUseCase
 import de.jepfa.yapm.usecase.CreateVaultUseCase
+import de.jepfa.yapm.usecase.ExportPlainMasterPasswordUseCase
 import de.jepfa.yapm.usecase.LoginUseCase
 import de.jepfa.yapm.util.AsyncWithProgressBar
 import de.jepfa.yapm.util.PasswordColorizer
@@ -37,6 +40,7 @@ class CreateVaultSummarizeFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setHasOptionsMenu(true)
 
         val encMasterPasswd = arguments?.getEncrypted(ARG_ENC_MASTER_PASSWD)
         if (encMasterPasswd == null) {
@@ -50,6 +54,13 @@ class CreateVaultSummarizeFragment : BaseFragment() {
         val switchStorePasswd: Switch = view.findViewById(R.id.switch_store_master_password)
         val generatedPasswdView: TextView = view.findViewById(R.id.generated_passwd)
         generatedPasswdView.text = PasswordColorizer.spannableString(masterPasswd, getBaseActivity())
+
+        val exportAsQrcImageView: ImageView = view.findViewById(R.id.imageview_qrcode)
+        exportAsQrcImageView.setOnClickListener {
+            val tempKey = getAndroidSecretKey(ALIAS_KEY_TRANSPORT)
+            val encMasterPasswd = encryptPassword(tempKey, masterPasswd)
+            ExportPlainMasterPasswordUseCase.execute(encMasterPasswd, true, getBaseActivity())
+        }
 
         view.findViewById<Button>(R.id.button_create_vault).setOnClickListener {
 
@@ -98,6 +109,7 @@ class CreateVaultSummarizeFragment : BaseFragment() {
                         Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
                     }
                     else {
+                        getBaseActivity().finishAffinity()
                         LoginUseCase.execute(pin, masterPasswd, getBaseActivity())
                         pin.clear()
                         masterPasswd.clear()

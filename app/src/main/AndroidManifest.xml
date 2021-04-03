@@ -43,7 +43,7 @@
             android:noHistory="false" />
         <activity
             android:name=".ui.createvault.CreateVaultActivity"
-            android:noHistory="true" />
+            android:noHistory="false" />
         <activity
             android:name=".ui.credential.ListCredentialsActivity"
             android:label="@string/app_name"

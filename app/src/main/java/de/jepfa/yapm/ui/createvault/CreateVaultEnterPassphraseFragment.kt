@@ -37,6 +37,7 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setHasOptionsMenu(true)
 
         val pseudoPhraseSwitch: Switch = view.findViewById(R.id.switch_use_pseudo_phrase)
         val generatedPasswdView: TextView = view.findViewById(R.id.generated_passwd)

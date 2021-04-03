@@ -173,7 +173,14 @@ class ListCredentialsActivity : SecureActivity() {
                 return GenerateMasterPasswordTokenUseCase.execute(this)
             }
             R.id.export_plain_masterpasswd -> {
-                return ExportPlainMasterPasswordUseCase.execute(this)
+                val encMasterPasswd = Session.getEncMasterPasswd()
+                if (encMasterPasswd != null) {
+                    ExportPlainMasterPasswordUseCase.execute(encMasterPasswd, false, this)
+                    return true
+                }
+                else {
+                    return false
+                }
             }
             R.id.export_masterkey -> {
                 return ExportEncMasterKeyUseCase.execute(this)

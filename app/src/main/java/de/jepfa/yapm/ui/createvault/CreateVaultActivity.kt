@@ -14,15 +14,6 @@ class CreateVaultActivity : BaseActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == android.R.id.home) {
-            navigateUpTo(intent)
-            return true
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
     companion object {
         const val ARG_ENC_MASTER_PASSWD = "masterpasswd"
         const val ARG_ENC_PIN = "pin"

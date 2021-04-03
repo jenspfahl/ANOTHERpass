@@ -26,13 +26,30 @@
                 android:text="@string/create_vault_explanation_3"
                 android:layout_marginBottom="24dp"/>
 
-            <TextView
-                android:id="@+id/generated_passwd"
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                style="@style/generated_password"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"/>
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/imageview_qrcode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:clickable="true"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_baseline_qr_code_24" />
+
+                <TextView
+                    android:id="@+id/generated_passwd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    style="@style/generated_password"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"/>
+
+            </LinearLayout>
 
             <Switch
                 android:id="@+id/switch_store_master_password"

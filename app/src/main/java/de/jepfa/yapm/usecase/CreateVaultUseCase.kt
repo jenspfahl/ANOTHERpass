@@ -22,7 +22,6 @@ object CreateVaultUseCase {
         if (storeMasterPasswd) {
             storeMasterPassword(masterPasswd, activity)
         }
-
         return true
     }
 

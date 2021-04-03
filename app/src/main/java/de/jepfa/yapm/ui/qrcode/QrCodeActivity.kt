@@ -26,13 +26,11 @@ class QrCodeActivity : SecureActivity() {
     private lateinit var head: String
     private lateinit var encQRC: Encrypted
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
 
-        if (Session.isDenied()) {
-            LockVaultUseCase.execute(this)
-            return
-        }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        checkSession = !intent.getBooleanExtra(EXTRA_NO_SESSION_CHECK, false)
+
+        super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_qr_code)
 
@@ -70,7 +68,7 @@ class QrCodeActivity : SecureActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        if (Session.isDenied()) {
+        if (checkSession && Session.isDenied()) {
             return false
         }
 
@@ -88,24 +86,19 @@ class QrCodeActivity : SecureActivity() {
         }
 
 
-        if (Session.isDenied()) {
+        if (checkSession && Session.isDenied()) {
             LockVaultUseCase.execute(this)
             return false
         }
 
         if (id == R.id.menu_download_qrc) {
-            val key = masterSecretKey
-            if (key != null) {
+            ExtPermissionChecker.verifyRWStoragePermissions(this) // TODO this is not enough
 
-                ExtPermissionChecker.verifyRWStoragePermissions(this) // TODO this is not enough
-
-                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
-                intent.addCategory(Intent.CATEGORY_OPENABLE)
-                intent.type = "image/jpeg"
-                intent.putExtra(Intent.EXTRA_TITLE, getFileName(head))
-                startActivityForResult(Intent.createChooser(intent, "Save as"), saveAsImage)
-
-            }
+            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+            intent.addCategory(Intent.CATEGORY_OPENABLE)
+            intent.type = "image/jpeg"
+            intent.putExtra(Intent.EXTRA_TITLE, getFileName(head))
+            startActivityForResult(Intent.createChooser(intent, "Save as"), saveAsImage)
         }
 
         if (id == R.id.menu_download_as_nfc) {
@@ -146,5 +139,6 @@ class QrCodeActivity : SecureActivity() {
         const val EXTRA_SUBTEXT = "sub"
         const val EXTRA_QRCODE = "qrc"
         const val EXTRA_COLOR = "col"
+        const val EXTRA_NO_SESSION_CHECK = "noSessionChecl"
     }
 }

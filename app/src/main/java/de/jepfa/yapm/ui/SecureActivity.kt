@@ -11,6 +11,9 @@ import java.util.concurrent.TimeUnit
 import javax.crypto.SecretKey
 
 abstract class SecureActivity : BaseActivity() {
+
+    protected var checkSession = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         checkSecret()
@@ -47,7 +50,9 @@ abstract class SecureActivity : BaseActivity() {
 
     @Synchronized
     private fun checkSecret() {
-        SecretChecker.getOrAskForSecret(this)
+        if (checkSession) {
+            SecretChecker.getOrAskForSecret(this)
+        }
     }
 
     /**
