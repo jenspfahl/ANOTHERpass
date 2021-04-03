@@ -8,8 +8,7 @@ class PasswordGenerator : GeneratorBase<PasswordGeneratorSpec>() {
     val ALPHA_CHARS_LOWER_CASE = "abcdefghijklmnopqrstuvwxyz"
     val ALPHA_CHARS_UPPER_CASE = ALPHA_CHARS_LOWER_CASE.toUpperCase()
     val DIGITS = "0123456789"
-    val SPECIAL_CHARS_1 = "!?-_,.;:/"
-    val SPECIAL_CHARS_2 = "$%&()[]{}"
+    val SPECIAL_CHARS = "!?-_,.;:/$%&"
 
     override fun generate(spec: PasswordGeneratorSpec): Password {
         while(true){
@@ -33,10 +32,7 @@ class PasswordGenerator : GeneratorBase<PasswordGeneratorSpec>() {
         if (spec.noDigits && containsChar(buffer, DIGITS)) {
             return false
         }
-        if (spec.excludeSpecialChars && containsChar(buffer, SPECIAL_CHARS_1 + SPECIAL_CHARS_2)) {
-            return false
-        }
-        if (spec.onlyCommonSpecialChars && containsChar(buffer, SPECIAL_CHARS_2)) {
+        if (spec.excludeSpecialChars && containsChar(buffer, SPECIAL_CHARS)) {
             return false
         }
 
@@ -63,10 +59,7 @@ class PasswordGenerator : GeneratorBase<PasswordGeneratorSpec>() {
             material += DIGITS
         }
         if (!spec.excludeSpecialChars) {
-            material += SPECIAL_CHARS_1
-            if (!spec.onlyCommonSpecialChars) {
-                material += SPECIAL_CHARS_2
-            }
+            material += SPECIAL_CHARS
         }
         if (!spec.onlyLowerCase) {
             material += ALPHA_CHARS_UPPER_CASE
