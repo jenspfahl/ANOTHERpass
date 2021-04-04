@@ -36,6 +36,7 @@ import de.jepfa.yapm.usecase.*
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
 import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD
 import de.jepfa.yapm.viewmodel.CredentialViewModel
@@ -64,7 +65,19 @@ class ListCredentialsActivity : SecureActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         credentialViewModel.allCredentials.observe(this, Observer { credentials ->
-            credentials?.let { credentialListAdapter.submitOriginList(it) }
+            credentials?.let {
+                val key = masterSecretKey
+                if (key != null) {
+                    val sorted = it.sortedBy {
+                        SecretService.decryptCommonString(key, it.name).toLowerCase()
+                    }
+                    credentialListAdapter.submitOriginList(sorted)
+                }
+                else {
+                    credentialListAdapter.submitOriginList(credentials)
+
+                }
+            }
         })
 
         val fab = findViewById<FloatingActionButton>(R.id.fab)
