@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <item android:title="@string/quick_access" >
+        <menu >
+            <item
+                android:id="@+id/generate_encrypted_masterpasswd"
+                android:orderInCategory="50"
+                android:title="@string/generate_encrypted_masterpasswd" />
+            <item
+                android:id="@+id/delete_stored_masterpasswd"
+                android:orderInCategory="70"
+                android:title="@string/delete_stored_masterpasswd" />
+            <item
+                android:id="@+id/store_masterpasswd"
+                android:orderInCategory="70"
+                android:title="@string/store_master_password" />
+        </menu>
+    </item>
+
+    <item android:title="@string/export" >
+        <menu >
+            <item
+                android:id="@+id/export_plain_masterpasswd"
+                android:orderInCategory="10"
+                android:title="@string/export_masterpasswd" />
+            <item
+                android:id="@+id/export_masterkey"
+                android:orderInCategory="20"
+                android:title="@string/export_masterkey" />
+            <item
+                android:id="@+id/export_vault"
+                android:orderInCategory="50"
+                android:title="@string/export_vault" />
+        </menu>
+    </item>
+
+    <item android:title="@string/security" >
+        <menu>
+            <item
+                android:id="@+id/change_pin"
+                android:orderInCategory="90"
+                android:title="@string/change_pin" />
+
+            <item
+                android:id="@+id/change_master_password"
+                android:orderInCategory="90"
+                android:title="@string/change_master_password" />
+
+            <item
+                android:id="@+id/test_copypaste_password"
+                android:orderInCategory="95"
+                android:title="@string/test_copypaste_password" />
+
+            <item
+                android:id="@+id/drop_vault"
+                android:orderInCategory="100"
+                android:title="@string/drop_vault" />
+        </menu>
+    </item>
+
+    <group>
+        <item
+            android:id="@+id/menu_settings"
+            android:icon="@drawable/ic_settings_black_24dp"
+            android:orderInCategory="100"
+            android:title="@string/action_settings" />
+
+        <item
+            android:id="@+id/menu_help"
+            android:icon="@drawable/ic_baseline_help_outline_24"
+            android:orderInCategory="200"
+            android:title="@string/help">
+        </item>
+
+        <item
+            android:id="@+id/menu_about"
+            android:icon="@drawable/ic_baseline_info_24"
+            android:orderInCategory="300"
+            android:title="@string/about">
+        </item>
+    </group>
+
+</menu>

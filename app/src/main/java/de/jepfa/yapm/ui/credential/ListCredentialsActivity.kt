@@ -6,6 +6,7 @@ import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.Menu
@@ -15,13 +16,19 @@ import android.widget.EditText
 import android.widget.Filterable
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.view.GravityCompat
 import androidx.core.view.MenuItemCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
+import androidx.navigation.ui.AppBarConfiguration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.navigation.NavigationView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Encrypted
@@ -44,9 +51,13 @@ import de.jepfa.yapm.viewmodel.CredentialViewModel
 import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
 
 
-class ListCredentialsActivity : SecureActivity() {
+class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationItemSelectedListener  {
 
-    private lateinit var mainMenu: Menu
+    private lateinit var appBarConfiguration: AppBarConfiguration
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var navigationView: NavigationView
+    private lateinit var toggle: ActionBarDrawerToggle
+
     val newOrUpdateCredentialActivityRequestCode = 1
 
     private lateinit var credentialListAdapter: CredentialListAdapter
@@ -58,7 +69,8 @@ class ListCredentialsActivity : SecureActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list_credentials)
-        setSupportActionBar(findViewById(R.id.toolbar))
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
         credentialListAdapter = CredentialListAdapter(this)
@@ -87,7 +99,30 @@ class ListCredentialsActivity : SecureActivity() {
             startActivityForResult(intent, newOrUpdateCredentialActivityRequestCode)
         }
 
+        drawerLayout = findViewById(R.id.drawer_layout)
+        navigationView = findViewById(R.id.nav_drawer_view)
+
+        navigationView.setNavigationItemSelectedListener(this)
+        refreshMenuMasterPasswordItem(navigationView.menu)
+
+        toggle = ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        drawerLayout.addDrawerListener(toggle)
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeButtonEnabled(true)
+
     }
+
+    override fun onPostCreate(savedInstanceState: Bundle?) {
+        super.onPostCreate(savedInstanceState)
+        toggle.syncState()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        toggle.onConfigurationChanged(newConfig)
+    }
+
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
 
@@ -97,8 +132,6 @@ class ListCredentialsActivity : SecureActivity() {
         }
 
         menuInflater.inflate(R.menu.menu_main, menu)
-
-        mainMenu = menu
 
         val searchItem: MenuItem = menu.findItem(R.id.action_search)
         if (searchItem != null) {
@@ -141,12 +174,16 @@ class ListCredentialsActivity : SecureActivity() {
         }
 
         refreshMenuLockItem(menu.findItem(R.id.menu_lock_items))
-        refreshMenuMasterPasswordItem(menu)
 
         return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        if (toggle.onOptionsItemSelected(item)) {
+            return true
+        }
+
         return when (item.itemId) {
             R.id.menu_lock_items -> {
                 LockVaultUseCase.execute(this)
@@ -156,12 +193,87 @@ class ListCredentialsActivity : SecureActivity() {
             R.id.menu_logout -> {
                 return LogoutUseCase.execute(this)
             }
+            else -> super.onOptionsItemSelected(item)
+        }
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == newOrUpdateCredentialActivityRequestCode && resultCode == Activity.RESULT_OK) {
+            data?.let {
+
+                var id: Int? = null
+                val idExtra = it.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
+                if (idExtra != -1) {
+                    id = idExtra
+                }
+                val nameBase64 = it.getStringExtra(EncCredential.EXTRA_CREDENTIAL_NAME)
+                val additionalInfoBase64 = it.getStringExtra(EncCredential.EXTRA_CREDENTIAL_ADDITIONAL_INFO)
+                val passwordBase64 = it.getStringExtra(EncCredential.EXTRA_CREDENTIAL_PASSWORD)
+
+                val encName = Encrypted.fromBase64String(nameBase64)
+                val encAdditionalInfo = Encrypted.fromBase64String(additionalInfoBase64)
+                val encPassword = Encrypted.fromBase64String(passwordBase64)
+
+                val credential = EncCredential(id, encName, encAdditionalInfo, encPassword)
+                if (credential.isPersistent()) {
+                    credentialViewModel.update(credential)
+                }
+                else {
+                    credentialViewModel.insert(credential)
+                }
+            }
+        }
+
+    }
+
+    override fun onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START)
+        }
+        else {
+            super.onBackPressed()
+        }
+    }
+
+    override fun lock() {
+        recreate()
+    }
+
+    private fun refreshMenuLockItem(lockItem: MenuItem) {
+        val secret = SecretChecker.getOrAskForSecret(this)
+        if (secret.isDenied()) {
+            lockItem.setIcon(R.drawable.ic_lock_outline_white_24dp)
+        } else {
+            lockItem.setIcon(R.drawable.ic_lock_open_white_24dp)
+        }
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+
+        drawerLayout.closeDrawer(GravityCompat.START)
+
+        when (item.itemId) {
+
             R.id.store_masterpasswd -> {
                 val masterPasswd = getMasterPasswordFromSession()
                 if (masterPasswd != null) {
-                    storeMasterPassword(masterPasswd, this)
-                    refreshMenuMasterPasswordItem(mainMenu)
-                    masterPasswd.clear()
+
+                    AlertDialog.Builder(this)
+                        .setTitle(getString(R.string.store_masterpasswd))
+                        .setMessage(getString(R.string.store_masterpasswd_confirmation))
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                            storeMasterPassword(masterPasswd, this)
+                            refreshMenuMasterPasswordItem(navigationView.menu)
+                            masterPasswd.clear()
+                            Toast.makeText(this, "Master password stored on device", Toast.LENGTH_LONG).show()
+                        }
+                        .setNegativeButton(android.R.string.no, null)
+                        .show()
+
                     return true
                 }
                 else {
@@ -170,16 +282,16 @@ class ListCredentialsActivity : SecureActivity() {
             }
             R.id.delete_stored_masterpasswd -> {
                 AlertDialog.Builder(this)
-                        .setTitle(getString(R.string.delete_stored_masterpasswd))
-                        .setMessage(getString(R.string.delete_stored_masterpasswd_confirmation))
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
-                            RemoveStoredMasterPasswordUseCase.execute(this)
-                            refreshMenuMasterPasswordItem(mainMenu)
-                            Toast.makeText(this, "Stored master password removed on device", Toast.LENGTH_LONG).show()
-                        }
-                        .setNegativeButton(android.R.string.no, null)
-                        .show()
+                    .setTitle(getString(R.string.delete_stored_masterpasswd))
+                    .setMessage(getString(R.string.delete_stored_masterpasswd_confirmation))
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                        RemoveStoredMasterPasswordUseCase.execute(this)
+                        refreshMenuMasterPasswordItem(navigationView.menu)
+                        Toast.makeText(this, "Stored master password removed on device", Toast.LENGTH_LONG).show()
+                    }
+                    .setNegativeButton(android.R.string.no, null)
+                    .show()
 
                 return true
             }
@@ -220,14 +332,14 @@ class ListCredentialsActivity : SecureActivity() {
             }
             R.id.drop_vault -> {
                 AlertDialog.Builder(this)
-                        .setTitle("Drop vault")
-                        .setMessage("You are going to delete ALL your credentials and login data.")
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
-                            DropVaultUseCase.execute(this)
-                        }
-                        .setNegativeButton(android.R.string.no, null)
-                        .show()
+                    .setTitle("Drop vault")
+                    .setMessage("You are going to delete ALL your credentials and login data.")
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                        DropVaultUseCase.execute(this)
+                    }
+                    .setNegativeButton(android.R.string.no, null)
+                    .show()
 
                 return true
             }
@@ -248,60 +360,16 @@ class ListCredentialsActivity : SecureActivity() {
                 val message = getString(R.string.app_name) + ", Version " + getVersionName() +
                         System.lineSeparator() + " \u00A9 Jens Pfahl 2021"
                 builder.setTitle(R.string.title_about_the_app)
-                        .setMessage(message)
-                        .setIcon(icon)
-                        .show()
+                    .setMessage(message)
+                    .setIcon(icon)
+                    .show()
                 return true
             }
             else -> super.onOptionsItemSelected(item)
         }
 
+        return true
     }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == newOrUpdateCredentialActivityRequestCode && resultCode == Activity.RESULT_OK) {
-            data?.let {
-
-                var id: Int? = null
-                val idExtra = it.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
-                if (idExtra != -1) {
-                    id = idExtra
-                }
-                val nameBase64 = it.getStringExtra(EncCredential.EXTRA_CREDENTIAL_NAME)
-                val additionalInfoBase64 = it.getStringExtra(EncCredential.EXTRA_CREDENTIAL_ADDITIONAL_INFO)
-                val passwordBase64 = it.getStringExtra(EncCredential.EXTRA_CREDENTIAL_PASSWORD)
-
-                val encName = Encrypted.fromBase64String(nameBase64)
-                val encAdditionalInfo = Encrypted.fromBase64String(additionalInfoBase64)
-                val encPassword = Encrypted.fromBase64String(passwordBase64)
-
-                val credential = EncCredential(id, encName, encAdditionalInfo, encPassword)
-                if (credential.isPersistent()) {
-                    credentialViewModel.update(credential)
-                }
-                else {
-                    credentialViewModel.insert(credential)
-                }
-            }
-        }
-
-    }
-
-    override fun lock() {
-        recreate()
-    }
-
-    private fun refreshMenuLockItem(lockItem: MenuItem) {
-        val secret = SecretChecker.getOrAskForSecret(this)
-        if (secret.isDenied()) {
-            lockItem.setIcon(R.drawable.ic_lock_outline_white_24dp)
-        } else {
-            lockItem.setIcon(R.drawable.ic_lock_open_white_24dp)
-        }
-    }
-
 
     private fun refreshMenuMasterPasswordItem(menu: Menu) {
         val storedMasterPasswdPresent = PreferenceUtil.isPresent(PREF_ENCRYPTED_MASTER_PASSWORD, this)

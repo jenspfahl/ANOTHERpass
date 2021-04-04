@@ -127,6 +127,13 @@
     <string name="toast_test_copypaste_password">Test data copied to clipboard</string>
     <string name="copy_to_clipboard">Copy password to clipboard</string>
     <string name="test_copypaste_password"><![CDATA[Test C&P password]]></string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_desc">Navigation header</string>
+
+
+    <string name="store_masterpasswd">Store master password</string>
+    <string name="store_masterpasswd_confirmation">Do you want to store your master password encrypted on this device? This makes login easier. You can remove it at any time.</string>
 
 
 </resources>

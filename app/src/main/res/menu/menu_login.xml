@@ -5,7 +5,7 @@
 
     <item
         android:id="@+id/action_login_help"
-        android:icon="@drawable/ic_baseline_help_outline_24"
+        android:icon="@drawable/ic_baseline_help_outline_24_white"
         app:showAsAction="always"
         android:title="@string/login_help">
     </item>
