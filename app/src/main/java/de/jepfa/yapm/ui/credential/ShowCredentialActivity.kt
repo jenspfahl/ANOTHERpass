@@ -25,6 +25,7 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
+import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.PasswordColorizer.spannableString
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.PREF_PASSWD_WORDS_ON_NL
@@ -137,6 +138,11 @@ class ShowCredentialActivity : SecureActivity() {
 
         if (id == R.id.menu_detach_credential) {
             DetachHelper.detachPassword(this, credential.password, multiLine)
+            return true
+        }
+
+        if (id == R.id.menu_copy_credential) {
+            ClipboardUtil.copyEncPasswordWithCheck(credential.password, this)
             return true
         }
 

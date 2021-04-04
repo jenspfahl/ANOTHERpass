@@ -1,6 +1,9 @@
 package de.jepfa.yapm.ui.qrcode
 
 import android.app.AlertDialog
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -12,6 +15,7 @@ import android.widget.Toast
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.provider.PasteContentProvider
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.ui.SecureActivity

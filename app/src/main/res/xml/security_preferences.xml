@@ -16,4 +16,9 @@
         app:title="@string/logout_timeout_title"
         app:useSimpleSummaryProvider="true" />
 
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:warn_copy_password"
+        app:title="Show warning when copying password to clipboard"
+        app:defaultValue="true"/>
+
 </PreferenceScreen>

@@ -19,6 +19,7 @@ import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.overlay.DetachHelper
+import de.jepfa.yapm.util.ClipboardUtil
 import java.util.*
 
 
@@ -49,6 +50,12 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
 
             val current = getItem(pos)
             DetachHelper.detachPassword(listCredentialsActivity, current.password, null)
+        }
+
+        holder.listenForCopyPasswd { pos, _ ->
+
+            val current = getItem(pos)
+            ClipboardUtil.copyEncPasswordWithCheck(current.password, listCredentialsActivity)
         }
 
         holder.listenForOpenMenu { position, _, view ->
@@ -148,6 +155,7 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
     class CredentialViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val credentialItemView: TextView = itemView.findViewById(R.id.credential_name)
         private val credentialDetachImageView: ImageView = itemView.findViewById(R.id.credential_detach)
+        private val credentialCopyImageView: ImageView = itemView.findViewById(R.id.credential_copy)
         private val credentialMenuImageView: ImageView = itemView.findViewById(R.id.credential_menu_popup)
 
         fun listenForShowCredential(event: (position: Int, type: Int) -> Unit) {
@@ -155,8 +163,15 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
                 event.invoke(adapterPosition, itemViewType)
             }
         }
+
         fun listenForDetachPasswd(event: (position: Int, type: Int) -> Boolean) {
             credentialDetachImageView.setOnClickListener {
+                event.invoke(adapterPosition, itemViewType)
+            }
+        }
+
+        fun listenForCopyPasswd(event: (position: Int, type: Int) -> Unit) {
+            credentialCopyImageView.setOnClickListener {
                 event.invoke(adapterPosition, itemViewType)
             }
         }

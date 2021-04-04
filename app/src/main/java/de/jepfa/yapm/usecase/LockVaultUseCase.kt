@@ -2,6 +2,7 @@ package de.jepfa.yapm.usecase
 
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.util.ClipboardUtil
 
 object LockVaultUseCase: SecureActivityUseCase {
 
@@ -10,6 +11,7 @@ object LockVaultUseCase: SecureActivityUseCase {
         activity.closeOverlayDialogs()
         activity.finishAffinity()
         SecureActivity.SecretChecker.getOrAskForSecret(activity)
+        ClipboardUtil.clearClips(activity)
 
         return true
     }

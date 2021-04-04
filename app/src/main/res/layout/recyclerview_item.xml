@@ -25,6 +25,14 @@
             android:src="@drawable/ic_baseline_north_east_24" />
 
         <ImageView
+            android:id="@+id/credential_copy"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:paddingLeft="16dp"
+            android:clickable="true"
+            android:src="@drawable/ic_baseline_content_copy_24" />
+
+        <ImageView
             android:id="@+id/credential_menu_popup"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"

@@ -2,6 +2,7 @@ package de.jepfa.yapm.usecase
 
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.util.ClipboardUtil
 
 object LogoutUseCase: SecureActivityUseCase {
 
@@ -11,6 +12,9 @@ object LogoutUseCase: SecureActivityUseCase {
         activity.closeOverlayDialogs()
         activity.finishAndRemoveTask()
         activity.finishAffinity()
+
+        ClipboardUtil.clearClips(activity)
+
 
         return true
     }

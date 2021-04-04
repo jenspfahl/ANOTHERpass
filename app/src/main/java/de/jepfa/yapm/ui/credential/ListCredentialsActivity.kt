@@ -37,6 +37,7 @@ import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
 import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD
 import de.jepfa.yapm.viewmodel.CredentialViewModel
@@ -211,6 +212,10 @@ class ListCredentialsActivity : SecureActivity() {
             R.id.change_master_password -> {
                 val intent = Intent(this, ChangeMasterPasswordActivity::class.java)
                 startActivity(intent)
+                return true
+            }
+            R.id.test_copypaste_password -> {
+                ClipboardUtil.copyTestPasteConsumer(this)
                 return true
             }
             R.id.drop_vault -> {

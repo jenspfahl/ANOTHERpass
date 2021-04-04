@@ -17,6 +17,7 @@ object PreferenceUtil {
     const val PREF_MAX_LOGIN_ATTEMPTS = PREF_PREFIX + "max_login_attempts"
     const val PREF_LOCK_TIMEOUT = PREF_PREFIX + "lock_timeout"
     const val PREF_LOGOUT_TIMEOUT = PREF_PREFIX + "logout_timeout"
+    const val PREF_WARN_BEFORE_COPY_TO_CB = PREF_PREFIX + "warn_copy_password"
 
     const val PREF_USE_PREUDO_PHRASE = PREF_PREFIX + "use_pseudo_prase_all_time"
     const val PREF_PASSWD_STRENGTH = PREF_PREFIX + "default_passwd_strength"

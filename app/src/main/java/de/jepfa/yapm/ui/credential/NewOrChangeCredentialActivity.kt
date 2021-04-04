@@ -22,6 +22,7 @@ import de.jepfa.yapm.service.secretgenerator.GeneratorBase.Companion.BRUTEFORCE_
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.usecase.LockVaultUseCase
+import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.PasswordColorizer.spannableString
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.PREF_USE_PREUDO_PHRASE
@@ -283,11 +284,24 @@ class NewOrChangeCredentialActivity : SecureActivity() {
                 }
                 else {
                     val encPassword = SecretService.encryptPassword(key, generatedPassword)
-
                     DetachHelper.detachPassword(this, encPassword, null)
                 }
             }
 
+            return true
+        }
+
+        if (id == R.id.menu_copy_credential) {
+            val key = masterSecretKey
+            if (key != null) {
+                if (generatedPassword.data.isEmpty()) {
+                    Toast.makeText(this, "Generate a password first", Toast.LENGTH_LONG).show()
+                }
+                else {
+                    val encPassword = SecretService.encryptPassword(key, generatedPassword)
+                    ClipboardUtil.copyEncPasswordWithCheck(encPassword, this)
+                }
+            }
             return true
         }
 

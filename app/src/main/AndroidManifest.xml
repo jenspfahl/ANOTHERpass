@@ -15,9 +15,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.YetAnotherPasswordManager">
+        <provider
+            android:name=".provider.PasteContentProvider"
+            android:authorities="de.jepfa.yapm"
+            android:enabled="true"
+            android:exported="true"></provider>
+
         <activity
             android:name=".ui.settings.SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
+            android:label="@string/title_activity_settings" />
         <activity android:name=".ui.importvault.ImportVaultActivity" />
         <activity android:name=".ui.exportvault.ExportVaultActivity" />
         <activity

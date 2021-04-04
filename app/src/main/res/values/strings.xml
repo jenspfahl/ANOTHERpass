@@ -122,6 +122,11 @@
     <string name="pref_header_login">Login</string>
     <string name="pref_header_passwd">Password generator</string>
     <string name="max_login_attempts_title">Maximun login attempts</string>
+    <string name="notification_channel_paste_title">ANOTHERpass paste notifications</string>
+    <string name="toast_copied_to_clipboard">Password copied to clipboard</string>
+    <string name="toast_test_copypaste_password">Test data copied to clipboard</string>
+    <string name="copy_to_clipboard">Copy password to clipboard</string>
+    <string name="test_copypaste_password"><![CDATA[Test C&P password]]></string>
 
 
 </resources>
