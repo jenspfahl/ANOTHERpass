@@ -129,12 +129,16 @@ class ImportVaultImportFileFragment : BaseFragment() {
     private fun deserializeCredential(json: JsonElement?): EncCredential? {
         if (json != null) {
             val jsonObject = json.asJsonObject
+            val jsonLabels = jsonObject.getAsJsonArray(EncCredential.ATTRIB_LABELS)
+            val labels = jsonLabels.map { it.asString }.toSet()
             return EncCredential(
                     jsonObject.get(EncCredential.ATTRIB_ID).asInt,
                     jsonObject.get(EncCredential.ATTRIB_NAME).asString,
                     jsonObject.get(EncCredential.ATTRIB_ADDITIONAL_INFO).asString,
+                    jsonObject.get(EncCredential.ATTRIB_USER).asString,
                     jsonObject.get(EncCredential.ATTRIB_PASSWORD).asString,
-                    jsonObject.get(EncCredential.ATTRIB_EXTRA_PIN_REQUIRED).asBoolean,
+                    jsonObject.get(EncCredential.ATTRIB_WEBSITE).asString,
+                    labels
             )
         }
         else {

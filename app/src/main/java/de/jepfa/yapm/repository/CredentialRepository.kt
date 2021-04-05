@@ -44,16 +44,20 @@ class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
         return EncCredential(entity.id,
                 entity.name,
                 entity.additionalInfo,
+                entity.user,
                 entity.password,
-                entity.extraPinRequired)
+                entity.website,
+                entity.labels)
     }
 
     private fun mapToEntity(encCredential: EncCredential): EncCredentialEntity {
         return EncCredentialEntity(encCredential.id,
                 encCredential.name,
                 encCredential.additionalInfo,
+                encCredential.user,
                 encCredential.password,
-                encCredential.extraPinRequired)
+                encCredential.website,
+                encCredential.labels)
     }
 
 }

@@ -40,12 +40,10 @@ import de.jepfa.yapm.ui.changelogin.ChangePinActivity
 import de.jepfa.yapm.ui.exportvault.ExportVaultActivity
 import de.jepfa.yapm.ui.settings.SettingsActivity
 import de.jepfa.yapm.usecase.*
-import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
 import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
 import de.jepfa.yapm.service.secret.SecretService
-import de.jepfa.yapm.util.ClipboardUtil
-import de.jepfa.yapm.util.PreferenceUtil
+import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD
 import de.jepfa.yapm.viewmodel.CredentialViewModel
 import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
@@ -204,20 +202,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         if (requestCode == newOrUpdateCredentialActivityRequestCode && resultCode == Activity.RESULT_OK) {
             data?.let {
 
-                var id: Int? = null
-                val idExtra = it.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
-                if (idExtra != -1) {
-                    id = idExtra
-                }
-                val nameBase64 = it.getStringExtra(EncCredential.EXTRA_CREDENTIAL_NAME)
-                val additionalInfoBase64 = it.getStringExtra(EncCredential.EXTRA_CREDENTIAL_ADDITIONAL_INFO)
-                val passwordBase64 = it.getStringExtra(EncCredential.EXTRA_CREDENTIAL_PASSWORD)
-
-                val encName = Encrypted.fromBase64String(nameBase64)
-                val encAdditionalInfo = Encrypted.fromBase64String(additionalInfoBase64)
-                val encPassword = Encrypted.fromBase64String(passwordBase64)
-
-                val credential = EncCredential(id, encName, encAdditionalInfo, encPassword)
+                val credential = EncCredential.fromIntent(it)
                 if (credential.isPersistent()) {
                     credentialViewModel.update(credential)
                 }
@@ -399,3 +384,4 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
     }
 
 }
+

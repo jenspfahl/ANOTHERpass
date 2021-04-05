@@ -187,20 +187,7 @@ class ShowCredentialActivity : SecureActivity() {
         if (requestCode == updateCredentialActivityRequestCode && resultCode == Activity.RESULT_OK) {
             data?.let {
 
-                var id: Int? = null
-                val idExtra = it.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
-                if (idExtra != -1) {
-                    id = idExtra
-                }
-                val nameBase64 = it.getStringExtra(EncCredential.EXTRA_CREDENTIAL_NAME)
-                val additionalInfoBase64 = it.getStringExtra(EncCredential.EXTRA_CREDENTIAL_ADDITIONAL_INFO)
-                val passwordBase64 = it.getStringExtra(EncCredential.EXTRA_CREDENTIAL_PASSWORD)
-
-                val encName = Encrypted.fromBase64String(nameBase64)
-                val encAdditionalInfo = Encrypted.fromBase64String(additionalInfoBase64)
-                val encPassword = Encrypted.fromBase64String(passwordBase64)
-
-                val credential = EncCredential(id, encName, encAdditionalInfo, encPassword)
+                val credential = EncCredential.fromIntent(it)
                 if (credential.isPersistent()) {
                     credentialViewModel.update(credential)
                 }

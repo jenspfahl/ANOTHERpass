@@ -31,6 +31,7 @@ import de.jepfa.yapm.util.PreferenceUtil.PREF_WITH_SPECIAL_CHARS
 import de.jepfa.yapm.util.PreferenceUtil.PREF_WITH_UPPER_CASE
 import de.jepfa.yapm.viewmodel.CredentialViewModel
 import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
+import java.util.*
 
 
 class NewOrChangeCredentialActivity : SecureActivity() {
@@ -165,13 +166,17 @@ class NewOrChangeCredentialActivity : SecureActivity() {
 
                         val encName = SecretService.encryptCommonString(key, name)
                         val encAdditionalInfo = SecretService.encryptCommonString(key, additionalInfo)
+                        val encUser = SecretService.encryptCommonString(key, "") //TODO
                         val encPassword = SecretService.encryptPassword(key, generatedPassword)
                         generatedPassword.clear()
+                        val encWebsite = SecretService.encryptCommonString(key, "") //TODO
+                        val encLabels = Collections.singleton(SecretService.encryptCommonString(key, "")) //TODO
 
-                        replyIntent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, currentId)
-                        replyIntent.putExtra(EncCredential.EXTRA_CREDENTIAL_NAME, encName.toBase64String())
-                        replyIntent.putExtra(EncCredential.EXTRA_CREDENTIAL_ADDITIONAL_INFO, encAdditionalInfo.toBase64String())
-                        replyIntent.putExtra(EncCredential.EXTRA_CREDENTIAL_PASSWORD, encPassword.toBase64String())
+                        val credentialToSave = EncCredential(
+                            currentId, encName, encAdditionalInfo, encUser, encPassword, encWebsite, encLabels)
+
+                        credentialToSave.applyExtras(replyIntent)
+
                         setResult(Activity.RESULT_OK, replyIntent)
                         finish()
                     }
