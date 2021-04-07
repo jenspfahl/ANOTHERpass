@@ -31,7 +31,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
-import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.YapmApp
@@ -43,6 +42,7 @@ import de.jepfa.yapm.usecase.*
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
 import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
 import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD
 import de.jepfa.yapm.viewmodel.CredentialViewModel
@@ -93,7 +93,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
-            val intent = Intent(this@ListCredentialsActivity, NewOrChangeCredentialActivity::class.java)
+            val intent = Intent(this@ListCredentialsActivity, EditCredentialActivity::class.java)
             startActivityForResult(intent, newOrUpdateCredentialActivityRequestCode)
         }
 

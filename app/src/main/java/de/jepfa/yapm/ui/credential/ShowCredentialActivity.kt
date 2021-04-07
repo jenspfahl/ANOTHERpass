@@ -13,7 +13,6 @@ import androidx.appcompat.widget.Toolbar
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
-import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SecretService
@@ -23,6 +22,7 @@ import de.jepfa.yapm.service.secret.SecretService.encryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.YapmApp
+import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.ClipboardUtil
@@ -148,7 +148,7 @@ class ShowCredentialActivity : SecureActivity() {
 
         if (id == R.id.menu_change_credential) {
 
-            val intent = Intent(this, NewOrChangeCredentialActivity::class.java)
+            val intent = Intent(this, EditCredentialActivity::class.java)
             intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, credential.id)
 
             startActivityForResult(intent, updateCredentialActivityRequestCode)

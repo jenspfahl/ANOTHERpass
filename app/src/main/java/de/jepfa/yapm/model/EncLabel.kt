@@ -1,7 +1,7 @@
 package de.jepfa.yapm.model
 
 data class EncLabel(var name: Encrypted,
-                    var color: Int?,) {
+                    var color: Int?) {
 
     constructor(nameBase64: String, color: Int?) :
             this(Encrypted.fromBase64String(nameBase64), color)

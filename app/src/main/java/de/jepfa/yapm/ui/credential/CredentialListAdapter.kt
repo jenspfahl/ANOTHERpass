@@ -19,6 +19,7 @@ import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.overlay.DetachHelper
+import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
 import de.jepfa.yapm.util.ClipboardUtil
 import java.util.*
 
@@ -65,7 +66,7 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
                     val current = getItem(position)
                     return when (item.itemId) {
                         R.id.menu_change_credential -> {
-                            val intent = Intent(listCredentialsActivity, NewOrChangeCredentialActivity::class.java)
+                            val intent = Intent(listCredentialsActivity, EditCredentialActivity::class.java)
                             intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, current.id)
 
                             listCredentialsActivity.startActivityForResult(intent, listCredentialsActivity.newOrUpdateCredentialActivityRequestCode)

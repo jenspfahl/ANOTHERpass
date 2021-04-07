@@ -134,6 +134,12 @@
 
     <string name="store_masterpasswd">Store master password</string>
     <string name="store_masterpasswd_confirmation">Do you want to store your master password encrypted on this device? This makes login easier. You can remove it at any time.</string>
+    <string name="edit_credential_data_fragment_label">Edit credential data</string>
+    <string name="edit_credential_password_fragment_label">Edit credential password</string>
+    <string name="hint_edit_credential_user">The credential user</string>
+    <string name="hint_edit_credential_website">The website url</string>
+    <string name="hint_edit_credential_labels">Labels</string>
+    <string name="credential_data_params">Edit your credential here</string>
 
 
 </resources>

@@ -46,7 +46,7 @@
             android:noHistory="false"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.credential.NewOrChangeCredentialActivity"
+            android:name=".ui.editcredential.EditCredentialActivity"
             android:noHistory="false" />
         <activity
             android:name=".ui.createvault.CreateVaultActivity"

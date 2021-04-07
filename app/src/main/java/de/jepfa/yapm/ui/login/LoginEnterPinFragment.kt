@@ -21,6 +21,7 @@ import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.usecase.LoginUseCase
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.AsyncWithProgressBar
+import de.jepfa.yapm.util.putEncrypted
 import java.util.*
 
 
@@ -83,7 +84,7 @@ class LoginEnterPinFragment : BaseFragment() {
             } else {
                 val encUserPin = SecretService.encryptPassword(keyForTemp, userPin)
                 val args = Bundle()
-                args.putString(CreateVaultActivity.ARG_ENC_PIN, encUserPin.toBase64String())
+                args.putEncrypted(CreateVaultActivity.ARG_ENC_PIN, encUserPin)
 
                 findNavController().navigate(R.id.action_Login_PinFragment_to_MasterPasswordFragment, args)
             }
