@@ -3,10 +3,13 @@ package de.jepfa.yapm.ui.credential
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
@@ -26,6 +29,7 @@ import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.ClipboardUtil
+import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.PasswordColorizer.spannableString
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.PREF_PASSWD_WORDS_ON_NL
@@ -42,6 +46,8 @@ class ShowCredentialActivity : SecureActivity() {
     private lateinit var credential: EncCredential
     private lateinit var appBarLayout: CollapsingToolbarLayout
     private lateinit var passwordTextView: TextView
+    private lateinit var userTextView: TextView
+    private lateinit var websiteTextView: TextView
     private lateinit var additionalInfoTextView: TextView
 
     private val credentialViewModel: CredentialViewModel by viewModels {
@@ -67,10 +73,26 @@ class ShowCredentialActivity : SecureActivity() {
 
         multiLine = PreferenceUtil.getAsBool(PREF_PASSWD_WORDS_ON_NL, multiLine, this)
 
-        appBarLayout =
-            findViewById(R.id.credential_detail_toolbar_layout)
+        appBarLayout = findViewById(R.id.credential_detail_toolbar_layout)
+
+        userTextView  = findViewById(R.id.user)
+        websiteTextView  = findViewById(R.id.website)
         additionalInfoTextView  = findViewById(R.id.additional_info)
         passwordTextView = findViewById(R.id.passwd)
+
+        websiteTextView.setOnClickListener {
+            val uri: Uri? = try {
+            Uri.parse(getUrl(websiteTextView.text.toString()))
+            } catch (e: Exception) {
+                null
+            }
+
+            if (uri != null) {
+                val browserIntent = Intent(Intent.ACTION_VIEW, uri)
+                startActivity(browserIntent)
+            }
+        }
+
         passwordTextView.setOnClickListener {
             multiLine = !multiLine
             updatePasswordView(idExtra)
@@ -80,6 +102,15 @@ class ShowCredentialActivity : SecureActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+    }
+
+    private fun getUrl(s: String): String {
+        if (s.startsWith(prefix = "http", ignoreCase = true)) {
+            return s
+        }
+        else {
+            return "http://" + s
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -111,10 +142,10 @@ class ShowCredentialActivity : SecureActivity() {
                         credential.name
                     )
                 )
-                val tempEncAddInfo = encryptCommonString(
+                val tempEncUser = encryptCommonString(
                     tempKey, decryptCommonString(
                         key,
-                        credential.additionalInfo
+                        credential.user
                     )
                 )
                 val tempEncPasswd = encryptPassword(
@@ -127,7 +158,7 @@ class ShowCredentialActivity : SecureActivity() {
                 val intent = Intent(this, QrCodeActivity::class.java)
                 intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, credential.id)
                 intent.putExtra(QrCodeActivity.EXTRA_HEADLINE, tempEncName.toBase64String())
-                intent.putExtra(QrCodeActivity.EXTRA_SUBTEXT, tempEncAddInfo.toBase64String())
+                intent.putExtra(QrCodeActivity.EXTRA_SUBTEXT, tempEncUser.toBase64String())
                 intent.putExtra(QrCodeActivity.EXTRA_QRCODE, tempEncPasswd.toBase64String())
 
                 startActivity(intent)
@@ -206,13 +237,25 @@ class ShowCredentialActivity : SecureActivity() {
             val key = masterSecretKey
             if (key != null) {
                 val name = decryptCommonString(key, credential.name)
-                val additionalInfo = decryptCommonString(
-                    key,
-                    credential.additionalInfo
-                )
+                val user = decryptCommonString(key, credential.user)
+                val website = decryptCommonString(key, credential.website)
+                val additionalInfo = decryptCommonString(key, credential.additionalInfo)
                 val password = decryptPassword(key, credential.password)
 
-                appBarLayout?.setTitle(name)
+                appBarLayout.setTitle(name)
+
+                if (user.isEmpty()) {
+                    val userView: ImageView = findViewById(R.id.user_image)
+                    userView.visibility = View.INVISIBLE
+                }
+                userTextView.setText(user)
+
+                if (website.isEmpty()) {
+                    val websiteView: ImageView = findViewById(R.id.website_image)
+                    websiteView.visibility = View.INVISIBLE
+                }
+                websiteTextView.setText(website)
+
                 additionalInfoTextView.setText(additionalInfo)
 
                 var spannedString = spannableString(password, multiLine, this)

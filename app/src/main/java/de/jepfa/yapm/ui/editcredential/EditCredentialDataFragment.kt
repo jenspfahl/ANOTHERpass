@@ -5,16 +5,14 @@ import android.content.Intent
 import android.os.AsyncTask
 import android.os.Bundle
 import android.text.TextUtils
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
+import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.core.app.NavUtils.navigateUpTo
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
@@ -28,6 +26,7 @@ import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.SecureFragment
 import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
+import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.usecase.LoginUseCase
 import de.jepfa.yapm.util.PreferenceUtil
@@ -60,8 +59,6 @@ class EditCredentialDataFragment : SecureFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, null)
         setHasOptionsMenu(true)
-
-        getBaseActivity().supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
         val editCredentialActivity = getBaseActivity() as EditCredentialActivity
 
@@ -122,4 +119,15 @@ class EditCredentialDataFragment : SecureFragment() {
         }
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        if (id == android.R.id.home) {
+            val upIntent = Intent(getBaseActivity(), ListCredentialsActivity::class.java)
+            getBaseActivity().navigateUpTo(upIntent)
+            return true
+            return true
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
 }

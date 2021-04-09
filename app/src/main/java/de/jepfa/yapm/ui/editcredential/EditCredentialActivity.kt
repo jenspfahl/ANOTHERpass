@@ -63,7 +63,7 @@ class EditCredentialActivity : SecureActivity() {
             setTitle(R.string.title_update_credential)
         }
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     override fun lock() {

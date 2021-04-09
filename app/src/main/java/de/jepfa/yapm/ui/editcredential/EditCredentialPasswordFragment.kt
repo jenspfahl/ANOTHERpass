@@ -54,7 +54,6 @@ class EditCredentialPasswordFragment : SecureFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, null)
         setHasOptionsMenu(true)
-        getBaseActivity().supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
         val editCredentialActivity = getBaseActivity() as EditCredentialActivity
 
