@@ -1,5 +1,7 @@
 package de.jepfa.yapm.model
 
+import java.util.*
+
 data class EncLabel(var name: Encrypted,
                     var color: Int?) {
 
@@ -12,5 +14,7 @@ data class EncLabel(var name: Encrypted,
 
         const val ATTRIB_NAME = "name"
         const val ATTRIB_COLOR = "color"
+
+        val knownLabels = TreeSet<EncLabel>()
     }
 }

@@ -5,15 +5,17 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.setPadding
 import com.google.android.material.appbar.CollapsingToolbarLayout
+import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Session
@@ -26,10 +28,10 @@ import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
+import de.jepfa.yapm.ui.label.LabelChip
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.ClipboardUtil
-import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.PasswordColorizer.spannableString
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.PREF_PASSWD_WORDS_ON_NL
@@ -45,6 +47,7 @@ class ShowCredentialActivity : SecureActivity() {
 
     private lateinit var credential: EncCredential
     private lateinit var appBarLayout: CollapsingToolbarLayout
+    private lateinit var titleLayout: LinearLayout
     private lateinit var passwordTextView: TextView
     private lateinit var userTextView: TextView
     private lateinit var websiteTextView: TextView
@@ -61,8 +64,7 @@ class ShowCredentialActivity : SecureActivity() {
         val toolbar: Toolbar = findViewById(R.id.activity_credential_detail_toolbar)
         setSupportActionBar(toolbar)
 
-        val titleLayout: View = findViewById(R.id.collapsing_toolbar_layout_title)
-        val subText = findViewById<TextView>(R.id.collapsing_toolbar_layout_title_subtext)
+        titleLayout = findViewById(R.id.collapsing_toolbar_layout_title)
         titleLayout.post {
             val layoutParams = toolbar.getLayoutParams() as CollapsingToolbarLayout.LayoutParams
             layoutParams.height = titleLayout.getHeight()
@@ -82,7 +84,7 @@ class ShowCredentialActivity : SecureActivity() {
 
         websiteTextView.setOnClickListener {
             val uri: Uri? = try {
-            Uri.parse(getUrl(websiteTextView.text.toString()))
+            Uri.parse(ensureHttp(websiteTextView.text.toString()))
             } catch (e: Exception) {
                 null
             }
@@ -104,7 +106,7 @@ class ShowCredentialActivity : SecureActivity() {
 
     }
 
-    private fun getUrl(s: String): String {
+    private fun ensureHttp(s: String): String {
         if (s.startsWith(prefix = "http", ignoreCase = true)) {
             return s
         }
@@ -244,6 +246,19 @@ class ShowCredentialActivity : SecureActivity() {
 
                 appBarLayout.setTitle(name)
 
+                titleLayout.removeAllViews()
+                for (encLabel in credential.labels) {
+                    val label = decryptCommonString(key, encLabel)
+                    if (label.isNotBlank()) {
+                        val chipView = ChipView(this)
+                        chipView.label = label
+                        chipView.setChipBackgroundColor(getColor(R.color.colorPrimaryDark))
+                        chipView.setLabelColor(getColor(R.color.white))
+                        chipView.setPadding(16)
+                        titleLayout.addView(chipView)
+                    }
+                }
+
                 if (user.isEmpty()) {
                     val userView: ImageView = findViewById(R.id.user_image)
                     userView.visibility = View.INVISIBLE
@@ -263,4 +278,5 @@ class ShowCredentialActivity : SecureActivity() {
             }
         })
     }
+
 }

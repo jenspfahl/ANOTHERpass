@@ -138,7 +138,7 @@
     <string name="edit_credential_password_fragment_label">Edit credential password</string>
     <string name="hint_edit_credential_user">The credential user</string>
     <string name="hint_edit_credential_website">The website url</string>
-    <string name="hint_edit_credential_labels">Labels</string>
+    <string name="hint_edit_credential_labels">Add labels, splitted by comma or space</string>
     <string name="credential_data_params">Edit your credential here</string>
 
 

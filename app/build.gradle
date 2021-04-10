@@ -69,6 +69,8 @@ dependencies {
     implementation 'com.journeyapps:zxing-android-embedded:3.6.0'
     implementation 'com.google.code.gson:gson:2.8.6'
 
+    implementation 'com.github.pchmn:MaterialChipsInput:1.0.5'
+
     // Testing
     testImplementation "junit:junit:$rootProject.junitVersion"
     androidTestImplementation "androidx.arch.core:core-testing:$rootProject.coreTestingVersion"
