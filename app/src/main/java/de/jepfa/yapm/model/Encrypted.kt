@@ -53,5 +53,6 @@ data class Encrypted(val type: String = "", val iv: ByteArray, val data: ByteArr
 
             return Encrypted(type, iv, data)
         }
+
     }
 }

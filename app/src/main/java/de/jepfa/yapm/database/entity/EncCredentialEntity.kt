@@ -1,6 +1,7 @@
 package de.jepfa.yapm.database.entity
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 import de.jepfa.yapm.model.Encrypted
@@ -15,7 +16,7 @@ data class EncCredentialEntity (@PrimaryKey(autoGenerate = true) val id: Int?,
                                 var user: String,
                                 var password: String,
                                 var website: String,
-                                var labels: Set<String>) {
+                                var labels: String) { // encrypted label ids, comma separated
 
     constructor(id: Int?,
                 name: Encrypted,
@@ -23,7 +24,7 @@ data class EncCredentialEntity (@PrimaryKey(autoGenerate = true) val id: Int?,
                 user: Encrypted,
                 password: Encrypted,
                 website: Encrypted,
-                labels: Set<Encrypted>)
+                labels: Encrypted)
             : this(
         id,
         name.toBase64String(),
@@ -31,6 +32,6 @@ data class EncCredentialEntity (@PrimaryKey(autoGenerate = true) val id: Int?,
         user.toBase64String(),
         password.toBase64String(),
         website.toBase64String(),
-        labels.map { it.toBase64String() }.toSet())
+        labels.toBase64String())
 
 }

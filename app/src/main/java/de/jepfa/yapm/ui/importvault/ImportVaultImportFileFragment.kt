@@ -91,7 +91,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
                 credentialsJson
                         .map{ json -> deserializeCredential(json)}
                         .filterNotNull()
-                        .forEach { c -> getApp().repository.insert(c) }
+                        .forEach { c -> getApp().credentialRepository.insert(c) }
             }
 
             findNavController().navigate(R.id.action_importVault_to_Login)
@@ -129,8 +129,6 @@ class ImportVaultImportFileFragment : BaseFragment() {
     private fun deserializeCredential(json: JsonElement?): EncCredential? {
         if (json != null) {
             val jsonObject = json.asJsonObject
-            val jsonLabels = jsonObject.getAsJsonArray(EncCredential.ATTRIB_LABELS)
-            val labels = jsonLabels.map { it.asString }.toSet()
             return EncCredential(
                     jsonObject.get(EncCredential.ATTRIB_ID).asInt,
                     jsonObject.get(EncCredential.ATTRIB_NAME).asString,
@@ -138,7 +136,8 @@ class ImportVaultImportFileFragment : BaseFragment() {
                     jsonObject.get(EncCredential.ATTRIB_USER).asString,
                     jsonObject.get(EncCredential.ATTRIB_PASSWORD).asString,
                     jsonObject.get(EncCredential.ATTRIB_WEBSITE).asString,
-                    labels
+                    jsonObject.get(EncCredential.ATTRIB_LABELS).asString
+
             )
         }
         else {

@@ -15,7 +15,6 @@ import android.view.View
 import android.widget.EditText
 import android.widget.Filterable
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
@@ -32,26 +31,22 @@ import com.google.android.material.navigation.NavigationView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Session
-import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.ui.YapmApp
-import de.jepfa.yapm.ui.changelogin.ChangeMasterPasswordActivity
-import de.jepfa.yapm.ui.changelogin.ChangePinActivity
-import de.jepfa.yapm.ui.exportvault.ExportVaultActivity
-import de.jepfa.yapm.ui.settings.SettingsActivity
-import de.jepfa.yapm.usecase.*
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
 import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.ui.changelogin.ChangeMasterPasswordActivity
+import de.jepfa.yapm.ui.changelogin.ChangePinActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
+import de.jepfa.yapm.ui.exportvault.ExportVaultActivity
+import de.jepfa.yapm.ui.settings.SettingsActivity
+import de.jepfa.yapm.usecase.*
 import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD
-import de.jepfa.yapm.viewmodel.CredentialViewModel
-import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
 
 
 class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationItemSelectedListener  {
 
-    private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var toggle: ActionBarDrawerToggle
@@ -59,10 +54,6 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
     val newOrUpdateCredentialActivityRequestCode = 1
 
     private lateinit var credentialListAdapter: CredentialListAdapter
-
-    private val credentialViewModel: CredentialViewModel by viewModels {
-        CredentialViewModelFactory((application as YapmApp).repository)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

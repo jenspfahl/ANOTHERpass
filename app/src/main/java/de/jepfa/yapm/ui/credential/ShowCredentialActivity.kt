@@ -11,7 +11,6 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.setPadding
 import com.google.android.material.appbar.CollapsingToolbarLayout
@@ -19,6 +18,7 @@ import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.service.label.LabelIndexService
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
@@ -26,17 +26,13 @@ import de.jepfa.yapm.service.secret.SecretService.decryptPassword
 import de.jepfa.yapm.service.secret.SecretService.encryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
-import de.jepfa.yapm.ui.label.LabelChip
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.PasswordColorizer.spannableString
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.PREF_PASSWD_WORDS_ON_NL
-import de.jepfa.yapm.viewmodel.CredentialViewModel
-import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
 
 
 class ShowCredentialActivity : SecureActivity() {
@@ -52,10 +48,6 @@ class ShowCredentialActivity : SecureActivity() {
     private lateinit var userTextView: TextView
     private lateinit var websiteTextView: TextView
     private lateinit var additionalInfoTextView: TextView
-
-    private val credentialViewModel: CredentialViewModel by viewModels {
-        CredentialViewModelFactory((application as YapmApp).repository)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -247,12 +239,16 @@ class ShowCredentialActivity : SecureActivity() {
                 appBarLayout.setTitle(name)
 
                 titleLayout.removeAllViews()
-                for (encLabel in credential.labels) {
-                    val label = decryptCommonString(key, encLabel)
-                    if (label.isNotBlank()) {
+
+                val labels = decryptCommonString(key, credential.labels)
+                val encLabels = LabelIndexService.stringToIdSet(labels)
+                for (encLabel in encLabels) {
+                    val name = decryptCommonString(key, encLabel.name)
+                    if (name.isNotBlank()) {
+                        val bgColor = encLabel.color ?: R.color.colorPrimaryDark
                         val chipView = ChipView(this)
-                        chipView.label = label
-                        chipView.setChipBackgroundColor(getColor(R.color.colorPrimaryDark))
+                        chipView.label = name
+                        chipView.setChipBackgroundColor(getColor(bgColor))
                         chipView.setLabelColor(getColor(R.color.white))
                         chipView.setPadding(16)
                         titleLayout.addView(chipView)

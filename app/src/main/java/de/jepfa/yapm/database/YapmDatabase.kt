@@ -7,16 +7,19 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import de.jepfa.yapm.database.converter.StringSetConverter
 import de.jepfa.yapm.database.dao.EncCredentialDao
+import de.jepfa.yapm.database.dao.EncLabelDao
 import de.jepfa.yapm.database.entity.EncCredentialEntity
+import de.jepfa.yapm.database.entity.EncLabelEntity
 
 @Database(
-    entities = [EncCredentialEntity::class],
+    entities = [EncCredentialEntity::class, EncLabelEntity::class],
     version = 1,
     exportSchema = false
 )
 @TypeConverters(StringSetConverter::class)
 abstract class YapmDatabase : RoomDatabase() {
     abstract fun credentialDao(): EncCredentialDao
+    abstract fun labelDao(): EncLabelDao
 
     companion object {
         @Volatile
