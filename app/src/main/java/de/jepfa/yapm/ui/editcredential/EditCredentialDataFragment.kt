@@ -1,6 +1,7 @@
 package de.jepfa.yapm.ui.editcredential
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.*
@@ -12,7 +13,7 @@ import com.pchmn.materialchips.ChipsInput.ChipsListener
 import com.pchmn.materialchips.model.ChipInterface
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.*
-import de.jepfa.yapm.service.label.LabelIndexService
+import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.encryptCommonString
@@ -59,14 +60,8 @@ class EditCredentialDataFragment : SecureFragment() {
         getBaseActivity().labelViewModel.allLabels.observe(getSecureActivity(), { labels ->
             val key = masterSecretKey
             if (key != null) {
-                val decryptedLabelChips = labels.map { label ->
-                    val name = decryptCommonString(key, label.name)
-                    val description = decryptCommonString(key, label.description)
-                    LabelChip(name, description)
-                }
-                editCredentialLabelsView.filterableList = decryptedLabelChips
-
-                LabelIndexService.init(labels.toSet())
+                //LabelService.init(key, labels.toSet(), getBaseActivity())
+                editCredentialLabelsView.filterableList = LabelService.getAllLabelChips()
             }
         })
 
@@ -75,16 +70,16 @@ class EditCredentialDataFragment : SecureFragment() {
             override fun onChipAdded(chip: ChipInterface, newSize: Int) {
 
                 val key = masterSecretKey
-                if (key != null) {
-                    val freeToInsert = editCredentialLabelsView.filterableList.filter { it.label == chip.label}.isEmpty()
-                    if (freeToInsert) {
+                if (key != null && editCredentialLabelsView.filterableList != null) {
+                    val exising = LabelService.lookupByLabelName(chip.label)
+                    if (exising == null) {
                         val encName = encryptCommonString(key, chip.label)
                         val encDesc = encryptCommonString(key, "")
                         val encLabel = EncLabel(null, encName, encDesc, null)
                         getBaseActivity().labelViewModel.insert(encLabel)
-                        LabelIndexService.update(encLabel)
+                        LabelService.updateLabel(key, encLabel)
                     }
-                } //TODO not here, but when saved
+                }
             }
 
             override fun onChipRemoved(chip: ChipInterface, newSize: Int) {
@@ -117,21 +112,10 @@ class EditCredentialDataFragment : SecureFragment() {
                     editCredentialWebsiteView.setText(website)
                     editCredentialAdditionalInfoView.setText(additionalInfo)
 
-                    val labels = decryptCommonString(key, originCredential.labels)
-                    val encLabels = LabelIndexService.stringToIdSet(labels)
-                    for (encLabel in encLabels) {
-                        val name = decryptCommonString(key, encLabel.name)
-                        val description = decryptCommonString(key, encLabel.description)
-                        if (name.isNotBlank()) {
-                            val labelColor = encLabel.color
-                            if (labelColor != null) {
-                                val color = getBaseActivity().getDrawable(labelColor)
-                                editCredentialLabelsView.addChip(color, name, description)
-                            }
-                            else {
-                                editCredentialLabelsView.addChip( name, description)
-                            }
-                        }
+                    LabelService.updateLabelsForCredential(key, originCredential)
+
+                    LabelService.getLabelsForCredential(key, originCredential).forEachIndexed { idx, it ->
+                        editCredentialLabelsView.addChip(it.labelChip)
                     }
                 }
             })
@@ -160,7 +144,7 @@ class EditCredentialDataFragment : SecureFragment() {
                     val encUser = encryptCommonString(key, user)
                     val encPassword = SecretService.encryptPassword(key, Password.empty())
                     val encWebsite = encryptCommonString(key, website)
-                    val encLabels = encryptLabels(key, editCredentialLabelsView.selectedChipList)
+                    val encLabels = LabelService.encryptLabelIds(key, editCredentialLabelsView.selectedChipList)
 
                     val credentialToSave = EncCredential(
                         editCredentialActivity.currentId,
@@ -183,16 +167,6 @@ class EditCredentialDataFragment : SecureFragment() {
     private fun isCommitLabel(text: CharSequence): Boolean {
         val lastChar = text.last()
         return lastChar in LAST_CHARS
-    }
-
-    private fun encryptLabels(key: SecretKey, chipList: List<ChipInterface>): Encrypted {
-        val ids = chipList.map {
-            val encName = encryptCommonString(key, it.label)
-            LabelIndexService.lookupLabelId(encName)
-        }.filterNotNull().toSet()
-
-        val idsAsString =  LabelIndexService.idSetToString(ids)
-        return encryptCommonString(key, idsAsString)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

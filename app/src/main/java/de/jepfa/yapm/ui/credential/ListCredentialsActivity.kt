@@ -23,7 +23,6 @@ import androidx.core.view.GravityCompat
 import androidx.core.view.MenuItemCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
-import androidx.navigation.ui.AppBarConfiguration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -31,6 +30,7 @@ import com.google.android.material.navigation.NavigationView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
 import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
 import de.jepfa.yapm.service.secret.SecretService
@@ -44,7 +44,9 @@ import de.jepfa.yapm.usecase.*
 import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD
 
-
+/**
+ * This is the main activity
+ */
 class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationItemSelectedListener  {
 
     private lateinit var drawerLayout: DrawerLayout
@@ -74,10 +76,11 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                         SecretService.decryptCommonString(key, it.name).toLowerCase()
                     }
                     credentialListAdapter.submitOriginList(sorted)
+
+                    credentials.forEach { LabelService.updateLabelsForCredential(key, it) }
                 }
                 else {
                     credentialListAdapter.submitOriginList(credentials)
-
                 }
             }
         })
@@ -105,6 +108,13 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
         toggle.syncState()
+
+        labelViewModel.allLabels.observe(this, { labels ->
+            val key = masterSecretKey
+            if (key != null) {
+                LabelService.initLabels(key, labels.toSet())
+            }
+        })
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

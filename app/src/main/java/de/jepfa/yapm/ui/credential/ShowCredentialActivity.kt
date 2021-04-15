@@ -18,7 +18,7 @@ import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Session
-import de.jepfa.yapm.service.label.LabelIndexService
+import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
@@ -240,19 +240,14 @@ class ShowCredentialActivity : SecureActivity() {
 
                 titleLayout.removeAllViews()
 
-                val labels = decryptCommonString(key, credential.labels)
-                val encLabels = LabelIndexService.stringToIdSet(labels)
-                for (encLabel in encLabels) {
-                    val name = decryptCommonString(key, encLabel.name)
-                    if (name.isNotBlank()) {
-                        val bgColor = encLabel.color ?: R.color.colorPrimaryDark
-                        val chipView = ChipView(this)
-                        chipView.label = name
-                        chipView.setChipBackgroundColor(getColor(bgColor))
-                        chipView.setLabelColor(getColor(R.color.white))
-                        chipView.setPadding(16)
-                        titleLayout.addView(chipView)
-                    }
+                LabelService.getLabelsForCredential(key, credential).forEachIndexed {idx, it ->
+                    val chipView = ChipView(this)
+                    // doesnt work: chipView.setChip(it.labelChip)
+                    chipView.label = it.labelChip.label
+                    chipView.setChipBackgroundColor(it.labelChip.getColor(this))
+                    chipView.setLabelColor(getColor(R.color.white))
+                    chipView.setPadding(16)
+                    titleLayout.addView(chipView, idx)
                 }
 
                 if (user.isEmpty()) {
