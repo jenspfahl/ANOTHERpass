@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.app.SearchManager
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -30,6 +31,7 @@ import com.google.android.material.navigation.NavigationView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
 import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
@@ -72,18 +74,21 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
             credentials?.let {
                 val key = masterSecretKey
                 if (key != null) {
-                    val sorted = it.sortedBy {
-                        SecretService.decryptCommonString(key, it.name).toLowerCase()
-                    }
-                    credentialListAdapter.submitOriginList(sorted)
-
                     credentials.forEach { LabelService.updateLabelsForCredential(key, it) }
+
+                    val sorted = it
+                        .sortedBy { SecretService.decryptCommonString(key, it.name).toLowerCase() }
+                    credentialListAdapter.submitOriginList(sorted)
+                    credentialListAdapter.filter.filter("")
                 }
                 else {
                     credentialListAdapter.submitOriginList(credentials)
+                    credentialListAdapter.filter.filter("")
                 }
             }
         })
+
+        initLabels()
 
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
@@ -108,13 +113,6 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
         toggle.syncState()
-
-        labelViewModel.allLabels.observe(this, { labels ->
-            val key = masterSecretKey
-            if (key != null) {
-                LabelService.initLabels(key, labels.toSet())
-            }
-        })
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -159,10 +157,8 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                 }
 
                 override fun onQueryTextChange(s: String?): Boolean {
-                    val filterable: Filterable = credentialListAdapter
-                    if (filterable != null) {
-                        filterable.filter.filter(s)
-                    }
+                    credentialListAdapter.filter.filter(s)
+
                     return false
                 }
             })
@@ -191,6 +187,42 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
             }
             R.id.menu_logout -> {
                 return LogoutUseCase.execute(this)
+            }
+            R.id.menu_filter -> {
+                val items = LabelService.getAllLabelChips().map { it.label }.toTypedArray()
+                val checkedItems = LabelService.getAllLabels()
+                    .map { LabelFilter.isFilterFor(it) }
+                    .toBooleanArray()
+                val multiListener =
+                    DialogInterface.OnMultiChoiceClickListener { dialog, which, isChecked ->
+                        checkedItems[which] = isChecked
+                    }
+                AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.filter))
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setMultiChoiceItems(items, checkedItems, multiListener)
+                    .setPositiveButton(android.R.string.ok) { dialog, whichButton ->
+                        for (i in 0 until items.size) {
+                            val checked = checkedItems[i]
+                            val label = LabelService.lookupByLabelName(items[i])
+                            if (label != null) {
+                                if (checked) {
+                                    LabelFilter.setFilterFor(label)
+                                } else {
+                                    LabelFilter.unsetFilterFor(label)
+                                }
+                            }
+                        }
+
+                        credentialListAdapter.filter.filter("")
+
+                        // TODO add red dot to menu item icon to indicate filter
+                    }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .create()
+                    .show()
+
+                return true
             }
             else -> super.onOptionsItemSelected(item)
         }
@@ -372,6 +404,15 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
     fun deleteCredential(credential: EncCredential) {
         credentialViewModel.delete(credential)
+    }
+
+    private fun initLabels() {
+        labelViewModel.allLabels.observe(this, { labels ->
+            val key = masterSecretKey
+            if (key != null) {
+                LabelService.initLabels(key, labels.toSet())
+            }
+        })
     }
 
     private fun getVersionName(): String {

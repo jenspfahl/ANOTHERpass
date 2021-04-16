@@ -20,7 +20,7 @@ object LabelService {
     private val nameToLabel: MutableMap<String, Label> = ConcurrentHashMap(16)
     private val idToLabel: MutableMap<Int, Label> = ConcurrentHashMap(16)
 
-    data class Label(val encLabel: EncLabel, val labelChip: LabelChip)
+    data class Label(val encLabel: EncLabel, val labelChip: LabelChip) // TODO remove this and add id to LabelChip
 
     fun initLabels(key: SecretKey, encLabels: Set<EncLabel>) {
         encLabels
@@ -64,6 +64,12 @@ object LabelService {
             }
     }
 
+    fun getAllLabels(): List<Label> {
+        return nameToLabel.values
+            .sortedBy { it.labelChip.label }
+            .toList()
+    }
+
     fun getAllLabelChips(): List<LabelChip> {
         return nameToLabel.values
             .map { it.labelChip }
@@ -96,7 +102,7 @@ object LabelService {
     }
 
     fun lookupByLabelName(labelName: String): Label? {
-        return nameToLabel[labelName]
+        return nameToLabel[labelName.toUpperCase()]
     }
 
     fun lookupByLabelId(id: Int): Label? {

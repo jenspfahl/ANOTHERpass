@@ -6,9 +6,9 @@ import android.graphics.drawable.Drawable
 import com.pchmn.materialchips.model.Chip
 import de.jepfa.yapm.R
 
-class LabelChip(val color: Int?, name: String, description: String): Chip(name.toUpperCase(), description) {
+class LabelChip(val color: Int?, name: String, description: String): Chip(name.toUpperCase().trim(), description) {
 
-    constructor(name: String, description: String) : this(null, name.toUpperCase(), description)
+    constructor(name: String, description: String) : this(null, name.toUpperCase().trim(), description)
 
     fun getColor(context: Context): Int {
         val colorCode = color ?: R.color.colorPrimaryDark

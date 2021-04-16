@@ -60,7 +60,6 @@ class EditCredentialDataFragment : SecureFragment() {
         getBaseActivity().labelViewModel.allLabels.observe(getSecureActivity(), { labels ->
             val key = masterSecretKey
             if (key != null) {
-                //LabelService.init(key, labels.toSet(), getBaseActivity())
                 editCredentialLabelsView.filterableList = LabelService.getAllLabelChips()
             }
         })
@@ -77,7 +76,6 @@ class EditCredentialDataFragment : SecureFragment() {
                         val encDesc = encryptCommonString(key, "")
                         val encLabel = EncLabel(null, encName, encDesc, null)
                         getBaseActivity().labelViewModel.insert(encLabel)
-                        LabelService.updateLabel(key, encLabel)
                     }
                 }
             }
@@ -115,7 +113,7 @@ class EditCredentialDataFragment : SecureFragment() {
                     LabelService.updateLabelsForCredential(key, originCredential)
 
                     LabelService.getLabelsForCredential(key, originCredential).forEachIndexed { idx, it ->
-                        editCredentialLabelsView.addChip(it.labelChip)
+                        editCredentialLabelsView.addChip(it.labelChip) // TODO is not sorted!!
                     }
                 }
             })

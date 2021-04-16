@@ -25,4 +25,11 @@
         app:showAsAction="always">
     </item>
 
+    <item
+        android:id="@+id/menu_filter"
+        android:icon="@drawable/ic_baseline_filter_list_24_white"
+        android:title="@string/filter"
+        app:showAsAction="ifRoom">
+    </item>
+
 </menu>

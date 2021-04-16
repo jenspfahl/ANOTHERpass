@@ -17,11 +17,14 @@ import androidx.recyclerview.widget.RecyclerView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.service.label.LabelFilter
+import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
 import de.jepfa.yapm.util.ClipboardUtil
 import java.util.*
+import javax.crypto.SecretKey
 
 
 class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity) :
@@ -112,16 +115,18 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
 
     }
 
-    override fun getFilter(): Filter? {
+    override fun getFilter(): Filter {
         return object : Filter() {
             override fun performFiltering(charSequence: CharSequence): FilterResults {
+                val key = listCredentialsActivity.masterSecretKey
+
                 val filterResults = FilterResults()
                 val charString = charSequence.toString()
+
                 if (charString.isEmpty()) {
-                    filterResults.values = originList
+                    filterResults.values = filterByLabels(key, originList)
                 } else {
                     val filteredList: MutableList<EncCredential> = ArrayList<EncCredential>()
-                    val key = listCredentialsActivity.masterSecretKey
                     for (credential in originList) {
                         var name: String
                         if (key != null) {
@@ -132,17 +137,28 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
                         }
 
                     }
-                    filterResults.values = filteredList
+                    filterResults.values = filterByLabels(key, filteredList)
                 }
                 return filterResults
             }
 
             override fun publishResults(charSequence: CharSequence, filterResults: FilterResults) {
-                val pubCredentials = filterResults.values as MutableList<EncCredential?>
+                val pubCredentials = filterResults.values as List<EncCredential?>
                 submitList(pubCredentials)
 
                 // refresh the list with filtered data
                 notifyDataSetChanged()
+            }
+
+
+            private fun filterByLabels(key: SecretKey?, credentials: List<EncCredential>): List<EncCredential> {
+                key ?: return credentials
+                return credentials
+                    .filter {
+                        val labels = LabelService.getLabelsForCredential(key, it)
+                        LabelFilter.isFilterFor(labels)
+                    }
+                    .toList()
             }
         }
     }

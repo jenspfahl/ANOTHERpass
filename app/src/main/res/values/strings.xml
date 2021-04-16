@@ -140,6 +140,8 @@
     <string name="hint_edit_credential_website">The website url</string>
     <string name="hint_edit_credential_labels">Add labels, splitted by comma or space</string>
     <string name="credential_data_params">Edit your credential here</string>
+    <string name="filter">Filter by labels</string>
+    <string name="filter_dialog">Select all labels to show credentials with that labels</string>
 
 
 </resources>
