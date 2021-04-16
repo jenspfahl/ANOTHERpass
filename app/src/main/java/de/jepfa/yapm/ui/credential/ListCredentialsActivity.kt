@@ -88,7 +88,12 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
             }
         })
 
-        initLabels()
+        labelViewModel.allLabels.observe(this, { labels ->
+            val key = masterSecretKey
+            if (key != null) {
+                LabelService.initLabels(key, labels.toSet())
+            }
+        })
 
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
@@ -215,7 +220,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                         }
 
                         credentialListAdapter.filter.filter("")
-
+                        item.setChecked(LabelFilter.hasFilters())
                         // TODO add red dot to menu item icon to indicate filter
                     }
                     .setNegativeButton(android.R.string.cancel, null)
@@ -404,15 +409,6 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
     fun deleteCredential(credential: EncCredential) {
         credentialViewModel.delete(credential)
-    }
-
-    private fun initLabels() {
-        labelViewModel.allLabels.observe(this, { labels ->
-            val key = masterSecretKey
-            if (key != null) {
-                LabelService.initLabels(key, labels.toSet())
-            }
-        })
     }
 
     private fun getVersionName(): String {

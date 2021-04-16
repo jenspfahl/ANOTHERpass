@@ -29,6 +29,7 @@
         android:id="@+id/menu_filter"
         android:icon="@drawable/ic_baseline_filter_list_24_white"
         android:title="@string/filter"
+        android:checkable="true"
         app:showAsAction="ifRoom">
     </item>
 
