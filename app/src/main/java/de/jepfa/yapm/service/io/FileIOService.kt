@@ -13,6 +13,7 @@ import android.widget.Toast
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
 import de.jepfa.yapm.model.EncCredential
+import de.jepfa.yapm.model.EncLabel
 import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.YapmApp
@@ -54,8 +55,12 @@ class FileIOService: IntentService("FileIOService") {
         const val JSON_ENC_MK = "encMk"
         const val JSON_CREDENTIALS = "credentials"
         const val JSON_CREDENTIALS_COUNT = "credentialsCount"
+        const val JSON_LABELS = "labels"
+        const val JSON_LABELS_COUNT = "labelsCount"
 
         val CREDENTIALS_TYPE = object : TypeToken<List<EncCredential>>() {}.type
+        val LABELS_TYPE = object : TypeToken<List<EncLabel>>() {}.type
+
         val SDF_DT_MEDIUM =
                 SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM)
         val GSON = GsonBuilder()
@@ -145,6 +150,12 @@ class FileIOService: IntentService("FileIOService") {
 
         root.add(JSON_CREDENTIALS, GSON.toJsonTree(credentials, CREDENTIALS_TYPE))
         root.addProperty(JSON_CREDENTIALS_COUNT, credentials.size)
+
+
+        val labels = getApp().labelRepository.getAllSync()
+
+        root.add(JSON_LABELS, GSON.toJsonTree(labels, LABELS_TYPE))
+        root.addProperty(JSON_LABELS_COUNT, labels.size)
 
         return root
     }

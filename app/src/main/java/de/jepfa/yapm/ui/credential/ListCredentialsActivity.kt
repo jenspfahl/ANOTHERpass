@@ -179,6 +179,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         }
 
         refreshMenuLockItem(menu.findItem(R.id.menu_lock_items))
+        refreshMenuFiltersItem(menu.findItem(R.id.menu_filter))
 
         return super.onCreateOptionsMenu(menu)
     }
@@ -225,7 +226,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                         }
 
                         credentialListAdapter.filter.filter("")
-                        item.setChecked(LabelFilter.hasFilters())
+                        refreshMenuFiltersItem(item)
                         // TODO add red dot to menu item icon to indicate filter
                     }
                     .setNegativeButton(android.R.string.cancel, null)
@@ -410,6 +411,11 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         if (deleteMasterPasswdItem != null) {
             deleteMasterPasswdItem.setVisible(storedMasterPasswdPresent)
         }
+    }
+
+
+    private fun refreshMenuFiltersItem(item: MenuItem) {
+        item.setChecked(LabelFilter.hasFilters())
     }
 
     fun deleteCredential(credential: EncCredential) {

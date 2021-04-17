@@ -14,6 +14,10 @@ object LabelFilter {
         return filterByLabels.remove(label.labelChip.label)
     }
 
+    fun unsetAllFilters() {
+        filterByLabels.clear()
+    }
+
     fun hasFilters(): Boolean {
         return !filterByLabels.none()
     }
@@ -28,4 +32,5 @@ object LabelFilter {
     fun isFilterFor(label: LabelService.Label): Boolean {
         return filterByLabels.containsKey(label.labelChip.label)
     }
+
 }

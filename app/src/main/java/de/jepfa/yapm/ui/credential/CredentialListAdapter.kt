@@ -168,6 +168,7 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
     }
 
     class CredentialViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val credentialContainerView: LinearLayout = itemView.findViewById(R.id.credential_container)
         private val credentialItemView: TextView = itemView.findViewById(R.id.credential_name)
         private val credentialDetachImageView: ImageView = itemView.findViewById(R.id.credential_detach)
         private val credentialCopyImageView: ImageView = itemView.findViewById(R.id.credential_copy)
@@ -175,7 +176,7 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
         private val credentialLabelContainerView: LinearLayout = itemView.findViewById(R.id.label_container)
 
         fun listenForShowCredential(event: (position: Int, type: Int) -> Unit) {
-            credentialItemView.setOnClickListener {
+            credentialContainerView.setOnClickListener {
                 event.invoke(adapterPosition, itemViewType)
             }
         }

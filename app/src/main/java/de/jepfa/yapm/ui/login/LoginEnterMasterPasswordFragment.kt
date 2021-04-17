@@ -130,6 +130,9 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
             }
             else {
                 masterPasswdTextView.setText(scanned)
+                if (isFastLogin()) {
+                    loginButton.performClick()
+                }
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data)

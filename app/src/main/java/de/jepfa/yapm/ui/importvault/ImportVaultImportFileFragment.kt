@@ -12,13 +12,20 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import com.google.zxing.integration.android.IntentIntegrator
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
+import de.jepfa.yapm.model.EncLabel
 import de.jepfa.yapm.model.Encrypted
+import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.ui.BaseFragment
+import de.jepfa.yapm.usecase.CreateVaultUseCase
+import de.jepfa.yapm.usecase.ImportVaultUseCase
+import de.jepfa.yapm.usecase.LoginUseCase
+import de.jepfa.yapm.util.AsyncWithProgressBar
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.QRCodeUtil
 import kotlinx.coroutines.CoroutineScope
@@ -55,9 +62,10 @@ class ImportVaultImportFileFragment : BaseFragment() {
 
         val createdAt = jsonContent.get(FileIOService.JSON_CREATION_DATE)?.asString
         val credentialsCount = jsonContent.get(FileIOService.JSON_CREDENTIALS_COUNT)?.asString
+        val labelsCount = jsonContent.get(FileIOService.JSON_LABELS_COUNT)?.asString
         encMasterKey = jsonContent.get(FileIOService.JSON_ENC_MK)?.asString
 
-        loadedFileStatusTextView.text = "Vault exported at $createdAt, ${System.lineSeparator()} contains $credentialsCount credentials"
+        loadedFileStatusTextView.text = "Vault exported at $createdAt, ${System.lineSeparator()} contains $credentialsCount credentials and ${labelsCount} labels"
 
         encMasterKey?.let {
             mkTextView.text = encMasterKey
@@ -75,26 +83,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
                 return@setOnClickListener
             }
 
-
-            val salt = jsonContent.get(FileIOService.JSON_VAULT_ID)?.asString
-            salt?.let { PreferenceUtil.put(PreferenceUtil.PREF_SALT, salt, getBaseActivity()) }
-
-            if (encMasterKey != null) {
-                val keyForMK = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
-                val encEncryptedMasterKey = SecretService.encryptEncrypted(keyForMK, Encrypted.fromBase64String(encMasterKey!!))
-
-                PreferenceUtil.putEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, encEncryptedMasterKey, getBaseActivity())
-            }
-
-            val credentialsJson = jsonContent.getAsJsonArray(FileIOService.JSON_CREDENTIALS)
-            CoroutineScope(Dispatchers.IO).launch {
-                credentialsJson
-                        .map{ json -> deserializeCredential(json)}
-                        .filterNotNull()
-                        .forEach { c -> getApp().credentialRepository.insert(c) }
-            }
-
-            findNavController().navigate(R.id.action_importVault_to_Login)
+            importVault(jsonContent, encMasterKey)
         }
     }
 
@@ -126,27 +115,34 @@ class ImportVaultImportFileFragment : BaseFragment() {
         }
     }
 
-    private fun deserializeCredential(json: JsonElement?): EncCredential? {
-        if (json != null) {
-            val jsonObject = json.asJsonObject
-            return EncCredential(
-                    jsonObject.get(EncCredential.ATTRIB_ID).asInt,
-                    jsonObject.get(EncCredential.ATTRIB_NAME).asString,
-                    jsonObject.get(EncCredential.ATTRIB_ADDITIONAL_INFO).asString,
-                    jsonObject.get(EncCredential.ATTRIB_USER).asString,
-                    jsonObject.get(EncCredential.ATTRIB_PASSWORD).asString,
-                    jsonObject.get(EncCredential.ATTRIB_WEBSITE).asString,
-                    jsonObject.get(EncCredential.ATTRIB_LABELS).asString
-
-            )
-        }
-        else {
-            return null
-        }
-    }
-
     private fun getImportVaultActivity() : ImportVaultActivity {
         return getBaseActivity() as ImportVaultActivity
+    }
+
+    private fun importVault(
+        jsonContent: JsonObject,
+        encMasterKey: String?
+    ) {
+
+        getBaseActivity().getProgressBar()?.let {
+
+            AsyncWithProgressBar(
+                getBaseActivity(),
+                {
+                    val success = ImportVaultUseCase.execute(jsonContent, encMasterKey, getBaseActivity())
+                    success
+                },
+                { success ->
+                    if (!success) {
+                        Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
+                    }
+                    else {
+                        findNavController().navigate(R.id.action_importVault_to_Login)
+                        getBaseActivity().finishAffinity()
+                    }
+                }
+            )
+        }
     }
 
 }
