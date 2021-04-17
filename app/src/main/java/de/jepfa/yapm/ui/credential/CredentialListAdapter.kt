@@ -6,14 +6,15 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Filter
-import android.widget.Filterable
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.content.ContextCompat.getColor
+import androidx.core.view.setPadding
+import androidx.core.view.size
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Session
@@ -107,12 +108,7 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
     override fun onBindViewHolder(holder: CredentialViewHolder, position: Int) {
         val current = getItem(position)
         val key = listCredentialsActivity.masterSecretKey
-        var name = "????"
-        if (key != null) {
-            name = SecretService.decryptCommonString(key, current.name)
-        }
-        holder.bind(name)
-
+        holder.bind(key, current)
     }
 
     override fun getFilter(): Filter {
@@ -174,6 +170,7 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
         private val credentialDetachImageView: ImageView = itemView.findViewById(R.id.credential_detach)
         private val credentialCopyImageView: ImageView = itemView.findViewById(R.id.credential_copy)
         private val credentialMenuImageView: ImageView = itemView.findViewById(R.id.credential_menu_popup)
+        private val credentialLabelContainerView: LinearLayout = itemView.findViewById(R.id.label_container)
 
         fun listenForShowCredential(event: (position: Int, type: Int) -> Unit) {
             credentialItemView.setOnClickListener {
@@ -199,8 +196,23 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
             }
         }
 
-        fun bind(text: CharSequence?) {
-            credentialItemView.text = text
+        fun bind(key: SecretKey?, credential: EncCredential) {
+            var name = "????"
+            if (key != null) {
+                name = SecretService.decryptCommonString(key, credential.name)
+
+                credentialLabelContainerView.removeAllViews()
+                LabelService.getLabelsForCredential(key, credential).forEachIndexed {idx, it ->
+                    val chipView = ChipView(itemView.context)
+                    // doesnt work: chipView.setChip(it.labelChip)
+                    chipView.label = it.labelChip.label
+                    chipView.setChipBackgroundColor(it.labelChip.getColor(itemView.context))
+                    chipView.setLabelColor(getColor(itemView.context, R.color.white))
+                    chipView.setPadding(16, 0, 16, 0)
+                    credentialLabelContainerView.addView(chipView, idx)
+                }
+            }
+            credentialItemView.text = name
         }
 
 

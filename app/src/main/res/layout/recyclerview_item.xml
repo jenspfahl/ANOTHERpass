@@ -1,45 +1,67 @@
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:stretchColumns="0,1"
-    android:shrinkColumns="0,1"
     android:paddingTop="4dp"
     android:orientation="horizontal">
-    <TableRow>
+    <TableRow
+        android:layout_width="match_parent"
+        android:weightSum="1.0">
 
-        <TextView
-            android:id="@+id/credential_name"
-            style="@style/credential_title"
-            android:clickable="true"
-            android:textIsSelectable="false"
-            android:textAlignment="textStart"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingTop="4dp"
+                android:layout_weight="0.75"
+                android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/credential_detach"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:clickable="true"
-            android:src="@drawable/ic_baseline_north_east_24" />
+                <TextView
+                    android:id="@+id/credential_name"
+                    style="@style/credential_title"
+                    android:clickable="true"
+                    android:textIsSelectable="false"
+                    android:textAlignment="textStart"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
 
-        <ImageView
-            android:id="@+id/credential_copy"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:paddingLeft="16dp"
-            android:clickable="true"
-            android:src="@drawable/ic_baseline_content_copy_24" />
+                <LinearLayout
+                    android:id="@+id/label_container"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:orientation="horizontal"/>
+            </LinearLayout>
 
-        <ImageView
-            android:id="@+id/credential_menu_popup"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:clickable="true"
-            android:layout_gravity="end"
-            android:paddingLeft="16dp"
-            android:src="@drawable/ic_baseline_more_vert_24" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center"
+                android:layout_weight="0.25">
+                <ImageView
+                    android:id="@+id/credential_detach"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="end"
+                    android:clickable="true"
+                    android:src="@drawable/ic_baseline_north_east_24" />
 
+                <ImageView
+                    android:id="@+id/credential_copy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="end"
+                    android:paddingLeft="16dp"
+                    android:clickable="true"
+                    android:src="@drawable/ic_baseline_content_copy_24" />
+
+                <ImageView
+                    android:id="@+id/credential_menu_popup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:clickable="true"
+                    android:layout_gravity="end"
+                    android:paddingLeft="16dp"
+                    android:src="@drawable/ic_baseline_more_vert_24" />
+            </LinearLayout>
     </TableRow>
 </TableLayout>
