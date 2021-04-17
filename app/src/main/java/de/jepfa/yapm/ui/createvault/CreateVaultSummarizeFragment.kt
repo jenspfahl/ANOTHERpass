@@ -113,8 +113,8 @@ class CreateVaultSummarizeFragment : BaseFragment() {
                         LoginUseCase.execute(pin, masterPasswd, getBaseActivity())
                         pin.clear()
                         masterPasswd.clear()
-                        getBaseActivity().finishAffinity()
                         findNavController().navigate(R.id.action_Create_Vault_to_ThirdFragment_to_Root)
+                        getBaseActivity().finishAffinity() //TODO switch this with next line
                     }
                 }
             )

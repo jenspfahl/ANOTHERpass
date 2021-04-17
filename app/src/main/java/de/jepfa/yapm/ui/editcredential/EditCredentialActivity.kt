@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
 
@@ -24,6 +25,13 @@ class EditCredentialActivity : SecureActivity() {
             return
         }
         setContentView(R.layout.activity_edit_credential)
+
+        labelViewModel.allLabels.observe(this, { labels ->
+            val key = masterSecretKey
+            if (key != null) {
+                LabelService.initLabels(key, labels.toSet())
+            }
+        })
 
         val idExtra = intent.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
         if (idExtra == -1) {

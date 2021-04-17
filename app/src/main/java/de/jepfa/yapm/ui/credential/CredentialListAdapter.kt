@@ -24,6 +24,8 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
 import de.jepfa.yapm.util.ClipboardUtil
+import de.jepfa.yapm.util.PreferenceUtil
+import de.jepfa.yapm.util.PreferenceUtil.PREF_SHOW_LABELS_IN_LIST
 import java.util.*
 import javax.crypto.SecretKey
 
@@ -202,14 +204,18 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
                 name = SecretService.decryptCommonString(key, credential.name)
 
                 credentialLabelContainerView.removeAllViews()
-                LabelService.getLabelsForCredential(key, credential).forEachIndexed {idx, it ->
-                    val chipView = ChipView(itemView.context)
-                    // doesnt work: chipView.setChip(it.labelChip)
-                    chipView.label = it.labelChip.label
-                    chipView.setChipBackgroundColor(it.labelChip.getColor(itemView.context))
-                    chipView.setLabelColor(getColor(itemView.context, R.color.white))
-                    chipView.setPadding(16, 0, 16, 0)
-                    credentialLabelContainerView.addView(chipView, idx)
+
+                val showLabels = PreferenceUtil.getAsBool(PREF_SHOW_LABELS_IN_LIST, true, itemView.context)
+                if (showLabels) {
+                    LabelService.getLabelsForCredential(key, credential).forEachIndexed { idx, it ->
+                        val chipView = ChipView(itemView.context)
+                        // doesnt work: chipView.setChip(it.labelChip)
+                        chipView.label = it.labelChip.label
+                        chipView.setChipBackgroundColor(it.labelChip.getColor(itemView.context))
+                        chipView.setLabelColor(getColor(itemView.context, R.color.white))
+                        chipView.setPadding(16, 0, 16, 0)
+                        credentialLabelContainerView.addView(chipView, idx)
+                    }
                 }
             }
             credentialItemView.text = name

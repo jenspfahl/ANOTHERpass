@@ -6,6 +6,8 @@
         app:entryValues="@array/lock_timeout_values"
         app:key="YAPM/pref:lock_timeout"
         app:title="@string/lock_timeout_title"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
         app:useSimpleSummaryProvider="true" />
 
     <ListPreference
@@ -14,11 +16,17 @@
         app:entryValues="@array/logout_timeout_values"
         app:key="YAPM/pref:logout_timeout"
         app:title="@string/logout_timeout_title"
+        app:allowDividerBelow="true"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
         app:useSimpleSummaryProvider="true" />
 
     <SwitchPreferenceCompat
         app:key="YAPM/pref:warn_copy_password"
         app:title="Show warning when copying password to clipboard"
+        app:allowDividerAbove="true"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
         app:defaultValue="true"/>
 
 </PreferenceScreen>

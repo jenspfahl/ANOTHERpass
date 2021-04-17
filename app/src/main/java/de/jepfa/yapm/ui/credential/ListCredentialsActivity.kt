@@ -120,6 +120,11 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         toggle.syncState()
     }
 
+    override fun onResume() {
+        super.onResume()
+        credentialListAdapter.notifyDataSetChanged()
+    }
+
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         toggle.onConfigurationChanged(newConfig)

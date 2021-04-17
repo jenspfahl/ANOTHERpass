@@ -29,6 +29,7 @@ object PreferenceUtil {
     const val PREF_COLORED_PASSWORD = PREF_PREFIX + "colored_passwords"
     const val PREF_TRANSPARENT_OVERLAY = PREF_PREFIX + "transparent_overlay"
     const val PREF_PASSWD_WORDS_ON_NL = PREF_PREFIX + "password_words_on_nl"
+    const val PREF_SHOW_LABELS_IN_LIST = PREF_PREFIX + "show_labels_in_list"
 
     const val STATE_LOGIN_ATTEMPTS = STATE_PREFIX + "login_attempts"
 

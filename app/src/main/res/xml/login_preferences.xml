@@ -6,12 +6,16 @@
         app:entryValues="@array/max_login_attempts_values"
         app:key="YAPM/pref:max_login_attempts"
         app:title="@string/max_login_attempts_title"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
         app:useSimpleSummaryProvider="true" />
 
     <SwitchPreferenceCompat
         app:key="YAPM/pref:fast_mp_login"
         app:summaryOff="Master password can be typed manually or scanned from QR code"
         app:summaryOn="Opens the QR code scanner immediately if master password is not stored on device and logs in afterwards"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
         app:title="Scan master password and login immediately" />
 
 </PreferenceScreen>
