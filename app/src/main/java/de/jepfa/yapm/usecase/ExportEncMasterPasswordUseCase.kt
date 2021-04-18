@@ -9,7 +9,7 @@ import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 
-object ExportPlainMasterPasswordUseCase {
+object ExportEncMasterPasswordUseCase {
 
     fun execute(encMasterPasswd: Encrypted, noSessionCheck: Boolean, activity: BaseActivity): Boolean {
 
@@ -17,7 +17,12 @@ object ExportPlainMasterPasswordUseCase {
 
         val encHead = SecretService.encryptCommonString(tempKey, "Your real master password")
         val encSub = SecretService.encryptCommonString(tempKey, "Store this on a safe place since this is your plain master password.")
-        val encQrc = encMasterPasswd
+        val masterPassword = SecretService.decryptPassword(tempKey, encMasterPasswd)
+        val salt = SecretService.getSalt(activity)
+        val saltSK = SecretService.generateFastSecretKey(salt, salt)
+        val encMasterPasswd = SecretService.encryptPassword(Encrypted.TYPE_ENC_MASTER_PASSWD, saltSK, masterPassword)
+        val encQrc = SecretService.encryptEncrypted(tempKey, encMasterPasswd)
+        masterPassword.clear()
 
         val intent = Intent(activity, QrCodeActivity::class.java)
         intent.putExtra(QrCodeActivity.EXTRA_HEADLINE, encHead.toBase64String())

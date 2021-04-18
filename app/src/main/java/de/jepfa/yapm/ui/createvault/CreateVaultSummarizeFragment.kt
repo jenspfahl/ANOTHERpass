@@ -10,20 +10,15 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Password
-import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.ALIAS_KEY_TRANSPORT
 import de.jepfa.yapm.service.secret.SecretService.decryptPassword
-import de.jepfa.yapm.service.secret.SecretService.encryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER_PASSWD
-import de.jepfa.yapm.ui.qrcode.QrCodeActivity
-import de.jepfa.yapm.usecase.ChangeMasterPasswordUseCase
 import de.jepfa.yapm.usecase.CreateVaultUseCase
-import de.jepfa.yapm.usecase.ExportPlainMasterPasswordUseCase
+import de.jepfa.yapm.usecase.ExportEncMasterPasswordUseCase
 import de.jepfa.yapm.usecase.LoginUseCase
 import de.jepfa.yapm.util.AsyncWithProgressBar
 import de.jepfa.yapm.util.PasswordColorizer
@@ -59,7 +54,7 @@ class CreateVaultSummarizeFragment : BaseFragment() {
         exportAsQrcImageView.setOnClickListener {
             val tempKey = getAndroidSecretKey(ALIAS_KEY_TRANSPORT)
             val encMasterPasswd = encryptPassword(tempKey, masterPasswd)
-            ExportPlainMasterPasswordUseCase.execute(encMasterPasswd, true, getBaseActivity())
+            ExportEncMasterPasswordUseCase.execute(encMasterPasswd, true, getBaseActivity())
         }
 
         view.findViewById<Button>(R.id.button_create_vault).setOnClickListener {

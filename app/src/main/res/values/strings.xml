@@ -77,7 +77,7 @@
     <string name="show_as_qrcode">Show as QR Code</string>
     <string name="export">Export</string>
     <string name="export_masterkey">Encrypted masterkey</string>
-    <string name="export_masterpasswd">Plain master password</string>
+    <string name="export_masterpasswd">Encrypted master password</string>
     <string name="export_vault">Vault as file</string>
     <string name="qrc_download_as_img">Save Qr code as image</string>
     <string name="download_as_nfc_tag">Push as NFC tag</string>
@@ -108,7 +108,7 @@
     <string name="repeat_new_pin">Repeat new pin</string>
     <string name="current_pin">Enter current pin</string>
     <string name="change_master_password">Change master password</string>
-    <string name="change_master_password_explanation">Change your master password by enter your current pin and generate a new master password. Note, that the encrypted master key will be changed, so you need to export it again. This also effects old vault export files with the old key. You should also export your master password (plain and token) again.</string>
+    <string name="change_master_password_explanation">Change your master password by enter your current pin and generate a new master password. Note, that the encrypted master key will be changed, so you need to export it again. This also effects old vault export files with the old key. You should also export your master password and tokens again.</string>
     <string name="security">Privacy</string>
     <string name="delete_stored_masterpasswd_confirmation">Do you want to delete the stored master password from this device? For future logins you will need the master password then.</string>
     <string name="pref_header_general">General</string>

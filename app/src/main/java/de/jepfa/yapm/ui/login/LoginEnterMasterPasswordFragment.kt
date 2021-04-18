@@ -118,9 +118,12 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                     val masterPasswordTokenKey = decryptKey(masterPasswordTokenSK, encMasterPasswordTokenKey)
                     val mptSK = generateSecretKey(masterPasswordTokenKey, getSalt(getBaseActivity()))
 
-                    val masterPasswordToken = scanned
+                    val encMasterPassword = SecretService.decryptPassword(mptSK, Encrypted.fromBase64String(scanned))
+                    if (!encMasterPassword.isValid()) {
+                        Toast.makeText(getBaseActivity(), "Invalid master password token", Toast.LENGTH_LONG).show()
+                        return
+                    }
 
-                    val encMasterPassword = SecretService.decryptPassword(mptSK, Encrypted.fromBase64String(masterPasswordToken))
                     masterPasswdTextView.setText(encMasterPassword)
 
                     if (isFastLogin()) {
@@ -128,11 +131,25 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                     }
                 }
             }
-            else {
-                masterPasswdTextView.setText(scanned)
+            else if (scanned.startsWith(Encrypted.TYPE_ENC_MASTER_PASSWD)) {
+
+                val salt = getSalt(getBaseActivity())
+                val saltSK = SecretService.generateFastSecretKey(salt, salt)
+                val encMasterPassword = SecretService.decryptPassword(saltSK, Encrypted.fromBase64String(scanned))
+                if (!encMasterPassword.isValid()) {
+                    Toast.makeText(getBaseActivity(), "Invalid encrypted master password", Toast.LENGTH_LONG).show()
+                    return
+                }
+
+                masterPasswdTextView.setText(encMasterPassword)
+
                 if (isFastLogin()) {
                     loginButton.performClick()
                 }
+            }
+            else {
+                Toast.makeText(getBaseActivity(), "Unknown master password", Toast.LENGTH_LONG).show()
+
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data)

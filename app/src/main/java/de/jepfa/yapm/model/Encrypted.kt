@@ -18,6 +18,7 @@ data class Encrypted(val type: String = "", val iv: ByteArray, val data: ByteArr
 
     companion object {
         const val TYPE_MASTER_PASSWD_TOKEN = "MPT"
+        const val TYPE_ENC_MASTER_PASSWD = "EMP"
         const val TYPE_ENC_MASTER_KEY = "EMK"
 
         private val BAS64_PAIR_DELIMITOR = ':'

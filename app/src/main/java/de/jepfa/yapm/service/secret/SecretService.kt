@@ -24,7 +24,6 @@ object SecretService {
 
     private val CIPHER_AES_GCM = "AES/GCM/NoPadding"
     private val ANDROID_KEY_STORE = "AndroidKeyStore"
-    val FAILED_BYTE_ARRAY = "<<LOCKED>>".toByteArray()
 
     private val random = SecureRandom()
     private val androidKeyStore = KeyStore.getInstance(ANDROID_KEY_STORE)
@@ -36,12 +35,20 @@ object SecretService {
         return Key(bytes)
     }
 
+    fun generateFastSecretKey(key: Key, salt: Key): SecretKey {
+        return generateSecretKey(Password(key.toCharArray()), salt, 1000)
+    }
+
     fun generateSecretKey(key: Key, salt: Key): SecretKey {
         return generateSecretKey(Password(key.toCharArray()), salt)
     }
 
     fun generateSecretKey(password: Password, salt: Key): SecretKey {
-        val keySpec = PBEKeySpec(password.data, salt.data, 65536, 128)
+        return generateSecretKey(password, salt, 65536)
+    }
+
+    fun generateSecretKey(password: Password, salt: Key, iterations: Int): SecretKey {
+        val keySpec = PBEKeySpec(password.data, salt.data, iterations, 128)
         val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
         try {
             return factory.generateSecret(keySpec)
@@ -120,7 +127,7 @@ object SecretService {
         try {
             return cipher.doFinal(encryptedData)
         } catch (e: GeneralSecurityException) {
-            return FAILED_BYTE_ARRAY;
+            return Key.FAILED_BYTE_ARRAY;
         }
     }
 
@@ -149,9 +156,16 @@ object SecretService {
     @Synchronized
     fun getSalt(activity: BaseActivity): Key {
         val saltBase64 = PreferenceUtil.get(PreferenceUtil.PREF_SALT, activity)
-        val salt = Key(Base64.decode(saltBase64, 0))
-        return salt
+            ?: return createAndStoreSalt(activity)
+        return Key(Base64.decode(saltBase64, 0))
     }
 
+    private fun createAndStoreSalt(activity: BaseActivity): Key {
+        val salt = generateKey(128)
+        val saltBase64 = Base64.encodeToString(salt.data, Base64.DEFAULT)
+        PreferenceUtil.put(PreferenceUtil.PREF_SALT, saltBase64, activity)
+
+        return salt
+    }
 
 }

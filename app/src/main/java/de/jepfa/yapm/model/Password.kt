@@ -5,7 +5,7 @@ import de.jepfa.yapm.util.PreferenceUtil
 import java.nio.CharBuffer
 import java.util.*
 
-data class Password(var data: CharArray) : Clearable, CharSequence {
+data class Password(var data: CharArray) : Clearable, Validable, CharSequence {
     constructor(passwd: String) : this(passwd.toCharArray()) {
     }
 
@@ -18,6 +18,10 @@ data class Password(var data: CharArray) : Clearable, CharSequence {
 
     fun isEqual(other: Password): Boolean {
         return Arrays.equals(data, other.data)
+    }
+
+    override fun isValid(): Boolean {
+        return Arrays.equals(toByteArray(), Validable.FAILED_BYTE_ARRAY)
     }
 
     fun add(other: Password) {

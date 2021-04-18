@@ -39,7 +39,7 @@ object MasterKeyService {
 
         val encMasterKey = SecretService.decryptEncrypted(androidSK, storedEncMasterKey)
         val masterKey = SecretService.decryptKey(masterPassPhraseSK, encMasterKey)
-        if (Arrays.equals(masterKey.data, SecretService.FAILED_BYTE_ARRAY)) {
+        if (!masterKey.isValid()) {
             return null
         }
         return masterKey

@@ -14,7 +14,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
-import android.widget.Filterable
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.SearchView
@@ -327,10 +326,10 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
             R.id.generate_encrypted_masterpasswd -> {
                 return GenerateMasterPasswordTokenUseCase.execute(this)
             }
-            R.id.export_plain_masterpasswd -> {
+            R.id.export_encrypted_masterpasswd -> {
                 val encMasterPasswd = Session.getEncMasterPasswd()
                 if (encMasterPasswd != null) {
-                    ExportPlainMasterPasswordUseCase.execute(encMasterPasswd, false, this)
+                    ExportEncMasterPasswordUseCase.execute(encMasterPasswd, false, this)
                     return true
                 }
                 else {

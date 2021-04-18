@@ -23,7 +23,7 @@
     <item android:title="@string/export" >
         <menu >
             <item
-                android:id="@+id/export_plain_masterpasswd"
+                android:id="@+id/export_encrypted_masterpasswd"
                 android:orderInCategory="10"
                 android:title="@string/export_masterpasswd" />
             <item
