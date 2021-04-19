@@ -20,6 +20,7 @@ import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.util.FileUtil
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.QRCodeUtil
+import de.jepfa.yapm.util.getEncryptedExtra
 import java.lang.reflect.Type
 import java.text.SimpleDateFormat
 import java.util.*
@@ -45,6 +46,7 @@ class FileIOService: IntentService("FileIOService") {
 
         const val PARAM_FILE_URI = "param_fileUrl"
         const val PARAM_QRC = "param_qrc"
+        const val PARAM_QRC_HEADER = "param_qrc_header"
         const val PARAM_QRC_COLOR = "param_qrc_color"
         const val PARAM_INCLUDE_MK = "param_include_mk"
 
@@ -166,13 +168,14 @@ class FileIOService: IntentService("FileIOService") {
             val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
 
             val uri = intent.getParcelableExtra<Uri>(PARAM_FILE_URI)
-            val encQrcBase64 = intent.getStringExtra(PARAM_QRC)
+            val encQrc = intent.getEncryptedExtra(PARAM_QRC)
+            val encHeader = intent.getEncryptedExtra(PARAM_QRC_HEADER)
             val qrcColor = intent.getIntExtra(PARAM_QRC_COLOR, Color.BLACK)
-            val encQrc = Encrypted.fromBase64String(encQrcBase64)
             val qrc = SecretService.decryptPassword(tempKey, encQrc)
+            val header = SecretService.decryptCommonString(tempKey, encHeader)
 
             val fileOutStream = contentResolver.openOutputStream(uri)
-            val bitmap = QRCodeUtil.generateQRCode(qrc.toString(), qrcColor)
+            val bitmap = QRCodeUtil.generateQRCode(header, qrc.toString(), qrcColor)
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fileOutStream)
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fileOutStream)
             message = "QR code as image saved"

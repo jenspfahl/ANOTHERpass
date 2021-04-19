@@ -33,6 +33,7 @@ import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.PasswordColorizer.spannableString
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.PREF_PASSWD_WORDS_ON_NL
+import de.jepfa.yapm.util.putEncryptedExtra
 
 
 class ShowCredentialActivity : SecureActivity() {
@@ -151,9 +152,10 @@ class ShowCredentialActivity : SecureActivity() {
 
                 val intent = Intent(this, QrCodeActivity::class.java)
                 intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, credential.id)
-                intent.putExtra(QrCodeActivity.EXTRA_HEADLINE, tempEncName.toBase64String())
-                intent.putExtra(QrCodeActivity.EXTRA_SUBTEXT, tempEncUser.toBase64String())
-                intent.putExtra(QrCodeActivity.EXTRA_QRCODE, tempEncPasswd.toBase64String())
+                intent.putEncryptedExtra(QrCodeActivity.EXTRA_HEADLINE, tempEncName)
+                intent.putEncryptedExtra(QrCodeActivity.EXTRA_SUBTEXT, tempEncUser)
+                intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE, tempEncPasswd)
+                intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE_HEADER, tempEncName)
 
                 startActivity(intent)
             }

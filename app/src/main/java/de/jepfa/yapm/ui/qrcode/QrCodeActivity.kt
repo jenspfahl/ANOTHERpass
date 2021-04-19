@@ -1,9 +1,6 @@
 package de.jepfa.yapm.ui.qrcode
 
 import android.app.AlertDialog
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -15,13 +12,13 @@ import android.widget.Toast
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Encrypted
 import de.jepfa.yapm.model.Session
-import de.jepfa.yapm.provider.PasteContentProvider
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.ExtPermissionChecker
 import de.jepfa.yapm.util.QRCodeUtil.generateQRCode
+import de.jepfa.yapm.util.getEncryptedExtra
 
 class QrCodeActivity : SecureActivity() {
 
@@ -42,21 +39,23 @@ class QrCodeActivity : SecureActivity() {
         val subTextView: TextView = findViewById(R.id.textview_subtext)
         val qrCodeImageView: ImageView = findViewById(R.id.imageview_qrcode)
 
-        val encHead = Encrypted.fromBase64String(intent.getStringExtra(EXTRA_HEADLINE))
-        val encSub = Encrypted.fromBase64String(intent.getStringExtra(EXTRA_SUBTEXT))
-        encQRC = Encrypted.fromBase64String(intent.getStringExtra(EXTRA_QRCODE))
+        val encHead = intent.getEncryptedExtra(EXTRA_HEADLINE)
+        val encSub = intent.getEncryptedExtra(EXTRA_SUBTEXT)
+        val encQrcHeader = intent.getEncryptedExtra(EXTRA_QRCODE_HEADER)
+        encQRC = intent.getEncryptedExtra(EXTRA_QRCODE)
         val qrcColor = intent.getIntExtra(EXTRA_COLOR, Color.BLACK)
 
         val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
         head = SecretService.decryptCommonString(tempKey, encHead)
         val sub = SecretService.decryptCommonString(tempKey, encSub)
+        val qrcHeader = SecretService.decryptCommonString(tempKey, encQrcHeader)
         val qrc = SecretService.decryptPassword(tempKey, encQRC)
 
         headTextView.text = head
         subTextView.text = sub
 
         if (!qrc.isEmpty()) {
-            val bitmap = generateQRCode(qrc.toString(), qrcColor)
+            val bitmap = generateQRCode(qrcHeader, qrc.toString(), qrcColor)
             qrCodeImageView.setImageBitmap(bitmap)
             qrCodeImageView.setOnLongClickListener {
                 AlertDialog.Builder(this)
@@ -118,10 +117,12 @@ class QrCodeActivity : SecureActivity() {
 
             data?.data?.let {
                 val qrcColor = intent.getIntExtra(EXTRA_COLOR, Color.BLACK)
+                val header = intent.getStringExtra(EXTRA_QRCODE_HEADER)
                 val intent = Intent(this, FileIOService::class.java)
                 intent.action = FileIOService.ACTION_SAVE_QRC
                 intent.putExtra(FileIOService.PARAM_FILE_URI, it)
                 intent.putExtra(FileIOService.PARAM_QRC, encQRC.toBase64String())
+                intent.putExtra(FileIOService.PARAM_QRC_HEADER, header)
                 intent.putExtra(FileIOService.PARAM_QRC_COLOR, qrcColor)
                 startService(intent)
             }
@@ -142,6 +143,7 @@ class QrCodeActivity : SecureActivity() {
         const val EXTRA_HEADLINE = "head"
         const val EXTRA_SUBTEXT = "sub"
         const val EXTRA_QRCODE = "qrc"
+        const val EXTRA_QRCODE_HEADER = "qrc_header"
         const val EXTRA_COLOR = "col"
         const val EXTRA_NO_SESSION_CHECK = "noSessionChecl"
     }

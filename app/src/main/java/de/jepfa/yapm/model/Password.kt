@@ -21,7 +21,7 @@ data class Password(var data: CharArray) : Clearable, Validable, CharSequence {
     }
 
     override fun isValid(): Boolean {
-        return Arrays.equals(toByteArray(), Validable.FAILED_BYTE_ARRAY)
+        return !Arrays.equals(toByteArray(), Validable.FAILED_BYTE_ARRAY)
     }
 
     fun add(other: Password) {

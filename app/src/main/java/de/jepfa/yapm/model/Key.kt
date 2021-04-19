@@ -14,7 +14,7 @@ data class Key(val data: ByteArray) : Clearable, Validable {
     }
 
     override fun isValid(): Boolean {
-        return Arrays.equals(data, Validable.FAILED_BYTE_ARRAY)
+        return !Arrays.equals(data, Validable.FAILED_BYTE_ARRAY)
     }
 
     fun debugToString(): String {

@@ -5,6 +5,7 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.util.PreferenceUtil
+import de.jepfa.yapm.util.putEncryptedExtra
 
 object ExportEncMasterKeyUseCase: SecureActivityUseCase {
 
@@ -19,12 +20,14 @@ object ExportEncMasterKeyUseCase: SecureActivityUseCase {
 
             val encHead = SecretService.encryptCommonString(tempKey, "Encrypted master key")
             val encSub = SecretService.encryptCommonString(tempKey, "Store this at a safe place. Future backups don't need to include that master key.")
+            val encQrcHeader = SecretService.encryptCommonString(tempKey, encMasterKey.type)
             val encQrc = SecretService.encryptEncrypted(tempKey, encMasterKey)
 
             val intent = Intent(activity, QrCodeActivity::class.java)
-            intent.putExtra(QrCodeActivity.EXTRA_HEADLINE, encHead.toBase64String())
-            intent.putExtra(QrCodeActivity.EXTRA_SUBTEXT, encSub.toBase64String())
-            intent.putExtra(QrCodeActivity.EXTRA_QRCODE, encQrc.toBase64String())
+            intent.putEncryptedExtra(QrCodeActivity.EXTRA_HEADLINE, encHead)
+            intent.putEncryptedExtra(QrCodeActivity.EXTRA_SUBTEXT, encSub)
+            intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE_HEADER, encQrcHeader)
+            intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE, encQrc)
             activity.startActivity(intent)
 
             return true

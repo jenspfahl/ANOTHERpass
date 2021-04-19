@@ -8,6 +8,7 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
+import de.jepfa.yapm.util.putEncryptedExtra
 
 object ExportEncMasterPasswordUseCase {
 
@@ -15,19 +16,21 @@ object ExportEncMasterPasswordUseCase {
 
         val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
 
-        val encHead = SecretService.encryptCommonString(tempKey, "Your real master password")
+        val encHead = SecretService.encryptCommonString(tempKey, "Your encrypted master password")
         val encSub = SecretService.encryptCommonString(tempKey, "Store this on a safe place since this is your plain master password.")
         val masterPassword = SecretService.decryptPassword(tempKey, encMasterPasswd)
         val salt = SecretService.getSalt(activity)
         val saltSK = SecretService.generateFastSecretKey(salt, salt)
         val encMasterPasswd = SecretService.encryptPassword(Encrypted.TYPE_ENC_MASTER_PASSWD, saltSK, masterPassword)
+        val encQrcHeader = SecretService.encryptCommonString(tempKey, encMasterPasswd.type)
         val encQrc = SecretService.encryptEncrypted(tempKey, encMasterPasswd)
         masterPassword.clear()
 
         val intent = Intent(activity, QrCodeActivity::class.java)
-        intent.putExtra(QrCodeActivity.EXTRA_HEADLINE, encHead.toBase64String())
-        intent.putExtra(QrCodeActivity.EXTRA_SUBTEXT, encSub.toBase64String())
-        intent.putExtra(QrCodeActivity.EXTRA_QRCODE, encQrc.toBase64String())
+        intent.putEncryptedExtra(QrCodeActivity.EXTRA_HEADLINE, encHead)
+        intent.putEncryptedExtra(QrCodeActivity.EXTRA_SUBTEXT, encSub)
+        intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE_HEADER, encQrcHeader)
+        intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE, encQrc)
         intent.putExtra(QrCodeActivity.EXTRA_COLOR, Color.RED)
         intent.putExtra(QrCodeActivity.EXTRA_NO_SESSION_CHECK, noSessionCheck)
         activity.startActivity(intent)

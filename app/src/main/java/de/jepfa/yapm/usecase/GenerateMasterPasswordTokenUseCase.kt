@@ -9,6 +9,7 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.util.PreferenceUtil
+import de.jepfa.yapm.util.putEncryptedExtra
 
 object GenerateMasterPasswordTokenUseCase: SecureActivityUseCase {
 
@@ -48,14 +49,16 @@ object GenerateMasterPasswordTokenUseCase: SecureActivityUseCase {
 
             val encHead = SecretService.encryptCommonString(tempKey, "Your master password token")
             val encSub = SecretService.encryptCommonString(tempKey, "Take this token in your wallet to scan for login. If you loose it, just create a new one.")
+            val encQrcHeader = SecretService.encryptCommonString(tempKey, encMasterPasswordToken.type)
             val encQrc = encMasterPasswordToken
 
             PreferenceUtil.putEncrypted(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, encMasterPasswordTokenKey, activity)
 
             val intent = Intent(activity, QrCodeActivity::class.java)
-            intent.putExtra(QrCodeActivity.EXTRA_HEADLINE, encHead.toBase64String())
-            intent.putExtra(QrCodeActivity.EXTRA_SUBTEXT, encSub.toBase64String())
-            intent.putExtra(QrCodeActivity.EXTRA_QRCODE, encQrc.toBase64String())
+            intent.putEncryptedExtra(QrCodeActivity.EXTRA_HEADLINE, encHead)
+            intent.putEncryptedExtra(QrCodeActivity.EXTRA_SUBTEXT, encSub)
+            intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE_HEADER, encQrcHeader)
+            intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE, encQrc)
             intent.putExtra(QrCodeActivity.EXTRA_COLOR, Color.BLUE)
 
             activity.startActivity(intent)

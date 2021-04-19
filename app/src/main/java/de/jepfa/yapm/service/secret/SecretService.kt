@@ -3,8 +3,10 @@ package de.jepfa.yapm.service.secret
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
+import android.util.Log
 import de.jepfa.yapm.model.*
 import de.jepfa.yapm.model.Key
+import de.jepfa.yapm.model.Validable.Companion.FAILED_BYTE_ARRAY
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.util.PreferenceUtil
 import java.security.*
@@ -127,7 +129,8 @@ object SecretService {
         try {
             return cipher.doFinal(encryptedData)
         } catch (e: GeneralSecurityException) {
-            return Key.FAILED_BYTE_ARRAY;
+            Log.e("SS", "unable to decrypt")
+            return FAILED_BYTE_ARRAY;
         }
     }
 
