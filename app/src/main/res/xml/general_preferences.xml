@@ -28,6 +28,15 @@
         app:title="Transparent password overlay"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
+        app:allowDividerBelow="true"
+        app:defaultValue="true"/>
+
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:colorize_mp_qrcodes"
+        app:title="Colorize master password QR codes"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:allowDividerAbove="true"
         app:defaultValue="true"/>
 
 </PreferenceScreen>

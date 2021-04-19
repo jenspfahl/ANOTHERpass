@@ -1,5 +1,6 @@
 package de.jepfa.yapm.util
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -11,11 +12,15 @@ import com.google.zxing.MultiFormatWriter
 import com.google.zxing.WriterException
 import com.google.zxing.integration.android.IntentIntegrator
 import de.jepfa.yapm.ui.qrcode.CaptureActivity
+import de.jepfa.yapm.util.PreferenceUtil.PREF_COLORIZE_MP_QRCODES
 
 
 object QRCodeUtil {
 
-    fun generateQRCode(header: String?, data: String, color: Int = Color.BLACK): Bitmap {
+    fun generateQRCode(header: String?, data: String, color: Int = Color.BLACK, context: Context): Bitmap {
+        val colorize = PreferenceUtil.getAsBool(PREF_COLORIZE_MP_QRCODES, true, context)
+        val printColor = if (colorize) color else Color.BLACK
+
         val width = 500
         val height = 500
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
@@ -24,7 +29,7 @@ object QRCodeUtil {
             val bitMatrix = codeWriter.encode(data, BarcodeFormat.QR_CODE, width, height)
             for (x in 0 until width) {
                 for (y in 0 until height) {
-                    bitmap.setPixel(x, y, if (bitMatrix[x, y]) color else Color.WHITE)
+                    bitmap.setPixel(x, y, if (bitMatrix[x, y]) printColor else Color.WHITE)
                 }
             }
         } catch (e: WriterException) {
@@ -35,7 +40,7 @@ object QRCodeUtil {
             val textPaint = TextPaint()
             textPaint.isAntiAlias = true
             textPaint.textSize = 32f
-            textPaint.color = color
+            textPaint.color = printColor
 
             val textWidth = textPaint.measureText(header).toInt()
             val canvas = Canvas(bitmap)

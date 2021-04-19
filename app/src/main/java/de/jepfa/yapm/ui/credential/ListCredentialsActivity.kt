@@ -316,7 +316,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                     .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
                         RemoveStoredMasterPasswordUseCase.execute(this)
                         refreshMenuMasterPasswordItem(navigationView.menu)
-                        Toast.makeText(this, "Stored master password removed on device", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "Stored master password removed from device", Toast.LENGTH_LONG).show()
                     }
                     .setNegativeButton(android.R.string.no, null)
                     .show()

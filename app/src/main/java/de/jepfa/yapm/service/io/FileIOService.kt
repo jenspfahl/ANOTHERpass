@@ -175,7 +175,7 @@ class FileIOService: IntentService("FileIOService") {
             val header = SecretService.decryptCommonString(tempKey, encHeader)
 
             val fileOutStream = contentResolver.openOutputStream(uri)
-            val bitmap = QRCodeUtil.generateQRCode(header, qrc.toString(), qrcColor)
+            val bitmap = QRCodeUtil.generateQRCode(header, qrc.toString(), qrcColor, this)
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fileOutStream)
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fileOutStream)
             message = "QR code as image saved"

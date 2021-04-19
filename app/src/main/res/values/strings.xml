@@ -76,9 +76,9 @@
     <string name="detach">Detach</string>
     <string name="show_as_qrcode">Show as QR Code</string>
     <string name="export">Export</string>
-    <string name="export_masterkey">Encrypted masterkey</string>
-    <string name="export_masterpasswd">Encrypted master password</string>
-    <string name="export_vault">Vault as file</string>
+    <string name="export_masterkey">Export masterkey</string>
+    <string name="export_masterpasswd">Export master password</string>
+    <string name="export_vault">Save vault as file</string>
     <string name="qrc_download_as_img">Save Qr code as image</string>
     <string name="download_as_nfc_tag">Push as NFC tag</string>
     <string name="export_vault_explanation">Here you can export your complete vault into a file for backup purposes. Use this file to import your vault after a fresh new app installation without data. You have the choice to include or exclude the encrypted masterkey. If you exlude it, export the masterkey by your own and store it on a safe place. You need it to import the vault file. The separation of encrypted master key and vault file might be sense to make the vault file useless for hackers even if they guess your pin and master password.</string>

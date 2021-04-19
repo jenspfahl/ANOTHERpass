@@ -18,7 +18,7 @@ object ExportEncMasterKeyUseCase: SecureActivityUseCase {
             val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
             val encMasterKey = SecretService.decryptEncrypted(mkKey, encStoredMasterKey)
 
-            val encHead = SecretService.encryptCommonString(tempKey, "Encrypted master key")
+            val encHead = SecretService.encryptCommonString(tempKey, "The Encrypted Master Key")
             val encSub = SecretService.encryptCommonString(tempKey, "Store this at a safe place. Future backups don't need to include that master key.")
             val encQrcHeader = SecretService.encryptCommonString(tempKey, encMasterKey.type)
             val encQrc = SecretService.encryptEncrypted(tempKey, encMasterKey)

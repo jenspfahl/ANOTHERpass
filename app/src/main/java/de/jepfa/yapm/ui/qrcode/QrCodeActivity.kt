@@ -55,7 +55,7 @@ class QrCodeActivity : SecureActivity() {
         subTextView.text = sub
 
         if (!qrc.isEmpty()) {
-            val bitmap = generateQRCode(qrcHeader, qrc.toString(), qrcColor)
+            val bitmap = generateQRCode(qrcHeader, qrc.toString(), qrcColor, this)
             qrCodeImageView.setImageBitmap(bitmap)
             qrCodeImageView.setOnLongClickListener {
                 AlertDialog.Builder(this)

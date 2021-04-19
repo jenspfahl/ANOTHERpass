@@ -3,10 +3,8 @@ package de.jepfa.yapm.usecase
 import android.content.Intent
 import android.graphics.Color
 import de.jepfa.yapm.model.Encrypted
-import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
-import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.util.putEncryptedExtra
 
@@ -16,8 +14,8 @@ object ExportEncMasterPasswordUseCase {
 
         val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
 
-        val encHead = SecretService.encryptCommonString(tempKey, "Your encrypted master password")
-        val encSub = SecretService.encryptCommonString(tempKey, "Store this on a safe place since this is your plain master password.")
+        val encHead = SecretService.encryptCommonString(tempKey, "Your Encrypted Master Password")
+        val encSub = SecretService.encryptCommonString(tempKey, "Store this on a safe place since this is contains your master password.")
         val masterPassword = SecretService.decryptPassword(tempKey, encMasterPasswd)
         val salt = SecretService.getSalt(activity)
         val saltSK = SecretService.generateFastSecretKey(salt, salt)

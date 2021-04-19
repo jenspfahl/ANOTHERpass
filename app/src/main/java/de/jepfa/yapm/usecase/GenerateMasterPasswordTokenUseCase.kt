@@ -47,7 +47,7 @@ object GenerateMasterPasswordTokenUseCase: SecureActivityUseCase {
             val masterPasswordToken = SecretService.encryptPassword(Encrypted.TYPE_MASTER_PASSWD_TOKEN, masterPasswordTokenSK, masterPassword)
             val encMasterPasswordToken = SecretService.encryptEncrypted(tempKey, masterPasswordToken)
 
-            val encHead = SecretService.encryptCommonString(tempKey, "Your master password token")
+            val encHead = SecretService.encryptCommonString(tempKey, "Your Master Password Token")
             val encSub = SecretService.encryptCommonString(tempKey, "Take this token in your wallet to scan for login. If you loose it, just create a new one.")
             val encQrcHeader = SecretService.encryptCommonString(tempKey, encMasterPasswordToken.type)
             val encQrc = encMasterPasswordToken
