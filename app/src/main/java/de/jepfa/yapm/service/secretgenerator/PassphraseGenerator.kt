@@ -20,7 +20,7 @@ class PassphraseGenerator: GeneratorBase<PassphraseGeneratorSpec>() {
         }
 
         if (spec.wordBeginningUpperCase) {
-            buffer.data[0] = buffer.data[0].toUpperCase()
+            buffer.replace(0, buffer.get(0).toUpperCase())
         }
 
         if (spec.addDigit) {
@@ -36,7 +36,7 @@ class PassphraseGenerator: GeneratorBase<PassphraseGeneratorSpec>() {
 
     private fun generateWord(): Password {
         val word = generateTuple()
-        val allowDuplicateConsonants = isVocal(word.data[word.data.lastIndex])
+        val allowDuplicateConsonants = isVocal(word.get(word.lastIndex))
         val next = generateTuple(true, allowDuplicateConsonants)
 
         word.add(next)

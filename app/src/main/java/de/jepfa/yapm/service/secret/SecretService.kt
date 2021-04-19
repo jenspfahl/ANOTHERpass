@@ -50,7 +50,7 @@ object SecretService {
     }
 
     fun generateSecretKey(password: Password, salt: Key, iterations: Int): SecretKey {
-        val keySpec = PBEKeySpec(password.data, salt.data, iterations, 128)
+        val keySpec = PBEKeySpec(password.toCharArray(), salt.data, iterations, 128)
         val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
         try {
             return factory.generateSecret(keySpec)
