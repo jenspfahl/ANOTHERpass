@@ -9,8 +9,6 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat.getColor
-import androidx.core.view.setPadding
-import androidx.core.view.size
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -226,7 +224,7 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
         companion object {
             fun create(parent: ViewGroup): CredentialViewHolder {
                 val view: View = LayoutInflater.from(parent.context)
-                        .inflate(R.layout.recyclerview_item, parent, false)
+                        .inflate(R.layout.recyclerview_credential, parent, false)
                 return CredentialViewHolder(view)
             }
         }

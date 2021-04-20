@@ -10,23 +10,25 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.MenuItemCompat
+import androidx.core.view.setPadding
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
+import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Session
@@ -79,8 +81,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                         .sortedBy { SecretService.decryptCommonString(key, it.name).toLowerCase() }
                     credentialListAdapter.submitOriginList(sorted)
                     credentialListAdapter.filter.filter("")
-                }
-                else {
+                } else {
                     credentialListAdapter.submitOriginList(credentials)
                     credentialListAdapter.filter.filter("")
                 }
@@ -106,7 +107,13 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         navigationView.setNavigationItemSelectedListener(this)
         refreshMenuMasterPasswordItem(navigationView.menu)
 
-        toggle = ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        toggle = ActionBarDrawerToggle(
+            this,
+            drawerLayout,
+            toolbar,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
+        )
         drawerLayout.addDrawerListener(toggle)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -153,10 +160,10 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
             val searchPlateView: View =
                     searchView.findViewById(androidx.appcompat.R.id.search_plate)
             searchPlateView.setBackgroundColor(
-                    ContextCompat.getColor(
-                            this,
-                            android.R.color.transparent
-                    )
+                ContextCompat.getColor(
+                    this,
+                    android.R.color.transparent
+                )
             )
 
             searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -207,10 +214,36 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                     DialogInterface.OnMultiChoiceClickListener { dialog, which, isChecked ->
                         checkedItems[which] = isChecked
                     }
+
+                val inflater: LayoutInflater = getLayoutInflater()
+                val labelsView: View = inflater.inflate(R.layout.content_dynamic_labels_list, null)
+                val labelsContainer: LinearLayout = labelsView.findViewById(R.id.dynamic_labels)
+                LabelService.getAllLabels().forEachIndexed {idx, it ->
+                    val chipView = ChipView(this)
+                    // doesnt work: chipView.setChip(it.labelChip)
+                    chipView.label = it.labelChip.label
+                    chipView.setChipBackgroundColor(it.labelChip.getColor(this))
+                    chipView.setLabelColor(getColor(R.color.white))
+
+                    chipView.setPadding(16)
+                    //chipView.setGravity(RelativeLayout.CENTER_HORIZONTAL)
+                    val row = LinearLayout(this)
+                    val checkBox = CheckBox(this)
+                    checkBox.isChecked = LabelFilter.isFilterFor(it)
+                    checkBox.setOnClickListener {
+                        checkedItems[idx] = checkBox.isChecked
+                    }
+
+                    row.addView(checkBox)
+                    row.addView(chipView)
+                    labelsContainer.addView(row)
+                }
+
                 AlertDialog.Builder(this)
                     .setTitle(getString(R.string.filter))
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setMultiChoiceItems(items, checkedItems, multiListener)
+                    .setIcon(R.drawable.ic_baseline_filter_list_24)
+                    .setView(labelsView)
+                  //  .setMultiChoiceItems(items, checkedItems, multiListener)
                     .setPositiveButton(android.R.string.ok) { dialog, whichButton ->
                         for (i in 0 until items.size) {
                             val checked = checkedItems[i]
@@ -297,14 +330,17 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                             storeMasterPassword(masterPasswd, this)
                             refreshMenuMasterPasswordItem(navigationView.menu)
                             masterPasswd.clear()
-                            Toast.makeText(this, "Master password stored on device", Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                this,
+                                "Master password stored on device",
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                         .setNegativeButton(android.R.string.no, null)
                         .show()
 
                     return true
-                }
-                else {
+                } else {
                     return false
                 }
             }
@@ -316,7 +352,11 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                     .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
                         RemoveStoredMasterPasswordUseCase.execute(this)
                         refreshMenuMasterPasswordItem(navigationView.menu)
-                        Toast.makeText(this, "Stored master password removed from device", Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            this,
+                            "Stored master password removed from device",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                     .setNegativeButton(android.R.string.no, null)
                     .show()
@@ -331,8 +371,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                 if (encMasterPasswd != null) {
                     ExportEncMasterPasswordUseCase.execute(encMasterPasswd, false, this)
                     return true
-                }
-                else {
+                } else {
                     return false
                 }
             }
@@ -400,7 +439,10 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
     }
 
     private fun refreshMenuMasterPasswordItem(menu: Menu) {
-        val storedMasterPasswdPresent = PreferenceUtil.isPresent(DATA_ENCRYPTED_MASTER_PASSWORD, this)
+        val storedMasterPasswdPresent = PreferenceUtil.isPresent(
+            DATA_ENCRYPTED_MASTER_PASSWORD,
+            this
+        )
 
         val storeMasterPasswdItem: MenuItem = menu.findItem(R.id.store_masterpasswd)
         if (storeMasterPasswdItem != null) {
