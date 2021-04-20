@@ -1,0 +1,40 @@
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingTop="4dp"
+    android:paddingHorizontal="32dp"
+    android:orientation="horizontal">
+    <TableRow>
+
+        <CheckBox>
+
+        </CheckBox>
+
+        <com.pchmn.materialchips.ChipView
+            android:id="@+id/label_chip"
+            app:label="label"
+            >
+
+        </com.pchmn.materialchips.ChipView>
+
+
+        <TextView
+            android:id="@+id/label_usage"
+            style="@style/credential_title"
+            android:textIsSelectable="false"
+            android:textAlignment="textStart"
+            android:text="used by 3 credentials"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <ImageView
+            android:id="@+id/label_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:layout_gravity="end"
+            android:paddingLeft="16dp"
+            android:src="@drawable/ic_baseline_delete_24" />
+    </TableRow>
+</TableLayout>

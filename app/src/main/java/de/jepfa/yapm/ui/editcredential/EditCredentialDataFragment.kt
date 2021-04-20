@@ -7,6 +7,7 @@ import android.text.TextUtils
 import android.view.*
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.pchmn.materialchips.ChipsInput
 import com.pchmn.materialchips.ChipsInput.ChipsListener
@@ -21,6 +22,7 @@ import de.jepfa.yapm.ui.SecureFragment
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.ui.label.LabelChip
 import de.jepfa.yapm.usecase.LockVaultUseCase
+import de.jepfa.yapm.util.Constants
 import javax.crypto.SecretKey
 
 
@@ -84,10 +86,23 @@ class EditCredentialDataFragment : SecureFragment() {
             }
 
             override fun onTextChanged(text: CharSequence) {
+
                 if (text.isNotBlank() && isCommitLabel(text)) {
-                    val labelName = text.substring(0, text.length - 1)
-                    val label = LabelChip(labelName, "")
-                    editCredentialLabelsView.addChip(label)
+
+                    val chipsCount = editCredentialLabelsView.selectedChipList.size
+                    if (chipsCount > Constants.MAX_LABELS_PER_CREDENTIAL) {
+                        Toast.makeText(getBaseActivity(),
+                            "Maximum of labels reached (${Constants.MAX_LABELS_PER_CREDENTIAL})", Toast.LENGTH_LONG).show()
+                    }
+                    else if (text.length > Constants.MAX_LABEL_LENGTH) {
+                        Toast.makeText(getBaseActivity(),
+                            "Label too long (max ${Constants.MAX_LABEL_LENGTH})", Toast.LENGTH_LONG).show()
+                    }
+                    else {
+                        val labelName = text.substring(0, text.length - 1)
+                        val label = LabelChip(labelName, "")
+                        editCredentialLabelsView.addChip(label)
+                    }
                 }
             }
         })

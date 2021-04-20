@@ -206,19 +206,14 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                 return LogoutUseCase.execute(this)
             }
             R.id.menu_filter -> {
-                val items = LabelService.getAllLabelChips().map { it.label }.toTypedArray()
-                val checkedItems = LabelService.getAllLabels()
-                    .map { LabelFilter.isFilterFor(it) }
-                    .toBooleanArray()
-                val multiListener =
-                    DialogInterface.OnMultiChoiceClickListener { dialog, which, isChecked ->
-                        checkedItems[which] = isChecked
-                    }
-
                 val inflater: LayoutInflater = getLayoutInflater()
                 val labelsView: View = inflater.inflate(R.layout.content_dynamic_labels_list, null)
                 val labelsContainer: LinearLayout = labelsView.findViewById(R.id.dynamic_labels)
-                LabelService.getAllLabels().forEachIndexed {idx, it ->
+
+                val allLabels = LabelService.getAllLabels()
+                val checkBoxes = ArrayList<CheckBox>(allLabels.size)
+
+                allLabels.forEachIndexed {idx, it ->
                     val chipView = ChipView(this)
                     // doesnt work: chipView.setChip(it.labelChip)
                     chipView.label = it.labelChip.label
@@ -226,33 +221,39 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                     chipView.setLabelColor(getColor(R.color.white))
 
                     chipView.setPadding(16)
-                    //chipView.setGravity(RelativeLayout.CENTER_HORIZONTAL)
                     val row = LinearLayout(this)
                     val checkBox = CheckBox(this)
                     checkBox.isChecked = LabelFilter.isFilterFor(it)
-                    checkBox.setOnClickListener {
-                        checkedItems[idx] = checkBox.isChecked
-                    }
+                    checkBoxes.add(checkBox)
 
                     row.addView(checkBox)
                     row.addView(chipView)
                     labelsContainer.addView(row)
                 }
 
-                AlertDialog.Builder(this)
+                val dialog = AlertDialog.Builder(this)
                     .setTitle(getString(R.string.filter))
                     .setIcon(R.drawable.ic_baseline_filter_list_24)
                     .setView(labelsView)
-                  //  .setMultiChoiceItems(items, checkedItems, multiListener)
-                    .setPositiveButton(android.R.string.ok) { dialog, whichButton ->
-                        for (i in 0 until items.size) {
-                            val checked = checkedItems[i]
-                            val label = LabelService.lookupByLabelName(items[i])
-                            if (label != null) {
-                                if (checked) {
-                                    LabelFilter.setFilterFor(label)
-                                } else {
-                                    LabelFilter.unsetFilterFor(label)
+                    .setNeutralButton("Deselect all", null)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .create()
+
+                dialog.setOnShowListener{
+                    val buttonPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                    buttonPositive.setOnClickListener{
+                        for (i in 0 until checkBoxes.size) {
+                            val checked = checkBoxes[i].isChecked
+                            val labelId = allLabels[i].encLabel.id
+                            if (labelId != null) {
+                                val label = LabelService.lookupByLabelId(labelId)
+                                if (label != null) {
+                                    if (checked) {
+                                        LabelFilter.setFilterFor(label)
+                                    } else {
+                                        LabelFilter.unsetFilterFor(label)
+                                    }
                                 }
                             }
                         }
@@ -260,10 +261,21 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                         credentialListAdapter.filter.filter("")
                         refreshMenuFiltersItem(item)
                         // TODO add red dot to menu item icon to indicate filter
+                        dialog.dismiss()
                     }
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .create()
-                    .show()
+
+                    val buttonNegative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                    buttonNegative.setOnClickListener{
+                        dialog.dismiss()
+                    }
+
+                    val buttonNeutral = dialog.getButton(AlertDialog.BUTTON_NEUTRAL)
+                    buttonNeutral.setOnClickListener{
+                        checkBoxes.forEach { it.isChecked = false }
+                    }
+                }
+
+                dialog.show()
 
                 return true
             }
