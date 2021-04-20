@@ -17,7 +17,7 @@ object MasterPasswordService {
         val mpSK = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP)
         val encMasterPasswd = SecretService.encryptPassword(mpSK, masterPasswd)
         PreferenceUtil.putEncrypted(
-            PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD,
+            PreferenceUtil.DATA_ENCRYPTED_MASTER_PASSWORD,
             encMasterPasswd,
             activity
         )

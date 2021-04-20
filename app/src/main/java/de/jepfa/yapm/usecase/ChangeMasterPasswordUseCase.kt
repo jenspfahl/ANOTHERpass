@@ -10,8 +10,8 @@ import de.jepfa.yapm.service.secret.MasterKeyService.getMasterPassPhraseSK
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
 import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
 import de.jepfa.yapm.util.PreferenceUtil
-import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY
-import de.jepfa.yapm.util.PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY
+import de.jepfa.yapm.util.PreferenceUtil.DATA_ENCRYPTED_MASTER_KEY
+import de.jepfa.yapm.util.PreferenceUtil.DATA_MASTER_PASSWORD_TOKEN_KEY
 
 object ChangeMasterPasswordUseCase {
 
@@ -28,7 +28,7 @@ object ChangeMasterPasswordUseCase {
 
         val oldMasterPassphraseSK = getMasterPassPhraseSK(pin, currentMasterPassword, salt)
 
-        val encEncryptedMasterKey = PreferenceUtil.getEncrypted(PREF_ENCRYPTED_MASTER_KEY, activity)
+        val encEncryptedMasterKey = PreferenceUtil.getEncrypted(DATA_ENCRYPTED_MASTER_KEY, activity)
         if (encEncryptedMasterKey == null) {
             Log.e(TAG, "master key not on device")
             return false;
@@ -47,7 +47,7 @@ object ChangeMasterPasswordUseCase {
             storeMasterPassword(newMasterPassword, activity)
         }
 
-        PreferenceUtil.delete(PREF_MASTER_PASSWORD_TOKEN_KEY, activity)
+        PreferenceUtil.delete(DATA_MASTER_PASSWORD_TOKEN_KEY, activity)
 
         return LoginUseCase.execute(pin, newMasterPassword, activity)
 

@@ -10,7 +10,7 @@ import de.jepfa.yapm.util.putEncryptedExtra
 object ExportEncMasterKeyUseCase: SecureActivityUseCase {
 
     override fun execute(activity: SecureActivity): Boolean {
-        val encStoredMasterKey = PreferenceUtil.getEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, activity)
+        val encStoredMasterKey = PreferenceUtil.getEncrypted(PreferenceUtil.DATA_ENCRYPTED_MASTER_KEY, activity)
         val key = activity.masterSecretKey
         if (key != null && encStoredMasterKey != null) {
 

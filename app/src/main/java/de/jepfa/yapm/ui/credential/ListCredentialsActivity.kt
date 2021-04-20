@@ -43,7 +43,7 @@ import de.jepfa.yapm.ui.exportvault.ExportVaultActivity
 import de.jepfa.yapm.ui.settings.SettingsActivity
 import de.jepfa.yapm.usecase.*
 import de.jepfa.yapm.util.*
-import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD
+import de.jepfa.yapm.util.PreferenceUtil.DATA_ENCRYPTED_MASTER_PASSWORD
 
 /**
  * This is the main activity
@@ -400,7 +400,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
     }
 
     private fun refreshMenuMasterPasswordItem(menu: Menu) {
-        val storedMasterPasswdPresent = PreferenceUtil.isPresent(PREF_ENCRYPTED_MASTER_PASSWORD, this)
+        val storedMasterPasswdPresent = PreferenceUtil.isPresent(DATA_ENCRYPTED_MASTER_PASSWORD, this)
 
         val storeMasterPasswdItem: MenuItem = menu.findItem(R.id.store_masterpasswd)
         if (storeMasterPasswdItem != null) {

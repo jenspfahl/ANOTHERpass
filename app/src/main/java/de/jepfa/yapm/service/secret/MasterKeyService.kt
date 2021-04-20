@@ -5,7 +5,6 @@ import de.jepfa.yapm.model.Key
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.util.PreferenceUtil
-import java.util.*
 import javax.crypto.SecretKey
 
 object MasterKeyService {
@@ -57,7 +56,7 @@ object MasterKeyService {
         val encEncryptedMasterKey = SecretService.encryptEncrypted(mkSK, encryptedMasterKey)
 
         PreferenceUtil.putEncrypted(
-            PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY,
+            PreferenceUtil.DATA_ENCRYPTED_MASTER_KEY,
             encEncryptedMasterKey,
             activity
         )

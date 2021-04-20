@@ -17,13 +17,13 @@ object ImportVaultUseCase {
 
     fun execute(jsonContent: JsonObject, encMasterKey: String?, activity: BaseActivity): Boolean {
         val salt = jsonContent.get(FileIOService.JSON_VAULT_ID)?.asString
-        salt?.let { PreferenceUtil.put(PreferenceUtil.PREF_SALT, salt, activity) }
+        salt?.let { PreferenceUtil.put(PreferenceUtil.DATA_SALT, salt, activity) }
 
         if (encMasterKey != null) {
             val keyForMK = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
             val encEncryptedMasterKey = SecretService.encryptEncrypted(keyForMK, Encrypted.fromBase64String(encMasterKey!!))
 
-            PreferenceUtil.putEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, encEncryptedMasterKey, activity)
+            PreferenceUtil.putEncrypted(PreferenceUtil.DATA_ENCRYPTED_MASTER_KEY, encEncryptedMasterKey, activity)
         }
 
         val credentialsJson = jsonContent.getAsJsonArray(FileIOService.JSON_CREDENTIALS)

@@ -1,11 +1,9 @@
 package de.jepfa.yapm.ui.login
 
-import android.os.AsyncTask
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
@@ -62,7 +60,7 @@ class LoginEnterPinFragment : BaseFragment() {
 
             val loginActivity = getBaseActivity() as LoginActivity
 
-            val encStoredMasterPasswd = PreferenceUtil.getEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, getBaseActivity())
+            val encStoredMasterPasswd = PreferenceUtil.getEncrypted(PreferenceUtil.DATA_ENCRYPTED_MASTER_PASSWORD, getBaseActivity())
 
             if (!Session.isLoggedOut()) {
                 val keyForTemp = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)

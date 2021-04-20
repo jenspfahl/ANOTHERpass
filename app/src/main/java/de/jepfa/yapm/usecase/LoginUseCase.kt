@@ -15,7 +15,7 @@ object LoginUseCase {
     fun execute(masterPin: Password, masterPassword: Password, activity: BaseActivity): Boolean {
 
         val salt = SecretService.getSalt(activity)
-        val encMasterKey = PreferenceUtil.getEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, activity)
+        val encMasterKey = PreferenceUtil.getEncrypted(PreferenceUtil.DATA_ENCRYPTED_MASTER_KEY, activity)
         if (encMasterKey == null) {
             return false;
         }

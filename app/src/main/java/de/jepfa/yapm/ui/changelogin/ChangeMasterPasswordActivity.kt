@@ -9,13 +9,12 @@ import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.ChangeMasterPasswordUseCase
-import de.jepfa.yapm.usecase.ChangePinUseCase
 import de.jepfa.yapm.usecase.GenerateMasterPasswordUseCase
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.AsyncWithProgressBar
 import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.PreferenceUtil
-import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD
+import de.jepfa.yapm.util.PreferenceUtil.DATA_ENCRYPTED_MASTER_PASSWORD
 
 class ChangeMasterPasswordActivity : SecureActivity() {
 
@@ -37,7 +36,7 @@ class ChangeMasterPasswordActivity : SecureActivity() {
         val switchStorePasswd: Switch = findViewById(R.id.switch_store_master_password)
         val generatedPasswdView: TextView = findViewById(R.id.generated_passwd)
 
-        val storedMasterPasswdPresent = PreferenceUtil.isPresent(PREF_ENCRYPTED_MASTER_PASSWORD, this)
+        val storedMasterPasswdPresent = PreferenceUtil.isPresent(DATA_ENCRYPTED_MASTER_PASSWORD, this)
         switchStorePasswd.isChecked = storedMasterPasswdPresent
 
         val buttonGeneratePasswd: Button = findViewById(R.id.button_generate_passwd)

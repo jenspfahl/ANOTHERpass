@@ -158,7 +158,7 @@ object SecretService {
 
     @Synchronized
     fun getSalt(activity: BaseActivity): Key {
-        val saltBase64 = PreferenceUtil.get(PreferenceUtil.PREF_SALT, activity)
+        val saltBase64 = PreferenceUtil.get(PreferenceUtil.DATA_SALT, activity)
             ?: return createAndStoreSalt(activity)
         return Key(Base64.decode(saltBase64, 0))
     }
@@ -166,7 +166,7 @@ object SecretService {
     private fun createAndStoreSalt(activity: BaseActivity): Key {
         val salt = generateKey(128)
         val saltBase64 = Base64.encodeToString(salt.data, Base64.DEFAULT)
-        PreferenceUtil.put(PreferenceUtil.PREF_SALT, saltBase64, activity)
+        PreferenceUtil.put(PreferenceUtil.DATA_SALT, saltBase64, activity)
 
         return salt
     }

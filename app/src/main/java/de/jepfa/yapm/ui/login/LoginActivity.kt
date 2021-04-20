@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
-import android.widget.ProgressBar
 import android.widget.Toast
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
@@ -15,7 +14,7 @@ import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.ui.importvault.ImportVaultActivity
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.PreferenceUtil
-import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY
+import de.jepfa.yapm.util.PreferenceUtil.DATA_ENCRYPTED_MASTER_KEY
 import de.jepfa.yapm.util.PreferenceUtil.PREF_MAX_LOGIN_ATTEMPTS
 import de.jepfa.yapm.util.PreferenceUtil.STATE_LOGIN_ATTEMPTS
 
@@ -33,7 +32,7 @@ class LoginActivity : BaseActivity() {
 
         loginAttempts = PreferenceUtil.getAsInt(STATE_LOGIN_ATTEMPTS, 0, this)
 
-        if (PreferenceUtil.isPresent(PREF_ENCRYPTED_MASTER_KEY, this)) {
+        if (PreferenceUtil.isPresent(DATA_ENCRYPTED_MASTER_KEY, this)) {
             setContentView(R.layout.activity_login)
         }
         else {
@@ -84,8 +83,8 @@ class LoginActivity : BaseActivity() {
         PreferenceUtil.put(STATE_LOGIN_ATTEMPTS, loginAttempts.toString(), this)
         if (loginAttempts >= getMaxLoginAttempts()) {
             Toast.makeText(baseContext, R.string.too_may_wrong_logins, Toast.LENGTH_LONG).show()
-            PreferenceUtil.delete(PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD, baseContext)
-            PreferenceUtil.delete(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, baseContext)
+            PreferenceUtil.delete(PreferenceUtil.DATA_ENCRYPTED_MASTER_PASSWORD, baseContext)
+            PreferenceUtil.delete(PreferenceUtil.DATA_MASTER_PASSWORD_TOKEN_KEY, baseContext)
             Session.logout()
             finishAffinity()
             finishAndRemoveTask()

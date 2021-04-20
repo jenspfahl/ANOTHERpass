@@ -7,12 +7,14 @@ import de.jepfa.yapm.model.Encrypted
 object PreferenceUtil {
 
     private const val PREF_PREFIX = "YAPM/pref:"
+    private const val DATA_PREFIX = "YAPM/data:"
     private const val STATE_PREFIX = "YAPM/state:"
 
-    const val PREF_SALT = PREF_PREFIX + "aslt"
-    const val PREF_MASTER_PASSWORD_TOKEN_KEY = PREF_PREFIX + "mpt"
-    const val PREF_ENCRYPTED_MASTER_PASSWORD = PREF_PREFIX + "mpwd"
-    const val PREF_ENCRYPTED_MASTER_KEY = PREF_PREFIX + "enmk"
+    const val DATA_SALT = DATA_PREFIX + "aslt"
+    const val DATA_ENCRYPTED_MASTER_PASSWORD = DATA_PREFIX + "mpwd"
+    const val DATA_ENCRYPTED_MASTER_KEY = DATA_PREFIX + "enmk"
+    const val DATA_MASTER_PASSWORD_TOKEN_KEY = DATA_PREFIX + "mpt"
+    const val STATE_MASTER_PASSWD_TOKEN_COUNTER = STATE_PREFIX + "mpt_counter"
 
     const val PREF_MAX_LOGIN_ATTEMPTS = PREF_PREFIX + "max_login_attempts"
     const val PREF_LOCK_TIMEOUT = PREF_PREFIX + "lock_timeout"

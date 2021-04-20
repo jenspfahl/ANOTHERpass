@@ -1,15 +1,11 @@
 package de.jepfa.yapm.usecase
 
-import android.util.Base64
-import de.jepfa.yapm.model.Key
 import de.jepfa.yapm.model.Password
 import de.jepfa.yapm.service.secret.SecretService.generateKey
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.service.secret.MasterKeyService.encryptAndStoreMasterKey
 import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
 import de.jepfa.yapm.service.secret.SecretService
-import de.jepfa.yapm.util.PreferenceUtil
-import de.jepfa.yapm.util.PreferenceUtil.PREF_SALT
 
 object CreateVaultUseCase {
 

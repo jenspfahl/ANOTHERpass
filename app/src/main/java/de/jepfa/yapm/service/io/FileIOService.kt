@@ -131,13 +131,13 @@ class FileIOService: IntentService("FileIOService") {
         }
 
         root.addProperty(JSON_CREATION_DATE, SDF_DT_MEDIUM.format(Date()))
-        val salt = PreferenceUtil.get(PreferenceUtil.PREF_SALT, this)
+        val salt = PreferenceUtil.get(PreferenceUtil.DATA_SALT, this)
         salt?.let {
             root.addProperty(JSON_VAULT_ID, it)
         }
 
         if (includeMasterkey) {
-            val encStoredMasterKey = PreferenceUtil.getEncrypted(PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY, this)
+            val encStoredMasterKey = PreferenceUtil.getEncrypted(PreferenceUtil.DATA_ENCRYPTED_MASTER_KEY, this)
             if (encStoredMasterKey != null) {
 
                 val mkKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)

@@ -24,7 +24,7 @@ import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.usecase.LoginUseCase
 import de.jepfa.yapm.util.AsyncWithProgressBar
 import de.jepfa.yapm.util.PreferenceUtil
-import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_PASSWORD
+import de.jepfa.yapm.util.PreferenceUtil.DATA_ENCRYPTED_MASTER_PASSWORD
 import de.jepfa.yapm.util.PreferenceUtil.PREF_FAST_MASTERPASSWD_LOGIN
 import de.jepfa.yapm.util.QRCodeUtil
 
@@ -107,12 +107,12 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
             val scanned = result.contents
 
             if (scanned.startsWith(Encrypted.TYPE_MASTER_PASSWD_TOKEN)) {
-                if (!PreferenceUtil.isPresent(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, getBaseActivity())) {
+                if (!PreferenceUtil.isPresent(PreferenceUtil.DATA_MASTER_PASSWORD_TOKEN_KEY, getBaseActivity())) {
                     Toast.makeText(getBaseActivity(), "No master password token present.", Toast.LENGTH_LONG).show()
                     return
                 }
                 // decrypt obliviously encrypted master password token
-                val encMasterPasswordTokenKey = PreferenceUtil.getEncrypted(PreferenceUtil.PREF_MASTER_PASSWORD_TOKEN_KEY, getBaseActivity())
+                val encMasterPasswordTokenKey = PreferenceUtil.getEncrypted(PreferenceUtil.DATA_MASTER_PASSWORD_TOKEN_KEY, getBaseActivity())
                 encMasterPasswordTokenKey?.let {
                     val masterPasswordTokenSK = getAndroidSecretKey(ALIAS_KEY_MP_TOKEN)
                     val masterPasswordTokenKey = decryptKey(masterPasswordTokenSK, encMasterPasswordTokenKey)
@@ -185,7 +185,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                         if (isStoreMasterPassword) {
                             val keyForMP = getAndroidSecretKey(SecretService.ALIAS_KEY_MP)
                             val encPasswd = encryptPassword(keyForMP, masterPassword)
-                            PreferenceUtil.putEncrypted(PREF_ENCRYPTED_MASTER_PASSWORD, encPasswd, getBaseActivity())
+                            PreferenceUtil.putEncrypted(DATA_ENCRYPTED_MASTER_PASSWORD, encPasswd, getBaseActivity())
                         }
 
                         findNavController().navigate(R.id.action_Login_to_CredentialList)

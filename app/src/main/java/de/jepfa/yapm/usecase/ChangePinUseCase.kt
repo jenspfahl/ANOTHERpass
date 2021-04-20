@@ -9,7 +9,7 @@ import de.jepfa.yapm.service.secret.MasterKeyService.getMasterKey
 import de.jepfa.yapm.service.secret.MasterKeyService.getMasterPassPhraseSK
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
 import de.jepfa.yapm.util.PreferenceUtil
-import de.jepfa.yapm.util.PreferenceUtil.PREF_ENCRYPTED_MASTER_KEY
+import de.jepfa.yapm.util.PreferenceUtil.DATA_ENCRYPTED_MASTER_KEY
 
 object ChangePinUseCase {
 
@@ -27,7 +27,7 @@ object ChangePinUseCase {
 
         val oldMasterPassphraseSK = getMasterPassPhraseSK(currentPin, masterPassword, salt)
 
-        val encEncryptedMasterKey = PreferenceUtil.getEncrypted(PREF_ENCRYPTED_MASTER_KEY, activity)
+        val encEncryptedMasterKey = PreferenceUtil.getEncrypted(DATA_ENCRYPTED_MASTER_KEY, activity)
         if (encEncryptedMasterKey == null) {
             Log.e(TAG, "master key not on device")
             return false;
