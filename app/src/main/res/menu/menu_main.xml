@@ -11,6 +11,15 @@
         android:title="@string/search">
     </item>
 
+
+    <item
+        android:id="@+id/menu_filter"
+        android:icon="@drawable/ic_baseline_filter_list_24_white"
+        android:title="@string/filter"
+        android:checkable="true"
+        app:showAsAction="always">
+    </item>
+
     <item
         android:id="@+id/menu_lock_items"
         android:icon="@drawable/ic_lock_outline_white_24dp"
@@ -25,12 +34,5 @@
         app:showAsAction="ifRoom">
     </item>
 
-    <item
-        android:id="@+id/menu_filter"
-        android:icon="@drawable/ic_baseline_filter_list_24_white"
-        android:title="@string/filter"
-        android:checkable="true"
-        app:showAsAction="never">
-    </item>
 
 </menu>

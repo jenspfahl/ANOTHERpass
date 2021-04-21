@@ -468,7 +468,14 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
 
     private fun refreshMenuFiltersItem(item: MenuItem) {
-        item.setChecked(LabelFilter.hasFilters())
+        val hasFilters = LabelFilter.hasFilters()
+        item.setChecked(hasFilters)
+        if (hasFilters) {
+            item.setIcon(R.drawable.ic_baseline_filter_list_with_with_dot_24dp)
+        }
+        else {
+            item.setIcon(R.drawable.ic_baseline_filter_list_24_white)
+        }
     }
 
     fun deleteCredential(credential: EncCredential) {
