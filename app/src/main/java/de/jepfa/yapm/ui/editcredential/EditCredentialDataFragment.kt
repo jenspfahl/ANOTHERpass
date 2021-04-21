@@ -134,6 +134,7 @@ class EditCredentialDataFragment : SecureFragment() {
             })
         }
 
+        // TODO do it async
         editCredentialNameView.requestFocus()
 
         val buttonNext: Button = view.findViewById(R.id.button_next)

@@ -13,10 +13,13 @@ import android.view.View.OnTouchListener
 import android.widget.Button
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Password
+import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.PREF_PASSWD_WORDS_ON_NL
 import de.jepfa.yapm.util.PreferenceUtil.PREF_TRANSPARENT_OVERLAY
+import de.jepfa.yapm.util.getEncryptedExtra
 
 
 class OverlayShowingService : Service(), OnTouchListener {
@@ -44,18 +47,23 @@ class OverlayShowingService : Service(), OnTouchListener {
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         clearIt()
-        val data = intent.getCharArrayExtra(DetachHelper.EXTRA_PASSWD)
-        if (data == null || data.isEmpty()) {
-            return START_NOT_STICKY
+        val encrypted = intent.getEncryptedExtra(DetachHelper.EXTRA_PASSWD)
+        if (encrypted != null && !Session.isDenied()) {
+            val masterKeySK = Session.getMasterKeySK()
+            if (masterKeySK != null) {
+                val transSK = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
+                password = SecretService.decryptPassword(transSK, encrypted)
+
+                val multiLineDefault =
+                    PreferenceUtil.getAsBool(PREF_PASSWD_WORDS_ON_NL, false, this)
+                multiLine = intent.getBooleanExtra(DetachHelper.EXTRA_MULTILINE, multiLineDefault)
+
+                paintIt()
+                return START_STICKY // STOP_FOREGROUND_REMOVE
+            }
         }
+        return START_NOT_STICKY
 
-        password = Password(data)
-
-        val multiLineDefault = PreferenceUtil.getAsBool(PREF_PASSWD_WORDS_ON_NL, false, this)
-        multiLine = intent.getBooleanExtra(DetachHelper.EXTRA_MULTILINE, multiLineDefault)
-
-        paintIt()
-        return START_STICKY // STOP_FOREGROUND_REMOVE
     }
 
     private fun paintIt() {

@@ -24,7 +24,7 @@
         android:id="@+id/menu_lock_items"
         android:icon="@drawable/ic_lock_outline_white_24dp"
         android:title="@string/lock_items"
-        app:showAsAction="always">
+        app:showAsAction="ifRoom">
     </item>
 
     <item
