@@ -18,6 +18,7 @@ import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SecretService
@@ -187,7 +188,7 @@ class ShowCredentialActivity : SecureActivity() {
 
             val key = masterSecretKey
             if (key != null) {
-                val decName = SecretService.decryptCommonString(key, credential.name)
+                val decName = decryptCommonString(key, credential.name)
 
                 AlertDialog.Builder(this)
                         .setTitle(R.string.title_delete_credential)
@@ -207,6 +208,7 @@ class ShowCredentialActivity : SecureActivity() {
 
         return super.onOptionsItemSelected(item)
     }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -269,6 +271,8 @@ class ShowCredentialActivity : SecureActivity() {
                 var spannedString = spannableString(password, multiLine, this)
                 passwordTextView.setText(spannedString)
             }
+
+            CurrentCredentialHolder.currentCredential = credential
         })
     }
 

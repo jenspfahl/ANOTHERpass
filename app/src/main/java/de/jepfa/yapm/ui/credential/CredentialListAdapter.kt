@@ -16,6 +16,7 @@ import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
@@ -49,6 +50,14 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
             intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, current.id)
 
             listCredentialsActivity.startActivity(intent)
+        }
+
+        holder.listenForSetToAutofill { pos,  _ ->
+
+            val current = getItem(pos)
+            CurrentCredentialHolder.currentCredential = current
+            Toast.makeText(listCredentialsActivity, "Credential used for Autofill", Toast.LENGTH_LONG).show()
+            true
         }
 
         holder.listenForDetachPasswd { pos, _ ->
@@ -194,6 +203,12 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
         fun listenForOpenMenu(event: (position: Int, type: Int, view: View) -> Unit) {
             credentialMenuImageView.setOnClickListener {
                 event.invoke(adapterPosition, itemViewType, credentialMenuImageView)
+            }
+        }
+
+        fun listenForSetToAutofill(event: (position: Int, type: Int) -> Boolean) {
+            credentialContainerView.setOnLongClickListener {
+                event.invoke(adapterPosition, itemViewType)
             }
         }
 

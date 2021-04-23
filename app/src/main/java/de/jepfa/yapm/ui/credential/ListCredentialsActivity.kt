@@ -32,6 +32,7 @@ import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
@@ -70,6 +71,8 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         credentialListAdapter = CredentialListAdapter(this)
         recyclerView.adapter = credentialListAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
+
+        CurrentCredentialHolder.currentCredential = null
 
         credentialViewModel.allCredentials.observe(this, Observer { credentials ->
             credentials?.let {
