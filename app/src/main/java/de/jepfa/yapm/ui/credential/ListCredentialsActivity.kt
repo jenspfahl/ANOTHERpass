@@ -338,6 +338,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                 putExtra(EXTRA_AUTHENTICATION_RESULT, fillResponse)
             }
             setResult(Activity.RESULT_OK, replyIntent)
+            finish()
         }
 
     }
