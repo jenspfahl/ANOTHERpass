@@ -1,11 +1,13 @@
 package de.jepfa.yapm.ui.login
 
+import android.app.assist.AssistStructure
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.autofill.AutofillManager
 import android.widget.*
 import androidx.navigation.fragment.findNavController
 import com.google.zxing.integration.android.IntentIntegrator
@@ -188,7 +190,12 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                             PreferenceUtil.putEncrypted(DATA_ENCRYPTED_MASTER_PASSWORD, encPasswd, getBaseActivity())
                         }
 
-                        findNavController().navigate(R.id.action_Login_to_CredentialList)
+                        val assistStructure = getBaseActivity().intent.getParcelableExtra<AssistStructure>(
+                            AutofillManager.EXTRA_ASSIST_STRUCTURE
+                        )
+                        val args = Bundle()
+                        args.putParcelable(AutofillManager.EXTRA_ASSIST_STRUCTURE, assistStructure)
+                        findNavController().navigate(R.id.action_Login_to_CredentialList, args)
 
                         userPin.clear()
                         masterPassword.clear()

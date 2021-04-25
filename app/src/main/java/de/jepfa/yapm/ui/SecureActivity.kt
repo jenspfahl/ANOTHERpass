@@ -1,8 +1,10 @@
 package de.jepfa.yapm.ui
 
+import android.app.assist.AssistStructure
 import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
+import android.view.autofill.AutofillManager
 import androidx.core.app.ActivityCompat.finishAffinity
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.overlay.OverlayShowingService
@@ -82,6 +84,12 @@ abstract class SecureActivity : BaseActivity() {
 
                 if (!isLoginIntented()) {
                     val intent = Intent(activity, LoginActivity::class.java)
+                    val assistStructure = activity.intent.getParcelableExtra<AssistStructure>(
+                        AutofillManager.EXTRA_ASSIST_STRUCTURE
+                    )
+                    if (assistStructure != null) {
+                        intent.putExtra(AutofillManager.EXTRA_ASSIST_STRUCTURE, assistStructure)
+                    }
                     activity.startActivity(intent)
                     loginIntented()
                     activity.lock()

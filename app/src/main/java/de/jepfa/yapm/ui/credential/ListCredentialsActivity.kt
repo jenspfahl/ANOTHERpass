@@ -3,6 +3,7 @@ package de.jepfa.yapm.ui.credential
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.SearchManager
+import android.app.assist.AssistStructure
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -14,6 +15,8 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.autofill.AutofillManager
+import android.view.autofill.AutofillManager.EXTRA_AUTHENTICATION_RESULT
 import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.SearchView
@@ -32,7 +35,9 @@ import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.service.autofill.CredentialFillService
 import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
+import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
@@ -53,6 +58,7 @@ import de.jepfa.yapm.util.PreferenceUtil.DATA_ENCRYPTED_MASTER_PASSWORD
  */
 class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationItemSelectedListener  {
 
+    var assistStructure: AssistStructure? = null
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var toggle: ActionBarDrawerToggle
@@ -73,6 +79,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         CurrentCredentialHolder.currentCredential = null
+        assistStructure = intent.getParcelableExtra(AutofillManager.EXTRA_ASSIST_STRUCTURE)
 
         credentialViewModel.allCredentials.observe(this, Observer { credentials ->
             credentials?.let {
@@ -316,6 +323,23 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
     override fun lock() {
         recreate()
+    }
+
+    fun shouldPushBackAutoFill() : Boolean {
+        return assistStructure != null
+    }
+
+    fun pushBackAutofill(credential: EncCredential) {
+        val structure = assistStructure
+        if (structure != null) {
+            CurrentCredentialHolder.currentCredential = credential
+            val replyIntent = Intent().apply {
+                val fillResponse = ResponseFiller.createFillResponse(structure, null, false, applicationContext)
+                putExtra(EXTRA_AUTHENTICATION_RESULT, fillResponse)
+            }
+            setResult(Activity.RESULT_OK, replyIntent)
+        }
+
     }
 
     private fun refreshMenuLockItem(lockItem: MenuItem) {

@@ -45,18 +45,31 @@ class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity
         holder.listenForShowCredential { pos, _ ->
             val current = getItem(pos)
 
-            val intent = Intent(listCredentialsActivity, ShowCredentialActivity::class.java)
+            if (listCredentialsActivity.shouldPushBackAutoFill()) {
+                listCredentialsActivity.pushBackAutofill(current)
+            }
+            else {
+                val intent = Intent(listCredentialsActivity, ShowCredentialActivity::class.java)
 
-            intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, current.id)
+                intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, current.id)
 
-            listCredentialsActivity.startActivity(intent)
+                listCredentialsActivity.startActivity(intent)
+            }
         }
 
         holder.listenForSetToAutofill { pos,  _ ->
 
             val current = getItem(pos)
+            if (listCredentialsActivity.shouldPushBackAutoFill()) {
+                listCredentialsActivity.pushBackAutofill(current)
+            }
             CurrentCredentialHolder.currentCredential = current
-            Toast.makeText(listCredentialsActivity, "Credential used for Autofill", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                listCredentialsActivity,
+                "Credential used for Autofill",
+                Toast.LENGTH_LONG
+            ).show()
+
             true
         }
 
