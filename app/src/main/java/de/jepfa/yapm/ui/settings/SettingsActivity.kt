@@ -112,4 +112,10 @@ class SettingsActivity : SecureActivity(),
             setPreferencesFromResource(R.xml.password_generator_preferences, rootKey)
         }
     }
+
+    class AutofillSettingsFragment : PreferenceFragmentCompat() {
+        override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            setPreferencesFromResource(R.xml.autofill_preferences, rootKey)
+        }
+    }
 }

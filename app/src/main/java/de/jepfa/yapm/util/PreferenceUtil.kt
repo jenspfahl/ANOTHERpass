@@ -34,6 +34,8 @@ object PreferenceUtil {
     const val PREF_SHOW_LABELS_IN_LIST = PREF_PREFIX + "show_labels_in_list"
     const val PREF_COLORIZE_MP_QRCODES = PREF_PREFIX + "colorize_mp_qrcodes"
 
+    const val PREF_AUTOFILL_EVERYWHERE = PREF_PREFIX + "autofill_suggest_everywhere"
+
     const val STATE_LOGIN_ATTEMPTS = STATE_PREFIX + "login_attempts"
 
 

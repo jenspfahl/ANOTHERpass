@@ -21,6 +21,7 @@ import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.util.PreferenceUtil
+import de.jepfa.yapm.util.PreferenceUtil.PREF_AUTOFILL_EVERYWHERE
 
 
 object ResponseFiller {
@@ -101,19 +102,19 @@ object ResponseFiller {
             return null
         }
 
-
-        val fields = identifyFields(structure, cancellationSignal) ?: return null
+        val suggestEverywhere = PreferenceUtil.getAsBool(PREF_AUTOFILL_EVERYWHERE, true, context)
+        val fields = identifyFields(structure, cancellationSignal, suggestEverywhere) ?: return null
 
         val key = Session.getMasterKeySK()
         val credential = CurrentCredentialHolder.currentCredential
         if (key == null || Session.isDenied() || credential == null) {
-            if (createAuthentication && fields.hasCredentialFields()) {
-                return createAuthenticationFillResponse(fields, context)
+            if (createAuthentication) {
+                if (suggestEverywhere || fields.hasCredentialFields()) {
+                    return createAuthenticationFillResponse(fields, context)
+                }
             }
-            else {
-                Log.i("CFS", "Not logged in or no credential selected")
-                return null
-            }
+            Log.i("CFS", "Not logged in or no credential selected")
+            return null
         }
 
         val name = SecretService.decryptCommonString(key, credential.name)
@@ -150,12 +151,8 @@ object ResponseFiller {
 
     private fun createAuthenticationFillResponse(fields: Fields, context: Context): FillResponse {
         val responseBuilder = FillResponse.Builder()
-        //addHeaderView(responseBuilder)
 
-        val authIntent = Intent(context, ListCredentialsActivity::class.java).apply {
-            // Send any additional data required to complete the request.
-            // putExtra(MY_EXTRA_DATASET_NAME, "my_dataset")
-        }
+        val authIntent = Intent(context, ListCredentialsActivity::class.java)
 
         val intentSender: IntentSender = PendingIntent.getActivity(
             context,
@@ -188,21 +185,21 @@ object ResponseFiller {
         return headerView
     }
 
-    private fun identifyFields(structure: AssistStructure, cancellationSignal: CancellationSignal?): Fields? {
+    private fun identifyFields(structure: AssistStructure, cancellationSignal: CancellationSignal?, suggestEverywhere: Boolean): Fields? {
 
         val fields = Fields()
 
         val windowNode = structure.getWindowNodeAt(0) ?: return null
         val viewNode = windowNode.rootViewNode ?: return null
 
-        identifyFields(viewNode, fields, cancellationSignal)
+        identifyFields(viewNode, fields, cancellationSignal, suggestEverywhere)
 
         return fields
 
     }
 
 
-    private fun identifyFields(node: ViewNode, fields: Fields, cancellationSignal: CancellationSignal?) {
+    private fun identifyFields(node: ViewNode, fields: Fields, cancellationSignal: CancellationSignal?, suggestEverywhere: Boolean) {
         if (cancellationSignal != null && cancellationSignal.isCanceled) {
             return
         }
@@ -211,13 +208,17 @@ object ResponseFiller {
         node.hint?.let { identifyField(it, node, fields) }
         node.htmlInfo?.let { identifyField(it.tag, node, fields) }
         node.autofillHints?.map { identifyField(it, node, fields) }
+        node.autofillOptions?.map { identifyField(it.toString(), node, fields) }
 
+        if (suggestEverywhere) {
+            fields.addPotentialField(node)
+        }
 
         // go deeper in the tree
         for (i in 0 until node.childCount) {
             val child = node.getChildAt(i)
             if (child != null) {
-                identifyFields(child, fields, cancellationSignal)
+                identifyFields(child, fields, cancellationSignal, suggestEverywhere)
             }
         }
     }

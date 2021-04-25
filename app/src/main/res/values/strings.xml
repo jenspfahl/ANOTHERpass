@@ -142,6 +142,7 @@
     <string name="credential_data_params">Edit your credential here</string>
     <string name="filter">Filter by labels</string>
     <string name="filter_dialog">Select all labels to show credentials with that labels</string>
+    <string name="pref_header_autofill">Auto fill support</string>
 
 
 </resources>

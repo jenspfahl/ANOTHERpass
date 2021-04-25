@@ -1,0 +1,12 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:autofill_suggest_everywhere"
+        app:summaryOff="Suggesting autofill only on identified user or password fields. With this option, the app could miss some fields, e.g. in web browsers."
+        app:summaryOn="Suggesting autofill on every text field."
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:defaultValue="true"
+        app:title="Autofill suggestion everywhere" />
+
+</PreferenceScreen>

@@ -337,8 +337,10 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                 val fillResponse = ResponseFiller.createFillResponse(structure, null, false, applicationContext)
                 putExtra(EXTRA_AUTHENTICATION_RESULT, fillResponse)
             }
-            setResult(Activity.RESULT_OK, replyIntent)
+            assistStructure = null
+            setResult(Activity.RESULT_OK, replyIntent) // TODO seems to not work
             finish()
+
         }
 
     }
