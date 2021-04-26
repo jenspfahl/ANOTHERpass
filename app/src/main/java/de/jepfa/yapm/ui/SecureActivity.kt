@@ -1,14 +1,12 @@
 package de.jepfa.yapm.ui
 
-import android.app.assist.AssistStructure
 import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
-import android.view.autofill.AutofillManager
-import androidx.core.app.ActivityCompat.finishAffinity
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.overlay.OverlayShowingService
 import de.jepfa.yapm.ui.login.LoginActivity
+import de.jepfa.yapm.util.ClipboardUtil
 import java.util.concurrent.TimeUnit
 import javax.crypto.SecretKey
 
@@ -62,6 +60,9 @@ abstract class SecureActivity : BaseActivity() {
      */
     object SecretChecker {
 
+        val fromSecretChecker = "fromSecretChecker"
+        val loginRequestCode = 38632
+
         private val DELTA_LOGIN_ACTIVITY_INTENTED = TimeUnit.SECONDS.toMillis(3)
 
         @Volatile
@@ -77,22 +78,19 @@ abstract class SecureActivity : BaseActivity() {
                     else
                         Session.lock()
 
+                    ClipboardUtil.clearClips(activity)
                     activity.closeOverlayDialogs()
-                    finishAffinity(activity)
+                    activity.lock()
                 }
 
 
                 if (!isLoginIntented()) {
                     val intent = Intent(activity, LoginActivity::class.java)
-                    val assistStructure = activity.intent.getParcelableExtra<AssistStructure>(
-                        AutofillManager.EXTRA_ASSIST_STRUCTURE
-                    )
-                    if (assistStructure != null) {
-                        intent.putExtra(AutofillManager.EXTRA_ASSIST_STRUCTURE, assistStructure)
-                    }
-                    activity.startActivity(intent)
+                    intent.putExtras(activity.intent)
+                    intent.putExtra(fromSecretChecker, true)
+                    activity.startActivityForResult(intent, loginRequestCode)
+
                     loginIntented()
-                    activity.lock()
                 }
             } else {
                 Session.touch()

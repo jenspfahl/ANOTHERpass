@@ -104,12 +104,11 @@ class CreateVaultSummarizeFragment : BaseFragment() {
                         Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
                     }
                     else {
-                        getBaseActivity().finishAffinity()
                         LoginUseCase.execute(pin, masterPasswd, getBaseActivity())
                         pin.clear()
                         masterPasswd.clear()
                         findNavController().navigate(R.id.action_Create_Vault_to_ThirdFragment_to_Root)
-                        getBaseActivity().finishAffinity() //TODO time between closing and opening new list activity takes too long
+                        getBaseActivity().finish()
                     }
                 }
             )

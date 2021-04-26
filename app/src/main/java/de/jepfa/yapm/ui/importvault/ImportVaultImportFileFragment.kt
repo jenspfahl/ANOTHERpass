@@ -138,7 +138,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
                     }
                     else {
                         findNavController().navigate(R.id.action_importVault_to_Login)
-                        getBaseActivity().finishAffinity()
+                        getBaseActivity().finish()
                     }
                 }
             )

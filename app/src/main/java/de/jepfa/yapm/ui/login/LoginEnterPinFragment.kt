@@ -1,11 +1,9 @@
 package de.jepfa.yapm.ui.login
 
-import android.app.assist.AssistStructure
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.autofill.AutofillManager.EXTRA_ASSIST_STRUCTURE
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
@@ -19,8 +17,8 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.usecase.LoginUseCase
-import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.AsyncWithProgressBar
+import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.putEncrypted
 import java.util.*
 
@@ -122,10 +120,7 @@ class LoginEnterPinFragment : BaseFragment() {
                         userPin.clear()
                         masterPasswd.clear()
                         pinTextView.setText("")
-                        val args = Bundle()
-                        val assistStructure = getBaseActivity().intent.getParcelableExtra<AssistStructure>(EXTRA_ASSIST_STRUCTURE)
-                        args.putParcelable(EXTRA_ASSIST_STRUCTURE, assistStructure)
-                        findNavController().navigate(R.id.action_Login_to_CredentialList, args)
+
                         loginActivity.loginSuccessful()
                         true
                     }

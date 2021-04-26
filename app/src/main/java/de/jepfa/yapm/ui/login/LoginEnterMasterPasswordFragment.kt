@@ -190,17 +190,11 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                             PreferenceUtil.putEncrypted(DATA_ENCRYPTED_MASTER_PASSWORD, encPasswd, getBaseActivity())
                         }
 
-                        val assistStructure = getBaseActivity().intent.getParcelableExtra<AssistStructure>(
-                            AutofillManager.EXTRA_ASSIST_STRUCTURE
-                        )
-                        val args = Bundle()
-                        args.putParcelable(AutofillManager.EXTRA_ASSIST_STRUCTURE, assistStructure)
-                        findNavController().navigate(R.id.action_Login_to_CredentialList, args)
-
                         userPin.clear()
                         masterPassword.clear()
                         masterPasswdTextView.setText("")
                         arguments?.remove(CreateVaultActivity.ARG_ENC_PIN)
+
                         loginActivity.loginSuccessful()
                     }
                 }

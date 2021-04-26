@@ -15,9 +15,6 @@
             android:id="@+id/action_Login_PinFragment_to_MasterPasswordFragment"
             app:destination="@id/LoginEnterMasterPasswordFragment" />
 
-        <action
-            android:id="@+id/action_Login_to_CredentialList"
-            app:destination="@id/ListCredentialsActivity" />
     </fragment>
 
     <fragment
@@ -27,16 +24,8 @@
         tools:layout="@layout/fragment_login_enter_masterpassword">
 
         <action
-            android:id="@+id/action_Login_to_CredentialList"
-            app:destination="@id/ListCredentialsActivity" />
-        <action
             android:id="@+id/action_Login_MasterPasswordFragment_to_Login_PinFragment"
             app:destination="@id/LoginEnterPinFragment" />
     </fragment>
-
-    <activity
-        android:id="@+id/ListCredentialsActivity"
-        android:name="de.jepfa.yapm.ui.credential.ListCredentialsActivity"
-        android:label="List Credentials Activity"/>
 
 </navigation>

@@ -53,9 +53,6 @@ import de.jepfa.yapm.usecase.*
 import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.PreferenceUtil.DATA_ENCRYPTED_MASTER_PASSWORD
 
-/**
- * This is the main activity
- */
 class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationItemSelectedListener  {
 
     var assistStructure: AssistStructure? = null
@@ -338,7 +335,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                 putExtra(EXTRA_AUTHENTICATION_RESULT, fillResponse)
             }
             assistStructure = null
-            setResult(Activity.RESULT_OK, replyIntent) // TODO seems to not work
+            setResult(Activity.RESULT_OK, replyIntent)
             finish()
 
         }

@@ -78,7 +78,7 @@ class ExportVaultActivity : SecureActivity() {
                 intent.putExtra(FileIOService.PARAM_FILE_URI, it)
                 startService(intent)
 
-                finishAffinity()
+                finish()
 
                 val upIntent = Intent(this, ListCredentialsActivity::class.java)
                 navigateUpTo(upIntent)

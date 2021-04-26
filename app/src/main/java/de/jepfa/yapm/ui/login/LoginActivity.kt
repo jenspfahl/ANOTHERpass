@@ -10,7 +10,9 @@ import android.widget.Toast
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.BaseActivity
+import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
+import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.ui.importvault.ImportVaultActivity
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.PreferenceUtil
@@ -86,7 +88,6 @@ class LoginActivity : BaseActivity() {
             PreferenceUtil.delete(PreferenceUtil.DATA_ENCRYPTED_MASTER_PASSWORD, baseContext)
             PreferenceUtil.delete(PreferenceUtil.DATA_MASTER_PASSWORD_TOKEN_KEY, baseContext)
             Session.logout()
-            finishAffinity()
             finishAndRemoveTask()
         }
     }
@@ -98,7 +99,16 @@ class LoginActivity : BaseActivity() {
     fun loginSuccessful() {
         loginAttempts = 0
         PreferenceUtil.delete(STATE_LOGIN_ATTEMPTS, this)
-        finishAffinity()
+
+        val isFromSecretChecker = intent.getBooleanExtra(SecureActivity.SecretChecker.fromSecretChecker, false)
+        if (isFromSecretChecker) {
+            setResult(SecureActivity.SecretChecker.loginRequestCode, intent)
+        }
+        else {
+            val intent = Intent(this, ListCredentialsActivity::class.java)
+            startActivity(intent)
+        }
+        finish()
     }
 
     private fun getMaxLoginAttempts(): Int {
