@@ -5,7 +5,6 @@ import android.app.AlertDialog
 import android.app.SearchManager
 import android.app.assist.AssistStructure
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -35,7 +34,6 @@ import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.EncCredential
 import de.jepfa.yapm.model.Session
-import de.jepfa.yapm.service.autofill.CredentialFillService
 import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
 import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.service.label.LabelFilter
@@ -48,6 +46,7 @@ import de.jepfa.yapm.ui.changelogin.ChangeMasterPasswordActivity
 import de.jepfa.yapm.ui.changelogin.ChangePinActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
 import de.jepfa.yapm.ui.exportvault.ExportVaultActivity
+import de.jepfa.yapm.ui.label.ListLabelsActivity
 import de.jepfa.yapm.ui.settings.SettingsActivity
 import de.jepfa.yapm.usecase.*
 import de.jepfa.yapm.util.*
@@ -62,7 +61,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
     val newOrUpdateCredentialActivityRequestCode = 1
 
-    private lateinit var credentialListAdapter: CredentialListAdapter
+    private lateinit var listCredentialAdapter: ListCredentialAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,8 +70,8 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         setSupportActionBar(toolbar)
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
-        credentialListAdapter = CredentialListAdapter(this)
-        recyclerView.adapter = credentialListAdapter
+        listCredentialAdapter = ListCredentialAdapter(this)
+        recyclerView.adapter = listCredentialAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         CurrentCredentialHolder.currentCredential = null
@@ -86,11 +85,11 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
                     val sorted = it
                         .sortedBy { SecretService.decryptCommonString(key, it.name).toLowerCase() }
-                    credentialListAdapter.submitOriginList(sorted)
-                    credentialListAdapter.filter.filter("")
+                    listCredentialAdapter.submitOriginList(sorted)
+                    listCredentialAdapter.filter.filter("")
                 } else {
-                    credentialListAdapter.submitOriginList(credentials)
-                    credentialListAdapter.filter.filter("")
+                    listCredentialAdapter.submitOriginList(credentials)
+                    listCredentialAdapter.filter.filter("")
                 }
             }
         })
@@ -135,7 +134,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
     override fun onResume() {
         super.onResume()
-        credentialListAdapter.notifyDataSetChanged()
+        listCredentialAdapter.notifyDataSetChanged()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -180,7 +179,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                 }
 
                 override fun onQueryTextChange(s: String?): Boolean {
-                    credentialListAdapter.filter.filter(s)
+                    listCredentialAdapter.filter.filter(s)
 
                     return false
                 }
@@ -265,7 +264,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                             }
                         }
 
-                        credentialListAdapter.filter.filter("")
+                        listCredentialAdapter.filter.filter("")
                         refreshMenuFiltersItem(item)
                         // TODO add red dot to menu item icon to indicate filter
                         dialog.dismiss()
@@ -319,7 +318,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
     }
 
     override fun lock() {
-        credentialListAdapter.notifyDataSetChanged()
+        listCredentialAdapter.notifyDataSetChanged()
     }
 
     fun shouldPushBackAutoFill() : Boolean {
@@ -449,11 +448,19 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
                 return true
             }
+
             R.id.menu_help -> {
                 val browserIntent = Intent(Intent.ACTION_VIEW, Constants.HOMEPAGE)
                 startActivity(browserIntent)
                 return true
             }
+
+            R.id.menu_labels -> {
+                val intent = Intent(this, ListLabelsActivity::class.java)
+                startActivity(intent)
+                return true
+            }
+
             R.id.menu_settings -> {
                 val intent = Intent(this, SettingsActivity::class.java)
                 startActivity(intent)

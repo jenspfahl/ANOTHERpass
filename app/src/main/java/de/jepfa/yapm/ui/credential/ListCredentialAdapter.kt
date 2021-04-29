@@ -29,8 +29,8 @@ import java.util.*
 import javax.crypto.SecretKey
 
 
-class CredentialListAdapter(val listCredentialsActivity: ListCredentialsActivity) :
-        ListAdapter<EncCredential, CredentialListAdapter.CredentialViewHolder>(CredentialsComparator()),
+class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity) :
+        ListAdapter<EncCredential, ListCredentialAdapter.CredentialViewHolder>(CredentialsComparator()),
         Filterable {
 
     private lateinit var originList: List<EncCredential>

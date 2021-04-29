@@ -5,34 +5,29 @@
     android:paddingTop="4dp"
     android:paddingHorizontal="32dp"
     android:orientation="horizontal">
-    <TableRow>
-
-        <CheckBox>
-
-        </CheckBox>
+    <TableRow android:layout_width="match_parent">
 
         <com.pchmn.materialchips.ChipView
             android:id="@+id/label_chip"
             app:label="label"
-            >
-
-        </com.pchmn.materialchips.ChipView>
-
+            android:layout_weight="0.75" />
 
         <TextView
             android:id="@+id/label_usage"
-            style="@style/credential_title"
             android:textIsSelectable="false"
-            android:textAlignment="textStart"
+            android:textSize="16sp"
+            android:gravity="center"
             android:text="used by 3 credentials"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"/>
 
         <ImageView
             android:id="@+id/label_delete"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:clickable="true"
+            android:foregroundGravity="right"
             android:layout_gravity="end"
             android:paddingLeft="16dp"
             android:src="@drawable/ic_baseline_delete_24" />

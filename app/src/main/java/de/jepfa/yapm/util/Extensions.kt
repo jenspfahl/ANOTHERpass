@@ -32,4 +32,9 @@ fun Intent.putEncryptedExtra(key: String, encrypted: Encrypted) {
     this.putExtra(key, encrypted.toBase64String())
 }
 
+fun Intent.getIntExtra(key: String): Int? {
+    val value = this.getIntExtra(key, -1)
+    return if (value != -1) value else null
+}
+
 

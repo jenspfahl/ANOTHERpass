@@ -35,17 +35,27 @@ object LabelService {
             val labelChip = createLabelChip(key, encLabel)
 
             val label = Label(encLabel, labelChip)
+            val existing = idToLabel.get(encLabelId)
+            if (existing != null) {
+                // important for name updates
+                nameToLabel.remove(existing.labelChip.label)
+            }
             nameToLabel.put(label.labelChip.label, label)
             idToLabel.put(encLabelId, label)
         }
     }
 
-    fun updateLabelsForCredential(key: SecretKey, credential: EncCredential) {
-        if (!credential.isPersistent()) {
-            return
+    fun removeLabel(label: Label) {
+        nameToLabel.remove(label.labelChip.label)
+        label.encLabel.id?.let {
+            idToLabel.remove(it)
+            labelIdToCredentialIds.remove(it)
         }
-        val labelsString = SecretService.decryptCommonString(key, credential.labels)
-        val labels = stringIdsToLabels(labelsString)
+    }
+
+    fun updateLabelsForCredential(key: SecretKey, credential: EncCredential) {
+
+        val labels = getLabelsForCredential(key, credential)
 
         labels
             .forEach { label ->
@@ -62,6 +72,10 @@ object LabelService {
                     }
                 }
             }
+    }
+
+    fun getCredentialIdsForLabelId(labelId: Int): Set<Int>? {
+        return labelIdToCredentialIds[labelId]
     }
 
     fun getAllLabels(): List<Label> {

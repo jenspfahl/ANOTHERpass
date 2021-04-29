@@ -62,6 +62,13 @@
     </item>
 
     <group>
+
+        <item
+            android:id="@+id/menu_labels"
+            android:icon="@drawable/ic_baseline_label_24"
+            android:orderInCategory="100"
+            android:title="@string/action_labels" />
+
         <item
             android:id="@+id/menu_settings"
             android:icon="@drawable/ic_settings_black_24dp"
