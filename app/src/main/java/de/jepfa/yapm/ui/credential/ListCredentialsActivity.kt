@@ -319,7 +319,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
     }
 
     override fun lock() {
-        recreate()
+        credentialListAdapter.notifyDataSetChanged()
     }
 
     fun shouldPushBackAutoFill() : Boolean {

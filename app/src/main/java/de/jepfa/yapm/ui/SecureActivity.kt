@@ -73,14 +73,16 @@ abstract class SecureActivity : BaseActivity() {
             if (Session.isDenied()) {
                 // make all not readable by setting key as invalid
                 if (Session.isOutdated()) {
-                    if (Session.shouldBeLoggedOut())
+                    if (Session.shouldBeLoggedOut()) {
                         Session.logout()
-                    else
+                    }
+                    else {
                         Session.lock()
+                    }
 
                     ClipboardUtil.clearClips(activity)
                     activity.closeOverlayDialogs()
-                    activity.lock()
+                    activity.lock() //TODO causes Decor exceptions
                 }
 
 
