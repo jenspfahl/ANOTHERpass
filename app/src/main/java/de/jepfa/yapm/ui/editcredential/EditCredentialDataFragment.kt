@@ -28,7 +28,7 @@ import javax.crypto.SecretKey
 
 class EditCredentialDataFragment : SecureFragment() {
 
-    private val LAST_CHARS = listOf(',', ';', ' ', System.lineSeparator())
+    private val LAST_CHARS = listOf(' ', '\t', System.lineSeparator())
 
     private lateinit var editCredentialNameView: EditText
     private lateinit var editCredentialLabelsView: ChipsInput

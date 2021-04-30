@@ -2,8 +2,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:paddingTop="4dp"
-    android:paddingHorizontal="32dp"
+    android:padding="@dimen/big_padding"
     android:orientation="horizontal">
     <TableRow android:layout_width="match_parent">
 
@@ -17,7 +16,6 @@
             android:textIsSelectable="false"
             android:textSize="16sp"
             android:gravity="center"
-            android:text="used by 3 credentials"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="0.5"/>

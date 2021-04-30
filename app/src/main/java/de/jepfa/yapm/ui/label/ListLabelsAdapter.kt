@@ -73,7 +73,7 @@ class ListLabelsAdapter(val listLabelsActivity: ListLabelsActivity) :
         private val labelDeleteImageView: ImageView = itemView.findViewById(R.id.label_delete)
 
         fun listenForEditLabel(event: (position: Int, type: Int) -> Unit) {
-            labelChipView.setOnClickListener {
+            labelChipView.setOnChipClicked {
                 event.invoke(adapterPosition, itemViewType)
             }
             labelUsageTextView.setOnClickListener {
@@ -96,7 +96,6 @@ class ListLabelsAdapter(val listLabelsActivity: ListLabelsActivity) :
             labelChipView.label = name
             labelChipView.setChipBackgroundColor(label.labelChip.getColor(itemView.context))
             labelChipView.setLabelColor(ContextCompat.getColor(itemView.context, R.color.white))
-            labelChipView.setPadding(16, 0, 16, 0)
             val labelId = label.encLabel.id
             if (labelId != null) {
                 val usageCount = LabelService.getCredentialIdsForLabelId(labelId)?.size
