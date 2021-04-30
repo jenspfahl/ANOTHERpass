@@ -30,9 +30,6 @@ class ListLabelsActivity : SecureActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list_labels)
-        setSupportActionBar(findViewById(R.id.toolbar))
-        supportActionBar?.setDisplayHomeAsUpEnabled(enableBack)
-
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
         listLabelsAdapter = ListLabelsAdapter(this)
@@ -102,6 +99,6 @@ class ListLabelsActivity : SecureActivity() {
     }
 
     override fun lock() {
-       // TODO("Not yet implemented")
+       // listLabelsAdapter.submitList(emptyList())
     }
 }

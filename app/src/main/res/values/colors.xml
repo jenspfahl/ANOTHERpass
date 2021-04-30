@@ -13,13 +13,11 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-
-
-
+<!--label colors-->
     <color name="Red">#FF0000</color>
     <color name="Maroon">#800000</color>
-    <color name="Orange">#FF5733</color>
-    <color name="Yellow">#FFFF00</color>
+    <color name="Orange">#F39C12</color>
+    <color name="Yellow">#EEEE00</color>
     <color name="Olive">#808000</color>
     <color name="Lime">#00FF00</color>
     <color name="Green">#008000</color>

@@ -17,10 +17,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.YetAnotherPasswordManager"
         tools:replace="android:allowBackup">
-        <activity
-            android:name=".ui.label.ListLabelsActivity"
-            android:label="@string/title_activity_list_label"
-            android:theme="@style/Theme.YetAnotherPasswordManager.NoActionBar"></activity>
 
         <provider
             android:name=".provider.PasteContentProvider"
@@ -55,8 +51,12 @@
             android:name=".ui.editcredential.EditCredentialActivity"
             android:noHistory="false" />
         <activity
+            android:name=".ui.label.ListLabelsActivity"
+            android:label="@string/title_activity_list_label"/>
+
+        <activity
             android:name=".ui.label.EditLabelActivity"
-            android:noHistory="false" />
+            android:noHistory="true" />
         <activity
             android:name=".ui.createvault.CreateVaultActivity"
             android:noHistory="false" />
