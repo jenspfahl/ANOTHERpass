@@ -16,9 +16,10 @@ import android.view.autofill.AutofillId
 import android.view.autofill.AutofillValue
 import android.widget.RemoteViews
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.Password
+import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.PREF_AUTOFILL_EVERYWHERE
@@ -153,6 +154,7 @@ object ResponseFiller {
         val responseBuilder = FillResponse.Builder()
 
         val authIntent = Intent(context, ListCredentialsActivity::class.java)
+        authIntent.putExtra(SecureActivity.SecretChecker.fromAutofill, true)
 
         val intentSender: IntentSender = PendingIntent.getActivity(
             context,

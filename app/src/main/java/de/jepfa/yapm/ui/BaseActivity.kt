@@ -1,7 +1,6 @@
 package de.jepfa.yapm.ui
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
@@ -11,10 +10,6 @@ import android.widget.ProgressBar
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.Encrypted
-import de.jepfa.yapm.service.secretgenerator.PasswordStrength
-import de.jepfa.yapm.ui.createvault.CreateVaultActivity
-import de.jepfa.yapm.ui.label.ListLabelsActivity
 import de.jepfa.yapm.viewmodel.CredentialViewModel
 import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
 import de.jepfa.yapm.viewmodel.LabelViewModel

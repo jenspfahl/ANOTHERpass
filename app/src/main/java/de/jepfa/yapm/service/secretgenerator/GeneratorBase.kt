@@ -1,6 +1,6 @@
 package de.jepfa.yapm.service.secretgenerator
 
-import de.jepfa.yapm.model.Password
+import de.jepfa.yapm.model.secret.Password
 import java.security.SecureRandom
 
 abstract class GeneratorBase<T : GeneratorSpec> {

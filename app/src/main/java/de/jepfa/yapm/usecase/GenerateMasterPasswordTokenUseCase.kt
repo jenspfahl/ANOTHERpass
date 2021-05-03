@@ -3,7 +3,7 @@ package de.jepfa.yapm.usecase
 import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
-import de.jepfa.yapm.model.Encrypted
+import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity

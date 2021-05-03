@@ -1,6 +1,6 @@
 package de.jepfa.yapm.service.secret
 
-import de.jepfa.yapm.model.Password
+import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.util.PreferenceUtil

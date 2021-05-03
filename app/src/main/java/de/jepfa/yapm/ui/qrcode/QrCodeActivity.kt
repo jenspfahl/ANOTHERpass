@@ -10,7 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.Encrypted
+import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.io.FileIOService
@@ -27,6 +27,9 @@ class QrCodeActivity : SecureActivity() {
     private lateinit var head: String
     private lateinit var encQRC: Encrypted
 
+    init {
+        enableBack = true
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         checkSession = !intent.getBooleanExtra(EXTRA_NO_SESSION_CHECK, false)
@@ -66,8 +69,6 @@ class QrCodeActivity : SecureActivity() {
             }
         }
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -82,12 +83,6 @@ class QrCodeActivity : SecureActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
-        if (id == android.R.id.home) {
-
-            navigateUpTo(intent)
-            return true
-        }
-
 
         if (checkSession && Session.isDenied()) {
             LockVaultUseCase.execute(this)

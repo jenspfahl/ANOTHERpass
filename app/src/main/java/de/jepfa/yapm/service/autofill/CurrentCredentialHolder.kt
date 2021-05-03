@@ -1,6 +1,6 @@
 package de.jepfa.yapm.service.autofill
 
-import de.jepfa.yapm.model.EncCredential
+import de.jepfa.yapm.model.encrypted.EncCredential
 
 object CurrentCredentialHolder {
 

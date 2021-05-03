@@ -2,7 +2,7 @@ package de.jepfa.yapm.usecase
 
 import android.content.Intent
 import android.graphics.Color
-import de.jepfa.yapm.model.Encrypted
+import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity

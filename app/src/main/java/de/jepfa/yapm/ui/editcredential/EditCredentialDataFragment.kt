@@ -1,7 +1,6 @@
 package de.jepfa.yapm.ui.editcredential
 
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.*
@@ -14,6 +13,9 @@ import com.pchmn.materialchips.ChipsInput.ChipsListener
 import com.pchmn.materialchips.model.ChipInterface
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.*
+import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.encrypted.EncLabel
+import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
@@ -23,7 +25,6 @@ import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.ui.label.LabelChip
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.Constants
-import javax.crypto.SecretKey
 
 
 class EditCredentialDataFragment : SecureFragment() {
@@ -139,7 +140,6 @@ class EditCredentialDataFragment : SecureFragment() {
 
         val buttonNext: Button = view.findViewById(R.id.button_next)
         buttonNext.setOnClickListener {
-            Session.safeTouch()
 
             if (TextUtils.isEmpty(editCredentialNameView.text)) {
                 editCredentialNameView.setError(getString(R.string.error_field_required))

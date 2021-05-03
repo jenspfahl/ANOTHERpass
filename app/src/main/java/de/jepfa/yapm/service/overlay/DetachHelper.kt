@@ -4,7 +4,7 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
-import de.jepfa.yapm.model.Encrypted
+import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.ALIAS_KEY_TRANSPORT
 import de.jepfa.yapm.ui.SecureActivity

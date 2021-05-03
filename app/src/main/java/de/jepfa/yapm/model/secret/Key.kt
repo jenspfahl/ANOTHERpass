@@ -1,7 +1,4 @@
-package de.jepfa.yapm.model
-
-import de.jepfa.yapm.service.secret.SecretService
-import java.util.*
+package de.jepfa.yapm.model.secret
 
 class Key : Secret {
 

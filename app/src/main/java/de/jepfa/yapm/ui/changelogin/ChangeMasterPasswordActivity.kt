@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.widget.*
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.Password
+import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.ChangeMasterPasswordUseCase

@@ -3,7 +3,7 @@ package de.jepfa.yapm.repository
 import androidx.annotation.WorkerThread
 import de.jepfa.yapm.database.dao.EncCredentialDao
 import de.jepfa.yapm.database.entity.EncCredentialEntity
-import de.jepfa.yapm.model.EncCredential
+import de.jepfa.yapm.model.encrypted.EncCredential
 import kotlinx.coroutines.flow.*
 
 class CredentialRepository(private val encCredentialDao: EncCredentialDao) {

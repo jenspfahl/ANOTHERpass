@@ -90,6 +90,7 @@
     <string name="button_export_vault">Export vault</string>
     <string name="include_enc_masterkey">Include encrypted masterkey</string>
     <string name="too_may_wrong_logins">Too many login attempts, all tokens declined</string>
+    <string name="too_may_wrong_logins_self_destruction">Too many login attempts, vault completely deleted</string>
     <string name="import_vault_explanation">Select a vault file to import. Note: You need the pin and the masterpassword and, depending on the file, the encrypted masterkey.</string>
     <string name="import_vault_load_file_fragment_label">Import vault 1/2</string>
     <string name="import_vault_import_file_fragment_label">Import vault 2/2</string>

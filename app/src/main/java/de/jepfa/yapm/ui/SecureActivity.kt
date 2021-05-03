@@ -2,6 +2,7 @@ package de.jepfa.yapm.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.WindowManager
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.overlay.OverlayShowingService
@@ -28,6 +29,11 @@ abstract class SecureActivity : BaseActivity() {
         super.onResume()
         window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
         checkSecret()
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        checkSecret()
+        return super.dispatchTouchEvent(ev)
     }
 
     protected abstract fun lock()
@@ -61,9 +67,10 @@ abstract class SecureActivity : BaseActivity() {
     object SecretChecker {
 
         val fromSecretChecker = "fromSecretChecker"
+        val fromAutofill = "fromAutofill"
         val loginRequestCode = 38632
 
-        private val DELTA_LOGIN_ACTIVITY_INTENTED = TimeUnit.SECONDS.toMillis(3)
+        private val DELTA_LOGIN_ACTIVITY_INTENTED = TimeUnit.SECONDS.toMillis(1)
 
         @Volatile
         private var loginActivityIntented: Long = 0
@@ -82,15 +89,20 @@ abstract class SecureActivity : BaseActivity() {
 
                     ClipboardUtil.clearClips(activity)
                     activity.closeOverlayDialogs()
-                    activity.lock() //TODO causes Decor exceptions
                 }
-
 
                 if (!isLoginIntented()) {
                     val intent = Intent(activity, LoginActivity::class.java)
                     intent.putExtras(activity.intent)
                     intent.putExtra(fromSecretChecker, true)
-                    activity.startActivityForResult(intent, loginRequestCode)
+                    if (activity.intent.getBooleanExtra(fromAutofill, false)) {
+                        activity.startActivityForResult(intent, loginRequestCode)
+                        activity.lock()
+                    }
+                    else {
+                        activity.startActivity(intent)
+                        activity.finish()
+                    }
 
                     loginIntented()
                 }

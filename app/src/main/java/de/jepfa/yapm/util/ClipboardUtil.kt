@@ -6,12 +6,11 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.Encrypted
-import de.jepfa.yapm.model.Password
+import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.provider.PasteContentProvider
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.usecase.DropVaultUseCase
 import de.jepfa.yapm.util.PreferenceUtil.PREF_WARN_BEFORE_COPY_TO_CB
 
 object ClipboardUtil {

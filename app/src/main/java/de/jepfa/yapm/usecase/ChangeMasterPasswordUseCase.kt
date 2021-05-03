@@ -1,7 +1,7 @@
 package de.jepfa.yapm.usecase
 
 import android.util.Log
-import de.jepfa.yapm.model.Password
+import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.service.secret.MasterKeyService.encryptAndStoreMasterKey

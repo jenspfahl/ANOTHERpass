@@ -38,7 +38,6 @@ class SettingsActivity : SecureActivity(),
             if (supportFragmentManager.backStackEntryCount == 0) {
                 setTitle(R.string.title_activity_settings)
             }
-            Session.safeTouch()
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }

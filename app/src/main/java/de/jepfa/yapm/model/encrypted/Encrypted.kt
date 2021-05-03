@@ -1,4 +1,4 @@
-package de.jepfa.yapm.model
+package de.jepfa.yapm.model.encrypted
 
 import android.util.Base64
 

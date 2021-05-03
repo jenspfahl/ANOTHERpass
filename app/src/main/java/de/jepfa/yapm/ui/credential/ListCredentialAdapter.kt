@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.EncCredential
+import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
 import de.jepfa.yapm.service.label.LabelFilter
@@ -226,11 +226,11 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         }
 
         fun bind(key: SecretKey?, credential: EncCredential) {
+            credentialLabelContainerView.removeAllViews()
+
             var name = "????"
             if (key != null) {
                 name = SecretService.decryptCommonString(key, credential.name)
-
-                credentialLabelContainerView.removeAllViews()
 
                 val showLabels = PreferenceUtil.getAsBool(PREF_SHOW_LABELS_IN_LIST, true, itemView.context)
                 if (showLabels) {

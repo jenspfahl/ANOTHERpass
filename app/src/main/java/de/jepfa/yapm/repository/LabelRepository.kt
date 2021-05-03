@@ -1,11 +1,9 @@
 package de.jepfa.yapm.repository
 
 import androidx.annotation.WorkerThread
-import androidx.lifecycle.asLiveData
 import de.jepfa.yapm.database.dao.EncLabelDao
 import de.jepfa.yapm.database.entity.EncLabelEntity
-import de.jepfa.yapm.model.EncLabel
-import de.jepfa.yapm.model.Encrypted
+import de.jepfa.yapm.model.encrypted.EncLabel
 import kotlinx.coroutines.flow.*
 
 class LabelRepository(private val encLabelDao: EncLabelDao) {

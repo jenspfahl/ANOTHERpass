@@ -8,12 +8,11 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.Password
+import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.ChangePinUseCase
 import de.jepfa.yapm.usecase.LockVaultUseCase
-import de.jepfa.yapm.usecase.LoginUseCase
 import de.jepfa.yapm.util.AsyncWithProgressBar
 
 class ChangePinActivity : SecureActivity() {

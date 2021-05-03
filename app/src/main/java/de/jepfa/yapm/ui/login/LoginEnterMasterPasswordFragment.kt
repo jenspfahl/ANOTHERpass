@@ -1,19 +1,17 @@
 package de.jepfa.yapm.ui.login
 
-import android.app.assist.AssistStructure
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.autofill.AutofillManager
 import android.widget.*
 import androidx.navigation.fragment.findNavController
 import com.google.zxing.integration.android.IntentIntegrator
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.Encrypted
-import de.jepfa.yapm.model.Password
+import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.ALIAS_KEY_MP_TOKEN
 import de.jepfa.yapm.service.secret.SecretService.decryptKey

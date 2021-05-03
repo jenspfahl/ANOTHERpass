@@ -12,7 +12,7 @@ import android.view.*
 import android.view.View.OnTouchListener
 import android.widget.Button
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.Password
+import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.util.PasswordColorizer

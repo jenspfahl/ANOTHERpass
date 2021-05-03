@@ -1,4 +1,4 @@
-package de.jepfa.yapm.model
+package de.jepfa.yapm.model.encrypted
 
 import android.content.Intent
 import de.jepfa.yapm.util.getEncryptedExtra
@@ -10,7 +10,8 @@ data class EncCredential(var id: Int?,
                          var user: Encrypted,
                          var password: Encrypted,
                          var website: Encrypted,
-                         var labels: Encrypted) {
+                         var labels: Encrypted
+) {
 
     constructor(id: Int?,
                 nameBase64: String,
@@ -25,7 +26,8 @@ data class EncCredential(var id: Int?,
                 Encrypted.fromBase64String(userBase64),
                 Encrypted.fromBase64String(passwordBase64),
                 Encrypted.fromBase64String(websiteBase64),
-                Encrypted.fromBase64String(labelsBase64))
+                Encrypted.fromBase64String(labelsBase64)
+            )
 
 
 

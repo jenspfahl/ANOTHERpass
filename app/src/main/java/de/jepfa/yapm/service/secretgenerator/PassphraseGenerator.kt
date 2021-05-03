@@ -1,7 +1,6 @@
 package de.jepfa.yapm.service.secretgenerator
 
-import de.jepfa.yapm.model.Password
-import java.security.SecureRandom
+import de.jepfa.yapm.model.secret.Password
 
 class PassphraseGenerator: GeneratorBase<PassphraseGeneratorSpec>() {
 

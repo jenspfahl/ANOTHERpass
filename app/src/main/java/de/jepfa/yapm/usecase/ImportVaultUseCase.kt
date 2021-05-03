@@ -2,9 +2,9 @@ package de.jepfa.yapm.usecase
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import de.jepfa.yapm.model.EncCredential
-import de.jepfa.yapm.model.EncLabel
-import de.jepfa.yapm.model.Encrypted
+import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.encrypted.EncLabel
+import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity

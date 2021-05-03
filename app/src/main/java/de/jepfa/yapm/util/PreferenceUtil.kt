@@ -2,7 +2,7 @@ package de.jepfa.yapm.util
 
 import android.content.Context
 import androidx.preference.PreferenceManager
-import de.jepfa.yapm.model.Encrypted
+import de.jepfa.yapm.model.encrypted.Encrypted
 
 object PreferenceUtil {
 
@@ -17,6 +17,8 @@ object PreferenceUtil {
     const val STATE_MASTER_PASSWD_TOKEN_COUNTER = STATE_PREFIX + "mpt_counter"
 
     const val PREF_MAX_LOGIN_ATTEMPTS = PREF_PREFIX + "max_login_attempts"
+    const val PREF_SELF_DESTRUCTION = PREF_PREFIX + "drop_vault_if_login_declined"
+
     const val PREF_LOCK_TIMEOUT = PREF_PREFIX + "lock_timeout"
     const val PREF_LOGOUT_TIMEOUT = PREF_PREFIX + "logout_timeout"
     const val PREF_WARN_BEFORE_COPY_TO_CB = PREF_PREFIX + "warn_copy_password"
@@ -40,7 +42,7 @@ object PreferenceUtil {
 
 
     fun getEncrypted(prefKey: String, context: Context): Encrypted? {
-        return get(prefKey, context)?.let {Encrypted.fromBase64String(it)}
+        return get(prefKey, context)?.let { Encrypted.fromBase64String(it)}
     }
 
     fun getAsInt(prefKey: String, default: Int, context: Context): Int {

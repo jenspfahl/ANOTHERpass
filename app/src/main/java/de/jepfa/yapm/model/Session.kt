@@ -1,5 +1,6 @@
 package de.jepfa.yapm.model
 
+import de.jepfa.yapm.model.encrypted.Encrypted
 import java.util.concurrent.TimeUnit
 import javax.crypto.SecretKey
 
@@ -21,7 +22,7 @@ object Session {
         return masterSecretKey
     }
 
-    fun getEncMasterPasswd() :Encrypted? {
+    fun getEncMasterPasswd() : Encrypted? {
         return encMasterPassword
     }
 
@@ -38,12 +39,6 @@ object Session {
 
     fun touch() {
         lastUpdated = System.currentTimeMillis()
-    }
-
-    fun safeTouch() {
-        if (!isLoggedOut() && !isLocked()) {
-            touch()
-        }
     }
 
     fun isOutdated(): Boolean {

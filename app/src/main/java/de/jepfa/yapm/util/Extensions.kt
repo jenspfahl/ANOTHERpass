@@ -2,9 +2,7 @@ package de.jepfa.yapm.util
 
 import android.content.Intent
 import android.os.Bundle
-import de.jepfa.yapm.model.Encrypted
-import java.util.*
-import kotlin.collections.ArrayList
+import de.jepfa.yapm.model.encrypted.Encrypted
 
 fun Bundle?.getEncrypted(key: String): Encrypted? {
 

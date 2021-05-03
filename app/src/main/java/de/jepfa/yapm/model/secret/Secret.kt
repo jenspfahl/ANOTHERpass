@@ -1,9 +1,7 @@
-package de.jepfa.yapm.model
+package de.jepfa.yapm.model.secret
 
-import android.text.Editable
-import de.jepfa.yapm.util.PreferenceUtil
-import java.lang.reflect.TypeVariable
-import java.nio.CharBuffer
+import de.jepfa.yapm.model.Clearable
+import de.jepfa.yapm.model.Validable
 import java.util.*
 
 open class Secret(var data: ByteArray) : Clearable, Validable {

@@ -2,9 +2,9 @@ package de.jepfa.yapm.service.label
 
 import android.util.Log
 import com.pchmn.materialchips.model.ChipInterface
-import de.jepfa.yapm.model.EncCredential
-import de.jepfa.yapm.model.EncLabel
-import de.jepfa.yapm.model.Encrypted
+import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.encrypted.EncLabel
+import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.label.LabelChip
 import java.util.*
@@ -51,6 +51,12 @@ object LabelService {
             idToLabel.remove(it)
             labelIdToCredentialIds.remove(it)
         }
+    }
+
+    fun clearAll() {
+        labelIdToCredentialIds.clear()
+        nameToLabel.clear()
+        idToLabel.clear()
     }
 
     fun updateLabelsForCredential(key: SecretKey, credential: EncCredential) {

@@ -32,7 +32,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.EncCredential
+import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
 import de.jepfa.yapm.service.autofill.ResponseFiller
@@ -318,6 +318,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
     }
 
     override fun lock() {
+        LabelService.clearAll()
         listCredentialAdapter.notifyDataSetChanged()
     }
 

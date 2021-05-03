@@ -1,8 +1,8 @@
 package de.jepfa.yapm.service.secret
 
-import de.jepfa.yapm.model.Encrypted
-import de.jepfa.yapm.model.Key
-import de.jepfa.yapm.model.Password
+import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.secret.Key
+import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.util.PreferenceUtil
 import javax.crypto.SecretKey

@@ -12,9 +12,9 @@ import android.util.Log
 import android.widget.Toast
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
-import de.jepfa.yapm.model.EncCredential
-import de.jepfa.yapm.model.EncLabel
-import de.jepfa.yapm.model.Encrypted
+import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.encrypted.EncLabel
+import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.util.FileUtil

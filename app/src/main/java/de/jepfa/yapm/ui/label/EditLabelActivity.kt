@@ -14,7 +14,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.setPadding
 import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.EncLabel
+import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.util.getIntExtra
@@ -66,7 +66,7 @@ class EditLabelActivity : SecureActivity() {
             labelColors.forEachIndexed { idx, color ->
                 val chipView = ChipView(this)
                 // doesnt work: chipView.setChip(it.labelChip)
-                chipView.label = labelNameTextView.text.toString()
+                chipView.label = labelNameTextView.text.toString().toUpperCase()
                 chipView.setChipBackgroundColor(color)
                 chipView.setLabelColor(getColor(R.color.white))
                 chipView.setPadding(8)
@@ -90,8 +90,6 @@ class EditLabelActivity : SecureActivity() {
             colorDialog.show()
 
         }
-
-
 
         val saveButton: Button = findViewById(R.id.button_save)
         saveButton.setOnClickListener {
@@ -120,6 +118,6 @@ class EditLabelActivity : SecureActivity() {
     }
 
     override fun lock() {
-        recreate()
+        finish()
     }
 }

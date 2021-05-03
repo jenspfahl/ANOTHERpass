@@ -1,6 +1,7 @@
 package de.jepfa.yapm.usecase
 
 import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.util.PreferenceUtil
 import kotlinx.coroutines.CoroutineScope
@@ -18,7 +19,7 @@ object DropVaultUseCase: SecureActivityUseCase {
         return true
     }
 
-    private fun dropVaultData(activity: SecureActivity) {
+    fun dropVaultData(activity: BaseActivity) {
 
         PreferenceUtil.delete(PreferenceUtil.DATA_ENCRYPTED_MASTER_KEY, activity)
         PreferenceUtil.delete(PreferenceUtil.DATA_ENCRYPTED_MASTER_PASSWORD, activity)

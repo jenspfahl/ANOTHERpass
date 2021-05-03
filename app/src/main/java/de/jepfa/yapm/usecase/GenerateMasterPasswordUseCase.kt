@@ -1,6 +1,6 @@
 package de.jepfa.yapm.usecase
 
-import de.jepfa.yapm.model.Password
+import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.secretgenerator.*
 
 object GenerateMasterPasswordUseCase {

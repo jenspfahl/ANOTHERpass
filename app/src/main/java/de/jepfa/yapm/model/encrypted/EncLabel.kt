@@ -1,6 +1,4 @@
-package de.jepfa.yapm.model
-
-import java.util.*
+package de.jepfa.yapm.model.encrypted
 
 data class EncLabel(var id: Int?,
                     var name: Encrypted,
@@ -8,7 +6,9 @@ data class EncLabel(var id: Int?,
                     var color: Int?) {
 
     constructor(id: Int?, nameBase64: String, descriptionBase64: String, color: Int?) :
-            this(id, Encrypted.fromBase64String(nameBase64), Encrypted.fromBase64String(descriptionBase64), color)
+            this(id,
+                Encrypted.fromBase64String(nameBase64),
+                Encrypted.fromBase64String(descriptionBase64), color)
 
     fun isPersistent(): Boolean {
         return id != null

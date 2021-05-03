@@ -1,9 +1,8 @@
 package de.jepfa.yapm.database.entity
 
 import androidx.room.Entity
-import androidx.room.Index
 import androidx.room.PrimaryKey
-import de.jepfa.yapm.model.Encrypted
+import de.jepfa.yapm.model.encrypted.Encrypted
 
 /**
  * Encrypted labels for Credential

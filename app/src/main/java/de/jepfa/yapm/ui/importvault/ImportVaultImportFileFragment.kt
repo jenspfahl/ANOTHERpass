@@ -11,26 +11,15 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
-import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.zxing.integration.android.IntentIntegrator
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.EncCredential
-import de.jepfa.yapm.model.EncLabel
-import de.jepfa.yapm.model.Encrypted
-import de.jepfa.yapm.model.Password
-import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.ui.BaseFragment
-import de.jepfa.yapm.usecase.CreateVaultUseCase
 import de.jepfa.yapm.usecase.ImportVaultUseCase
-import de.jepfa.yapm.usecase.LoginUseCase
 import de.jepfa.yapm.util.AsyncWithProgressBar
-import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.QRCodeUtil
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class ImportVaultImportFileFragment : BaseFragment() {
 

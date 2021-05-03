@@ -1,26 +1,20 @@
 package de.jepfa.yapm.ui.editcredential
 
-import android.app.Activity
 import android.app.AlertDialog
-import android.content.Intent
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.*
 import android.widget.*
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.tabs.TabLayout
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.EncCredential
-import de.jepfa.yapm.model.Password
+import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secretgenerator.*
 import de.jepfa.yapm.ui.SecureFragment
-import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.*
-import java.util.*
 
 
 class EditCredentialPasswordFragment : SecureFragment() {
@@ -98,7 +92,6 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
         val buttonGeneratePasswd: Button = view.findViewById(R.id.button_generate_passwd)
         buttonGeneratePasswd.setOnClickListener {
-            Session.safeTouch()
             generatedPassword = generatePassword()
             var spannedString = PasswordColorizer.spannableString(generatedPassword, getSecureActivity())
             generatedPasswdView.setText(spannedString)
@@ -129,7 +122,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
         val buttonSave: Button = view.findViewById(R.id.button_save)
         buttonSave.setOnClickListener {
-            Session.safeTouch()
+
             if (generatedPassword.data.isEmpty()) {
                 Toast.makeText(it.context, "Generate a password first", Toast.LENGTH_LONG).show()
             }

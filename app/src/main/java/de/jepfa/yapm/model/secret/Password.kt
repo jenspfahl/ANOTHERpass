@@ -1,4 +1,4 @@
-package de.jepfa.yapm.model
+package de.jepfa.yapm.model.secret
 
 import android.text.Editable
 

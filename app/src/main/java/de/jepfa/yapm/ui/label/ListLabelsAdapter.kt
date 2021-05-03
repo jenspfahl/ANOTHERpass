@@ -12,10 +12,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.EncLabel
+import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.label.LabelService
-import java.util.*
 import javax.crypto.SecretKey
 
 

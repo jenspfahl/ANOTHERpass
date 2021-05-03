@@ -16,7 +16,7 @@ import androidx.core.view.setPadding
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.EncCredential
+import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
 import de.jepfa.yapm.service.label.LabelService

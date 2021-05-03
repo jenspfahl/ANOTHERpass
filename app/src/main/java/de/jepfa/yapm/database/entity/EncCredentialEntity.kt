@@ -1,10 +1,8 @@
 package de.jepfa.yapm.database.entity
 
 import androidx.room.Entity
-import androidx.room.Index
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverter
-import de.jepfa.yapm.model.Encrypted
+import de.jepfa.yapm.model.encrypted.Encrypted
 
 /**
  * Encrypted entity for Credential
@@ -24,7 +22,8 @@ data class EncCredentialEntity (@PrimaryKey(autoGenerate = true) val id: Int?,
                 user: Encrypted,
                 password: Encrypted,
                 website: Encrypted,
-                labels: Encrypted)
+                labels: Encrypted
+    )
             : this(
         id,
         name.toBase64String(),
