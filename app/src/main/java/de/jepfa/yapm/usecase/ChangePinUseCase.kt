@@ -8,6 +8,7 @@ import de.jepfa.yapm.service.secret.MasterKeyService.encryptAndStoreMasterKey
 import de.jepfa.yapm.service.secret.MasterKeyService.getMasterKey
 import de.jepfa.yapm.service.secret.MasterKeyService.getMasterPassPhraseSK
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
+import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.DATA_ENCRYPTED_MASTER_KEY
 
@@ -18,7 +19,7 @@ object ChangePinUseCase {
 
     fun execute(currentPin: Password, newPin: Password, activity: BaseActivity): Boolean {
 
-        val salt = SecretService.getSalt(activity)
+        val salt = SaltService.getSalt(activity)
         val masterPassword = getMasterPasswordFromSession()
         if (masterPassword == null) {
             Log.e(TAG, "master password not at Session")

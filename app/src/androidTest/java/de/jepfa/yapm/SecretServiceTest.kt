@@ -33,7 +33,7 @@ class SecretServiceTest {
 
         // generate master passphrase used for master key
         val masterPassPhrase = SecretService.conjunctPasswords(masterPin, masterPassword, salt)
-        Log.i(TAG, "masterPin + masterPassword=${masterPassword.toStringRepresentation(false)}) --> masterPassPhrase=${masterPassPhrase.toStringRepresentation()}")
+        Log.i(TAG, "masterPin + masterPassword=${masterPassword.toStringRepresentation(false)}) --> masterPassPhrase=${masterPassPhrase.toStringRepresentation(false)}")
         // not needed anymore
         masterPin.clear()
         masterPassword.clear()

@@ -244,14 +244,23 @@ class ShowCredentialActivity : SecureActivity() {
 
                 titleLayout.removeAllViews()
 
-                LabelService.getLabelsForCredential(key, credential).forEachIndexed {idx, it ->
-                    val chipView = ChipView(this)
-                    // doesnt work: chipView.setChip(it.labelChip)
-                    chipView.label = it.labelChip.label
-                    chipView.setChipBackgroundColor(it.labelChip.getColor(this))
-                    chipView.setLabelColor(getColor(R.color.white))
-                    chipView.setPadding(16)
-                    titleLayout.addView(chipView, idx)
+                val labelsForCredential = LabelService.getLabelsForCredential(key, credential)
+                if (labelsForCredential.isNotEmpty()) {
+                    labelsForCredential.forEachIndexed { idx, it ->
+                        val chipView = ChipView(this)
+                        // doesnt work: chipView.setChip(it.labelChip)
+                        chipView.label = it.labelChip.label
+                        chipView.setChipBackgroundColor(it.labelChip.getColor(this))
+                        chipView.setLabelColor(getColor(R.color.white))
+                        chipView.setPadding(16)
+                        titleLayout.addView(chipView, idx)
+                    }
+                }
+                else {
+                    // add blind label to ensure layouting
+                    val blindView = TextView(this)
+                    blindView.setPadding(16)
+                    titleLayout.addView(blindView)
                 }
 
                 if (user.isEmpty()) {

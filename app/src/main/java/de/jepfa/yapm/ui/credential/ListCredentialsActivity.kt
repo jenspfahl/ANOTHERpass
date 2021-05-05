@@ -61,7 +61,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
     val newOrUpdateCredentialActivityRequestCode = 1
 
-    private lateinit var listCredentialAdapter: ListCredentialAdapter
+    private var listCredentialAdapter: ListCredentialAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,11 +85,11 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
                     val sorted = it
                         .sortedBy { SecretService.decryptCommonString(key, it.name).toLowerCase() }
-                    listCredentialAdapter.submitOriginList(sorted)
-                    listCredentialAdapter.filter.filter("")
+                    listCredentialAdapter?.submitOriginList(sorted)
+                    listCredentialAdapter?.filter?.filter("")
                 } else {
-                    listCredentialAdapter.submitOriginList(credentials)
-                    listCredentialAdapter.filter.filter("")
+                    listCredentialAdapter?.submitOriginList(credentials)
+                    listCredentialAdapter?.filter?.filter("")
                 }
             }
         })
@@ -134,7 +134,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
     override fun onResume() {
         super.onResume()
-        listCredentialAdapter.notifyDataSetChanged()
+        listCredentialAdapter?.notifyDataSetChanged()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -179,7 +179,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                 }
 
                 override fun onQueryTextChange(s: String?): Boolean {
-                    listCredentialAdapter.filter.filter(s)
+                    listCredentialAdapter?.filter?.filter(s)
 
                     return false
                 }
@@ -264,7 +264,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                             }
                         }
 
-                        listCredentialAdapter.filter.filter("")
+                        listCredentialAdapter?.filter?.filter("")
                         refreshMenuFiltersItem(item)
                         // TODO add red dot to menu item icon to indicate filter
                         dialog.dismiss()
@@ -319,7 +319,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
     override fun lock() {
         LabelService.clearAll()
-        listCredentialAdapter.notifyDataSetChanged()
+        listCredentialAdapter?.notifyDataSetChanged()
     }
 
     fun shouldPushBackAutoFill() : Boolean {

@@ -15,6 +15,7 @@ import com.google.gson.reflect.TypeToken
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.util.FileUtil
@@ -131,7 +132,7 @@ class FileIOService: IntentService("FileIOService") {
         }
 
         root.addProperty(JSON_CREATION_DATE, SDF_DT_MEDIUM.format(Date()))
-        val salt = PreferenceUtil.get(PreferenceUtil.DATA_SALT, this)
+        val salt = SaltService.getSaltAsBase64String(this)
         salt?.let {
             root.addProperty(JSON_VAULT_ID, it)
         }

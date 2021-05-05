@@ -157,6 +157,9 @@
     <string name="label_data_params">Change the label name and description and color here</string>
     <string name="choose_color">Choose a color</string>
     <string name="error_labelname_in_use">This label name is already in use by another label</string>
+    <string name="title_new_label">New label</string>
+    <string name="title_change_label">Change label</string>
+    <string name="reset_vault">Reset all</string>
 
 
 </resources>

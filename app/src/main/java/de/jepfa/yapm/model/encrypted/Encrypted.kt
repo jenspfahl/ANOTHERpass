@@ -20,6 +20,7 @@ data class Encrypted(val type: String = "", val iv: ByteArray, val data: ByteArr
         const val TYPE_MASTER_PASSWD_TOKEN = "MPT"
         const val TYPE_ENC_MASTER_PASSWD = "EMP"
         const val TYPE_ENC_MASTER_KEY = "EMK"
+        const val TYPE_ENC_SALT = "SLT"
 
         private val BAS64_PAIR_DELIMITOR = ':'
         private val BASE64_FLAGS = Base64.NO_WRAP or Base64.NO_PADDING

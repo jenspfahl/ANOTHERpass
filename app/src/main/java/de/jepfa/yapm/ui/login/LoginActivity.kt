@@ -1,6 +1,7 @@
 package de.jepfa.yapm.ui.login
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
@@ -68,6 +69,21 @@ class LoginActivity : BaseActivity() {
             return true
         }
 
+        if (id == R.id.action_reset_vault) {
+            AlertDialog.Builder(this)
+                .setTitle("Reset all")
+                .setMessage("If you cannot import a vault file and got stuck you can reset all data here.")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(R.string.reset_vault) { dialog, whichButton ->
+                    DropVaultUseCase.dropVaultData(this)
+                    Session.logout()
+                    val intent = Intent(this, LoginActivity::class.java)
+                    startActivity(intent)
+                }
+                .setNegativeButton(android.R.string.no, null)
+                .show()
+        }
+
         return super.onOptionsItemSelected(item)
     }
 
@@ -98,6 +114,7 @@ class LoginActivity : BaseActivity() {
                 PreferenceUtil.delete(PreferenceUtil.DATA_MASTER_PASSWORD_TOKEN_KEY, baseContext)
             }
             Session.logout()
+            finishAffinity()
             finishAndRemoveTask()
         }
     }

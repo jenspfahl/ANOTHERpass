@@ -1,5 +1,6 @@
 package de.jepfa.yapm.service.secret
 
+import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
@@ -21,6 +22,7 @@ import javax.crypto.spec.PBEKeySpec
 object SecretService {
 
     val ALIAS_KEY_TRANSPORT = "YAPM/keyAlias:TRANS"
+    val ALIAS_KEY_SALT = "YAPM/keyAlias:SALT"
     val ALIAS_KEY_MK = "YAPM/keyAlias:MK"
     val ALIAS_KEY_MP = "YAPM/keyAlias:MP"
     val ALIAS_KEY_MP_TOKEN = "YAPM/keyAlias:MPT"
@@ -157,19 +159,5 @@ object SecretService {
         return keyGenerator.generateKey();
     }
 
-    @Synchronized
-    fun getSalt(activity: BaseActivity): Key {
-        val saltBase64 = PreferenceUtil.get(PreferenceUtil.DATA_SALT, activity)
-            ?: return createAndStoreSalt(activity)
-        return Key(Base64.decode(saltBase64, 0))
-    }
-
-    private fun createAndStoreSalt(activity: BaseActivity): Key {
-        val salt = generateKey(128)
-        val saltBase64 = Base64.encodeToString(salt.data, Base64.DEFAULT)
-        PreferenceUtil.put(PreferenceUtil.DATA_SALT, saltBase64, activity)
-
-        return salt
-    }
 
 }

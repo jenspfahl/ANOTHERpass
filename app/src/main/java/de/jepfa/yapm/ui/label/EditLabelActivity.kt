@@ -48,6 +48,10 @@ class EditLabelActivity : SecureActivity() {
         val labelId = intent.getIntExtra(EncLabel.EXTRA_LABEL_ID)
         if (labelId != null) {
             label = LabelService.lookupByLabelId(labelId)
+            setTitle(R.string.title_change_label)
+        }
+        else {
+            setTitle(R.string.title_new_label)
         }
         label?.let {
             labelNameTextView.text = it.labelChip.label

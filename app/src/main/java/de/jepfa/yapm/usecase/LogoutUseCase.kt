@@ -10,6 +10,7 @@ object LogoutUseCase: SecureActivityUseCase {
         Session.logout()
 
         activity.closeOverlayDialogs()
+        activity.finishAffinity()
         activity.finishAndRemoveTask()
 
         ClipboardUtil.clearClips(activity)

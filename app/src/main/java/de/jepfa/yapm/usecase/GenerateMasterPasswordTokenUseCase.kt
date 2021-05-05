@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Color
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
@@ -46,7 +47,7 @@ object GenerateMasterPasswordTokenUseCase: SecureActivityUseCase {
 
             val masterPasswordTokenKey = SecretService.generateKey(32)
             val encMasterPasswordTokenKey = SecretService.encryptKey(mPTKey, masterPasswordTokenKey)
-            val masterPasswordTokenSK = SecretService.generateSecretKey(masterPasswordTokenKey, SecretService.getSalt(activity))
+            val masterPasswordTokenSK = SecretService.generateSecretKey(masterPasswordTokenKey, SaltService.getSalt(activity))
             val masterPasswordToken = SecretService.encryptPassword(Encrypted.TYPE_MASTER_PASSWD_TOKEN, masterPasswordTokenSK, masterPassword)
             val encMasterPasswordToken = SecretService.encryptEncrypted(tempKey, masterPasswordToken)
 

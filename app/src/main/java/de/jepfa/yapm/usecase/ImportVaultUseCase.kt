@@ -6,6 +6,7 @@ import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.service.io.FileIOService
+import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.util.PreferenceUtil
@@ -17,7 +18,9 @@ object ImportVaultUseCase {
 
     fun execute(jsonContent: JsonObject, encMasterKey: String?, activity: BaseActivity): Boolean {
         val salt = jsonContent.get(FileIOService.JSON_VAULT_ID)?.asString
-        salt?.let { PreferenceUtil.put(PreferenceUtil.DATA_SALT, salt, activity) }
+        salt?.let {
+            SaltService.storeSaltFromBase64String(it, activity)
+        }
 
         if (encMasterKey != null) {
             val keyForMK = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)

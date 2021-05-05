@@ -18,7 +18,7 @@ import de.jepfa.yapm.service.secret.SecretService.decryptKey
 import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.service.secret.SecretService.generateSecretKey
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
-import de.jepfa.yapm.service.secret.SecretService.getSalt
+import de.jepfa.yapm.service.secret.SaltService.getSalt
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.usecase.LoginUseCase

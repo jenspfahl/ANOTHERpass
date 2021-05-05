@@ -9,4 +9,9 @@
         app:showAsAction="always"
         android:title="@string/login_help">
     </item>
+    <item
+        android:id="@+id/action_reset_vault"
+        app:showAsAction="never"
+        android:title="@string/reset_vault">
+    </item>
 </menu>

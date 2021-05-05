@@ -61,7 +61,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
         }
 
         scanQrCodeImageView.setOnClickListener {
-            QRCodeUtil.scanQRCode(this, "Scanning Encrypted Master KEy")
+            QRCodeUtil.scanQRCode(this, "Scanning Encrypted Master Key")
             true
         }
 
