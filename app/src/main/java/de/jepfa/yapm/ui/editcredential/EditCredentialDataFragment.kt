@@ -37,6 +37,10 @@ class EditCredentialDataFragment : SecureFragment() {
     private lateinit var editCredentialWebsiteView: EditText
     private lateinit var editCredentialAdditionalInfoView: EditText
 
+    init {
+        enableBack = true
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -50,7 +54,6 @@ class EditCredentialDataFragment : SecureFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, null)
-        setHasOptionsMenu(true)
 
         val editCredentialActivity = getBaseActivity() as EditCredentialActivity
 
@@ -65,6 +68,7 @@ class EditCredentialDataFragment : SecureFragment() {
             if (key != null) {
                 editCredentialLabelsView.filterableList = LabelService.getAllLabelChips()
             }
+            editCredentialNameView.requestFocus()
         })
 
 
@@ -129,14 +133,12 @@ class EditCredentialDataFragment : SecureFragment() {
                     LabelService.updateLabelsForCredential(key, originCredential)
 
                     LabelService.getLabelsForCredential(key, originCredential).forEachIndexed { idx, it ->
-                        editCredentialLabelsView.addChip(it.labelChip) // TODO is not sorted!!
+                        editCredentialLabelsView.addChip(it.labelChip)
                     }
+                    editCredentialNameView.requestFocus()
                 }
             })
         }
-
-        // TODO do it async
-        editCredentialNameView.requestFocus()
 
         val buttonNext: Button = view.findViewById(R.id.button_next)
         buttonNext.setOnClickListener {
@@ -183,14 +185,4 @@ class EditCredentialDataFragment : SecureFragment() {
         return lastChar in LAST_CHARS
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == android.R.id.home) {
-            val upIntent = Intent(getBaseActivity(), ListCredentialsActivity::class.java)
-            getBaseActivity().navigateUpTo(upIntent)
-            return true
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
 }

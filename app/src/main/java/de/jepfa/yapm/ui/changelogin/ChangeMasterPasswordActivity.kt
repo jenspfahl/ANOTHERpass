@@ -20,6 +20,10 @@ class ChangeMasterPasswordActivity : SecureActivity() {
 
     private var generatedPassword: Password = Password.empty()
 
+    init {
+        enableBack = true
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -29,7 +33,6 @@ class ChangeMasterPasswordActivity : SecureActivity() {
         }
 
         setContentView(R.layout.activity_change_master_password)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val currentPinTextView: EditText = findViewById(R.id.current_pin)
         val pseudoPhraseSwitch: Switch = findViewById(R.id.switch_use_pseudo_phrase)
@@ -68,16 +71,6 @@ class ChangeMasterPasswordActivity : SecureActivity() {
 
     override fun lock() {
         recreate()
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == android.R.id.home) {
-            val upIntent = Intent(intent)
-            navigateUpTo(upIntent)
-            return true
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     private fun changeMasterPin(

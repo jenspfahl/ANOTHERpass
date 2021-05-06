@@ -20,6 +20,12 @@ import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_PIN
 
 class CreateVaultEnterPinFragment : BaseFragment() {
 
+
+    init {
+        enableBack = true
+        actionBack = R.id.action_Create_Vault_SecondFragment_back_to_FirstFragment
+    }
+
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
@@ -29,7 +35,7 @@ class CreateVaultEnterPinFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setHasOptionsMenu(true)
+        setTitle(R.string.create_vault_enter_pin_fragment_label)
 
         val pin1TextView: EditText = view.findViewById(R.id.first_pin)
         val pin2TextView: EditText = view.findViewById(R.id.second_pin)
@@ -65,16 +71,6 @@ class CreateVaultEnterPinFragment : BaseFragment() {
             pin1.clear()
             pin2.clear()
         }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == android.R.id.home) {
-            val upIntent = Intent(getBaseActivity(), CreateVaultActivity::class.java)
-            getBaseActivity().navigateUpTo(upIntent)
-            return true
-        }
-        return super.onOptionsItemSelected(item)
     }
 
 }

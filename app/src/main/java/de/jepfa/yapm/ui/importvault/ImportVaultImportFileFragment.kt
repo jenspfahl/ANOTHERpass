@@ -26,6 +26,11 @@ class ImportVaultImportFileFragment : BaseFragment() {
     private lateinit var mkTextView: TextView
     private var encMasterKey: String? = null
 
+    init {
+        enableBack = true
+        actionBack = R.id.action_importVault_ImportFileFragment_to_LoadFileFragment
+    }
+
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
@@ -35,9 +40,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, null)
-
-        getBaseActivity().supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        setHasOptionsMenu(true)
+        setTitle(R.string.import_vault_import_file_fragment_label)
 
         val loadedFileStatusTextView = view.findViewById<TextView>(R.id.loaded_file_status)
         val scanQrCodeImageView = view.findViewById<ImageView>(R.id.imageview_scan_qrcode)
@@ -74,16 +77,6 @@ class ImportVaultImportFileFragment : BaseFragment() {
 
             importVault(jsonContent, encMasterKey)
         }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == android.R.id.home) {
-
-            findNavController().navigate(R.id.action_importVault_ImportFileFragment_to_LoadFileFragment)
-            return true
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

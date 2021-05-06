@@ -31,9 +31,11 @@
         <activity android:name=".ui.exportvault.ExportVaultActivity" />
         <activity
             android:name=".ui.changelogin.ChangePinActivity"
+            android:label="@string/change_pin"
             android:noHistory="true" />
         <activity
             android:name=".ui.changelogin.ChangeMasterPasswordActivity"
+            android:label="@string/change_master_password"
             android:noHistory="true" />
         <activity
             android:name=".ui.qrcode.QrCodeActivity"

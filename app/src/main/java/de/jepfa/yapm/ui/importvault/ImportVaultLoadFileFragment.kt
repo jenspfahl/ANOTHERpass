@@ -20,7 +20,11 @@ import de.jepfa.yapm.util.FileUtil
 
 class ImportVaultLoadFileFragment : BaseFragment() {
 
-    val importVaultFile = 1
+    private val importVaultFile = 1
+
+    init {
+        enableBack = true
+    }
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -31,8 +35,7 @@ class ImportVaultLoadFileFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, null)
-
-        getBaseActivity().supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        setTitle(R.string.import_vault_load_file_fragment_label)
 
         val loadButton = view.findViewById<Button>(R.id.button_load_vault)
         loadButton.setOnClickListener {

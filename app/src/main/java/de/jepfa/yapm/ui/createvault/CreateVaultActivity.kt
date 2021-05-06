@@ -10,8 +10,6 @@ class CreateVaultActivity : BaseActivity() {
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_vault)
-
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     companion object {

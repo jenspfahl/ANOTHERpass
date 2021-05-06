@@ -34,6 +34,10 @@ class EditCredentialPasswordFragment : SecureFragment() {
     private val passphraseGenerator = PassphraseGenerator()
     private val passwordGenerator = PasswordGenerator()
 
+    init {
+        enableBack = true
+        actionBack = R.id.action_EditCredential_PasswordFragment_to_DataFragment
+    }
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
@@ -47,7 +51,6 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, null)
-        setHasOptionsMenu(true)
 
         val editCredentialActivity = getBaseActivity() as EditCredentialActivity
 
@@ -137,10 +140,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                     credentialToSave.password = encPassword
 
                     editCredentialActivity.reply()
-
-
                 }
-
             }
         }
     }
@@ -225,12 +225,6 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
-        if (id == android.R.id.home) {
-            findNavController().navigate(R.id.action_EditCredential_PasswordFragment_to_DataFragment)
-
-            return true
-        }
-
         if (id == R.id.menu_detach_credential) {
 
             val key = masterSecretKey

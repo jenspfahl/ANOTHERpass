@@ -26,6 +26,11 @@ import de.jepfa.yapm.util.getEncrypted
 
 class CreateVaultSummarizeFragment : BaseFragment() {
 
+    init {
+        enableBack = true
+        actionBack = R.id.action_Create_Vault_ThirdFragment_back_to_SecondFragment
+    }
+
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
@@ -35,7 +40,7 @@ class CreateVaultSummarizeFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setHasOptionsMenu(true)
+        setTitle(R.string.create_vault_summarize_fragment_label)
 
         val encMasterPasswd = arguments?.getEncrypted(ARG_ENC_MASTER_PASSWD)
         if (encMasterPasswd == null) {
@@ -70,16 +75,6 @@ class CreateVaultSummarizeFragment : BaseFragment() {
             createVault(pin, masterPasswd, switchStorePasswd.isChecked)
 
         }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == android.R.id.home) {
-            val upIntent = Intent(getBaseActivity(), CreateVaultEnterPassphraseFragment::class.java)
-            getBaseActivity().navigateUpTo(upIntent)
-            return true
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     private fun createVault(

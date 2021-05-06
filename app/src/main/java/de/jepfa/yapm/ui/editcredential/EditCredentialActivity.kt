@@ -41,12 +41,9 @@ class EditCredentialActivity : SecureActivity() {
             currentId = idExtra
             setTitle(R.string.title_update_credential)
         }
-
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     override fun lock() {
-        //generatedPassword.clear()
         recreate()
     }
 

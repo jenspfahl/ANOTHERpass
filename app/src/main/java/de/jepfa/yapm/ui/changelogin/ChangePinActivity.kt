@@ -17,6 +17,10 @@ import de.jepfa.yapm.util.AsyncWithProgressBar
 
 class ChangePinActivity : SecureActivity() {
 
+    init {
+        enableBack = true
+    }
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -58,21 +62,10 @@ class ChangePinActivity : SecureActivity() {
             }
         }
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     override fun lock() {
         recreate()
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == android.R.id.home) {
-            val upIntent = Intent(intent)
-            navigateUpTo(upIntent)
-            return true
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     private fun changePin(

@@ -27,6 +27,10 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
 
     private var generatedPassword: Password = Password.empty()
 
+    init {
+        enableBack = true
+    }
+
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
@@ -36,7 +40,7 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setHasOptionsMenu(true)
+        setTitle(R.string.create_vault_enter_passphrase_fragment_label)
 
         val pseudoPhraseSwitch: Switch = view.findViewById(R.id.switch_use_pseudo_phrase)
         val generatedPasswdView: TextView = view.findViewById(R.id.generated_passwd)
@@ -63,16 +67,6 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
                 findNavController().navigate(R.id.action_Create_Vault_FirstFragment_to_SecondFragment, args)
             }
         }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == android.R.id.home) {
-            val upIntent = Intent(getBaseActivity(), CreateVaultEnterPinFragment::class.java)
-            getBaseActivity().navigateUpTo(upIntent)
-            return true
-        }
-        return super.onOptionsItemSelected(item)
     }
 
 }
