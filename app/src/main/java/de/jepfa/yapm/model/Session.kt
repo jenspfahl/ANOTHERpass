@@ -26,9 +26,17 @@ object Session {
         return encMasterPassword
     }
 
-    fun setTimeouts(lockTimeoutMinutes: Int?, logoutTimeoutMinutes: Int?) {
+    fun setLockTimeout(lockTimeoutMinutes: Int?) {
         if (lockTimeoutMinutes != null) lock_timeout = minutesToMillis(lockTimeoutMinutes)
+    }
+
+    fun setLogoutTimeout(logoutTimeoutMinutes: Int?) {
         if (logoutTimeoutMinutes != null)logout_timeout = minutesToMillis(logoutTimeoutMinutes)
+    }
+
+    fun setTimeouts(lockTimeoutMinutes: Int?, logoutTimeoutMinutes: Int?) {
+        setLockTimeout(lockTimeoutMinutes)
+        setLogoutTimeout(logoutTimeoutMinutes)
     }
 
     fun login(secretKey: SecretKey, encMasterPasswd: Encrypted) {

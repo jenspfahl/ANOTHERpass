@@ -1,16 +1,14 @@
 package de.jepfa.yapm.ui.settings
 
-import android.content.Intent
 import android.os.Bundle
-import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
-import de.jepfa.yapm.util.Constants
+import de.jepfa.yapm.util.PreferenceUtil
 
 private const val TITLE_TAG = "settingsActivityTitle"
 
@@ -103,6 +101,20 @@ class SettingsActivity : SecureActivity(),
     class SecuritySettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.security_preferences, rootKey)
+
+            findPreference<ListPreference>(PreferenceUtil.PREF_LOCK_TIMEOUT)?.let {
+                it.setOnPreferenceChangeListener { preference, newValue ->
+                    Session.setLockTimeout(newValue.toString().toInt())
+                    true
+                }
+            }
+
+            findPreference<ListPreference>(PreferenceUtil.PREF_LOGOUT_TIMEOUT)?.let {
+                it.setOnPreferenceChangeListener { preference, newValue ->
+                    Session.setLogoutTimeout(newValue.toString().toInt())
+                    true
+                }
+            }
         }
     }
 

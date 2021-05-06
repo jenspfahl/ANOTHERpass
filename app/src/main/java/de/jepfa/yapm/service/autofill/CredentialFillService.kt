@@ -28,6 +28,4 @@ class CredentialFillService: AutofillService() {
     override fun onSaveRequest(saveRequest: SaveRequest, saveCallback: SaveCallback) {
     }
 
-
-
 }
