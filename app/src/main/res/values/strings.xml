@@ -35,10 +35,10 @@
     <string name="change">Change</string>
     <string name="delete">Delete</string>
 
-    <string name="title_delete_credential">Delete credential</string>
+    <string name="title_delete_credential">Delete Credential</string>
     <string name="message_delete_credential">Are you sure deleting credential \'%1$s\'?</string>
 
-    <string name="title_delete_label">Delete label</string>
+    <string name="title_delete_label">Delete Label</string>
     <string name="message_delete_label">Are you sure deleting label \'%1$s\'? It will be removed from all credentials where it is assigned to.</string>
 
     <string name="title_encryption_pin_required">Pin required</string>
@@ -59,7 +59,7 @@
     <string name="create_vault_explanation_2">Create a pin or short password used to unlock your vault.</string>
     <string name="pin">Enter a pin</string>
     <string name="repeat_pin">Repeat the pin</string>
-    <string name="create_vault_enter_pin_fragment_label">Create vault 2/3</string>
+    <string name="create_vault_enter_pin_fragment_label">Create Vault 2/3</string>
     <string name="pin_required">A pin is required</string>
     <string name="pin_too_short">Pin is too short</string>
     <string name="pin_not_equal">Pin repetition not equal</string>
@@ -67,7 +67,7 @@
     <string name="button_create_vault">Create vault</string>
     <string name="create_vault_explanation_3">Here you see your master password. Note it or download as QR code and store it safely. Additionally, you can also store it on this device for faster login.</string>
     <string name="store_master_password">Store master password on this device</string>
-    <string name="create_vault_summarize_fragment_label">Create vault 3/3</string>
+    <string name="create_vault_summarize_fragment_label">Create Vault 3/3</string>
     <string name="login_explanation_1">Enter your pin to login into your vault.</string>
     <string name="login_explanation_2">Enter your master password to login into your vault.</string>
     <string name="password">Enter your master password</string>
@@ -76,8 +76,8 @@
     <string name="delete_stored_masterpasswd">Remove stored master password</string>
     <string name="password_wrong">Master password or pin wrong</string>
     <string name="something_went_wrong">Something went wrong :-(</string>
-    <string name="title_new_credential">Create credential</string>
-    <string name="title_update_credential">Update credential</string>
+    <string name="title_new_credential">Create Credential</string>
+    <string name="title_update_credential">Update Credential</string>
     <string name="detach">Detach</string>
     <string name="show_as_qrcode">Show as QR Code</string>
     <string name="export">Export</string>
@@ -92,8 +92,8 @@
     <string name="too_may_wrong_logins">Too many login attempts, all tokens declined</string>
     <string name="too_may_wrong_logins_self_destruction">Too many login attempts, vault completely deleted</string>
     <string name="import_vault_explanation">Select a vault file to import. Note: You need the pin and the masterpassword and, depending on the file, the encrypted masterkey.</string>
-    <string name="import_vault_load_file_fragment_label">Import vault 1/2</string>
-    <string name="import_vault_import_file_fragment_label">Import vault 2/2</string>
+    <string name="import_vault_load_file_fragment_label">Import Vault 1/2</string>
+    <string name="import_vault_import_file_fragment_label">Import Vault 2/2</string>
     <string name="button_load_vault">Load vault file</string>
     <string name="button_import_vault">Import vault</string>
     <string name="scan_mk">Scan your master key</string>

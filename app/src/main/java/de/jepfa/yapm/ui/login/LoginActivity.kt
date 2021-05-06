@@ -53,7 +53,6 @@ class LoginActivity : BaseActivity() {
                 startActivityForResult(intent, createVaultActivityRequestCode)
             }
         }
-        setSupportActionBar(findViewById(R.id.toolbar))
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

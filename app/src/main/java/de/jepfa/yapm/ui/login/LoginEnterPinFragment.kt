@@ -35,8 +35,6 @@ class LoginEnterPinFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, null)
 
-        getBaseActivity().supportActionBar?.setDisplayHomeAsUpEnabled(false)
-
         val pinTextView: EditText = view.findViewById(R.id.edittext_enter_pin)
         val nextButton = view.findViewById<Button>(R.id.button_login_next)
 
@@ -86,7 +84,6 @@ class LoginEnterPinFragment : BaseFragment() {
 
                 findNavController().navigate(R.id.action_Login_PinFragment_to_MasterPasswordFragment, args)
             }
-
         }
     }
 

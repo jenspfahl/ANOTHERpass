@@ -34,6 +34,11 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
     private lateinit var masterPasswdTextView: EditText
     private lateinit var loginButton: Button
 
+    init {
+        enableBack = true
+        actionBack = R.id.action_Login_MasterPasswordFragment_to_Login_PinFragment
+    }
+
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
@@ -43,9 +48,6 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, null)
-
-        getBaseActivity().supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        setHasOptionsMenu(true)
 
         masterPasswdTextView = view.findViewById(R.id.edittext_enter_masterpassword)
         val scanQrCodeImageView: ImageView = view.findViewById(R.id.imageview_scan_qrcode)
@@ -89,16 +91,6 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
 
             login( masterPin, masterPassword, switchStorePasswd.isChecked, loginActivity)
         }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == android.R.id.home) {
-
-            findNavController().navigate(R.id.action_Login_MasterPasswordFragment_to_Login_PinFragment)
-            return true
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
