@@ -160,6 +160,10 @@
     <string name="title_new_label">New label</string>
     <string name="title_change_label">Change label</string>
     <string name="reset_vault">Reset all</string>
+    <string name="button_report_bug">Report bug</string>
+    <string name="button_restart">Restart</string>
+    <string name="bug_explaination">Sorry, a bug occured :-(</string>
+    <string name="toast_bug_report_copied">Bug report copied to clipboard</string>
 
 
 </resources>

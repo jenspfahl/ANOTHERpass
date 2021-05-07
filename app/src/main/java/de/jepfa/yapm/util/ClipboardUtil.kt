@@ -44,10 +44,14 @@ object ClipboardUtil {
         }
     }
 
-    private fun copyPassword(password: Password, context: Context) {
+    fun copy(label: String, text: String, context: Context) {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText("Password", password.toString())
+        val clip = ClipData.newPlainText(label, text)
         clipboard.setPrimaryClip(clip)
+    }
+
+    private fun copyPassword(password: Password, context: Context) {
+        copy("Password", password.toString(), context)
         Toast.makeText(context, R.string.toast_copied_to_clipboard, Toast.LENGTH_SHORT).show()
     }
 

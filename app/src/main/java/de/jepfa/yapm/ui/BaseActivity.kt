@@ -10,6 +10,7 @@ import android.widget.ProgressBar
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import de.jepfa.yapm.R
+import de.jepfa.yapm.ui.errorhandling.ExceptionHandler
 import de.jepfa.yapm.viewmodel.CredentialViewModel
 import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
 import de.jepfa.yapm.viewmodel.LabelViewModel
@@ -47,6 +48,7 @@ open class BaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler(this));
         supportActionBar?.setDisplayHomeAsUpEnabled(enableBack)
     }
 
