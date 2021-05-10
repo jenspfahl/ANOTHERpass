@@ -1,11 +1,11 @@
 package de.jepfa.yapm.ui.editcredential
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.*
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.pchmn.materialchips.ChipsInput
@@ -21,10 +21,10 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.encryptCommonString
 import de.jepfa.yapm.ui.SecureFragment
-import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.ui.label.LabelChip
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.Constants
+import de.jepfa.yapm.util.DebugInfo
 
 
 class EditCredentialDataFragment : SecureFragment() {
@@ -63,6 +63,18 @@ class EditCredentialDataFragment : SecureFragment() {
         editCredentialWebsiteView = view.findViewById(R.id.edit_credential_website)
         editCredentialAdditionalInfoView = view.findViewById(R.id.edit_credential_additional_info)
 
+        val explanationView: TextView = view.findViewById(R.id.edit_credential_explanation)
+        explanationView.setOnLongClickListener {
+            DebugInfo.toggleDebug()
+            Toast.makeText(
+                getBaseActivity(),
+                "Debug mode " + if (DebugInfo.isDebug) "ON" else "OFF",
+                Toast.LENGTH_LONG
+            ).show()
+            true
+        }
+
+
         getBaseActivity().labelViewModel.allLabels.observe(getSecureActivity(), { labels ->
             val key = masterSecretKey
             if (key != null) {
@@ -96,14 +108,17 @@ class EditCredentialDataFragment : SecureFragment() {
 
                     val chipsCount = editCredentialLabelsView.selectedChipList.size
                     if (chipsCount > Constants.MAX_LABELS_PER_CREDENTIAL) {
-                        Toast.makeText(getBaseActivity(),
-                            "Maximum of labels reached (${Constants.MAX_LABELS_PER_CREDENTIAL})", Toast.LENGTH_LONG).show()
-                    }
-                    else if (text.length > Constants.MAX_LABEL_LENGTH) {
-                        Toast.makeText(getBaseActivity(),
-                            "Label too long (max ${Constants.MAX_LABEL_LENGTH})", Toast.LENGTH_LONG).show()
-                    }
-                    else {
+                        Toast.makeText(
+                            getBaseActivity(),
+                            "Maximum of labels reached (${Constants.MAX_LABELS_PER_CREDENTIAL})",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    } else if (text.length > Constants.MAX_LABEL_LENGTH) {
+                        Toast.makeText(
+                            getBaseActivity(),
+                            "Label too long (max ${Constants.MAX_LABEL_LENGTH})", Toast.LENGTH_LONG
+                        ).show()
+                    } else {
                         val labelName = text.substring(0, text.length - 1)
                         val label = LabelChip(labelName, "")
                         editCredentialLabelsView.addChip(label)
@@ -132,9 +147,10 @@ class EditCredentialDataFragment : SecureFragment() {
 
                     LabelService.updateLabelsForCredential(key, originCredential)
 
-                    LabelService.getLabelsForCredential(key, originCredential).forEachIndexed { idx, it ->
-                        editCredentialLabelsView.addChip(it.labelChip)
-                    }
+                    LabelService.getLabelsForCredential(key, originCredential)
+                        .forEachIndexed { idx, it ->
+                            editCredentialLabelsView.addChip(it.labelChip)
+                        }
                     editCredentialNameView.requestFocus()
                 }
             })
@@ -160,7 +176,10 @@ class EditCredentialDataFragment : SecureFragment() {
                     val encUser = encryptCommonString(key, user)
                     val encPassword = SecretService.encryptPassword(key, Password.empty())
                     val encWebsite = encryptCommonString(key, website)
-                    val encLabels = LabelService.encryptLabelIds(key, editCredentialLabelsView.selectedChipList)
+                    val encLabels = LabelService.encryptLabelIds(
+                        key,
+                        editCredentialLabelsView.selectedChipList
+                    )
 
                     val credentialToSave = EncCredential(
                         editCredentialActivity.currentId,

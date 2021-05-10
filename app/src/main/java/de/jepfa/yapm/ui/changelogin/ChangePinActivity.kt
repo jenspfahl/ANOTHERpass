@@ -14,6 +14,8 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.ChangePinUseCase
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.AsyncWithProgressBar
+import de.jepfa.yapm.util.DebugInfo
+import java.lang.RuntimeException
 
 class ChangePinActivity : SecureActivity() {
 
@@ -34,6 +36,12 @@ class ChangePinActivity : SecureActivity() {
         val currentPinTextView: EditText = findViewById(R.id.current_pin)
         val newPin1TextView: EditText = findViewById(R.id.first_new_pin)
         val newPin2TextView: EditText = findViewById(R.id.second_new_pin)
+
+        val explanationView: TextView = findViewById(R.id.change_pin_explanation)
+        explanationView.setOnLongClickListener {
+            throw RuntimeException("test bug report")
+            true
+        }
 
         findViewById<Button>(R.id.button_change).setOnClickListener {
 

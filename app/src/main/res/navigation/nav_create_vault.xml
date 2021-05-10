@@ -27,9 +27,6 @@
         <action
                android:id="@+id/action_Create_Vault_SecondFragment_to_ThirdFragment"
                app:destination="@id/CreateVaultSummarizeFragment" />
-        <action
-            android:id="@+id/action_Create_Vault_SecondFragment_back_to_FirstFragment"
-            app:destination="@id/CreateVaultEnterPassphraseFragment" />
     </fragment>
     <fragment
         android:id="@+id/CreateVaultSummarizeFragment"
@@ -46,9 +43,6 @@
         <action
             android:id="@+id/action_Create_Vault_to_ThirdFragment_to_Root"
             app:destination="@id/ListCredentialsActivity" />
-        <action
-            android:id="@+id/action_Create_Vault_ThirdFragment_back_to_SecondFragment"
-            app:destination="@id/CreateVaultEnterPinFragment" />
 
     </fragment>
 

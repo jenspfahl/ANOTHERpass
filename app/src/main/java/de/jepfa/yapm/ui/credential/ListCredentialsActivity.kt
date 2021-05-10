@@ -6,7 +6,6 @@ import android.app.SearchManager
 import android.app.assist.AssistStructure
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -32,8 +31,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
 import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.service.label.LabelFilter
@@ -50,6 +49,7 @@ import de.jepfa.yapm.ui.label.ListLabelsActivity
 import de.jepfa.yapm.ui.settings.SettingsActivity
 import de.jepfa.yapm.usecase.*
 import de.jepfa.yapm.util.*
+import de.jepfa.yapm.util.DebugInfo.getVersionName
 import de.jepfa.yapm.util.PreferenceUtil.DATA_ENCRYPTED_MASTER_PASSWORD
 
 class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationItemSelectedListener  {
@@ -112,6 +112,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
         navigationView.setNavigationItemSelectedListener(this)
         refreshMenuMasterPasswordItem(navigationView.menu)
+        refreshMenuDebugItem(navigationView.menu)
 
         toggle = ActionBarDrawerToggle(
             this,
@@ -219,7 +220,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                 val allLabels = LabelService.getAllLabels()
                 val checkBoxes = ArrayList<CheckBox>(allLabels.size)
 
-                allLabels.forEachIndexed {idx, it ->
+                allLabels.forEachIndexed { idx, it ->
                     val chipView = ChipView(this)
                     // doesnt work: chipView.setChip(it.labelChip)
                     chipView.label = it.labelChip.label
@@ -246,9 +247,9 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                     .setNegativeButton(android.R.string.cancel, null)
                     .create()
 
-                dialog.setOnShowListener{
+                dialog.setOnShowListener {
                     val buttonPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                    buttonPositive.setOnClickListener{
+                    buttonPositive.setOnClickListener {
                         for (i in 0 until checkBoxes.size) {
                             val checked = checkBoxes[i].isChecked
                             val labelId = allLabels[i].encLabel.id
@@ -271,12 +272,12 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                     }
 
                     val buttonNegative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-                    buttonNegative.setOnClickListener{
+                    buttonNegative.setOnClickListener {
                         dialog.dismiss()
                     }
 
                     val buttonNeutral = dialog.getButton(AlertDialog.BUTTON_NEUTRAL)
-                    buttonNeutral.setOnClickListener{
+                    buttonNeutral.setOnClickListener {
                         checkBoxes.forEach { it.isChecked = false }
                     }
                 }
@@ -331,7 +332,12 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         if (structure != null) {
             CurrentCredentialHolder.currentCredential = credential
             val replyIntent = Intent().apply {
-                val fillResponse = ResponseFiller.createFillResponse(structure, null, false, applicationContext)
+                val fillResponse = ResponseFiller.createFillResponse(
+                    structure,
+                    null,
+                    false,
+                    applicationContext
+                )
                 putExtra(EXTRA_AUTHENTICATION_RESULT, fillResponse)
             }
             assistStructure = null
@@ -471,7 +477,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
             R.id.menu_about -> {
                 val builder: AlertDialog.Builder = AlertDialog.Builder(this)
                 val icon: Drawable = getApplicationInfo().loadIcon(getPackageManager())
-                val message = getString(R.string.app_name) + ", Version " + getVersionName() +
+                val message = getString(R.string.app_name) + ", Version " + getVersionName(this) +
                         System.lineSeparator() + " \u00A9 Jens Pfahl 2021"
                 builder.setTitle(R.string.title_about_the_app)
                     .setMessage(message)
@@ -479,6 +485,17 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                     .show()
                 return true
             }
+            R.id.menu_debug -> {
+                val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+                val icon: Drawable = getApplicationInfo().loadIcon(getPackageManager())
+                val message = DebugInfo.getDebugInfo(this)
+                builder.setTitle(R.string.debug)
+                    .setMessage(message)
+                    .setIcon(icon)
+                    .show()
+                return true
+            }
+
             else -> super.onOptionsItemSelected(item)
         }
 
@@ -501,6 +518,13 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         }
     }
 
+    private fun refreshMenuDebugItem(menu: Menu) {
+        val debugItem: MenuItem = menu.findItem(R.id.menu_debug)
+        if (debugItem != null) {
+            debugItem.setVisible(DebugInfo.isDebug)
+        }
+    }
+
 
     private fun refreshMenuFiltersItem(item: MenuItem) {
         val hasFilters = LabelFilter.hasFilters()
@@ -515,16 +539,6 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
     fun deleteCredential(credential: EncCredential) {
         credentialViewModel.delete(credential)
-    }
-
-    private fun getVersionName(): String {
-        try {
-            val pInfo = packageManager.getPackageInfo(packageName, 0)
-            return pInfo.versionName
-        } catch (e: PackageManager.NameNotFoundException) {
-            e.printStackTrace()
-        }
-        return "?"
     }
 
 }

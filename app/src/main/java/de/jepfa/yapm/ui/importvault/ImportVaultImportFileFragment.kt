@@ -28,7 +28,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
 
     init {
         enableBack = true
-        actionBack = R.id.action_importVault_ImportFileFragment_to_LoadFileFragment
+        backToPreviousFragment = true
     }
 
     override fun onCreateView(

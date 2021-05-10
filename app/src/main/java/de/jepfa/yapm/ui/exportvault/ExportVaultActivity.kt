@@ -2,7 +2,6 @@ package de.jepfa.yapm.ui.exportvault
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.MenuItem
 import android.widget.Button
 import android.widget.Switch
 import de.jepfa.yapm.R
@@ -11,15 +10,13 @@ import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
+import de.jepfa.yapm.util.Constants.SDF_D_INTERNATIONAL
 import de.jepfa.yapm.util.ExtPermissionChecker
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.util.*
 
 class ExportVaultActivity : SecureActivity() {
 
     private val saveAsFile = 1
-    private var SDF_D_INTERNATIONAL: DateFormat = SimpleDateFormat("yyyy-MM-dd")
 
     private lateinit var includeMasterKeySwitch: Switch
 

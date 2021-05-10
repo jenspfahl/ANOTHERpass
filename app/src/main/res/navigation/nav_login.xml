@@ -23,9 +23,6 @@
         android:label="@string/login_masterpassword_fragment_label"
         tools:layout="@layout/fragment_login_enter_masterpassword">
 
-        <action
-            android:id="@+id/action_Login_MasterPasswordFragment_to_Login_PinFragment"
-            app:destination="@id/LoginEnterPinFragment" />
     </fragment>
 
 </navigation>

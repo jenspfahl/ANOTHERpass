@@ -23,7 +23,7 @@ class CreateVaultEnterPinFragment : BaseFragment() {
 
     init {
         enableBack = true
-        actionBack = R.id.action_Create_Vault_SecondFragment_back_to_FirstFragment
+        backToPreviousFragment = true
     }
 
     override fun onCreateView(

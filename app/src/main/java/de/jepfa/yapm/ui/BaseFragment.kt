@@ -11,7 +11,7 @@ import de.jepfa.yapm.ui.createvault.CreateVaultEnterPinFragment
 open class BaseFragment : Fragment() {
 
     protected var enableBack = false
-    protected var actionBack: Int? = null
+    protected var backToPreviousFragment = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,9 +22,8 @@ open class BaseFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         if (enableBack && id == android.R.id.home) {
-            val action = actionBack
-            if (action != null) {
-                findNavController().navigate(action)
+            if (backToPreviousFragment) {
+                findNavController().navigateUp()
             }
             else {
                 val upIntent = Intent(getBaseActivity().intent)

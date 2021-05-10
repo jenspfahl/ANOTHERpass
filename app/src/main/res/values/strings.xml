@@ -164,6 +164,7 @@
     <string name="button_restart">Restart</string>
     <string name="bug_explaination">Sorry, a bug occured :-(</string>
     <string name="toast_bug_report_copied">Bug report copied to clipboard</string>
+    <string name="debug">Debug info</string>
 
 
 </resources>

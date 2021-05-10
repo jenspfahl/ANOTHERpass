@@ -13,7 +13,7 @@ import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.Constants
 
 /*
-Taken from https://github.com/hardik-trivedi/ForceClose
+  Inspired from https://github.com/hardik-trivedi/ForceClose
 */
 class ErrorActivity : AppCompatActivity() {
 

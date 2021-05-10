@@ -36,7 +36,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
     init {
         enableBack = true
-        actionBack = R.id.action_EditCredential_PasswordFragment_to_DataFragment
+        backToPreviousFragment = true
     }
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,

@@ -28,7 +28,7 @@ class CreateVaultSummarizeFragment : BaseFragment() {
 
     init {
         enableBack = true
-        actionBack = R.id.action_Create_Vault_ThirdFragment_back_to_SecondFragment
+        backToPreviousFragment = true
     }
 
     override fun onCreateView(

@@ -36,7 +36,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
 
     init {
         enableBack = true
-        actionBack = R.id.action_Login_MasterPasswordFragment_to_Login_PinFragment
+        backToPreviousFragment = true
     }
 
     override fun onCreateView(

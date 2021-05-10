@@ -18,10 +18,8 @@ import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.YapmApp
-import de.jepfa.yapm.util.FileUtil
-import de.jepfa.yapm.util.PreferenceUtil
-import de.jepfa.yapm.util.QRCodeUtil
-import de.jepfa.yapm.util.getEncryptedExtra
+import de.jepfa.yapm.util.*
+import de.jepfa.yapm.util.Constants.SDF_DT_MEDIUM
 import java.lang.reflect.Type
 import java.text.SimpleDateFormat
 import java.util.*
@@ -64,8 +62,6 @@ class FileIOService: IntentService("FileIOService") {
         val CREDENTIALS_TYPE = object : TypeToken<List<EncCredential>>() {}.type
         val LABELS_TYPE = object : TypeToken<List<EncLabel>>() {}.type
 
-        val SDF_DT_MEDIUM =
-                SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM)
         val GSON = GsonBuilder()
                 .registerTypeAdapter(Encrypted::class.java, EncryptedSerializer())
                 .create()
@@ -124,9 +120,8 @@ class FileIOService: IntentService("FileIOService") {
     private fun exportToJson(includeMasterkey: Boolean): JsonObject {
         val root = JsonObject()
         try {
-            val pInfo = application.packageManager.getPackageInfo(application.packageName, 0)
-            root.addProperty(JSON_APP_VERSION_CODE, pInfo.versionCode)
-            root.addProperty(JSON_APP_VERSION_NAME, pInfo.versionName)
+            root.addProperty(JSON_APP_VERSION_CODE, DebugInfo.getVersionCode(applicationContext))
+            root.addProperty(JSON_APP_VERSION_NAME, DebugInfo.getVersionName(applicationContext))
         } catch (e: PackageManager.NameNotFoundException) {
             Log.e("BACKUPALL", "cannot get version code", e)
         }
