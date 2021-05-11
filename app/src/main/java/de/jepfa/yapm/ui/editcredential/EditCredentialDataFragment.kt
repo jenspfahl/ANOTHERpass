@@ -166,7 +166,7 @@ class EditCredentialDataFragment : SecureFragment() {
 
                 val key = masterSecretKey
                 if (key != null) {
-                    val name = editCredentialNameView.text.toString()
+                    val name = editCredentialNameView.text.toString().trim()
                     val additionalInfo = editCredentialAdditionalInfoView.text.toString()
                     val user = editCredentialUserView.text.toString().trim()
                     val website = editCredentialWebsiteView.text.toString().trim()

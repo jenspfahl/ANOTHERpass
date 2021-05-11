@@ -165,7 +165,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
             val searchPlate = searchView.findViewById(androidx.appcompat.R.id.search_src_text) as EditText
             searchPlate.hint = "Search"
             val searchPlateView: View =
-                    searchView.findViewById(androidx.appcompat.R.id.search_plate)
+                searchView.findViewById(androidx.appcompat.R.id.search_plate)
             searchPlateView.setBackgroundColor(
                 ContextCompat.getColor(
                     this,

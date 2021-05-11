@@ -3,6 +3,7 @@ package de.jepfa.yapm.ui.credential
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
@@ -31,6 +32,7 @@ import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.ClipboardUtil
+import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.PasswordColorizer.spannableString
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.PREF_PASSWD_WORDS_ON_NL
@@ -131,12 +133,19 @@ class ShowCredentialActivity : SecureActivity() {
             val key = masterSecretKey
             if (key != null) {
                 val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
+                val credentialName = decryptCommonString(
+                    key,
+                    credential.name
+                )
+                val tempEncHeader = encryptCommonString(
+                    tempKey, "The plain password of '$credentialName'"
+                )
 
+                val tempEncSubtext = encryptCommonString(
+                    tempKey, "Keep this QR code safe since it contains a real plain password!"
+                )
                 val tempEncName = encryptCommonString(
-                    tempKey, decryptCommonString(
-                        key,
-                        credential.name
-                    )
+                    tempKey, credentialName
                 )
                 val tempEncUser = encryptCommonString(
                     tempKey, decryptCommonString(
@@ -153,8 +162,8 @@ class ShowCredentialActivity : SecureActivity() {
 
                 val intent = Intent(this, QrCodeActivity::class.java)
                 intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, credential.id)
-                intent.putEncryptedExtra(QrCodeActivity.EXTRA_HEADLINE, tempEncName)
-                intent.putEncryptedExtra(QrCodeActivity.EXTRA_SUBTEXT, tempEncUser)
+                intent.putEncryptedExtra(QrCodeActivity.EXTRA_HEADLINE, tempEncHeader)
+                intent.putEncryptedExtra(QrCodeActivity.EXTRA_SUBTEXT, tempEncSubtext)
                 intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE, tempEncPasswd)
                 intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE_HEADER, tempEncName)
 
@@ -279,6 +288,19 @@ class ShowCredentialActivity : SecureActivity() {
 
                 var spannedString = spannableString(password, multiLine, this)
                 passwordTextView.setText(spannedString)
+
+                if (DebugInfo.isDebug) {
+                    passwordTextView.setOnLongClickListener {
+                        val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+                        val icon: Drawable = getApplicationInfo().loadIcon(getPackageManager())
+                        val message = credential.toString()
+                        builder.setTitle(R.string.debug)
+                            .setMessage(message)
+                            .setIcon(icon)
+                            .show()
+                        true
+                    }
+                }
             }
 
             CurrentCredentialHolder.currentCredential = credential
