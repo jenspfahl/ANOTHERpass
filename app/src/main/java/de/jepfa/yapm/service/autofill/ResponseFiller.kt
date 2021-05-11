@@ -27,7 +27,7 @@ import de.jepfa.yapm.util.PreferenceUtil.PREF_AUTOFILL_EVERYWHERE
 
 object ResponseFiller {
 
-    private val VIEW_TO_IDENTIFY = "EditText"
+    private val VIEW_TO_IDENTIFY = "text"
     private val PASSWORD_INDICATORS = listOf("password", "passwd", "passphrase", "pin", "pass phrase", "keyword")
     private val USER_INDICATORS = listOf("user", "account", "email")
 
@@ -212,8 +212,12 @@ object ResponseFiller {
         node.autofillHints?.map { identifyField(it, node, fields) }
         node.autofillOptions?.map { identifyField(it.toString(), node, fields) }
 
-        if (suggestEverywhere) {
-            fields.addPotentialField(node)
+
+        if (suggestEverywhere && node.className != null) {
+            val viewId = node.idEntry?.toLowerCase()
+            if (viewId != null && node.className.contains(VIEW_TO_IDENTIFY)) {
+                fields.addPotentialField(node)
+            }
         }
 
         // go deeper in the tree
@@ -240,23 +244,6 @@ object ResponseFiller {
         else {
             fields.addPotentialField(node)
         }
-
-        /*
-        if (node.className != null) {
-            val viewId = node.idEntry?.toLowerCase()
-            if (viewId != null && node.className.contains(VIEW_TO_IDENTIFY)) {
-                if (contains(viewId, USER_INDICATORS)) {
-                    fields.userFields.add(node)
-                    return true
-                } else if (contains(viewId, PASSWORD_INDICATORS)) {
-                    fields.passwordFields.add(node)
-                    return true
-                }
-            }
-        }
-        fields.potentialFields.add(node)
-        */
-
     }
 
     private fun contains(s: String, contents: Collection<String>) : Boolean {

@@ -127,7 +127,7 @@ class ShowCredentialActivity : SecureActivity() {
             return false
         }
 
-        if (id == R.id.menu_show_as_qrcode) {
+        if (id == R.id.menu_export_credential) {
             val key = masterSecretKey
             if (key != null) {
                 val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
