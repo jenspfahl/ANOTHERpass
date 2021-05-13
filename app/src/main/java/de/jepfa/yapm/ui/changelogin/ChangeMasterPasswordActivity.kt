@@ -1,20 +1,25 @@
 package de.jepfa.yapm.ui.changelogin
 
+import android.app.AlertDialog
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.*
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.ChangeMasterPasswordUseCase
 import de.jepfa.yapm.usecase.GenerateMasterPasswordUseCase
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.AsyncWithProgressBar
+import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.DATA_ENCRYPTED_MASTER_PASSWORD
+import java.lang.RuntimeException
 
 class ChangeMasterPasswordActivity : SecureActivity() {
 
@@ -41,6 +46,23 @@ class ChangeMasterPasswordActivity : SecureActivity() {
 
         val storedMasterPasswdPresent = PreferenceUtil.isPresent(DATA_ENCRYPTED_MASTER_PASSWORD, this)
         switchStorePasswd.isChecked = storedMasterPasswdPresent
+
+        if (DebugInfo.isDebug) {
+            val explanationView: TextView = findViewById(R.id.change_master_password_explanation)
+            explanationView.setOnLongClickListener {
+                val masterPasswd = MasterPasswordService.getMasterPasswordFromSession()
+                if (!Session.isDenied() && masterPasswd != null) {
+                    val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+                    val icon: Drawable = getApplicationInfo().loadIcon(getPackageManager())
+                    builder.setTitle(R.string.your_masterpassword)
+                        .setMessage(masterPasswd.toStringRepresentation(false))
+                        .setIcon(icon)
+                        .show()
+                    masterPasswd.clear()
+                }
+                true
+            }
+        }
 
         val buttonGeneratePasswd: Button = findViewById(R.id.button_generate_passwd)
         buttonGeneratePasswd.setOnClickListener {

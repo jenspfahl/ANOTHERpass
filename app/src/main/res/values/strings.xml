@@ -164,6 +164,7 @@
     <string name="bug_explaination">Sorry, a bug occured :-(</string>
     <string name="toast_bug_report_copied">Bug report copied to clipboard</string>
     <string name="debug">Debug info</string>
+    <string name="your_masterpassword">Your real master password</string>
 
 
 </resources>
