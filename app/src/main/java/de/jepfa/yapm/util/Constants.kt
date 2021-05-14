@@ -5,7 +5,7 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 
 object Constants {
-    val HOMEPAGE = Uri.parse("https://jepfa.de") // TODO add subdomain if online
+    val HOMEPAGE = Uri.parse("https://anotherpass.jepfa.de")
     val BUG_REPORT_SITE = Uri.parse("https://bitbucket.org/jepfa/yapm") // TODO add bugtracker if online
 
     val MAX_LABELS_PER_CREDENTIAL = 5

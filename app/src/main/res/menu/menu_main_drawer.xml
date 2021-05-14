@@ -50,11 +50,6 @@
                 android:title="@string/change_master_password" />
 
             <item
-                android:id="@+id/test_copypaste_password"
-                android:orderInCategory="95"
-                android:title="@string/test_copypaste_password" />
-
-            <item
                 android:id="@+id/drop_vault"
                 android:orderInCategory="100"
                 android:title="@string/drop_vault" />

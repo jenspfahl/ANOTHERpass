@@ -59,7 +59,7 @@ object ClipboardUtil {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newUri(
             context.contentResolver,
-            "Test paste consumer",
+            "Test copy password",
             PasteContentProvider.contentUri
         )
         PasteContentProvider.enablePushNotification = true

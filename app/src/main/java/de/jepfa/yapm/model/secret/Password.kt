@@ -18,8 +18,13 @@ class Password: Secret, CharSequence {
     }
 
     fun toStringRepresentation(multiLine: Boolean): String {
+        return toStringRepresentation(multiLine, maskPassword = false)
+    }
+
+    fun toStringRepresentation(multiLine: Boolean, maskPassword: Boolean): String {
         var presentation = "";
-        for (i in 0 until length) {
+        var presentationLength = if (maskPassword) 16 else length
+        for (i in 0 until presentationLength) {
             if (i != 0 && i % 4 == 0) {
                 if (i % 8 == 0) {
                     if (multiLine) {
@@ -34,7 +39,7 @@ class Password: Secret, CharSequence {
                 }
             }
 
-            presentation += get(i)
+            presentation += if (maskPassword) '*' else get(i)
         }
 
         return presentation

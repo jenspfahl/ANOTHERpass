@@ -9,6 +9,7 @@ object PreferenceUtil {
     private const val PREF_PREFIX = "YAPM/pref:"
     private const val DATA_PREFIX = "YAPM/data:"
     private const val STATE_PREFIX = "YAPM/state:"
+    private const val ACTION_PREFIX = "YAPM/action:"
 
     const val DATA_SALT = DATA_PREFIX + "aslt"
     const val DATA_ENCRYPTED_MASTER_PASSWORD = DATA_PREFIX + "mpwd"
@@ -37,6 +38,10 @@ object PreferenceUtil {
     const val PREF_COLORIZE_MP_QRCODES = PREF_PREFIX + "colorize_mp_qrcodes"
 
     const val PREF_AUTOFILL_EVERYWHERE = PREF_PREFIX + "autofill_suggest_everywhere"
+
+    const val PREF_MASK_PASSWORD = PREF_PREFIX + "mask_password"
+    const val PREF_ENABLE_COPY_PASSWORD = PREF_PREFIX + "enable_copy_password"
+    const val ACTION_TEST_COPY_PASSWORD = ACTION_PREFIX + "test_copy_password"
 
     const val STATE_LOGIN_ATTEMPTS = STATE_PREFIX + "login_attempts"
 

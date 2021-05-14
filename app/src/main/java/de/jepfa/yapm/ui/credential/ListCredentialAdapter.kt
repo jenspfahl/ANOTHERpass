@@ -24,6 +24,7 @@ import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
 import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.PreferenceUtil
+import de.jepfa.yapm.util.PreferenceUtil.PREF_ENABLE_COPY_PASSWORD
 import de.jepfa.yapm.util.PreferenceUtil.PREF_SHOW_LABELS_IN_LIST
 import java.util.*
 import javax.crypto.SecretKey
@@ -40,6 +41,10 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
 
         if (Session.isDenied()) {
             return holder
+        }
+        val enableCopyPassword = PreferenceUtil.getAsBool(PREF_ENABLE_COPY_PASSWORD, false, listCredentialsActivity)
+        if (!enableCopyPassword) {
+            holder.hideCopyPasswordIcon()
         }
 
         holder.listenForShowCredential { pos, _ ->
@@ -194,6 +199,10 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         private val credentialCopyImageView: ImageView = itemView.findViewById(R.id.credential_copy)
         private val credentialMenuImageView: ImageView = itemView.findViewById(R.id.credential_menu_popup)
         private val credentialLabelContainerView: LinearLayout = itemView.findViewById(R.id.label_container)
+
+        fun hideCopyPasswordIcon() {
+            credentialCopyImageView.visibility = View.GONE
+        }
 
         fun listenForShowCredential(event: (position: Int, type: Int) -> Unit) {
             credentialContainerView.setOnClickListener {

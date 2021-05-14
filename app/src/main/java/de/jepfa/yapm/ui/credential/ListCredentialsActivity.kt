@@ -438,10 +438,6 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                 startActivity(intent)
                 return true
             }
-            R.id.test_copypaste_password -> {
-                ClipboardUtil.copyTestPasteConsumer(this)
-                return true
-            }
             R.id.drop_vault -> {
                 AlertDialog.Builder(this)
                     .setTitle("Drop vault")

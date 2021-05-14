@@ -1,0 +1,29 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:enable_copy_password"
+        app:title="Enable copying password to clipboard"
+        app:summary="Copying passwords to clipboard is dangerous and could leak your password to any other app that observe the system clipboard. Use this option with care!"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:defaultValue="false"/>
+
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:warn_copy_password"
+        app:title="Show warning when copying password to clipboard"
+        app:dependency="YAPM/pref:enable_copy_password"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:defaultValue="true"/>
+
+    <Preference
+        app:defaultValue="-1"
+        app:key="YAPM/action:test_copy_password"
+        app:title="@string/test_copypaste_password"
+        app:summary="@string/test_copypaste_password_explanation"
+        app:iconSpaceReserved="false"
+        app:allowDividerAbove="true"
+        app:singleLineTitle="false"/>
+
+
+</PreferenceScreen>

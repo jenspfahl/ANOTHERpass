@@ -22,11 +22,11 @@
         app:useSimpleSummaryProvider="true" />
 
     <SwitchPreferenceCompat
-        app:key="YAPM/pref:warn_copy_password"
-        app:title="Show warning when copying password to clipboard"
+        app:key="YAPM/pref:mask_password"
+        app:title="Mask password when showing a credential (can be unmasked by clicking on it)"
         app:allowDividerAbove="true"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
-        app:defaultValue="true"/>
+        app:defaultValue="false"/>
 
 </PreferenceScreen>

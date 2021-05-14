@@ -261,6 +261,12 @@ class EditCredentialPasswordFragment : SecureFragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.credential_new_or_update_menu, menu)
+
+        val enableCopyPassword = PreferenceUtil.getAsBool(PreferenceUtil.PREF_ENABLE_COPY_PASSWORD, false, getBaseActivity())
+        if (!enableCopyPassword) {
+            menu.findItem(R.id.menu_copy_credential)?.isVisible = false
+        }
+
     }
 
 

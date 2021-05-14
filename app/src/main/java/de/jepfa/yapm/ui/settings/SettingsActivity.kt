@@ -8,6 +8,7 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
+import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.PreferenceUtil
 
 private const val TITLE_TAG = "settingsActivityTitle"
@@ -121,6 +122,19 @@ class SettingsActivity : SecureActivity(),
     class PasswordGeneratorSettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.password_generator_preferences, rootKey)
+        }
+    }
+
+    class ClipboardSettingsFragment : PreferenceFragmentCompat() {
+        override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            setPreferencesFromResource(R.xml.clipboard_preferences, rootKey)
+
+            findPreference<Preference>(PreferenceUtil.ACTION_TEST_COPY_PASSWORD)?.let {
+                it.setOnPreferenceClickListener { preference ->
+                    activity?.let { activity -> ClipboardUtil.copyTestPasteConsumer(activity.applicationContext) }
+                    true
+                }
+            }
         }
     }
 

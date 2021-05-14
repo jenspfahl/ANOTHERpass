@@ -165,6 +165,8 @@
     <string name="toast_bug_report_copied">Bug report copied to clipboard</string>
     <string name="debug">Debug info</string>
     <string name="your_masterpassword">Your real master password</string>
+    <string name="test_copypaste_password_explanation">Click here to copy a dummy password to the clipboard and get notified if some other app reads it immediately.</string>
+    <string name="pref_header_clipboard">Clipboard settings</string>
 
 
 </resources>

@@ -35,6 +35,8 @@ import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.PasswordColorizer.spannableString
 import de.jepfa.yapm.util.PreferenceUtil
+import de.jepfa.yapm.util.PreferenceUtil.PREF_ENABLE_COPY_PASSWORD
+import de.jepfa.yapm.util.PreferenceUtil.PREF_MASK_PASSWORD
 import de.jepfa.yapm.util.PreferenceUtil.PREF_PASSWD_WORDS_ON_NL
 import de.jepfa.yapm.util.putEncryptedExtra
 
@@ -44,6 +46,7 @@ class ShowCredentialActivity : SecureActivity() {
     val updateCredentialActivityRequestCode = 1
 
     private var multiLine = false
+    private var maskPassword = false
 
     private lateinit var credential: EncCredential
     private lateinit var appBarLayout: CollapsingToolbarLayout
@@ -70,6 +73,7 @@ class ShowCredentialActivity : SecureActivity() {
         val idExtra = intent.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
 
         multiLine = PreferenceUtil.getAsBool(PREF_PASSWD_WORDS_ON_NL, multiLine, this)
+        maskPassword = PreferenceUtil.getAsBool(PREF_MASK_PASSWORD, maskPassword, this)
 
         appBarLayout = findViewById(R.id.credential_detail_toolbar_layout)
 
@@ -92,7 +96,12 @@ class ShowCredentialActivity : SecureActivity() {
         }
 
         passwordTextView.setOnClickListener {
-            multiLine = !multiLine
+            if (maskPassword) {
+                maskPassword = false
+            }
+            else {
+                multiLine = !multiLine
+            }
             updatePasswordView(idExtra)
         }
 
@@ -113,6 +122,12 @@ class ShowCredentialActivity : SecureActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.credential_detail_menu, menu)
+
+        val enableCopyPassword = PreferenceUtil.getAsBool(PREF_ENABLE_COPY_PASSWORD, false, this)
+        if (!enableCopyPassword) {
+            menu.findItem(R.id.menu_copy_credential)?.isVisible = false
+        }
+
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -286,7 +301,7 @@ class ShowCredentialActivity : SecureActivity() {
 
                 additionalInfoTextView.setText(additionalInfo)
 
-                var spannedString = spannableString(password, multiLine, this)
+                var spannedString = spannableString(password, multiLine, maskPassword, this)
                 passwordTextView.setText(spannedString)
 
                 if (DebugInfo.isDebug) {

@@ -15,23 +15,28 @@ object PasswordColorizer {
 
     fun spannableString(password: Password, context: Context): CharSequence {
         val multiLine = PreferenceUtil.getAsBool(PreferenceUtil.PREF_PASSWD_WORDS_ON_NL, false, context)
-        return spannableString(password, multiLine, context)
+        return spannableString(password, multiLine, maskPassword = false, context)
     }
 
     fun spannableString(password: Password, multiLine: Boolean, context: Context): CharSequence {
+        return spannableString(password, multiLine, maskPassword = false, context)
+    }
+
+    fun spannableString(password: Password, multiLine: Boolean, maskPassword: Boolean, context: Context): CharSequence {
         val colorizePasswd = PreferenceUtil.getAsBool(PREF_COLORED_PASSWORD, true, context)
         if (colorizePasswd) {
-            return colorizePassword(password, multiLine, context)
+            return colorizePassword(password, multiLine, maskPassword, context)
         }
-        return password.toStringRepresentation(multiLine)
+        return password.toStringRepresentation(multiLine, maskPassword)
     }
 
     private fun colorizePassword(
         password: Password,
         multiLine: Boolean,
+        maskPassword: Boolean,
         context: Context
     ): SpannableString {
-        var spannedString = SpannableString(password.toStringRepresentation(multiLine))
+        var spannedString = SpannableString(password.toStringRepresentation(multiLine, maskPassword))
         val length = spannedString.length
         val stepWidth = getStepWidth(multiLine)
         for (i in 0 until length step stepWidth) {
