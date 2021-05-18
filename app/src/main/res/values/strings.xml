@@ -167,6 +167,7 @@
     <string name="your_masterpassword">Your real master password</string>
     <string name="test_copypaste_password_explanation">Click here to copy a dummy password to the clipboard and get notified if some other app reads it immediately.</string>
     <string name="pref_header_clipboard">Clipboard settings</string>
+    <string name="button_write_nfc">Write NFC tag</string>
 
 
 </resources>

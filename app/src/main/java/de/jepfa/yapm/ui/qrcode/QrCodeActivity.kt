@@ -15,6 +15,7 @@ import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.ExtPermissionChecker
 import de.jepfa.yapm.util.QRCodeUtil.generateQRCode
@@ -35,6 +36,10 @@ class QrCodeActivity : SecureActivity() {
         checkSession = !intent.getBooleanExtra(EXTRA_NO_SESSION_CHECK, false)
 
         super.onCreate(savedInstanceState)
+
+        if (checkSession && Session.isDenied()) {
+            return
+        }
 
         setContentView(R.layout.activity_qr_code)
 
@@ -100,7 +105,8 @@ class QrCodeActivity : SecureActivity() {
         }
 
         if (id == R.id.menu_download_as_nfc) {
-            Toast.makeText(this, "not supported yet", Toast.LENGTH_LONG).show()
+            val intent = Intent(this, NfcActivity::class.java)
+            startActivity(intent)
         }
 
         return super.onOptionsItemSelected(item)
