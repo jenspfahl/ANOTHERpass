@@ -3,6 +3,7 @@ package de.jepfa.yapm.ui.qrcode
 import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
+import android.nfc.tech.NfcA
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -20,6 +21,7 @@ import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.ExtPermissionChecker
 import de.jepfa.yapm.util.QRCodeUtil.generateQRCode
 import de.jepfa.yapm.util.getEncryptedExtra
+import de.jepfa.yapm.util.putEncryptedExtra
 
 class QrCodeActivity : SecureActivity() {
 
@@ -106,6 +108,8 @@ class QrCodeActivity : SecureActivity() {
 
         if (id == R.id.menu_download_as_nfc) {
             val intent = Intent(this, NfcActivity::class.java)
+            intent.putExtra(NfcActivity.EXTRA_MODE, NfcActivity.EXTRA_MODE_RW)
+            intent.putEncryptedExtra(NfcActivity.EXTRA_DATA, encQRC)
             startActivity(intent)
         }
 

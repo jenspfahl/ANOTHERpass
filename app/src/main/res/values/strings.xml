@@ -168,6 +168,19 @@
     <string name="test_copypaste_password_explanation">Click here to copy a dummy password to the clipboard and get notified if some other app reads it immediately.</string>
     <string name="pref_header_clipboard">Clipboard settings</string>
     <string name="button_write_nfc">Write NFC tag</string>
+    <string name="nfc_explanation_readonly">Tap the tag on your device to read from it.</string>
+    <string name="nfc_explanation_readwrite">Tap the tag on your device to read from it and click the button to write data on it.</string>
+    <string name="nfc_tapping_needed">Tap a NFC tag on your device first</string>
+    <string name="nfc_not_enough_space">Not enough space on NFC tag</string>
+    <string name="nfc_successfully_written">NFC tag successfully written</string>
+    <string name="nfc_tap_again">Tap tag on your device to write again</string>
+    <string name="nfc_cannot_write">Cannot write NFC tag. Have you tapped it on your device?</string>
+    <string name="nfc_tag_detected">NFC tag detected.</string>
+    <string name="nfc_tag_not_empty_detected">Not empty NFC tag detected! All data will be overwritten!</string>
+    <string name="nfc_tag_empty_detected">Empty NFC tag detected.</string>
+    <string name="title_write_nfc_tag">Write NFC tag</string>
+    <string name="message_write_nfc_tag">There is data on the NFC tag. Overwrite it?</string>
+    <string name="title_read_nfc_tag">Read NFC tag</string>
 
 
 </resources>

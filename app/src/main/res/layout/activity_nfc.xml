@@ -10,6 +10,7 @@
         android:id="@+id/nfc_explanation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:text="..."
         android:paddingHorizontal="24dp"
         app:layout_constraintBottom_toTopOf="@id/read_nfc_status_layout"
@@ -27,7 +28,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/nfc_explanation">
 
-
         <ImageView
             android:id="@+id/imageview_scan_qrcode"
             android:layout_width="wrap_content"
@@ -40,8 +40,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingHorizontal="15dp"
-            android:layout_gravity="center"
-            android:text="..." />
+            android:gravity="center"
+            android:layout_gravity="center" />
 
     </LinearLayout>
 

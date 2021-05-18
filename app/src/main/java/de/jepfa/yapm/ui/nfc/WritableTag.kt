@@ -58,6 +58,17 @@ class WritableTag @Throws(FormatException::class) constructor(val tag: Tag, val 
         return data?.length
     }
 
+    fun getFreeSize(): Int? {
+        val size = getSize()
+        val maxSize = getMaxSize()
+        if (size != null && maxSize != null) {
+            return maxSize - size;
+        }
+        else {
+            return null
+        }
+    }
+
     @Throws(IOException::class, FormatException::class)
     fun writeData(message: NdefMessage): Boolean {
         if (ndef != null) {

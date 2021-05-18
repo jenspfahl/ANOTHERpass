@@ -38,14 +38,12 @@
             android:name=".ui.changelogin.ChangeMasterPasswordActivity"
             android:label="@string/change_master_password"
             android:noHistory="true" />
-        <activity android:name=".ui.nfc.NfcActivity">
-        <!--    <intent-filter>
-                <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-            </intent-filter>-->
-        </activity>
+        <activity
+            android:name=".ui.nfc.NfcActivity"
+            android:noHistory="true" />
         <activity
             android:name=".ui.qrcode.QrCodeActivity"
+            android:label="@string/export"
             android:noHistory="false" />
         <activity
             android:name=".ui.qrcode.CaptureActivity"
