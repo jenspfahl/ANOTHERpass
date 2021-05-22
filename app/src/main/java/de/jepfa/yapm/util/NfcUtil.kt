@@ -5,6 +5,8 @@ import android.nfc.*
 import android.os.Parcelable
 import android.util.Log
 import de.jepfa.yapm.ui.BaseActivity
+import de.jepfa.yapm.ui.BaseFragment
+import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.ui.nfc.WritableTag
 
 /**
@@ -47,6 +49,13 @@ object NfcUtil {
         }
 
         return sb.toString()
+    }
+
+    fun scanNfcTag(fragment: BaseFragment) {
+        val intent = Intent(fragment.getBaseActivity(), NfcActivity::class.java)
+        intent.putExtra(NfcActivity.EXTRA_MODE, NfcActivity.EXTRA_MODE_RO)
+        intent.putExtra(NfcActivity.EXTRA_NO_SESSION_CHECK, true)
+        fragment.startActivityForResult(intent, NfcActivity.ACTION_READ_NFC_TAG)
     }
 
 }

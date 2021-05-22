@@ -1,6 +1,7 @@
 package de.jepfa.yapm.ui.login
 
 import android.content.Intent
+import android.nfc.tech.NfcA
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -21,8 +22,10 @@ import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.service.secret.SaltService.getSalt
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
+import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.usecase.LoginUseCase
 import de.jepfa.yapm.util.AsyncWithProgressBar
+import de.jepfa.yapm.util.NfcUtil
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.DATA_ENCRYPTED_MASTER_PASSWORD
 import de.jepfa.yapm.util.PreferenceUtil.PREF_FAST_MASTERPASSWD_LOGIN
@@ -50,12 +53,18 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         super.onViewCreated(view, null)
 
         masterPasswdTextView = view.findViewById(R.id.edittext_enter_masterpassword)
-        val scanQrCodeImageView: ImageView = view.findViewById(R.id.imageview_scan_qrcode)
         val switchStorePasswd: Switch = view.findViewById(R.id.switch_store_master_password)
         loginButton = view.findViewById(R.id.button_login)
 
+        val scanQrCodeImageView: ImageView = view.findViewById(R.id.imageview_scan_qrcode)
         scanQrCodeImageView.setOnClickListener {
             QRCodeUtil.scanQRCode(this, "Scanning Master Password")
+            true
+        }
+
+        val scanNfcImageView: ImageView = view.findViewById(R.id.imageview_scan_nfc)
+        scanNfcImageView.setOnClickListener {
+            NfcUtil.scanNfcTag(this)
             true
         }
 
@@ -94,9 +103,8 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
-        if (result != null && result.contents != null) {
-            val scanned = result.contents
+        val scanned = getScannedFromIntent(requestCode, resultCode, data)
+        if (scanned != null) {
 
             if (scanned.startsWith(Encrypted.TYPE_MASTER_PASSWD_TOKEN)) {
                 if (!PreferenceUtil.isPresent(PreferenceUtil.DATA_MASTER_PASSWORD_TOKEN_KEY, getBaseActivity())) {
@@ -146,6 +154,19 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }
+    }
+
+    private fun getScannedFromIntent(requestCode: Int, resultCode: Int, data: Intent?): String? {
+        if (requestCode == NfcActivity.ACTION_READ_NFC_TAG) {
+            return data?.getStringExtra(NfcActivity.EXTRA_SCANNED_NDC_TAG_DATA)
+        }
+        else {
+            val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
+            if (result != null && result.contents != null) {
+                return result.contents
+            }
+        }
+        return null
     }
 
     private fun login(

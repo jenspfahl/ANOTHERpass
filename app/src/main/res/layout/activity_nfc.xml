@@ -29,7 +29,7 @@
         app:layout_constraintTop_toBottomOf="@id/nfc_explanation">
 
         <ImageView
-            android:id="@+id/imageview_scan_qrcode"
+            android:id="@+id/imageview_nfc_icon"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center"

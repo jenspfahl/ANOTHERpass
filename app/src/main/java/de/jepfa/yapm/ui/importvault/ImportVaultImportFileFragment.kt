@@ -17,8 +17,10 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.ui.BaseFragment
+import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.usecase.ImportVaultUseCase
 import de.jepfa.yapm.util.AsyncWithProgressBar
+import de.jepfa.yapm.util.NfcUtil
 import de.jepfa.yapm.util.QRCodeUtil
 
 class ImportVaultImportFileFragment : BaseFragment() {
@@ -44,6 +46,16 @@ class ImportVaultImportFileFragment : BaseFragment() {
 
         val loadedFileStatusTextView = view.findViewById<TextView>(R.id.loaded_file_status)
         val scanQrCodeImageView = view.findViewById<ImageView>(R.id.imageview_scan_qrcode)
+        scanQrCodeImageView.setOnClickListener {
+            QRCodeUtil.scanQRCode(this, "Scanning Encrypted Master Key")
+            true
+        }
+
+        val scanNfcImageView: ImageView = view.findViewById(R.id.imageview_scan_nfc)
+        scanNfcImageView.setOnClickListener {
+            NfcUtil.scanNfcTag(this)
+            true
+        }
 
         mkTextView = view.findViewById<TextView>(R.id.text_scan_mk)
 
@@ -63,11 +75,6 @@ class ImportVaultImportFileFragment : BaseFragment() {
             mkTextView.text = encMasterKey
         }
 
-        scanQrCodeImageView.setOnClickListener {
-            QRCodeUtil.scanQRCode(this, "Scanning Encrypted Master Key")
-            true
-        }
-
         val importButton = view.findViewById<Button>(R.id.button_import_loaded_vault)
         importButton.setOnClickListener {
             if (mkTextView.text.isEmpty() || encMasterKey == null) {
@@ -80,10 +87,8 @@ class ImportVaultImportFileFragment : BaseFragment() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
-        if (result != null && result.contents != null) {
-            val scanned = result.contents
-
+        val scanned = getScannedFromIntent(requestCode, resultCode, data)
+        if (scanned != null) {
             if (scanned.startsWith(Encrypted.TYPE_ENC_MASTER_KEY)) {
                 encMasterKey = scanned
                 mkTextView.setText(encMasterKey)
@@ -127,4 +132,16 @@ class ImportVaultImportFileFragment : BaseFragment() {
         }
     }
 
+    private fun getScannedFromIntent(requestCode: Int, resultCode: Int, data: Intent?): String? {
+        if (requestCode == NfcActivity.ACTION_READ_NFC_TAG) {
+            return data?.getStringExtra(NfcActivity.EXTRA_SCANNED_NDC_TAG_DATA)
+        }
+        else {
+            val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
+            if (result != null && result.contents != null) {
+                return result.contents
+            }
+        }
+        return null
+    }
 }

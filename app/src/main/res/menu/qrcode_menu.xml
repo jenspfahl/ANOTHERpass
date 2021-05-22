@@ -6,7 +6,7 @@
         app:showAsAction="ifRoom"
         android:title="@string/qrc_download_as_img" />
     <item android:id="@+id/menu_download_as_nfc"
-        android:icon="@drawable/ic_baseline_nfc_24"
+        android:icon="@drawable/ic_baseline_nfc_24_white"
         app:showAsAction="ifRoom"
         android:visible="true"
         android:title="@string/download_as_nfc_tag" />

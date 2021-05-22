@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import de.jepfa.yapm.R
@@ -51,9 +52,10 @@ class NfcActivity : SecureActivity() {
 
         nfcStatusTextView = findViewById(R.id.read_nfc_status)
         val nfcExplanationTextView: TextView = findViewById(R.id.nfc_explanation)
+        val nfcImageView: ImageView = findViewById(R.id.imageview_nfc_icon)
         val nfcWriteTagButton: Button = findViewById(R.id.button_write_nfc_tag)
 
-        nfcStatusTextView.setOnLongClickListener {
+        nfcImageView.setOnClickListener {
             tag?.let {
                 val text =
                     "UUD=${it.tagId} \n" +
@@ -67,9 +69,7 @@ class NfcActivity : SecureActivity() {
                     .setMessage(text)
                     .show()
             }
-
             true
-
         }
 
         mode = intent.getStringExtra(EXTRA_MODE)
@@ -130,7 +130,15 @@ class NfcActivity : SecureActivity() {
         super.onNewIntent(intent)
         intent?.let {
             tag = NfcUtil.getWritableTag(intent)
-            updateView()
+            val tData = tag?.data
+            if (mode == EXTRA_MODE_RO && tData != null) {
+                intent.putExtra(EXTRA_SCANNED_NDC_TAG_DATA, tData)
+                setResult(ACTION_READ_NFC_TAG, intent)
+                finish()
+            }
+            else {
+                updateView()
+            }
         }
     }
 
@@ -204,6 +212,9 @@ class NfcActivity : SecureActivity() {
         const val EXTRA_MODE_RW = "readwrite"
         const val EXTRA_DATA= "data"
         const val EXTRA_NO_SESSION_CHECK = "noSessionCheck"
+        const val EXTRA_SCANNED_NDC_TAG_DATA = "scannedData"
+
+        const val ACTION_READ_NFC_TAG = 1
     }
 
 }

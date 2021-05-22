@@ -2,6 +2,8 @@ package de.jepfa.yapm.util
 
 import android.net.Uri
 import java.text.DateFormat
+import java.text.DecimalFormat
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 
 object Constants {
@@ -15,5 +17,7 @@ object Constants {
         SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM)
     var SDF_D_INTERNATIONAL: DateFormat = SimpleDateFormat("yyyy-MM-dd")
 
+    var NF: NumberFormat = NumberFormat.getNumberInstance()
+    var DF: DecimalFormat = NF as DecimalFormat
 
 }

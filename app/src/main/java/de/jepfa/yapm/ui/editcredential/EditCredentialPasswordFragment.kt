@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.os.Bundle
 import android.view.*
 import android.widget.*
-import androidx.navigation.fragment.findNavController
 import com.google.android.material.tabs.TabLayout
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
@@ -109,7 +108,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 passwordGenerator.calcCombinationCount(buildPasswordGeneratorSpec())
             }
 
-            val bruteForceWithPentum = passphraseGenerator.calcBruteForceWaitingSeconds(
+            val bruteForceWithPentium = passphraseGenerator.calcBruteForceWaitingSeconds(
                 combinations, GeneratorBase.BRUTEFORCE_ATTEMPTS_PENTIUM
             )
             val bruteForceWithSupercomp = passphraseGenerator.calcBruteForceWaitingSeconds(
@@ -117,9 +116,25 @@ class EditCredentialPasswordFragment : SecureFragment() {
             )
             AlertDialog.Builder(it.context)
                 .setTitle("Password strength")
-                .setMessage("Combinations: $combinations" + System.lineSeparator() + System.lineSeparator() +
-                        "Years to brute force with a usual PC: ${bruteForceWithPentum / 60 / 60 / 24 / 365}" + System.lineSeparator() + System.lineSeparator() +
-                        "Years to brute force with a super computer: ${bruteForceWithSupercomp / 60 / 60 / 24 / 365}")
+                .setMessage("Combinations: " +
+                        System.lineSeparator() +
+                        "${combinations.toReadableFormat(0)}" +
+                        System.lineSeparator() +
+                        "($combinations)" +
+                        System.lineSeparator() +
+                        System.lineSeparator() +
+                        "Years to brute force with a usual PC: " +
+                        System.lineSeparator() +
+                        "${bruteForceWithPentium.secondsToYear().toReadableFormat(0)}" +
+                        System.lineSeparator() +
+                        "(${bruteForceWithPentium.secondsToYear()})" +
+                        System.lineSeparator() +
+                        System.lineSeparator() +
+                        "Years to brute force with a super computer: " +
+                        System.lineSeparator() +
+                        "${bruteForceWithSupercomp.secondsToYear().toReadableFormat(0)}" +
+                        System.lineSeparator() +
+                        "(${bruteForceWithSupercomp.secondsToYear()})")
                 .show()
         }
 
