@@ -8,12 +8,14 @@ import com.google.android.material.tabs.TabLayout
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secretgenerator.*
 import de.jepfa.yapm.ui.SecureFragment
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.*
+import javax.crypto.SecretKey
 
 
 class EditCredentialPasswordFragment : SecureFragment() {
@@ -29,6 +31,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
     private lateinit var radioStrength: RadioGroup
 
     private var generatedPassword: Password = Password.empty()
+    private var originCredential: EncCredential? = null
 
     private val passphraseGenerator = PassphraseGenerator()
     private val passwordGenerator = PasswordGenerator()
@@ -63,10 +66,10 @@ class EditCredentialPasswordFragment : SecureFragment() {
         //fill UI
         if (editCredentialActivity.isUpdate()) {
             editCredentialActivity.load().observe(getSecureActivity(), {
-                val originCredential = it
+                originCredential = it
                 val key = masterSecretKey
                 if (key != null) {
-                    val password = SecretService.decryptPassword(key, originCredential.password)
+                    val password = SecretService.decryptPassword(key, it.password)
                     generatedPassword = password
                     var spannedString = PasswordColorizer.spannableString(generatedPassword, getSecureActivity())
                     generatedPasswdView.setText(spannedString)
@@ -148,16 +151,47 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 val key = masterSecretKey
                 if (key != null) {
 
-                    val encPassword = SecretService.encryptPassword(key, generatedPassword)
-                    generatedPassword.clear()
-
-                    val credentialToSave = editCredentialActivity.current
-                    credentialToSave.password = encPassword
-
-                    editCredentialActivity.reply()
+                    val origCredential = originCredential
+                    if (origCredential != null) {
+                        val originPasswd =
+                            SecretService.decryptPassword(key, origCredential.password)
+                        if (editCredentialActivity.current.isPersistent()
+                            && !generatedPassword.isEqual(originPasswd)
+                        ) {
+                            AlertDialog.Builder(editCredentialActivity)
+                                .setTitle(R.string.title_change_credential)
+                                .setMessage(R.string.message_password_changed)
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setPositiveButton(R.string.title_continue) { dialog, whichButton ->
+                                    updateCredential(key, editCredentialActivity)
+                                }
+                                .setNegativeButton(android.R.string.cancel, null)
+                                .show()
+                        }
+                        else {
+                            updateCredential(key, editCredentialActivity)
+                        }
+                        originPasswd.clear()
+                    }
+                    else {
+                        updateCredential(key, editCredentialActivity)
+                    }
                 }
             }
         }
+    }
+
+    private fun updateCredential(
+        key: SecretKey,
+        editCredentialActivity: EditCredentialActivity
+    ) {
+        val encPassword = SecretService.encryptPassword(key, generatedPassword)
+        generatedPassword.clear()
+
+        val credentialToSave = editCredentialActivity.current
+        credentialToSave.password = encPassword
+
+        editCredentialActivity.reply()
     }
 
     private fun generatePassword() : Password {

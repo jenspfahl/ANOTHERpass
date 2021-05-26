@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -17,12 +16,14 @@ import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER_PASSWD
+import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.usecase.CreateVaultUseCase
 import de.jepfa.yapm.usecase.ExportEncMasterPasswordUseCase
 import de.jepfa.yapm.usecase.LoginUseCase
 import de.jepfa.yapm.util.AsyncWithProgressBar
 import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.getEncrypted
+import de.jepfa.yapm.util.putEncryptedExtra
 
 class CreateVaultSummarizeFragment : BaseFragment() {
 
@@ -60,6 +61,17 @@ class CreateVaultSummarizeFragment : BaseFragment() {
             val tempKey = getAndroidSecretKey(ALIAS_KEY_TRANSPORT)
             val encMasterPasswd = encryptPassword(tempKey, masterPasswd)
             ExportEncMasterPasswordUseCase.execute(encMasterPasswd, true, getBaseActivity())
+        }
+        val exportAsNfcImageView: ImageView = view.findViewById(R.id.imageview_nfc_tag)
+        exportAsNfcImageView.setOnClickListener {
+            val tempKey = getAndroidSecretKey(ALIAS_KEY_TRANSPORT)
+            val encMasterPasswd = encryptPassword(tempKey, masterPasswd)
+
+            val intent = Intent(getBaseActivity(), NfcActivity::class.java)
+            intent.putExtra(NfcActivity.EXTRA_NO_SESSION_CHECK, true)
+            intent.putExtra(NfcActivity.EXTRA_MODE, NfcActivity.EXTRA_MODE_RW)
+            intent.putEncryptedExtra(NfcActivity.EXTRA_DATA, encMasterPasswd)
+            startActivity(intent)
         }
 
         view.findViewById<Button>(R.id.button_create_vault).setOnClickListener {

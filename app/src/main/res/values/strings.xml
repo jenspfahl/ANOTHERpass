@@ -65,7 +65,7 @@
     <string name="pin_not_equal">Pin repetition not equal</string>
     <string name="pin_wrong">Wrong pin</string>
     <string name="button_create_vault">Create vault</string>
-    <string name="create_vault_explanation_3">Here you see your master password. Note it or download as QR code and store it safely. Additionally, you can also store it on this device for faster login.</string>
+    <string name="create_vault_explanation_3">Here you see your master password. Note it or download as QR code or NFC tag and store it safely. Additionally, you can also store it on this device for faster login.</string>
     <string name="store_master_password">Store master password on this device</string>
     <string name="create_vault_summarize_fragment_label">Create Vault 3/3</string>
     <string name="login_explanation_1">Enter your pin to login into your vault.</string>
@@ -77,7 +77,8 @@
     <string name="password_wrong">Master password or pin wrong</string>
     <string name="something_went_wrong">Something went wrong :-(</string>
     <string name="title_new_credential">Create Credential</string>
-    <string name="title_update_credential">Update Credential</string>
+    <string name="title_change_credential">Change credential</string>
+    <string name="title_change_credential_with_title">Change \'%1$s\'</string>
     <string name="detach">Detach</string>
     <string name="export">Export</string>
     <string name="export_masterkey">Export masterkey</string>
@@ -181,6 +182,8 @@
     <string name="title_write_nfc_tag">Write NFC tag</string>
     <string name="message_write_nfc_tag">There is data on the NFC tag. Overwrite it?</string>
     <string name="title_read_nfc_tag">Read NFC tag</string>
+    <string name="message_password_changed">The password has been changed. If you continue you will loose the origin password. Have you still updated the password out there?</string>
+    <string name="title_continue">Continue</string>
 
 
 </resources>

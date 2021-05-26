@@ -1,5 +1,6 @@
 package de.jepfa.yapm.model
 
+import android.util.Log
 import de.jepfa.yapm.model.encrypted.Encrypted
 import java.util.concurrent.TimeUnit
 import javax.crypto.SecretKey
@@ -70,6 +71,11 @@ object Session {
     }
 
     fun lock() {
+        try {
+            masterSecretKey?.destroy()
+        } catch (e: Exception) {
+            Log.w("SESSION", "cannot destroy mSK", e)
+        }
         masterSecretKey = null
         touch()
     }

@@ -140,6 +140,9 @@ class EditCredentialDataFragment : SecureFragment() {
                         key,
                         originCredential.additionalInfo
                     )
+
+                    getBaseActivity().setTitle(getString(R.string.title_change_credential_with_title, name))
+
                     editCredentialNameView.setText(name)
                     editCredentialUserView.setText(user)
                     editCredentialWebsiteView.setText(website)

@@ -17,28 +17,24 @@ import androidx.core.view.setPadding
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.overlay.DetachHelper
-import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.decryptPassword
-import de.jepfa.yapm.service.secret.SecretService.encryptCommonString
-import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
-import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.DebugInfo
+import de.jepfa.yapm.util.ExportCredentialUtil
 import de.jepfa.yapm.util.PasswordColorizer.spannableString
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.PREF_ENABLE_COPY_PASSWORD
 import de.jepfa.yapm.util.PreferenceUtil.PREF_MASK_PASSWORD
 import de.jepfa.yapm.util.PreferenceUtil.PREF_PASSWD_WORDS_ON_NL
-import de.jepfa.yapm.util.putEncryptedExtra
 
 
 class ShowCredentialActivity : SecureActivity() {
@@ -145,46 +141,12 @@ class ShowCredentialActivity : SecureActivity() {
         }
 
         if (id == R.id.menu_export_credential) {
-            val key = masterSecretKey
-            if (key != null) {
-                val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
-                val credentialName = decryptCommonString(
-                    key,
-                    credential.name
-                )
-                val tempEncHeader = encryptCommonString(
-                    tempKey, "The plain password of '$credentialName'"
-                )
+            ExportCredentialUtil.startExport(credential, this)
+            return true
+        }
 
-                val tempEncSubtext = encryptCommonString(
-                    tempKey, "Keep this QR code safe since it contains a real plain password!"
-                )
-                val tempEncName = encryptCommonString(
-                    tempKey, credentialName
-                )
-                val tempEncUser = encryptCommonString(
-                    tempKey, decryptCommonString(
-                        key,
-                        credential.user
-                    )
-                )
-                val tempEncPasswd = encryptPassword(
-                    tempKey, decryptPassword(
-                        key,
-                        credential.password
-                    )
-                )
-
-                val intent = Intent(this, QrCodeActivity::class.java)
-                intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, credential.id)
-                intent.putEncryptedExtra(QrCodeActivity.EXTRA_HEADLINE, tempEncHeader)
-                intent.putEncryptedExtra(QrCodeActivity.EXTRA_SUBTEXT, tempEncSubtext)
-                intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE, tempEncPasswd)
-                intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE_HEADER, tempEncName)
-
-                startActivity(intent)
-            }
-
+        if (id == R.id.menu_lock_items) {
+            LockVaultUseCase.execute(this)
             return true
         }
 

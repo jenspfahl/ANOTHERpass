@@ -39,7 +39,7 @@ class EditCredentialActivity : SecureActivity() {
         }
         else {
             currentId = idExtra
-            setTitle(R.string.title_update_credential)
+            setTitle(R.string.title_change_credential)
         }
     }
 

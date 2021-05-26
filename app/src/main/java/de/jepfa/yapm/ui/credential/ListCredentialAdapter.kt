@@ -14,15 +14,16 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
-import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.overlay.DetachHelper
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
 import de.jepfa.yapm.util.ClipboardUtil
+import de.jepfa.yapm.util.ExportCredentialUtil
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.PREF_ENABLE_COPY_PASSWORD
 import de.jepfa.yapm.util.PreferenceUtil.PREF_SHOW_LABELS_IN_LIST
@@ -96,6 +97,10 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                 override fun onMenuItemClick(item: MenuItem): Boolean {
                     val current = getItem(position)
                     return when (item.itemId) {
+                        R.id.menu_export_credential -> {
+                            ExportCredentialUtil.startExport(current, listCredentialsActivity)
+                            return true
+                        }
                         R.id.menu_change_credential -> {
                             val intent = Intent(listCredentialsActivity, EditCredentialActivity::class.java)
                             intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, current.id)

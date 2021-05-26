@@ -25,13 +25,13 @@ class PasswordGenerator : GeneratorBase<PasswordGeneratorSpec>() {
     }
 
     private fun matchSpec(spec: PasswordGeneratorSpec, buffer: CharArray): Boolean {
-        if (spec.onlyLowerCase && containsChar(buffer, ALPHA_CHARS_UPPER_CASE)) {
+        if (!spec.onlyLowerCase && !containsChar(buffer, ALPHA_CHARS_UPPER_CASE)) {
             return false
         }
-        if (spec.noDigits && containsChar(buffer, DIGITS)) {
+        if (!spec.noDigits && !containsChar(buffer, DIGITS)) {
             return false
         }
-        if (spec.excludeSpecialChars && containsChar(buffer, SPECIAL_CHARS)) {
+        if (!spec.excludeSpecialChars && !containsChar(buffer, SPECIAL_CHARS)) {
             return false
         }
 
