@@ -76,8 +76,7 @@ class EditCredentialDataFragment : SecureFragment() {
 
 
         getBaseActivity().labelViewModel.allLabels.observe(getSecureActivity(), { labels ->
-            val key = masterSecretKey
-            if (key != null) {
+            masterSecretKey?.let{ key ->
                 editCredentialLabelsView.filterableList = LabelService.getAllLabelChips()
             }
             editCredentialNameView.requestFocus()
@@ -131,8 +130,7 @@ class EditCredentialDataFragment : SecureFragment() {
         if (editCredentialActivity.isUpdate()) {
             editCredentialActivity.load().observe(getSecureActivity(), {
                 val originCredential = it
-                val key = masterSecretKey
-                if (key != null) {
+                masterSecretKey?.let{ key ->
                     val name = decryptCommonString(key, originCredential.name)
                     val user = decryptCommonString(key, originCredential.user)
                     val website = decryptCommonString(key, originCredential.website)
@@ -167,8 +165,7 @@ class EditCredentialDataFragment : SecureFragment() {
                 editCredentialNameView.requestFocus()
             } else {
 
-                val key = masterSecretKey
-                if (key != null) {
+                masterSecretKey?.let{ key ->
                     val name = editCredentialNameView.text.toString().trim()
                     val additionalInfo = editCredentialAdditionalInfoView.text.toString()
                     val user = editCredentialUserView.text.toString().trim()

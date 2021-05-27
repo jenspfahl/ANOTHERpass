@@ -27,8 +27,7 @@ class EditCredentialActivity : SecureActivity() {
         setContentView(R.layout.activity_edit_credential)
 
         labelViewModel.allLabels.observe(this, { labels ->
-            val key = masterSecretKey
-            if (key != null) {
+            masterSecretKey?.let{ key ->
                 LabelService.initLabels(key, labels.toSet())
             }
         })

@@ -36,8 +36,7 @@ object ClipboardUtil {
     }
 
     private fun copyEncPassword(encPassword: Encrypted, activity: SecureActivity) {
-        val key = activity.masterSecretKey
-        if (key != null) {
+        activity.masterSecretKey?.let{ key ->
             val passwd = SecretService.decryptPassword(key, encPassword)
             copyPassword(passwd, activity)
             passwd.clear()

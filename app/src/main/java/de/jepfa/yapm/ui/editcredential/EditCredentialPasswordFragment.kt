@@ -67,8 +67,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
         if (editCredentialActivity.isUpdate()) {
             editCredentialActivity.load().observe(getSecureActivity(), {
                 originCredential = it
-                val key = masterSecretKey
-                if (key != null) {
+                masterSecretKey?.let{ key ->
                     val password = SecretService.decryptPassword(key, it.password)
                     generatedPassword = password
                     var spannedString = PasswordColorizer.spannableString(generatedPassword, getSecureActivity())
@@ -148,9 +147,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 Toast.makeText(it.context, "Generate a password first", Toast.LENGTH_LONG).show()
             }
             else {
-                val key = masterSecretKey
-                if (key != null) {
-
+                masterSecretKey?.let{ key ->
                     val origCredential = originCredential
                     if (origCredential != null) {
                         val originPasswd =
@@ -276,8 +273,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
         val id = item.itemId
         if (id == R.id.menu_detach_credential) {
 
-            val key = masterSecretKey
-            if (key != null) {
+            masterSecretKey?.let{ key ->
                 if (generatedPassword.data.isEmpty()) {
                     Toast.makeText(activity, "Generate a password first", Toast.LENGTH_LONG).show()
                 }
@@ -291,8 +287,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
         }
 
         if (id == R.id.menu_copy_credential) {
-            val key = masterSecretKey
-            if (key != null) {
+            masterSecretKey?.let{ key ->
                 if (generatedPassword.data.isEmpty()) {
                     Toast.makeText(activity, "Generate a password first", Toast.LENGTH_LONG).show()
                 }

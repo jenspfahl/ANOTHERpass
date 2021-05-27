@@ -17,10 +17,12 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
+import de.jepfa.yapm.ui.label.LabelDialogUtil
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
 import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.ExportCredentialUtil
@@ -109,8 +111,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                             true
                         }
                         R.id.menu_delete_credential -> {
-                            val key = listCredentialsActivity.masterSecretKey
-                            if (key != null) {
+                            listCredentialsActivity.masterSecretKey?.let{ key ->
                                 val decName = SecretService.decryptCommonString(key, current.name)
 
                                 AlertDialog.Builder(listCredentialsActivity)
@@ -140,7 +141,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
     override fun onBindViewHolder(holder: CredentialViewHolder, position: Int) {
         val current = getItem(position)
         val key = listCredentialsActivity.masterSecretKey
-        holder.bind(key, current)
+        holder.bind(key, current, listCredentialsActivity)
     }
 
     override fun getFilter(): Filter {
@@ -239,7 +240,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             }
         }
 
-        fun bind(key: SecretKey?, credential: EncCredential) {
+        fun bind(key: SecretKey?, credential: EncCredential, activity: SecureActivity) {
             credentialLabelContainerView.removeAllViews()
 
             var name = "????"
@@ -255,6 +256,10 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                         chipView.setChipBackgroundColor(it.labelChip.getColor(itemView.context))
                         chipView.setLabelColor(getColor(itemView.context, R.color.white))
                         chipView.setPadding(16, 0, 16, 0)
+                        chipView.setOnChipClicked {_ ->
+                            LabelDialogUtil.openLabelDialog(activity, it)
+                            true
+                        }
                         credentialLabelContainerView.addView(chipView, idx)
                     }
                 }

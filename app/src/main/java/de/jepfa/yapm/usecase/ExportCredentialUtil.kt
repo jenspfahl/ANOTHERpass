@@ -16,8 +16,7 @@ import de.jepfa.yapm.util.putEncryptedExtra
 object ExportCredentialUtil {
 
     fun startExport(credential: EncCredential, activity: SecureActivity): Boolean {
-        val key = activity.masterSecretKey
-        if (key != null) {
+        activity.masterSecretKey?.let{ key ->
             val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
             val credentialName = SecretService.decryptCommonString(
                 key,

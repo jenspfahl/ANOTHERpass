@@ -37,9 +37,7 @@ class ExportVaultActivity : SecureActivity() {
         includeMasterKeySwitch = findViewById(R.id.switch_include_enc_masterkey)
 
         findViewById<Button>(R.id.button_export_vault).setOnClickListener {
-            val key = masterSecretKey
-            if (key != null) {
-
+            masterSecretKey?.let{ key ->
                 ExtPermissionChecker.verifyRWStoragePermissions(this) // TODO this is not enough
 
                 val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
@@ -47,7 +45,6 @@ class ExportVaultActivity : SecureActivity() {
                 intent.type = "text/json"
                 intent.putExtra(Intent.EXTRA_TITLE, getBackupFileName())
                 startActivityForResult(Intent.createChooser(intent, "Save as"), saveAsFile)
-
             }
         }
     }

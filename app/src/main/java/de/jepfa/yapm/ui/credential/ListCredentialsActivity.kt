@@ -95,8 +95,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         })
 
         labelViewModel.allLabels.observe(this, { labels ->
-            val key = masterSecretKey
-            if (key != null) {
+            masterSecretKey?.let{ key ->
                 LabelService.initLabels(key, labels.toSet())
             }
         })

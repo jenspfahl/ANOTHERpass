@@ -16,6 +16,7 @@ import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.util.getIntExtra
 
@@ -28,7 +29,6 @@ class EditLabelActivity : SecureActivity() {
     private lateinit var labelDescTextView: TextView
     private lateinit var labelColorChipView: ChipView
     private lateinit var colorDialog: AlertDialog
-
 
     init {
         enableBack = true
@@ -109,12 +109,11 @@ class EditLabelActivity : SecureActivity() {
                 return@setOnClickListener
             }
 
-            val replyIntent = Intent()
-            replyIntent.putExtra(EncLabel.EXTRA_LABEL_ID, labelId)
-            replyIntent.putExtra(EncLabel.EXTRA_LABEL_NAME, labelNameTextView.text.toString())
-            replyIntent.putExtra(EncLabel.EXTRA_LABEL_DESC, labelDescTextView.text.toString())
-            replyIntent.putExtra(EncLabel.EXTRA_LABEL_COLOR, labelColor)
-            setResult(Activity.RESULT_OK, replyIntent)
+            updateLabel(labelId,
+                labelNameTextView.text.toString(),
+                labelDescTextView.text.toString(),
+                labelColor)
+
             finish()
 
         }
@@ -123,5 +122,22 @@ class EditLabelActivity : SecureActivity() {
 
     override fun lock() {
         finish()
+    }
+
+    private fun updateLabel(id: Int?, name: String, desc: String, color: Int?) {
+
+        masterSecretKey?.let { key ->
+            val encName = SecretService.encryptCommonString(key, name)
+            val encDesc = SecretService.encryptCommonString(key, desc)
+            val encLabel = EncLabel(id, encName, encDesc, color)
+
+            if (encLabel.isPersistent()) {
+                labelViewModel.update(encLabel)
+            }
+            else {
+                labelViewModel.insert(encLabel)
+            }
+            LabelService.updateLabel(key, encLabel)
+        }
     }
 }

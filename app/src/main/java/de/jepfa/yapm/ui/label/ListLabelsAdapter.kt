@@ -33,8 +33,7 @@ class ListLabelsAdapter(val listLabelsActivity: ListLabelsActivity) :
 
             val intent = Intent(listLabelsActivity, EditLabelActivity::class.java)
             intent.putExtra(EncLabel.EXTRA_LABEL_ID, current.encLabel.id)
-
-            listLabelsActivity.startActivityForResult(intent, ListLabelsActivity.ADD_OR_CHANGE_LABEL_REQUEST_CODE)
+            listLabelsActivity.startActivity(intent)
 
         }
 

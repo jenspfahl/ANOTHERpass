@@ -16,9 +16,6 @@ data class EncLabel(var id: Int?,
 
     companion object {
         const val EXTRA_LABEL_ID = "de.jepfa.yapm.ui.label.id"
-        const val EXTRA_LABEL_NAME = "de.jepfa.yapm.ui.label.name"
-        const val EXTRA_LABEL_DESC = "de.jepfa.yapm.ui.label.description"
-        const val EXTRA_LABEL_COLOR = "de.jepfa.yapm.ui.label.color"
 
         const val ATTRIB_ID = "id"
         const val ATTRIB_NAME = "name"

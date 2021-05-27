@@ -34,8 +34,7 @@ object DetachHelper {
                 false
             } else {
 
-                val key = activity.masterSecretKey
-                if (key != null) {
+                activity.masterSecretKey?.let{ key ->
                     val password = SecretService.decryptPassword(key, encPassword)
                     val transSK = SecretService.getAndroidSecretKey(ALIAS_KEY_TRANSPORT)
                     val encPassword = SecretService.encryptPassword(transSK, password)

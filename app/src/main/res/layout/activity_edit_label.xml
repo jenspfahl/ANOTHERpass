@@ -50,12 +50,13 @@
                 <EditText
                     android:id="@+id/edit_label_desc"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="135dp"
                     android:layout_marginBottom="30dp"
                     android:hint="@string/hint_edit_label_desc"
-                    android:inputType="text"
-                    android:maxLines="1"
-                    android:singleLine="true" />
+                    android:inputType="textMultiLine"
+                    android:maxLines="3"
+                    android:singleLine="false" />
+
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -65,6 +66,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
+                android:layout_marginTop="32dp"
                 app:label="@string/choose_color"
                 app:labelColor="@color/white"/>
 
@@ -73,7 +75,7 @@
                 style="?android:textAppearanceSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="32dp"
                 android:background="@color/colorAccent"
                 android:text="@string/button_save"
                 android:textColor="@color/buttonLabel"

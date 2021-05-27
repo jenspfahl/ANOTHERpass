@@ -26,6 +26,7 @@ import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.decryptPassword
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
+import de.jepfa.yapm.ui.label.LabelDialogUtil
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.DebugInfo
@@ -172,8 +173,7 @@ class ShowCredentialActivity : SecureActivity() {
 
         if (id == R.id.menu_delete_credential) {
 
-            val key = masterSecretKey
-            if (key != null) {
+            masterSecretKey?.let{ key ->
                 val decName = decryptCommonString(key, credential.name)
 
                 AlertDialog.Builder(this)
@@ -218,8 +218,7 @@ class ShowCredentialActivity : SecureActivity() {
     private fun updatePasswordView(idExtra: Int) {
         credentialViewModel.getById(idExtra).observe(this, {
             credential = it
-            val key = masterSecretKey
-            if (key != null) {
+            masterSecretKey?.let{ key ->
                 val name = decryptCommonString(key, credential.name)
                 val user = decryptCommonString(key, credential.user)
                 val website = decryptCommonString(key, credential.website)
@@ -240,6 +239,10 @@ class ShowCredentialActivity : SecureActivity() {
                         chipView.setLabelColor(getColor(R.color.white))
                         chipView.setPadding(16)
                         titleLayout.addView(chipView, idx)
+                        chipView.setOnChipClicked {_ ->
+                            LabelDialogUtil.openLabelDialog(this, it)
+                            true
+                        }
                     }
                 }
                 else {

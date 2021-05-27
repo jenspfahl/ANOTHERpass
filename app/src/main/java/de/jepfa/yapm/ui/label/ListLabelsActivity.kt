@@ -15,10 +15,6 @@ import de.jepfa.yapm.util.getIntExtra
 
 class ListLabelsActivity : SecureActivity() {
 
-    companion object {
-        const val ADD_OR_CHANGE_LABEL_REQUEST_CODE = 1
-    }
-
     private lateinit var listLabelsAdapter: ListLabelsAdapter
 
     init {
@@ -35,8 +31,7 @@ class ListLabelsActivity : SecureActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         labelViewModel.allLabels.observe(this, { labels ->
-            val key = masterSecretKey
-            if (key != null) {
+            masterSecretKey?.let{ key ->
                 LabelService.initLabels(key, labels.toSet())
                 listLabelsAdapter.submitList(LabelService.getAllLabels())
             }
@@ -44,34 +39,8 @@ class ListLabelsActivity : SecureActivity() {
 
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
             val intent = Intent(this, EditLabelActivity::class.java)
-            startActivityForResult(intent, ADD_OR_CHANGE_LABEL_REQUEST_CODE)
+            startActivity(intent)
         }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        val key = masterSecretKey
-        if (key != null && requestCode == ADD_OR_CHANGE_LABEL_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            data?.let {intent ->
-                val id = intent.getIntExtra(EncLabel.EXTRA_LABEL_ID)
-                val name = intent.getStringExtra(EncLabel.EXTRA_LABEL_NAME)
-                val desc = intent.getStringExtra(EncLabel.EXTRA_LABEL_DESC) ?: ""
-                val color = intent.getIntExtra(EncLabel.EXTRA_LABEL_COLOR)
-
-                val encName = SecretService.encryptCommonString(key, name)
-                val encDesc = SecretService.encryptCommonString(key, desc)
-                val encLabel = EncLabel(id, encName, encDesc, color)
-
-                if (encLabel.isPersistent()) {
-                    labelViewModel.update(encLabel)
-                }
-                else {
-                    labelViewModel.insert(encLabel)
-                }
-                LabelService.updateLabel(key, encLabel)
-            }
-        }
-
     }
 
     fun deleteLabel(label: LabelService.Label) {
