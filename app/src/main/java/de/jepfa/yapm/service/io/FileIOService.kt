@@ -164,8 +164,8 @@ class FileIOService: IntentService("FileIOService") {
             val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
 
             val uri = intent.getParcelableExtra<Uri>(PARAM_FILE_URI)
-            val encQrc = intent.getEncryptedExtra(PARAM_QRC)
-            val encHeader = intent.getEncryptedExtra(PARAM_QRC_HEADER)
+            val encQrc = intent.getEncryptedExtra(PARAM_QRC, Encrypted.empty())
+            val encHeader = intent.getEncryptedExtra(PARAM_QRC_HEADER, Encrypted.empty())
             val qrcColor = intent.getIntExtra(PARAM_QRC_COLOR, Color.BLACK)
             val qrc = SecretService.decryptPassword(tempKey, encQrc)
             val header = SecretService.decryptCommonString(tempKey, encHeader)

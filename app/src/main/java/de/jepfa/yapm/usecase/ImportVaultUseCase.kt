@@ -58,6 +58,7 @@ object ImportVaultUseCase {
                 jsonObject.get(EncCredential.ATTRIB_ADDITIONAL_INFO).asString,
                 jsonObject.get(EncCredential.ATTRIB_USER).asString,
                 jsonObject.get(EncCredential.ATTRIB_PASSWORD).asString,
+                null,
                 jsonObject.get(EncCredential.ATTRIB_WEBSITE).asString,
                 jsonObject.get(EncCredential.ATTRIB_LABELS).asString
 

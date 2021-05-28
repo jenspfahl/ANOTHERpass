@@ -46,6 +46,7 @@ class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
                 entity.additionalInfo,
                 entity.user,
                 entity.password,
+                entity.lastPassword,
                 entity.website,
                 entity.labels)
     }
@@ -56,6 +57,7 @@ class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
                 encCredential.additionalInfo,
                 encCredential.user,
                 encCredential.password,
+                encCredential.lastPassword,
                 encCredential.website,
                 encCredential.labels)
     }

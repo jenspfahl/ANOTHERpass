@@ -49,10 +49,10 @@ class QrCodeActivity : SecureActivity() {
         val subTextView: TextView = findViewById(R.id.textview_subtext)
         val qrCodeImageView: ImageView = findViewById(R.id.imageview_qrcode)
 
-        val encHead = intent.getEncryptedExtra(EXTRA_HEADLINE)
-        val encSub = intent.getEncryptedExtra(EXTRA_SUBTEXT)
-        val encQrcHeader = intent.getEncryptedExtra(EXTRA_QRCODE_HEADER)
-        encQRC = intent.getEncryptedExtra(EXTRA_QRCODE)
+        val encHead = intent.getEncryptedExtra(EXTRA_HEADLINE, Encrypted.empty())
+        val encSub = intent.getEncryptedExtra(EXTRA_SUBTEXT, Encrypted.empty())
+        val encQrcHeader = intent.getEncryptedExtra(EXTRA_QRCODE_HEADER, Encrypted.empty())
+        encQRC = intent.getEncryptedExtra(EXTRA_QRCODE, Encrypted.empty())
         val qrcColor = intent.getIntExtra(EXTRA_COLOR, Color.BLACK)
 
         val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)

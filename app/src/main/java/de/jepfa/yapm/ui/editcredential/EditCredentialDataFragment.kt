@@ -46,7 +46,7 @@ class EditCredentialDataFragment : SecureFragment() {
         savedInstanceState: Bundle?
     ): View? {
         if (Session.isDenied()) {
-            LockVaultUseCase.execute(getSecureActivity())
+            getSecureActivity()?.let { LockVaultUseCase.execute(it) }
             return null
         }
         return inflater.inflate(R.layout.fragment_edit_credential_data, container, false)
@@ -75,7 +75,7 @@ class EditCredentialDataFragment : SecureFragment() {
         }
 
 
-        getBaseActivity().labelViewModel.allLabels.observe(getSecureActivity(), { labels ->
+        getBaseActivity().labelViewModel.allLabels.observe(getBaseActivity(), { labels ->
             masterSecretKey?.let{ key ->
                 editCredentialLabelsView.filterableList = LabelService.getAllLabelChips()
             }
@@ -128,15 +128,15 @@ class EditCredentialDataFragment : SecureFragment() {
 
         //fill UI
         if (editCredentialActivity.isUpdate()) {
-            editCredentialActivity.load().observe(getSecureActivity(), {
-                val originCredential = it
+            editCredentialActivity.load().observe(editCredentialActivity, {
+                editCredentialActivity.original = it
                 masterSecretKey?.let{ key ->
-                    val name = decryptCommonString(key, originCredential.name)
-                    val user = decryptCommonString(key, originCredential.user)
-                    val website = decryptCommonString(key, originCredential.website)
+                    val name = decryptCommonString(key, it.name)
+                    val user = decryptCommonString(key, it.user)
+                    val website = decryptCommonString(key, it.website)
                     val additionalInfo = decryptCommonString(
                         key,
-                        originCredential.additionalInfo
+                        it.additionalInfo
                     )
 
                     getBaseActivity().setTitle(getString(R.string.title_change_credential_with_title, name))
@@ -146,11 +146,11 @@ class EditCredentialDataFragment : SecureFragment() {
                     editCredentialWebsiteView.setText(website)
                     editCredentialAdditionalInfoView.setText(additionalInfo)
 
-                    LabelService.updateLabelsForCredential(key, originCredential)
+                    LabelService.updateLabelsForCredential(key, it)
 
-                    LabelService.getLabelsForCredential(key, originCredential)
-                        .forEachIndexed { idx, it ->
-                            editCredentialLabelsView.addChip(it.labelChip)
+                    LabelService.getLabelsForCredential(key, it)
+                        .forEachIndexed { idx, label ->
+                            editCredentialLabelsView.addChip(label.labelChip)
                         }
                     editCredentialNameView.requestFocus()
                 }
@@ -187,6 +187,7 @@ class EditCredentialDataFragment : SecureFragment() {
                         encAdditionalInfo,
                         encUser,
                         encPassword,
+                        editCredentialActivity.original?.lastPassword,
                         encWebsite,
                         encLabels
                     )

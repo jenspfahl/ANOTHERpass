@@ -45,7 +45,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
             savedInstanceState: Bundle?
     ): View? {
         if (Session.isDenied()) {
-            LockVaultUseCase.execute(getSecureActivity())
+            getSecureActivity()?.let { LockVaultUseCase.execute(it) }
             return null
         }
         return inflater.inflate(R.layout.fragment_edit_credential_password, container, false)
@@ -65,13 +65,11 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
         //fill UI
         if (editCredentialActivity.isUpdate()) {
-            editCredentialActivity.load().observe(getSecureActivity(), {
+            editCredentialActivity.load().observe(editCredentialActivity, {
                 originCredential = it
                 masterSecretKey?.let{ key ->
                     val password = SecretService.decryptPassword(key, it.password)
-                    generatedPassword = password
-                    var spannedString = PasswordColorizer.spannableString(generatedPassword, getSecureActivity())
-                    generatedPasswdView.setText(spannedString)
+                    updatePasswordView(password)
                 }
             })
         }
@@ -96,9 +94,8 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
         val buttonGeneratePasswd: Button = view.findViewById(R.id.button_generate_passwd)
         buttonGeneratePasswd.setOnClickListener {
-            generatedPassword = generatePassword()
-            var spannedString = PasswordColorizer.spannableString(generatedPassword, getSecureActivity())
-            generatedPasswdView.setText(spannedString)
+            val password = generatePassword()
+            updatePasswordView(password)
         }
 
         generatedPasswdView.setOnClickListener {
@@ -160,33 +157,45 @@ class EditCredentialPasswordFragment : SecureFragment() {
                                 .setMessage(R.string.message_password_changed)
                                 .setIcon(android.R.drawable.ic_dialog_alert)
                                 .setPositiveButton(R.string.title_continue) { dialog, whichButton ->
-                                    updateCredential(key, editCredentialActivity)
+                                    updateCredential(key, saveLastPassword = true, editCredentialActivity)
                                 }
                                 .setNegativeButton(android.R.string.cancel, null)
                                 .show()
                         }
                         else {
-                            updateCredential(key, editCredentialActivity)
+                            updateCredential(key, saveLastPassword = false, editCredentialActivity)
                         }
                         originPasswd.clear()
                     }
                     else {
-                        updateCredential(key, editCredentialActivity)
+                        updateCredential(key, saveLastPassword = false, editCredentialActivity)
                     }
                 }
             }
         }
     }
 
+    private fun updatePasswordView(password: Password) {
+        getSecureActivity()?.let {
+            generatedPassword = password
+            var spannedString =
+                PasswordColorizer.spannableString(generatedPassword, it)
+            generatedPasswdView.setText(spannedString)
+        }
+    }
+
     private fun updateCredential(
         key: SecretKey,
+        saveLastPassword: Boolean,
         editCredentialActivity: EditCredentialActivity
     ) {
         val encPassword = SecretService.encryptPassword(key, generatedPassword)
         generatedPassword.clear()
 
-        val credentialToSave = editCredentialActivity.current
-        credentialToSave.password = encPassword
+        if (saveLastPassword) {
+            editCredentialActivity.current.lastPassword = editCredentialActivity.original?.password
+        }
+        editCredentialActivity.current.password = encPassword
 
         editCredentialActivity.reply()
     }
@@ -253,7 +262,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
         val name = getResources().getString(passphraseStrength.nameId)
         radioButton.text = "${name}"
 
-        val prefDefaultPasswdStrength = PreferenceUtil.get(PreferenceUtil.PREF_PASSWD_STRENGTH, getSecureActivity())
+        val prefDefaultPasswdStrength = PreferenceUtil.get(PreferenceUtil.PREF_PASSWD_STRENGTH, getBaseActivity())
         val defaultPasswdStrength = getStrengthEnum(prefDefaultPasswdStrength)
         if (defaultPasswdStrength == passphraseStrength) {
             radioButton.setChecked(true)
@@ -261,7 +270,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
     }
 
     private fun getPref(key: String, default: Boolean): Boolean {
-        return PreferenceUtil.getAsBool(key, default, getSecureActivity())
+        return PreferenceUtil.getAsBool(key, default, getBaseActivity())
     }
 
     private fun getStrengthEnum(name: String?) : PassphraseStrength {
@@ -270,6 +279,8 @@ class EditCredentialPasswordFragment : SecureFragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val editCredentialActivity = getBaseActivity() as EditCredentialActivity
+
         val id = item.itemId
         if (id == R.id.menu_detach_credential) {
 
@@ -278,8 +289,10 @@ class EditCredentialPasswordFragment : SecureFragment() {
                     Toast.makeText(activity, "Generate a password first", Toast.LENGTH_LONG).show()
                 }
                 else {
-                    val encPassword = SecretService.encryptPassword(key, generatedPassword)
-                    DetachHelper.detachPassword(getSecureActivity() , encPassword, null)
+                    getSecureActivity()?.let {
+                        val encPassword = SecretService.encryptPassword(key, generatedPassword)
+                        DetachHelper.detachPassword(it, encPassword, null)
+                    }
                 }
             }
 
@@ -292,10 +305,31 @@ class EditCredentialPasswordFragment : SecureFragment() {
                     Toast.makeText(activity, "Generate a password first", Toast.LENGTH_LONG).show()
                 }
                 else {
-                    val encPassword = SecretService.encryptPassword(key, generatedPassword)
-                    ClipboardUtil.copyEncPasswordWithCheck(encPassword, getSecureActivity())
+                    getSecureActivity()?.let {
+                        val encPassword = SecretService.encryptPassword(key, generatedPassword)
+                        ClipboardUtil.copyEncPasswordWithCheck(encPassword, it)
+                    }
                 }
             }
+            return true
+        }
+
+        if (id == R.id.menu_restore_last_password) {
+
+            masterSecretKey?.let{ key ->
+
+                val lastPasswd = editCredentialActivity.current.lastPassword?.let {
+                    SecretService.decryptPassword(key, it)
+                }
+
+                if (lastPasswd == null || lastPasswd.isBlank() || !lastPasswd.isValid()) {
+                    Toast.makeText(activity, "Nothing to restore", Toast.LENGTH_LONG).show()
+                }
+                else {
+                    updatePasswordView(lastPasswd)
+                }
+            }
+
             return true
         }
 
@@ -304,7 +338,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.credential_new_or_update_menu, menu)
+        inflater.inflate(R.menu.credential_edit_menu, menu)
 
         val enableCopyPassword = PreferenceUtil.getAsBool(PreferenceUtil.PREF_ENABLE_COPY_PASSWORD, false, getBaseActivity())
         if (!enableCopyPassword) {

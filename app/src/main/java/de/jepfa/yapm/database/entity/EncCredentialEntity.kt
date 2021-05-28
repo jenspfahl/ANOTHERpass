@@ -13,6 +13,7 @@ data class EncCredentialEntity (@PrimaryKey(autoGenerate = true) val id: Int?,
                                 var additionalInfo: String,
                                 var user: String,
                                 var password: String,
+                                var lastPassword: String?,
                                 var website: String,
                                 var labels: String) { // encrypted label ids, comma separated
 
@@ -21,6 +22,7 @@ data class EncCredentialEntity (@PrimaryKey(autoGenerate = true) val id: Int?,
                 additionalInfo: Encrypted,
                 user: Encrypted,
                 password: Encrypted,
+                lastPassword: Encrypted?,
                 website: Encrypted,
                 labels: Encrypted
     )
@@ -30,6 +32,7 @@ data class EncCredentialEntity (@PrimaryKey(autoGenerate = true) val id: Int?,
         additionalInfo.toBase64String(),
         user.toBase64String(),
         password.toBase64String(),
+        lastPassword?.toBase64String(),
         website.toBase64String(),
         labels.toBase64String())
 

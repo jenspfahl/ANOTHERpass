@@ -9,6 +9,7 @@ data class EncCredential(var id: Int?,
                          var additionalInfo: Encrypted,
                          var user: Encrypted,
                          var password: Encrypted,
+                         var lastPassword: Encrypted?,
                          var website: Encrypted,
                          var labels: Encrypted
 ) {
@@ -18,6 +19,7 @@ data class EncCredential(var id: Int?,
                 additionalInfoBase64: String,
                 userBase64: String,
                 passwordBase64: String,
+                lastPasswordBase64: String?,
                 websiteBase64: String,
                 labelsBase64: String) :
             this(id,
@@ -25,6 +27,7 @@ data class EncCredential(var id: Int?,
                 Encrypted.fromBase64String(additionalInfoBase64),
                 Encrypted.fromBase64String(userBase64),
                 Encrypted.fromBase64String(passwordBase64),
+                lastPasswordBase64?.run { Encrypted.fromBase64String(lastPasswordBase64) },
                 Encrypted.fromBase64String(websiteBase64),
                 Encrypted.fromBase64String(labelsBase64)
             )
@@ -41,6 +44,7 @@ data class EncCredential(var id: Int?,
         intent.putEncryptedExtra(EXTRA_CREDENTIAL_ADDITIONAL_INFO, additionalInfo)
         intent.putEncryptedExtra(EXTRA_CREDENTIAL_USER, user)
         intent.putEncryptedExtra(EXTRA_CREDENTIAL_PASSWORD, password)
+        lastPassword?.let { intent.putEncryptedExtra(EXTRA_CREDENTIAL_LAST_PASSWORD, it) }
         intent.putEncryptedExtra(EXTRA_CREDENTIAL_WEBSITE, website)
         intent.putEncryptedExtra(EXTRA_CREDENTIAL_LABELS, labels)
     }
@@ -52,6 +56,7 @@ data class EncCredential(var id: Int?,
         const val EXTRA_CREDENTIAL_ADDITIONAL_INFO = "de.jepfa.yapm.ui.credential.additionalInfo"
         const val EXTRA_CREDENTIAL_USER = "de.jepfa.yapm.ui.credential.user"
         const val EXTRA_CREDENTIAL_PASSWORD = "de.jepfa.yapm.ui.credential.password"
+        const val EXTRA_CREDENTIAL_LAST_PASSWORD = "de.jepfa.yapm.ui.credential.lastpassword"
         const val EXTRA_CREDENTIAL_WEBSITE = "de.jepfa.yapm.ui.credential.website"
         const val EXTRA_CREDENTIAL_LABELS = "de.jepfa.yapm.ui.credential.labels"
 
@@ -69,15 +74,16 @@ data class EncCredential(var id: Int?,
             if (idExtra != -1) {
                 id = idExtra
             }
-            val encName = intent.getEncryptedExtra(EXTRA_CREDENTIAL_NAME)
-            val encAdditionalInfo = intent.getEncryptedExtra(EXTRA_CREDENTIAL_ADDITIONAL_INFO)
-            val encUser = intent.getEncryptedExtra(EXTRA_CREDENTIAL_USER)
-            val encPassword = intent.getEncryptedExtra(EXTRA_CREDENTIAL_PASSWORD)
-            val encWebsite = intent.getEncryptedExtra(EXTRA_CREDENTIAL_WEBSITE)
-            val encLabels = intent.getEncryptedExtra(EXTRA_CREDENTIAL_LABELS)
+            val encName = intent.getEncryptedExtra(EXTRA_CREDENTIAL_NAME, Encrypted.empty())
+            val encAdditionalInfo = intent.getEncryptedExtra(EXTRA_CREDENTIAL_ADDITIONAL_INFO, Encrypted.empty())
+            val encUser = intent.getEncryptedExtra(EXTRA_CREDENTIAL_USER, Encrypted.empty())
+            val encPassword = intent.getEncryptedExtra(EXTRA_CREDENTIAL_PASSWORD, Encrypted.empty())
+            val encLastPassword = intent.getEncryptedExtra(EXTRA_CREDENTIAL_LAST_PASSWORD)
+            val encWebsite = intent.getEncryptedExtra(EXTRA_CREDENTIAL_WEBSITE, Encrypted.empty())
+            val encLabels = intent.getEncryptedExtra(EXTRA_CREDENTIAL_LABELS, Encrypted.empty())
 
             return EncCredential(
-                id, encName, encAdditionalInfo, encUser, encPassword, encWebsite, encLabels)
+                id, encName, encAdditionalInfo, encUser, encPassword, encLastPassword, encWebsite, encLabels)
         }
     }
 }

@@ -182,10 +182,11 @@
     <string name="title_write_nfc_tag">Write NFC tag</string>
     <string name="message_write_nfc_tag">There is data on the NFC tag. Overwrite it?</string>
     <string name="title_read_nfc_tag">Read NFC tag</string>
-    <string name="message_password_changed">The password has been changed. If you continue you will loose the origin password. Have you still updated the password out there?</string>
+    <string name="message_password_changed">The password has been changed. If you continue you will loose the origin password, but you can restore it if needed. Have you still updated the password out there?</string>
     <string name="title_continue">Continue</string>
     <string name="label_details">Label details</string>
     <string name="close">Close</string>
+    <string name="restore_last_password">Restore last password</string>
 
 
 </resources>

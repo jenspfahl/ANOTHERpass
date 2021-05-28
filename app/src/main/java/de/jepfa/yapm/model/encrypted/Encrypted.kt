@@ -25,6 +25,10 @@ data class Encrypted(val type: String = "", val iv: ByteArray, val data: ByteArr
         private val BAS64_PAIR_DELIMITOR = ':'
         private val BASE64_FLAGS = Base64.NO_WRAP or Base64.NO_PADDING
 
+        fun empty(): Encrypted {
+            return Encrypted("", ByteArray(0), ByteArray(0))
+        }
+
         fun toBase64String(encrypted: Encrypted): String {
             val iv = Base64.encodeToString(encrypted.iv, BASE64_FLAGS)
             val data = Base64.encodeToString(encrypted.data, BASE64_FLAGS)

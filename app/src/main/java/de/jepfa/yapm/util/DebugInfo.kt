@@ -3,6 +3,7 @@ package de.jepfa.yapm.util
 import android.content.Context
 import android.os.Build
 import de.jepfa.yapm.BuildConfig
+import de.jepfa.yapm.database.YapmDatabase
 
 object DebugInfo {
 
@@ -31,6 +32,7 @@ object DebugInfo {
         sb.append("\n************ APP INFORMATION ***********\n")
         sb.addLabelLine("Version", getVersionName(context))
         sb.addLabelLine("VersionCode", getVersionCode(context))
+        sb.addLabelLine("Database Version", YapmDatabase.getVersion())
         sb.addLabelLine("BuildTimestamp", Constants.SDF_DT_MEDIUM.format(BuildConfig.BUILD_TIME))
         sb.addLabelLine("BuildType", BuildConfig.BUILD_TYPE)
 

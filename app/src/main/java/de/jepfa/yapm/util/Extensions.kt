@@ -22,9 +22,13 @@ fun Bundle.putEncrypted(key: String, encrypted: Encrypted) {
     this.putString(key, encrypted.toBase64String())
 }
 
-fun Intent.getEncryptedExtra(key: String): Encrypted {
+fun Intent.getEncryptedExtra(key: String, default: Encrypted): Encrypted {
+    val value = this.getStringExtra(key) ?: return default
+    return Encrypted.fromBase64String(value)
+}
 
-    val value = this.getStringExtra(key)
+fun Intent.getEncryptedExtra(key: String): Encrypted? {
+    val value = this.getStringExtra(key) ?: return null
     return Encrypted.fromBase64String(value)
 }
 

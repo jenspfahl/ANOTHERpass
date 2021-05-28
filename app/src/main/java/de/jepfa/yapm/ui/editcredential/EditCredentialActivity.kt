@@ -16,6 +16,7 @@ class EditCredentialActivity : SecureActivity() {
 
     var currentId: Int? = null
     lateinit var current: EncCredential
+    var original: EncCredential? = null
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
