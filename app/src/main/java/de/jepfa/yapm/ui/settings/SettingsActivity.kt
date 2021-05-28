@@ -7,6 +7,7 @@ import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.ClipboardUtil
+import de.jepfa.yapm.util.NfcUtil
 import de.jepfa.yapm.util.PreferenceUtil
 
 private const val TITLE_TAG = "settingsActivityTitle"
@@ -108,6 +109,8 @@ class SettingsActivity : SecureActivity(),
                     true
                 }
             }
+
+            nfcPref?.isEnabled = activity?.let { NfcUtil.isNfcAvailable(it) } == true
 
             nfcPref?.let {
                 it.setOnPreferenceChangeListener { preference, newValue ->

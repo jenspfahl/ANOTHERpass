@@ -158,9 +158,11 @@ class NfcActivity : SecureActivity() {
     }
 
     private fun initNfcAdapter() {
-        val nfcManager = getSystemService(Context.NFC_SERVICE) as NfcManager
-        adapter = nfcManager.defaultAdapter
+        adapter = NfcUtil.getNfcAdapter(this)
         if (adapter == null) {
+            Toast.makeText(this, "NFC not supported by your device", Toast.LENGTH_LONG).show()
+        }
+        else if (adapter?.isEnabled == false) {
             Toast.makeText(this, "Enable NFC to use this feature", Toast.LENGTH_LONG).show()
         }
     }

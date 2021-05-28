@@ -42,6 +42,8 @@ object DebugInfo {
         sb.addLabelLine("Model", Build.MODEL)
         sb.addLabelLine("Id", Build.ID)
         sb.addLabelLine("Product", Build.PRODUCT)
+        sb.addLabelLine("NFC available", NfcUtil.isNfcAvailable(context))
+        sb.addLabelLine("NFC enabled", NfcUtil.isNfcEnabled(context))
 
         sb.append("\n************ FIRMWARE ************\n")
         sb.addLabelLine("SDK", Build.VERSION.SDK)

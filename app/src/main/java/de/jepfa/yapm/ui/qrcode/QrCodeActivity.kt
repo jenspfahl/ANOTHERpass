@@ -7,6 +7,7 @@ import android.nfc.tech.NfcA
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -19,6 +20,7 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.ExtPermissionChecker
+import de.jepfa.yapm.util.NfcUtil
 import de.jepfa.yapm.util.QRCodeUtil.generateQRCode
 import de.jepfa.yapm.util.getEncryptedExtra
 import de.jepfa.yapm.util.putEncryptedExtra
@@ -86,6 +88,15 @@ class QrCodeActivity : SecureActivity() {
         menuInflater.inflate(R.menu.qrcode_menu, menu)
 
         return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        val nfcItem = menu?.findItem(R.id.menu_download_as_nfc)
+        if (nfcItem != null && !NfcUtil.isNfcAvailable(this)) {
+            nfcItem.setVisible(false)
+        }
+
+        return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

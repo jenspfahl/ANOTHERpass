@@ -20,10 +20,7 @@ import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.usecase.CreateVaultUseCase
 import de.jepfa.yapm.usecase.ExportEncMasterPasswordUseCase
 import de.jepfa.yapm.usecase.LoginUseCase
-import de.jepfa.yapm.util.AsyncWithProgressBar
-import de.jepfa.yapm.util.PasswordColorizer
-import de.jepfa.yapm.util.getEncrypted
-import de.jepfa.yapm.util.putEncryptedExtra
+import de.jepfa.yapm.util.*
 
 class CreateVaultSummarizeFragment : BaseFragment() {
 
@@ -63,6 +60,9 @@ class CreateVaultSummarizeFragment : BaseFragment() {
             ExportEncMasterPasswordUseCase.execute(encMasterPasswd, true, getBaseActivity())
         }
         val exportAsNfcImageView: ImageView = view.findViewById(R.id.imageview_nfc_tag)
+        if (!NfcUtil.isNfcAvailable(getBaseActivity())) {
+            exportAsNfcImageView.visibility = View.GONE
+        }
         exportAsNfcImageView.setOnClickListener {
             val tempKey = getAndroidSecretKey(ALIAS_KEY_TRANSPORT)
             val encMasterPasswd = encryptPassword(tempKey, masterPasswd)

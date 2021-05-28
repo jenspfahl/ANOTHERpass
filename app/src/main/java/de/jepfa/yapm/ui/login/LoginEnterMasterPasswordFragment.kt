@@ -61,6 +61,9 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         }
 
         val scanNfcImageView: ImageView = view.findViewById(R.id.imageview_scan_nfc)
+        if (!NfcUtil.isNfcAvailable(getBaseActivity())) {
+            scanNfcImageView.visibility = View.GONE
+        }
         scanNfcImageView.setOnClickListener {
             NfcUtil.scanNfcTag(this)
             true

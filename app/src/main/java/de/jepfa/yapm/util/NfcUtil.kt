@@ -1,9 +1,11 @@
 package de.jepfa.yapm.util
 
+import android.content.Context
 import android.content.Intent
 import android.nfc.*
 import android.os.Parcelable
 import android.util.Log
+import android.widget.Toast
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.nfc.NfcActivity
@@ -13,6 +15,21 @@ import de.jepfa.yapm.ui.nfc.WritableTag
  * Inspired by https://proandroiddev.com/working-with-nfc-tags-on-android-c1e5af47a3db
  */
 object NfcUtil {
+
+    fun getNfcAdapter(context: Context): NfcAdapter? {
+        val nfcManager = context.getSystemService(Context.NFC_SERVICE) as NfcManager
+        return nfcManager.defaultAdapter
+    }
+
+    fun isNfcAvailable(context: Context): Boolean {
+        val adapter = getNfcAdapter(context)
+        return adapter != null
+    }
+
+    fun isNfcEnabled(context: Context): Boolean {
+        val adapter = getNfcAdapter(context)
+        return adapter != null && adapter.isEnabled
+    }
 
     fun getWritableTag(intent: Intent): WritableTag? {
         val tagFromIntent: Tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
