@@ -22,12 +22,20 @@
         app:allowDividerBelow="true"/>
 
     <SwitchPreferenceCompat
-        app:key="YAPM/pref:fast_mp_login"
+        app:key="YAPM/pref:fast_mp_login_with_qrc"
         app:summaryOff="Master password can be typed manually or scanned from QR code"
         app:summaryOn="Opens the QR code scanner immediately if master password is not stored on device and logs in afterwards"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
-        app:title="Scan master password and login immediately"
+        app:title="Scan master password QR code and login immediately"
         app:allowDividerAbove="true"/>
+
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:fast_mp_login_with_nfc"
+        app:summaryOff="Master password can also be read from NFC tag"
+        app:summaryOn="Opens the NFC tag reader immediately if master password is not stored on device and logs in afterwards"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:title="Read master password NFC tag and login immediately"/>
 
 </PreferenceScreen>

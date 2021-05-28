@@ -30,7 +30,8 @@ object PreferenceUtil {
     const val PREF_WITH_DIGITS = PREF_PREFIX + "with_digits"
     const val PREF_WITH_SPECIAL_CHARS = PREF_PREFIX + "with_special_chars"
 
-    const val PREF_FAST_MASTERPASSWD_LOGIN = PREF_PREFIX + "fast_mp_login"
+    const val PREF_FAST_MASTERPASSWD_LOGIN_WITH_QRC = PREF_PREFIX + "fast_mp_login_with_qrc"
+    const val PREF_FAST_MASTERPASSWD_LOGIN_WITH_NFC = PREF_PREFIX + "fast_mp_login_with_nfc"
     const val PREF_COLORED_PASSWORD = PREF_PREFIX + "colored_passwords"
     const val PREF_TRANSPARENT_OVERLAY = PREF_PREFIX + "transparent_overlay"
     const val PREF_PASSWD_WORDS_ON_NL = PREF_PREFIX + "password_words_on_nl"

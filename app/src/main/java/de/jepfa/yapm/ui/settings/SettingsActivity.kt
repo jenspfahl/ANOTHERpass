@@ -1,9 +1,7 @@
 package de.jepfa.yapm.ui.settings
 
 import android.os.Bundle
-import androidx.preference.ListPreference
-import androidx.preference.Preference
-import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.*
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.SecureActivity
@@ -96,6 +94,29 @@ class SettingsActivity : SecureActivity(),
     class LoginSettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.login_preferences, rootKey)
+
+            val qrcPref = findPreference<SwitchPreferenceCompat>(
+                PreferenceUtil.PREF_FAST_MASTERPASSWD_LOGIN_WITH_QRC)
+            val nfcPref = findPreference<SwitchPreferenceCompat>(
+                PreferenceUtil.PREF_FAST_MASTERPASSWD_LOGIN_WITH_NFC)
+
+            qrcPref?.let {
+                it.setOnPreferenceChangeListener { preference, newValue ->
+                    if (newValue == true) {
+                        nfcPref?.isChecked = false
+                    }
+                    true
+                }
+            }
+
+            nfcPref?.let {
+                it.setOnPreferenceChangeListener { preference, newValue ->
+                    if (newValue == true) {
+                        qrcPref?.isChecked = false
+                    }
+                    true
+                }
+            }
         }
     }
 

@@ -1,14 +1,11 @@
 package de.jepfa.yapm.ui.login
 
 import android.content.Intent
-import android.nfc.tech.NfcA
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.navigation.fragment.findNavController
 import com.google.zxing.integration.android.IntentIntegrator
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
@@ -28,7 +25,8 @@ import de.jepfa.yapm.util.AsyncWithProgressBar
 import de.jepfa.yapm.util.NfcUtil
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.DATA_ENCRYPTED_MASTER_PASSWORD
-import de.jepfa.yapm.util.PreferenceUtil.PREF_FAST_MASTERPASSWD_LOGIN
+import de.jepfa.yapm.util.PreferenceUtil.PREF_FAST_MASTERPASSWD_LOGIN_WITH_NFC
+import de.jepfa.yapm.util.PreferenceUtil.PREF_FAST_MASTERPASSWD_LOGIN_WITH_QRC
 import de.jepfa.yapm.util.QRCodeUtil
 
 
@@ -68,8 +66,11 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
             true
         }
 
-        if (isFastLogin()) {
+        if (isFastLoginWithQrCode()) {
             scanQrCodeImageView.performClick()
+        }
+        else if (isFastLoginWithNfcTag()) {
+            scanNfcImageView.performClick()
         }
 
         masterPasswdTextView.setOnEditorActionListener{ textView, id, keyEvent ->
@@ -126,7 +127,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
 
                     masterPasswdTextView.setText(encMasterPassword)
 
-                    if (isFastLogin()) {
+                    if (isFastLoginWithQrCode() || isFastLoginWithNfcTag()) {
                         loginButton.performClick()
                     }
                 }
@@ -143,7 +144,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
 
                 masterPasswdTextView.setText(encMasterPassword)
 
-                if (isFastLogin()) {
+                if (isFastLoginWithQrCode() || isFastLoginWithNfcTag()) {
                     loginButton.performClick()
                 }
             }
@@ -215,8 +216,12 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
 
     }
 
-    private fun isFastLogin(): Boolean {
-        return  PreferenceUtil.getAsBool(PREF_FAST_MASTERPASSWD_LOGIN, false, getBaseActivity())
+    private fun isFastLoginWithQrCode(): Boolean {
+        return  PreferenceUtil.getAsBool(PREF_FAST_MASTERPASSWD_LOGIN_WITH_QRC, false, getBaseActivity())
+    }
+
+    private fun isFastLoginWithNfcTag(): Boolean {
+        return  PreferenceUtil.getAsBool(PREF_FAST_MASTERPASSWD_LOGIN_WITH_NFC, false, getBaseActivity())
     }
 
 }
