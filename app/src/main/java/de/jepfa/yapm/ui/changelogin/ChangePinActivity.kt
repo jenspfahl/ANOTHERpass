@@ -39,7 +39,9 @@ class ChangePinActivity : SecureActivity() {
 
         val explanationView: TextView = findViewById(R.id.change_pin_explanation)
         explanationView.setOnLongClickListener {
-            throw RuntimeException("test bug report")
+            if (DebugInfo.isDebug) {
+                throw RuntimeException("test bug report")
+            }
             true
         }
 

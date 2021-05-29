@@ -149,6 +149,12 @@ class SettingsActivity : SecureActivity(),
         }
     }
 
+    class OverlaySettingsFragment : PreferenceFragmentCompat() {
+        override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            setPreferencesFromResource(R.xml.overlay_preferences, rootKey)
+        }
+    }
+
     class ClipboardSettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.clipboard_preferences, rootKey)

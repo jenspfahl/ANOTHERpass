@@ -189,6 +189,7 @@
     <string name="restore_last_password">Restore last password</string>
     <string name="edit_password">Edit password</string>
     <string name="edit_password_message">Here you can change the password manually which is not supposed by the app.</string>
+    <string name="pref_header_overlay">Password overlay dialog</string>
 
 
 </resources>

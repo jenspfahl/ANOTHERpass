@@ -13,7 +13,6 @@
         app:key="login_header"
         app:title="@string/pref_header_login" />
 
-
     <Preference
         app:fragment="de.jepfa.yapm.ui.settings.SettingsActivity$SecuritySettingsFragment"
         app:icon="@drawable/ic_security_black_24dp"
@@ -25,6 +24,12 @@
         app:icon="@drawable/ic_baseline_vpn_key_24"
         app:key="passwd_generator_header"
         app:title="@string/pref_header_passwd" />
+
+    <Preference
+        app:fragment="de.jepfa.yapm.ui.settings.SettingsActivity$OverlaySettingsFragment"
+        app:icon="@drawable/ic_baseline_north_east_24"
+        app:key="overlay_header"
+        app:title="@string/pref_header_overlay" />
 
     <Preference
         app:fragment="de.jepfa.yapm.ui.settings.SettingsActivity$ClipboardSettingsFragment"

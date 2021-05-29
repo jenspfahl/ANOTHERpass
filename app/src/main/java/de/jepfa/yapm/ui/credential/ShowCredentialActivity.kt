@@ -34,6 +34,7 @@ import de.jepfa.yapm.util.ExportCredentialUtil
 import de.jepfa.yapm.util.PasswordColorizer.spannableString
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.PREF_ENABLE_COPY_PASSWORD
+import de.jepfa.yapm.util.PreferenceUtil.PREF_ENABLE_OVERLAY_FEATURE
 import de.jepfa.yapm.util.PreferenceUtil.PREF_MASK_PASSWORD
 import de.jepfa.yapm.util.PreferenceUtil.PREF_PASSWD_WORDS_ON_NL
 
@@ -123,6 +124,11 @@ class ShowCredentialActivity : SecureActivity() {
         val enableCopyPassword = PreferenceUtil.getAsBool(PREF_ENABLE_COPY_PASSWORD, false, this)
         if (!enableCopyPassword) {
             menu.findItem(R.id.menu_copy_credential)?.isVisible = false
+        }
+
+        val enableOverlayFeature = PreferenceUtil.getAsBool(PREF_ENABLE_OVERLAY_FEATURE, true, this)
+        if (!enableOverlayFeature) {
+            menu.findItem(R.id.menu_detach_credential)?.isVisible = false
         }
 
         return super.onCreateOptionsMenu(menu)

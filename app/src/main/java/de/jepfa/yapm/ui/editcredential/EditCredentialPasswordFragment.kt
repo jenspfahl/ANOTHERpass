@@ -367,6 +367,11 @@ class EditCredentialPasswordFragment : SecureFragment() {
             menu.findItem(R.id.menu_copy_credential)?.isVisible = false
         }
 
+        val enableOverlayFeature = PreferenceUtil.getAsBool(PreferenceUtil.PREF_ENABLE_OVERLAY_FEATURE, true, getBaseActivity())
+        if (!enableOverlayFeature) {
+            menu.findItem(R.id.menu_detach_credential)?.isVisible = false
+        }
+
     }
 
 

@@ -28,6 +28,7 @@ import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.ExportCredentialUtil
 import de.jepfa.yapm.util.PreferenceUtil
 import de.jepfa.yapm.util.PreferenceUtil.PREF_ENABLE_COPY_PASSWORD
+import de.jepfa.yapm.util.PreferenceUtil.PREF_ENABLE_OVERLAY_FEATURE
 import de.jepfa.yapm.util.PreferenceUtil.PREF_SHOW_LABELS_IN_LIST
 import java.util.*
 import javax.crypto.SecretKey
@@ -241,6 +242,12 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         }
 
         fun bind(key: SecretKey?, credential: EncCredential, activity: SecureActivity) {
+
+            val enableOverlayFeature = PreferenceUtil.getAsBool(PREF_ENABLE_OVERLAY_FEATURE, true, activity)
+            if (!enableOverlayFeature) {
+                credentialDetachImageView.visibility = View.GONE
+            }
+
             credentialLabelContainerView.removeAllViews()
 
             var name = "????"
