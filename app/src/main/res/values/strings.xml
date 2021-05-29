@@ -187,6 +187,8 @@
     <string name="label_details">Label details</string>
     <string name="close">Close</string>
     <string name="restore_last_password">Restore last password</string>
+    <string name="edit_password">Edit password</string>
+    <string name="edit_password_message">Here you can change the password manually which is not supposed by the app.</string>
 
 
 </resources>

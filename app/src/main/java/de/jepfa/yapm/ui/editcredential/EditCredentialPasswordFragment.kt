@@ -2,13 +2,14 @@ package de.jepfa.yapm.ui.editcredential
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.text.InputType
 import android.view.*
 import android.widget.*
 import com.google.android.material.tabs.TabLayout
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secretgenerator.*
@@ -96,6 +97,27 @@ class EditCredentialPasswordFragment : SecureFragment() {
         buttonGeneratePasswd.setOnClickListener {
             val password = generatePassword()
             updatePasswordView(password)
+        }
+
+        generatedPasswdView.setOnLongClickListener {
+
+            val input = EditText(getBaseActivity())
+            input.inputType = InputType.TYPE_CLASS_TEXT
+            input.setText(generatedPassword, TextView.BufferType.EDITABLE)
+
+            AlertDialog.Builder(getBaseActivity())
+                .setTitle(R.string.edit_password)
+                .setMessage(R.string.edit_password_message)
+                .setView(input)
+                .setPositiveButton(android.R.string.ok) { dialog, which ->
+                    updatePasswordView(Password(input.text.toString()))
+                }
+                .setNegativeButton(android.R.string.cancel) { dialog, which ->
+                    dialog.cancel()
+                }
+                .show()
+
+            true
         }
 
         generatedPasswdView.setOnClickListener {
