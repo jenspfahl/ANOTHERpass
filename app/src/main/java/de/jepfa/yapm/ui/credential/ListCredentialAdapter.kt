@@ -245,7 +245,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
 
             val enableOverlayFeature = PreferenceUtil.getAsBool(PREF_ENABLE_OVERLAY_FEATURE, true, activity)
             if (!enableOverlayFeature) {
-                credentialDetachImageView.visibility = View.GONE
+                credentialDetachImageView.visibility = View.INVISIBLE
             }
 
             credentialLabelContainerView.removeAllViews()
