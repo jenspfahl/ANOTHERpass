@@ -7,7 +7,10 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import android.widget.LinearLayout
 import androidx.appcompat.widget.PopupMenu
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat.getColor
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -17,13 +20,13 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
-import de.jepfa.yapm.ui.label.LabelDialogUtil
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
+import de.jepfa.yapm.ui.label.LabelDialogUtil
 import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.ExportCredentialUtil
 import de.jepfa.yapm.util.PreferenceUtil
@@ -49,6 +52,11 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         val enableCopyPassword = PreferenceUtil.getAsBool(PREF_ENABLE_COPY_PASSWORD, false, listCredentialsActivity)
         if (!enableCopyPassword) {
             holder.hideCopyPasswordIcon()
+        }
+
+        val enableOverlayFeature = PreferenceUtil.getAsBool(PREF_ENABLE_OVERLAY_FEATURE, true, listCredentialsActivity)
+        if (!enableOverlayFeature) {
+            holder.hideDetachPasswordIcon()
         }
 
         holder.listenForShowCredential { pos, _ ->
@@ -206,9 +214,18 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         private val credentialCopyImageView: ImageView = itemView.findViewById(R.id.credential_copy)
         private val credentialMenuImageView: ImageView = itemView.findViewById(R.id.credential_menu_popup)
         private val credentialLabelContainerView: LinearLayout = itemView.findViewById(R.id.label_container)
+        private val credentialToolbarContainerView: ConstraintLayout = itemView.findViewById(R.id.toolbar_container)
 
         fun hideCopyPasswordIcon() {
-            credentialCopyImageView.visibility = View.GONE
+            credentialCopyImageView.visibility = View.INVISIBLE
+            // TODO test if we can shrink the toolbar space on demand
+            /*val contraintLayoutSet = ConstraintSet()
+            contraintLayoutSet.clone(credentialToolbarContainerView)
+            contraintLayoutSet.setHorizontalWeight(R.id.toolbar_container, 0.1f)*/
+        }
+
+        fun hideDetachPasswordIcon() {
+            credentialDetachImageView.visibility = View.INVISIBLE
         }
 
         fun listenForShowCredential(event: (position: Int, type: Int) -> Unit) {
@@ -242,11 +259,6 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         }
 
         fun bind(key: SecretKey?, credential: EncCredential, activity: SecureActivity) {
-
-            val enableOverlayFeature = PreferenceUtil.getAsBool(PREF_ENABLE_OVERLAY_FEATURE, true, activity)
-            if (!enableOverlayFeature) {
-                credentialDetachImageView.visibility = View.INVISIBLE
-            }
 
             credentialLabelContainerView.removeAllViews()
 

@@ -68,6 +68,7 @@ object GenerateMasterPasswordTokenUseCase: SecureActivityUseCase {
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE_HEADER, encQrcHeader)
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE, encQrc)
             intent.putExtra(QrCodeActivity.EXTRA_COLOR, Color.BLUE)
+            intent.putExtra(QrCodeActivity.EXTRA_NFC_WITH_APP_RECORD, true)
 
             activity.startActivity(intent)
 

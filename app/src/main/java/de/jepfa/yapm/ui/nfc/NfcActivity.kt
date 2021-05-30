@@ -73,6 +73,7 @@ class NfcActivity : SecureActivity() {
         }
 
         mode = intent.getStringExtra(EXTRA_MODE)
+        val withAppRecord = intent.getBooleanExtra(EXTRA_WITH_APP_RECORD, false)
         if (mode == EXTRA_MODE_RO) {
             nfcExplanationTextView.text = getString(R.string.nfc_explanation_readonly)
             nfcWriteTagButton.visibility = View.GONE
@@ -95,14 +96,14 @@ class NfcActivity : SecureActivity() {
                             .setMessage(R.string.message_write_nfc_tag)
                             .setIcon(android.R.drawable.ic_dialog_alert)
                             .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
-                                writeTag(t)
+                                writeTag(t, withAppRecord)
                                 true
                             }
                             .setNegativeButton(android.R.string.no, null)
                             .show()
                     }
                     else {
-                        writeTag(t)
+                        writeTag(t, withAppRecord)
                     }
                 }
             }
@@ -185,7 +186,7 @@ class NfcActivity : SecureActivity() {
         }
     }
 
-    private fun writeTag(t: WritableTag) {
+    private fun writeTag(t: WritableTag, withAppRecord: Boolean) {
         encData?.let { eD ->
             val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
             val data = SecretService.decryptPassword(tempKey, eD)
@@ -195,7 +196,7 @@ class NfcActivity : SecureActivity() {
                 return
             }
             try {
-                val message = NfcUtil.createNdefMessage(this, data.toByteArray())
+                val message = NfcUtil.createNdefMessage(this, data.toByteArray(), withAppRecord)
                 t.writeData(message)
                 Toast.makeText(this, R.string.nfc_successfully_written, Toast.LENGTH_LONG).show()
                 nfcStatusTextView.text = getString(R.string.nfc_tap_again)
@@ -212,6 +213,7 @@ class NfcActivity : SecureActivity() {
         const val EXTRA_MODE = "mode"
         const val EXTRA_MODE_RO = "readonly"
         const val EXTRA_MODE_RW = "readwrite"
+        const val EXTRA_WITH_APP_RECORD= "withAppRecord"
         const val EXTRA_DATA= "data"
         const val EXTRA_NO_SESSION_CHECK = "noSessionCheck"
         const val EXTRA_SCANNED_NDC_TAG_DATA = "scannedData"

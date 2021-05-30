@@ -32,6 +32,7 @@ object ExportEncMasterPasswordUseCase {
         intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE, encQrc)
         intent.putExtra(QrCodeActivity.EXTRA_COLOR, Color.RED)
         intent.putExtra(QrCodeActivity.EXTRA_NO_SESSION_CHECK, noSessionCheck)
+        intent.putExtra(QrCodeActivity.EXTRA_NFC_WITH_APP_RECORD, true)
         activity.startActivity(intent)
 
         return true

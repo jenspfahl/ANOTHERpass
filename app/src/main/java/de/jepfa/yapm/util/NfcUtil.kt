@@ -5,7 +5,6 @@ import android.content.Intent
 import android.nfc.*
 import android.os.Parcelable
 import android.util.Log
-import android.widget.Toast
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.nfc.NfcActivity
@@ -44,12 +43,17 @@ object NfcUtil {
         }
     }
 
-    fun createNdefMessage(activity: BaseActivity, payload: ByteArray) : NdefMessage{
+    fun createNdefMessage(activity: BaseActivity, payload: ByteArray, withAppRecord: Boolean) : NdefMessage {
         val typeBytes = "appliation/${activity.getApp().packageName}".toByteArray()
-        val r1 = NdefRecord.createApplicationRecord(activity.getApp().packageName)
-        val r2 = NdefRecord(NdefRecord.TNF_MIME_MEDIA, typeBytes, null, payload)
+        val dataRecord = NdefRecord(NdefRecord.TNF_MIME_MEDIA, typeBytes, null, payload)
 
-        return NdefMessage(arrayOf(r1, r2))
+        if (withAppRecord) {
+            val appRecord = NdefRecord.createApplicationRecord(activity.getApp().packageName)
+            return NdefMessage(arrayOf(appRecord, dataRecord))
+        }
+        else {
+            return NdefMessage(dataRecord)
+        }
 
     }
 

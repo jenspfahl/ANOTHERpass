@@ -200,9 +200,14 @@ class EditCredentialPasswordFragment : SecureFragment() {
     private fun updatePasswordView(password: Password) {
         getSecureActivity()?.let {
             generatedPassword = password
-            var spannedString =
-                PasswordColorizer.spannableString(generatedPassword, it)
-            generatedPasswdView.setText(spannedString)
+            if (!generatedPassword.isEmpty()) {
+                var spannedString =
+                    PasswordColorizer.spannableString(generatedPassword, it)
+                generatedPasswdView.setText(spannedString)
+            }
+            else {
+                generatedPasswdView.setText("..")
+            }
         }
     }
 
