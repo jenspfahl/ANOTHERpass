@@ -217,7 +217,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         private val credentialToolbarContainerView: ConstraintLayout = itemView.findViewById(R.id.toolbar_container)
 
         fun hideCopyPasswordIcon() {
-            credentialCopyImageView.visibility = View.INVISIBLE
+            credentialCopyImageView.visibility = View.GONE
             // TODO test if we can shrink the toolbar space on demand
             /*val contraintLayoutSet = ConstraintSet()
             contraintLayoutSet.clone(credentialToolbarContainerView)
@@ -225,7 +225,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         }
 
         fun hideDetachPasswordIcon() {
-            credentialDetachImageView.visibility = View.INVISIBLE
+            credentialDetachImageView.visibility = View.GONE
         }
 
         fun listenForShowCredential(event: (position: Int, type: Int) -> Unit) {

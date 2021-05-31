@@ -35,6 +35,9 @@ class LoginEnterPinFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, null)
 
+        val loginActivity = getBaseActivity() as LoginActivity
+        loginActivity.showTagDetectedMessage = true
+
         val pinTextView: EditText = view.findViewById(R.id.edittext_enter_pin)
         val nextButton = view.findViewById<Button>(R.id.button_login_next)
 
@@ -55,8 +58,6 @@ class LoginEnterPinFragment : BaseFragment() {
 
                 return@setOnClickListener
             }
-
-            val loginActivity = getBaseActivity() as LoginActivity
 
             val encStoredMasterPasswd = PreferenceUtil.getEncrypted(PreferenceUtil.DATA_ENCRYPTED_MASTER_PASSWORD, getBaseActivity())
 

@@ -3,14 +3,11 @@ package de.jepfa.yapm.ui.qrcode
 import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
-import android.nfc.tech.NfcA
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.Session
@@ -20,7 +17,7 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.ExtPermissionChecker
-import de.jepfa.yapm.util.NfcUtil
+import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.util.QRCodeUtil.generateQRCode
 import de.jepfa.yapm.util.getEncryptedExtra
 import de.jepfa.yapm.util.putEncryptedExtra
@@ -92,7 +89,7 @@ class QrCodeActivity : SecureActivity() {
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         val nfcItem = menu?.findItem(R.id.menu_download_as_nfc)
-        if (nfcItem != null && !NfcUtil.isNfcAvailable(this)) {
+        if (nfcItem != null && !NfcService.isNfcAvailable(this)) {
             nfcItem.setVisible(false)
         }
 

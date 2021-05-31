@@ -1,4 +1,4 @@
-package de.jepfa.yapm.ui.nfc
+package de.jepfa.yapm.service.nfc
 
 import android.nfc.FormatException
 import android.nfc.NdefMessage
@@ -13,7 +13,7 @@ import java.util.*
 /**
  * Inspired by https://proandroiddev.com/working-with-nfc-tags-on-android-c1e5af47a3db
  */
-class WritableTag @Throws(FormatException::class) constructor(val tag: Tag, val data: String?) {
+class NdefTag @Throws(FormatException::class) constructor(val tag: Tag, val data: String?) {
     private val NDEF = Ndef::class.java.canonicalName
     private val NDEF_FORMATABLE = NdefFormatable::class.java.canonicalName
 

@@ -1,4 +1,4 @@
-package de.jepfa.yapm.util
+package de.jepfa.yapm.service.nfc
 
 import android.content.Context
 import android.content.Intent
@@ -8,12 +8,11 @@ import android.util.Log
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.nfc.NfcActivity
-import de.jepfa.yapm.ui.nfc.WritableTag
 
 /**
  * Inspired by https://proandroiddev.com/working-with-nfc-tags-on-android-c1e5af47a3db
  */
-object NfcUtil {
+object NfcService {
 
     fun getNfcAdapter(context: Context): NfcAdapter? {
         val nfcManager = context.getSystemService(Context.NFC_SERVICE) as NfcManager
@@ -30,13 +29,13 @@ object NfcUtil {
         return adapter != null && adapter.isEnabled
     }
 
-    fun getWritableTag(intent: Intent): WritableTag? {
-        val tagFromIntent: Tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+    fun getNdefTag(intent: Intent): NdefTag? {
+        val tagFromIntent: Tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG) ?: return null
 
         try {
             val messages = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
             val data = messages?.run { getData(this) }
-            return WritableTag(tagFromIntent, data)
+            return NdefTag(tagFromIntent, data)
         } catch (e: FormatException) {
             Log.e("NFC", "Unsupported tag tapped", e)
             return null
@@ -49,7 +48,7 @@ object NfcUtil {
 
         if (withAppRecord) {
             val appRecord = NdefRecord.createApplicationRecord(activity.getApp().packageName)
-            return NdefMessage(arrayOf(appRecord, dataRecord))
+            return NdefMessage(arrayOf(dataRecord, appRecord))
         }
         else {
             return NdefMessage(dataRecord)

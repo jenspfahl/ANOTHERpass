@@ -3,7 +3,6 @@ package de.jepfa.yapm.ui.importvault
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -20,7 +19,7 @@ import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.usecase.ImportVaultUseCase
 import de.jepfa.yapm.util.AsyncWithProgressBar
-import de.jepfa.yapm.util.NfcUtil
+import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.util.QRCodeUtil
 
 class ImportVaultImportFileFragment : BaseFragment() {
@@ -52,11 +51,11 @@ class ImportVaultImportFileFragment : BaseFragment() {
         }
 
         val scanNfcImageView: ImageView = view.findViewById(R.id.imageview_scan_nfc)
-        if (!NfcUtil.isNfcAvailable(getBaseActivity())) {
+        if (!NfcService.isNfcAvailable(getBaseActivity())) {
             scanNfcImageView.visibility = View.GONE
         }
         scanNfcImageView.setOnClickListener {
-            NfcUtil.scanNfcTag(this)
+            NfcService.scanNfcTag(this)
             true
         }
 

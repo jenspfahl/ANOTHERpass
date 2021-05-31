@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Build
 import de.jepfa.yapm.BuildConfig
 import de.jepfa.yapm.database.YapmDatabase
+import de.jepfa.yapm.service.nfc.NfcService
 
 object DebugInfo {
 
@@ -42,8 +43,8 @@ object DebugInfo {
         sb.addLabelLine("Model", Build.MODEL)
         sb.addLabelLine("Id", Build.ID)
         sb.addLabelLine("Product", Build.PRODUCT)
-        sb.addLabelLine("NFC available", NfcUtil.isNfcAvailable(context))
-        sb.addLabelLine("NFC enabled", NfcUtil.isNfcEnabled(context))
+        sb.addLabelLine("NFC available", NfcService.isNfcAvailable(context))
+        sb.addLabelLine("NFC enabled", NfcService.isNfcEnabled(context))
 
         sb.append("\n************ FIRMWARE ************\n")
         sb.addLabelLine("SDK", Build.VERSION.SDK)

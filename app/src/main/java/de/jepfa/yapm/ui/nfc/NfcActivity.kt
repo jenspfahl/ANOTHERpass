@@ -1,11 +1,6 @@
 package de.jepfa.yapm.ui.nfc
 
 import android.app.AlertDialog
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
-import android.nfc.NfcAdapter
-import android.nfc.NfcManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -16,21 +11,17 @@ import android.widget.Toast
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.service.nfc.NdefTag
 import de.jepfa.yapm.service.secret.SecretService
-import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.ui.credential.ListCredentialsActivity
-import de.jepfa.yapm.util.DebugInfo
-import de.jepfa.yapm.util.NfcUtil
+import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.util.getEncryptedExtra
 
 
 /**
  * Inspired by https://proandroiddev.com/working-with-nfc-tags-on-android-c1e5af47a3db
  */
-class NfcActivity : SecureActivity() {
+class NfcActivity : NfcBaseActivity() {
 
-    private var adapter: NfcAdapter? = null
-    private var tag: WritableTag? = null
     private var encData: Encrypted? = null
     private var mode: String? = null
     private lateinit var nfcStatusTextView: TextView
@@ -56,13 +47,13 @@ class NfcActivity : SecureActivity() {
         val nfcWriteTagButton: Button = findViewById(R.id.button_write_nfc_tag)
 
         nfcImageView.setOnClickListener {
-            tag?.let {
+            ndefTag?.let {tag ->
                 val text =
-                    "UUD=${it.tagId} \n" +
-                            "size=${it.getSize()} \n" +
-                            "maxSize=${it.getMaxSize()} \n" +
-                            "freeSize=${it.getFreeSize()} \n" +
-                            "data: ${it.data}"
+                    "UUD=${tag.tagId} \n" +
+                            "size=${tag.getSize()} \n" +
+                            "maxSize=${tag.getMaxSize()} \n" +
+                            "freeSize=${tag.getFreeSize()} \n" +
+                            "data: ${tag.data}"
 
                 AlertDialog.Builder(this)
                     .setTitle("NFC tag content")
@@ -84,11 +75,11 @@ class NfcActivity : SecureActivity() {
             nfcExplanationTextView.text = getString(R.string.nfc_explanation_readwrite)
             title = getString(R.string.title_write_nfc_tag)
             nfcWriteTagButton.setOnClickListener {
-                if (tag == null) {
+                if (ndefTag == null) {
                     Toast.makeText(this, R.string.nfc_tapping_needed, Toast.LENGTH_LONG).show()
                 }
 
-                tag?.let { t ->
+                ndefTag?.let { t ->
                     val size = t.getSize()
                     if (size != null && size > 0) {
                         AlertDialog.Builder(this)
@@ -109,42 +100,33 @@ class NfcActivity : SecureActivity() {
             }
         }
 
-        initNfcAdapter()
+        if (nfcAdapter == null) {
+            Toast.makeText(this, "NFC not supported by your device", Toast.LENGTH_LONG).show()
+        }
+        else if (nfcAdapter?.isEnabled == false) {
+            Toast.makeText(this, "Enable NFC to use this feature", Toast.LENGTH_LONG).show()
+        }
     }
 
     override fun lock() {
         recreate()
     }
 
-    override fun onResume() {
-        super.onResume()
-        enableNfcForegroundDispatch()
-    }
-
-    override fun onPause() {
-        tag?.close()
-        disableNfcForegroundDispatch()
-        super.onPause()
-    }
-
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        intent?.let {
-            tag = NfcUtil.getWritableTag(intent)
-            val tData = tag?.data
-            if (mode == EXTRA_MODE_RO && tData != null) {
-                intent.putExtra(EXTRA_SCANNED_NDC_TAG_DATA, tData)
-                setResult(ACTION_READ_NFC_TAG, intent)
-                finish()
-            }
-            else {
-                updateView()
-            }
+    override fun handleTag() {
+        val tData = ndefTag?.data
+        if (mode == EXTRA_MODE_RO && tData != null) {
+            nfcStatusTextView.text = getString(R.string.nfc_tag_detected)
+            intent.putExtra(EXTRA_SCANNED_NDC_TAG_DATA, tData)
+            setResult(ACTION_READ_NFC_TAG, intent)
+            finish()
+        }
+        else {
+            updateView()
         }
     }
 
     private fun updateView() {
-        tag?.let {
+        ndefTag?.let {
             val size = it.getSize()
             if (size == null) {
                 nfcStatusTextView.text = getString(R.string.nfc_tag_detected)
@@ -158,35 +140,7 @@ class NfcActivity : SecureActivity() {
         }
     }
 
-    private fun initNfcAdapter() {
-        adapter = NfcUtil.getNfcAdapter(this)
-        if (adapter == null) {
-            Toast.makeText(this, "NFC not supported by your device", Toast.LENGTH_LONG).show()
-        }
-        else if (adapter?.isEnabled == false) {
-            Toast.makeText(this, "Enable NFC to use this feature", Toast.LENGTH_LONG).show()
-        }
-    }
-
-    private fun enableNfcForegroundDispatch() {
-        try {
-            val intent = Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            val nfcPendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
-            adapter?.enableForegroundDispatch(this, nfcPendingIntent, null, null)
-        } catch (ex: IllegalStateException) {
-            Log.e("NFC", "Error enabling NFC foreground dispatch", ex)
-        }
-    }
-
-    private fun disableNfcForegroundDispatch() {
-        try {
-            adapter?.disableForegroundDispatch(this)
-        } catch (ex: IllegalStateException) {
-            Log.e("NFC", "Error disabling NFC foreground dispatch", ex)
-        }
-    }
-
-    private fun writeTag(t: WritableTag, withAppRecord: Boolean) {
+    private fun writeTag(t: NdefTag, withAppRecord: Boolean) {
         encData?.let { eD ->
             val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
             val data = SecretService.decryptPassword(tempKey, eD)
@@ -196,7 +150,7 @@ class NfcActivity : SecureActivity() {
                 return
             }
             try {
-                val message = NfcUtil.createNdefMessage(this, data.toByteArray(), withAppRecord)
+                val message = NfcService.createNdefMessage(this, data.toByteArray(), withAppRecord)
                 t.writeData(message)
                 Toast.makeText(this, R.string.nfc_successfully_written, Toast.LENGTH_LONG).show()
                 nfcStatusTextView.text = getString(R.string.nfc_tap_again)

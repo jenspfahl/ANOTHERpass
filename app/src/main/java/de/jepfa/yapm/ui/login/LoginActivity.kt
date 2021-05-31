@@ -4,17 +4,19 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.Toast
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
-import de.jepfa.yapm.ui.BaseActivity
+import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.ui.importvault.ImportVaultActivity
+import de.jepfa.yapm.ui.nfc.NfcBaseActivity
 import de.jepfa.yapm.usecase.DropVaultUseCase
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.PreferenceUtil
@@ -24,13 +26,19 @@ import de.jepfa.yapm.util.PreferenceUtil.PREF_SELF_DESTRUCTION
 import de.jepfa.yapm.util.PreferenceUtil.STATE_LOGIN_ATTEMPTS
 
 
-class LoginActivity : BaseActivity() {
+class LoginActivity : NfcBaseActivity() {
 
     val DEFAULT_MAX_LOGIN_ATTEMPTS = 3
     var loginAttempts = 0
+    var showTagDetectedMessage = false
 
     val createVaultActivityRequestCode = 1
     val importVaultActivityRequestCode = 2
+
+
+    init {
+        checkSession = false
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(null)
@@ -39,6 +47,9 @@ class LoginActivity : BaseActivity() {
 
         if (PreferenceUtil.isPresent(DATA_ENCRYPTED_MASTER_KEY, this)) {
             setContentView(R.layout.activity_login)
+            nfcAdapter = NfcService.getNfcAdapter(this)
+            readTagFromIntent(intent) // TODO tag data is not at intent here because of missing foreground dispatch
+
         }
         else {
             setContentView(R.layout.activity_create_or_import_vault)
@@ -116,6 +127,17 @@ class LoginActivity : BaseActivity() {
             finishAffinity()
             finishAndRemoveTask()
         }
+    }
+
+    override fun handleTag() {
+        Log.i("LOGIN", "tag detected " + ndefTag?.tagId)
+        if (ndefTag != null && showTagDetectedMessage) {
+            Toast.makeText(this, "NFC Tag for login detected.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    override fun lock() {
+
     }
 
     fun getLoginAttemptMessage(): String {

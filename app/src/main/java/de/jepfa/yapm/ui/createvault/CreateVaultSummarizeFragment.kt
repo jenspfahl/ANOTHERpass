@@ -10,6 +10,7 @@ import android.widget.*
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.SecretService.ALIAS_KEY_TRANSPORT
 import de.jepfa.yapm.service.secret.SecretService.decryptPassword
 import de.jepfa.yapm.service.secret.SecretService.encryptPassword
@@ -60,7 +61,7 @@ class CreateVaultSummarizeFragment : BaseFragment() {
             ExportEncMasterPasswordUseCase.execute(encMasterPasswd, true, getBaseActivity())
         }
         val exportAsNfcImageView: ImageView = view.findViewById(R.id.imageview_nfc_tag)
-        if (!NfcUtil.isNfcAvailable(getBaseActivity())) {
+        if (!NfcService.isNfcAvailable(getBaseActivity())) {
             exportAsNfcImageView.visibility = View.GONE
         }
         exportAsNfcImageView.setOnClickListener {
