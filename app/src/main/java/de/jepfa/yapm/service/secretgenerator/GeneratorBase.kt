@@ -17,8 +17,6 @@ abstract class GeneratorBase<T : GeneratorSpec> {
     abstract fun calcCombinationCount(spec: T): Double
 
     fun calcBruteForceWaitingSeconds(combinations: Double, tryPerSec: Int): Double {
-        val seconds = combinations / tryPerSec
-
-        return seconds;
+        return combinations / tryPerSec
     }
 }

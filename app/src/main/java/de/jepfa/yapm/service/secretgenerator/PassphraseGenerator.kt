@@ -8,7 +8,8 @@ class PassphraseGenerator: GeneratorBase<PassphraseGeneratorSpec>() {
     private val CONSONANTS = "bcdfghjklmnpqrstvwxz"
     private val ALPHABET = VOCALS + CONSONANTS
     private val DIGITS = "1234567890"
-    private val SPECIAL_CHARS = ".:!?"
+    private val SPECIAL_CHARS = "!?-,.:/$%&@#"
+
 
     override fun generate(spec: PassphraseGeneratorSpec): Password {
         var buffer = Password(CharArray(0));

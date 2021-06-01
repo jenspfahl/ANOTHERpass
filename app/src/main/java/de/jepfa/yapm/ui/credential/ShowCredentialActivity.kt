@@ -244,11 +244,11 @@ class ShowCredentialActivity : SecureActivity() {
                         chipView.setChipBackgroundColor(it.labelChip.getColor(this))
                         chipView.setLabelColor(getColor(R.color.white))
                         chipView.setPadding(16)
-                        titleLayout.addView(chipView, idx)
                         chipView.setOnChipClicked {_ ->
                             LabelDialogUtil.openLabelDialog(this, it)
                             true
                         }
+                        titleLayout.addView(chipView, idx)
                     }
                 }
                 else {

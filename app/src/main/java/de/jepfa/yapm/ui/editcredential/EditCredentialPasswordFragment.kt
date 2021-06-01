@@ -37,6 +37,8 @@ class EditCredentialPasswordFragment : SecureFragment() {
     private val passphraseGenerator = PassphraseGenerator()
     private val passwordGenerator = PasswordGenerator()
 
+    private var passwordCombinations: Double? = null
+
     init {
         enableBack = true
         backToPreviousFragment = true
@@ -70,7 +72,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 originCredential = it
                 masterSecretKey?.let{ key ->
                     val password = SecretService.decryptPassword(key, it.password)
-                    updatePasswordView(password)
+                    updatePasswordView(password, guessPasswordCombinations = true)
                 }
             })
         }
@@ -96,7 +98,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
         val buttonGeneratePasswd: Button = view.findViewById(R.id.button_generate_passwd)
         buttonGeneratePasswd.setOnClickListener {
             val password = generatePassword()
-            updatePasswordView(password)
+            updatePasswordView(password, guessPasswordCombinations = false)
         }
 
         generatedPasswdView.setOnLongClickListener {
@@ -110,7 +112,8 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 .setMessage(R.string.edit_password_message)
                 .setView(input)
                 .setPositiveButton(android.R.string.ok) { dialog, which ->
-                    updatePasswordView(Password(input.text.toString()))
+                    val password = Password(input.text.toString())
+                    updatePasswordView(password, guessPasswordCombinations = true)
                 }
                 .setNegativeButton(android.R.string.cancel) { dialog, which ->
                     dialog.cancel()
@@ -121,42 +124,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
         }
 
         generatedPasswdView.setOnClickListener {
-
-            val combinations = if (isPassphraseSelected()) {
-                passphraseGenerator.calcCombinationCount(buildPassphraseGeneratorSpec())
-            }
-            else {
-                passwordGenerator.calcCombinationCount(buildPasswordGeneratorSpec())
-            }
-
-            val bruteForceWithPentium = passphraseGenerator.calcBruteForceWaitingSeconds(
-                combinations, GeneratorBase.BRUTEFORCE_ATTEMPTS_PENTIUM
-            )
-            val bruteForceWithSupercomp = passphraseGenerator.calcBruteForceWaitingSeconds(
-                combinations, GeneratorBase.BRUTEFORCE_ATTEMPTS_SUPERCOMP
-            )
-            AlertDialog.Builder(it.context)
-                .setTitle("Password strength")
-                .setMessage("Combinations: " +
-                        System.lineSeparator() +
-                        "${combinations.toReadableFormat(0)}" +
-                        System.lineSeparator() +
-                        "($combinations)" +
-                        System.lineSeparator() +
-                        System.lineSeparator() +
-                        "Years to brute force with a usual PC: " +
-                        System.lineSeparator() +
-                        "${bruteForceWithPentium.secondsToYear().toReadableFormat(0)}" +
-                        System.lineSeparator() +
-                        "(${bruteForceWithPentium.secondsToYear()})" +
-                        System.lineSeparator() +
-                        System.lineSeparator() +
-                        "Years to brute force with a super computer: " +
-                        System.lineSeparator() +
-                        "${bruteForceWithSupercomp.secondsToYear().toReadableFormat(0)}" +
-                        System.lineSeparator() +
-                        "(${bruteForceWithSupercomp.secondsToYear()})")
-                .show()
+            showPasswordStrength()
         }
 
         val buttonSave: Button = view.findViewById(R.id.button_save)
@@ -197,16 +165,77 @@ class EditCredentialPasswordFragment : SecureFragment() {
         }
     }
 
-    private fun updatePasswordView(password: Password) {
+    private fun guessPasswordCombinations(password: Password) {
+        // rudimentary combination calculation by assuming a-Z, A-Z, 0-9 and 10 potential special chars
+        passwordCombinations = Math.pow(
+            (26 + 26 + 10 + 10).toDouble(),
+            password.length.toDouble()
+        )
+    }
+
+    private fun calcPasswordStrength() {
+        passwordCombinations = if (isPassphraseSelected()) {
+            passphraseGenerator.calcCombinationCount(buildPassphraseGeneratorSpec())
+        } else {
+            passwordGenerator.calcCombinationCount(buildPasswordGeneratorSpec())
+        }
+
+    }
+
+    private fun showPasswordStrength() {
+        val combinations = passwordCombinations
+        if (combinations != null) {
+            val bruteForceWithPentium = passphraseGenerator.calcBruteForceWaitingSeconds(
+                combinations, GeneratorBase.BRUTEFORCE_ATTEMPTS_PENTIUM
+            )
+            val bruteForceWithSupercomp = passphraseGenerator.calcBruteForceWaitingSeconds(
+                combinations, GeneratorBase.BRUTEFORCE_ATTEMPTS_SUPERCOMP
+            )
+
+            AlertDialog.Builder(context)
+                .setTitle("Password strength")
+                .setMessage(
+                    "Combinations: " +
+                            System.lineSeparator() +
+                            "${combinations.toReadableFormat(0)}" +
+                            System.lineSeparator() +
+                            "($combinations)" +
+                            System.lineSeparator() +
+                            System.lineSeparator() +
+                            "Years to brute force with a usual PC: " +
+                            System.lineSeparator() +
+                            "${bruteForceWithPentium.secondsToYear().toReadableFormat(0)}" +
+                            System.lineSeparator() +
+                            "(${bruteForceWithPentium.secondsToYear()})" +
+                            System.lineSeparator() +
+                            System.lineSeparator() +
+                            "Years to brute force with a super computer: " +
+                            System.lineSeparator() +
+                            "${bruteForceWithSupercomp.secondsToYear().toReadableFormat(0)}" +
+                            System.lineSeparator() +
+                            "(${bruteForceWithSupercomp.secondsToYear()})"
+                )
+                .show()
+        }
+    }
+
+    private fun updatePasswordView(password: Password, guessPasswordCombinations: Boolean) {
         getSecureActivity()?.let {
             generatedPassword = password
             if (!generatedPassword.isEmpty()) {
                 var spannedString =
                     PasswordColorizer.spannableString(generatedPassword, it)
                 generatedPasswdView.setText(spannedString)
+                if (guessPasswordCombinations) {
+                    guessPasswordCombinations(password)
+                }
+                else {
+                    calcPasswordStrength()
+                }
             }
             else {
                 generatedPasswdView.setText("..")
+                passwordCombinations = null
             }
         }
     }
@@ -353,7 +382,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                     Toast.makeText(activity, "Nothing to restore", Toast.LENGTH_LONG).show()
                 }
                 else {
-                    updatePasswordView(lastPasswd)
+                    updatePasswordView(lastPasswd, guessPasswordCombinations = true)
                 }
             }
 

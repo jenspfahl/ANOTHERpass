@@ -53,6 +53,7 @@ fun Double.toReadableFormat(scale: Int): String {
     return BigDecimal(this).setScale(scale, RoundingMode.HALF_EVEN).toString()
 }
 
+
 fun Double.secondsToYear(): Double {
     return this / 60 / 60 / 24 / 365
 }
