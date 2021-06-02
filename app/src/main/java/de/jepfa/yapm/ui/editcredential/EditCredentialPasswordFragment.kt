@@ -167,8 +167,11 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
     private fun guessPasswordCombinations(password: Password) {
         // rudimentary combination calculation by assuming a-Z, A-Z, 0-9 and 10 potential special chars
+        val containsLowerCase = if (password.toString().contains(Regex("[a-z]"))) 26 else 0
+        val containsUpperCase = if (password.toString().contains(Regex("[A-Z]"))) 26 else 0
+        val containsDigits = if (password.toString().contains(Regex("[0-9]"))) 10 else 0
         passwordCombinations = Math.pow(
-            (26 + 26 + 10 + 10).toDouble(),
+            (containsLowerCase + containsUpperCase + containsDigits + 10).toDouble(),
             password.length.toDouble()
         )
     }
