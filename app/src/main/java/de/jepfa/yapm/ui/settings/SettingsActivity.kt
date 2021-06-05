@@ -8,7 +8,7 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.service.nfc.NfcService
-import de.jepfa.yapm.util.PreferenceUtil
+import de.jepfa.yapm.service.PreferenceService
 
 private const val TITLE_TAG = "settingsActivityTitle"
 
@@ -97,9 +97,9 @@ class SettingsActivity : SecureActivity(),
             setPreferencesFromResource(R.xml.login_preferences, rootKey)
 
             val qrcPref = findPreference<SwitchPreferenceCompat>(
-                PreferenceUtil.PREF_FAST_MASTERPASSWD_LOGIN_WITH_QRC)
+                PreferenceService.PREF_FAST_MASTERPASSWD_LOGIN_WITH_QRC)
             val nfcPref = findPreference<SwitchPreferenceCompat>(
-                PreferenceUtil.PREF_FAST_MASTERPASSWD_LOGIN_WITH_NFC)
+                PreferenceService.PREF_FAST_MASTERPASSWD_LOGIN_WITH_NFC)
 
             qrcPref?.let {
                 it.setOnPreferenceChangeListener { preference, newValue ->
@@ -127,14 +127,14 @@ class SettingsActivity : SecureActivity(),
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.security_preferences, rootKey)
 
-            findPreference<ListPreference>(PreferenceUtil.PREF_LOCK_TIMEOUT)?.let {
+            findPreference<ListPreference>(PreferenceService.PREF_LOCK_TIMEOUT)?.let {
                 it.setOnPreferenceChangeListener { preference, newValue ->
                     Session.setLockTimeout(newValue.toString().toInt())
                     true
                 }
             }
 
-            findPreference<ListPreference>(PreferenceUtil.PREF_LOGOUT_TIMEOUT)?.let {
+            findPreference<ListPreference>(PreferenceService.PREF_LOGOUT_TIMEOUT)?.let {
                 it.setOnPreferenceChangeListener { preference, newValue ->
                     Session.setLogoutTimeout(newValue.toString().toInt())
                     true
@@ -159,7 +159,7 @@ class SettingsActivity : SecureActivity(),
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.clipboard_preferences, rootKey)
 
-            findPreference<Preference>(PreferenceUtil.ACTION_TEST_COPY_PASSWORD)?.let {
+            findPreference<Preference>(PreferenceService.ACTION_TEST_COPY_PASSWORD)?.let {
                 it.setOnPreferenceClickListener { preference ->
                     activity?.let { activity -> ClipboardUtil.copyTestPasteConsumer(activity.applicationContext) }
                     true

@@ -19,11 +19,11 @@ import de.jepfa.yapm.ui.importvault.ImportVaultActivity
 import de.jepfa.yapm.ui.nfc.NfcBaseActivity
 import de.jepfa.yapm.usecase.DropVaultUseCase
 import de.jepfa.yapm.util.Constants
-import de.jepfa.yapm.util.PreferenceUtil
-import de.jepfa.yapm.util.PreferenceUtil.DATA_ENCRYPTED_MASTER_KEY
-import de.jepfa.yapm.util.PreferenceUtil.PREF_MAX_LOGIN_ATTEMPTS
-import de.jepfa.yapm.util.PreferenceUtil.PREF_SELF_DESTRUCTION
-import de.jepfa.yapm.util.PreferenceUtil.STATE_LOGIN_ATTEMPTS
+import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_KEY
+import de.jepfa.yapm.service.PreferenceService.PREF_MAX_LOGIN_ATTEMPTS
+import de.jepfa.yapm.service.PreferenceService.PREF_SELF_DESTRUCTION
+import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_ATTEMPTS
 
 
 class LoginActivity : NfcBaseActivity() {
@@ -43,9 +43,9 @@ class LoginActivity : NfcBaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(null)
 
-        loginAttempts = PreferenceUtil.getAsInt(STATE_LOGIN_ATTEMPTS, 0, this)
+        loginAttempts = PreferenceService.getAsInt(STATE_LOGIN_ATTEMPTS, 0, this)
 
-        if (PreferenceUtil.isPresent(DATA_ENCRYPTED_MASTER_KEY, this)) {
+        if (PreferenceService.isPresent(DATA_ENCRYPTED_MASTER_KEY, this)) {
             setContentView(R.layout.activity_login)
             nfcAdapter = NfcService.getNfcAdapter(this)
             readTagFromIntent(intent) // TODO tag data is not at intent here because of missing foreground dispatch
@@ -110,9 +110,9 @@ class LoginActivity : NfcBaseActivity() {
 
     fun handleFailedLoginAttempt() {
         loginAttempts++
-        PreferenceUtil.put(STATE_LOGIN_ATTEMPTS, loginAttempts.toString(), this)
+        PreferenceService.put(STATE_LOGIN_ATTEMPTS, loginAttempts.toString(), this)
         if (loginAttempts >= getMaxLoginAttempts()) {
-            val selfDestruction = PreferenceUtil.getAsBool(PREF_SELF_DESTRUCTION, false, this)
+            val selfDestruction = PreferenceService.getAsBool(PREF_SELF_DESTRUCTION, false, this)
 
             if (selfDestruction) {
                 Toast.makeText(baseContext, R.string.too_may_wrong_logins_self_destruction, Toast.LENGTH_LONG).show()
@@ -120,8 +120,8 @@ class LoginActivity : NfcBaseActivity() {
             }
             else {
                 Toast.makeText(baseContext, R.string.too_may_wrong_logins, Toast.LENGTH_LONG).show()
-                PreferenceUtil.delete(PreferenceUtil.DATA_ENCRYPTED_MASTER_PASSWORD, baseContext)
-                PreferenceUtil.delete(PreferenceUtil.DATA_MASTER_PASSWORD_TOKEN_KEY, baseContext)
+                PreferenceService.delete(PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD, baseContext)
+                PreferenceService.delete(PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY, baseContext)
             }
             Session.logout()
             finishAffinity()
@@ -146,7 +146,7 @@ class LoginActivity : NfcBaseActivity() {
 
     fun loginSuccessful() {
         loginAttempts = 0
-        PreferenceUtil.delete(STATE_LOGIN_ATTEMPTS, this)
+        PreferenceService.delete(STATE_LOGIN_ATTEMPTS, this)
 
         val isFromAutofill = intent.getBooleanExtra(SecureActivity.SecretChecker.fromAutofill, false)
         if (isFromAutofill) {
@@ -160,6 +160,6 @@ class LoginActivity : NfcBaseActivity() {
     }
 
     private fun getMaxLoginAttempts(): Int {
-        return PreferenceUtil.getAsInt(PREF_MAX_LOGIN_ATTEMPTS, DEFAULT_MAX_LOGIN_ATTEMPTS, this)
+        return PreferenceService.getAsInt(PREF_MAX_LOGIN_ATTEMPTS, DEFAULT_MAX_LOGIN_ATTEMPTS, this)
     }
 }

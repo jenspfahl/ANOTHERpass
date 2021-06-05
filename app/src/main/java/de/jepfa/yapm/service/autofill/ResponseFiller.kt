@@ -21,8 +21,8 @@ import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
-import de.jepfa.yapm.util.PreferenceUtil
-import de.jepfa.yapm.util.PreferenceUtil.PREF_AUTOFILL_EVERYWHERE
+import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_EVERYWHERE
 
 
 object ResponseFiller {
@@ -97,13 +97,13 @@ object ResponseFiller {
         }
 
         val vaultPresent =
-            PreferenceUtil.isPresent(PreferenceUtil.DATA_ENCRYPTED_MASTER_KEY, context)
+            PreferenceService.isPresent(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, context)
         if (!vaultPresent) {
             Log.i("CFS", "No vault created or imported")
             return null
         }
 
-        val suggestEverywhere = PreferenceUtil.getAsBool(PREF_AUTOFILL_EVERYWHERE, true, context)
+        val suggestEverywhere = PreferenceService.getAsBool(PREF_AUTOFILL_EVERYWHERE, true, context)
         val fields = identifyFields(structure, cancellationSignal, suggestEverywhere) ?: return null
 
         val key = Session.getMasterKeySK()

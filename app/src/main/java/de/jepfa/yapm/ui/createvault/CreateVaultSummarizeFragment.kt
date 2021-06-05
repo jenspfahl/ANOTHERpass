@@ -15,6 +15,7 @@ import de.jepfa.yapm.service.secret.SecretService.ALIAS_KEY_TRANSPORT
 import de.jepfa.yapm.service.secret.SecretService.decryptPassword
 import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
+import de.jepfa.yapm.ui.AsyncWithProgressBar
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER_PASSWD
 import de.jepfa.yapm.ui.nfc.NfcActivity

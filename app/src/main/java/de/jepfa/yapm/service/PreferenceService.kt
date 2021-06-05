@@ -1,10 +1,10 @@
-package de.jepfa.yapm.util
+package de.jepfa.yapm.service
 
 import android.content.Context
 import androidx.preference.PreferenceManager
 import de.jepfa.yapm.model.encrypted.Encrypted
 
-object PreferenceUtil {
+object PreferenceService {
 
     private const val PREF_PREFIX = "YAPM/pref:"
     private const val DATA_PREFIX = "YAPM/data:"

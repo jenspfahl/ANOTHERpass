@@ -29,7 +29,7 @@
     <string name="EASY">Easy</string>
     <string name="NORMAL">Normal</string>
     <string name="STRONG">Strong</string>
-    <string name="SUPER_STRONG">Ultra</string>
+    <string name="ULTRA">Ultra</string>
     <string name="EXTREME">Extreme</string>
 
     <string name="change">Change</string>
@@ -190,6 +190,7 @@
     <string name="edit_password">Edit password</string>
     <string name="edit_password_message">Here you can change the password manually which is not supposed by the app.</string>
     <string name="pref_header_overlay">Password overlay dialog</string>
+    <string name="HYPER">Hyper</string>
 
 
 </resources>

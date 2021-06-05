@@ -1,16 +1,12 @@
 package de.jepfa.yapm.service.secret
 
-import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
-import android.util.Base64
 import android.util.Log
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.Validable.Companion.FAILED_BYTE_ARRAY
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.secret.Password
-import de.jepfa.yapm.ui.BaseActivity
-import de.jepfa.yapm.util.PreferenceUtil
 import java.security.*
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator

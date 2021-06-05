@@ -16,9 +16,9 @@ import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.util.PasswordColorizer
-import de.jepfa.yapm.util.PreferenceUtil
-import de.jepfa.yapm.util.PreferenceUtil.PREF_PASSWD_WORDS_ON_NL
-import de.jepfa.yapm.util.PreferenceUtil.PREF_TRANSPARENT_OVERLAY
+import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.PREF_PASSWD_WORDS_ON_NL
+import de.jepfa.yapm.service.PreferenceService.PREF_TRANSPARENT_OVERLAY
 import de.jepfa.yapm.util.getEncryptedExtra
 
 
@@ -55,7 +55,7 @@ class OverlayShowingService : Service(), OnTouchListener {
                 password = SecretService.decryptPassword(transSK, encrypted)
 
                 val multiLineDefault =
-                    PreferenceUtil.getAsBool(PREF_PASSWD_WORDS_ON_NL, false, this)
+                    PreferenceService.getAsBool(PREF_PASSWD_WORDS_ON_NL, false, this)
                 multiLine = intent.getBooleanExtra(DetachHelper.EXTRA_MULTILINE, multiLineDefault)
 
                 paintIt()
@@ -76,7 +76,7 @@ class OverlayShowingService : Service(), OnTouchListener {
         overlayedButton?.apply {
             setAllCaps(false)
             setPadding(24, 12, 24, 12)
-            val isTransparent = PreferenceUtil.getAsBool(PREF_TRANSPARENT_OVERLAY, true, this@OverlayShowingService)
+            val isTransparent = PreferenceService.getAsBool(PREF_TRANSPARENT_OVERLAY, true, this@OverlayShowingService)
             if (isTransparent) {
                 setBackgroundColor(0x77feccff)
             }

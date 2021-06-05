@@ -9,7 +9,7 @@ import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
-import de.jepfa.yapm.util.PreferenceUtil
+import de.jepfa.yapm.service.PreferenceService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -26,7 +26,7 @@ object ImportVaultUseCase {
             val keyForMK = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
             val encEncryptedMasterKey = SecretService.encryptEncrypted(keyForMK, Encrypted.fromBase64String(encMasterKey!!))
 
-            PreferenceUtil.putEncrypted(PreferenceUtil.DATA_ENCRYPTED_MASTER_KEY, encEncryptedMasterKey, activity)
+            PreferenceService.putEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, encEncryptedMasterKey, activity)
         }
 
         val credentialsJson = jsonContent.getAsJsonArray(FileIOService.JSON_CREDENTIALS)

@@ -33,6 +33,7 @@ import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
 import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.service.label.LabelFilter
@@ -50,7 +51,7 @@ import de.jepfa.yapm.ui.settings.SettingsActivity
 import de.jepfa.yapm.usecase.*
 import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.DebugInfo.getVersionName
-import de.jepfa.yapm.util.PreferenceUtil.DATA_ENCRYPTED_MASTER_PASSWORD
+import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
 
 class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationItemSelectedListener  {
 
@@ -498,7 +499,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
     }
 
     private fun refreshMenuMasterPasswordItem(menu: Menu) {
-        val storedMasterPasswdPresent = PreferenceUtil.isPresent(
+        val storedMasterPasswdPresent = PreferenceService.isPresent(
             DATA_ENCRYPTED_MASTER_PASSWORD,
             this
         )

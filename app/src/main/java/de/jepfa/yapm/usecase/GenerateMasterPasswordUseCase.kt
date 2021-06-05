@@ -18,7 +18,7 @@ object GenerateMasterPasswordUseCase {
         else {
             return passwordGenerator.generate(
                     PasswordGeneratorSpec(
-                            strength = PasswordStrength.SUPER_STRONG))
+                            strength = PasswordStrength.ULTRA))
         }
 
     }

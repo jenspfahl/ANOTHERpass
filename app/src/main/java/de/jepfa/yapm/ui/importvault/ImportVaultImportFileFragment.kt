@@ -18,7 +18,7 @@ import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.usecase.ImportVaultUseCase
-import de.jepfa.yapm.util.AsyncWithProgressBar
+import de.jepfa.yapm.ui.AsyncWithProgressBar
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.util.QRCodeUtil
 

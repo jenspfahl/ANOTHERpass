@@ -1,4 +1,4 @@
-package de.jepfa.yapm.util
+package de.jepfa.yapm.ui
 
 import android.os.AsyncTask
 import android.util.Log

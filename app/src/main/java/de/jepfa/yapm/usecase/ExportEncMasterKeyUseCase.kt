@@ -4,13 +4,13 @@ import android.content.Intent
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
-import de.jepfa.yapm.util.PreferenceUtil
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.util.putEncryptedExtra
 
 object ExportEncMasterKeyUseCase: SecureActivityUseCase {
 
     override fun execute(activity: SecureActivity): Boolean {
-        val encStoredMasterKey = PreferenceUtil.getEncrypted(PreferenceUtil.DATA_ENCRYPTED_MASTER_KEY, activity)
+        val encStoredMasterKey = PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, activity)
         val key = activity.masterSecretKey
         if (key != null && encStoredMasterKey != null) {
 

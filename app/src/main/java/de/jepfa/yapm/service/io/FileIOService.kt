@@ -15,13 +15,13 @@ import com.google.gson.reflect.TypeToken
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.Constants.SDF_DT_MEDIUM
 import java.lang.reflect.Type
-import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -133,7 +133,7 @@ class FileIOService: IntentService("FileIOService") {
         }
 
         if (includeMasterkey) {
-            val encStoredMasterKey = PreferenceUtil.getEncrypted(PreferenceUtil.DATA_ENCRYPTED_MASTER_KEY, this)
+            val encStoredMasterKey = PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, this)
             if (encStoredMasterKey != null) {
 
                 val mkKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)

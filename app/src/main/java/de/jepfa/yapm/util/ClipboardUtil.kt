@@ -9,14 +9,15 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.provider.PasteContentProvider
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.util.PreferenceUtil.PREF_WARN_BEFORE_COPY_TO_CB
+import de.jepfa.yapm.service.PreferenceService.PREF_WARN_BEFORE_COPY_TO_CB
 
 object ClipboardUtil {
 
     fun copyEncPasswordWithCheck(encPassword: Encrypted, activity: SecureActivity) {
-        val warn = PreferenceUtil.getAsBool(PREF_WARN_BEFORE_COPY_TO_CB, true, activity)
+        val warn = PreferenceService.getAsBool(PREF_WARN_BEFORE_COPY_TO_CB, true, activity)
         if (warn) {
             AlertDialog.Builder(activity)
                 .setTitle("Copy password")

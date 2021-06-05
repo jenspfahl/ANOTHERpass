@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.view.MenuItem
 import android.widget.*
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
@@ -14,12 +13,11 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.ChangeMasterPasswordUseCase
 import de.jepfa.yapm.usecase.GenerateMasterPasswordUseCase
 import de.jepfa.yapm.usecase.LockVaultUseCase
-import de.jepfa.yapm.util.AsyncWithProgressBar
+import de.jepfa.yapm.ui.AsyncWithProgressBar
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.PasswordColorizer
-import de.jepfa.yapm.util.PreferenceUtil
-import de.jepfa.yapm.util.PreferenceUtil.DATA_ENCRYPTED_MASTER_PASSWORD
-import java.lang.RuntimeException
+import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
 
 class ChangeMasterPasswordActivity : SecureActivity() {
 
@@ -44,7 +42,7 @@ class ChangeMasterPasswordActivity : SecureActivity() {
         val switchStorePasswd: Switch = findViewById(R.id.switch_store_master_password)
         val generatedPasswdView: TextView = findViewById(R.id.generated_passwd)
 
-        val storedMasterPasswdPresent = PreferenceUtil.isPresent(DATA_ENCRYPTED_MASTER_PASSWORD, this)
+        val storedMasterPasswdPresent = PreferenceService.isPresent(DATA_ENCRYPTED_MASTER_PASSWORD, this)
         switchStorePasswd.isChecked = storedMasterPasswdPresent
 
         if (DebugInfo.isDebug) {

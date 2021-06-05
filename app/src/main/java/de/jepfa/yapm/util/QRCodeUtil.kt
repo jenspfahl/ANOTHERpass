@@ -11,14 +11,15 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 import com.google.zxing.WriterException
 import com.google.zxing.integration.android.IntentIntegrator
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.ui.qrcode.CaptureActivity
-import de.jepfa.yapm.util.PreferenceUtil.PREF_COLORIZE_MP_QRCODES
+import de.jepfa.yapm.service.PreferenceService.PREF_COLORIZE_MP_QRCODES
 
 
 object QRCodeUtil {
 
     fun generateQRCode(header: String?, data: String, color: Int = Color.BLACK, context: Context): Bitmap {
-        val colorize = PreferenceUtil.getAsBool(PREF_COLORIZE_MP_QRCODES, true, context)
+        val colorize = PreferenceService.getAsBool(PREF_COLORIZE_MP_QRCODES, true, context)
         val printColor = if (colorize) color else Color.BLACK
 
         val width = 500

@@ -26,17 +26,17 @@ import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.decryptPassword
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
-import de.jepfa.yapm.ui.label.LabelDialogUtil
+import de.jepfa.yapm.ui.label.LabelDialogOpener
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.ExportCredentialUtil
 import de.jepfa.yapm.util.PasswordColorizer.spannableString
-import de.jepfa.yapm.util.PreferenceUtil
-import de.jepfa.yapm.util.PreferenceUtil.PREF_ENABLE_COPY_PASSWORD
-import de.jepfa.yapm.util.PreferenceUtil.PREF_ENABLE_OVERLAY_FEATURE
-import de.jepfa.yapm.util.PreferenceUtil.PREF_MASK_PASSWORD
-import de.jepfa.yapm.util.PreferenceUtil.PREF_PASSWD_WORDS_ON_NL
+import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_COPY_PASSWORD
+import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_OVERLAY_FEATURE
+import de.jepfa.yapm.service.PreferenceService.PREF_MASK_PASSWORD
+import de.jepfa.yapm.service.PreferenceService.PREF_PASSWD_WORDS_ON_NL
 
 
 class ShowCredentialActivity : SecureActivity() {
@@ -70,8 +70,8 @@ class ShowCredentialActivity : SecureActivity() {
 
         val idExtra = intent.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
 
-        multiLine = PreferenceUtil.getAsBool(PREF_PASSWD_WORDS_ON_NL, multiLine, this)
-        maskPassword = PreferenceUtil.getAsBool(PREF_MASK_PASSWORD, maskPassword, this)
+        multiLine = PreferenceService.getAsBool(PREF_PASSWD_WORDS_ON_NL, multiLine, this)
+        maskPassword = PreferenceService.getAsBool(PREF_MASK_PASSWORD, maskPassword, this)
 
         appBarLayout = findViewById(R.id.credential_detail_toolbar_layout)
 
@@ -121,12 +121,12 @@ class ShowCredentialActivity : SecureActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.credential_detail_menu, menu)
 
-        val enableCopyPassword = PreferenceUtil.getAsBool(PREF_ENABLE_COPY_PASSWORD, false, this)
+        val enableCopyPassword = PreferenceService.getAsBool(PREF_ENABLE_COPY_PASSWORD, false, this)
         if (!enableCopyPassword) {
             menu.findItem(R.id.menu_copy_credential)?.isVisible = false
         }
 
-        val enableOverlayFeature = PreferenceUtil.getAsBool(PREF_ENABLE_OVERLAY_FEATURE, true, this)
+        val enableOverlayFeature = PreferenceService.getAsBool(PREF_ENABLE_OVERLAY_FEATURE, true, this)
         if (!enableOverlayFeature) {
             menu.findItem(R.id.menu_detach_credential)?.isVisible = false
         }
@@ -245,7 +245,7 @@ class ShowCredentialActivity : SecureActivity() {
                         chipView.setLabelColor(getColor(R.color.white))
                         chipView.setPadding(16)
                         chipView.setOnChipClicked {_ ->
-                            LabelDialogUtil.openLabelDialog(this, it)
+                            LabelDialogOpener.openLabelDialog(this, it)
                             true
                         }
                         titleLayout.addView(chipView, idx)

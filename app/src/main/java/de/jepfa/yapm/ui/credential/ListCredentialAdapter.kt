@@ -10,7 +10,6 @@ import android.widget.*
 import android.widget.LinearLayout
 import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat.getColor
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -26,13 +25,13 @@ import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
-import de.jepfa.yapm.ui.label.LabelDialogUtil
+import de.jepfa.yapm.ui.label.LabelDialogOpener
 import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.ExportCredentialUtil
-import de.jepfa.yapm.util.PreferenceUtil
-import de.jepfa.yapm.util.PreferenceUtil.PREF_ENABLE_COPY_PASSWORD
-import de.jepfa.yapm.util.PreferenceUtil.PREF_ENABLE_OVERLAY_FEATURE
-import de.jepfa.yapm.util.PreferenceUtil.PREF_SHOW_LABELS_IN_LIST
+import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_COPY_PASSWORD
+import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_OVERLAY_FEATURE
+import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_LABELS_IN_LIST
 import java.util.*
 import javax.crypto.SecretKey
 
@@ -49,12 +48,12 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         if (Session.isDenied()) {
             return holder
         }
-        val enableCopyPassword = PreferenceUtil.getAsBool(PREF_ENABLE_COPY_PASSWORD, false, listCredentialsActivity)
+        val enableCopyPassword = PreferenceService.getAsBool(PREF_ENABLE_COPY_PASSWORD, false, listCredentialsActivity)
         if (!enableCopyPassword) {
             holder.hideCopyPasswordIcon()
         }
 
-        val enableOverlayFeature = PreferenceUtil.getAsBool(PREF_ENABLE_OVERLAY_FEATURE, true, listCredentialsActivity)
+        val enableOverlayFeature = PreferenceService.getAsBool(PREF_ENABLE_OVERLAY_FEATURE, true, listCredentialsActivity)
         if (!enableOverlayFeature) {
             holder.hideDetachPasswordIcon()
         }
@@ -266,7 +265,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             if (key != null) {
                 name = SecretService.decryptCommonString(key, credential.name)
 
-                val showLabels = PreferenceUtil.getAsBool(PREF_SHOW_LABELS_IN_LIST, true, itemView.context)
+                val showLabels = PreferenceService.getAsBool(PREF_SHOW_LABELS_IN_LIST, true, itemView.context)
                 if (showLabels) {
                     LabelService.getLabelsForCredential(key, credential).forEachIndexed { idx, it ->
                         val chipView = ChipView(itemView.context)
@@ -276,7 +275,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                         chipView.setLabelColor(getColor(itemView.context, R.color.white))
                         chipView.setPadding(16, 0, 16, 0)
                         chipView.setOnChipClicked {_ ->
-                            LabelDialogUtil.openLabelDialog(activity, it)
+                            LabelDialogOpener.openLabelDialog(activity, it)
                             true
                         }
                         credentialLabelContainerView.addView(chipView, idx)

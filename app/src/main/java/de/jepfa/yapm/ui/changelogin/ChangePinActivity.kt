@@ -2,7 +2,6 @@ package de.jepfa.yapm.ui.changelogin
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.MenuItem
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -13,7 +12,7 @@ import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.ChangePinUseCase
 import de.jepfa.yapm.usecase.LockVaultUseCase
-import de.jepfa.yapm.util.AsyncWithProgressBar
+import de.jepfa.yapm.ui.AsyncWithProgressBar
 import de.jepfa.yapm.util.DebugInfo
 import java.lang.RuntimeException
 

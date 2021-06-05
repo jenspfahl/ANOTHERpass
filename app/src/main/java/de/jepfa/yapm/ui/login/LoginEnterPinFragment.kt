@@ -17,8 +17,8 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.usecase.LoginUseCase
-import de.jepfa.yapm.util.AsyncWithProgressBar
-import de.jepfa.yapm.util.PreferenceUtil
+import de.jepfa.yapm.ui.AsyncWithProgressBar
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.util.putEncrypted
 import java.util.*
 
@@ -59,7 +59,7 @@ class LoginEnterPinFragment : BaseFragment() {
                 return@setOnClickListener
             }
 
-            val encStoredMasterPasswd = PreferenceUtil.getEncrypted(PreferenceUtil.DATA_ENCRYPTED_MASTER_PASSWORD, getBaseActivity())
+            val encStoredMasterPasswd = PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD, getBaseActivity())
 
             if (!Session.isLoggedOut()) {
                 val keyForTemp = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)

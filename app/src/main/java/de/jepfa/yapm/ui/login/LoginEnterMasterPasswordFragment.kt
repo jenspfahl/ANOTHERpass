@@ -22,12 +22,12 @@ import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.usecase.LoginUseCase
-import de.jepfa.yapm.util.AsyncWithProgressBar
+import de.jepfa.yapm.ui.AsyncWithProgressBar
 import de.jepfa.yapm.service.nfc.NfcService
-import de.jepfa.yapm.util.PreferenceUtil
-import de.jepfa.yapm.util.PreferenceUtil.DATA_ENCRYPTED_MASTER_PASSWORD
-import de.jepfa.yapm.util.PreferenceUtil.PREF_FAST_MASTERPASSWD_LOGIN_WITH_NFC
-import de.jepfa.yapm.util.PreferenceUtil.PREF_FAST_MASTERPASSWD_LOGIN_WITH_QRC
+import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
+import de.jepfa.yapm.service.PreferenceService.PREF_FAST_MASTERPASSWD_LOGIN_WITH_NFC
+import de.jepfa.yapm.service.PreferenceService.PREF_FAST_MASTERPASSWD_LOGIN_WITH_QRC
 import de.jepfa.yapm.util.QRCodeUtil
 
 
@@ -131,8 +131,8 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
 
     private fun readAndUpdateMasterPassword(scanned: String): Boolean {
         if (scanned.startsWith(Encrypted.TYPE_MASTER_PASSWD_TOKEN)) {
-            if (!PreferenceUtil.isPresent(
-                    PreferenceUtil.DATA_MASTER_PASSWORD_TOKEN_KEY,
+            if (!PreferenceService.isPresent(
+                    PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY,
                     getBaseActivity()
                 )
             ) {
@@ -144,8 +144,8 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                 return false
             }
             // decrypt obliviously encrypted master password token
-            val encMasterPasswordTokenKey = PreferenceUtil.getEncrypted(
-                PreferenceUtil.DATA_MASTER_PASSWORD_TOKEN_KEY,
+            val encMasterPasswordTokenKey = PreferenceService.getEncrypted(
+                PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY,
                 getBaseActivity()
             )
             encMasterPasswordTokenKey?.let {
@@ -242,7 +242,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                         if (isStoreMasterPassword) {
                             val keyForMP = getAndroidSecretKey(SecretService.ALIAS_KEY_MP)
                             val encPasswd = encryptPassword(keyForMP, masterPassword)
-                            PreferenceUtil.putEncrypted(DATA_ENCRYPTED_MASTER_PASSWORD, encPasswd, getBaseActivity())
+                            PreferenceService.putEncrypted(DATA_ENCRYPTED_MASTER_PASSWORD, encPasswd, getBaseActivity())
                         }
 
                         userPin.clear()
@@ -260,11 +260,11 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
     }
 
     private fun isFastLoginWithQrCode(): Boolean {
-        return  PreferenceUtil.getAsBool(PREF_FAST_MASTERPASSWD_LOGIN_WITH_QRC, false, getBaseActivity())
+        return  PreferenceService.getAsBool(PREF_FAST_MASTERPASSWD_LOGIN_WITH_QRC, false, getBaseActivity())
     }
 
     private fun isFastLoginWithNfcTag(): Boolean {
-        return  PreferenceUtil.getAsBool(PREF_FAST_MASTERPASSWD_LOGIN_WITH_NFC, false, getBaseActivity())
+        return  PreferenceService.getAsBool(PREF_FAST_MASTERPASSWD_LOGIN_WITH_NFC, false, getBaseActivity())
     }
 
 }

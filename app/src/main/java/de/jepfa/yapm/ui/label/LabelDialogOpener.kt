@@ -16,7 +16,7 @@ import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.ui.SecureActivity
 
-object LabelDialogUtil {
+object LabelDialogOpener {
 
     fun openLabelDialog(activity: SecureActivity, label: LabelService.Label) {
 
@@ -41,7 +41,7 @@ object LabelDialogUtil {
 
         val dialog = AlertDialog.Builder(activity)
             .setTitle(activity.getString(R.string.label_details))
-            .setIcon(R.drawable.ic_baseline_filter_list_24)
+            .setIcon(R.drawable.ic_baseline_label_24)
             .setView(labelsView)
             .setPositiveButton(R.string.title_change_label, null)
             .setNegativeButton(R.string.close, null)

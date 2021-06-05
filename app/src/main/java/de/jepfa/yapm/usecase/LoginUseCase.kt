@@ -7,16 +7,16 @@ import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.service.secret.MasterKeyService.getMasterPassPhraseSK
 import de.jepfa.yapm.service.secret.MasterKeyService.getMasterSK
 import de.jepfa.yapm.service.secret.SaltService
-import de.jepfa.yapm.util.PreferenceUtil
-import de.jepfa.yapm.util.PreferenceUtil.PREF_LOCK_TIMEOUT
-import de.jepfa.yapm.util.PreferenceUtil.PREF_LOGOUT_TIMEOUT
+import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.PREF_LOCK_TIMEOUT
+import de.jepfa.yapm.service.PreferenceService.PREF_LOGOUT_TIMEOUT
 
 object LoginUseCase {
 
     fun execute(masterPin: Password, masterPassword: Password, activity: BaseActivity): Boolean {
 
         val salt = SaltService.getSalt(activity)
-        val encMasterKey = PreferenceUtil.getEncrypted(PreferenceUtil.DATA_ENCRYPTED_MASTER_KEY, activity)
+        val encMasterKey = PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, activity)
         if (encMasterKey == null) {
             return false;
         }
@@ -29,8 +29,8 @@ object LoginUseCase {
         val encMasterPassword = SecretService.encryptPassword(key, masterPassword)
         Session.login(masterSecretKey, encMasterPassword)
         Session.setTimeouts(
-            PreferenceUtil.getAsInt(PREF_LOCK_TIMEOUT, activity),
-            PreferenceUtil.getAsInt(PREF_LOGOUT_TIMEOUT, activity)
+            PreferenceService.getAsInt(PREF_LOCK_TIMEOUT, activity),
+            PreferenceService.getAsInt(PREF_LOGOUT_TIMEOUT, activity)
         )
 
         return true

@@ -9,16 +9,16 @@ import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
-import de.jepfa.yapm.util.PreferenceUtil
-import de.jepfa.yapm.util.PreferenceUtil.DATA_MASTER_PASSWORD_TOKEN_KEY
-import de.jepfa.yapm.util.PreferenceUtil.STATE_MASTER_PASSWD_TOKEN_COUNTER
+import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY
+import de.jepfa.yapm.service.PreferenceService.STATE_MASTER_PASSWD_TOKEN_COUNTER
 import de.jepfa.yapm.util.putEncryptedExtra
 
 object GenerateMasterPasswordTokenUseCase: SecureActivityUseCase {
 
     override fun execute(activity: SecureActivity): Boolean {
-        val mptCounter = PreferenceUtil.getAsInt(STATE_MASTER_PASSWD_TOKEN_COUNTER, 0, activity)
-        if (PreferenceUtil.isPresent(DATA_MASTER_PASSWORD_TOKEN_KEY, activity)) {
+        val mptCounter = PreferenceService.getAsInt(STATE_MASTER_PASSWD_TOKEN_COUNTER, 0, activity)
+        if (PreferenceService.isPresent(DATA_MASTER_PASSWORD_TOKEN_KEY, activity)) {
             AlertDialog.Builder(activity)
                     .setTitle("Generate master password token")
                     .setMessage("The last generated token with number #$mptCounter will be become invalid.")
@@ -51,15 +51,15 @@ object GenerateMasterPasswordTokenUseCase: SecureActivityUseCase {
             val masterPasswordToken = SecretService.encryptPassword(Encrypted.TYPE_MASTER_PASSWD_TOKEN, masterPasswordTokenSK, masterPassword)
             val encMasterPasswordToken = SecretService.encryptEncrypted(tempKey, masterPasswordToken)
 
-            var nextMptNumber = PreferenceUtil.getAsInt(STATE_MASTER_PASSWD_TOKEN_COUNTER, 0, activity) + 1
+            var nextMptNumber = PreferenceService.getAsInt(STATE_MASTER_PASSWD_TOKEN_COUNTER, 0, activity) + 1
 
             val encHead = SecretService.encryptCommonString(tempKey, "Your Master Password Token #$nextMptNumber")
             val encSub = SecretService.encryptCommonString(tempKey, "Take this token in your wallet to scan for login. If you loose it, just create a new one.")
             val encQrcHeader = SecretService.encryptCommonString(tempKey, "${encMasterPasswordToken.type} #$nextMptNumber")
             val encQrc = encMasterPasswordToken
 
-            PreferenceUtil.putEncrypted(DATA_MASTER_PASSWORD_TOKEN_KEY, encMasterPasswordTokenKey, activity)
-            PreferenceUtil.put(STATE_MASTER_PASSWD_TOKEN_COUNTER, nextMptNumber.toString(), activity)
+            PreferenceService.putEncrypted(DATA_MASTER_PASSWORD_TOKEN_KEY, encMasterPasswordTokenKey, activity)
+            PreferenceService.put(STATE_MASTER_PASSWD_TOKEN_COUNTER, nextMptNumber.toString(), activity)
 
 
             val intent = Intent(activity, QrCodeActivity::class.java)
