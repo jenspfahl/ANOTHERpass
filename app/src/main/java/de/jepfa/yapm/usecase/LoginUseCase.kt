@@ -1,9 +1,9 @@
 package de.jepfa.yapm.usecase
 
+import android.content.Context
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.secret.SecretService
-import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.service.secret.MasterKeyService.getMasterPassPhraseSK
 import de.jepfa.yapm.service.secret.MasterKeyService.getMasterSK
 import de.jepfa.yapm.service.secret.SaltService
@@ -13,14 +13,14 @@ import de.jepfa.yapm.service.PreferenceService.PREF_LOGOUT_TIMEOUT
 
 object LoginUseCase {
 
-    fun execute(masterPin: Password, masterPassword: Password, activity: BaseActivity): Boolean {
+    fun execute(pin: Password, masterPassword: Password, context: Context): Boolean {
 
-        val salt = SaltService.getSalt(activity)
-        val encMasterKey = PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, activity)
+        val salt = SaltService.getSalt(context)
+        val encMasterKey = PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, context)
         if (encMasterKey == null) {
             return false;
         }
-        val masterPassPhraseSK = getMasterPassPhraseSK(masterPin, masterPassword, salt)
+        val masterPassPhraseSK = getMasterPassPhraseSK(pin, masterPassword, salt)
         val masterSecretKey = getMasterSK(masterPassPhraseSK, salt, encMasterKey)
         if (masterSecretKey == null) {
             return false;
@@ -29,8 +29,8 @@ object LoginUseCase {
         val encMasterPassword = SecretService.encryptPassword(key, masterPassword)
         Session.login(masterSecretKey, encMasterPassword)
         Session.setTimeouts(
-            PreferenceService.getAsInt(PREF_LOCK_TIMEOUT, activity),
-            PreferenceService.getAsInt(PREF_LOGOUT_TIMEOUT, activity)
+            PreferenceService.getAsInt(PREF_LOCK_TIMEOUT, context),
+            PreferenceService.getAsInt(PREF_LOGOUT_TIMEOUT, context)
         )
 
         return true

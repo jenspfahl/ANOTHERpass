@@ -28,6 +28,7 @@ import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
 import de.jepfa.yapm.service.PreferenceService.PREF_FAST_MASTERPASSWD_LOGIN_WITH_NFC
 import de.jepfa.yapm.service.PreferenceService.PREF_FAST_MASTERPASSWD_LOGIN_WITH_QRC
+import de.jepfa.yapm.service.secret.MasterPasswordService.generateEncMasterPasswdSK
 import de.jepfa.yapm.util.QRCodeUtil
 
 
@@ -175,9 +176,9 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         } else if (scanned.startsWith(Encrypted.TYPE_ENC_MASTER_PASSWD)) {
 
             val salt = getSalt(getBaseActivity())
-            val saltSK = SecretService.generateFastSecretKey(salt, salt)
+            val empSK = generateEncMasterPasswdSK(Password(salt.toCharArray()))
             val encMasterPassword =
-                SecretService.decryptPassword(saltSK, Encrypted.fromBase64String(scanned))
+                SecretService.decryptPassword(empSK, Encrypted.fromBase64String(scanned))
             if (!encMasterPassword.isValid()) {
                 Toast.makeText(
                     getBaseActivity(),

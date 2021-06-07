@@ -1,5 +1,6 @@
 package de.jepfa.yapm.service.secret
 
+import android.content.Context
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
@@ -44,7 +45,7 @@ object MasterKeyService {
         return masterKey
     }
 
-    fun encryptAndStoreMasterKey(masterKey: Key, pin: Password, masterPasswd: Password, salt: Key, activity: BaseActivity) {
+    fun encryptAndStoreMasterKey(masterKey: Key, pin: Password, masterPasswd: Password, salt: Key, context: Context) {
 
         val mkSK = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
         val masterPassphrase = SecretService.conjunctPasswords(pin, masterPasswd, salt)
@@ -58,7 +59,7 @@ object MasterKeyService {
         PreferenceService.putEncrypted(
             PreferenceService.DATA_ENCRYPTED_MASTER_KEY,
             encEncryptedMasterKey,
-            activity
+            context
         )
     }
 }

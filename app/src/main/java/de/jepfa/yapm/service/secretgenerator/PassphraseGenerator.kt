@@ -1,6 +1,8 @@
 package de.jepfa.yapm.service.secretgenerator
 
 import de.jepfa.yapm.model.secret.Password
+import java.lang.Math.ceil
+import java.lang.Math.pow
 
 class PassphraseGenerator: GeneratorBase<PassphraseGeneratorSpec>() {
 
@@ -14,7 +16,7 @@ class PassphraseGenerator: GeneratorBase<PassphraseGeneratorSpec>() {
     override fun generate(spec: PassphraseGeneratorSpec): Password {
         var buffer = Password(CharArray(0));
 
-        for (i in 0 until spec.strength.passwordLength/4) {
+        for (i in 0 until strengthToWordCount(spec.strength)) {
             val word = generateWord()
             buffer.add(word)
         }
@@ -36,27 +38,24 @@ class PassphraseGenerator: GeneratorBase<PassphraseGeneratorSpec>() {
 
     private fun generateWord(): Password {
         val word = generateTuple()
-        val allowDuplicateConsonants = isVocal(word.get(word.lastIndex))
-        val next = generateTuple(true, allowDuplicateConsonants)
+        val recentEndsWithVocal = isVocal(word.last())
+        val next = generateTuple(recentEndsWithVocal)
 
         word.add(next)
 
         return word
     }
 
-    private fun generateTuple(allowDuplicateVocals: Boolean = false,
-                              allowDuplicateConsonants: Boolean = false): Password {
+    private fun generateTuple(recentEndsWithVocal: Boolean = false): Password {
         val buffer = CharArray(2)
         buffer[0] = random(ALPHABET)
-        var material = when(isVocal(buffer[0])) {
-            true ->  CONSONANTS
+        val char = buffer[0]
+        var material = when(isVocal(char)) {
+            true ->  ALPHABET
             else -> VOCALS
         }
-        if (allowDuplicateVocals && isVocal(buffer[0])) {
-            material += buffer[0]
-        }
-        if (allowDuplicateConsonants && isConsonant(buffer[0])) {
-            material += buffer[0]
+        if (recentEndsWithVocal && isConsonant(char)) {
+            material += char
         }
 
         buffer[1] = random(material)
@@ -64,21 +63,27 @@ class PassphraseGenerator: GeneratorBase<PassphraseGeneratorSpec>() {
     }
 
     override fun calcCombinationCount(spec: PassphraseGeneratorSpec): Double {
-        val vocalChance = VOCALS.length / ALPHABET.length.toDouble()
-        val consonantChance = CONSONANTS.length / ALPHABET.length.toDouble()
-        val normalTubleComp = VOCALS.length * CONSONANTS.length
-        val doubleTubleComp = normalTubleComp + (consonantChance * VOCALS.length) + (vocalChance * ALPHABET.length)
-        val normalWordComp = normalTubleComp + doubleTubleComp
-        val wordsComp = Math.pow(normalWordComp, spec.strength.passwordLength/2.toDouble())
+        val vocalLength = VOCALS.length.toDouble()
+        val consonantLength = CONSONANTS.length.toDouble()
+        val alphabetLength = ALPHABET.length.toDouble()
 
-        var comp = wordsComp;
+        val vocalChance = vocalLength / alphabetLength
+        val consonantChance = consonantLength / alphabetLength
+
+        val tupleCombinations = alphabetLength * ((vocalChance * alphabetLength) + (consonantChance * vocalLength))
+        val tupleCombinationsWithDuplicateConsonants = alphabetLength * ((vocalChance * alphabetLength) + (consonantChance * (vocalLength + 1)))
+
+        val wordCombinations = tupleCombinations *
+                ((consonantChance * tupleCombinations) + (vocalChance * tupleCombinationsWithDuplicateConsonants))
+        var combinations = ceil(pow(wordCombinations, strengthToWordCount(spec.strength).toDouble()))
+
         if (spec.addDigit) {
-            comp *= DIGITS.length
+            combinations *= DIGITS.length
         }
         if (spec.addSpecialChar) {
-            comp *= SPECIAL_CHARS.length
+            combinations *= SPECIAL_CHARS.length
         }
-        return comp;
+        return combinations;
     }
 
     private fun random(material: String): Char {
@@ -93,6 +98,10 @@ class PassphraseGenerator: GeneratorBase<PassphraseGeneratorSpec>() {
 
     private fun isConsonant(char: Char): Boolean {
             return CONSONANTS.contains(char, true);
+    }
+
+    private fun strengthToWordCount(strength: PassphraseStrength): Int {
+        return strength.passwordLength / 4
     }
 
 }

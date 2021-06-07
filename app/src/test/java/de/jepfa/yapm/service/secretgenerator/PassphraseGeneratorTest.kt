@@ -1,8 +1,8 @@
-package de.jepfa.yapm
+package de.jepfa.yapm.service.secretgenerator
 
-import de.jepfa.yapm.service.secretgenerator.*
 import de.jepfa.yapm.service.secretgenerator.GeneratorBase.Companion.BRUTEFORCE_ATTEMPTS_PENTIUM
 import de.jepfa.yapm.service.secretgenerator.GeneratorBase.Companion.BRUTEFORCE_ATTEMPTS_SUPERCOMP
+import de.jepfa.yapm.util.secondsToYear
 import org.junit.Test
 
 class PassphraseGeneratorTest {
@@ -13,19 +13,28 @@ class PassphraseGeneratorTest {
     fun generateAndClearPassphrase() {
         val spec = PassphraseGeneratorSpec(PassphraseStrength.STRONG,
                 wordBeginningUpperCase = true, addDigit = false, addSpecialChar = true)
+        val hits = HashSet<String>()
         for (i in 0..100) {
             val passphrase = passphraseGenerator.generate(spec)
-            println("passphrase=${passphrase.toStringRepresentation(false)}")
+            println("passphrase = ${passphrase.toStringRepresentation(false)}")
+            hits.add(passphrase.toStringRepresentation(false))
             passphrase.clear()
         }
+
+     //   println("hits=$hits")
+        println("counted=${hits.size}")
+
         val calcCombinationCount = passphraseGenerator.calcCombinationCount(spec)
-        println("comp=$calcCombinationCount")
+        println("combinations: $calcCombinationCount")
+
+        println("ratio to real counted: ${hits.size/calcCombinationCount}")
+
 
         val calcBruteForceWaitingPentiumSeconds = passphraseGenerator.calcBruteForceWaitingSeconds(calcCombinationCount, BRUTEFORCE_ATTEMPTS_PENTIUM)
-        val calcBruteForceWaitingupercompSeconds = passphraseGenerator.calcBruteForceWaitingSeconds(calcBruteForceWaitingPentiumSeconds, BRUTEFORCE_ATTEMPTS_SUPERCOMP)
+        val calcBruteForceWaitingSupercompSeconds = passphraseGenerator.calcBruteForceWaitingSeconds(calcCombinationCount, BRUTEFORCE_ATTEMPTS_SUPERCOMP)
 
-        println("brute force years for Pentum =${calcBruteForceWaitingPentiumSeconds/60/60/24/365}")
-        println("brute force years for Supercomp =${calcBruteForceWaitingupercompSeconds/60/60/24/365}")
+        println("brute force years for Pentum: ${calcBruteForceWaitingPentiumSeconds.secondsToYear()}")
+        println("brute force years for Supercomp: ${calcBruteForceWaitingSupercompSeconds.secondsToYear()}")
 
     }
 }

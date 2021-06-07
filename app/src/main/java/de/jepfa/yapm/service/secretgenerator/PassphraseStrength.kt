@@ -3,6 +3,7 @@ package de.jepfa.yapm.service.secretgenerator
 import de.jepfa.yapm.R
 
 enum class PassphraseStrength(val passwordLength: Int, val nameId: Int) {
+    ONE_WORD(5, -1),
     EASY(12, R.string.EASY),
     NORMAL(16, R.string.NORMAL),
     STRONG(20, R.string.STRONG),

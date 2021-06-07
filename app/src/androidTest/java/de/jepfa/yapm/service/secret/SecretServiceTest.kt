@@ -1,4 +1,4 @@
-package de.jepfa.yapm
+package de.jepfa.yapm.service.secret
 
 import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4

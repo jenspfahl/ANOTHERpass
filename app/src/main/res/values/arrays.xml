@@ -62,7 +62,7 @@
     <string-array name="default_passwd_strength_values">
         <item>NORMAL</item>
         <item>STRONG</item>
-        <item>SUPER_STRONG</item>
+        <item>ULTRA</item>
         <item>EXTREME</item>
     </string-array>
 

@@ -13,12 +13,12 @@ object GenerateMasterPasswordUseCase {
         if (usePseudoPhrase) {
             return passphraseGenerator.generate(
                     PassphraseGeneratorSpec(
-                            strength = PassphraseStrength.EXTREME))
+                            strength = PassphraseStrength.HYPER))
         }
         else {
             return passwordGenerator.generate(
                     PasswordGeneratorSpec(
-                            strength = PasswordStrength.ULTRA))
+                            strength = PasswordStrength.HYPER))
         }
 
     }

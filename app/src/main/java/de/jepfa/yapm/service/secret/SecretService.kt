@@ -36,10 +36,6 @@ object SecretService {
         return Key(bytes)
     }
 
-    fun generateFastSecretKey(key: Key, salt: Key): SecretKey {
-        return generateSecretKey(Password(key.toCharArray()), salt, 1000)
-    }
-
     fun generateSecretKey(key: Key, salt: Key): SecretKey {
         return generateSecretKey(Password(key.toCharArray()), salt)
     }
