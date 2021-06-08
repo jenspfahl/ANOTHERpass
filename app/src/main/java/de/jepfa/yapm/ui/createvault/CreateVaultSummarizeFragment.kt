@@ -72,7 +72,7 @@ class CreateVaultSummarizeFragment : BaseFragment() {
             val intent = Intent(getBaseActivity(), NfcActivity::class.java)
             intent.putExtra(NfcActivity.EXTRA_NO_SESSION_CHECK, true)
             intent.putExtra(NfcActivity.EXTRA_MODE, NfcActivity.EXTRA_MODE_RW)
-            intent.putExtra(NfcActivity.EXTRA_WITH_APP_RECORD, true)
+            intent.putExtra(NfcActivity.EXTRA_WITH_APP_RECORD, false)
             intent.putEncryptedExtra(NfcActivity.EXTRA_DATA, encMasterPasswd)
             startActivity(intent)
         }

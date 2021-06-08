@@ -4,13 +4,17 @@ import de.jepfa.yapm.model.secret.Password
 import java.lang.Math.ceil
 import java.lang.Math.pow
 
-class PassphraseGenerator: GeneratorBase<PassphraseGeneratorSpec>() {
+private var DEFAULT_VOCALS = "aeiouy"
+private var DEFAULT_CONSONANTS = "bcdfghjklmnpqrstvwxz"
+private var DEFAULT_DIGITS = "1234567890"
+private var DEFAULT_SPECIAL_CHARS = "!?-,.:/$%&@#"
 
-    private val VOCALS = "aeiouy"
-    private val CONSONANTS = "bcdfghjklmnpqrstvwxz"
-    private val ALPHABET = VOCALS + CONSONANTS
-    private val DIGITS = "1234567890"
-    private val SPECIAL_CHARS = "!?-,.:/$%&@#"
+class PassphraseGenerator(
+    val vocals: String = DEFAULT_VOCALS,
+    val consonants: String = DEFAULT_CONSONANTS,
+    val digits: String = DEFAULT_DIGITS,
+    val specialChars: String = DEFAULT_SPECIAL_CHARS
+): GeneratorBase<PassphraseGeneratorSpec>() {
 
 
     override fun generate(spec: PassphraseGeneratorSpec): Password {
@@ -26,11 +30,11 @@ class PassphraseGenerator: GeneratorBase<PassphraseGeneratorSpec>() {
         }
 
         if (spec.addDigit) {
-            buffer.add(random(DIGITS))
+            buffer.add(random(digits))
         }
 
         if (spec.addSpecialChar) {
-            buffer.add(random(SPECIAL_CHARS))
+            buffer.add(random(specialChars))
         }
 
         return buffer
@@ -48,11 +52,11 @@ class PassphraseGenerator: GeneratorBase<PassphraseGeneratorSpec>() {
 
     private fun generateTuple(recentEndsWithVocal: Boolean = false): Password {
         val buffer = CharArray(2)
-        buffer[0] = random(ALPHABET)
+        buffer[0] = random(alphabet())
         val char = buffer[0]
         var material = when(isVocal(char)) {
-            true ->  ALPHABET
-            else -> VOCALS
+            true ->  alphabet()
+            else -> vocals
         }
         if (recentEndsWithVocal && isConsonant(char)) {
             material += char
@@ -63,27 +67,26 @@ class PassphraseGenerator: GeneratorBase<PassphraseGeneratorSpec>() {
     }
 
     override fun calcCombinationCount(spec: PassphraseGeneratorSpec): Double {
-        val vocalLength = VOCALS.length.toDouble()
-        val consonantLength = CONSONANTS.length.toDouble()
-        val alphabetLength = ALPHABET.length.toDouble()
+        val vocalLength = vocals.length.toDouble()
+        val consonantLength = consonants.length.toDouble()
+        val alphabetLength = alphabet().length.toDouble()
 
         val vocalChance = vocalLength / alphabetLength
         val consonantChance = consonantLength / alphabetLength
 
-        val tupleCombinations = alphabetLength * ((vocalChance * alphabetLength) + (consonantChance * vocalLength))
-        val tupleCombinationsWithDuplicateConsonants = alphabetLength * ((vocalChance * alphabetLength) + (consonantChance * (vocalLength + 1)))
+        val tupleCombinations = alphabetLength * ((vocalChance * alphabetLength) + (consonantChance * vocalLength)) // this is the material = when(isVocal) expression
+        val tupleCombinationsWithVocalAtLast = vocalLength * alphabetLength // these tuples allow subsequent tuples with duplicate consonants
 
-        val wordCombinations = tupleCombinations *
-                ((consonantChance * tupleCombinations) + (vocalChance * tupleCombinationsWithDuplicateConsonants))
-        var combinations = ceil(pow(wordCombinations, strengthToWordCount(spec.strength).toDouble()))
+        val wordCombinations = (tupleCombinations * tupleCombinations) + (tupleCombinationsWithVocalAtLast * consonantLength) // add tuples with duplicate consonants for each consonant
+        var totalCombinations = ceil(pow(wordCombinations, strengthToWordCount(spec.strength).toDouble()))
 
         if (spec.addDigit) {
-            combinations *= DIGITS.length
+            totalCombinations *= digits.length
         }
         if (spec.addSpecialChar) {
-            combinations *= SPECIAL_CHARS.length
+            totalCombinations *= specialChars.length
         }
-        return combinations;
+        return totalCombinations;
     }
 
     private fun random(material: String): Char {
@@ -93,15 +96,17 @@ class PassphraseGenerator: GeneratorBase<PassphraseGeneratorSpec>() {
     }
 
     private fun isVocal(char: Char): Boolean {
-        return VOCALS.contains(char, true);
+        return vocals.contains(char, true);
     }
 
     private fun isConsonant(char: Char): Boolean {
-            return CONSONANTS.contains(char, true);
+            return consonants.contains(char, true);
     }
 
     private fun strengthToWordCount(strength: PassphraseStrength): Int {
         return strength.passwordLength / 4
     }
+
+    private fun alphabet() = vocals + consonants
 
 }
