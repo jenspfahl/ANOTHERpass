@@ -48,12 +48,12 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         if (Session.isDenied()) {
             return holder
         }
-        val enableCopyPassword = PreferenceService.getAsBool(PREF_ENABLE_COPY_PASSWORD, false, listCredentialsActivity)
+        val enableCopyPassword = PreferenceService.getAsBool(PREF_ENABLE_COPY_PASSWORD, listCredentialsActivity)
         if (!enableCopyPassword) {
             holder.hideCopyPasswordIcon()
         }
 
-        val enableOverlayFeature = PreferenceService.getAsBool(PREF_ENABLE_OVERLAY_FEATURE, true, listCredentialsActivity)
+        val enableOverlayFeature = PreferenceService.getAsBool(PREF_ENABLE_OVERLAY_FEATURE, listCredentialsActivity)
         if (!enableOverlayFeature) {
             holder.hideDetachPasswordIcon()
         }
@@ -265,7 +265,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             if (key != null) {
                 name = SecretService.decryptCommonString(key, credential.name)
 
-                val showLabels = PreferenceService.getAsBool(PREF_SHOW_LABELS_IN_LIST, true, itemView.context)
+                val showLabels = PreferenceService.getAsBool(PREF_SHOW_LABELS_IN_LIST, itemView.context)
                 if (showLabels) {
                     LabelService.getLabelsForCredential(key, credential).forEachIndexed { idx, it ->
                         val chipView = ChipView(itemView.context)

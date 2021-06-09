@@ -103,7 +103,7 @@ object ResponseFiller {
             return null
         }
 
-        val suggestEverywhere = PreferenceService.getAsBool(PREF_AUTOFILL_EVERYWHERE, true, context)
+        val suggestEverywhere = PreferenceService.getAsBool(PREF_AUTOFILL_EVERYWHERE, context)
         val fields = identifyFields(structure, cancellationSignal, suggestEverywhere) ?: return null
 
         val key = Session.getMasterKeySK()

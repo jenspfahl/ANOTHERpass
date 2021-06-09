@@ -261,11 +261,11 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
     }
 
     private fun isFastLoginWithQrCode(): Boolean {
-        return  PreferenceService.getAsBool(PREF_FAST_MASTERPASSWD_LOGIN_WITH_QRC, false, getBaseActivity())
+        return  PreferenceService.getAsBool(PREF_FAST_MASTERPASSWD_LOGIN_WITH_QRC, getBaseActivity())
     }
 
     private fun isFastLoginWithNfcTag(): Boolean {
-        return  PreferenceService.getAsBool(PREF_FAST_MASTERPASSWD_LOGIN_WITH_NFC, false, getBaseActivity())
+        return  PreferenceService.getAsBool(PREF_FAST_MASTERPASSWD_LOGIN_WITH_NFC, getBaseActivity())
     }
 
 }

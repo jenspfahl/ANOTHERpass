@@ -2,6 +2,7 @@ package de.jepfa.yapm.service
 
 import android.content.Context
 import androidx.preference.PreferenceManager
+import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 
 object PreferenceService {
@@ -10,6 +11,8 @@ object PreferenceService {
     private const val DATA_PREFIX = "YAPM/data:"
     private const val STATE_PREFIX = "YAPM/state:"
     private const val ACTION_PREFIX = "YAPM/action:"
+
+    const val STATE_DEFAULT_INIT_DONE = STATE_PREFIX + "default_init_done"
 
     const val DATA_SALT = DATA_PREFIX + "aslt"
     const val DATA_ENCRYPTED_MASTER_PASSWORD = DATA_PREFIX + "mpwd"
@@ -48,28 +51,42 @@ object PreferenceService {
     const val STATE_LOGIN_ATTEMPTS = STATE_PREFIX + "login_attempts"
 
 
+    fun initDefaults(context: Context) {
+        val defaultInitDone = getAsBool(STATE_DEFAULT_INIT_DONE, context)
+        if (!defaultInitDone) {
+            PreferenceManager.setDefaultValues(context, R.xml.autofill_preferences, true)
+            PreferenceManager.setDefaultValues(context, R.xml.clipboard_preferences, true)
+            PreferenceManager.setDefaultValues(context, R.xml.general_preferences, true)
+            PreferenceManager.setDefaultValues(context, R.xml.login_preferences, true)
+            PreferenceManager.setDefaultValues(context, R.xml.overlay_preferences, true)
+            PreferenceManager.setDefaultValues(context, R.xml.password_generator_preferences, true)
+            PreferenceManager.setDefaultValues(context, R.xml.security_preferences, true)
+
+            put(STATE_DEFAULT_INIT_DONE, true.toString(), context)
+        }
+    }
+
     fun getEncrypted(prefKey: String, context: Context): Encrypted? {
         return get(prefKey, context)?.let { Encrypted.fromBase64String(it)}
     }
 
-    fun getAsInt(prefKey: String, default: Int, context: Context): Int {
-        val value = get(prefKey, context) ?: return default
+    fun getAsInt(prefKey: String, context: Context): Int {
+        val value = get(prefKey, context) ?: return 0
         return value.toInt()
     }
 
-    fun getAsInt(prefKey: String, context: Context): Int? {
-        val value = get(prefKey, context) ?: return null
-        return value.toInt()
-    }
-
-    fun getAsBool(prefKey: String, default: Boolean, context: Context): Boolean {
+    fun getAsBool(prefKey: String, context: Context): Boolean {
         val defaultSharedPreferences = PreferenceManager
             .getDefaultSharedPreferences(context)
         return defaultSharedPreferences
-            .getBoolean(prefKey, default)
+            .getBoolean(prefKey, false)
     }
 
-    fun get(prefKey: String, context: Context): String? {
+    fun getAsString(prefKey: String, context: Context): String? {
+        return get(prefKey, context)
+    }
+
+    private fun get(prefKey: String, context: Context): String? {
         val defaultSharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(context)
         return defaultSharedPreferences

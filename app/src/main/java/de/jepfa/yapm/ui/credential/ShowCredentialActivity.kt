@@ -70,8 +70,8 @@ class ShowCredentialActivity : SecureActivity() {
 
         val idExtra = intent.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
 
-        multiLine = PreferenceService.getAsBool(PREF_PASSWD_WORDS_ON_NL, multiLine, this)
-        maskPassword = PreferenceService.getAsBool(PREF_MASK_PASSWORD, maskPassword, this)
+        multiLine = PreferenceService.getAsBool(PREF_PASSWD_WORDS_ON_NL, this)
+        maskPassword = PreferenceService.getAsBool(PREF_MASK_PASSWORD, this)
 
         appBarLayout = findViewById(R.id.credential_detail_toolbar_layout)
 
@@ -121,12 +121,12 @@ class ShowCredentialActivity : SecureActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.credential_detail_menu, menu)
 
-        val enableCopyPassword = PreferenceService.getAsBool(PREF_ENABLE_COPY_PASSWORD, false, this)
+        val enableCopyPassword = PreferenceService.getAsBool(PREF_ENABLE_COPY_PASSWORD, this)
         if (!enableCopyPassword) {
             menu.findItem(R.id.menu_copy_credential)?.isVisible = false
         }
 
-        val enableOverlayFeature = PreferenceService.getAsBool(PREF_ENABLE_OVERLAY_FEATURE, true, this)
+        val enableOverlayFeature = PreferenceService.getAsBool(PREF_ENABLE_OVERLAY_FEATURE, this)
         if (!enableOverlayFeature) {
             menu.findItem(R.id.menu_detach_credential)?.isVisible = false
         }

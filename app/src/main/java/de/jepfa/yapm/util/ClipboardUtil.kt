@@ -17,7 +17,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_WARN_BEFORE_COPY_TO_CB
 object ClipboardUtil {
 
     fun copyEncPasswordWithCheck(encPassword: Encrypted, activity: SecureActivity) {
-        val warn = PreferenceService.getAsBool(PREF_WARN_BEFORE_COPY_TO_CB, true, activity)
+        val warn = PreferenceService.getAsBool(PREF_WARN_BEFORE_COPY_TO_CB, activity)
         if (warn) {
             AlertDialog.Builder(activity)
                 .setTitle("Copy password")

@@ -92,9 +92,9 @@ class EditCredentialPasswordFragment : SecureFragment() {
         switchAddDigit = view.findViewById(R.id.switch_add_digit)
         switchAddSpecialChar = view.findViewById(R.id.switch_add_special_char)
 
-        switchUpperCaseChar.isChecked = getPref(PreferenceService.PREF_WITH_UPPER_CASE, true)
-        switchAddDigit.isChecked = getPref(PreferenceService.PREF_WITH_DIGITS, false)
-        switchAddSpecialChar.isChecked = getPref(PreferenceService.PREF_WITH_SPECIAL_CHARS, false)
+        switchUpperCaseChar.isChecked = getPref(PreferenceService.PREF_WITH_UPPER_CASE)
+        switchAddDigit.isChecked = getPref(PreferenceService.PREF_WITH_DIGITS)
+        switchAddSpecialChar.isChecked = getPref(PreferenceService.PREF_WITH_SPECIAL_CHARS)
 
         val buttonGeneratePasswd: Button = view.findViewById(R.id.button_generate_passwd)
         buttonGeneratePasswd.setOnClickListener {
@@ -278,7 +278,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
     }
 
     private fun getPreferedTab(): TabLayout.Tab? {
-        if (getPref(PreferenceService.PREF_USE_PREUDO_PHRASE, true)) {
+        if (getPref(PreferenceService.PREF_USE_PREUDO_PHRASE)) {
             return passwdTypeTab.getTabAt(0)
         }
         else {
@@ -322,15 +322,15 @@ class EditCredentialPasswordFragment : SecureFragment() {
         val name = getResources().getString(passphraseStrength.nameId)
         radioButton.text = "${name}"
 
-        val prefDefaultPasswdStrength = PreferenceService.get(PreferenceService.PREF_PASSWD_STRENGTH, getBaseActivity())
+        val prefDefaultPasswdStrength = PreferenceService.getAsString(PreferenceService.PREF_PASSWD_STRENGTH, getBaseActivity())
         val defaultPasswdStrength = getStrengthEnum(prefDefaultPasswdStrength)
         if (defaultPasswdStrength == passphraseStrength) {
             radioButton.setChecked(true)
         }
     }
 
-    private fun getPref(key: String, default: Boolean): Boolean {
-        return PreferenceService.getAsBool(key, default, getBaseActivity())
+    private fun getPref(key: String): Boolean {
+        return PreferenceService.getAsBool(key, getBaseActivity())
     }
 
     private fun getStrengthEnum(name: String?) : PassphraseStrength {
@@ -400,12 +400,12 @@ class EditCredentialPasswordFragment : SecureFragment() {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.credential_edit_menu, menu)
 
-        val enableCopyPassword = PreferenceService.getAsBool(PreferenceService.PREF_ENABLE_COPY_PASSWORD, false, getBaseActivity())
+        val enableCopyPassword = PreferenceService.getAsBool(PreferenceService.PREF_ENABLE_COPY_PASSWORD, getBaseActivity())
         if (!enableCopyPassword) {
             menu.findItem(R.id.menu_copy_credential)?.isVisible = false
         }
 
-        val enableOverlayFeature = PreferenceService.getAsBool(PreferenceService.PREF_ENABLE_OVERLAY_FEATURE, true, getBaseActivity())
+        val enableOverlayFeature = PreferenceService.getAsBool(PreferenceService.PREF_ENABLE_OVERLAY_FEATURE, getBaseActivity())
         if (!enableOverlayFeature) {
             menu.findItem(R.id.menu_detach_credential)?.isVisible = false
         }

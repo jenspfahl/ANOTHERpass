@@ -1,16 +1,23 @@
 package de.jepfa.yapm.ui
 
 import android.app.Application
+import androidx.preference.PreferenceManager
+import de.jepfa.yapm.R
 import de.jepfa.yapm.database.YapmDatabase
 import de.jepfa.yapm.repository.CredentialRepository
 import de.jepfa.yapm.repository.LabelRepository
+import de.jepfa.yapm.service.PreferenceService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 
 class YapmApp : Application() {
-    val applicationScope = CoroutineScope(SupervisorJob())
 
     val database by lazy { YapmDatabase.getDatabase(this) }
     val credentialRepository by lazy { CredentialRepository(database!!.credentialDao()) }
     val labelRepository by lazy { LabelRepository(database!!.labelDao()) }
+
+    override fun onCreate() {
+        super.onCreate()
+        PreferenceService.initDefaults(this.applicationContext)
+    }
 }

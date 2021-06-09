@@ -21,7 +21,7 @@
         app:title="Show passwords on multiple line"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
-        app:defaultValue="false"/>
+        app:defaultValue="true"/>
 
     <SwitchPreferenceCompat
         app:key="YAPM/pref:colorize_mp_qrcodes"

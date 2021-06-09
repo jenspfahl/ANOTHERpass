@@ -19,7 +19,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_COLORIZE_MP_QRCODES
 object QRCodeUtil {
 
     fun generateQRCode(header: String?, data: String, color: Int = Color.BLACK, context: Context): Bitmap {
-        val colorize = PreferenceService.getAsBool(PREF_COLORIZE_MP_QRCODES, true, context)
+        val colorize = PreferenceService.getAsBool(PREF_COLORIZE_MP_QRCODES, context)
         val printColor = if (colorize) color else Color.BLACK
 
         val width = 500

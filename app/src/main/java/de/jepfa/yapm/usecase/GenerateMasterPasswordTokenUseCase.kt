@@ -17,7 +17,7 @@ import de.jepfa.yapm.util.putEncryptedExtra
 object GenerateMasterPasswordTokenUseCase: SecureActivityUseCase {
 
     override fun execute(activity: SecureActivity): Boolean {
-        val mptCounter = PreferenceService.getAsInt(STATE_MASTER_PASSWD_TOKEN_COUNTER, 0, activity)
+        val mptCounter = PreferenceService.getAsInt(STATE_MASTER_PASSWD_TOKEN_COUNTER, activity)
         if (PreferenceService.isPresent(DATA_MASTER_PASSWORD_TOKEN_KEY, activity)) {
             AlertDialog.Builder(activity)
                     .setTitle("Generate master password token")
@@ -51,7 +51,7 @@ object GenerateMasterPasswordTokenUseCase: SecureActivityUseCase {
             val masterPasswordToken = SecretService.encryptPassword(Encrypted.TYPE_MASTER_PASSWD_TOKEN, masterPasswordTokenSK, masterPassword)
             val encMasterPasswordToken = SecretService.encryptEncrypted(tempKey, masterPasswordToken)
 
-            var nextMptNumber = PreferenceService.getAsInt(STATE_MASTER_PASSWD_TOKEN_COUNTER, 0, activity) + 1
+            var nextMptNumber = PreferenceService.getAsInt(STATE_MASTER_PASSWD_TOKEN_COUNTER, activity) + 1
 
             val encHead = SecretService.encryptCommonString(tempKey, "Your Master Password Token #$nextMptNumber")
             val encSub = SecretService.encryptCommonString(tempKey, "Take this token in your wallet to scan for login. If you loose it, just create a new one.")

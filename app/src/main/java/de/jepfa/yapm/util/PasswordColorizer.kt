@@ -15,7 +15,7 @@ object PasswordColorizer {
     private const val WORD_WIDTH = 4
 
     fun spannableString(password: Password, context: Context): CharSequence {
-        val multiLine = PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_WORDS_ON_NL, false, context)
+        val multiLine = PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_WORDS_ON_NL, context)
         return spannableString(password, multiLine, maskPassword = false, context)
     }
 
@@ -24,7 +24,7 @@ object PasswordColorizer {
     }
 
     fun spannableString(password: Password, multiLine: Boolean, maskPassword: Boolean, context: Context): CharSequence {
-        val colorizePasswd = PreferenceService.getAsBool(PREF_COLORED_PASSWORD, true, context)
+        val colorizePasswd = PreferenceService.getAsBool(PREF_COLORED_PASSWORD, context)
         if (colorizePasswd) {
             return colorizePassword(password, multiLine, maskPassword, context)
         }

@@ -28,7 +28,6 @@ import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_ATTEMPTS
 
 class LoginActivity : NfcBaseActivity() {
 
-    val DEFAULT_MAX_LOGIN_ATTEMPTS = 3
     var loginAttempts = 0
     var showTagDetectedMessage = false
 
@@ -43,12 +42,12 @@ class LoginActivity : NfcBaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(null)
 
-        loginAttempts = PreferenceService.getAsInt(STATE_LOGIN_ATTEMPTS, 0, this)
+        loginAttempts = PreferenceService.getAsInt(STATE_LOGIN_ATTEMPTS,  this)
 
         if (PreferenceService.isPresent(DATA_ENCRYPTED_MASTER_KEY, this)) {
             setContentView(R.layout.activity_login)
             nfcAdapter = NfcService.getNfcAdapter(this)
-            readTagFromIntent(intent) // TODO tag data is not at intent here because of missing foreground dispatch
+            readTagFromIntent(intent)
 
         }
         else {
@@ -112,7 +111,7 @@ class LoginActivity : NfcBaseActivity() {
         loginAttempts++
         PreferenceService.put(STATE_LOGIN_ATTEMPTS, loginAttempts.toString(), this)
         if (loginAttempts >= getMaxLoginAttempts()) {
-            val selfDestruction = PreferenceService.getAsBool(PREF_SELF_DESTRUCTION, false, this)
+            val selfDestruction = PreferenceService.getAsBool(PREF_SELF_DESTRUCTION, this)
 
             if (selfDestruction) {
                 Toast.makeText(baseContext, R.string.too_may_wrong_logins_self_destruction, Toast.LENGTH_LONG).show()
@@ -160,6 +159,6 @@ class LoginActivity : NfcBaseActivity() {
     }
 
     private fun getMaxLoginAttempts(): Int {
-        return PreferenceService.getAsInt(PREF_MAX_LOGIN_ATTEMPTS, DEFAULT_MAX_LOGIN_ATTEMPTS, this)
+        return PreferenceService.getAsInt(PREF_MAX_LOGIN_ATTEMPTS, this)
     }
 }

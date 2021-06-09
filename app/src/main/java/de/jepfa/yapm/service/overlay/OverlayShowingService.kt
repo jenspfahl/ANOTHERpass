@@ -55,7 +55,7 @@ class OverlayShowingService : Service(), OnTouchListener {
                 password = SecretService.decryptPassword(transSK, encrypted)
 
                 val multiLineDefault =
-                    PreferenceService.getAsBool(PREF_PASSWD_WORDS_ON_NL, false, this)
+                    PreferenceService.getAsBool(PREF_PASSWD_WORDS_ON_NL, this)
                 multiLine = intent.getBooleanExtra(DetachHelper.EXTRA_MULTILINE, multiLineDefault)
 
                 paintIt()
@@ -76,7 +76,7 @@ class OverlayShowingService : Service(), OnTouchListener {
         overlayedButton?.apply {
             setAllCaps(false)
             setPadding(24, 12, 24, 12)
-            val isTransparent = PreferenceService.getAsBool(PREF_TRANSPARENT_OVERLAY, true, this@OverlayShowingService)
+            val isTransparent = PreferenceService.getAsBool(PREF_TRANSPARENT_OVERLAY, this@OverlayShowingService)
             if (isTransparent) {
                 setBackgroundColor(0x77feccff)
             }
