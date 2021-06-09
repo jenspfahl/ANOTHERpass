@@ -191,6 +191,7 @@
     <string name="edit_password_message">Here you can change the password manually which is not supposed by the app.</string>
     <string name="pref_header_overlay">Password overlay dialog</string>
     <string name="HYPER">Hyper</string>
+    <string name="sort_by_recent">Sort by recent</string>
 
 
 </resources>

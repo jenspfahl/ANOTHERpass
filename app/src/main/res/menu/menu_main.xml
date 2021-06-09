@@ -34,5 +34,12 @@
         app:showAsAction="ifRoom">
     </item>
 
+    <item
+        android:id="@+id/menu_sort_by_recent"
+        android:checkable="true"
+        android:title="@string/sort_by_recent"
+        app:showAsAction="never">
+    </item>
+
 
 </menu>

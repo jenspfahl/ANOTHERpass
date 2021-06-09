@@ -57,6 +57,8 @@ object PreferenceService {
 
     const val STATE_LOGIN_ATTEMPTS = STATE_PREFIX + "login_attempts"
 
+    const val PREF_SORT_BY_RECENT = PREF_PREFIX + "sort_by_recent"
+
 
     fun initDefaults(context: Context) {
         val defaultInitDone = getAsString(STATE_DEFAULT_INIT_DONE, context)
@@ -118,6 +120,20 @@ object PreferenceService {
         val editor = defaultSharedPreferences.edit()
         editor.putString(prefKey, value)
         editor.commit()
+    }
+
+    fun putBoolean(prefKey: String, value: Boolean, context: Context) {
+        val defaultSharedPreferences = PreferenceManager
+                .getDefaultSharedPreferences(context)
+
+        val editor = defaultSharedPreferences.edit()
+        editor.putBoolean(prefKey, value)
+        editor.commit()
+    }
+
+    fun toggleBoolean(prefKey: String, context: Context) {
+        val value = getAsBool(prefKey, context)
+        putBoolean(prefKey, !value, context)
     }
 
     fun delete(prefKey: String, context: Context) {

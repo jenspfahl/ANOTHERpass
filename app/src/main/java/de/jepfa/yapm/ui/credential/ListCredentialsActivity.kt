@@ -52,6 +52,7 @@ import de.jepfa.yapm.usecase.*
 import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.DebugInfo.getVersionName
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
+import de.jepfa.yapm.service.PreferenceService.PREF_SORT_BY_RECENT
 
 class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationItemSelectedListener  {
 
@@ -78,22 +79,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         CurrentCredentialHolder.currentCredential = null
         assistStructure = intent.getParcelableExtra(AutofillManager.EXTRA_ASSIST_STRUCTURE)
 
-        credentialViewModel.allCredentials.observe(this, Observer { credentials ->
-            credentials?.let {
-                val key = masterSecretKey
-                if (key != null) {
-                    credentials.forEach { LabelService.updateLabelsForCredential(key, it) }
-
-                    val sorted = it
-                        .sortedBy { SecretService.decryptCommonString(key, it.name).toLowerCase() }
-                    listCredentialAdapter?.submitOriginList(sorted)
-                    listCredentialAdapter?.filter?.filter("")
-                } else {
-                    listCredentialAdapter?.submitOriginList(credentials)
-                    listCredentialAdapter?.filter?.filter("")
-                }
-            }
-        })
+        refreshCredentials()
 
         labelViewModel.allLabels.observe(this, { labels ->
             masterSecretKey?.let{ key ->
@@ -193,6 +179,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
         refreshMenuLockItem(menu.findItem(R.id.menu_lock_items))
         refreshMenuFiltersItem(menu.findItem(R.id.menu_filter))
+        refreshMenuSortedByItem(menu.findItem(R.id.menu_sort_by_recent))
 
         return super.onCreateOptionsMenu(menu)
     }
@@ -267,7 +254,6 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
                         listCredentialAdapter?.filter?.filter("")
                         refreshMenuFiltersItem(item)
-                        // TODO add red dot to menu item icon to indicate filter
                         dialog.dismiss()
                     }
 
@@ -284,6 +270,12 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
                 dialog.show()
 
+                return true
+            }
+            R.id.menu_sort_by_recent -> {
+                PreferenceService.toggleBoolean(PREF_SORT_BY_RECENT, this)
+                refreshMenuSortedByItem(item)
+                refreshCredentials()
                 return true
             }
             else -> super.onOptionsItemSelected(item)
@@ -498,6 +490,34 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         return true
     }
 
+    private fun refreshCredentials() {
+        credentialViewModel.allCredentials.observe(this, Observer { credentials ->
+            credentials?.let { credentials ->
+                var sortedCredentials = credentials
+
+                masterSecretKey?.let { key ->
+                    credentials.forEach { LabelService.updateLabelsForCredential(key, it) }
+
+                    val sortedByRecent = PreferenceService.getAsBool(PREF_SORT_BY_RECENT, this)
+                    if (sortedByRecent) {
+                        sortedCredentials = credentials
+                            .sortedBy { it.id }
+                            .reversed()
+                    } else {
+                        sortedCredentials = credentials
+                            .sortedBy {
+                                SecretService.decryptCommonString(key, it.name).toLowerCase()
+                            }
+                    }
+                }
+
+                listCredentialAdapter?.submitOriginList(sortedCredentials)
+                listCredentialAdapter?.filter?.filter("")
+
+            }
+        })
+    }
+
     private fun refreshMenuMasterPasswordItem(menu: Menu) {
         val storedMasterPasswdPresent = PreferenceService.isPresent(
             DATA_ENCRYPTED_MASTER_PASSWORD,
@@ -521,7 +541,6 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         }
     }
 
-
     private fun refreshMenuFiltersItem(item: MenuItem) {
         val hasFilters = LabelFilter.hasFilters()
         item.setChecked(hasFilters)
@@ -531,6 +550,11 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         else {
             item.setIcon(R.drawable.ic_baseline_filter_list_24_white)
         }
+    }
+
+    private fun refreshMenuSortedByItem(item: MenuItem) {
+        val sortedByRecent = PreferenceService.getAsBool(PREF_SORT_BY_RECENT, this)
+        item.setChecked(sortedByRecent)
     }
 
     fun deleteCredential(credential: EncCredential) {
