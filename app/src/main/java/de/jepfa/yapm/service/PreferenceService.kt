@@ -1,6 +1,7 @@
 package de.jepfa.yapm.service
 
 import android.content.Context
+import android.util.Log
 import androidx.preference.PreferenceManager
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
@@ -11,6 +12,12 @@ object PreferenceService {
     private const val DATA_PREFIX = "YAPM/data:"
     private const val STATE_PREFIX = "YAPM/state:"
     private const val ACTION_PREFIX = "YAPM/action:"
+
+    /**
+     * If you add new preference xml files inside #initDefaults, they should be recognised as well.
+     * To achieve this, count the version value up here.
+     */
+    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_1"
 
     const val STATE_DEFAULT_INIT_DONE = STATE_PREFIX + "default_init_done"
 
@@ -52,8 +59,8 @@ object PreferenceService {
 
 
     fun initDefaults(context: Context) {
-        val defaultInitDone = getAsBool(STATE_DEFAULT_INIT_DONE, context)
-        if (!defaultInitDone) {
+        val defaultInitDone = getAsString(STATE_DEFAULT_INIT_DONE, context)
+        if (defaultInitDone == null || !defaultInitDone.equals(STATE_DEFAULT_INIT_DONE_VERSION)) {
             PreferenceManager.setDefaultValues(context, R.xml.autofill_preferences, true)
             PreferenceManager.setDefaultValues(context, R.xml.clipboard_preferences, true)
             PreferenceManager.setDefaultValues(context, R.xml.general_preferences, true)
@@ -61,8 +68,11 @@ object PreferenceService {
             PreferenceManager.setDefaultValues(context, R.xml.overlay_preferences, true)
             PreferenceManager.setDefaultValues(context, R.xml.password_generator_preferences, true)
             PreferenceManager.setDefaultValues(context, R.xml.security_preferences, true)
-
-            put(STATE_DEFAULT_INIT_DONE, true.toString(), context)
+            /*
+            If you add new preference xml files here, don't forget to count up STATE_DEFAULT_INIT_DONE_VERSION
+             */
+            putString(STATE_DEFAULT_INIT_DONE, STATE_DEFAULT_INIT_DONE_VERSION, context)
+            Log.i("PREFS", "default values set with version $STATE_DEFAULT_INIT_DONE_VERSION")
         }
     }
 
@@ -98,10 +108,10 @@ object PreferenceService {
     }
 
     fun putEncrypted(prefKey: String, encrypted: Encrypted, context: Context) {
-        put(prefKey, encrypted.toBase64String(), context)
+        putString(prefKey, encrypted.toBase64String(), context)
     }
 
-    fun put(prefKey: String, value: String, context: Context) {
+    fun putString(prefKey: String, value: String, context: Context) {
         val defaultSharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(context)
 

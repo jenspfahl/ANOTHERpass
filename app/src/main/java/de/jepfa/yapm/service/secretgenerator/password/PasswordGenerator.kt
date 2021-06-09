@@ -1,6 +1,7 @@
-package de.jepfa.yapm.service.secretgenerator
+package de.jepfa.yapm.service.secretgenerator.password
 
 import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.service.secretgenerator.GeneratorBase
 
 class PasswordGenerator : GeneratorBase<PasswordGeneratorSpec>() {
 
@@ -21,7 +22,7 @@ class PasswordGenerator : GeneratorBase<PasswordGeneratorSpec>() {
     override fun calcCombinationCount(spec: PasswordGeneratorSpec): Double {
         val material = extractMaterial(spec)
         //TODO contains also all #matchSpec() exclusions which shouldn't
-        return Math.pow(material.length.toDouble(), spec.strength.passwordLength.toDouble())
+        return Math.pow(material.length.toDouble(), spec.strength.ordinaryPasswordLength.toDouble())
     }
 
     private fun matchSpec(spec: PasswordGeneratorSpec, buffer: CharArray): Boolean {
@@ -43,7 +44,7 @@ class PasswordGenerator : GeneratorBase<PasswordGeneratorSpec>() {
     }
 
     private fun generatePassword(spec: PasswordGeneratorSpec): CharArray {
-        val buffer = CharArray(spec.strength.passwordLength)
+        val buffer = CharArray(spec.strength.ordinaryPasswordLength)
         val material = extractMaterial(spec)
 
         for (i in 0 until buffer.size) {

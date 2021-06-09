@@ -109,7 +109,7 @@ class LoginActivity : NfcBaseActivity() {
 
     fun handleFailedLoginAttempt() {
         loginAttempts++
-        PreferenceService.put(STATE_LOGIN_ATTEMPTS, loginAttempts.toString(), this)
+        PreferenceService.putString(STATE_LOGIN_ATTEMPTS, loginAttempts.toString(), this)
         if (loginAttempts >= getMaxLoginAttempts()) {
             val selfDestruction = PreferenceService.getAsBool(PREF_SELF_DESTRUCTION, this)
 

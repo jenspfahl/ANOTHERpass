@@ -59,7 +59,7 @@ object GenerateMasterPasswordTokenUseCase: SecureActivityUseCase {
             val encQrc = encMasterPasswordToken
 
             PreferenceService.putEncrypted(DATA_MASTER_PASSWORD_TOKEN_KEY, encMasterPasswordTokenKey, activity)
-            PreferenceService.put(STATE_MASTER_PASSWD_TOKEN_COUNTER, nextMptNumber.toString(), activity)
+            PreferenceService.putString(STATE_MASTER_PASSWD_TOKEN_COUNTER, nextMptNumber.toString(), activity)
 
 
             val intent = Intent(activity, QrCodeActivity::class.java)

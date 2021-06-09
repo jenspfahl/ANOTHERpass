@@ -1,6 +1,8 @@
-package de.jepfa.yapm.service.secretgenerator
+package de.jepfa.yapm.service.secretgenerator.passphrase
 
 import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.service.secretgenerator.GeneratorBase
+import de.jepfa.yapm.service.secretgenerator.SecretStrength
 import java.lang.Math.ceil
 import java.lang.Math.pow
 
@@ -103,8 +105,8 @@ class PassphraseGenerator(
             return consonants.contains(char, true);
     }
 
-    private fun strengthToWordCount(strength: PassphraseStrength): Int {
-        return strength.passwordLength / 4
+    private fun strengthToWordCount(strength: SecretStrength): Int {
+        return strength.pseudoPhraseLength / 4
     }
 
     private fun alphabet() = vocals + consonants

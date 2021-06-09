@@ -1,7 +1,10 @@
-package de.jepfa.yapm.service.secretgenerator
+package de.jepfa.yapm.service.secretgenerator.passphrase
 
 import de.jepfa.yapm.service.secretgenerator.GeneratorBase.Companion.BRUTEFORCE_ATTEMPTS_PENTIUM
 import de.jepfa.yapm.service.secretgenerator.GeneratorBase.Companion.BRUTEFORCE_ATTEMPTS_SUPERCOMP
+import de.jepfa.yapm.service.secretgenerator.SecretStrength
+import de.jepfa.yapm.service.secretgenerator.passphrase.PassphraseGenerator
+import de.jepfa.yapm.service.secretgenerator.passphrase.PassphraseGeneratorSpec
 import de.jepfa.yapm.util.secondsToYear
 import org.junit.Assert
 import org.junit.Test
@@ -10,7 +13,8 @@ class PassphraseGeneratorTest {
 
     @Test
     fun generateAndClearPassphrase() {
-        val spec = PassphraseGeneratorSpec(PassphraseStrength.STRONG,
+        val spec = PassphraseGeneratorSpec(
+            SecretStrength.STRONG,
                 wordBeginningUpperCase = true, addDigit = false, addSpecialChar = true)
         val passphraseGenerator = PassphraseGenerator()
 
@@ -32,7 +36,7 @@ class PassphraseGeneratorTest {
 
     @Test
     fun testCalcCombinations() {
-        val spec = PassphraseGeneratorSpec(PassphraseStrength.ONE_WORD)
+        val spec = PassphraseGeneratorSpec(SecretStrength.ONE_WORD)
         val passphraseGenerator = PassphraseGenerator(vocals = "ai", consonants = "hst")
 
         val hits = HashSet<String>()

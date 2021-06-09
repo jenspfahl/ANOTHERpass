@@ -1,8 +1,7 @@
-package de.jepfa.yapm.service.secretgenerator
+package de.jepfa.yapm.service.secretgenerator.password
 
-import de.jepfa.yapm.service.secretgenerator.PasswordGeneratorSpec
-import de.jepfa.yapm.service.secretgenerator.PasswordGenerator
-import de.jepfa.yapm.service.secretgenerator.PasswordStrength
+import de.jepfa.yapm.service.secretgenerator.GeneratorBase
+import de.jepfa.yapm.service.secretgenerator.SecretStrength
 import de.jepfa.yapm.util.secondsToYear
 import org.junit.Test
 
@@ -12,7 +11,8 @@ class PasswordGeneratorTest {
 
     @Test
     fun generatePassword() {
-        val spec = PasswordGeneratorSpec(PasswordStrength.NORMAL,
+        val spec = PasswordGeneratorSpec(
+            SecretStrength.NORMAL,
             noDigits = false, excludeSpecialChars = false, onlyLowerCase = false)
         for (i in 1..10) {
             val password = passwordGenerator.generate(spec)
