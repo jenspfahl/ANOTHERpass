@@ -98,7 +98,7 @@ class CreateVaultSummarizeFragment : BaseFragment() {
         storeMasterPassword: Boolean
     ) {
 
-        getBaseActivity().getProgressBar()?.let {
+        getBaseActivity()?.getProgressBar()?.let {
 
             AsyncWithProgressBar(
                 getBaseActivity(),
@@ -118,7 +118,7 @@ class CreateVaultSummarizeFragment : BaseFragment() {
                         pin.clear()
                         masterPasswd.clear()
                         findNavController().navigate(R.id.action_Create_Vault_to_ThirdFragment_to_Root)
-                        getBaseActivity().finish()
+                        getBaseActivity()?.finish()
                     }
                 }
             )

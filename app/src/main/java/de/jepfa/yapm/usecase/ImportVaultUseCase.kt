@@ -16,7 +16,8 @@ import kotlinx.coroutines.launch
 
 object ImportVaultUseCase {
 
-    fun execute(jsonContent: JsonObject, encMasterKey: String?, activity: BaseActivity): Boolean {
+    fun execute(jsonContent: JsonObject, encMasterKey: String?, activity: BaseActivity?): Boolean {
+        if (activity == null) return false
         val salt = jsonContent.get(FileIOService.JSON_VAULT_ID)?.asString
         salt?.let {
             SaltService.storeSaltFromBase64String(it, activity)

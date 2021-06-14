@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat
 
 object Constants {
     val HOMEPAGE = Uri.parse("https://anotherpass.jepfa.de")
-    val BUG_REPORT_SITE = Uri.parse("https://bitbucket.org/jepfa/yapm") // TODO add bugtracker if online
+    val BUG_REPORT_SITE = Uri.parse("https://github.com/jenspfahl/anotherpass/issues")
 
     val MAX_LABELS_PER_CREDENTIAL = 5
     val MAX_LABEL_LENGTH = 20

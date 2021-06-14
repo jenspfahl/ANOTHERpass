@@ -60,7 +60,8 @@ object PreferenceService {
     const val PREF_SORT_BY_RECENT = PREF_PREFIX + "sort_by_recent"
 
 
-    fun initDefaults(context: Context) {
+    fun initDefaults(context: Context?) {
+        if (context == null) return
         val defaultInitDone = getAsString(STATE_DEFAULT_INIT_DONE, context)
         if (defaultInitDone == null || !defaultInitDone.equals(STATE_DEFAULT_INIT_DONE_VERSION)) {
             PreferenceManager.setDefaultValues(context, R.xml.autofill_preferences, true)
@@ -78,34 +79,36 @@ object PreferenceService {
         }
     }
 
-    fun getEncrypted(prefKey: String, context: Context): Encrypted? {
+    fun getEncrypted(prefKey: String, context: Context?): Encrypted? {
         return get(prefKey, context)?.let { Encrypted.fromBase64String(it)}
     }
 
-    fun getAsInt(prefKey: String, context: Context): Int {
+    fun getAsInt(prefKey: String, context: Context?): Int {
         val value = get(prefKey, context) ?: return 0
         return value.toInt()
     }
 
-    fun getAsBool(prefKey: String, context: Context): Boolean {
+    fun getAsBool(prefKey: String, context: Context?): Boolean {
+        if (context == null) return false
         val defaultSharedPreferences = PreferenceManager
             .getDefaultSharedPreferences(context)
         return defaultSharedPreferences
             .getBoolean(prefKey, false)
     }
 
-    fun getAsString(prefKey: String, context: Context): String? {
+    fun getAsString(prefKey: String, context: Context?): String? {
         return get(prefKey, context)
     }
 
-    private fun get(prefKey: String, context: Context): String? {
+    private fun get(prefKey: String, context: Context?): String? {
+        if (context == null) return null
         val defaultSharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(context)
         return defaultSharedPreferences
                 .getString(prefKey, null)
     }
 
-    fun isPresent(prefKey: String, context: Context): Boolean {
+    fun isPresent(prefKey: String, context: Context?): Boolean {
         return get(prefKey, context) != null
     }
 

@@ -13,8 +13,8 @@ import de.jepfa.yapm.util.putEncryptedExtra
 
 object ExportEncMasterPasswordUseCase {
 
-    fun execute(encMasterPasswd: Encrypted, noSessionCheck: Boolean, activity: BaseActivity): Boolean {
-
+    fun execute(encMasterPasswd: Encrypted, noSessionCheck: Boolean, activity: BaseActivity?): Boolean {
+        if (activity == null) return false
         val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
 
         val encHead = SecretService.encryptCommonString(tempKey, "Your Encrypted Master Password")

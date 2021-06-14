@@ -14,17 +14,18 @@ import de.jepfa.yapm.ui.nfc.NfcActivity
  */
 object NfcService {
 
-    fun getNfcAdapter(context: Context): NfcAdapter? {
+    fun getNfcAdapter(context: Context?): NfcAdapter? {
+        if (context == null) return null
         val nfcManager = context.getSystemService(Context.NFC_SERVICE) as NfcManager
         return nfcManager.defaultAdapter
     }
 
-    fun isNfcAvailable(context: Context): Boolean {
+    fun isNfcAvailable(context: Context?): Boolean {
         val adapter = getNfcAdapter(context)
         return adapter != null
     }
 
-    fun isNfcEnabled(context: Context): Boolean {
+    fun isNfcEnabled(context: Context?): Boolean {
         val adapter = getNfcAdapter(context)
         return adapter != null && adapter.isEnabled
     }
@@ -72,10 +73,12 @@ object NfcService {
     }
 
     fun scanNfcTag(fragment: BaseFragment) {
-        val intent = Intent(fragment.getBaseActivity(), NfcActivity::class.java)
-        intent.putExtra(NfcActivity.EXTRA_MODE, NfcActivity.EXTRA_MODE_RO)
-        intent.putExtra(NfcActivity.EXTRA_NO_SESSION_CHECK, true)
-        fragment.startActivityForResult(intent, NfcActivity.ACTION_READ_NFC_TAG)
+        fragment.getBaseActivity()?.let {
+            val intent = Intent(it, NfcActivity::class.java)
+            intent.putExtra(NfcActivity.EXTRA_MODE, NfcActivity.EXTRA_MODE_RO)
+            intent.putExtra(NfcActivity.EXTRA_NO_SESSION_CHECK, true)
+            fragment.startActivityForResult(intent, NfcActivity.ACTION_READ_NFC_TAG)
+        }
     }
 
 }

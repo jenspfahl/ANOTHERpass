@@ -113,7 +113,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
         encMasterKey: String?
     ) {
 
-        getBaseActivity().getProgressBar()?.let {
+        getBaseActivity()?.getProgressBar()?.let {
 
             AsyncWithProgressBar(
                 getBaseActivity(),
@@ -127,7 +127,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
                     }
                     else {
                         findNavController().navigate(R.id.action_importVault_to_Login)
-                        getBaseActivity().finish()
+                        getBaseActivity()?.finish()
                     }
                 }
             )

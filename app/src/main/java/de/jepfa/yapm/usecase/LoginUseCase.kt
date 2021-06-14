@@ -13,8 +13,8 @@ import de.jepfa.yapm.service.PreferenceService.PREF_LOGOUT_TIMEOUT
 
 object LoginUseCase {
 
-    fun execute(pin: Password, masterPassword: Password, context: Context): Boolean {
-
+    fun execute(pin: Password, masterPassword: Password, context: Context?): Boolean {
+        if (context == null) return false
         val salt = SaltService.getSalt(context)
         val encMasterKey = PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, context)
         if (encMasterKey == null) {

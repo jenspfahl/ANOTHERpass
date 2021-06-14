@@ -39,7 +39,8 @@ class ImportVaultLoadFileFragment : BaseFragment() {
 
         val loadButton = view.findViewById<Button>(R.id.button_load_vault)
         loadButton.setOnClickListener {
-            ExtPermissionChecker.verifyReadStoragePermissions(getBaseActivity())
+            val baseActivity = getBaseActivity() ?: return@setOnClickListener
+            ExtPermissionChecker.verifyReadStoragePermissions(baseActivity)
 
             val intent = Intent()
                     .setType("*/*")
@@ -57,7 +58,8 @@ class ImportVaultLoadFileFragment : BaseFragment() {
 
                 if (selectedFile != null && FileUtil.isExternalStorageReadable()) {
                     try {
-                        val content = FileUtil.readFile(getBaseActivity(), selectedFile)
+                        val baseActivity = getBaseActivity() ?: return
+                        val content = FileUtil.readFile(baseActivity, selectedFile)
                         if (content != null) {
                             getImportVaultActivity().jsonContent = JsonParser.parseString(content).getAsJsonObject()
                         }

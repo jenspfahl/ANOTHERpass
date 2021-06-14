@@ -153,7 +153,8 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                 val masterPasswordTokenSK = getAndroidSecretKey(ALIAS_KEY_MP_TOKEN)
                 val masterPasswordTokenKey =
                     decryptKey(masterPasswordTokenSK, encMasterPasswordTokenKey)
-                val mptSK = generateSecretKey(masterPasswordTokenKey, getSalt(getBaseActivity()))
+                val baseActivity = getBaseActivity() ?: return false
+                val mptSK = generateSecretKey(masterPasswordTokenKey, getSalt(baseActivity))
 
                 val encMasterPassword =
                     SecretService.decryptPassword(mptSK, Encrypted.fromBase64String(scanned))
@@ -175,7 +176,8 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
             }
         } else if (scanned.startsWith(Encrypted.TYPE_ENC_MASTER_PASSWD)) {
 
-            val salt = getSalt(getBaseActivity())
+            val baseActivity = getBaseActivity() ?: return false
+            val salt = getSalt(baseActivity)
             val empSK = generateEncMasterPasswdSK(Password(salt.toCharArray()))
             val encMasterPassword =
                 SecretService.decryptPassword(empSK, Encrypted.fromBase64String(scanned))
@@ -231,7 +233,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                     LoginUseCase.execute(
                         userPin,
                         masterPassword,
-                        getBaseActivity()
+                        loginActivity
                     )
                 },
                 { success ->
@@ -243,7 +245,9 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                         if (isStoreMasterPassword) {
                             val keyForMP = getAndroidSecretKey(SecretService.ALIAS_KEY_MP)
                             val encPasswd = encryptPassword(keyForMP, masterPassword)
-                            PreferenceService.putEncrypted(DATA_ENCRYPTED_MASTER_PASSWORD, encPasswd, getBaseActivity())
+                            val baseActivity = getBaseActivity() ?: return@AsyncWithProgressBar
+
+                            PreferenceService.putEncrypted(DATA_ENCRYPTED_MASTER_PASSWORD, encPasswd, baseActivity)
                         }
 
                         userPin.clear()

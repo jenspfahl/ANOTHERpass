@@ -11,8 +11,8 @@ import de.jepfa.yapm.service.secret.SecretService
 
 object CreateVaultUseCase {
 
-    fun execute(pin: Password, masterPasswd: Password, storeMasterPasswd: Boolean, context: Context): Boolean {
-
+    fun execute(pin: Password, masterPasswd: Password, storeMasterPasswd: Boolean, context: Context?): Boolean {
+        if (context == null) return false
         val salt = SaltService.getSalt(context)
         val masterKey = generateKey(128)
         encryptAndStoreMasterKey(masterKey, pin, masterPasswd, salt, context)

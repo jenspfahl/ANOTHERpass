@@ -1,5 +1,6 @@
 package de.jepfa.yapm.ui
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
@@ -15,7 +16,7 @@ open class BaseFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        getBaseActivity().supportActionBar?.setDisplayHomeAsUpEnabled(enableBack)
+        getBaseActivity()?.supportActionBar?.setDisplayHomeAsUpEnabled(enableBack)
         setHasOptionsMenu(enableBack)
     }
 
@@ -26,8 +27,10 @@ open class BaseFragment : Fragment() {
                 findNavController().navigateUp()
             }
             else {
-                val upIntent = Intent(getBaseActivity().intent)
-                getBaseActivity().navigateUpTo(upIntent)
+                getBaseActivity()?.let {
+                    val upIntent = Intent(it.intent)
+                    it.navigateUpTo(upIntent)
+                }
             }
             return true
         }
@@ -35,12 +38,16 @@ open class BaseFragment : Fragment() {
     }
 
     fun setTitle(titleId: Int) {
-        getBaseActivity().setTitle(titleId)
+        getBaseActivity()?.setTitle(titleId)
     }
 
 
-    fun getBaseActivity() : BaseActivity {
-        return activity as BaseActivity
+    fun getBaseActivity() : BaseActivity? {
+        return activity as BaseActivity?
+    }
+
+    fun <T: BaseActivity> getBaseActivityAs() :T? {
+        return activity as T?
     }
 
     fun getApp(): YapmApp {

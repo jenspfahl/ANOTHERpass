@@ -74,14 +74,14 @@ class EditCredentialDataFragment : SecureFragment() {
             true
         }
 
-
-        getBaseActivity().labelViewModel.allLabels.observe(getBaseActivity(), { labels ->
-            masterSecretKey?.let{ key ->
-                editCredentialLabelsView.filterableList = LabelService.getAllLabelChips()
-            }
-            editCredentialNameView.requestFocus()
-        })
-
+        getBaseActivity()?.let {
+            it.labelViewModel.allLabels.observe(it, { labels ->
+                masterSecretKey?.let{ key ->
+                    editCredentialLabelsView.filterableList = LabelService.getAllLabelChips()
+                }
+                editCredentialNameView.requestFocus()
+            })
+        }
 
         editCredentialLabelsView.addChipsListener(object : ChipsListener {
             override fun onChipAdded(chip: ChipInterface, newSize: Int) {
@@ -93,7 +93,7 @@ class EditCredentialDataFragment : SecureFragment() {
                         val encName = encryptCommonString(key, chip.label)
                         val encDesc = encryptCommonString(key, "")
                         val encLabel = EncLabel(null, encName, encDesc, null)
-                        getBaseActivity().labelViewModel.insert(encLabel)
+                        getBaseActivity()?.labelViewModel?.insert(encLabel)
                     }
                 }
             }
@@ -139,7 +139,7 @@ class EditCredentialDataFragment : SecureFragment() {
                         it.additionalInfo
                     )
 
-                    getBaseActivity().setTitle(getString(R.string.title_change_credential_with_title, name))
+                    getBaseActivity()?.setTitle(getString(R.string.title_change_credential_with_title, name))
 
                     editCredentialNameView.setText(name)
                     editCredentialUserView.setText(user)
