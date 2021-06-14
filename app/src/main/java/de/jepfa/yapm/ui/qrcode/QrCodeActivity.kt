@@ -16,7 +16,7 @@ import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
-import de.jepfa.yapm.util.ExtPermissionChecker
+import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.util.QRCodeUtil.generateQRCode
 import de.jepfa.yapm.util.getEncryptedExtra
@@ -105,13 +105,14 @@ class QrCodeActivity : SecureActivity() {
         }
 
         if (id == R.id.menu_download_qrc) {
-            ExtPermissionChecker.verifyRWStoragePermissions(this) // TODO this is not enough
-
-            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
-            intent.addCategory(Intent.CATEGORY_OPENABLE)
-            intent.type = "image/jpeg"
-            intent.putExtra(Intent.EXTRA_TITLE, getFileName(head))
-            startActivityForResult(Intent.createChooser(intent, "Save as"), saveAsImage)
+            PermissionChecker.verifyRWStoragePermissions(this)
+            if (PermissionChecker.hasRWStoragePermissions(this)) {
+                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+                intent.addCategory(Intent.CATEGORY_OPENABLE)
+                intent.type = "image/jpeg"
+                intent.putExtra(Intent.EXTRA_TITLE, getFileName(head))
+                startActivityForResult(Intent.createChooser(intent, "Save as"), saveAsImage)
+            }
         }
 
         if (id == R.id.menu_download_as_nfc) {

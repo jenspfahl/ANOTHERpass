@@ -11,7 +11,7 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.Constants.SDF_D_INTERNATIONAL
-import de.jepfa.yapm.util.ExtPermissionChecker
+import de.jepfa.yapm.util.PermissionChecker
 import java.util.*
 
 class ExportVaultActivity : SecureActivity() {
@@ -38,13 +38,14 @@ class ExportVaultActivity : SecureActivity() {
 
         findViewById<Button>(R.id.button_export_vault).setOnClickListener {
             masterSecretKey?.let{ key ->
-                ExtPermissionChecker.verifyRWStoragePermissions(this) // TODO this is not enough
-
-                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
-                intent.addCategory(Intent.CATEGORY_OPENABLE)
-                intent.type = "text/json"
-                intent.putExtra(Intent.EXTRA_TITLE, getBackupFileName())
-                startActivityForResult(Intent.createChooser(intent, "Save as"), saveAsFile)
+                PermissionChecker.verifyRWStoragePermissions(this)
+                if (PermissionChecker.hasRWStoragePermissions(this)) {
+                    val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+                    intent.addCategory(Intent.CATEGORY_OPENABLE)
+                    intent.type = "text/json"
+                    intent.putExtra(Intent.EXTRA_TITLE, getBackupFileName())
+                    startActivityForResult(Intent.createChooser(intent, "Save as"), saveAsFile)
+                }
             }
         }
     }

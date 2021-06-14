@@ -8,6 +8,7 @@ import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.ALIAS_KEY_TRANSPORT
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.putEncryptedExtra
 
 object DetachHelper {
@@ -15,7 +16,7 @@ object DetachHelper {
     val EXTRA_MULTILINE = "multiline"
 
     fun detachPassword(activity: SecureActivity, encPassword: Encrypted, multiLine: Boolean?) =
-            if (!Settings.canDrawOverlays(activity)) {
+            if (!PermissionChecker.hasOverlayPermission(activity)) {
 
                 AlertDialog.Builder(activity)
                         .setTitle("Missing permission")

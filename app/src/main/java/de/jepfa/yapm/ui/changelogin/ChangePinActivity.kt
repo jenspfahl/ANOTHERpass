@@ -13,6 +13,7 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.ChangePinUseCase
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.ui.AsyncWithProgressBar
+import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.DebugInfo
 import java.lang.RuntimeException
 
@@ -58,7 +59,7 @@ class ChangePinActivity : SecureActivity() {
                 newPin1TextView.setError(getString(R.string.pin_required))
                 newPin1TextView.requestFocus()
             }
-            else if (newPin1.length < 4) {
+            else if (newPin1.length < Constants.MIN_PIN_LENGTH) {
                 newPin1TextView.setError(getString(R.string.pin_too_short))
                 newPin1TextView.requestFocus()
             }

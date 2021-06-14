@@ -4,18 +4,16 @@ import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
-import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import de.jepfa.yapm.R
 import de.jepfa.yapm.ui.BaseFragment
-import de.jepfa.yapm.util.ExtPermissionChecker
+import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.FileUtil
 
 class ImportVaultLoadFileFragment : BaseFragment() {
@@ -40,13 +38,15 @@ class ImportVaultLoadFileFragment : BaseFragment() {
         val loadButton = view.findViewById<Button>(R.id.button_load_vault)
         loadButton.setOnClickListener {
             val baseActivity = getBaseActivity() ?: return@setOnClickListener
-            ExtPermissionChecker.verifyReadStoragePermissions(baseActivity)
-
-            val intent = Intent()
+            PermissionChecker.verifyReadStoragePermissions(baseActivity)
+            if (PermissionChecker.hasReadStoragePermissions(baseActivity)) {
+                val intent = Intent()
                     .setType("*/*")
                     .setAction(Intent.ACTION_GET_CONTENT)
-            val chooserIntent = Intent.createChooser(intent, getString(R.string.chooser_select_vault_file))
-            startActivityForResult(chooserIntent, importVaultFile)
+                val chooserIntent =
+                    Intent.createChooser(intent, getString(R.string.chooser_select_vault_file))
+                startActivityForResult(chooserIntent, importVaultFile)
+            }
         }
     }
 

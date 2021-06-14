@@ -10,6 +10,7 @@ object Constants {
     val HOMEPAGE = Uri.parse("https://anotherpass.jepfa.de")
     val BUG_REPORT_SITE = Uri.parse("https://github.com/jenspfahl/anotherpass/issues")
 
+    val MIN_PIN_LENGTH = 6
     val MAX_LABELS_PER_CREDENTIAL = 5
     val MAX_LABEL_LENGTH = 20
 

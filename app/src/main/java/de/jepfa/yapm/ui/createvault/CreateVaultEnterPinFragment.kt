@@ -17,6 +17,7 @@ import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER_PASSWD
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_PIN
+import de.jepfa.yapm.util.Constants
 
 class CreateVaultEnterPinFragment : BaseFragment() {
 
@@ -49,7 +50,7 @@ class CreateVaultEnterPinFragment : BaseFragment() {
                 pin1TextView.setError(getString(R.string.pin_required))
                 pin1TextView.requestFocus()
             }
-            else if (pin1.length < 4) {
+            else if (pin1.length < Constants.MIN_PIN_LENGTH) {
                 pin1TextView.setError(getString(R.string.pin_too_short))
                 pin1TextView.requestFocus()
             }

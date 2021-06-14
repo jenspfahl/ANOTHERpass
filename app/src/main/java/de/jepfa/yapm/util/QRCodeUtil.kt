@@ -50,10 +50,6 @@ object QRCodeUtil {
         return bitmap
     }
 
-    private fun printHeader(it: String) {
-
-    }
-
     fun scanQRCode(fragment: Fragment, prompt: String) {
         val integrator = IntentIntegrator.forSupportFragment(fragment).apply {
             captureActivity = CaptureActivity::class.java
