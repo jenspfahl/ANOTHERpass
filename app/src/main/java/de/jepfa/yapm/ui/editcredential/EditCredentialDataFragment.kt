@@ -105,17 +105,18 @@ class EditCredentialDataFragment : SecureFragment() {
 
                 if (text.isNotBlank() && isCommitLabel(text)) {
 
+                    val maxLabelLength = editCredentialActivity.getResources().getInteger(R.integer.max_label_name_length);
                     val chipsCount = editCredentialLabelsView.selectedChipList.size
-                    if (chipsCount > Constants.MAX_LABELS_PER_CREDENTIAL) {
+                    if (chipsCount >= Constants.MAX_LABELS_PER_CREDENTIAL) {
                         Toast.makeText(
                             getBaseActivity(),
                             "Maximum of labels reached (${Constants.MAX_LABELS_PER_CREDENTIAL})",
                             Toast.LENGTH_LONG
                         ).show()
-                    } else if (text.length > Constants.MAX_LABEL_LENGTH) {
+                    } else if (text.length > maxLabelLength) {
                         Toast.makeText(
                             getBaseActivity(),
-                            "Label too long (max ${Constants.MAX_LABEL_LENGTH})", Toast.LENGTH_LONG
+                            "Label too long (max $maxLabelLength)", Toast.LENGTH_LONG
                         ).show()
                     } else {
                         val labelName = text.substring(0, text.length - 1)
@@ -151,6 +152,7 @@ class EditCredentialDataFragment : SecureFragment() {
                     LabelService.getLabelsForCredential(key, it)
                         .forEachIndexed { idx, label ->
                             editCredentialLabelsView.addChip(label.labelChip)
+                            editCredentialLabelsView.selectedChipList + label.labelChip
                         }
                     editCredentialNameView.requestFocus()
                 }

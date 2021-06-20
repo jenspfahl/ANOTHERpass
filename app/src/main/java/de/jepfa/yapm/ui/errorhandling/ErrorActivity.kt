@@ -2,6 +2,7 @@ package de.jepfa.yapm.ui.errorhandling
 
 import android.app.AlertDialog
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
@@ -11,6 +12,7 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.ui.login.LoginActivity
 import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.Constants
+import java.net.URLEncoder
 
 /*
   Inspired from https://github.com/hardik-trivedi/ForceClose
@@ -31,11 +33,13 @@ class ErrorActivity : AppCompatActivity() {
         buttonReportBug.setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle(R.string.button_report_bug)
-                .setMessage("The bug will be copied to the clipboard and the bug report tracker website will be open. Please paste the report there and send it. Thanks.")
+                .setMessage("The bug will be sent to a bug report tracker website (Github). Wou need a Github account for doing this. Additionally the bug is copied to the clipboard. Thanks for helping.")
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.ok) { dialog, whichButton ->
                     ClipboardUtil.copy("bug report", errorText, this)
-                    val browserIntent = Intent(Intent.ACTION_VIEW, Constants.BUG_REPORT_SITE)
+                    val errorTextUrlSafe = URLEncoder.encode(errorText, "UTF-8")
+                    val bugReportUrl = Constants.BUG_REPORT_SITE.format("Something went wrong :-(", errorTextUrlSafe)
+                    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(bugReportUrl))
                     startActivity(browserIntent)
 
                     Toast.makeText(this, R.string.toast_bug_report_copied, Toast.LENGTH_LONG).show()

@@ -32,6 +32,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/textview_login_vault"
+            android:maxLength="@integer/max_pin_length"
             android:hint="@string/pin" />
 
 

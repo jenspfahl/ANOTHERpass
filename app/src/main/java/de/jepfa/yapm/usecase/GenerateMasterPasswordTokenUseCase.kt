@@ -21,7 +21,7 @@ object GenerateMasterPasswordTokenUseCase: SecureActivityUseCase {
         if (PreferenceService.isPresent(DATA_MASTER_PASSWORD_TOKEN_KEY, activity)) {
             AlertDialog.Builder(activity)
                     .setTitle("Generate master password token")
-                    .setMessage("The last generated token with number #$mptCounter will be become invalid.")
+                    .setMessage("The last generated token with number #$mptCounter will become invalid.")
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
                         generateMasterPasswordToken(activity)

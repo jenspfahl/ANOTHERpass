@@ -81,7 +81,7 @@ class LoginActivity : NfcBaseActivity() {
         if (id == R.id.action_reset_vault) {
             AlertDialog.Builder(this)
                 .setTitle("Reset all")
-                .setMessage("If you cannot import a vault file and got stuck you can reset all data here.")
+                .setMessage("If you cannot import a vault file and got stuck you can reset all data here. If you continue all data is going to be deleted. Are you sure?")
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(R.string.reset_vault) { dialog, whichButton ->
                     DropVaultUseCase.dropVaultData(this)
