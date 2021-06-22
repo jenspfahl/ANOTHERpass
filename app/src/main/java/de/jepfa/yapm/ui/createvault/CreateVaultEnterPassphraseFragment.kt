@@ -1,9 +1,7 @@
 package de.jepfa.yapm.ui.createvault
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -49,7 +47,7 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
         buttonGeneratePasswd.setOnClickListener {
             generatedPassword = GenerateMasterPasswordUseCase.execute(pseudoPhraseSwitch.isChecked)
             var spannedString = PasswordColorizer.spannableString(generatedPassword, getBaseActivity())
-            generatedPasswdView.setText(spannedString)
+            generatedPasswdView.text = spannedString
         }
 
         val button = view.findViewById<Button>(R.id.button_next)

@@ -1,19 +1,13 @@
-package de.jepfa.yapm.util
+package de.jepfa.yapm.usecase
 
 import android.content.Intent
 import de.jepfa.yapm.model.encrypted.EncCredential
-import de.jepfa.yapm.model.secret.Password
-import de.jepfa.yapm.service.secret.SecretService.generateKey
-import de.jepfa.yapm.ui.BaseActivity
-import de.jepfa.yapm.service.secret.MasterKeyService.encryptAndStoreMasterKey
-import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
-import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.util.putEncryptedExtra
 
-object ExportCredentialUtil {
+object ExportCredentialUseCase {
 
     fun startExport(credential: EncCredential, activity: SecureActivity): Boolean {
         activity.masterSecretKey?.let{ key ->

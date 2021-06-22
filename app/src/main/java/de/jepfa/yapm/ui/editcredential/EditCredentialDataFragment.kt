@@ -105,7 +105,7 @@ class EditCredentialDataFragment : SecureFragment() {
 
                 if (text.isNotBlank() && isCommitLabel(text)) {
 
-                    val maxLabelLength = editCredentialActivity.getResources().getInteger(R.integer.max_label_name_length);
+                    val maxLabelLength = editCredentialActivity.resources.getInteger(R.integer.max_label_name_length)
                     val chipsCount = editCredentialLabelsView.selectedChipList.size
                     if (chipsCount >= Constants.MAX_LABELS_PER_CREDENTIAL) {
                         Toast.makeText(
@@ -140,7 +140,8 @@ class EditCredentialDataFragment : SecureFragment() {
                         it.additionalInfo
                     )
 
-                    getBaseActivity()?.setTitle(getString(R.string.title_change_credential_with_title, name))
+                    getBaseActivity()?.title =
+                        getString(R.string.title_change_credential_with_title, name)
 
                     editCredentialNameView.setText(name)
                     editCredentialUserView.setText(user)
@@ -163,7 +164,7 @@ class EditCredentialDataFragment : SecureFragment() {
         buttonNext.setOnClickListener {
 
             if (TextUtils.isEmpty(editCredentialNameView.text)) {
-                editCredentialNameView.setError(getString(R.string.error_field_required))
+                editCredentialNameView.error = getString(R.string.error_field_required)
                 editCredentialNameView.requestFocus()
             } else {
 

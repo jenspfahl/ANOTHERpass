@@ -30,7 +30,7 @@ open class Secret(var data: ByteArray) : Clearable, Validable {
     }
 
     fun toCharArray(): CharArray {
-        return data.map { it.toChar() }.toCharArray();
+        return data.map { it.toChar() }.toCharArray()
     }
 
     override fun clear() {

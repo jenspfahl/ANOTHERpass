@@ -8,10 +8,7 @@ import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.usecase.CreateVaultUseCase
-import de.jepfa.yapm.usecase.LoginUseCase
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

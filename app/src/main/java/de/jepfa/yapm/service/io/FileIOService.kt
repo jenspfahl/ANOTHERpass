@@ -59,10 +59,10 @@ class FileIOService: IntentService("FileIOService") {
         const val JSON_LABELS = "labels"
         const val JSON_LABELS_COUNT = "labelsCount"
 
-        val CREDENTIALS_TYPE = object : TypeToken<List<EncCredential>>() {}.type
-        val LABELS_TYPE = object : TypeToken<List<EncLabel>>() {}.type
+        val CREDENTIALS_TYPE: Type = object : TypeToken<List<EncCredential>>() {}.type
+        val LABELS_TYPE: Type = object : TypeToken<List<EncLabel>>() {}.type
 
-        val GSON = GsonBuilder()
+        val GSON: Gson = GsonBuilder()
                 .registerTypeAdapter(Encrypted::class.java, EncryptedSerializer())
                 .create()
     }
@@ -128,7 +128,7 @@ class FileIOService: IntentService("FileIOService") {
 
         root.addProperty(JSON_CREATION_DATE, SDF_DT_MEDIUM.format(Date()))
         val salt = SaltService.getSaltAsBase64String(this)
-        salt?.let {
+        salt.let {
             root.addProperty(JSON_VAULT_ID, it)
         }
 

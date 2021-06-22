@@ -2,12 +2,10 @@ package de.jepfa.yapm.usecase
 
 import android.content.Context
 import de.jepfa.yapm.model.secret.Password
-import de.jepfa.yapm.service.secret.SecretService.generateKey
-import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.service.secret.MasterKeyService.encryptAndStoreMasterKey
 import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
 import de.jepfa.yapm.service.secret.SaltService
-import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.service.secret.SecretService.generateKey
 
 object CreateVaultUseCase {
 

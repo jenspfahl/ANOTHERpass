@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingHorizontal="15dp"
-        android:text="..."
+        android:text="@string/nothing_placeholder"
         app:layout_constraintBottom_toTopOf="@id/load_with_mk"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

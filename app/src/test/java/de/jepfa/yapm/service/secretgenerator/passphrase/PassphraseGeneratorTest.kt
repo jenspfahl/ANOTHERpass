@@ -3,8 +3,6 @@ package de.jepfa.yapm.service.secretgenerator.passphrase
 import de.jepfa.yapm.service.secretgenerator.GeneratorBase.Companion.BRUTEFORCE_ATTEMPTS_PENTIUM
 import de.jepfa.yapm.service.secretgenerator.GeneratorBase.Companion.BRUTEFORCE_ATTEMPTS_SUPERCOMP
 import de.jepfa.yapm.service.secretgenerator.SecretStrength
-import de.jepfa.yapm.service.secretgenerator.passphrase.PassphraseGenerator
-import de.jepfa.yapm.service.secretgenerator.passphrase.PassphraseGeneratorSpec
 import de.jepfa.yapm.util.secondsToYear
 import org.junit.Assert
 import org.junit.Test

@@ -111,7 +111,7 @@ object SecretService {
         val cipher: Cipher = Cipher.getInstance(CIPHER_AES_GCM)
         cipher.init(Cipher.ENCRYPT_MODE, secretKey)
 
-        return Encrypted(type, cipher.getIV(), cipher.doFinal(data))
+        return Encrypted(type, cipher.iv, cipher.doFinal(data))
     }
 
     private fun decryptData(secretKey: SecretKey, encrypted: Encrypted): ByteArray {
@@ -125,7 +125,7 @@ object SecretService {
             return cipher.doFinal(encryptedData)
         } catch (e: GeneralSecurityException) {
             Log.e("SS", "unable to decrypt")
-            return FAILED_BYTE_ARRAY;
+            return FAILED_BYTE_ARRAY
         }
     }
 
@@ -133,12 +133,12 @@ object SecretService {
         androidKeyStore.load(null)
         val entry: KeyStore.Entry? = androidKeyStore.getEntry(alias, null)
 
-        return (entry as? KeyStore.SecretKeyEntry)?.getSecretKey() ?: initAndroidSecretKey(alias)
+        return (entry as? KeyStore.SecretKeyEntry)?.secretKey ?: initAndroidSecretKey(alias)
     }
 
     private fun initAndroidSecretKey(alias: String): SecretKey {
         val keyGenerator = KeyGenerator
-                .getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE);
+                .getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE)
 
         val spec = KeyGenParameterSpec.Builder(alias,
                 KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
@@ -148,7 +148,7 @@ object SecretService {
 
         keyGenerator.init(spec)
 
-        return keyGenerator.generateKey();
+        return keyGenerator.generateKey()
     }
 
 

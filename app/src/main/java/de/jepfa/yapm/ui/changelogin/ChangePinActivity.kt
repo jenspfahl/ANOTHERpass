@@ -52,19 +52,19 @@ class ChangePinActivity : SecureActivity() {
             val newPin2 = Password.fromEditable(newPin2TextView.text)
 
             if (currentPin.isEmpty()) {
-                currentPinTextView.setError(getString(R.string.pin_required))
+                currentPinTextView.error = getString(R.string.pin_required)
                 currentPinTextView.requestFocus()
             }
             else if (newPin1.isEmpty()) {
-                newPin1TextView.setError(getString(R.string.pin_required))
+                newPin1TextView.error = getString(R.string.pin_required)
                 newPin1TextView.requestFocus()
             }
             else if (newPin1.length < Constants.MIN_PIN_LENGTH) {
-                newPin1TextView.setError(getString(R.string.pin_too_short))
+                newPin1TextView.error = getString(R.string.pin_too_short)
                 newPin1TextView.requestFocus()
             }
             else if (! newPin1.isEqual(newPin2)) {
-                newPin2TextView.setError(getString(R.string.pin_not_equal))
+                newPin2TextView.error = getString(R.string.pin_not_equal)
                 newPin2TextView.requestFocus()
             }
             else {
@@ -105,7 +105,7 @@ class ChangePinActivity : SecureActivity() {
                         Toast.makeText(baseContext, "Pin successfully changed", Toast.LENGTH_LONG).show()
                     }
                     else {
-                        currentPinTextView.setError(getString(R.string.pin_wrong))
+                        currentPinTextView.error = getString(R.string.pin_wrong)
                         currentPinTextView.requestFocus()
                     }
                 }

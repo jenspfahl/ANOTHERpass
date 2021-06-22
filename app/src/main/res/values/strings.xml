@@ -1,14 +1,10 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">ANOTHERpass</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
     <string name="login_pin_fragment_label">Unlock with your PIN</string>
     <string name="login_masterpassword_fragment_label">Login with your master password</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
 
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="add_credential">Add Credential</string>
 
     <string name="hint_edit_label_name">A short label name</string>
@@ -16,8 +12,6 @@
     <string name="hint_edit_credential_name">A short credential name</string>
     <string name="hint_edit_credential_additional_info">Some optional info</string>
     <string name="button_save">Save</string>
-    <string name="empty_not_saved">Credential not saved because it is empty.</string>
-    <string name="save_credential">Save Credential</string>
     <string name="error_field_required">This field is required.</string>
     <string name="with_upper_case">With upper case chars</string>
     <string name="with_digits">With digits</string>
@@ -41,11 +35,6 @@
     <string name="title_delete_label">Delete Label</string>
     <string name="message_delete_label">Are you sure deleting label \'%1$s\'? It will be removed from all credentials where it is assigned to.</string>
 
-    <string name="title_encryption_pin_required">Pin required</string>
-    <string name="message_encrypt_pin_required">Please enter your pin to encrypt your credentials.</string>
-    <string name="wrong_pin">Wrong pin</string>
-    <string name="title_encryption_passphrase_required">Passphrase required</string>
-    <string name="message_encrypt_passphrase_required">Please enter your passphrase to encrypt your credentials.</string>
     <string name="lock_items">Lock vault</string>
     <string name="logout">Logout</string>
     <string name="login_help">Help</string>
@@ -55,7 +44,7 @@
     <string name="text_import_new_vault">Import an existing vault here, if you have a vault file.</string>
     <string name="create_vault_explanation_1">First, you need to generate the master password. This is used to login into your vault.</string>
     <string name="button_next">Next</string>
-    <string name="create_vault_enter_passphrase_fragment_label">Create Vault 1/3</string>
+    <string name="create_vault_enter_passphrase_fragment_label" tools:ignore="TypographyFractions">Create Vault 1/3</string>
     <string name="create_vault_explanation_2">Create a pin or short password used to unlock your vault.</string>
     <string name="pin">Enter a pin</string>
     <string name="repeat_pin">Repeat the pin</string>
@@ -86,13 +75,13 @@
     <string name="export_vault">Save vault as file</string>
     <string name="qrc_download_as_img">Save Qr code as image</string>
     <string name="download_as_nfc_tag">Push as NFC tag</string>
-    <string name="export_vault_explanation">Here you can export your complete vault into a file for backup purposes. Use this file to import your vault after a fresh new app installation without data. You have the choice to include or exclude the encrypted masterkey. If you exlude it, export the masterkey by your own and store it on a safe place. You need it to import the vault file. The separation of encrypted master key and vault file might be sense to make the vault file useless for hackers even if they guess your pin and master password.</string>
+    <string name="export_vault_explanation">Here you can export your complete vault into a file for backup purposes. Use this file to import your vault after a fresh new app installation without data. You have the choice to include or exclude the encrypted masterkey. If you exclude it, export the masterkey by your own and store it on a safe place. You need it to import the vault file. The separation of encrypted master key and vault file might be sense to make the vault file useless for hackers even if they guess your pin and master password.</string>
     <string name="button_export_vault">Export vault</string>
     <string name="include_enc_masterkey">Include encrypted masterkey</string>
     <string name="too_may_wrong_logins">Too many login attempts, all tokens declined</string>
     <string name="too_may_wrong_logins_self_destruction">Too many login attempts, vault completely deleted</string>
     <string name="import_vault_explanation">Select a vault file to import. Note: You need the pin and the masterpassword and, depending on the file, the encrypted masterkey.</string>
-    <string name="import_vault_load_file_fragment_label">Import Vault 1/2</string>
+    <string name="import_vault_load_file_fragment_label" tools:ignore="TypographyFractions">Import Vault 1/2</string>
     <string name="import_vault_import_file_fragment_label">Import Vault 2/2</string>
     <string name="button_load_vault">Load vault file</string>
     <string name="button_import_vault">Import vault</string>
@@ -124,10 +113,9 @@
     <string name="lock_timeout_title">Lock vault after inactivity</string>
     <string name="logout_timeout_title">Logout after inactivity</string>
 
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="pref_header_login">Login</string>
     <string name="pref_header_passwd">Password generator</string>
-    <string name="max_login_attempts_title">Maximun login attempts</string>
+    <string name="max_login_attempts_title">Maximum login attempts</string>
     <string name="notification_channel_paste_title">ANOTHERpass paste notifications</string>
     <string name="toast_copied_to_clipboard">Password copied to clipboard</string>
     <string name="toast_test_copypaste_password">Test data copied to clipboard</string>
@@ -144,15 +132,12 @@
     <string name="edit_credential_password_fragment_label">Edit credential password</string>
     <string name="hint_edit_credential_user">The credential user</string>
     <string name="hint_edit_credential_website">The website url</string>
-    <string name="hint_edit_credential_labels">Add labels, splitted by comma or space</string>
+    <string name="hint_edit_credential_labels">Add labels, separated by comma or space</string>
     <string name="credential_data_params">Edit your credential here</string>
     <string name="filter">Filter by labels</string>
-    <string name="filter_dialog">Select all labels to show credentials with that labels</string>
     <string name="pref_header_autofill">Auto fill support</string>
     <string name="title_activity_list_label">Manage Labels</string>
     <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
     <string name="action_labels">Manage labels</string>
     <string name="label_data_params">Change the label name and description and color here</string>
     <string name="choose_color">Choose a color</string>
@@ -162,7 +147,7 @@
     <string name="reset_vault">Reset all</string>
     <string name="button_report_bug">Report bug</string>
     <string name="button_restart">Restart</string>
-    <string name="bug_explaination">Sorry, a bug occured :-(</string>
+    <string name="bug_explanation">Sorry, a bug occurred :-(</string>
     <string name="toast_bug_report_copied">Bug report copied to clipboard</string>
     <string name="debug">Debug info</string>
     <string name="your_masterpassword">Your real master password</string>
@@ -192,6 +177,10 @@
     <string name="pref_header_overlay">Password overlay dialog</string>
     <string name="HYPER">Hyper</string>
     <string name="sort_by_recent">Sort by recent</string>
+    <string name="nothing_placeholder">…</string>
+    <string name="tab_pseudo_phrase">Pseudo phrase</string>
+    <string name="tab_ordinary">Ordinary password</string>
+    <string name="drop_to_reove">DROP TO REMOVE</string>
 
 
 </resources>

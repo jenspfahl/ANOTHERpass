@@ -3,7 +3,6 @@ package de.jepfa.yapm.service.secret
 import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import de.jepfa.yapm.model.secret.Password
-import de.jepfa.yapm.service.secret.SecretService
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith

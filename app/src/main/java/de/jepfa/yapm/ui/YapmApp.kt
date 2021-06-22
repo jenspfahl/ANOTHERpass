@@ -5,8 +5,6 @@ import de.jepfa.yapm.database.YapmDatabase
 import de.jepfa.yapm.repository.CredentialRepository
 import de.jepfa.yapm.repository.LabelRepository
 import de.jepfa.yapm.service.PreferenceService
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 
 class YapmApp : Application() {
 

@@ -90,7 +90,7 @@ class QrCodeActivity : SecureActivity() {
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         val nfcItem = menu?.findItem(R.id.menu_download_as_nfc)
         if (nfcItem != null && !NfcService.isNfcAvailable(this)) {
-            nfcItem.setVisible(false)
+            nfcItem.isVisible = false
         }
 
         return super.onPrepareOptionsMenu(menu)

@@ -200,7 +200,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                 return LogoutUseCase.execute(this)
             }
             R.id.menu_filter -> {
-                val inflater: LayoutInflater = getLayoutInflater()
+                val inflater: LayoutInflater = layoutInflater
                 val labelsView: View = inflater.inflate(R.layout.content_dynamic_labels_list, null)
                 val labelsContainer: LinearLayout = labelsView.findViewById(R.id.dynamic_labels)
 
@@ -464,7 +464,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
             R.id.menu_about -> {
                 val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-                val icon: Drawable = getApplicationInfo().loadIcon(getPackageManager())
+                val icon: Drawable = applicationInfo.loadIcon(packageManager)
                 val message = getString(R.string.app_name) + ", Version " + getVersionName(this) +
                         System.lineSeparator() + " \u00A9 Jens Pfahl 2021"
                 builder.setTitle(R.string.title_about_the_app)
@@ -475,7 +475,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
             }
             R.id.menu_debug -> {
                 val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-                val icon: Drawable = getApplicationInfo().loadIcon(getPackageManager())
+                val icon: Drawable = applicationInfo.loadIcon(packageManager)
                 val message = DebugInfo.getDebugInfo(this)
                 builder.setTitle(R.string.debug)
                     .setMessage(message)
@@ -491,7 +491,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
     }
 
     private fun refreshCredentials() {
-        credentialViewModel.allCredentials.observe(this, Observer { credentials ->
+        credentialViewModel.allCredentials.observe(this, { credentials ->
             credentials?.let { credentials ->
                 var sortedCredentials = credentials
 
@@ -526,24 +526,24 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
         val storeMasterPasswdItem: MenuItem = menu.findItem(R.id.store_masterpasswd)
         if (storeMasterPasswdItem != null) {
-            storeMasterPasswdItem.setVisible(!storedMasterPasswdPresent)
+            storeMasterPasswdItem.isVisible = !storedMasterPasswdPresent
         }
         val deleteMasterPasswdItem: MenuItem = menu.findItem(R.id.delete_stored_masterpasswd)
         if (deleteMasterPasswdItem != null) {
-            deleteMasterPasswdItem.setVisible(storedMasterPasswdPresent)
+            deleteMasterPasswdItem.isVisible = storedMasterPasswdPresent
         }
     }
 
     private fun refreshMenuDebugItem(menu: Menu) {
         val debugItem: MenuItem = menu.findItem(R.id.menu_debug)
         if (debugItem != null) {
-            debugItem.setVisible(DebugInfo.isDebug)
+            debugItem.isVisible = DebugInfo.isDebug
         }
     }
 
     private fun refreshMenuFiltersItem(item: MenuItem) {
         val hasFilters = LabelFilter.hasFilters()
-        item.setChecked(hasFilters)
+        item.isChecked = hasFilters
         if (hasFilters) {
             item.setIcon(R.drawable.ic_baseline_filter_list_with_with_dot_24dp)
         }
@@ -554,7 +554,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
     private fun refreshMenuSortedByItem(item: MenuItem) {
         val sortedByRecent = PreferenceService.getAsBool(PREF_SORT_BY_RECENT, this)
-        item.setChecked(sortedByRecent)
+        item.isChecked = sortedByRecent
     }
 
     fun deleteCredential(credential: EncCredential) {

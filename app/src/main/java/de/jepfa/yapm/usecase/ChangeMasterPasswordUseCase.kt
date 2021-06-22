@@ -23,7 +23,7 @@ object ChangeMasterPasswordUseCase {
         val currentMasterPassword = getMasterPasswordFromSession()
         if (currentMasterPassword == null) {
             Log.e(TAG, "master password not at Session")
-            return false;
+            return false
         }
 
         val oldMasterPassphraseSK = getMasterPassPhraseSK(pin, currentMasterPassword, salt)
@@ -31,13 +31,13 @@ object ChangeMasterPasswordUseCase {
         val encEncryptedMasterKey = PreferenceService.getEncrypted(DATA_ENCRYPTED_MASTER_KEY, activity)
         if (encEncryptedMasterKey == null) {
             Log.e(TAG, "master key not on device")
-            return false;
+            return false
         }
 
         val masterKey = getMasterKey(oldMasterPassphraseSK, encEncryptedMasterKey)
         if (masterKey == null) {
             Log.e(TAG, "cannot decrypt master key, pin wrong?")
-            return false;
+            return false
         }
 
         encryptAndStoreMasterKey(masterKey, pin, newMasterPassword, salt, activity)

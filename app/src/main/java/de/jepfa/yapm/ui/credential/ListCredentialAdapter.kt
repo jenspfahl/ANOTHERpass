@@ -27,7 +27,7 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
 import de.jepfa.yapm.ui.label.LabelDialogOpener
 import de.jepfa.yapm.util.ClipboardUtil
-import de.jepfa.yapm.util.ExportCredentialUtil
+import de.jepfa.yapm.usecase.ExportCredentialUseCase
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_COPY_PASSWORD
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_OVERLAY_FEATURE
@@ -108,7 +108,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                     val current = getItem(position)
                     return when (item.itemId) {
                         R.id.menu_export_credential -> {
-                            ExportCredentialUtil.startExport(current, listCredentialsActivity)
+                            ExportCredentialUseCase.startExport(current, listCredentialsActivity)
                             return true
                         }
                         R.id.menu_change_credential -> {

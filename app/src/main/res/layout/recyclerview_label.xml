@@ -31,7 +31,8 @@
             android:clickable="true"
             android:foregroundGravity="right"
             android:layout_gravity="end"
-            android:paddingLeft="16dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="1dp"
             android:src="@drawable/ic_baseline_delete_24" />
     </TableRow>
 </TableLayout>

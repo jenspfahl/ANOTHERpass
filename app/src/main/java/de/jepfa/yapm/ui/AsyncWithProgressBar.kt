@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.ProgressBar
-import de.jepfa.yapm.ui.BaseActivity
 
 class AsyncWithProgressBar(
     val activity: BaseActivity?,
@@ -29,8 +28,8 @@ class AsyncWithProgressBar(
 
     override fun onPreExecute() {
         super.onPreExecute()
-        progressBar.setVisibility(View.VISIBLE)
-        activity?.getWindow()?.setFlags(
+        progressBar.visibility = View.VISIBLE
+        activity?.window?.setFlags(
             WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
             WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
     }
@@ -41,8 +40,8 @@ class AsyncWithProgressBar(
 
     override fun onPostExecute(result: Boolean) {
         super.onPostExecute(result)
-        progressBar.setVisibility(View.INVISIBLE)
-        activity?.getWindow()?.clearFlags(
+        progressBar.visibility = View.INVISIBLE
+        activity?.window?.clearFlags(
             WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
         postHandler.invoke(result)
     }

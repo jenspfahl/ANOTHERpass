@@ -20,7 +20,7 @@ class PassphraseGenerator(
 
 
     override fun generate(spec: PassphraseGeneratorSpec): Password {
-        var buffer = Password(CharArray(0));
+        var buffer = Password(CharArray(0))
 
         for (i in 0 until strengthToWordCount(spec.strength)) {
             val word = generateWord()
@@ -88,7 +88,7 @@ class PassphraseGenerator(
         if (spec.addSpecialChar) {
             totalCombinations *= specialChars.length
         }
-        return totalCombinations;
+        return totalCombinations
     }
 
     private fun random(material: String): Char {
@@ -98,11 +98,11 @@ class PassphraseGenerator(
     }
 
     private fun isVocal(char: Char): Boolean {
-        return vocals.contains(char, true);
+        return vocals.contains(char, true)
     }
 
     private fun isConsonant(char: Char): Boolean {
-            return consonants.contains(char, true);
+            return consonants.contains(char, true)
     }
 
     private fun strengthToWordCount(strength: SecretStrength): Int {

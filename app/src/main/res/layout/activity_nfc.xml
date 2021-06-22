@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="..."
+        android:text="@string/nothing_placeholder"
         android:paddingHorizontal="24dp"
         app:layout_constraintBottom_toTopOf="@id/read_nfc_status_layout"
         app:layout_constraintEnd_toEndOf="parent"

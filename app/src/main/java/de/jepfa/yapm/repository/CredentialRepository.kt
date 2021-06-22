@@ -25,19 +25,19 @@ class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
 
     fun getById(id: Int): Flow<EncCredential> {
         val byId = encCredentialDao.getById(id)
-        return byId.filterNotNull().map { it -> mapToCredential(it)}
+        return byId.filterNotNull().map {mapToCredential(it)}
     }
 
     fun getAll(): Flow<List<EncCredential>> {
-        return encCredentialDao.getAll().filterNotNull().map {it -> mapToCredentials(it)}
+        return encCredentialDao.getAll().filterNotNull().map {mapToCredentials(it)}
     }
 
     fun getAllSync(): List<EncCredential> {
-        return encCredentialDao.getAllSync().filterNotNull().map {it -> mapToCredential(it)}
+        return encCredentialDao.getAllSync().map {mapToCredential(it)}
     }
 
     private fun mapToCredentials(entities: List<EncCredentialEntity>): List<EncCredential> {
-        return entities.map { it -> mapToCredential(it) }.toList()
+        return entities.map {mapToCredential(it) }.toList()
     }
 
     private fun mapToCredential(entity: EncCredentialEntity): EncCredential {

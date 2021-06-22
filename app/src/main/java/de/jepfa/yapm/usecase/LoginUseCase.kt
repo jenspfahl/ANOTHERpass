@@ -18,12 +18,12 @@ object LoginUseCase {
         val salt = SaltService.getSalt(context)
         val encMasterKey = PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, context)
         if (encMasterKey == null) {
-            return false;
+            return false
         }
         val masterPassPhraseSK = getMasterPassPhraseSK(pin, masterPassword, salt)
         val masterSecretKey = getMasterSK(masterPassPhraseSK, salt, encMasterKey)
         if (masterSecretKey == null) {
-            return false;
+            return false
         }
         val key = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
         val encMasterPassword = SecretService.encryptPassword(key, masterPassword)

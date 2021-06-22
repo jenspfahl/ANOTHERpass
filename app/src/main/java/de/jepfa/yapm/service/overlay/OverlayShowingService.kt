@@ -74,7 +74,7 @@ class OverlayShowingService : Service(), OnTouchListener {
 
         overlayedButton = Button(this)
         overlayedButton?.apply {
-            setAllCaps(false)
+            isAllCaps = false
             setPadding(24, 12, 24, 12)
             val isTransparent = PreferenceService.getAsBool(PREF_TRANSPARENT_OVERLAY, this@OverlayShowingService)
             if (isTransparent) {
@@ -202,9 +202,9 @@ class OverlayShowingService : Service(), OnTouchListener {
         calcOriginalPos()
     }
     private fun updateRemove() {
-        overlayedButton?.text = "DROP TO REMOVE"
+        overlayedButton?.text = getString(R.string.drop_to_reove)
         overlayedButton?.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_close_12, 0, 0)
-        overlayedButton?.setTypeface(null)
+        overlayedButton?.typeface = null
         calcOriginalPos()
     }
 

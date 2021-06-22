@@ -84,7 +84,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
 
             val masterPassword = Password.fromEditable(masterPasswdTextView.text)
             if (masterPassword.isEmpty()) {
-                masterPasswdTextView.setError(getString(R.string.password_required))
+                masterPasswdTextView.error = getString(R.string.password_required)
                 masterPasswdTextView.requestFocus()
                 return@setOnClickListener
             }
@@ -239,7 +239,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                 { success ->
                     if (!success) {
                         loginActivity.handleFailedLoginAttempt()
-                        masterPasswdTextView.setError("${getString(R.string.password_wrong)} ${loginActivity.getLoginAttemptMessage()}")
+                        masterPasswdTextView.error = "${getString(R.string.password_wrong)} ${loginActivity.getLoginAttemptMessage()}"
                         masterPasswdTextView.requestFocus()
                     } else {
                         if (isStoreMasterPassword) {

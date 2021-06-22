@@ -1,9 +1,7 @@
 package de.jepfa.yapm.ui.createvault
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -47,15 +45,15 @@ class CreateVaultEnterPinFragment : BaseFragment() {
             val pin2 = Password.fromEditable(pin2TextView.text)
 
             if (pin1.isEmpty()) {
-                pin1TextView.setError(getString(R.string.pin_required))
+                pin1TextView.error = getString(R.string.pin_required)
                 pin1TextView.requestFocus()
             }
             else if (pin1.length < Constants.MIN_PIN_LENGTH) {
-                pin1TextView.setError(getString(R.string.pin_too_short))
+                pin1TextView.error = getString(R.string.pin_too_short)
                 pin1TextView.requestFocus()
             }
             else if (! pin1.isEqual(pin2)) {
-                pin2TextView.setError(getString(R.string.pin_not_equal))
+                pin2TextView.error = getString(R.string.pin_not_equal)
                 pin2TextView.requestFocus()
             }
             else {

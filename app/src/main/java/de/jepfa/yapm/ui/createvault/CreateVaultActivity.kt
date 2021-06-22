@@ -1,7 +1,6 @@
 package de.jepfa.yapm.ui.createvault
 
 import android.os.Bundle
-import android.view.MenuItem
 import de.jepfa.yapm.R
 import de.jepfa.yapm.ui.BaseActivity
 

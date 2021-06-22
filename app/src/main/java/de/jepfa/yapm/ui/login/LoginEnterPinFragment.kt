@@ -41,7 +41,7 @@ class LoginEnterPinFragment : BaseFragment() {
         val pinTextView: EditText = view.findViewById(R.id.edittext_enter_pin)
         val nextButton = view.findViewById<Button>(R.id.button_login_next)
 
-        pinTextView.setImeOptions(EditorInfo.IME_ACTION_DONE)
+        pinTextView.imeOptions = EditorInfo.IME_ACTION_DONE
         pinTextView.setOnEditorActionListener{ textView, id, keyEvent ->
             nextButton.performClick()
             true
@@ -53,7 +53,7 @@ class LoginEnterPinFragment : BaseFragment() {
 
             val userPin = Password.fromEditable(pinTextView.text)
             if (userPin.isEmpty()) {
-                pinTextView.setError(getString(R.string.pin_required))
+                pinTextView.error = getString(R.string.pin_required)
                 pinTextView.requestFocus()
 
                 return@setOnClickListener
@@ -111,13 +111,13 @@ class LoginEnterPinFragment : BaseFragment() {
                 { success ->
                     if (!success) {
                         loginActivity.handleFailedLoginAttempt()
-                        pinTextView.setError("${getString(R.string.password_wrong)} ${loginActivity.getLoginAttemptMessage()}")
+                        pinTextView.error = "${getString(R.string.password_wrong)} ${loginActivity.getLoginAttemptMessage()}"
                         pinTextView.requestFocus()
                         false
                     } else {
                         userPin.clear()
                         masterPasswd.clear()
-                        pinTextView.setText("")
+                        pinTextView.text = ""
 
                         loginActivity.loginSuccessful()
                         true

@@ -1,7 +1,5 @@
 package de.jepfa.yapm.ui.label
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.Gravity
@@ -61,7 +59,7 @@ class EditLabelActivity : SecureActivity() {
         }
 
         labelColorChipView.setOnChipClicked {
-            val inflater: LayoutInflater = getLayoutInflater()
+            val inflater: LayoutInflater = layoutInflater
             val labelsView: View = inflater.inflate(R.layout.content_dynamic_labels_list, null)
             val labelsContainer: LinearLayout = labelsView.findViewById(R.id.dynamic_labels)
 
@@ -98,13 +96,13 @@ class EditLabelActivity : SecureActivity() {
         val saveButton: Button = findViewById(R.id.button_save)
         saveButton.setOnClickListener {
             if (TextUtils.isEmpty(labelNameTextView.text)) {
-                labelNameTextView.setError(getString(R.string.error_field_required))
+                labelNameTextView.error = getString(R.string.error_field_required)
                 labelNameTextView.requestFocus()
                 return@setOnClickListener
             }
             val existingLabel = LabelService.lookupByLabelName(labelNameTextView.text.toString())
             if (existingLabel != null && existingLabel.encLabel.id != labelId) {
-                labelNameTextView.setError(getString(R.string.error_labelname_in_use))
+                labelNameTextView.error = getString(R.string.error_labelname_in_use)
                 labelNameTextView.requestFocus()
                 return@setOnClickListener
             }

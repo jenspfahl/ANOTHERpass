@@ -5,14 +5,12 @@ import android.content.Intent
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.setPadding
 import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncLabel
-import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.ui.SecureActivity
 
@@ -20,7 +18,7 @@ object LabelDialogOpener {
 
     fun openLabelDialog(activity: SecureActivity, label: LabelService.Label) {
 
-        val inflater: LayoutInflater = activity.getLayoutInflater()
+        val inflater: LayoutInflater = activity.layoutInflater
         val labelsView: View = inflater.inflate(R.layout.content_dynamic_labels_list, null)
         val labelsContainer: LinearLayout = labelsView.findViewById(R.id.dynamic_labels)
 

@@ -147,9 +147,9 @@ class LoginActivity : NfcBaseActivity() {
         loginAttempts = 0
         PreferenceService.delete(STATE_LOGIN_ATTEMPTS, this)
 
-        val isFromAutofill = intent.getBooleanExtra(SecureActivity.SecretChecker.fromAutofill, false)
+        val isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofill, false)
         if (isFromAutofill) {
-            setResult(SecureActivity.SecretChecker.loginRequestCode, intent)
+            setResult(SecretChecker.loginRequestCode, intent)
         }
         else {
             val intent = Intent(this, ListCredentialsActivity::class.java)

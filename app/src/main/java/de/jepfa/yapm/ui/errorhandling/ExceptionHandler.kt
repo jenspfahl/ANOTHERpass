@@ -2,14 +2,10 @@ package de.jepfa.yapm.ui.errorhandling
 
 import android.app.Activity
 import android.content.Intent
-import android.os.Build
 import android.os.Process
-import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.DebugInfo.getDebugInfo
-import de.jepfa.yapm.util.addLabelLine
 import java.io.PrintWriter
 import java.io.StringWriter
-import java.lang.Character.LINE_SEPARATOR
 
 /*
  Inspired from https://github.com/hardik-trivedi/ForceClose

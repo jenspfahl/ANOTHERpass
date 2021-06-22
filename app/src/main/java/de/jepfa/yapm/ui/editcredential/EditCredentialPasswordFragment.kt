@@ -205,21 +205,21 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 .setMessage(
                     "Combinations: " +
                             System.lineSeparator() +
-                            "${combinations.toReadableFormat(0)}" +
+                            combinations.toReadableFormat(0) +
                             System.lineSeparator() +
                             "($combinations)" +
                             System.lineSeparator() +
                             System.lineSeparator() +
                             "Years to brute force with a usual PC: " +
                             System.lineSeparator() +
-                            "${bruteForceWithPentium.secondsToYear().toReadableFormat(0)}" +
+                            bruteForceWithPentium.secondsToYear().toReadableFormat(0) +
                             System.lineSeparator() +
                             "(${bruteForceWithPentium.secondsToYear()})" +
                             System.lineSeparator() +
                             System.lineSeparator() +
                             "Years to brute force with a super computer: " +
                             System.lineSeparator() +
-                            "${bruteForceWithSupercomp.secondsToYear().toReadableFormat(0)}" +
+                            bruteForceWithSupercomp.secondsToYear().toReadableFormat(0) +
                             System.lineSeparator() +
                             "(${bruteForceWithSupercomp.secondsToYear()})"
                 )
@@ -233,7 +233,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
             if (!generatedPassword.isEmpty()) {
                 var spannedString =
                     PasswordColorizer.spannableString(generatedPassword, it)
-                generatedPasswdView.setText(spannedString)
+                generatedPasswdView.text = spannedString
                 if (guessPasswordCombinations) {
                     guessPasswordCombinations(password)
                 }
@@ -242,7 +242,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 }
             }
             else {
-                generatedPasswdView.setText("..")
+                generatedPasswdView.text = getString(R.string.nothing_placeholder)
                 passwordCombinations = null
             }
         }
@@ -323,13 +323,13 @@ class EditCredentialPasswordFragment : SecureFragment() {
     }
 
     private fun buildRadioButton(radioButton: RadioButton, passphraseStrength: SecretStrength) {
-        val name = getResources().getString(passphraseStrength.nameId)
-        radioButton.text = "${name}"
+        val name = resources.getString(passphraseStrength.nameId)
+        radioButton.text = name
 
         val prefDefaultPasswdStrength = PreferenceService.getAsString(PreferenceService.PREF_PASSWD_STRENGTH, getBaseActivity())
         val defaultPasswdStrength = getStrengthEnum(prefDefaultPasswdStrength)
         if (defaultPasswdStrength == passphraseStrength) {
-            radioButton.setChecked(true)
+            radioButton.isChecked = true
         }
     }
 

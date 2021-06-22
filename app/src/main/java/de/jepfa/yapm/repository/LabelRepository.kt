@@ -33,7 +33,7 @@ class LabelRepository(private val encLabelDao: EncLabelDao) {
     }
 
     fun getAllSync(): List<EncLabel> {
-        return encLabelDao.getAllSync().filterNotNull().map { mapToLabel(it)}
+        return encLabelDao.getAllSync().map { mapToLabel(it)}
     }
 
     private fun mapToLabels(entities: List<EncLabelEntity>): List<EncLabel> {

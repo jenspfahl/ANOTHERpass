@@ -4,7 +4,6 @@ import android.content.Context
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
-import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.service.PreferenceService
 import javax.crypto.SecretKey
 

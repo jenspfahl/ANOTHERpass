@@ -15,7 +15,7 @@ class CredentialFillService: AutofillService() {
     ) {
 
         val contexts = fillRequest.fillContexts
-        val structure = contexts.get(contexts.size - 1).getStructure()
+        val structure = contexts.get(contexts.size - 1).structure
 
         val fillResponse = createFillResponse(structure, cancellationSignal,
             createAuthentication = true, context = applicationContext)

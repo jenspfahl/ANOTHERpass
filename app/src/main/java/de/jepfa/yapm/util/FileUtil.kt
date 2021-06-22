@@ -40,7 +40,7 @@ object FileUtil {
                         do {
                             line = br.readLine()
                             if (line == null)
-                                break;
+                                break
                             text.append(line)
                             text.append('\n')
                         } while (true)

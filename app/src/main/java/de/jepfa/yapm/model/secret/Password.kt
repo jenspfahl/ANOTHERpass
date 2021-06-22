@@ -22,7 +22,7 @@ class Password: Secret, CharSequence {
     }
 
     fun toStringRepresentation(multiLine: Boolean, maskPassword: Boolean): String {
-        var presentation = "";
+        var presentation = ""
         var presentationLength = if (maskPassword) 16 else length
         for (i in 0 until presentationLength) {
             if (i != 0 && i % 4 == 0) {

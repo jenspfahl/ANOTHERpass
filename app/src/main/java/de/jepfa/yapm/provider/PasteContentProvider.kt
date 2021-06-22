@@ -5,7 +5,6 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.database.MatrixCursor
 import android.net.Uri
-import android.provider.Settings.Global.getString
 import de.jepfa.yapm.R
 import de.jepfa.yapm.util.NotificationHelper
 
@@ -69,7 +68,7 @@ class PasteContentProvider : ContentProvider() {
 
     private fun populateCursor(): Cursor {
         val cursor = MatrixCursor(arrayOf("pwd"))
-        cursor.addRow(arrayOf<String>("testpwd"))
+        cursor.addRow(arrayOf("testpwd"))
 
         return cursor
     }

@@ -25,7 +25,9 @@ object ImportVaultUseCase {
 
         if (encMasterKey != null) {
             val keyForMK = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
-            val encEncryptedMasterKey = SecretService.encryptEncrypted(keyForMK, Encrypted.fromBase64String(encMasterKey!!))
+            val encEncryptedMasterKey = SecretService.encryptEncrypted(keyForMK, Encrypted.fromBase64String(
+                encMasterKey
+            ))
 
             PreferenceService.putEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, encEncryptedMasterKey, activity)
         }

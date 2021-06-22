@@ -51,7 +51,7 @@ class ChangeMasterPasswordActivity : SecureActivity() {
                 val masterPasswd = MasterPasswordService.getMasterPasswordFromSession()
                 if (!Session.isDenied() && masterPasswd != null) {
                     val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-                    val icon: Drawable = getApplicationInfo().loadIcon(getPackageManager())
+                    val icon: Drawable = applicationInfo.loadIcon(packageManager)
                     builder.setTitle(R.string.your_masterpassword)
                         .setMessage(masterPasswd.toStringRepresentation(false))
                         .setIcon(icon)
@@ -74,7 +74,7 @@ class ChangeMasterPasswordActivity : SecureActivity() {
             val currentPin = Password.fromEditable(currentPinTextView.text)
 
             if (currentPin.isEmpty()) {
-                currentPinTextView.setError(getString(R.string.pin_required))
+                currentPinTextView.error = getString(R.string.pin_required)
                 currentPinTextView.requestFocus()
             }
             else if (generatedPassword.data.isEmpty()) {
@@ -118,7 +118,7 @@ class ChangeMasterPasswordActivity : SecureActivity() {
                         Toast.makeText(baseContext, "Master password successfully changed", Toast.LENGTH_LONG).show()
                     }
                     else {
-                        currentPinTextView.setError(getString(R.string.pin_wrong))
+                        currentPinTextView.error = getString(R.string.pin_wrong)
                         currentPinTextView.requestFocus()
                     }
                 }

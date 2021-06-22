@@ -59,7 +59,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
             true
         }
 
-        mkTextView = view.findViewById<TextView>(R.id.text_scan_mk)
+        mkTextView = view.findViewById(R.id.text_scan_mk)
 
         val jsonContent = getImportVaultActivity().jsonContent
         if (jsonContent == null) {
@@ -71,7 +71,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
         val labelsCount = jsonContent.get(FileIOService.JSON_LABELS_COUNT)?.asString
         encMasterKey = jsonContent.get(FileIOService.JSON_ENC_MK)?.asString
 
-        loadedFileStatusTextView.text = "Vault exported at $createdAt, ${System.lineSeparator()} contains $credentialsCount credentials and ${labelsCount} labels"
+        loadedFileStatusTextView.text = "Vault exported at $createdAt, ${System.lineSeparator()} contains $credentialsCount credentials and $labelsCount labels"
 
         encMasterKey?.let {
             mkTextView.text = encMasterKey
@@ -93,7 +93,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
         if (scanned != null) {
             if (scanned.startsWith(Encrypted.TYPE_ENC_MASTER_KEY)) {
                 encMasterKey = scanned
-                mkTextView.setText(encMasterKey)
+                mkTextView.text = encMasterKey
             }
             else {
                 Toast.makeText(getBaseActivity(), "This is not an encrypted master key.", Toast.LENGTH_LONG).show()

@@ -23,7 +23,8 @@
             android:name=".provider.PasteContentProvider"
             android:authorities="de.jepfa.yapm"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true"
+            tools:ignore="ExportedContentProvider" />
 
         <activity
             android:name=".ui.settings.SettingsActivity"

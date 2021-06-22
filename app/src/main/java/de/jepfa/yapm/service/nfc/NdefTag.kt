@@ -62,7 +62,7 @@ class NdefTag @Throws(FormatException::class) constructor(val tag: Tag, val data
         val size = getSize()
         val maxSize = getMaxSize()
         if (size != null && maxSize != null) {
-            return maxSize - size;
+            return maxSize - size
         }
         else {
             return null

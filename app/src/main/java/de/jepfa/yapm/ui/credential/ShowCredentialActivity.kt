@@ -30,7 +30,7 @@ import de.jepfa.yapm.ui.label.LabelDialogOpener
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.DebugInfo
-import de.jepfa.yapm.util.ExportCredentialUtil
+import de.jepfa.yapm.usecase.ExportCredentialUseCase
 import de.jepfa.yapm.util.PasswordColorizer.spannableString
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_COPY_PASSWORD
@@ -63,9 +63,9 @@ class ShowCredentialActivity : SecureActivity() {
 
         titleLayout = findViewById(R.id.collapsing_toolbar_layout_title)
         titleLayout.post {
-            val layoutParams = toolbar.getLayoutParams() as CollapsingToolbarLayout.LayoutParams
-            layoutParams.height = titleLayout.getHeight()
-            toolbar.setLayoutParams(layoutParams)
+            val layoutParams = toolbar.layoutParams as CollapsingToolbarLayout.LayoutParams
+            layoutParams.height = titleLayout.height
+            toolbar.layoutParams = layoutParams
         }
 
         val idExtra = intent.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
@@ -148,7 +148,7 @@ class ShowCredentialActivity : SecureActivity() {
         }
 
         if (id == R.id.menu_export_credential) {
-            ExportCredentialUtil.startExport(credential, this)
+            ExportCredentialUseCase.startExport(credential, this)
             return true
         }
 
@@ -231,7 +231,7 @@ class ShowCredentialActivity : SecureActivity() {
                 val additionalInfo = decryptCommonString(key, credential.additionalInfo)
                 val password = decryptPassword(key, credential.password)
 
-                appBarLayout.setTitle(name)
+                appBarLayout.title = name
 
                 titleLayout.removeAllViews()
 
@@ -262,23 +262,23 @@ class ShowCredentialActivity : SecureActivity() {
                     val userView: ImageView = findViewById(R.id.user_image)
                     userView.visibility = View.INVISIBLE
                 }
-                userTextView.setText(user)
+                userTextView.text = user
 
                 if (website.isEmpty()) {
                     val websiteView: ImageView = findViewById(R.id.website_image)
                     websiteView.visibility = View.INVISIBLE
                 }
-                websiteTextView.setText(website)
+                websiteTextView.text = website
 
-                additionalInfoTextView.setText(additionalInfo)
+                additionalInfoTextView.text = additionalInfo
 
                 var spannedString = spannableString(password, multiLine, maskPassword, this)
-                passwordTextView.setText(spannedString)
+                passwordTextView.text = spannedString
 
                 if (DebugInfo.isDebug) {
                     passwordTextView.setOnLongClickListener {
                         val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-                        val icon: Drawable = getApplicationInfo().loadIcon(getPackageManager())
+                        val icon: Drawable = applicationInfo.loadIcon(packageManager)
                         val message = credential.toString()
                         builder.setTitle(R.string.debug)
                             .setMessage(message)
