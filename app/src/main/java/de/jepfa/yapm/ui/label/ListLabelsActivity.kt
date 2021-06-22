@@ -49,16 +49,18 @@ class ListLabelsActivity : SecureActivity() {
         if (key != null && labelId != null) {
             val credentialsToUpdate = LabelService.getCredentialIdsForLabelId(labelId)
             credentialsToUpdate?.forEach { credentialId ->
-                val credential = credentialViewModel.getById(credentialId).value
-                credential?.let {
-                    val labels = LabelService.getLabelsForCredential(key, credential)
+                credentialViewModel.getById(credentialId).observe(this, { credential ->
+                    credential?.let {
+                        val labels = LabelService.getLabelsForCredential(key, credential)
 
-                    val remainingLabelChips = labels
-                        .filterNot { it.encLabel.id == labelId}
-                        .map { it.labelChip }
-                    LabelService.encryptLabelIds(key, remainingLabelChips)
-                    LabelService.updateLabelsForCredential(key, credential)
-                }
+                        val remainingLabelChips = labels
+                            .filterNot { it.encLabel.id == labelId}
+                            .map { it.labelChip }
+                        LabelService.encryptLabelIds(key, remainingLabelChips)
+                        LabelService.updateLabelsForCredential(key, credential)
+                    }
+                })
+
             }
             LabelService.removeLabel(label)
             labelViewModel.delete(label.encLabel)
