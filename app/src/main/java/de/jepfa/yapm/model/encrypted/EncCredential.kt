@@ -49,7 +49,6 @@ data class EncCredential(var id: Int?,
         intent.putEncryptedExtra(EXTRA_CREDENTIAL_LABELS, labels)
     }
 
-
     companion object {
         const val EXTRA_CREDENTIAL_ID = "de.jepfa.yapm.ui.credential.id"
         const val EXTRA_CREDENTIAL_NAME = "de.jepfa.yapm.ui.credential.name"

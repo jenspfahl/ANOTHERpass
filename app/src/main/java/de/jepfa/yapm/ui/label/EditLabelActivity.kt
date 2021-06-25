@@ -1,5 +1,6 @@
 package de.jepfa.yapm.ui.label
 
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.Gravity
@@ -16,6 +17,7 @@ import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.getIntExtra
 
 
@@ -56,6 +58,19 @@ class EditLabelActivity : SecureActivity() {
             labelDescTextView.text = it.labelChip.description
             labelColor = it.labelChip.rgbColor
             labelColorChipView.setChipBackgroundColor(it.labelChip.getColor(this))
+
+            if (DebugInfo.isDebug) {
+                findViewById<TextView>(R.id.edit_label_explanation)?.setOnLongClickListener { view ->
+                    val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+                    val icon: Drawable = applicationInfo.loadIcon(packageManager)
+                    val message = it.encLabel.toString()
+                    builder.setTitle(R.string.debug)
+                        .setMessage(message)
+                        .setIcon(icon)
+                        .show()
+                    true
+                }
+            }
         }
 
         labelColorChipView.setOnChipClicked {

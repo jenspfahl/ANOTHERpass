@@ -16,6 +16,10 @@ data class Encrypted(val type: String = "", val iv: ByteArray, val data: ByteArr
         return toBase64(this)
     }
 
+    override fun toString(): String {
+        return toBase64String()
+    }
+
     companion object {
         const val TYPE_MASTER_PASSWD_TOKEN = "MPT"
         const val TYPE_ENC_MASTER_PASSWD = "EMP"
