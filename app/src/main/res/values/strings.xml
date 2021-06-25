@@ -1,7 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">ANOTHERpass</string>
     <string name="action_settings">Settings</string>
-    <!-- Strings used for fragments for navigation -->
     <string name="login_pin_fragment_label">Unlock with your PIN</string>
     <string name="login_masterpassword_fragment_label">Login with your master password</string>
 
@@ -178,9 +177,73 @@
     <string name="HYPER">Hyper</string>
     <string name="sort_by_recent">Sort by recent</string>
     <string name="nothing_placeholder">…</string>
+    <string name="unknown_placeholder">\???</string>
     <string name="tab_pseudo_phrase">Pseudo phrase</string>
     <string name="tab_ordinary">Ordinary password</string>
     <string name="drop_to_reove">DROP TO REMOVE</string>
+
+    <string name="vault_export_info">"Vault exported at %1$s, contains %2$s credentials and %3$s labels"</string>
+    <string name="scan_masterkey_first">Scan your master key first</string>
+    <string name="not_an_emk">This is not an encrypted master key</string>
+
+    <string name="label_never_used">Never used</string>
+    <string name="label_used_once">Used %1$d time</string>
+    <string name="label_used_many">Used %1$d times</string>
+    <string name="save_as">Save as</string>
+    <string name="password_pasted_by_another">Password pasted by another app</string>
+    <string name="login_with_yapm">Login into your vault and select a credential</string>
+    <string name="select_credential_for_autofill">Select a credential to autofill</string>
+    <string name="paste_user_for_autofill">Paste user for \'%1$s\'</string>
+    <string name="paste_passwd_for_autofill">Paste password for \'%1$s\'</string>
+    <string name="backup_file_saved">Backup file saved</string>
+    <string name="backup_failed">Error while creating the backup file</string>
+    <string name="backup_permission_missing">Permission to write to external storage is missing</string>
+    <string name="qr_code_saved">QR code as image saved</string>
+    <string name="qr_code_permission_missing">Permission to write to external storage is missing</string>
+    <string name="title_missing_overlay_permission">Missing permission</string>
+    <string name="message_missing_overlay_permission">App cannot draw over other apps. Enable permission and try again.</string>
+    <string name="open_overlay_permission">Open permission</string>
+    <string name="masterpassword_changed">Master password successfully changed</string>
+    <string name="pin_changed">Pin successfully changed</string>
+    <string name="credential_used_for_autofill">Credential used for Autofill</string>
+    <string name="masterpassword_stored">Master password stored on device</string>
+    <string name="masterpassword_removed">Stored master password removed from device</string>
+    <string name="title_drop_vault">Drop vault</string>
+    <string name="message_drop_vault">You are going to delete ALL your credentials and login data.</string>
+    <string name="deselect_all">Deselect all</string>
+    <string name="title_copy_password">Copy password</string>
+    <string name="message_copy_password">Copying passwords to clipboard may leak your password since any other app can listen to clipboard changes and read from it. Further it can remain there when you use a clipboard with history function (e.g. Samsung). " Use 'Privacy/Test C&amp;P password' to figure out if someone reads the clipboard beside you. You can disable this warning in 'Settings/Security'.</string>
+    <string name="head_generate_mpt">Your Master Password Token \#%1$d</string>
+    <string name="sub_generate_mpt">Take this token in your wallet to scan for login. If you loose it, just create a new one.</string>
+    <string name="title_generate_mpt">Generate master password token</string>
+    <string name="message_generate_mpt">The last generated token with number \#%1$d will become invalid.</string>
+    <string name="head_export_emp">Your Encrypted Master Password</string>
+    <string name="sub_export_emp">Store this on a safe place since this is contains your master password.</string>
+    <string name="head_export_emk">The Encrypted Master Key</string>
+    <string name="sub_export_emk">Store this at a safe place. Future backups don\'t need to include that master key.</string>
+    <string name="head_export_plain_passwd">"The plain password of '%1$s'</string>
+    <string name="sub_export_plain_passwd">Keep this QR code safe since it contains a real plain password!</string>
+    <string name="nfc_tag_content">NFC tag content</string>
+    <string name="nfc_not_supported">NFC not supported by your device</string>
+    <string name="nfc_not_enabled">Enable NFC to use this feature</string>
+    <string name="unknown_emp">Unknown master password</string>
+    <string name="no_mpt_present">No master password token present.</string>
+    <string name="invalid_mpt">Invalid master password token</string>
+    <string name="invalid_emp">Invalid encrypted master password</string>
+    <string name="scanning_emp">Scanning Master Password</string>
+    <string name="title_reset_all">Reset all</string>
+    <string name="message_extract_all">If you cannot import a vault file and got stuck you can reset all data here. If you continue all data is going to be deleted. Are you sure?</string>
+    <string name="nfc_tag_for_login_detected">NFC Tag for login detected.</string>
+    <string name="login_attempt">(attempt %1$d of %2$d)</string>
+    <string name="scanning_emk">Scanning Encrypted Master Key</string>
+    <string name="generate_password_first">Generate a password first</string>
+    <string name="nothing_to_restore">Nothing to restore</string>
+    <string name="label_too_long">Label too long (max %1$d)</string>
+    <string name="max_labels_reached">Maximum of labels reached (%1$d)</string>
+    <string name="password_strength">Password strength</string>
+    <string name="combinations">Combinations</string>
+    <string name="bruteforce_years_pc">Years to brute force with a usual PC</string>
+    <string name="bruteforce_year_supercomp">Years to brute force with a super computer</string>
 
 
 </resources>

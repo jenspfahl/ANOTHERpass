@@ -44,7 +44,12 @@ object NfcService {
     }
 
     fun createNdefMessage(activity: BaseActivity, payload: ByteArray, withAppRecord: Boolean) : NdefMessage {
-        val typeBytes = "appliation/${activity.getApp().packageName}".toByteArray()
+        val typeBytes = (
+                if (withAppRecord)
+                    "appliation/${activity.getApp().packageName}"
+                else
+                    "text/plain")
+            .toByteArray()
         val dataRecord = NdefRecord(NdefRecord.TNF_MIME_MEDIA, typeBytes, null, payload)
 
         if (withAppRecord) {

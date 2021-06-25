@@ -56,7 +56,7 @@ class NfcActivity : NfcBaseActivity() {
                             "data: ${tag.data}"
 
                 AlertDialog.Builder(this)
-                    .setTitle("NFC tag content")
+                    .setTitle(getString(R.string.nfc_tag_content))
                     .setMessage(text)
                     .show()
             }
@@ -101,10 +101,10 @@ class NfcActivity : NfcBaseActivity() {
         }
 
         if (nfcAdapter == null) {
-            Toast.makeText(this, "NFC not supported by your device", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.nfc_not_supported), Toast.LENGTH_LONG).show()
         }
         else if (nfcAdapter?.isEnabled == false) {
-            Toast.makeText(this, "Enable NFC to use this feature", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.nfc_not_enabled), Toast.LENGTH_LONG).show()
         }
     }
 

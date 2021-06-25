@@ -1,6 +1,7 @@
 package de.jepfa.yapm.usecase
 
 import android.content.Intent
+import de.jepfa.yapm.R
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
@@ -18,8 +19,8 @@ object ExportEncMasterKeyUseCase: SecureActivityUseCase {
             val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
             val encMasterKey = SecretService.decryptEncrypted(mkKey, encStoredMasterKey)
 
-            val encHead = SecretService.encryptCommonString(tempKey, "The Encrypted Master Key")
-            val encSub = SecretService.encryptCommonString(tempKey, "Store this at a safe place. Future backups don't need to include that master key.")
+            val encHead = SecretService.encryptCommonString(tempKey, activity.getString(R.string.head_export_emk))
+            val encSub = SecretService.encryptCommonString(tempKey, activity.getString(R.string.sub_export_emk))
             val encQrcHeader = SecretService.encryptCommonString(tempKey, encMasterKey.type)
             val encQrc = SecretService.encryptEncrypted(tempKey, encMasterKey)
 

@@ -136,7 +136,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
         buttonSave.setOnClickListener {
 
             if (generatedPassword.data.isEmpty()) {
-                Toast.makeText(it.context, "Generate a password first", Toast.LENGTH_LONG).show()
+                Toast.makeText(it.context, getString(R.string.generate_password_first), Toast.LENGTH_LONG).show()
             }
             else {
                 masterSecretKey?.let{ key ->
@@ -201,23 +201,23 @@ class EditCredentialPasswordFragment : SecureFragment() {
             )
 
             AlertDialog.Builder(context)
-                .setTitle("Password strength")
+                .setTitle(getString(R.string.password_strength))
                 .setMessage(
-                    "Combinations: " +
+                    getString(R.string.combinations) + ": " +
                             System.lineSeparator() +
                             combinations.toReadableFormat(0) +
                             System.lineSeparator() +
                             "($combinations)" +
                             System.lineSeparator() +
                             System.lineSeparator() +
-                            "Years to brute force with a usual PC: " +
+                            getString(R.string.bruteforce_years_pc) + ": " +
                             System.lineSeparator() +
                             bruteForceWithPentium.secondsToYear().toReadableFormat(0) +
                             System.lineSeparator() +
                             "(${bruteForceWithPentium.secondsToYear()})" +
                             System.lineSeparator() +
                             System.lineSeparator() +
-                            "Years to brute force with a super computer: " +
+                            getString(R.string.bruteforce_year_supercomp) + ": " +
                             System.lineSeparator() +
                             bruteForceWithSupercomp.secondsToYear().toReadableFormat(0) +
                             System.lineSeparator() +
@@ -350,7 +350,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
             masterSecretKey?.let{ key ->
                 if (generatedPassword.data.isEmpty()) {
-                    Toast.makeText(activity, "Generate a password first", Toast.LENGTH_LONG).show()
+                    Toast.makeText(activity, getString(R.string.generate_password_first), Toast.LENGTH_LONG).show()
                 }
                 else {
                     getSecureActivity()?.let {
@@ -366,7 +366,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
         if (id == R.id.menu_copy_credential) {
             masterSecretKey?.let{ key ->
                 if (generatedPassword.data.isEmpty()) {
-                    Toast.makeText(activity, "Generate a password first", Toast.LENGTH_LONG).show()
+                    Toast.makeText(activity, getString(R.string.generate_password_first), Toast.LENGTH_LONG).show()
                 }
                 else {
                     getSecureActivity()?.let {
@@ -387,7 +387,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 }
 
                 if (lastPasswd == null || lastPasswd.isBlank() || !lastPasswd.isValid()) {
-                    Toast.makeText(activity, "Nothing to restore", Toast.LENGTH_LONG).show()
+                    Toast.makeText(activity, getString(R.string.nothing_to_restore), Toast.LENGTH_LONG).show()
                 }
                 else {
                     updatePasswordView(lastPasswd, guessPasswordCombinations = true)

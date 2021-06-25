@@ -61,7 +61,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
 
         val scanQrCodeImageView: ImageView = view.findViewById(R.id.imageview_scan_qrcode)
         scanQrCodeImageView.setOnClickListener {
-            QRCodeUtil.scanQRCode(this, "Scanning Master Password")
+            QRCodeUtil.scanQRCode(this, getString(R.string.scanning_emp))
             true
         }
 
@@ -139,7 +139,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
             ) {
                 Toast.makeText(
                     getBaseActivity(),
-                    "No master password token present.",
+                    getString(R.string.no_mpt_present),
                     Toast.LENGTH_LONG
                 ).show()
                 return false
@@ -161,7 +161,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                 if (!encMasterPassword.isValid()) {
                     Toast.makeText(
                         getBaseActivity(),
-                        "Invalid master password token",
+                        getString(R.string.invalid_mpt),
                         Toast.LENGTH_LONG
                     ).show()
                     return false
@@ -184,7 +184,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
             if (!encMasterPassword.isValid()) {
                 Toast.makeText(
                     getBaseActivity(),
-                    "Invalid encrypted master password",
+                    getString(R.string.invalid_emp),
                     Toast.LENGTH_LONG
                 ).show()
                 return false
@@ -197,7 +197,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                 return true
             }
         } else {
-            Toast.makeText(getBaseActivity(), "Unknown master password", Toast.LENGTH_LONG).show()
+            Toast.makeText(getBaseActivity(), getString(R.string.unknown_emp), Toast.LENGTH_LONG).show()
         }
 
         return false

@@ -115,7 +115,7 @@ class ChangeMasterPasswordActivity : SecureActivity() {
 
                         generatedPassword.clear()
 
-                        Toast.makeText(baseContext, "Master password successfully changed", Toast.LENGTH_LONG).show()
+                        Toast.makeText(baseContext, getString(R.string.masterpassword_changed), Toast.LENGTH_LONG).show()
                     }
                     else {
                         currentPinTextView.error = getString(R.string.pin_wrong)

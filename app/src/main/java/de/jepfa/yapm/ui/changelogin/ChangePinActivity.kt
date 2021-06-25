@@ -102,7 +102,7 @@ class ChangePinActivity : SecureActivity() {
                         newPin1.clear()
                         newPin2.clear()
 
-                        Toast.makeText(baseContext, "Pin successfully changed", Toast.LENGTH_LONG).show()
+                        Toast.makeText(baseContext, getString(R.string.pin_changed), Toast.LENGTH_LONG).show()
                     }
                     else {
                         currentPinTextView.error = getString(R.string.pin_wrong)

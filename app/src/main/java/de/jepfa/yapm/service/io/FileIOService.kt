@@ -12,6 +12,7 @@ import android.util.Log
 import android.widget.Toast
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
+import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.model.encrypted.Encrypted
@@ -85,14 +86,14 @@ class FileIOService: IntentService("FileIOService") {
             val success = writeExportFile(uri, jsonData)
 
             if (success) {
-                message = "Backup file saved"
+                message = getString(R.string.backup_file_saved)
             }
             else {
-                message = "Error while creating the backup file"
+                message = getString(R.string.backup_failed)
             }
         }
         else {
-            message = "Permission to write to external storage is missing"
+            message = getString(R.string.backup_permission_missing)
         }
         if (message.isNotBlank()) {
             handler.post {
@@ -174,11 +175,11 @@ class FileIOService: IntentService("FileIOService") {
             val bitmap = QRCodeUtil.generateQRCode(header, qrc.toString(), qrcColor, this)
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fileOutStream)
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fileOutStream)
-            message = "QR code as image saved"
+            message = getString(R.string.qr_code_saved)
 
         }
         else {
-            message = "Permission to write to external storage is missing"
+            message = getString(R.string.qr_code_permission_missing)
         }
         handler.post {
             Toast.makeText(baseContext, message, Toast.LENGTH_LONG).show()

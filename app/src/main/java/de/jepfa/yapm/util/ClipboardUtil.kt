@@ -20,10 +20,8 @@ object ClipboardUtil {
         val warn = PreferenceService.getAsBool(PREF_WARN_BEFORE_COPY_TO_CB, activity)
         if (warn) {
             AlertDialog.Builder(activity)
-                .setTitle("Copy password")
-                .setMessage("Copying passwords to clipboard may leak your password since any other app can listen to clipboard changes and read from it. Further it can remain there when you use a clipboard with history function (e.g. Samsung)." +
-                        " Use 'Privacy/Test C&P password' to figure out if someone reads the clipboard beside you." +
-                        " You can disable this warning in 'Settings/Security'.")
+                .setTitle(activity.getString(R.string.title_copy_password))
+                .setMessage(activity.getString(R.string.message_copy_password))
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.copy) { dialog, whichButton ->
                     copyEncPassword(encPassword, activity)

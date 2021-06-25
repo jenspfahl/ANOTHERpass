@@ -80,8 +80,8 @@ class LoginActivity : NfcBaseActivity() {
 
         if (id == R.id.action_reset_vault) {
             AlertDialog.Builder(this)
-                .setTitle("Reset all")
-                .setMessage("If you cannot import a vault file and got stuck you can reset all data here. If you continue all data is going to be deleted. Are you sure?")
+                .setTitle(getString(R.string.title_reset_all))
+                .setMessage(getString(R.string.message_extract_all))
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(R.string.reset_vault) { dialog, whichButton ->
                     DropVaultUseCase.dropVaultData(this)
@@ -131,7 +131,7 @@ class LoginActivity : NfcBaseActivity() {
     override fun handleTag() {
         Log.i("LOGIN", "tag detected " + ndefTag?.tagId)
         if (ndefTag != null && showTagDetectedMessage) {
-            Toast.makeText(this, "NFC Tag for login detected.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.nfc_tag_for_login_detected), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -140,7 +140,7 @@ class LoginActivity : NfcBaseActivity() {
     }
 
     fun getLoginAttemptMessage(): String {
-        return "(attempt $loginAttempts of ${getMaxLoginAttempts()})"
+        return getString(R.string.login_attempt, loginAttempts, getMaxLoginAttempts())
     }
 
     fun loginSuccessful() {

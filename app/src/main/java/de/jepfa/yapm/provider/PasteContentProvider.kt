@@ -28,7 +28,7 @@ class PasteContentProvider : ContentProvider() {
                 NotificationHelper.pushNotification(
                     it,
                     NotificationHelper.CHANNEL_ID_PASTE,
-                    "ANNOTHERpass", "Password pasted by another app",
+                    it.getString(R.string.app_name), it.getString(R.string.password_pasted_by_another),
                     NotificationHelper.NOTIFICATION_ID_PASTE_SUCCESS
                 )
             }

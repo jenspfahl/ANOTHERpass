@@ -86,7 +86,7 @@ class ListLabelsAdapter(val listLabelsActivity: ListLabelsActivity) :
         }
 
         fun bind(key: SecretKey?, label: LabelService.Label) {
-            var name = "????"
+            var name = itemView.context.getString(R.string.unknown_placeholder)
             if (key != null) {
                 name = label.labelChip.label
 
@@ -98,13 +98,13 @@ class ListLabelsAdapter(val listLabelsActivity: ListLabelsActivity) :
             if (labelId != null) {
                 val usageCount = LabelService.getCredentialIdsForLabelId(labelId)?.size
                 if (usageCount == null || usageCount == 0) {
-                    labelUsageTextView.text = "Never used"
+                    labelUsageTextView.text = itemView.context.getString(R.string.label_never_used)
                 }
                 else if (usageCount == 1) {
-                    labelUsageTextView.text = "Used $usageCount time"
+                    labelUsageTextView.text = itemView.context.getString(R.string.label_used_once, usageCount)
                 }
                 else if (usageCount > 1) {
-                    labelUsageTextView.text = "Used $usageCount times"
+                    labelUsageTextView.text = itemView.context.getString(R.string.label_used_many, usageCount)
 
                 }
             }

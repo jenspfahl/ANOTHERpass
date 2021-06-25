@@ -110,13 +110,13 @@ class EditCredentialDataFragment : SecureFragment() {
                     if (chipsCount >= Constants.MAX_LABELS_PER_CREDENTIAL) {
                         Toast.makeText(
                             getBaseActivity(),
-                            "Maximum of labels reached (${Constants.MAX_LABELS_PER_CREDENTIAL})",
+                            getString(R.string.max_labels_reached, Constants.MAX_LABELS_PER_CREDENTIAL),
                             Toast.LENGTH_LONG
                         ).show()
                     } else if (text.length > maxLabelLength) {
                         Toast.makeText(
                             getBaseActivity(),
-                            "Label too long (max $maxLabelLength)", Toast.LENGTH_LONG
+                            getString(R.string.label_too_long, maxLabelLength), Toast.LENGTH_LONG
                         ).show()
                     } else {
                         val labelName = text.substring(0, text.length - 1)

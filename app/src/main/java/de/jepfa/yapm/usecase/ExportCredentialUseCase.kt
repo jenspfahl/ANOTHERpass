@@ -1,6 +1,7 @@
 package de.jepfa.yapm.usecase
 
 import android.content.Intent
+import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
@@ -17,11 +18,11 @@ object ExportCredentialUseCase {
                 credential.name
             )
             val tempEncHeader = SecretService.encryptCommonString(
-                tempKey, "The plain password of '$credentialName'"
+                tempKey, activity.getString(R.string.head_export_plain_passwd, credentialName)
             )
 
             val tempEncSubtext = SecretService.encryptCommonString(
-                tempKey, "Keep this QR code safe since it contains a real plain password!"
+                tempKey, activity.getString(R.string.sub_export_plain_passwd)
             )
             val tempEncName = SecretService.encryptCommonString(
                 tempKey, credentialName

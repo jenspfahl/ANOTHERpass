@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.ALIAS_KEY_TRANSPORT
@@ -19,9 +20,9 @@ object DetachHelper {
             if (!PermissionChecker.hasOverlayPermission(activity)) {
 
                 AlertDialog.Builder(activity)
-                        .setTitle("Missing permission")
-                        .setMessage("App cannot draw over other apps. Enable permission and try again.")
-                        .setPositiveButton("Open permission"
+                        .setTitle(activity.getString(R.string.title_missing_overlay_permission))
+                        .setMessage(activity.getString(R.string.message_missing_overlay_permission))
+                        .setPositiveButton(activity.getString(R.string.open_overlay_permission)
                         ) { _, _ ->
                             val intent = Intent()
                             intent.action = Settings.ACTION_MANAGE_OVERLAY_PERMISSION
@@ -29,7 +30,7 @@ object DetachHelper {
                                 Uri.parse("package:" + activity.applicationInfo.packageName)
                             activity.startActivity(intent)
                         }
-                    .setNegativeButton("Close",
+                    .setNegativeButton(R.string.close,
                                 { dialogInterface, _ -> dialogInterface.cancel() })
                         .show()
                 false

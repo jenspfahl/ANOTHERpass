@@ -164,7 +164,8 @@ object ResponseFiller {
         ).intentSender
 
         val message =
-            if (Session.isDenied()) "Login into your vault and select a credential" else "Select a credential to autofill"
+            if (Session.isDenied()) context.getString(R.string.login_with_yapm) 
+            else context.getString(R.string.select_credential_for_autofill)
         responseBuilder.setAuthentication(
             fields.getAutofillIds(),
             intentSender, createRemoteView(R.mipmap.ic_launcher_round, message, context)
@@ -251,11 +252,19 @@ object ResponseFiller {
     }
 
     private fun createUserDataSets(fields : Set<ViewNode>, name: String, user: String, context: Context): List<Dataset> {
-        return createDataSets(fields, R.drawable.ic_baseline_person_24,"Paste user for '$name'", user, context)
+        return createDataSets(fields,
+            R.drawable.ic_baseline_person_24,
+            context.getString(R.string.paste_user_for_autofill, name),
+            user,
+            context)
     }
 
     private fun createPasswordDataSets(fields : Set<ViewNode>, name: String, password: Password, context: Context): List<Dataset> {
-        return createDataSets(fields, R.drawable.ic_baseline_vpn_key_24, "Paste password for '$name'", password.toString(), context)
+        return createDataSets(fields,
+            R.drawable.ic_baseline_vpn_key_24,
+            context.getString(R.string.paste_passwd_for_autofill, name),
+            password.toString(),
+            context)
     }
 
     private fun createDataSets(fields : Set<ViewNode>, iconId: Int, text: String, content: String, context: Context): List<Dataset> {

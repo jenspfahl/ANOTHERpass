@@ -3,6 +3,7 @@ package de.jepfa.yapm.usecase
 import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
+import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.secret.SaltService
@@ -20,8 +21,8 @@ object GenerateMasterPasswordTokenUseCase: SecureActivityUseCase {
         val mptCounter = PreferenceService.getAsInt(STATE_MASTER_PASSWD_TOKEN_COUNTER, activity)
         if (PreferenceService.isPresent(DATA_MASTER_PASSWORD_TOKEN_KEY, activity)) {
             AlertDialog.Builder(activity)
-                    .setTitle("Generate master password token")
-                    .setMessage("The last generated token with number #$mptCounter will become invalid.")
+                    .setTitle(activity.getString(R.string.title_generate_mpt))
+                    .setMessage(activity.getString(R.string.message_generate_mpt, mptCounter))
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
                         generateMasterPasswordToken(activity)
@@ -53,8 +54,8 @@ object GenerateMasterPasswordTokenUseCase: SecureActivityUseCase {
 
             var nextMptNumber = PreferenceService.getAsInt(STATE_MASTER_PASSWD_TOKEN_COUNTER, activity) + 1
 
-            val encHead = SecretService.encryptCommonString(tempKey, "Your Master Password Token #$nextMptNumber")
-            val encSub = SecretService.encryptCommonString(tempKey, "Take this token in your wallet to scan for login. If you loose it, just create a new one.")
+            val encHead = SecretService.encryptCommonString(tempKey, activity.getString(R.string.head_generate_mpt, nextMptNumber))
+            val encSub = SecretService.encryptCommonString(tempKey, activity.getString(R.string.sub_generate_mpt))
             val encQrcHeader = SecretService.encryptCommonString(tempKey, "${encMasterPasswordToken.type} #$nextMptNumber")
             val encQrc = encMasterPasswordToken
 

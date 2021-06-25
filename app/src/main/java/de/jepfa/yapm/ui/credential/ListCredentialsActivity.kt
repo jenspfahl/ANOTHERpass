@@ -149,7 +149,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
             })
 
             val searchPlate = searchView.findViewById(androidx.appcompat.R.id.search_src_text) as EditText
-            searchPlate.hint = "Search"
+            searchPlate.hint = getString(R.string.search)
             val searchPlateView: View =
                 searchView.findViewById(androidx.appcompat.R.id.search_plate)
             searchPlateView.setBackgroundColor(
@@ -229,7 +229,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                     .setTitle(getString(R.string.filter))
                     .setIcon(R.drawable.ic_baseline_filter_list_24)
                     .setView(labelsView)
-                    .setNeutralButton("Deselect all", null)
+                    .setNeutralButton(getString(R.string.deselect_all), null)
                     .setPositiveButton(android.R.string.ok, null)
                     .setNegativeButton(android.R.string.cancel, null)
                     .create()
@@ -369,7 +369,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                             masterPasswd.clear()
                             Toast.makeText(
                                 this,
-                                "Master password stored on device",
+                                getString(R.string.masterpassword_stored),
                                 Toast.LENGTH_LONG
                             ).show()
                         }
@@ -391,7 +391,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                         refreshMenuMasterPasswordItem(navigationView.menu)
                         Toast.makeText(
                             this,
-                            "Stored master password removed from device",
+                            getString(R.string.masterpassword_removed),
                             Toast.LENGTH_LONG
                         ).show()
                     }
@@ -432,8 +432,8 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
             }
             R.id.drop_vault -> {
                 AlertDialog.Builder(this)
-                    .setTitle("Drop vault")
-                    .setMessage("You are going to delete ALL your credentials and login data.")
+                    .setTitle(getString(R.string.title_drop_vault))
+                    .setMessage(getString(R.string.message_drop_vault))
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
                         DropVaultUseCase.execute(this)

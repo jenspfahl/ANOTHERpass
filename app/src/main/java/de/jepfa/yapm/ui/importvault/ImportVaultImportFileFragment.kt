@@ -46,7 +46,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
         val loadedFileStatusTextView = view.findViewById<TextView>(R.id.loaded_file_status)
         val scanQrCodeImageView = view.findViewById<ImageView>(R.id.imageview_scan_qrcode)
         scanQrCodeImageView.setOnClickListener {
-            QRCodeUtil.scanQRCode(this, "Scanning Encrypted Master Key")
+            QRCodeUtil.scanQRCode(this, getString(R.string.scanning_emk))
             true
         }
 
@@ -71,7 +71,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
         val labelsCount = jsonContent.get(FileIOService.JSON_LABELS_COUNT)?.asString
         encMasterKey = jsonContent.get(FileIOService.JSON_ENC_MK)?.asString
 
-        loadedFileStatusTextView.text = "Vault exported at $createdAt, ${System.lineSeparator()} contains $credentialsCount credentials and $labelsCount labels"
+        loadedFileStatusTextView.text = getString(R.string.vault_export_info, createdAt, credentialsCount, labelsCount)
 
         encMasterKey?.let {
             mkTextView.text = encMasterKey
@@ -80,7 +80,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
         val importButton = view.findViewById<Button>(R.id.button_import_loaded_vault)
         importButton.setOnClickListener {
             if (mkTextView.text.isEmpty() || encMasterKey == null) {
-                Toast.makeText(getBaseActivity(), "Scan your master key first", Toast.LENGTH_LONG).show()
+                Toast.makeText(getBaseActivity(), getString(R.string.scan_masterkey_first), Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
 
@@ -96,7 +96,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
                 mkTextView.text = encMasterKey
             }
             else {
-                Toast.makeText(getBaseActivity(), "This is not an encrypted master key.", Toast.LENGTH_LONG).show()
+                Toast.makeText(getBaseActivity(), getString(R.string.not_an_emk), Toast.LENGTH_LONG).show()
                 return
             }
         } else {

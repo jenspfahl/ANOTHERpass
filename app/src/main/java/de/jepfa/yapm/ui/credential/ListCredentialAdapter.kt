@@ -82,7 +82,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             CurrentCredentialHolder.currentCredential = current
             Toast.makeText(
                 listCredentialsActivity,
-                "Credential used for Autofill",
+                listCredentialsActivity.getString(R.string.credential_used_for_autofill),
                 Toast.LENGTH_LONG
             ).show()
 
@@ -261,7 +261,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
 
             credentialLabelContainerView.removeAllViews()
 
-            var name = "????"
+            var name = itemView.context.getString(R.string.unknown_placeholder)
             if (key != null) {
                 name = SecretService.decryptCommonString(key, credential.name)
 

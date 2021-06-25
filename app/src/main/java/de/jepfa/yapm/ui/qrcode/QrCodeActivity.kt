@@ -111,7 +111,7 @@ class QrCodeActivity : SecureActivity() {
                 intent.addCategory(Intent.CATEGORY_OPENABLE)
                 intent.type = "image/jpeg"
                 intent.putExtra(Intent.EXTRA_TITLE, getFileName(head))
-                startActivityForResult(Intent.createChooser(intent, "Save as"), saveAsImage)
+                startActivityForResult(Intent.createChooser(intent, getString(R.string.save_as)), saveAsImage)
             }
         }
 

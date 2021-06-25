@@ -44,7 +44,7 @@ class ExportVaultActivity : SecureActivity() {
                     intent.addCategory(Intent.CATEGORY_OPENABLE)
                     intent.type = "text/json"
                     intent.putExtra(Intent.EXTRA_TITLE, getBackupFileName())
-                    startActivityForResult(Intent.createChooser(intent, "Save as"), saveAsFile)
+                    startActivityForResult(Intent.createChooser(intent, getString(R.string.save_as)), saveAsFile)
                 }
             }
         }
