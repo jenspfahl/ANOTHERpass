@@ -29,6 +29,8 @@ object ExportEncMasterKeyUseCase: SecureActivityUseCase {
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_SUBTEXT, encSub)
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE_HEADER, encQrcHeader)
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE, encQrc)
+            intent.putExtra(QrCodeActivity.EXTRA_NFC_WITH_APP_RECORD, true)
+
             activity.startActivity(intent)
 
             return true
