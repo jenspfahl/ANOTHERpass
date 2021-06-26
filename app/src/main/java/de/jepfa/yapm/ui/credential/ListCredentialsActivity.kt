@@ -9,10 +9,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.view.autofill.AutofillManager
 import android.view.autofill.AutofillManager.EXTRA_AUTHENTICATION_RESULT
 import android.widget.*
@@ -91,6 +88,22 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         fab.setOnClickListener {
             val intent = Intent(this@ListCredentialsActivity, EditCredentialActivity::class.java)
             startActivityForResult(intent, newOrUpdateCredentialActivityRequestCode)
+        }
+
+        fab.setOnLongClickListener {
+            it.setOnTouchListener { view, event ->
+                when (event.actionMasked) {
+                    MotionEvent.ACTION_MOVE -> {
+                        view.x = event.getRawX() - (view.getWidth() / 2)
+                        view.y= event.getRawY() - (view.getHeight())
+                    }
+                    MotionEvent.ACTION_UP -> view.setOnTouchListener(null)
+                    else -> {
+                    }
+                }
+                true
+            }
+            true
         }
 
         drawerLayout = findViewById(R.id.drawer_layout)

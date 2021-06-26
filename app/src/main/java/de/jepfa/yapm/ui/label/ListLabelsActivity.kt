@@ -2,6 +2,7 @@ package de.jepfa.yapm.ui.label
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.MotionEvent
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -33,10 +34,28 @@ class ListLabelsActivity : SecureActivity() {
             }
         })
 
-        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
+        val fab = findViewById<FloatingActionButton>(R.id.fab)
+        fab.setOnClickListener { view ->
             val intent = Intent(this, EditLabelActivity::class.java)
             startActivity(intent)
         }
+
+        fab.setOnLongClickListener {
+            it.setOnTouchListener { view, event ->
+                when (event.actionMasked) {
+                    MotionEvent.ACTION_MOVE -> {
+                        view.x = event.getRawX() - (view.getWidth() / 2)
+                        view.y= event.getRawY() - (view.getHeight())
+                    }
+                    MotionEvent.ACTION_UP -> view.setOnTouchListener(null)
+                    else -> {
+                    }
+                }
+                true
+            }
+            true
+        }
+
     }
 
     fun deleteLabel(label: LabelService.Label) {
