@@ -3,6 +3,7 @@ package de.jepfa.yapm.ui.login
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -24,6 +25,8 @@ import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_KEY
 import de.jepfa.yapm.service.PreferenceService.PREF_MAX_LOGIN_ATTEMPTS
 import de.jepfa.yapm.service.PreferenceService.PREF_SELF_DESTRUCTION
 import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_ATTEMPTS
+import de.jepfa.yapm.usecase.ShowInfoUseCase
+import de.jepfa.yapm.util.DebugInfo
 
 
 class LoginActivity : NfcBaseActivity() {
@@ -91,6 +94,11 @@ class LoginActivity : NfcBaseActivity() {
                 }
                 .setNegativeButton(android.R.string.no, null)
                 .show()
+        }
+
+        if (id == R.id.menu_about) {
+            ShowInfoUseCase.execute(this)
+            return true
         }
 
         return super.onOptionsItemSelected(item)

@@ -14,4 +14,11 @@
         app:showAsAction="never"
         android:title="@string/reset_vault">
     </item>
+
+    <item
+        android:id="@+id/menu_about"
+        app:showAsAction="never"
+        android:title="@string/about">
+    </item>
+
 </menu>

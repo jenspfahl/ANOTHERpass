@@ -476,14 +476,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
             }
 
             R.id.menu_about -> {
-                val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-                val icon: Drawable = applicationInfo.loadIcon(packageManager)
-                val message = getString(R.string.app_name) + ", Version " + getVersionName(this) +
-                        System.lineSeparator() + " \u00A9 Jens Pfahl 2021"
-                builder.setTitle(R.string.title_about_the_app)
-                    .setMessage(message)
-                    .setIcon(icon)
-                    .show()
+                ShowInfoUseCase.execute(this)
                 return true
             }
             R.id.menu_debug -> {
