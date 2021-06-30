@@ -52,13 +52,7 @@ object NfcService {
             .toByteArray()
         val dataRecord = NdefRecord(NdefRecord.TNF_MIME_MEDIA, typeBytes, null, payload)
 
-        if (withAppRecord) {
-            val appRecord = NdefRecord.createApplicationRecord(activity.getApp().packageName)
-            return NdefMessage(arrayOf(dataRecord, appRecord))
-        }
-        else {
-            return NdefMessage(dataRecord)
-        }
+        return NdefMessage(dataRecord)
 
     }
 
