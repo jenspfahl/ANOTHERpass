@@ -1,5 +1,6 @@
 package de.jepfa.yapm.model
 
+import android.os.Build
 import android.util.Log
 import de.jepfa.yapm.model.encrypted.Encrypted
 import java.util.concurrent.TimeUnit
@@ -72,7 +73,9 @@ object Session {
 
     fun lock() {
         try {
-            masterSecretKey?.destroy()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                masterSecretKey?.destroy()
+            }
         } catch (e: Exception) {
             Log.w("SESSION", "cannot destroy mSK", e)
         }

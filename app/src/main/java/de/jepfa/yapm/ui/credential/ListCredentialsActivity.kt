@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.view.autofill.AutofillManager
@@ -343,7 +344,9 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                     false,
                     applicationContext
                 )
-                putExtra(EXTRA_AUTHENTICATION_RESULT, fillResponse)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    putExtra(EXTRA_AUTHENTICATION_RESULT, fillResponse)
+                }
             }
             assistStructure = null
             setResult(Activity.RESULT_OK, replyIntent)

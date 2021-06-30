@@ -7,18 +7,19 @@ import android.app.Service
 import android.content.Intent
 import android.graphics.PixelFormat
 import android.graphics.Typeface
+import android.os.Build
 import android.os.IBinder
 import android.view.*
 import android.view.View.OnTouchListener
 import android.widget.Button
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.Session
-import de.jepfa.yapm.service.secret.SecretService
-import de.jepfa.yapm.util.PasswordColorizer
+import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_PASSWD_WORDS_ON_NL
 import de.jepfa.yapm.service.PreferenceService.PREF_TRANSPARENT_OVERLAY
+import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.getEncryptedExtra
 
 
@@ -86,10 +87,17 @@ class OverlayShowingService : Service(), OnTouchListener {
         overlayedButton?.setOnTouchListener(this)
         updateContent()
 
+        val LAYOUT_FLAG =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+            } else {
+                WindowManager.LayoutParams.TYPE_PHONE
+            }
+
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+            LAYOUT_FLAG,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
             PixelFormat.TRANSLUCENT
         )
@@ -102,7 +110,7 @@ class OverlayShowingService : Service(), OnTouchListener {
         val topParams = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+            LAYOUT_FLAG,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
             PixelFormat.TRANSLUCENT
         )

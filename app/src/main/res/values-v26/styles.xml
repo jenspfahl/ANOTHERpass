@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="generated_password">
+        <item name="android:textAlignment">center</item>
+        <item name="android:textSize">24dp</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:paddingHorizontal">24dp</item>
+        <item name="android:text">@string/nothing_placeholder</item>
+        <item name="android:textIsSelectable">false</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+</resources>

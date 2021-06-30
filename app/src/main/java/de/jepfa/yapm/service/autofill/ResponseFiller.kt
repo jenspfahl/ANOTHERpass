@@ -15,6 +15,7 @@ import android.util.TypedValue
 import android.view.autofill.AutofillId
 import android.view.autofill.AutofillValue
 import android.widget.RemoteViews
+import androidx.annotation.RequiresApi
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.Session
@@ -24,7 +25,7 @@ import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_EVERYWHERE
 
-
+@RequiresApi(Build.VERSION_CODES.O)
 object ResponseFiller {
 
     private val VIEW_TO_IDENTIFY = "text"

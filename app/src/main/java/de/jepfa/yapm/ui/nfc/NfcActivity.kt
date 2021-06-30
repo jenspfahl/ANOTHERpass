@@ -144,13 +144,14 @@ class NfcActivity : NfcBaseActivity() {
         encData?.let { eD ->
             val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
             val data = SecretService.decryptPassword(tempKey, eD)
-            val maxSize = t.getMaxSize()
-            if (maxSize != null && maxSize < data.length) {
-                Toast.makeText(this, R.string.nfc_not_enough_space, Toast.LENGTH_LONG).show()
-                return
-            }
+
             try {
                 val message = NfcService.createNdefMessage(this, data.toByteArray(), withAppRecord)
+                val maxSize = t.getMaxSize()
+                if (maxSize != null && maxSize < message.byteArrayLength) {
+                    Toast.makeText(this, R.string.nfc_not_enough_space, Toast.LENGTH_LONG).show()
+                    return
+                }
                 t.writeData(message)
                 Toast.makeText(this, R.string.nfc_successfully_written, Toast.LENGTH_LONG).show()
                 nfcStatusTextView.text = getString(R.string.nfc_tap_again)
