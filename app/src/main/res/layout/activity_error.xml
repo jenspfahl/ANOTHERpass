@@ -26,14 +26,18 @@
                 android:layout_marginBottom="6dp"
                 android:text="@string/bug_explanation" />
 
-            <TextView
-                android:id="@+id/bug_report"
+            <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="350dp"
-                android:layout_marginBottom="30dp"
-                android:maxLines="100"
-                android:textIsSelectable="true"
-                android:singleLine="false" />
+                android:layout_height="340dp">
+                <TextView
+                    android:id="@+id/bug_report"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="30dp"
+                    android:maxLines="100"
+                    android:textIsSelectable="true"
+                    android:singleLine="false" />
+            </ScrollView>
 
             <Button
                 android:id="@+id/button_report_bug"
@@ -41,7 +45,7 @@
                 android:layout_width="75pt"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="10dp"
                 android:background="@color/white"
                 android:text="@string/button_report_bug"
                 android:textAlignment="center"

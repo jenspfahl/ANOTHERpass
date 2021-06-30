@@ -77,7 +77,11 @@ class EditCredentialDataFragment : SecureFragment() {
         getBaseActivity()?.let {
             it.labelViewModel.allLabels.observe(it, { labels ->
                 masterSecretKey?.let{ key ->
-                    editCredentialLabelsView.filterableList = LabelService.getAllLabelChips()
+                    // Wrapping the result of getAllLabelChips into an ArrayList is a hack to
+                    // avoid sorting a SingletonList (which is returned if size==1)
+                    // inside com.pchmn.materialchips - lib
+                    // which would fail with a UnsupportedOperationException
+                    editCredentialLabelsView.filterableList = ArrayList(LabelService.getAllLabelChips())
                 }
                 editCredentialNameView.requestFocus()
             })
