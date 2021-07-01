@@ -39,7 +39,8 @@
                     android:layout_marginRight="4dp"
                     android:layout_marginBottom="4dp"
                     android:maxLength="@integer/max_pin_length"
-                    android:hint="@string/pin" />
+                    android:hint="@string/pin"
+                    tools:ignore="TextFields" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -58,7 +59,8 @@
                     android:layout_marginRight="4dp"
                     android:layout_marginBottom="4dp"
                     android:maxLength="@integer/max_pin_length"
-                    android:hint="@string/repeat_pin"/>
+                    android:hint="@string/repeat_pin"
+                    tools:ignore="TextFields" />
 
             </com.google.android.material.textfield.TextInputLayout>
 

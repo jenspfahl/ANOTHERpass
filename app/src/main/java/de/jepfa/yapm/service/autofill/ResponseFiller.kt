@@ -24,6 +24,9 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_EVERYWHERE
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashSet
 
 @RequiresApi(Build.VERSION_CODES.O)
 object ResponseFiller {
@@ -216,7 +219,7 @@ object ResponseFiller {
 
 
         if (suggestEverywhere && node.className != null) {
-            val viewId = node.idEntry?.toLowerCase()
+            val viewId = node.idEntry?.toLowerCase(Locale.ROOT)
             if (viewId != null && node.className.contains(VIEW_TO_IDENTIFY)) {
                 fields.addPotentialField(node)
             }
@@ -237,7 +240,7 @@ object ResponseFiller {
         fields: Fields
     ) {
 
-        val attrib = attribute.toLowerCase()
+        val attrib = attribute.toLowerCase(Locale.ROOT)
         if (contains(attrib, USER_INDICATORS)) {
             fields.addUserField(node)
         } else if (contains(attrib, PASSWORD_INDICATORS)) {

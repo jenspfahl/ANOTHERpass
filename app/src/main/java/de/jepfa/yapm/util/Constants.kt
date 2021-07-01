@@ -1,5 +1,6 @@
 package de.jepfa.yapm.util
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import java.text.DateFormat
 import java.text.DecimalFormat

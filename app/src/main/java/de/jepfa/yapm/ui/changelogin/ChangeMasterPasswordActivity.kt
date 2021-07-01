@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.widget.*
+import androidx.appcompat.widget.SwitchCompat
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.Session
@@ -38,8 +39,8 @@ class ChangeMasterPasswordActivity : SecureActivity() {
         setContentView(R.layout.activity_change_master_password)
 
         val currentPinTextView: EditText = findViewById(R.id.current_pin)
-        val pseudoPhraseSwitch: Switch = findViewById(R.id.switch_use_pseudo_phrase)
-        val switchStorePasswd: Switch = findViewById(R.id.switch_store_master_password)
+        val pseudoPhraseSwitch: SwitchCompat = findViewById(R.id.switch_use_pseudo_phrase)
+        val switchStorePasswd: SwitchCompat = findViewById(R.id.switch_store_master_password)
         val generatedPasswdView: TextView = findViewById(R.id.generated_passwd)
 
         val storedMasterPasswdPresent = PreferenceService.isPresent(DATA_ENCRYPTED_MASTER_PASSWORD, this)

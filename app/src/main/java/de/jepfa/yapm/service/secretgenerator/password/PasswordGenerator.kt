@@ -2,11 +2,12 @@ package de.jepfa.yapm.service.secretgenerator.password
 
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.secretgenerator.GeneratorBase
+import java.util.*
 
 class PasswordGenerator : GeneratorBase<PasswordGeneratorSpec>() {
 
     val ALPHA_CHARS_LOWER_CASE = "abcdefghijklmnopqrstuvwxyz"
-    val ALPHA_CHARS_UPPER_CASE = ALPHA_CHARS_LOWER_CASE.toUpperCase()
+    val ALPHA_CHARS_UPPER_CASE = ALPHA_CHARS_LOWER_CASE.toUpperCase(Locale.ROOT)
     val DIGITS = "0123456789"
     val SPECIAL_CHARS = "!?-,.:/$%&@#_;"
 

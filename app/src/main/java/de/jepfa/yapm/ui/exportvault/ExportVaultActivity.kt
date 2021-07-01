@@ -3,7 +3,7 @@ package de.jepfa.yapm.ui.exportvault
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
-import android.widget.Switch
+import androidx.appcompat.widget.SwitchCompat
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.io.FileIOService
@@ -18,7 +18,7 @@ class ExportVaultActivity : SecureActivity() {
 
     private val saveAsFile = 1
 
-    private lateinit var includeMasterKeySwitch: Switch
+    private lateinit var includeMasterKeySwitch: SwitchCompat
 
     init {
         enableBack = true

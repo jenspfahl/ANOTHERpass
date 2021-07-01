@@ -122,7 +122,7 @@ object PreferenceService {
 
         val editor = defaultSharedPreferences.edit()
         editor.putString(prefKey, value)
-        editor.commit()
+        editor.apply()
     }
 
     fun putBoolean(prefKey: String, value: Boolean, context: Context) {
@@ -131,7 +131,7 @@ object PreferenceService {
 
         val editor = defaultSharedPreferences.edit()
         editor.putBoolean(prefKey, value)
-        editor.commit()
+        editor.apply()
     }
 
     fun toggleBoolean(prefKey: String, context: Context) {
@@ -145,7 +145,7 @@ object PreferenceService {
 
         val editor = defaultSharedPreferences.edit()
         editor.putString(prefKey, null)
-        editor.commit()
+        editor.apply()
     }
 
 }

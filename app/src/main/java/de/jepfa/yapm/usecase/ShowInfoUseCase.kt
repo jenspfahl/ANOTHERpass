@@ -3,14 +3,8 @@ package de.jepfa.yapm.usecase
 import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.ui.BaseActivity
-import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.util.DebugInfo
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 object ShowInfoUseCase {
 

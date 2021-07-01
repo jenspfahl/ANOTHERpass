@@ -60,7 +60,6 @@ class NfcActivity : NfcBaseActivity() {
                     .setMessage(text)
                     .show()
             }
-            true
         }
 
         mode = intent.getStringExtra(EXTRA_MODE)
@@ -88,7 +87,6 @@ class NfcActivity : NfcBaseActivity() {
                             .setIcon(android.R.drawable.ic_dialog_alert)
                             .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
                                 writeTag(t, withAppRecord)
-                                true
                             }
                             .setNegativeButton(android.R.string.no, null)
                             .show()

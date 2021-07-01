@@ -10,4 +10,5 @@
         <item name="android:textIsSelectable">false</item>
         <item name="android:textStyle">bold</item>
     </style>
+
 </resources>

@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.widget.SwitchCompat
 import com.google.zxing.integration.android.IntentIntegrator
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
@@ -56,13 +57,12 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         loginActivity.showTagDetectedMessage = false
 
         masterPasswdTextView = view.findViewById(R.id.edittext_enter_masterpassword)
-        val switchStorePasswd: Switch = view.findViewById(R.id.switch_store_master_password)
+        val switchStorePasswd: SwitchCompat = view.findViewById(R.id.switch_store_master_password)
         loginButton = view.findViewById(R.id.button_login)
 
         val scanQrCodeImageView: ImageView = view.findViewById(R.id.imageview_scan_qrcode)
         scanQrCodeImageView.setOnClickListener {
             QRCodeUtil.scanQRCode(this, getString(R.string.scanning_emp))
-            true
         }
 
         val scanNfcImageView: ImageView = view.findViewById(R.id.imageview_scan_nfc)
@@ -71,7 +71,6 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         }
         scanNfcImageView.setOnClickListener {
             NfcService.scanNfcTag(this)
-            true
         }
 
         masterPasswdTextView.setOnEditorActionListener{ textView, id, keyEvent ->

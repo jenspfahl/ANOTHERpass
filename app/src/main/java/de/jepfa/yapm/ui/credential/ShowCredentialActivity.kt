@@ -191,7 +191,6 @@ class ShowCredentialActivity : SecureActivity() {
 
                             val upIntent = Intent(this, ListCredentialsActivity::class.java)
                             navigateUpTo(upIntent)
-                            true
                         }
                         .setNegativeButton(android.R.string.no, null)
                         .show()
@@ -246,7 +245,6 @@ class ShowCredentialActivity : SecureActivity() {
                         chipView.setPadding(16)
                         chipView.setOnChipClicked {_ ->
                             LabelDialogOpener.openLabelDialog(this, it)
-                            true
                         }
                         titleLayout.addView(chipView, idx)
                     }

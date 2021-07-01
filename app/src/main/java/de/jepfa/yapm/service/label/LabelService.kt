@@ -122,7 +122,7 @@ object LabelService {
     }
 
     fun lookupByLabelName(labelName: String): Label? {
-        return nameToLabel[labelName.toUpperCase()]
+        return nameToLabel[labelName.toUpperCase(Locale.ROOT)]
     }
 
     fun lookupByLabelId(id: Int): Label? {

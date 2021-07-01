@@ -3,7 +3,6 @@ package de.jepfa.yapm.ui.login
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -12,21 +11,19 @@ import android.widget.Button
 import android.widget.Toast
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
-import de.jepfa.yapm.service.nfc.NfcService
-import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.ui.createvault.CreateVaultActivity
-import de.jepfa.yapm.ui.credential.ListCredentialsActivity
-import de.jepfa.yapm.ui.importvault.ImportVaultActivity
-import de.jepfa.yapm.ui.nfc.NfcBaseActivity
-import de.jepfa.yapm.usecase.DropVaultUseCase
-import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_KEY
 import de.jepfa.yapm.service.PreferenceService.PREF_MAX_LOGIN_ATTEMPTS
 import de.jepfa.yapm.service.PreferenceService.PREF_SELF_DESTRUCTION
 import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_ATTEMPTS
+import de.jepfa.yapm.service.nfc.NfcService
+import de.jepfa.yapm.ui.createvault.CreateVaultActivity
+import de.jepfa.yapm.ui.credential.ListCredentialsActivity
+import de.jepfa.yapm.ui.importvault.ImportVaultActivity
+import de.jepfa.yapm.ui.nfc.NfcBaseActivity
+import de.jepfa.yapm.usecase.DropVaultUseCase
 import de.jepfa.yapm.usecase.ShowInfoUseCase
-import de.jepfa.yapm.util.DebugInfo
+import de.jepfa.yapm.util.Constants
 
 
 class LoginActivity : NfcBaseActivity() {

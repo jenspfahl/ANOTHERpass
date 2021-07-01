@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.widget.SwitchCompat
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
@@ -51,7 +52,7 @@ class CreateVaultSummarizeFragment : BaseFragment() {
         val transSK = getAndroidSecretKey(ALIAS_KEY_TRANSPORT)
         val masterPasswd = decryptPassword(transSK, encMasterPasswd)
 
-        val switchStorePasswd: Switch = view.findViewById(R.id.switch_store_master_password)
+        val switchStorePasswd: SwitchCompat = view.findViewById(R.id.switch_store_master_password)
         val generatedPasswdView: TextView = view.findViewById(R.id.generated_passwd)
         generatedPasswdView.text = PasswordColorizer.spannableString(masterPasswd, getBaseActivity())
 

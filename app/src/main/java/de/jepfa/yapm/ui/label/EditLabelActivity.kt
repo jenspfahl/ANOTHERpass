@@ -19,6 +19,7 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.getIntExtra
+import java.util.*
 
 
 class EditLabelActivity : SecureActivity() {
@@ -83,7 +84,7 @@ class EditLabelActivity : SecureActivity() {
             labelColors.forEachIndexed { idx, color ->
                 val chipView = ChipView(this)
                 // doesnt work: chipView.setChip(it.labelChip)
-                chipView.label = labelNameTextView.text.toString().toUpperCase()
+                chipView.label = labelNameTextView.text.toString().toUpperCase(Locale.ROOT)
                 chipView.setChipBackgroundColor(color)
                 chipView.setLabelColor(getColor(R.color.white))
                 chipView.setPadding(8)

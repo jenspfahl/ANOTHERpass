@@ -79,7 +79,7 @@
     <string name="include_enc_masterkey">Include encrypted masterkey</string>
     <string name="too_may_wrong_logins">Too many login attempts, all tokens declined</string>
     <string name="too_may_wrong_logins_self_destruction">Too many login attempts, vault completely deleted</string>
-    <string name="import_vault_explanation">Select a vault file to import. Note: You need the pin and the masterpassword and, depending on the file, the encrypted masterkey.</string>
+    <string name="import_vault_explanation">Select a vault file to import. Note: You need the pin and the master password and, depending on the file, the encrypted masterkey.</string>
     <string name="import_vault_load_file_fragment_label" tools:ignore="TypographyFractions">Import Vault 1/2</string>
     <string name="import_vault_import_file_fragment_label">Import Vault 2/2</string>
     <string name="button_load_vault">Load vault file</string>
@@ -216,7 +216,7 @@
     <string name="head_generate_mpt">Your Master Password Token \#%1$d</string>
     <string name="sub_generate_mpt">Take this token in your wallet to scan for login. If you loose it, just create a new one.</string>
     <string name="title_generate_mpt">Generate master password token</string>
-    <string name="message_generate_mpt">The last generated token with number \#%1$d will become invalid.</string>
+    <string name="message_generate_mpt" tools:ignore="PluralsCandidate">The last generated token with number \#%1$d will become invalid.</string>
     <string name="head_export_emp">Your Encrypted Master Password</string>
     <string name="sub_export_emp">Store this on a safe place since this is contains your master password.</string>
     <string name="head_export_emk">The Encrypted Master Key</string>

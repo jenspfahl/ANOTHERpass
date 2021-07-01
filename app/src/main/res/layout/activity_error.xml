@@ -1,5 +1,4 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,59 +9,54 @@
     android:fitsSystemWindows="true"
     tools:context=".ui.errorhandling.ErrorActivity">
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <LinearLayout
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="6dp"
+            android:text="@string/bug_explanation" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="340dp">
+            <TextView
+                android:id="@+id/bug_report"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                android:maxLines="100"
+                android:textIsSelectable="true"
+                android:singleLine="false" />
+        </ScrollView>
+
+        <Button
+            android:id="@+id/button_report_bug"
+            style="?android:textAppearanceSmall"
+            android:layout_width="75pt"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:background="@color/white"
+            android:text="@string/button_report_bug"
+            android:textAlignment="center"
+            android:textColor="@color/colorAccent"
+            android:textStyle="normal" />
+
+        <Button
+            android:id="@+id/button_restart"
+            style="?android:textAppearanceSmall"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_marginTop="16dp"
+            android:background="@color/colorAccent"
+            android:text="@string/button_restart"
+            android:textColor="@color/buttonLabel"
+            android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="6dp"
-                android:text="@string/bug_explanation" />
-
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="340dp">
-                <TextView
-                    android:id="@+id/bug_report"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginBottom="30dp"
-                    android:maxLines="100"
-                    android:textIsSelectable="true"
-                    android:singleLine="false" />
-            </ScrollView>
-
-            <Button
-                android:id="@+id/button_report_bug"
-                style="?android:textAppearanceSmall"
-                android:layout_width="75pt"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:background="@color/white"
-                android:text="@string/button_report_bug"
-                android:textAlignment="center"
-                android:textColor="@color/colorAccent"
-                android:textStyle="normal" />
-
-            <Button
-                android:id="@+id/button_restart"
-                style="?android:textAppearanceSmall"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="@color/colorAccent"
-                android:text="@string/button_restart"
-                android:textColor="@color/buttonLabel"
-                android:textStyle="bold" />
-
-        </LinearLayout>
-    </ScrollView>
+    </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

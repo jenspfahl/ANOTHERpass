@@ -51,7 +51,7 @@ class NdefTag @Throws(FormatException::class) constructor(val tag: Tag, val data
     }
 
     fun getMaxSize(): Int? {
-        return ndef?.maxSize ?: null
+        return ndef?.maxSize
     }
 
     fun getSize(): Int? {

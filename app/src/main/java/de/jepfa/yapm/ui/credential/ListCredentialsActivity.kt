@@ -14,6 +14,7 @@ import android.view.*
 import android.view.autofill.AutofillManager
 import android.view.autofill.AutofillManager.EXTRA_AUTHENTICATION_RESULT
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
@@ -22,7 +23,6 @@ import androidx.core.view.GravityCompat
 import androidx.core.view.MenuItemCompat
 import androidx.core.view.setPadding
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -32,6 +32,8 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
+import de.jepfa.yapm.service.PreferenceService.PREF_SORT_BY_RECENT
 import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
 import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.service.label.LabelFilter
@@ -48,9 +50,8 @@ import de.jepfa.yapm.ui.label.ListLabelsActivity
 import de.jepfa.yapm.ui.settings.SettingsActivity
 import de.jepfa.yapm.usecase.*
 import de.jepfa.yapm.util.*
-import de.jepfa.yapm.util.DebugInfo.getVersionName
-import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
-import de.jepfa.yapm.service.PreferenceService.PREF_SORT_BY_RECENT
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationItemSelectedListener  {
 
@@ -75,7 +76,9 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         CurrentCredentialHolder.currentCredential = null
-        assistStructure = intent.getParcelableExtra(AutofillManager.EXTRA_ASSIST_STRUCTURE)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            assistStructure = intent.getParcelableExtra(AutofillManager.EXTRA_ASSIST_STRUCTURE)
+        }
 
         refreshCredentials()
 
@@ -154,42 +157,36 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         menuInflater.inflate(R.menu.menu_main, menu)
 
         val searchItem: MenuItem = menu.findItem(R.id.action_search)
-        if (searchItem != null) {
-            val searchView = MenuItemCompat.getActionView(searchItem) as SearchView
-            searchView.setOnCloseListener(object : SearchView.OnCloseListener {
-                override fun onClose(): Boolean {
-                    return true
-                }
-            })
+        val searchView = MenuItemCompat.getActionView(searchItem) as SearchView
 
-            val searchPlate = searchView.findViewById(androidx.appcompat.R.id.search_src_text) as EditText
-            searchPlate.hint = getString(R.string.search)
-            val searchPlateView: View =
-                searchView.findViewById(androidx.appcompat.R.id.search_plate)
-            searchPlateView.setBackgroundColor(
-                ContextCompat.getColor(
-                    this,
-                    android.R.color.transparent
-                )
+        val searchPlate = searchView.findViewById(R.id.search_src_text) as EditText
+        searchPlate.hint = getString(R.string.search)
+        val searchPlateView: View =
+            searchView.findViewById(R.id.search_plate)
+        searchPlateView.setBackgroundColor(
+            ContextCompat.getColor(
+                this,
+                android.R.color.transparent
             )
+        )
 
-            searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                override fun onQueryTextSubmit(query: String?): Boolean {
-                    searchItem.collapseActionView()
-                    return false
-                }
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                searchItem.collapseActionView()
+                return false
+            }
 
-                override fun onQueryTextChange(s: String?): Boolean {
-                    listCredentialAdapter?.filter?.filter(s)
+            override fun onQueryTextChange(s: String?): Boolean {
+                listCredentialAdapter?.filter?.filter(s)
 
-                    return false
-                }
-            })
+                return false
+            }
+        })
 
-            val searchManager =
-                    getSystemService(Context.SEARCH_SERVICE) as SearchManager
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
-        }
+        val searchManager =
+                getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
+
 
         refreshMenuLockItem(menu.findItem(R.id.menu_lock_items))
         refreshMenuFiltersItem(menu.findItem(R.id.menu_filter))
@@ -333,6 +330,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         return assistStructure != null
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun pushBackAutofill(credential: EncCredential) {
         val structure = assistStructure
         if (structure != null) {
@@ -344,9 +342,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                     false,
                     applicationContext
                 )
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    putExtra(EXTRA_AUTHENTICATION_RESULT, fillResponse)
-                }
+                putExtra(EXTRA_AUTHENTICATION_RESULT, fillResponse)
             }
             assistStructure = null
             setResult(Activity.RESULT_OK, replyIntent)
@@ -515,7 +511,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                     } else {
                         sortedCredentials = credentials
                             .sortedBy {
-                                SecretService.decryptCommonString(key, it.name).toLowerCase()
+                                SecretService.decryptCommonString(key, it.name).toLowerCase(Locale.ROOT)
                             }
                     }
                 }
@@ -534,20 +530,16 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         )
 
         val storeMasterPasswdItem: MenuItem = menu.findItem(R.id.store_masterpasswd)
-        if (storeMasterPasswdItem != null) {
-            storeMasterPasswdItem.isVisible = !storedMasterPasswdPresent
-        }
+        storeMasterPasswdItem.isVisible = !storedMasterPasswdPresent
+
         val deleteMasterPasswdItem: MenuItem = menu.findItem(R.id.delete_stored_masterpasswd)
-        if (deleteMasterPasswdItem != null) {
-            deleteMasterPasswdItem.isVisible = storedMasterPasswdPresent
-        }
+        deleteMasterPasswdItem.isVisible = storedMasterPasswdPresent
     }
 
     private fun refreshMenuDebugItem(menu: Menu) {
         val debugItem: MenuItem = menu.findItem(R.id.menu_debug)
-        if (debugItem != null) {
-            debugItem.isVisible = DebugInfo.isDebug
-        }
+        debugItem.isVisible = DebugInfo.isDebug
+
     }
 
     private fun refreshMenuFiltersItem(item: MenuItem) {

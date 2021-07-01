@@ -47,7 +47,6 @@ class ImportVaultImportFileFragment : BaseFragment() {
         val scanQrCodeImageView = view.findViewById<ImageView>(R.id.imageview_scan_qrcode)
         scanQrCodeImageView.setOnClickListener {
             QRCodeUtil.scanQRCode(this, getString(R.string.scanning_emk))
-            true
         }
 
         val scanNfcImageView: ImageView = view.findViewById(R.id.imageview_scan_nfc)
@@ -56,7 +55,6 @@ class ImportVaultImportFileFragment : BaseFragment() {
         }
         scanNfcImageView.setOnClickListener {
             NfcService.scanNfcTag(this)
-            true
         }
 
         mkTextView = view.findViewById(R.id.text_scan_mk)

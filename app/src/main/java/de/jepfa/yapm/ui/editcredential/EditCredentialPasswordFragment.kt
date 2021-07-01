@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.text.InputType
 import android.view.*
 import android.widget.*
+import androidx.appcompat.widget.SwitchCompat
 import com.google.android.material.tabs.TabLayout
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
@@ -31,9 +32,9 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
     private lateinit var generatedPasswdView: TextView
     private lateinit var passwdTypeTab: TabLayout
-    private lateinit var switchUpperCaseChar: Switch
-    private lateinit var switchAddDigit: Switch
-    private lateinit var switchAddSpecialChar: Switch
+    private lateinit var switchUpperCaseChar: SwitchCompat
+    private lateinit var switchAddDigit: SwitchCompat
+    private lateinit var switchAddSpecialChar: SwitchCompat
     private lateinit var radioStrength: RadioGroup
 
     private var generatedPassword: Password = Password.empty()

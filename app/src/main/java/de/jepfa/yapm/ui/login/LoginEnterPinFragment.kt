@@ -113,14 +113,12 @@ class LoginEnterPinFragment : BaseFragment() {
                         loginActivity.handleFailedLoginAttempt()
                         pinTextView.error = "${getString(R.string.password_wrong)} ${loginActivity.getLoginAttemptMessage()}"
                         pinTextView.requestFocus()
-                        false
                     } else {
                         userPin.clear()
                         masterPasswd.clear()
                         pinTextView.text = ""
 
                         loginActivity.loginSuccessful()
-                        true
                     }
                 }
             )

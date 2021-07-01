@@ -5,9 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.SwitchCompat
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
@@ -40,7 +40,7 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         setTitle(R.string.create_vault_enter_passphrase_fragment_label)
 
-        val pseudoPhraseSwitch: Switch = view.findViewById(R.id.switch_use_pseudo_phrase)
+        val pseudoPhraseSwitch: SwitchCompat = view.findViewById(R.id.switch_use_pseudo_phrase)
         val generatedPasswdView: TextView = view.findViewById(R.id.generated_passwd)
 
         val buttonGeneratePasswd: Button = view.findViewById(R.id.button_generate_passwd)

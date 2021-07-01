@@ -2,6 +2,7 @@ package de.jepfa.yapm.ui.credential
 
 import android.app.AlertDialog
 import android.content.Intent
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -62,7 +63,9 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             val current = getItem(pos)
 
             if (listCredentialsActivity.shouldPushBackAutoFill()) {
-                listCredentialsActivity.pushBackAutofill(current)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    listCredentialsActivity.pushBackAutofill(current)
+                }
             }
             else {
                 val intent = Intent(listCredentialsActivity, ShowCredentialActivity::class.java)
@@ -77,7 +80,9 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
 
             val current = getItem(pos)
             if (listCredentialsActivity.shouldPushBackAutoFill()) {
-                listCredentialsActivity.pushBackAutofill(current)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    listCredentialsActivity.pushBackAutofill(current)
+                }
             }
             CurrentCredentialHolder.currentCredential = current
             Toast.makeText(
@@ -168,7 +173,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                         var name: String
                         if (key != null) {
                             name = SecretService.decryptCommonString(key, credential.name)
-                            if (name.toLowerCase().contains(charString.toLowerCase())) {
+                            if (name.toLowerCase(Locale.ROOT).contains(charString.toLowerCase(Locale.ROOT))) {
                                 filteredList.add(credential)
                             }
                         }
@@ -276,7 +281,6 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                         chipView.setPadding(16, 0, 16, 0)
                         chipView.setOnChipClicked {_ ->
                             LabelDialogOpener.openLabelDialog(activity, it)
-                            true
                         }
                         credentialLabelContainerView.addView(chipView, idx)
                     }
