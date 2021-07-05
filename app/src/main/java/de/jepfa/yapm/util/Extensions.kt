@@ -41,7 +41,7 @@ fun Intent.getIntExtra(key: String): Int? {
     return if (value != -1) value else null
 }
 
-fun StringBuilder.addLabelLine(label: String, data: Any?) {
+fun StringBuilder.addFormattedLine(label: String, data: Any?) {
     append(label)
         .append(": ")
         .append(data)

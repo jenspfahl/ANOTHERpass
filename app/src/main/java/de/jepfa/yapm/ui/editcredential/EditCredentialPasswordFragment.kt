@@ -2,6 +2,8 @@ package de.jepfa.yapm.ui.editcredential
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.text.InputFilter
+import android.text.InputFilter.LengthFilter
 import android.text.InputType
 import android.view.*
 import android.widget.*
@@ -112,6 +114,9 @@ class EditCredentialPasswordFragment : SecureFragment() {
             val input = EditText(getBaseActivity())
             input.inputType = InputType.TYPE_CLASS_TEXT
             input.setText(generatedPassword, TextView.BufferType.EDITABLE)
+
+            val filters = arrayOf<InputFilter>(LengthFilter(Constants.MAX_CREDENTIAL_PASSWD_LENGTH))
+            input.setFilters(filters)
 
             AlertDialog.Builder(getBaseActivity())
                 .setTitle(R.string.edit_password)

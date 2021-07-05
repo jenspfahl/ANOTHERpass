@@ -182,7 +182,7 @@
     <string name="tab_ordinary">Ordinary password</string>
     <string name="drop_to_reove">DROP TO REMOVE</string>
 
-    <string name="vault_export_info">"Vault exported at %1$s, contains %2$s credentials and %3$s labels"</string>
+    <string name="vault_export_info">"Vault (Id = %4$s) exported at %1$s, contains %2$s credentials and %3$s labels"</string>
     <string name="scan_masterkey_first">Scan your master key first</string>
     <string name="not_an_emk">This is not an encrypted master key</string>
 
@@ -244,6 +244,14 @@
     <string name="combinations">Combinations</string>
     <string name="bruteforce_years_pc">Years to brute force with a usual PC</string>
     <string name="bruteforce_year_supercomp">Years to brute force with a super computer</string>
+    <string name="show_vault_info">Show vault info</string>
+    <string name="vault_info">Vault info</string>
+    <string name="vault_id">Vault Id</string>
+    <string name="credential_count">Credential count</string>
+    <string name="label_count">Label count</string>
+    <string name="vault_created_at">Vault created at</string>
+    <string name="vault_imported_at">Vault imported at</string>
+    <string name="vault_already_created">Vault has already been created</string>
 
 
 </resources>

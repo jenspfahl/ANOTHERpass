@@ -20,6 +20,8 @@ import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.usecase.ImportVaultUseCase
 import de.jepfa.yapm.ui.AsyncWithProgressBar
 import de.jepfa.yapm.service.nfc.NfcService
+import de.jepfa.yapm.service.secret.MasterKeyService
+import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.util.QRCodeUtil
 
 class ImportVaultImportFileFragment : BaseFragment() {
@@ -67,9 +69,11 @@ class ImportVaultImportFileFragment : BaseFragment() {
         val createdAt = jsonContent.get(FileIOService.JSON_CREATION_DATE)?.asString
         val credentialsCount = jsonContent.get(FileIOService.JSON_CREDENTIALS_COUNT)?.asString
         val labelsCount = jsonContent.get(FileIOService.JSON_LABELS_COUNT)?.asString
+        val salt = jsonContent.get(FileIOService.JSON_VAULT_ID)
+        val vaultId = if (salt != null) SaltService.saltToVaultId(salt.asString) else R.string.unknown_placeholder
         encMasterKey = jsonContent.get(FileIOService.JSON_ENC_MK)?.asString
 
-        loadedFileStatusTextView.text = getString(R.string.vault_export_info, createdAt, credentialsCount, labelsCount)
+        loadedFileStatusTextView.text = getString(R.string.vault_export_info, createdAt, credentialsCount, labelsCount, vaultId)
 
         encMasterKey?.let {
             mkTextView.text = encMasterKey
@@ -79,6 +83,11 @@ class ImportVaultImportFileFragment : BaseFragment() {
         importButton.setOnClickListener {
             if (mkTextView.text.isEmpty() || encMasterKey == null) {
                 Toast.makeText(getBaseActivity(), getString(R.string.scan_masterkey_first), Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
+            if (MasterKeyService.isMasterKeyStored(getImportVaultActivity())) {
+                Toast.makeText(getBaseActivity(), getString(R.string.vault_already_created), Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
 

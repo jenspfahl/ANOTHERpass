@@ -10,9 +10,12 @@ import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_IMPORTED_AT
+import de.jepfa.yapm.util.Constants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
 
 object ImportVaultUseCase {
 
@@ -47,6 +50,11 @@ object ImportVaultUseCase {
                 .filterNotNull()
                 .forEach { c -> activity.getApp().labelRepository.insert(c) }
         }
+
+        PreferenceService.putString(
+            DATA_VAULT_IMPORTED_AT,
+            Constants.SDF_DT_MEDIUM.format(Date()),
+            activity)
 
         return true
     }

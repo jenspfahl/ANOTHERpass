@@ -10,6 +10,7 @@ import de.jepfa.yapm.service.secret.SecretService.encryptKey
 import de.jepfa.yapm.service.secret.SecretService.generateKey
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.service.PreferenceService
+import java.util.*
 
 object SaltService {
 
@@ -40,6 +41,13 @@ object SaltService {
         val saltKey = getAndroidSecretKey(ALIAS_KEY_SALT)
         val encSalt = encryptKey(Encrypted.TYPE_ENC_SALT, saltKey, salt)
         PreferenceService.putEncrypted(PreferenceService.DATA_SALT, encSalt, context)
+    }
+
+    fun saltToVaultId(saltAsBase64String: String): String {
+        return saltAsBase64String
+            .toLowerCase(Locale.ROOT)
+            .replace(Regex("[^0-9a-z]"),"")
+            .take(8)
     }
 
     private fun createAndStoreSalt(context: Context): Key {

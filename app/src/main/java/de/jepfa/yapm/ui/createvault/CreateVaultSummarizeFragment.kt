@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.nfc.NfcService
+import de.jepfa.yapm.service.secret.MasterKeyService
 import de.jepfa.yapm.service.secret.SecretService.ALIAS_KEY_TRANSPORT
 import de.jepfa.yapm.service.secret.SecretService.decryptPassword
 import de.jepfa.yapm.service.secret.SecretService.encryptPassword
@@ -80,15 +81,23 @@ class CreateVaultSummarizeFragment : BaseFragment() {
 
         view.findViewById<Button>(R.id.button_create_vault).setOnClickListener {
 
-            val encPin = arguments?.getEncrypted(CreateVaultActivity.ARG_ENC_PIN)
-            if (encPin == null) {
-                Log.e("CV", "No pin in extra")
-                Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-            val pin = decryptPassword(transSK, encPin)
+            context?.let {
+                if (MasterKeyService.isMasterKeyStored(it)) {
+                    Toast.makeText(it, getString(R.string.vault_already_created), Toast.LENGTH_LONG).show()
+                    return@setOnClickListener
+                }
 
-            createVault(pin, masterPasswd, switchStorePasswd.isChecked)
+                val encPin = arguments?.getEncrypted(CreateVaultActivity.ARG_ENC_PIN)
+                if (encPin == null) {
+                    Log.e("CV", "No pin in extra")
+                    Toast.makeText(it, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
+                    return@setOnClickListener
+                }
+
+                val pin = decryptPassword(transSK, encPin)
+
+                createVault(pin, masterPasswd, switchStorePasswd.isChecked)
+            }
 
         }
     }

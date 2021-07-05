@@ -61,4 +61,8 @@ object MasterKeyService {
             context
         )
     }
+
+    fun isMasterKeyStored(context: Context): Boolean {
+        return PreferenceService.isPresent(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, context)
+    }
 }

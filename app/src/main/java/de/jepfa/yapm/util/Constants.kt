@@ -13,6 +13,7 @@ object Constants {
 
     val MIN_PIN_LENGTH = 6
     val MAX_LABELS_PER_CREDENTIAL = 5
+    val MAX_CREDENTIAL_PASSWD_LENGTH = 50
 
     var SDF_DT_MEDIUM =
         SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM)

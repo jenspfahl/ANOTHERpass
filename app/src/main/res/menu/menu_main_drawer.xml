@@ -39,6 +39,12 @@
 
     <item android:title="@string/security" >
         <menu>
+
+            <item
+                android:id="@+id/show_vault_info"
+                android:orderInCategory="80"
+                android:title="@string/show_vault_info" />
+
             <item
                 android:id="@+id/change_pin"
                 android:orderInCategory="90"

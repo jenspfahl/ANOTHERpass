@@ -17,6 +17,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_MAX_LOGIN_ATTEMPTS
 import de.jepfa.yapm.service.PreferenceService.PREF_SELF_DESTRUCTION
 import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_ATTEMPTS
 import de.jepfa.yapm.service.nfc.NfcService
+import de.jepfa.yapm.service.secret.MasterKeyService
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.ui.importvault.ImportVaultActivity
@@ -44,7 +45,7 @@ class LoginActivity : NfcBaseActivity() {
 
         loginAttempts = PreferenceService.getAsInt(STATE_LOGIN_ATTEMPTS,  this)
 
-        if (PreferenceService.isPresent(DATA_ENCRYPTED_MASTER_KEY, this)) {
+        if (MasterKeyService.isMasterKeyStored(this)) {
             setContentView(R.layout.activity_login)
             nfcAdapter = NfcService.getNfcAdapter(this)
             readTagFromIntent(intent)
@@ -54,11 +55,22 @@ class LoginActivity : NfcBaseActivity() {
             setContentView(R.layout.activity_create_or_import_vault)
             val buttonCreateVault: Button = findViewById(R.id.button_create_vault)
             buttonCreateVault.setOnClickListener {
+
+                if (MasterKeyService.isMasterKeyStored(this)) {
+                    Toast.makeText(this, getString(R.string.vault_already_created), Toast.LENGTH_LONG).show()
+                    return@setOnClickListener
+                }
+
                 val intent = Intent(this@LoginActivity, CreateVaultActivity::class.java)
                 startActivityForResult(intent, importVaultActivityRequestCode)
             }
             val buttonImportVault: Button = findViewById(R.id.button_import_vault)
             buttonImportVault.setOnClickListener {
+                if (MasterKeyService.isMasterKeyStored(this)) {
+                    Toast.makeText(this, getString(R.string.vault_already_created), Toast.LENGTH_LONG).show()
+                    return@setOnClickListener
+                }
+
                 val intent = Intent(this@LoginActivity, ImportVaultActivity::class.java)
                 startActivityForResult(intent, createVaultActivityRequestCode)
             }

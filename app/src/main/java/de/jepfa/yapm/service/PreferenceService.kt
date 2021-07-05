@@ -27,6 +27,9 @@ object PreferenceService {
     const val DATA_MASTER_PASSWORD_TOKEN_KEY = DATA_PREFIX + "mpt"
     const val STATE_MASTER_PASSWD_TOKEN_COUNTER = STATE_PREFIX + "mpt_counter"
 
+    const val DATA_VAULT_CREATED_AT = DATA_PREFIX + "vault_created_at"
+    const val DATA_VAULT_IMPORTED_AT = DATA_PREFIX + "vault_imported_at"
+
     const val PREF_MAX_LOGIN_ATTEMPTS = PREF_PREFIX + "max_login_attempts"
     const val PREF_SELF_DESTRUCTION = PREF_PREFIX + "drop_vault_if_login_declined"
 

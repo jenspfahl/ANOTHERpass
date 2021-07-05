@@ -63,6 +63,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
     val newOrUpdateCredentialActivityRequestCode = 1
 
     private var listCredentialAdapter: ListCredentialAdapter? = null
+    private var credentialCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -442,6 +443,12 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                 startActivity(intent)
                 return true
             }
+            R.id.show_vault_info -> {
+                val labelCount = LabelService.getAllLabels().size
+                ShowVaultInfoUseCase.execute(this, credentialCount, labelCount)
+
+                return true
+            }
             R.id.drop_vault -> {
                 AlertDialog.Builder(this)
                     .setTitle(getString(R.string.title_drop_vault))
@@ -498,6 +505,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
     private fun refreshCredentials() {
         credentialViewModel.allCredentials.observe(this, { credentials ->
             credentials?.let { credentials ->
+                credentialCount = credentials.size
                 var sortedCredentials = credentials
 
                 masterSecretKey?.let { key ->
