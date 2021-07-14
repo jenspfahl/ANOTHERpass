@@ -117,10 +117,12 @@ class QrCodeActivity : SecureActivity() {
 
         if (id == R.id.menu_download_as_nfc) {
             val withAppRecord = intent.getBooleanExtra(EXTRA_NFC_WITH_APP_RECORD, false)
+            val noSessionCheck = intent.getBooleanExtra(EXTRA_NO_SESSION_CHECK, false)
 
             val intent = Intent(this, NfcActivity::class.java)
             intent.putExtra(NfcActivity.EXTRA_MODE, NfcActivity.EXTRA_MODE_RW)
             intent.putExtra(NfcActivity.EXTRA_WITH_APP_RECORD, withAppRecord)
+            intent.putExtra(NfcActivity.EXTRA_NO_SESSION_CHECK, noSessionCheck)
             intent.putEncryptedExtra(NfcActivity.EXTRA_DATA, encQRC)
             startActivity(intent)
         }
@@ -163,6 +165,6 @@ class QrCodeActivity : SecureActivity() {
         const val EXTRA_QRCODE_HEADER = "qrc_header"
         const val EXTRA_COLOR = "col"
         const val EXTRA_NFC_WITH_APP_RECORD = "nfcWithAppRecord"
-        const val EXTRA_NO_SESSION_CHECK = "noSessionChecl"
+        const val EXTRA_NO_SESSION_CHECK = "noSessionCheck"
     }
 }

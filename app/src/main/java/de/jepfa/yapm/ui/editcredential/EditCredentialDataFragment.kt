@@ -106,30 +106,19 @@ class EditCredentialDataFragment : SecureFragment() {
             }
 
             override fun onTextChanged(text: CharSequence) {
-
-                if (text.isNotBlank() && isCommitLabel(text)) {
-
-                    val maxLabelLength = editCredentialActivity.resources.getInteger(R.integer.max_label_name_length)
-                    val chipsCount = editCredentialLabelsView.selectedChipList.size
-                    if (chipsCount >= Constants.MAX_LABELS_PER_CREDENTIAL) {
-                        Toast.makeText(
-                            getBaseActivity(),
-                            getString(R.string.max_labels_reached, Constants.MAX_LABELS_PER_CREDENTIAL),
-                            Toast.LENGTH_LONG
-                        ).show()
-                    } else if (text.length > maxLabelLength) {
-                        Toast.makeText(
-                            getBaseActivity(),
-                            getString(R.string.label_too_long, maxLabelLength), Toast.LENGTH_LONG
-                        ).show()
-                    } else {
-                        val labelName = text.substring(0, text.length - 1)
-                        val label = LabelChip(labelName, "")
-                        editCredentialLabelsView.addChip(label)
-                    }
-                }
+                addLabel(text, editCredentialActivity)
             }
         })
+
+        /*
+        TODO doesn't work since editCredentialLabelsView.editText return a new ChipsInputEditText ll the time.
+         The origin is encapsulated in ChipsAdapter which is encapsulated in ChipsInput.
+         Need to fork that lib and change it,
+        editCredentialLabelsView.editText.setOnFocusChangeListener { view, focusGained ->
+            if (!focusGained) {
+                addLabel(editCredentialLabelsView.editText.editableText.toString(), editCredentialActivity)
+            }
+        }*/
 
         //fill UI
         if (editCredentialActivity.isUpdate()) {
@@ -144,8 +133,7 @@ class EditCredentialDataFragment : SecureFragment() {
                         it.additionalInfo
                     )
 
-                    getBaseActivity()?.title =
-                        getString(R.string.title_change_credential_with_title, name)
+                    getBaseActivity()?.title = getString(R.string.title_change_credential_with_title, name)
 
                     editCredentialNameView.setText(name)
                     editCredentialUserView.setText(user)
@@ -203,6 +191,34 @@ class EditCredentialDataFragment : SecureFragment() {
                     findNavController().navigate(R.id.action_EditCredential_DataFragment_to_PasswordFragment)
 
                 }
+            }
+        }
+    }
+
+    private fun addLabel(
+        text: CharSequence,
+        editCredentialActivity: EditCredentialActivity
+    ) {
+        if (text.isNotBlank() && isCommitLabel(text)) {
+
+            val maxLabelLength =
+                editCredentialActivity.resources.getInteger(R.integer.max_label_name_length)
+            val chipsCount = editCredentialLabelsView.selectedChipList.size
+            if (chipsCount >= Constants.MAX_LABELS_PER_CREDENTIAL) {
+                Toast.makeText(
+                    getBaseActivity(),
+                    getString(R.string.max_labels_reached, Constants.MAX_LABELS_PER_CREDENTIAL),
+                    Toast.LENGTH_LONG
+                ).show()
+            } else if (text.length > maxLabelLength) {
+                Toast.makeText(
+                    getBaseActivity(),
+                    getString(R.string.label_too_long, maxLabelLength), Toast.LENGTH_LONG
+                ).show()
+            } else {
+                val labelName = text.substring(0, text.length - 1)
+                val label = LabelChip(labelName, "")
+                editCredentialLabelsView.addChip(label)
             }
         }
     }
