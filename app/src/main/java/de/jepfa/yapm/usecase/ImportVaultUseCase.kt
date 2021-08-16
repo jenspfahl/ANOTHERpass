@@ -63,6 +63,7 @@ object ImportVaultUseCase {
     private fun deserializeCredential(json: JsonElement?): EncCredential? {
         if (json != null) {
             val jsonObject = json.asJsonObject
+            val jsonIsObfuscated = jsonObject.get(EncCredential.ATTRIB_IS_OBFUSCATED)
             return EncCredential(
                 jsonObject.get(EncCredential.ATTRIB_ID).asInt,
                 jsonObject.get(EncCredential.ATTRIB_NAME).asString,
@@ -71,7 +72,8 @@ object ImportVaultUseCase {
                 jsonObject.get(EncCredential.ATTRIB_PASSWORD).asString,
                 null,
                 jsonObject.get(EncCredential.ATTRIB_WEBSITE).asString,
-                jsonObject.get(EncCredential.ATTRIB_LABELS).asString
+                jsonObject.get(EncCredential.ATTRIB_LABELS).asString,
+                if (jsonIsObfuscated != null) jsonIsObfuscated.asBoolean else false
 
             )
         }

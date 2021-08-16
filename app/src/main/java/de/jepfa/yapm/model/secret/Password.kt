@@ -1,6 +1,7 @@
 package de.jepfa.yapm.model.secret
 
 import android.text.Editable
+import de.jepfa.obfusser.util.encrypt.Loop
 
 class Password: Secret, CharSequence {
     constructor(passwd: String) : super(passwd.toByteArray())
@@ -15,6 +16,14 @@ class Password: Secret, CharSequence {
 
     fun replace(index: Int, other: Char) {
         data[index] = other.toByte()
+    }
+
+    fun obfuscate(key: Key) {
+        Loop.loopPassword(this, key, forwards = true)
+    }
+
+    fun deobfuscate(key: Key) {
+        Loop.loopPassword(this, key, forwards = false)
     }
 
     fun toStringRepresentation(multiLine: Boolean): String {

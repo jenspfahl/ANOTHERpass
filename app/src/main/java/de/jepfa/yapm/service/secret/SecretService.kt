@@ -36,6 +36,14 @@ object SecretService {
         return Key(bytes)
     }
 
+    fun deriveKey(password: Password, salt: Key): Key {
+        val message = MessageDigest.getInstance("SHA-256")
+        message.update(salt.data)
+        message.update(password.toByteArray())
+        val digest = message.digest()
+        return Key(digest)
+    }
+
     fun generateSecretKey(key: Key, salt: Key): SecretKey {
         return generateSecretKey(Password(key.toCharArray()), salt)
     }

@@ -6,10 +6,10 @@ import de.jepfa.yapm.service.secretgenerator.SecretStrength
 import java.lang.Math.ceil
 import java.lang.Math.pow
 
-private var DEFAULT_VOCALS = "aeiouy"
-private var DEFAULT_CONSONANTS = "bcdfghjklmnpqrstvwxz"
-private var DEFAULT_DIGITS = "1234567890"
-private var DEFAULT_SPECIAL_CHARS = "!?-,.:/$%&@#"
+val DEFAULT_VOCALS = "aeiouy"
+val DEFAULT_CONSONANTS = "bcdfghjklmnpqrstvwxz"
+val DEFAULT_DIGITS = "1234567890"
+val DEFAULT_SPECIAL_CHARS = "!?-,.:/$%&@#"
 
 class PassphraseGenerator(
     val vocals: String = DEFAULT_VOCALS,

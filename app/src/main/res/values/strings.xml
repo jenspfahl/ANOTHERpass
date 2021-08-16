@@ -51,6 +51,7 @@
     <string name="pin_required">A pin is required</string>
     <string name="pin_too_short">Pin is too short</string>
     <string name="pin_not_equal">Pin repetition not equal</string>
+    <string name="password_not_equal">Password repetition not equal</string>
     <string name="pin_wrong">Wrong pin</string>
     <string name="button_create_vault">Create vault</string>
     <string name="create_vault_explanation_3">Here you see your master password. Note it or download as QR code or NFC tag and store it safely. Additionally, you can also store it on this device for faster login.</string>
@@ -252,6 +253,14 @@
     <string name="vault_created_at">Vault created at</string>
     <string name="vault_imported_at">Vault imported at</string>
     <string name="vault_already_created">Vault has already been created</string>
+    <string name="obfuscate_while_saving">Obfuscate password while saving</string>
+    <string name="obfuscate_while_saving_toast">Password will be obfuscated while saving</string>
+    <string name="obfuscate_while_saving_message">To obfuscate the password now you have to choose another password used to de-obfuscate only this password later.</string>
+    <string name="deobfuscate">De-obfuscate password</string>
+    <string name="password_deobfuscated">Password de-obfuscated</string>
+    <string name="password_obfuscated">Password obfuscated</string>
+    <string name="message_deobfuscate_password">If this password was obfuscated while creation you can de-obfuscate it with the obfuscation code.</string>
+    <string name="deobfuscate_restored">Origin password restored</string>
 
 
 </resources>

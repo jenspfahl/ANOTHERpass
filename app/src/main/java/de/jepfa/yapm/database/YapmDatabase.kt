@@ -13,11 +13,11 @@ import de.jepfa.yapm.database.dao.EncLabelDao
 import de.jepfa.yapm.database.entity.EncCredentialEntity
 import de.jepfa.yapm.database.entity.EncLabelEntity
 
-const val DB_VERISON = 2
+const val DB_VERSION = 3
 
 @Database(
     entities = [EncCredentialEntity::class, EncLabelEntity::class],
-    version = DB_VERISON,
+    version = DB_VERSION,
     exportSchema = false
 )
 @TypeConverters(StringSetConverter::class)
@@ -28,7 +28,7 @@ abstract class YapmDatabase : RoomDatabase() {
     companion object {
 
         fun getVersion(): Int {
-            return DB_VERISON
+            return DB_VERSION
         }
 
         @Volatile
@@ -37,9 +37,14 @@ abstract class YapmDatabase : RoomDatabase() {
             if (INSTANCE == null) {
                 synchronized(YapmDatabase::class.java) {
                     if (INSTANCE == null) {
-                        val migration = object : Migration(1, 2) {
+                        val migration1to2 = object : Migration(1, 2) {
                             override fun migrate(database: SupportSQLiteDatabase) {
                                 database.execSQL("ALTER TABLE EncCredentialEntity ADD COLUMN lastPassword TEXT")
+                            }
+                        }
+                        val migration2to3 = object : Migration(2, 3) {
+                            override fun migrate(database: SupportSQLiteDatabase) {
+                                database.execSQL("ALTER TABLE EncCredentialEntity ADD COLUMN isObfuscated INTEGER NOT NULL DEFAULT 0")
                             }
                         }
 
@@ -47,7 +52,7 @@ abstract class YapmDatabase : RoomDatabase() {
                             context.applicationContext,
                             YapmDatabase::class.java, "yapm_database"
                         )
-                        .addMigrations(migration)
+                        .addMigrations(migration1to2, migration2to3)
                         .build()
                     }
                 }

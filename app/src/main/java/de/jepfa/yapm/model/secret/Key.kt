@@ -1,5 +1,7 @@
 package de.jepfa.yapm.model.secret
 
+import android.text.Editable
+
 class Key : Secret {
 
     constructor(data: ByteArray): super(data)
@@ -7,5 +9,4 @@ class Key : Secret {
     fun debugToString(): String {
         return data.contentToString()
     }
-
 }

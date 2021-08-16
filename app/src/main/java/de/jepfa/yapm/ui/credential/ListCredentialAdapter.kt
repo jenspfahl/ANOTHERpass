@@ -97,13 +97,13 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         holder.listenForDetachPasswd { pos, _ ->
 
             val current = getItem(pos)
-            DetachHelper.detachPassword(listCredentialsActivity, current.password, null)
+            DetachHelper.detachPassword(listCredentialsActivity, current.password, null, null)
         }
 
         holder.listenForCopyPasswd { pos, _ ->
 
             val current = getItem(pos)
-            ClipboardUtil.copyEncPasswordWithCheck(current.password, listCredentialsActivity)
+            ClipboardUtil.copyEncPasswordWithCheck(current.password, null, listCredentialsActivity)
         }
 
         holder.listenForOpenMenu { position, _, view ->
@@ -113,7 +113,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                     val current = getItem(position)
                     return when (item.itemId) {
                         R.id.menu_export_credential -> {
-                            ExportCredentialUseCase.startExport(current, listCredentialsActivity)
+                            ExportCredentialUseCase.startExport(current, null, listCredentialsActivity)
                             return true
                         }
                         R.id.menu_change_credential -> {

@@ -1,9 +1,11 @@
 package de.jepfa.yapm.util
 
 import android.content.Context
+import android.graphics.Typeface
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.PreferenceService
@@ -16,25 +18,36 @@ object PasswordColorizer {
 
     fun spannableString(password: Password, context: Context?): CharSequence {
         val multiLine = PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_WORDS_ON_NL, context)
-        return spannableString(password, multiLine, maskPassword = false, context)
+        return spannableObfusableString(password, multiLine, maskPassword = false, obfuscated = false, context)
+    }
+    fun spannableObfusableString(password: Password, obfuscated: Boolean, context: Context?): CharSequence {
+        val multiLine = PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_WORDS_ON_NL, context)
+        return spannableObfusableString(password, multiLine, maskPassword = false, obfuscated = obfuscated, context)
     }
 
     fun spannableString(password: Password, multiLine: Boolean, context: Context?): CharSequence {
-        return spannableString(password, multiLine, maskPassword = false, context)
+        return spannableObfusableString(password, multiLine, maskPassword = false, obfuscated = false, context)
     }
 
-    fun spannableString(password: Password, multiLine: Boolean, maskPassword: Boolean, context: Context?): CharSequence {
+    fun spannableObfusableString(password: Password, multiLine: Boolean, maskPassword: Boolean, obfuscated: Boolean, context: Context?): CharSequence {
         val colorizePasswd = PreferenceService.getAsBool(PREF_COLORED_PASSWORD, context)
         if (colorizePasswd) {
-            return colorizePassword(password, multiLine, maskPassword, context)
+            return colorizePassword(password, multiLine, maskPassword, obfuscated, context)
         }
-        return password.toStringRepresentation(multiLine, maskPassword)
+        else {
+            var spannedString = SpannableString(password.toStringRepresentation(multiLine, maskPassword))
+            if (obfuscated) {
+                spannedString.setSpan(StyleSpan(Typeface.ITALIC), 0, spannedString.length, 0)
+            }
+            return spannedString
+        }
     }
 
     private fun colorizePassword(
         password: Password,
         multiLine: Boolean,
         maskPassword: Boolean,
+        obfuscated: Boolean,
         context: Context?
     ): SpannableString {
         if (context == null) return SpannableString("")
@@ -60,6 +73,9 @@ object PasswordColorizer {
                 start4,
                 Spanned.SPAN_MARK_MARK
             )
+        }
+        if (obfuscated) {
+            spannedString.setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0)
         }
         return spannedString
     }

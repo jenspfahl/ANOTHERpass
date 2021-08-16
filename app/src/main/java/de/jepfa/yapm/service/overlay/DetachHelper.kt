@@ -6,6 +6,7 @@ import android.net.Uri
 import android.provider.Settings
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.ALIAS_KEY_TRANSPORT
 import de.jepfa.yapm.ui.SecureActivity
@@ -16,7 +17,7 @@ object DetachHelper {
     val EXTRA_PASSWD = "password"
     val EXTRA_MULTILINE = "multiline"
 
-    fun detachPassword(activity: SecureActivity, encPassword: Encrypted, multiLine: Boolean?) =
+    fun detachPassword(activity: SecureActivity, encPassword: Encrypted, obfuscationKey : Key?, multiLine: Boolean?) =
             if (!PermissionChecker.hasOverlayPermission(activity)) {
 
                 AlertDialog.Builder(activity)
@@ -38,6 +39,9 @@ object DetachHelper {
 
                 activity.masterSecretKey?.let{ key ->
                     val password = SecretService.decryptPassword(key, encPassword)
+                    obfuscationKey?.let {
+                        password.deobfuscate(it)
+                    }
                     val transSK = SecretService.getAndroidSecretKey(ALIAS_KEY_TRANSPORT)
                     val encPassword = SecretService.encryptPassword(transSK, password)
 

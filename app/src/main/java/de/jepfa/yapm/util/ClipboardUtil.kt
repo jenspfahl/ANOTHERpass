@@ -7,6 +7,7 @@ import android.content.Context
 import android.widget.Toast
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.provider.PasteContentProvider
 import de.jepfa.yapm.service.PreferenceService
@@ -16,7 +17,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_WARN_BEFORE_COPY_TO_CB
 
 object ClipboardUtil {
 
-    fun copyEncPasswordWithCheck(encPassword: Encrypted, activity: SecureActivity) {
+    fun copyEncPasswordWithCheck(encPassword: Encrypted, obfuscationKey : Key?, activity: SecureActivity) {
         val warn = PreferenceService.getAsBool(PREF_WARN_BEFORE_COPY_TO_CB, activity)
         if (warn) {
             AlertDialog.Builder(activity)
@@ -24,19 +25,22 @@ object ClipboardUtil {
                 .setMessage(activity.getString(R.string.message_copy_password))
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.copy) { dialog, whichButton ->
-                    copyEncPassword(encPassword, activity)
+                    copyEncPassword(encPassword, obfuscationKey, activity)
                 }
                 .setNegativeButton(android.R.string.cancel, null)
                 .show()
         }
         else {
-            copyEncPassword(encPassword, activity)
+            copyEncPassword(encPassword, obfuscationKey, activity)
         }
     }
 
-    private fun copyEncPassword(encPassword: Encrypted, activity: SecureActivity) {
+    private fun copyEncPassword(encPassword: Encrypted, obfuscationKey : Key?, activity: SecureActivity) {
         activity.masterSecretKey?.let{ key ->
             val passwd = SecretService.decryptPassword(key, encPassword)
+            obfuscationKey?.let {
+                passwd.deobfuscate(it)
+            }
             copyPassword(passwd, activity)
             passwd.clear()
         }

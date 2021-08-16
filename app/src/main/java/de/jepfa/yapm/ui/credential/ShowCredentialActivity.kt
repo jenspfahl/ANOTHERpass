@@ -9,9 +9,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.setPadding
 import com.google.android.material.appbar.CollapsingToolbarLayout
@@ -19,24 +17,28 @@ import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.model.encrypted.EncCredential
-import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
-import de.jepfa.yapm.service.label.LabelService
-import de.jepfa.yapm.service.overlay.DetachHelper
-import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
-import de.jepfa.yapm.service.secret.SecretService.decryptPassword
-import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
-import de.jepfa.yapm.ui.label.LabelDialogOpener
-import de.jepfa.yapm.usecase.LockVaultUseCase
-import de.jepfa.yapm.util.ClipboardUtil
-import de.jepfa.yapm.util.DebugInfo
-import de.jepfa.yapm.usecase.ExportCredentialUseCase
-import de.jepfa.yapm.util.PasswordColorizer.spannableString
+import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_COPY_PASSWORD
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_OVERLAY_FEATURE
 import de.jepfa.yapm.service.PreferenceService.PREF_MASK_PASSWORD
 import de.jepfa.yapm.service.PreferenceService.PREF_PASSWD_WORDS_ON_NL
+import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
+import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.overlay.DetachHelper
+import de.jepfa.yapm.service.secret.SaltService
+import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
+import de.jepfa.yapm.service.secret.SecretService.decryptPassword
+import de.jepfa.yapm.service.secret.SecretService.deriveKey
+import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
+import de.jepfa.yapm.ui.label.LabelDialogOpener
+import de.jepfa.yapm.usecase.ExportCredentialUseCase
+import de.jepfa.yapm.usecase.LockVaultUseCase
+import de.jepfa.yapm.util.ClipboardUtil
+import de.jepfa.yapm.util.DebugInfo
+import de.jepfa.yapm.util.DeobfuscationDialog
+import de.jepfa.yapm.util.PasswordColorizer.spannableObfusableString
 
 
 class ShowCredentialActivity : SecureActivity() {
@@ -45,6 +47,7 @@ class ShowCredentialActivity : SecureActivity() {
 
     private var multiLine = false
     private var maskPassword = false
+    private var obfuscationKey: Key? = null
 
     private lateinit var credential: EncCredential
     private lateinit var appBarLayout: CollapsingToolbarLayout
@@ -53,6 +56,7 @@ class ShowCredentialActivity : SecureActivity() {
     private lateinit var userTextView: TextView
     private lateinit var websiteTextView: TextView
     private lateinit var additionalInfoTextView: TextView
+    private var optionsMenu: Menu? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -132,6 +136,8 @@ class ShowCredentialActivity : SecureActivity() {
             menu.findItem(R.id.menu_detach_credential)?.isVisible = false
         }
 
+        optionsMenu = menu
+
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -149,7 +155,7 @@ class ShowCredentialActivity : SecureActivity() {
         }
 
         if (id == R.id.menu_export_credential) {
-            ExportCredentialUseCase.startExport(credential, this)
+            ExportCredentialUseCase.startExport(credential, obfuscationKey, this)
             return true
         }
 
@@ -159,12 +165,12 @@ class ShowCredentialActivity : SecureActivity() {
         }
 
         if (id == R.id.menu_detach_credential) {
-            DetachHelper.detachPassword(this, credential.password, multiLine)
+            DetachHelper.detachPassword(this, credential.password, obfuscationKey, multiLine)
             return true
         }
 
         if (id == R.id.menu_copy_credential) {
-            ClipboardUtil.copyEncPasswordWithCheck(credential.password, this)
+            ClipboardUtil.copyEncPasswordWithCheck(credential.password, obfuscationKey, this)
             return true
         }
 
@@ -196,6 +202,54 @@ class ShowCredentialActivity : SecureActivity() {
                         .setNegativeButton(android.R.string.no, null)
                         .show()
             }
+            return true
+        }
+
+        if (id == R.id.menu_deobfuscate_password) {
+
+            masterSecretKey?.let{ key ->
+
+                if (obfuscationKey != null) {
+                    val originPassword = decryptPassword(key, credential.password)
+                    var spannedString =
+                        spannableObfusableString(originPassword, multiLine, maskPassword, showObfuscated(credential), this)
+                    passwordTextView.text = spannedString
+                    originPassword.clear()
+
+                    obfuscationKey?.clear()
+                    obfuscationKey = null
+                    item.isChecked = false
+                    Toast.makeText(this, R.string.deobfuscate_restored, Toast.LENGTH_LONG).show()
+                }
+                else {
+
+                    DeobfuscationDialog.openDeobfuscationDialog(this) { obfusPasswd ->
+                        maskPassword = false
+                        item.isChecked = true
+
+                        obfuscationKey = deriveKey(obfusPasswd, SaltService.getSalt(this))
+                        obfuscationKey?.let {
+                            val passwordForDeobfuscation = decryptPassword(key, credential.password)
+                            passwordForDeobfuscation.deobfuscate(it)
+                            var spannedString =
+                                spannableObfusableString(
+                                    passwordForDeobfuscation,
+                                    multiLine,
+                                    maskPassword,
+                                    showObfuscated(credential),
+                                    this
+                                )
+                            passwordTextView.text = spannedString
+                            passwordForDeobfuscation.clear()
+                        }
+                        obfusPasswd.clear()
+
+                        Toast.makeText(this, R.string.password_deobfuscated, Toast.LENGTH_LONG)
+                            .show()
+                    }
+                }
+            }
+            return true
         }
 
         return super.onOptionsItemSelected(item)
@@ -210,6 +264,9 @@ class ShowCredentialActivity : SecureActivity() {
 
                 val credential = EncCredential.fromIntent(it)
                 if (credential.isPersistent()) {
+                    obfuscationKey?.clear()
+                    obfuscationKey = null
+                    optionsMenu?.findItem(R.id.menu_deobfuscate_password)?.isChecked = false
                     credentialViewModel.update(credential)
                 }
             }
@@ -218,8 +275,21 @@ class ShowCredentialActivity : SecureActivity() {
     }
 
     override fun lock() {
+        obfuscationKey?.clear()
+        obfuscationKey = null
+        maskPassword = true
         recreate()
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        obfuscationKey?.clear()
+    }
+
+    private fun showObfuscated(credential: EncCredential): Boolean {
+        return credential.isObfuscated && obfuscationKey == null
+    }
+
 
     private fun updatePasswordView(idExtra: Int) {
         credentialViewModel.getById(idExtra).observe(this, {
@@ -230,6 +300,9 @@ class ShowCredentialActivity : SecureActivity() {
                 val website = decryptCommonString(key, credential.website)
                 val additionalInfo = decryptCommonString(key, credential.additionalInfo)
                 val password = decryptPassword(key, credential.password)
+                obfuscationKey?.let {
+                    password.deobfuscate(it)
+                }
 
                 appBarLayout.title = name
 
@@ -271,7 +344,7 @@ class ShowCredentialActivity : SecureActivity() {
 
                 additionalInfoTextView.text = additionalInfo
 
-                var spannedString = spannableString(password, multiLine, maskPassword, this)
+                var spannedString = spannableObfusableString(password, multiLine, maskPassword, showObfuscated(credential),this)
                 passwordTextView.text = spannedString
 
                 if (DebugInfo.isDebug) {

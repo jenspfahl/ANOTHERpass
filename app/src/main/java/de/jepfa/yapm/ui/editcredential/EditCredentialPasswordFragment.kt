@@ -8,13 +8,16 @@ import android.text.InputType
 import android.view.*
 import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
+import androidx.core.view.setPadding
 import com.google.android.material.tabs.TabLayout
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.overlay.DetachHelper
+import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secretgenerator.*
 import de.jepfa.yapm.service.secretgenerator.passphrase.PassphraseGenerator
@@ -24,6 +27,7 @@ import de.jepfa.yapm.service.secretgenerator.password.PasswordGeneratorSpec
 import de.jepfa.yapm.ui.SecureFragment
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.*
+import java.util.*
 import javax.crypto.SecretKey
 
 
@@ -46,6 +50,9 @@ class EditCredentialPasswordFragment : SecureFragment() {
     private val passwordGenerator = PasswordGenerator()
 
     private var passwordCombinations: Double? = null
+
+    private var obfuscatePasswordRequired = false
+    private var obfuscationKey: Key? = null
 
     init {
         enableBack = true
@@ -80,7 +87,8 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 originCredential = it
                 masterSecretKey?.let{ key ->
                     val password = SecretService.decryptPassword(key, it.password)
-                    updatePasswordView(password, guessPasswordCombinations = true)
+                    updatePasswordView(password, guessPasswordCombinations = true,
+                        editCredentialActivity.current.isObfuscated)
                 }
             })
         }
@@ -106,7 +114,9 @@ class EditCredentialPasswordFragment : SecureFragment() {
         val buttonGeneratePasswd: Button = view.findViewById(R.id.button_generate_passwd)
         buttonGeneratePasswd.setOnClickListener {
             val password = generatePassword()
-            updatePasswordView(password, guessPasswordCombinations = false)
+            editCredentialActivity.current.isObfuscated = false
+            updatePasswordView(password, guessPasswordCombinations = false,
+                editCredentialActivity.current.isObfuscated)
         }
 
         generatedPasswdView.setOnLongClickListener {
@@ -124,7 +134,8 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 .setView(input)
                 .setPositiveButton(android.R.string.ok) { dialog, which ->
                     val password = Password(input.text.toString())
-                    updatePasswordView(password, guessPasswordCombinations = true)
+                    updatePasswordView(password, guessPasswordCombinations = true,
+                        editCredentialActivity.current.isObfuscated)
                 }
                 .setNegativeButton(android.R.string.cancel) { dialog, which ->
                     dialog.cancel()
@@ -146,33 +157,107 @@ class EditCredentialPasswordFragment : SecureFragment() {
             }
             else {
                 masterSecretKey?.let{ key ->
-                    val origCredential = originCredential
-                    if (origCredential != null) {
-                        val originPasswd =
-                            SecretService.decryptPassword(key, origCredential.password)
-                        if (editCredentialActivity.current.isPersistent()
-                            && !generatedPassword.isEqual(originPasswd)
-                        ) {
-                            AlertDialog.Builder(editCredentialActivity)
-                                .setTitle(R.string.title_change_credential)
-                                .setMessage(R.string.message_password_changed)
-                                .setIcon(android.R.drawable.ic_dialog_alert)
-                                .setPositiveButton(R.string.title_continue) { dialog, whichButton ->
-                                    updateCredential(key, saveLastPassword = true, editCredentialActivity)
+                    if (obfuscatePasswordRequired) {
+                        val inputView = LinearLayout(context)
+                        inputView.orientation = LinearLayout.VERTICAL
+                        inputView.setPadding(16)
+
+                        val pwd1 = EditText(context)
+                        pwd1.inputType =
+                            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                        val filters =
+                            arrayOf<InputFilter>(InputFilter.LengthFilter(Constants.MAX_CREDENTIAL_PASSWD_LENGTH))
+                        pwd1.setFilters(filters)
+                        pwd1.requestFocus()
+                        inputView.addView(pwd1)
+
+                        val pwd2 = EditText(context)
+                        pwd2.inputType =
+                            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                        pwd2.setFilters(filters)
+                        inputView.addView(pwd2)
+
+                        val builder = AlertDialog.Builder(context)
+                        val dialog: AlertDialog = builder.setTitle(R.string.obfuscate_while_saving)
+                            .setMessage(R.string.obfuscate_while_saving_message)
+                            .setView(inputView)
+                            .setPositiveButton(android.R.string.ok, null)
+                            .setNegativeButton(android.R.string.cancel, null)
+                            .create()
+
+                        dialog.setOnShowListener {
+                            val buttonPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                            buttonPositive.setOnClickListener {
+                                val obfusPasswd1 = Password.fromEditable(pwd1.text)
+                                val obfusPasswd2 = Password.fromEditable(pwd2.text)
+                                if (obfusPasswd1.isEmpty()) {
+                                    pwd1.setError(getString(R.string.error_field_required))
+                                    pwd1.requestFocus()
+                                    return@setOnClickListener
                                 }
-                                .setNegativeButton(android.R.string.cancel, null)
-                                .show()
+                                else if (obfusPasswd2.isEmpty()) {
+                                    pwd2.setError(getString(R.string.error_field_required))
+                                    pwd2.requestFocus()
+                                    return@setOnClickListener
+                                }
+                                else if (!obfusPasswd1.isEqual(obfusPasswd2)) {
+                                    pwd2.setError(getString(R.string.password_not_equal))
+                                    pwd2.requestFocus()
+                                    return@setOnClickListener
+                                }
+
+                                context?.let {
+                                    val obfuscationKey =
+                                        SecretService.deriveKey(obfusPasswd1, SaltService.getSalt(it))
+                                    generatedPassword.obfuscate(obfuscationKey)
+                                    obfuscationKey.clear()
+
+                                    editCredentialActivity.current.isObfuscated = true
+                                    saveCredential(key, editCredentialActivity)
+                                }
+
+                                dialog.dismiss()
+                            }
+                            val buttonNegative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                            buttonNegative.setOnClickListener { dialog.dismiss() }
                         }
-                        else {
-                            updateCredential(key, saveLastPassword = false, editCredentialActivity)
-                        }
-                        originPasswd.clear()
+                        dialog.show()
+
                     }
                     else {
-                        updateCredential(key, saveLastPassword = false, editCredentialActivity)
+                        saveCredential(key, editCredentialActivity)
                     }
                 }
             }
+        }
+    }
+
+    private fun saveCredential(
+        key: SecretKey,
+        editCredentialActivity: EditCredentialActivity
+    ) {
+        val origCredential = originCredential
+        if (origCredential != null) {
+            val originPasswd =
+                SecretService.decryptPassword(key, origCredential.password)
+            if (editCredentialActivity.current.isPersistent()
+                && !generatedPassword.isEqual(originPasswd)
+            ) {
+                AlertDialog.Builder(editCredentialActivity)
+                    .setTitle(R.string.title_change_credential)
+                    .setMessage(R.string.message_password_changed)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(R.string.title_continue) { dialog, whichButton ->
+                        updateCredential(key, saveLastPassword = true, editCredentialActivity)
+                    }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show()
+            } else {
+                updateCredential(key, saveLastPassword = false, editCredentialActivity)
+            }
+            originPasswd.clear()
+        } else {
+            updateCredential(key, saveLastPassword = false, editCredentialActivity)
         }
     }
 
@@ -233,12 +318,15 @@ class EditCredentialPasswordFragment : SecureFragment() {
         }
     }
 
-    private fun updatePasswordView(password: Password, guessPasswordCombinations: Boolean) {
+    private fun updatePasswordView(password: Password, guessPasswordCombinations: Boolean, isObfuscated: Boolean) {
         getSecureActivity()?.let {
             generatedPassword = password
             if (!generatedPassword.isEmpty()) {
                 var spannedString =
-                    PasswordColorizer.spannableString(generatedPassword, it)
+                    PasswordColorizer.spannableObfusableString(
+                        generatedPassword,
+                        isObfuscated,
+                        it)
                 generatedPasswdView.text = spannedString
                 if (guessPasswordCombinations) {
                     guessPasswordCombinations(password)
@@ -361,7 +449,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 else {
                     getSecureActivity()?.let {
                         val encPassword = SecretService.encryptPassword(key, generatedPassword)
-                        DetachHelper.detachPassword(it, encPassword, null)
+                        DetachHelper.detachPassword(it, encPassword, null, null)
                     }
                 }
             }
@@ -377,7 +465,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 else {
                     getSecureActivity()?.let {
                         val encPassword = SecretService.encryptPassword(key, generatedPassword)
-                        ClipboardUtil.copyEncPasswordWithCheck(encPassword, it)
+                        ClipboardUtil.copyEncPasswordWithCheck(encPassword, null, it)
                     }
                 }
             }
@@ -396,10 +484,62 @@ class EditCredentialPasswordFragment : SecureFragment() {
                     Toast.makeText(activity, getString(R.string.nothing_to_restore), Toast.LENGTH_LONG).show()
                 }
                 else {
-                    updatePasswordView(lastPasswd, guessPasswordCombinations = true)
+                    updatePasswordView(lastPasswd, guessPasswordCombinations = true,
+                        editCredentialActivity.current.isObfuscated)
                 }
             }
 
+            return true
+        }
+
+        if (id == R.id.menu_deobfuscate_password) {
+
+            masterSecretKey?.let{ key ->
+
+                if (obfuscationKey != null) {
+                    obfuscationKey?.let {
+                        generatedPassword.obfuscate(it)
+                        editCredentialActivity.current.isObfuscated = true
+                        updatePasswordView(generatedPassword, guessPasswordCombinations = true,
+                            editCredentialActivity.current.isObfuscated)
+                    }
+
+                    obfuscationKey?.clear()
+                    obfuscationKey = null
+                    item.isChecked = false
+                    Toast.makeText(context, R.string.deobfuscate_restored, Toast.LENGTH_LONG).show()
+                }
+                else {
+                    context?.let { ctx ->
+                        DeobfuscationDialog.openDeobfuscationDialog(ctx) { obfusPasswd ->
+                            item.isChecked = true
+
+                            obfuscationKey =
+                                SecretService.deriveKey(obfusPasswd, SaltService.getSalt(ctx))
+                            obfuscationKey?.let {
+                                generatedPassword.deobfuscate(it)
+                                editCredentialActivity.current.isObfuscated = false
+                                updatePasswordView(generatedPassword, guessPasswordCombinations = true,
+                                    editCredentialActivity.current.isObfuscated)
+                            }
+                            obfusPasswd.clear()
+
+                            Toast.makeText(ctx, R.string.password_deobfuscated, Toast.LENGTH_LONG)
+                                .show()
+                        }
+                    }
+                }
+            }
+            return true
+        }
+
+        if (id == R.id.menu_obfuscate_password) {
+            obfuscatePasswordRequired = !obfuscatePasswordRequired
+            item.isChecked = obfuscatePasswordRequired
+
+            if (obfuscatePasswordRequired) {
+                Toast.makeText(context, R.string.obfuscate_while_saving_toast, Toast.LENGTH_LONG).show()
+            }
             return true
         }
 
@@ -418,6 +558,15 @@ class EditCredentialPasswordFragment : SecureFragment() {
         val enableOverlayFeature = PreferenceService.getAsBool(PreferenceService.PREF_ENABLE_OVERLAY_FEATURE, getBaseActivity())
         if (!enableOverlayFeature) {
             menu.findItem(R.id.menu_detach_credential)?.isVisible = false
+        }
+
+        originCredential?.let {
+            if (it.isObfuscated) {
+                menu.findItem(R.id.menu_obfuscate_password)?.isVisible = false
+            }
+            else {
+                menu.findItem(R.id.menu_deobfuscate_password)?.isVisible = false
+            }
         }
 
     }
