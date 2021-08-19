@@ -33,6 +33,7 @@ import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_COPY_PASSWORD
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_OVERLAY_FEATURE
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_LABELS_IN_LIST
+import de.jepfa.yapm.util.DeobfuscationDialog
 import java.util.*
 import javax.crypto.SecretKey
 
@@ -64,7 +65,14 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
 
             if (listCredentialsActivity.shouldPushBackAutoFill()) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    listCredentialsActivity.pushBackAutofill(current)
+                    if (current.isObfuscated) {
+                        DeobfuscationDialog.openDeobfuscationDialog(listCredentialsActivity) { deobfuscationKey ->
+                            listCredentialsActivity.pushBackAutofill(current, deobfuscationKey)
+                        }
+                    }
+                    else {
+                        listCredentialsActivity.pushBackAutofill(current, null)
+                    }
                 }
             }
             else {
@@ -79,17 +87,32 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         holder.listenForSetToAutofill { pos,  _ ->
 
             val current = getItem(pos)
-            if (listCredentialsActivity.shouldPushBackAutoFill()) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    listCredentialsActivity.pushBackAutofill(current)
+
+            if (current.isObfuscated) {
+                DeobfuscationDialog.openDeobfuscationDialog(listCredentialsActivity) { deobfuscationKey ->
+                    if (listCredentialsActivity.shouldPushBackAutoFill()) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            listCredentialsActivity.pushBackAutofill(current, deobfuscationKey)
+                        }
+                    }
+
+                    Toast.makeText(
+                        listCredentialsActivity,
+                        listCredentialsActivity.getString(R.string.credential_used_for_autofill),
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
-            CurrentCredentialHolder.currentCredential = current
-            Toast.makeText(
-                listCredentialsActivity,
-                listCredentialsActivity.getString(R.string.credential_used_for_autofill),
-                Toast.LENGTH_LONG
-            ).show()
+            else {
+                CurrentCredentialHolder.update(current, null)
+                Toast.makeText(
+                    listCredentialsActivity,
+                    listCredentialsActivity.getString(R.string.credential_used_for_autofill),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+
+
 
             true
         }

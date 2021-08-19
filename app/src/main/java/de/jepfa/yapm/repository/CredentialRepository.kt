@@ -49,7 +49,8 @@ class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
                 entity.lastPassword,
                 entity.website,
                 entity.labels,
-                entity.isObfuscated)
+                entity.isObfuscated,
+                entity.isLastPasswordObfuscated)
     }
 
     private fun mapToEntity(encCredential: EncCredential): EncCredentialEntity {
@@ -61,7 +62,8 @@ class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
                 encCredential.lastPassword,
                 encCredential.website,
                 encCredential.labels,
-                encCredential.isObfuscated)
+                encCredential.isObfuscated,
+                encCredential.isLastPasswordObfuscated)
     }
 
 }

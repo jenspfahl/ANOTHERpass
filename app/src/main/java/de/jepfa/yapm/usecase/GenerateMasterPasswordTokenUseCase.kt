@@ -50,7 +50,7 @@ object GenerateMasterPasswordTokenUseCase: SecureActivityUseCase {
 
             val masterPasswordTokenKey = SecretService.generateKey(32)
             val encMasterPasswordTokenKey = SecretService.encryptKey(mPTKey, masterPasswordTokenKey)
-            val masterPasswordTokenSK = SecretService.generateSecretKey(masterPasswordTokenKey, SaltService.getSalt(activity))
+            val masterPasswordTokenSK = SecretService.generateStrongSecretKey(masterPasswordTokenKey, SaltService.getSalt(activity))
             val type = Encrypted.TYPE_MASTER_PASSWD_TOKEN + "#" + nextMptNumber
             val masterPasswordToken = SecretService.encryptPassword(type, masterPasswordTokenSK, masterPassword)
             val encMasterPasswordToken = SecretService.encryptEncrypted(tempKey, masterPasswordToken)

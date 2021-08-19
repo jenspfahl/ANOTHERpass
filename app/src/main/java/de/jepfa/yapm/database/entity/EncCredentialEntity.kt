@@ -15,8 +15,9 @@ data class EncCredentialEntity (@PrimaryKey(autoGenerate = true) val id: Int?,
                                 var password: String,
                                 var lastPassword: String?,
                                 var website: String,
-                                var labels: String,
-                                var isObfuscated: Boolean) { // encrypted label ids, comma separated
+                                var labels: String, // encrypted label ids, comma separated
+                                var isObfuscated: Boolean,
+                                var isLastPasswordObfuscated: Boolean) {
 
     constructor(id: Int?,
                 name: Encrypted,
@@ -26,7 +27,8 @@ data class EncCredentialEntity (@PrimaryKey(autoGenerate = true) val id: Int?,
                 lastPassword: Encrypted?,
                 website: Encrypted,
                 labels: Encrypted,
-                isObfuscated: Boolean
+                isObfuscated: Boolean,
+                isLastPasswordObfuscated: Boolean
     ) : this(
         id,
         name.toBase64String(),
@@ -36,6 +38,7 @@ data class EncCredentialEntity (@PrimaryKey(autoGenerate = true) val id: Int?,
         lastPassword?.toBase64String(),
         website.toBase64String(),
         labels.toBase64String(),
-        isObfuscated)
+        isObfuscated,
+        isLastPasswordObfuscated)
 
 }

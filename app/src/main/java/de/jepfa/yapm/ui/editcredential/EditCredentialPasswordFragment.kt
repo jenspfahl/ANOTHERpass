@@ -43,6 +43,8 @@ class EditCredentialPasswordFragment : SecureFragment() {
     private lateinit var switchAddSpecialChar: SwitchCompat
     private lateinit var radioStrength: RadioGroup
 
+    private var optionsMenu: Menu? = null
+
     private var generatedPassword: Password = Password.empty()
     private var originCredential: EncCredential? = null
 
@@ -83,14 +85,17 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
         //fill UI
         if (editCredentialActivity.isUpdate()) {
-            editCredentialActivity.load().observe(editCredentialActivity, {
-                originCredential = it
+            originCredential = editCredentialActivity.original
+
+            originCredential?.let { _originCredential ->
                 masterSecretKey?.let{ key ->
-                    val password = SecretService.decryptPassword(key, it.password)
+                    val password = SecretService.decryptPassword(key, _originCredential.password)
                     updatePasswordView(password, guessPasswordCombinations = true,
-                        editCredentialActivity.current.isObfuscated)
+                        _originCredential.isObfuscated)
                 }
-            })
+                updateObfuscationMenuItems(_originCredential)
+            }
+
         }
 
         val radioStrengthNormal: RadioButton = view.findViewById(R.id.radio_strength_normal)
@@ -115,6 +120,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
         buttonGeneratePasswd.setOnClickListener {
             val password = generatePassword()
             editCredentialActivity.current.isObfuscated = false
+            unsetObfuscation(editCredentialActivity.current)
             updatePasswordView(password, guessPasswordCombinations = false,
                 editCredentialActivity.current.isObfuscated)
         }
@@ -134,6 +140,8 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 .setView(input)
                 .setPositiveButton(android.R.string.ok) { dialog, which ->
                     val password = Password(input.text.toString())
+                    editCredentialActivity.current.isObfuscated = false
+                    unsetObfuscation(editCredentialActivity.current)
                     updatePasswordView(password, guessPasswordCombinations = true,
                         editCredentialActivity.current.isObfuscated)
                 }
@@ -160,14 +168,14 @@ class EditCredentialPasswordFragment : SecureFragment() {
                     if (obfuscatePasswordRequired) {
                         val inputView = LinearLayout(context)
                         inputView.orientation = LinearLayout.VERTICAL
-                        inputView.setPadding(16)
+                        inputView.setPadding(32)
 
                         val pwd1 = EditText(context)
                         pwd1.inputType =
                             InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
                         val filters =
                             arrayOf<InputFilter>(InputFilter.LengthFilter(Constants.MAX_CREDENTIAL_PASSWD_LENGTH))
-                        pwd1.setFilters(filters)
+                        pwd1.filters = filters
                         pwd1.requestFocus()
                         inputView.addView(pwd1)
 
@@ -178,7 +186,8 @@ class EditCredentialPasswordFragment : SecureFragment() {
                         inputView.addView(pwd2)
 
                         val builder = AlertDialog.Builder(context)
-                        val dialog: AlertDialog = builder.setTitle(R.string.obfuscate_while_saving)
+                        val dialog: AlertDialog = builder
+                            .setTitle(R.string.obfuscate_while_saving)
                             .setMessage(R.string.obfuscate_while_saving_message)
                             .setView(inputView)
                             .setPositiveButton(android.R.string.ok, null)
@@ -207,8 +216,10 @@ class EditCredentialPasswordFragment : SecureFragment() {
                                 }
 
                                 context?.let {
-                                    val obfuscationKey =
-                                        SecretService.deriveKey(obfusPasswd1, SaltService.getSalt(it))
+                                    val salt = SaltService.getSalt(it)
+                                    val obfuscationSK =
+                                        SecretService.generateNormalSecretKey(obfusPasswd1, salt)
+                                    val obfuscationKey = SecretService.secretKeyToKey(obfuscationSK, salt)
                                     generatedPassword.obfuscate(obfuscationKey)
                                     obfuscationKey.clear()
 
@@ -352,6 +363,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
         if (saveLastPassword) {
             editCredentialActivity.current.lastPassword = editCredentialActivity.original?.password
+            editCredentialActivity.current.isLastPasswordObfuscated = editCredentialActivity.original?.isObfuscated ?: false
         }
         editCredentialActivity.current.password = encPassword
 
@@ -479,11 +491,14 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 val lastPasswd = editCredentialActivity.current.lastPassword?.let {
                     SecretService.decryptPassword(key, it)
                 }
+                val isLastPasswordObfuscated = editCredentialActivity.current.isLastPasswordObfuscated
 
                 if (lastPasswd == null || lastPasswd.isBlank() || !lastPasswd.isValid()) {
                     Toast.makeText(activity, getString(R.string.nothing_to_restore), Toast.LENGTH_LONG).show()
                 }
                 else {
+                    editCredentialActivity.current.isObfuscated = isLastPasswordObfuscated
+                    unsetObfuscation(editCredentialActivity.current)
                     updatePasswordView(lastPasswd, guessPasswordCombinations = true,
                         editCredentialActivity.current.isObfuscated)
                 }
@@ -504,25 +519,24 @@ class EditCredentialPasswordFragment : SecureFragment() {
                             editCredentialActivity.current.isObfuscated)
                     }
 
-                    obfuscationKey?.clear()
-                    obfuscationKey = null
                     item.isChecked = false
+                    unsetObfuscation(editCredentialActivity.current)
+
                     Toast.makeText(context, R.string.deobfuscate_restored, Toast.LENGTH_LONG).show()
                 }
                 else {
                     context?.let { ctx ->
-                        DeobfuscationDialog.openDeobfuscationDialog(ctx) { obfusPasswd ->
+                        DeobfuscationDialog.openDeobfuscationDialog(ctx) { newObfuscationKey ->
                             item.isChecked = true
 
-                            obfuscationKey =
-                                SecretService.deriveKey(obfusPasswd, SaltService.getSalt(ctx))
+                            obfuscationKey = newObfuscationKey
                             obfuscationKey?.let {
                                 generatedPassword.deobfuscate(it)
                                 editCredentialActivity.current.isObfuscated = false
                                 updatePasswordView(generatedPassword, guessPasswordCombinations = true,
                                     editCredentialActivity.current.isObfuscated)
                             }
-                            obfusPasswd.clear()
+                            updateObfuscationMenuItems(editCredentialActivity.current)
 
                             Toast.makeText(ctx, R.string.password_deobfuscated, Toast.LENGTH_LONG)
                                 .show()
@@ -550,6 +564,8 @@ class EditCredentialPasswordFragment : SecureFragment() {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.credential_edit_menu, menu)
 
+        optionsMenu = menu
+
         val enableCopyPassword = PreferenceService.getAsBool(PreferenceService.PREF_ENABLE_COPY_PASSWORD, getBaseActivity())
         if (!enableCopyPassword) {
             menu.findItem(R.id.menu_copy_credential)?.isVisible = false
@@ -560,15 +576,30 @@ class EditCredentialPasswordFragment : SecureFragment() {
             menu.findItem(R.id.menu_detach_credential)?.isVisible = false
         }
 
-        originCredential?.let {
+        updateObfuscationMenuItems(originCredential)
+    }
+
+    private fun unsetObfuscation(credential: EncCredential?) {
+        obfuscationKey?.clear()
+        obfuscationKey = null
+        updateObfuscationMenuItems(credential)
+    }
+
+    private fun updateObfuscationMenuItems(credential: EncCredential?) {
+        if (credential == null) {
+            optionsMenu?.findItem(R.id.menu_obfuscate_password)?.isVisible = true
+            optionsMenu?.findItem(R.id.menu_deobfuscate_password)?.isVisible = false
+        }
+        credential?.let {
             if (it.isObfuscated) {
-                menu.findItem(R.id.menu_obfuscate_password)?.isVisible = false
+                optionsMenu?.findItem(R.id.menu_obfuscate_password)?.isVisible = false
+                optionsMenu?.findItem(R.id.menu_deobfuscate_password)?.isVisible = true
             }
             else {
-                menu.findItem(R.id.menu_deobfuscate_password)?.isVisible = false
+                optionsMenu?.findItem(R.id.menu_obfuscate_password)?.isVisible = true
+                optionsMenu?.findItem(R.id.menu_deobfuscate_password)?.isVisible = false
             }
         }
-
     }
 
 

@@ -15,7 +15,7 @@ object MasterKeyService {
     fun getMasterPassPhraseSK(masterPin: Password, masterPassword: Password, salt: Key): SecretKey {
         val masterPassPhrase = SecretService.conjunctPasswords(masterPin, masterPassword, salt)
 
-        val masterPassPhraseSK = SecretService.generateSecretKey(masterPassPhrase, salt)
+        val masterPassPhraseSK = SecretService.generateStrongSecretKey(masterPassPhrase, salt)
         masterPassPhrase.clear()
 
         return masterPassPhraseSK
@@ -27,7 +27,7 @@ object MasterKeyService {
      */
     fun getMasterSK(masterPassPhraseSK: SecretKey, salt: Key, storedEncMasterKey: Encrypted): SecretKey? {
         val masterKey = getMasterKey(masterPassPhraseSK, storedEncMasterKey) ?: return null
-        val masterSK = SecretService.generateSecretKey(masterKey, salt)
+        val masterSK = SecretService.generateStrongSecretKey(masterKey, salt)
         masterKey.clear()
 
         return masterSK
@@ -48,7 +48,7 @@ object MasterKeyService {
 
         val mkSK = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
         val masterPassphrase = SecretService.conjunctPasswords(pin, masterPasswd, salt)
-        val masterSK = SecretService.generateSecretKey(masterPassphrase, salt)
+        val masterSK = SecretService.generateStrongSecretKey(masterPassphrase, salt)
         masterPassphrase.clear()
 
         val encryptedMasterKey = SecretService.encryptKey(Encrypted.TYPE_ENC_MASTER_KEY, masterSK, masterKey)

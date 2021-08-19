@@ -3,6 +3,7 @@ package de.jepfa.yapm.model
 import android.os.Build
 import android.util.Log
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
 import java.util.concurrent.TimeUnit
 import javax.crypto.SecretKey
 
@@ -80,6 +81,7 @@ object Session {
             Log.w("SESSION", "cannot destroy mSK", e)
         }
         masterSecretKey = null
+        CurrentCredentialHolder.clear()
         touch()
     }
 

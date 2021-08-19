@@ -41,7 +41,7 @@ class SecretServiceTest {
         Log.i(TAG, "masterKey=${masterKey.debugToString()}")
 
         // store masterKey encrypted with masterPassPhrase --> AES
-        val masterPassPhraseSK = SecretService.generateSecretKey(masterPassPhrase, salt)
+        val masterPassPhraseSK = SecretService.generateStrongSecretKey(masterPassPhrase, salt)
         Log.i(TAG, "masterPassPhraseSK=${masterPassPhraseSK.encoded.contentToString()}")
 
         val encMasterKey = SecretService.encryptKey(masterPassPhraseSK, masterKey)
@@ -53,7 +53,7 @@ class SecretServiceTest {
 
         // Credential enc-/decryption with masterKey --> AES
         val credential = Password("9999")
-        val masterKeySK = SecretService.generateSecretKey(masterKey, salt)
+        val masterKeySK = SecretService.generateStrongSecretKey(masterKey, salt)
         // not needed anymore
         masterKey.clear()
 

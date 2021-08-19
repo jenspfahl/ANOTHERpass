@@ -31,6 +31,7 @@ import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
 import de.jepfa.yapm.service.PreferenceService.PREF_SORT_BY_RECENT
@@ -76,7 +77,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         recyclerView.adapter = listCredentialAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        CurrentCredentialHolder.currentCredential = null
+        CurrentCredentialHolder.clear()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             assistStructure = intent.getParcelableExtra(AutofillManager.EXTRA_ASSIST_STRUCTURE)
         }
@@ -332,10 +333,10 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun pushBackAutofill(credential: EncCredential) {
+    fun pushBackAutofill(credential: EncCredential, deobfuscationKey: Key?) {
         val structure = assistStructure
         if (structure != null) {
-            CurrentCredentialHolder.currentCredential = credential
+            CurrentCredentialHolder.update(credential, deobfuscationKey)
             val replyIntent = Intent().apply {
                 val fillResponse = ResponseFiller.createFillResponse(
                     structure,

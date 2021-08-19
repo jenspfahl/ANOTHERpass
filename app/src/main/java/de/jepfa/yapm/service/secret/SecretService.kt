@@ -36,23 +36,19 @@ object SecretService {
         return Key(bytes)
     }
 
-    fun deriveKey(password: Password, salt: Key): Key {
-        val message = MessageDigest.getInstance("SHA-256")
-        message.update(salt.data)
-        message.update(password.toByteArray())
-        val digest = message.digest()
-        return Key(digest)
+    fun generateStrongSecretKey(key: Key, salt: Key): SecretKey {
+        return generateStrongSecretKey(Password(key.toCharArray()), salt)
     }
 
-    fun generateSecretKey(key: Key, salt: Key): SecretKey {
-        return generateSecretKey(Password(key.toCharArray()), salt)
-    }
-
-    fun generateSecretKey(password: Password, salt: Key): SecretKey {
+    fun generateStrongSecretKey(password: Password, salt: Key): SecretKey {
         return generateSecretKey(password, salt, 65536)
     }
 
-    fun generateSecretKey(password: Password, salt: Key, iterations: Int): SecretKey {
+    fun generateNormalSecretKey(password: Password, salt: Key): SecretKey {
+        return generateSecretKey(password, salt, 1000)
+    }
+
+    private fun generateSecretKey(password: Password, salt: Key, iterations: Int): SecretKey {
         val keySpec = PBEKeySpec(password.toCharArray(), salt.data, iterations, 128)
         val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
         try {
@@ -72,6 +68,19 @@ object SecretService {
         val result = digest.map { it.toChar() }.toCharArray()
 
         return Password(result)
+    }
+
+    fun secretKeyToKey(secretKey: SecretKey, salt: Key) : Key {
+        return fastHash(secretKey.encoded, salt)
+    }
+
+    fun fastHash(data: ByteArray, salt: Key): Key {
+        val message = MessageDigest.getInstance("SHA-256")
+        message.update(salt.data)
+        message.update(data)
+        val digest = message.digest()
+
+        return Key(digest)
     }
 
     fun encryptKey(secretKey: SecretKey, key: Key): Encrypted {

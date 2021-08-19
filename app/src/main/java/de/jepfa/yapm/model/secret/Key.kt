@@ -1,6 +1,7 @@
 package de.jepfa.yapm.model.secret
 
 import android.text.Editable
+import javax.crypto.SecretKey
 
 class Key : Secret {
 

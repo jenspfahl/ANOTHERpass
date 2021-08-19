@@ -12,7 +12,8 @@ data class EncCredential(var id: Int?,
                          var lastPassword: Encrypted?,
                          var website: Encrypted,
                          var labels: Encrypted,
-                         var isObfuscated: Boolean
+                         var isObfuscated: Boolean,
+                         var isLastPasswordObfuscated: Boolean
 ) {
 
     constructor(id: Int?,
@@ -23,7 +24,8 @@ data class EncCredential(var id: Int?,
                 lastPasswordBase64: String?,
                 websiteBase64: String,
                 labelsBase64: String,
-                isObfuscated: Boolean) :
+                isObfuscated: Boolean,
+                isLastPasswordObfuscated: Boolean) :
             this(id,
                 Encrypted.fromBase64String(nameBase64),
                 Encrypted.fromBase64String(additionalInfoBase64),
@@ -32,7 +34,8 @@ data class EncCredential(var id: Int?,
                 lastPasswordBase64?.run { Encrypted.fromBase64String(lastPasswordBase64) },
                 Encrypted.fromBase64String(websiteBase64),
                 Encrypted.fromBase64String(labelsBase64),
-                isObfuscated
+                isObfuscated,
+                isLastPasswordObfuscated
             )
 
 
@@ -51,6 +54,7 @@ data class EncCredential(var id: Int?,
         intent.putEncryptedExtra(EXTRA_CREDENTIAL_WEBSITE, website)
         intent.putEncryptedExtra(EXTRA_CREDENTIAL_LABELS, labels)
         intent.putExtra(EXTRA_CREDENTIAL_IS_OBFUSCATED, isObfuscated)
+        intent.putExtra(EXTRA_CREDENTIAL_IS_LAST_PASSWORD_OBFUSCATED, isLastPasswordObfuscated)
 
     }
 
@@ -64,15 +68,18 @@ data class EncCredential(var id: Int?,
         const val EXTRA_CREDENTIAL_WEBSITE = "de.jepfa.yapm.ui.credential.website"
         const val EXTRA_CREDENTIAL_LABELS = "de.jepfa.yapm.ui.credential.labels"
         const val EXTRA_CREDENTIAL_IS_OBFUSCATED = "de.jepfa.yapm.ui.credential.isObfuscated"
+        const val EXTRA_CREDENTIAL_IS_LAST_PASSWORD_OBFUSCATED = "de.jepfa.yapm.ui.credential.isLastPasswordObfuscated"
 
         const val ATTRIB_ID = "id"
         const val ATTRIB_NAME = "name"
         const val ATTRIB_ADDITIONAL_INFO = "additionalInfo"
         const val ATTRIB_USER = "user"
         const val ATTRIB_PASSWORD = "password"
+        const val ATTRIB_LAST_PASSWORD = "lastPassword"
         const val ATTRIB_WEBSITE = "website"
         const val ATTRIB_LABELS = "labels"
         const val ATTRIB_IS_OBFUSCATED = "isObfuscated"
+        const val ATTRIB_IS_LAST_PASSWORD_OBFUSCATED = "isLastPasswordObfuscated"
 
         fun fromIntent(intent: Intent): EncCredential {
             var id: Int? = null
@@ -88,9 +95,12 @@ data class EncCredential(var id: Int?,
             val encWebsite = intent.getEncryptedExtra(EXTRA_CREDENTIAL_WEBSITE, Encrypted.empty())
             val encLabels = intent.getEncryptedExtra(EXTRA_CREDENTIAL_LABELS, Encrypted.empty())
             val isObfuscated = intent.getBooleanExtra(EXTRA_CREDENTIAL_IS_OBFUSCATED, false)
+            val isLastPasswordObfuscated = intent.getBooleanExtra(
+                EXTRA_CREDENTIAL_IS_LAST_PASSWORD_OBFUSCATED, false)
 
             return EncCredential(
-                id, encName, encAdditionalInfo, encUser, encPassword, encLastPassword, encWebsite, encLabels, isObfuscated)
+                id, encName, encAdditionalInfo, encUser, encPassword, encLastPassword, encWebsite, encLabels,
+                isObfuscated, isLastPasswordObfuscated)
         }
     }
 }

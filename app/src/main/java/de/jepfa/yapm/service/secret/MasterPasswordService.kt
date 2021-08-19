@@ -28,7 +28,7 @@ object MasterPasswordService {
     }
 
     fun generateEncMasterPasswdSK(passwd: Password): SecretKey {
-        val empSK = SecretService.generateSecretKey(passwd, EMP_SALT, 1000)
+        val empSK = SecretService.generateNormalSecretKey(passwd, EMP_SALT)
         passwd.clear()
         return empSK
     }

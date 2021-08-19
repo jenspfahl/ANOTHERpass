@@ -45,6 +45,7 @@ abstract class YapmDatabase : RoomDatabase() {
                         val migration2to3 = object : Migration(2, 3) {
                             override fun migrate(database: SupportSQLiteDatabase) {
                                 database.execSQL("ALTER TABLE EncCredentialEntity ADD COLUMN isObfuscated INTEGER NOT NULL DEFAULT 0")
+                                database.execSQL("ALTER TABLE EncCredentialEntity ADD COLUMN isLastPasswordObfuscated INTEGER NOT NULL DEFAULT 0")
                             }
                         }
 

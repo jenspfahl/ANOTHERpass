@@ -259,7 +259,7 @@
     <string name="deobfuscate">De-obfuscate password</string>
     <string name="password_deobfuscated">Password de-obfuscated</string>
     <string name="password_obfuscated">Password obfuscated</string>
-    <string name="message_deobfuscate_password">If this password was obfuscated while creation you can de-obfuscate it with the obfuscation code.</string>
+    <string name="message_deobfuscate_password">This password was obfuscated while creation. You can de-obfuscate it with your obfuscation code.</string>
     <string name="deobfuscate_restored">Origin password restored</string>
 
 

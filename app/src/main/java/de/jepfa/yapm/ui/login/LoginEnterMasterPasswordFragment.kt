@@ -16,7 +16,7 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.ALIAS_KEY_MP_TOKEN
 import de.jepfa.yapm.service.secret.SecretService.decryptKey
 import de.jepfa.yapm.service.secret.SecretService.encryptPassword
-import de.jepfa.yapm.service.secret.SecretService.generateSecretKey
+import de.jepfa.yapm.service.secret.SecretService.generateStrongSecretKey
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.service.secret.SaltService.getSalt
 import de.jepfa.yapm.ui.BaseFragment
@@ -153,7 +153,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                 val masterPasswordTokenKey =
                     decryptKey(masterPasswordTokenSK, encMasterPasswordTokenKey)
                 val baseActivity = getBaseActivity() ?: return false
-                val mptSK = generateSecretKey(masterPasswordTokenKey, getSalt(baseActivity))
+                val mptSK = generateStrongSecretKey(masterPasswordTokenKey, getSalt(baseActivity))
 
                 val encMasterPassword =
                     SecretService.decryptPassword(mptSK, Encrypted.fromBase64String(scanned))

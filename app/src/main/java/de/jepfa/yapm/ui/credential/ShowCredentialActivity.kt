@@ -26,10 +26,8 @@ import de.jepfa.yapm.service.PreferenceService.PREF_PASSWD_WORDS_ON_NL
 import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.overlay.DetachHelper
-import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.decryptPassword
-import de.jepfa.yapm.service.secret.SecretService.deriveKey
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
 import de.jepfa.yapm.ui.label.LabelDialogOpener
@@ -49,7 +47,7 @@ class ShowCredentialActivity : SecureActivity() {
     private var maskPassword = false
     private var obfuscationKey: Key? = null
 
-    private lateinit var credential: EncCredential
+    private lateinit var credential: EncCredential //TODO change to ?
     private lateinit var appBarLayout: CollapsingToolbarLayout
     private lateinit var titleLayout: LinearLayout
     private lateinit var passwordTextView: TextView
@@ -136,6 +134,9 @@ class ShowCredentialActivity : SecureActivity() {
             menu.findItem(R.id.menu_detach_credential)?.isVisible = false
         }
 
+        menu.findItem(R.id.menu_deobfuscate_password)?.isVisible = credential.isObfuscated
+
+
         optionsMenu = menu
 
         return super.onCreateOptionsMenu(menu)
@@ -210,27 +211,31 @@ class ShowCredentialActivity : SecureActivity() {
             masterSecretKey?.let{ key ->
 
                 if (obfuscationKey != null) {
+                    obfuscationKey?.clear()
+                    obfuscationKey = null
+                    item.isChecked = false
+
+                    CurrentCredentialHolder.clear()
+
                     val originPassword = decryptPassword(key, credential.password)
                     var spannedString =
                         spannableObfusableString(originPassword, multiLine, maskPassword, showObfuscated(credential), this)
                     passwordTextView.text = spannedString
                     originPassword.clear()
 
-                    obfuscationKey?.clear()
-                    obfuscationKey = null
-                    item.isChecked = false
                     Toast.makeText(this, R.string.deobfuscate_restored, Toast.LENGTH_LONG).show()
                 }
                 else {
 
-                    DeobfuscationDialog.openDeobfuscationDialog(this) { obfusPasswd ->
+                    DeobfuscationDialog.openDeobfuscationDialog(this) { deobfuscationKey ->
                         maskPassword = false
                         item.isChecked = true
 
-                        obfuscationKey = deriveKey(obfusPasswd, SaltService.getSalt(this))
+                        obfuscationKey = deobfuscationKey
                         obfuscationKey?.let {
                             val passwordForDeobfuscation = decryptPassword(key, credential.password)
                             passwordForDeobfuscation.deobfuscate(it)
+
                             var spannedString =
                                 spannableObfusableString(
                                     passwordForDeobfuscation,
@@ -239,10 +244,11 @@ class ShowCredentialActivity : SecureActivity() {
                                     showObfuscated(credential),
                                     this
                                 )
-                            passwordTextView.text = spannedString
                             passwordForDeobfuscation.clear()
+
+                            passwordTextView.text = spannedString
+                            CurrentCredentialHolder.update(credential, it)
                         }
-                        obfusPasswd.clear()
 
                         Toast.makeText(this, R.string.password_deobfuscated, Toast.LENGTH_LONG)
                             .show()
@@ -294,6 +300,7 @@ class ShowCredentialActivity : SecureActivity() {
     private fun updatePasswordView(idExtra: Int) {
         credentialViewModel.getById(idExtra).observe(this, {
             credential = it
+
             masterSecretKey?.let{ key ->
                 val name = decryptCommonString(key, credential.name)
                 val user = decryptCommonString(key, credential.user)
@@ -347,6 +354,8 @@ class ShowCredentialActivity : SecureActivity() {
                 var spannedString = spannableObfusableString(password, multiLine, maskPassword, showObfuscated(credential),this)
                 passwordTextView.text = spannedString
 
+                optionsMenu?.findItem(R.id.menu_deobfuscate_password)?.isVisible = credential.isObfuscated
+
                 if (DebugInfo.isDebug) {
                     passwordTextView.setOnLongClickListener {
                         val builder: AlertDialog.Builder = AlertDialog.Builder(this)
@@ -361,7 +370,7 @@ class ShowCredentialActivity : SecureActivity() {
                 }
             }
 
-            CurrentCredentialHolder.currentCredential = credential
+            CurrentCredentialHolder.update(credential, obfuscationKey)
         })
     }
 
