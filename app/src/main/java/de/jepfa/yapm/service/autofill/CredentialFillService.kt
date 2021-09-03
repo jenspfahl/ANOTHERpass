@@ -18,11 +18,15 @@ class CredentialFillService: AutofillService() {
         fillCallback: FillCallback
     ) {
 
+        if (cancellationSignal != null && cancellationSignal.isCanceled) {
+            return
+        }
+
         val contexts = fillRequest.fillContexts
         val structure = contexts.get(contexts.size - 1).structure
 
-        val fillResponse = createFillResponse(structure, cancellationSignal,
-            createAuthentication = true, context = applicationContext)
+        val fillResponse = createFillResponse(structure,
+            allowCreateAuthentication = true, context = applicationContext)
         fillResponse?.let {
             fillCallback.onSuccess(it)
         }

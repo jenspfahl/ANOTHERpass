@@ -53,6 +53,7 @@ object PreferenceService {
     const val PREF_COLORIZE_MP_QRCODES = PREF_PREFIX + "colorize_mp_qrcodes"
 
     const val PREF_AUTOFILL_EVERYWHERE = PREF_PREFIX + "autofill_suggest_everywhere"
+    const val PREF_AUTOFILL_EXCLUSION_LIST = PREF_PREFIX + "autofill_exclusion_list"
 
     const val PREF_MASK_PASSWORD = PREF_PREFIX + "mask_password"
     const val PREF_ENABLE_COPY_PASSWORD = PREF_PREFIX + "enable_copy_password"
@@ -101,6 +102,14 @@ object PreferenceService {
 
     fun getAsString(prefKey: String, context: Context?): String? {
         return get(prefKey, context)
+    }
+
+    fun getAsStringSet(prefKey: String, context: Context?): Set<String>? {
+        if (context == null) return null
+        val defaultSharedPreferences = PreferenceManager
+            .getDefaultSharedPreferences(context)
+        return defaultSharedPreferences
+            .getStringSet(prefKey, null)
     }
 
     private fun get(prefKey: String, context: Context?): String? {

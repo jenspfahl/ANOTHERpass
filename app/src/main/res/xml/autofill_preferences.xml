@@ -6,7 +6,13 @@
         app:summaryOn="Suggesting autofill on every text field."
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
-        app:defaultValue="true"
+        app:defaultValue="false"
         app:title="Autofill suggestion everywhere" />
+
+    <MultiSelectListPreference
+        app:key="YAPM/pref:autofill_exclusion_list"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:title="Exclude apps from Autofill" />
 
 </PreferenceScreen>

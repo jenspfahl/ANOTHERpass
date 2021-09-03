@@ -340,8 +340,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
             val replyIntent = Intent().apply {
                 val fillResponse = ResponseFiller.createFillResponse(
                     structure,
-                    null,
-                    false,
+                    allowCreateAuthentication = false,
                     applicationContext
                 )
                 putExtra(EXTRA_AUTHENTICATION_RESULT, fillResponse)

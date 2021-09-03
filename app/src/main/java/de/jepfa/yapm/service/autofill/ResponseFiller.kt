@@ -8,10 +8,10 @@ import android.content.Intent
 import android.content.IntentSender
 import android.graphics.Color
 import android.os.Build
-import android.os.CancellationSignal
 import android.service.autofill.*
 import android.util.Log
 import android.util.TypedValue
+import android.view.View
 import android.view.autofill.AutofillId
 import android.view.autofill.AutofillValue
 import android.widget.RemoteViews
@@ -24,6 +24,7 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_EVERYWHERE
+import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_EXCLUSION_LIST
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
@@ -86,8 +87,7 @@ object ResponseFiller {
 
     fun createFillResponse(
         structure: AssistStructure,
-        cancellationSignal: CancellationSignal?,
-        createAuthentication : Boolean,
+        allowCreateAuthentication : Boolean,
         context: Context
     ) : FillResponse? {
         if (structure.isHomeActivity) {
@@ -100,6 +100,11 @@ object ResponseFiller {
             return null
         }
 
+        if (getExcludedAppList(context).contains(structure.activityComponent?.packageName)) {
+            Log.i("CFS", "excluded: " + structure.activityComponent?.packageName)
+            return null
+        }
+
         val vaultPresent =
             PreferenceService.isPresent(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, context)
         if (!vaultPresent) {
@@ -108,12 +113,12 @@ object ResponseFiller {
         }
 
         val suggestEverywhere = PreferenceService.getAsBool(PREF_AUTOFILL_EVERYWHERE, context)
-        val fields = identifyFields(structure, cancellationSignal, suggestEverywhere) ?: return null
+        val fields = identifyFields(structure, suggestEverywhere) ?: return null
 
         val key = Session.getMasterKeySK()
         val credential = CurrentCredentialHolder.currentCredential
         if (key == null || Session.isDenied() || credential == null) {
-            if (createAuthentication) {
+            if (allowCreateAuthentication) {
                 if (suggestEverywhere || fields.hasCredentialFields()) {
                     return createAuthenticationFillResponse(fields, context)
                 }
@@ -195,36 +200,63 @@ object ResponseFiller {
         return headerView
     }
 
-    private fun identifyFields(structure: AssistStructure, cancellationSignal: CancellationSignal?, suggestEverywhere: Boolean): Fields? {
+    private fun identifyFields(structure: AssistStructure, suggestEverywhere: Boolean): Fields? {
 
         val fields = Fields()
 
         val windowNode = structure.getWindowNodeAt(0) ?: return null
         val viewNode = windowNode.rootViewNode ?: return null
 
-        identifyFields(viewNode, fields, cancellationSignal, suggestEverywhere)
+        identifyFields(viewNode, fields, suggestEverywhere)
 
         return fields
 
     }
 
 
-    private fun identifyFields(node: ViewNode, fields: Fields, cancellationSignal: CancellationSignal?, suggestEverywhere: Boolean) {
-        if (cancellationSignal != null && cancellationSignal.isCanceled) {
-            return
-        }
+    private fun identifyFields(node: ViewNode, fields: Fields, suggestEverywhere: Boolean) {
         node.idEntry?.let { identifyField(it, node, fields) }
         node.text?.let { identifyField(it.toString(), node, fields) }
         node.hint?.let { identifyField(it, node, fields) }
         node.htmlInfo?.let { identifyField(it.tag, node, fields) }
         node.autofillHints?.map { identifyField(it, node, fields) }
-        node.autofillOptions?.map { identifyField(it.toString(), node, fields) }
 
+        if (!suggestEverywhere && node.autofillType != View.AUTOFILL_TYPE_TEXT) {
+            Log.i("CFS", "No text autofill type")
+            return;
+        }
+
+        if (!suggestEverywhere && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            if (node.importantForAutofill == View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS) {
+                // don't traverse anything
+                Log.i("CFS", "No autofill for current node and children")
+                return;
+            }
+        }
 
         if (suggestEverywhere && node.className != null) {
             val viewId = node.idEntry?.toLowerCase(Locale.ROOT)
             if (viewId != null && node.className.contains(VIEW_TO_IDENTIFY)) {
-                fields.addPotentialField(node)
+                if (!suggestEverywhere && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    if (node.importantForAutofill != View.IMPORTANT_FOR_AUTOFILL_NO) {
+                        // only consider current node if AUTO and YES*
+                        fields.addPotentialField(node)
+                    }
+                    else {
+                        Log.i("CFS", "No autofill for current node but its children")
+                    }
+                }
+                else {
+                    fields.addPotentialField(node)
+                }
+            }
+        }
+
+        if (!suggestEverywhere && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            if (node.importantForAutofill == View.IMPORTANT_FOR_AUTOFILL_YES_EXCLUDE_DESCENDANTS) {
+                // don't traverse children
+                Log.i("CFS", "No autofill for current nodes children only")
+                return;
             }
         }
 
@@ -232,7 +264,7 @@ object ResponseFiller {
         for (i in 0 until node.childCount) {
             val child = node.getChildAt(i)
             if (child != null) {
-                identifyFields(child, fields, cancellationSignal, suggestEverywhere)
+                identifyFields(child, fields, suggestEverywhere)
             }
         }
     }
@@ -307,6 +339,12 @@ object ResponseFiller {
         remoteView.setImageViewResource(R.id.autofill_image, iconId)
         remoteView.setTextViewText(R.id.autofill_item, text)
         return remoteView
+    }
+
+
+    private fun getExcludedAppList(context: Context): List<String> {
+        val apps = PreferenceService.getAsStringSet(PREF_AUTOFILL_EXCLUSION_LIST, context)
+        return apps?.toList() ?: emptyList()
     }
 
 }

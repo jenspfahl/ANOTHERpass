@@ -1,14 +1,16 @@
 package de.jepfa.yapm.ui.settings
 
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.preference.*
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.ClipboardUtil
-import de.jepfa.yapm.service.nfc.NfcService
-import de.jepfa.yapm.service.PreferenceService
 
 private const val TITLE_TAG = "settingsActivityTitle"
 
@@ -171,6 +173,30 @@ class SettingsActivity : SecureActivity(),
     class AutofillSettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.autofill_preferences, rootKey)
+
+            val exclusionAppPref = findPreference<MultiSelectListPreference>(
+                PreferenceService.PREF_AUTOFILL_EXCLUSION_LIST)
+            exclusionAppPref?.let { pref ->
+                val pm = requireContext().packageManager
+                val packages = pm.getInstalledApplications(PackageManager.GET_META_DATA)
+
+                packages?.let {
+                    val filteredPackages = it.toList()
+                        .filterNotNull()
+                        .filter { it.enabled }
+                        .filter { isUserApp(it) }
+                        .sortedBy { it.loadLabel(pm).toString() }
+
+                    pref.entries = filteredPackages.map { it.loadLabel(pm) }.toTypedArray()
+                    pref.entryValues = filteredPackages.map { it.packageName }.toTypedArray()
+
+                }
+            }
+        }
+
+        fun isUserApp(ai: ApplicationInfo): Boolean {
+            val mask = ApplicationInfo.FLAG_SYSTEM or ApplicationInfo.FLAG_UPDATED_SYSTEM_APP
+            return ai.flags and mask == 0
         }
     }
 }
