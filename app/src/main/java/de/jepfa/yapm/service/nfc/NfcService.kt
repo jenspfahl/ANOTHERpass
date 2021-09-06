@@ -80,4 +80,12 @@ object NfcService {
         }
     }
 
+    fun scanNfcTag(activity: BaseActivity) {
+
+        val intent = Intent(activity, NfcActivity::class.java)
+        intent.putExtra(NfcActivity.EXTRA_MODE, NfcActivity.EXTRA_MODE_RO)
+        intent.putExtra(NfcActivity.EXTRA_NO_SESSION_CHECK, true)
+        activity.startActivityForResult(intent, NfcActivity.ACTION_READ_NFC_TAG)
+    }
+
 }

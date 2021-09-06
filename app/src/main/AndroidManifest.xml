@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="de.jepfa.yapm"
-    android:installLocation="auto">
+    android:installLocation="internalOnly">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
@@ -32,6 +32,10 @@
             android:label="@string/title_activity_settings" />
         <activity android:name=".ui.importvault.ImportVaultActivity" />
         <activity android:name=".ui.exportvault.ExportVaultActivity" />
+        <activity
+            android:name=".ui.verify.VerifyActivity"
+            android:label="@string/verify_test"
+            android:noHistory="false" />
         <activity
             android:name=".ui.changelogin.ChangePinActivity"
             android:label="@string/change_pin"

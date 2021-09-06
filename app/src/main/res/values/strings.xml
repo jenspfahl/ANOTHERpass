@@ -261,6 +261,18 @@
     <string name="password_obfuscated">Password obfuscated</string>
     <string name="message_deobfuscate_password">This password was obfuscated while creation. You can de-obfuscate it with your obfuscation code.</string>
     <string name="deobfuscate_restored">Origin password restored</string>
+    <string name="verify_test">Verify QR code / NFC tag</string>
+    <string name="button_close">Close</string>
+    <string name="verify_exported_data_explanation">Scan a QR code or read a NFC tag to find out if it is well known for your current vault. This is usefull when you have forgotten what data a QR code of NFC tag contains.</string>
+    <string name="scan_qr_or_nfc">Scan QR code or read NFC tag</string>
+    <string name="scanning_qrcode">Scanning a QR code</string>
+    <string name="unknown_qr_code_or_nfc_tag">Unknown QR code or read NFC tag</string>
+    <string name="unknown_emk_scanned">\u274C Unknown Encrypted Master Key (EMK) scanned</string>
+    <string name="well_known_emk_scanned">\u2705 Well known Encrypted Master Key (EMK) scanned</string>
+    <string name="unknown_emp_scanned">\u274C Unknown Encrypted Master Password (EMP) scanned</string>
+    <string name="well_known_emp_scanned">\u2705 Well known Encrypted Master Password (EMP) scanned</string>
+    <string name="unknown_mpt_scanned">\u274C Unknown Master Password Token (MPT) scanned</string>
+    <string name="well_known_mpt_scanned">\u2705 Well known Master Password Token (MPT) scanned</string>
 
 
 </resources>

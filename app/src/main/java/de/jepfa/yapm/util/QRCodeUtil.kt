@@ -1,5 +1,6 @@
 package de.jepfa.yapm.util
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -52,6 +53,18 @@ object QRCodeUtil {
 
     fun scanQRCode(fragment: Fragment, prompt: String) {
         val integrator = IntentIntegrator.forSupportFragment(fragment).apply {
+            captureActivity = CaptureActivity::class.java
+            setOrientationLocked(false)
+            setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
+            setPrompt(prompt)
+            setBarcodeImageEnabled(false)
+            setBeepEnabled(false)
+        }
+        integrator.initiateScan()
+    }
+
+    fun scanQRCode(activity: Activity, prompt: String) {
+        val integrator = IntentIntegrator(activity).apply {
             captureActivity = CaptureActivity::class.java
             setOrientationLocked(false)
             setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
