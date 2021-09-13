@@ -4,9 +4,11 @@ import android.content.Context
 import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.usecase.CreateVaultUseCase
 import org.junit.Before
@@ -19,13 +21,14 @@ class BruteForceTest {
 
     val pin = Password("123")
     val masterPassword = Password("abcd")
+    val cipherAlgorithm = CipherAlgorithm.AES_256
 
     lateinit var context: Context
 
     @Before
     fun setup() {
         context = InstrumentationRegistry.getInstrumentation().context
-        CreateVaultUseCase.execute(pin, masterPassword, false, context)
+        CreateVaultUseCase.execute(pin, masterPassword, false, cipherAlgorithm, context)
     }
 
     @Test
@@ -44,8 +47,8 @@ class BruteForceTest {
         }
     }
 
-    private fun crack(salt: Key, pin: Password, masterPassword: Password, encMasterKey: Encrypted): SecretKey? {
-        val masterPassPhraseSK = MasterKeyService.getMasterPassPhraseSK(pin, masterPassword, salt)
+    private fun crack(salt: Key, pin: Password, masterPassword: Password, encMasterKey: Encrypted): SecretKeyHolder? {
+        val masterPassPhraseSK = MasterKeyService.getMasterPassPhraseSK(pin, masterPassword, salt, encMasterKey.cipherAlgorithm)
         return MasterKeyService.getMasterSK(masterPassPhraseSK, salt, encMasterKey)
     }
 }

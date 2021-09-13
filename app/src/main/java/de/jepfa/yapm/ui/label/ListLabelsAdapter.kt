@@ -14,6 +14,7 @@ import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.label.LabelService
 import javax.crypto.SecretKey
 
@@ -85,7 +86,7 @@ class ListLabelsAdapter(val listLabelsActivity: ListLabelsActivity) :
             }
         }
 
-        fun bind(key: SecretKey?, label: LabelService.Label) {
+        fun bind(key: SecretKeyHolder?, label: LabelService.Label) {
             var name = itemView.context.getString(R.string.unknown_placeholder)
             if (key != null) {
                 name = label.labelChip.label

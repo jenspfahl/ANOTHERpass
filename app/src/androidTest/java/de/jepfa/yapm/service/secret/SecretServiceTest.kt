@@ -2,6 +2,7 @@ package de.jepfa.yapm.service.secret
 
 import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.secret.Password
 import org.junit.Assert
 import org.junit.Test
@@ -15,6 +16,7 @@ class SecretServiceTest {
     @Test
     fun bootstrap() {
         val salt = SecretService.generateKey(32)
+        val cipherAlgorithm = CipherAlgorithm.CHACHACHA20
         Log.i(TAG, "salt=${salt.debugToString()}")
 
         val masterPin = Password("1234") // given by the user (knowledge)
@@ -41,8 +43,8 @@ class SecretServiceTest {
         Log.i(TAG, "masterKey=${masterKey.debugToString()}")
 
         // store masterKey encrypted with masterPassPhrase --> AES
-        val masterPassPhraseSK = SecretService.generateStrongSecretKey(masterPassPhrase, salt)
-        Log.i(TAG, "masterPassPhraseSK=${masterPassPhraseSK.encoded.contentToString()}")
+        val masterPassPhraseSK = SecretService.generateStrongSecretKey(masterPassPhrase, salt, cipherAlgorithm)
+        Log.i(TAG, "masterPassPhraseSK=${masterPassPhraseSK.secretKey.encoded.contentToString()}")
 
         val encMasterKey = SecretService.encryptKey(masterPassPhraseSK, masterKey)
         Log.i(TAG, "encMasterKey=${encMasterKey.debugToString()}")
@@ -53,7 +55,7 @@ class SecretServiceTest {
 
         // Credential enc-/decryption with masterKey --> AES
         val credential = Password("9999")
-        val masterKeySK = SecretService.generateStrongSecretKey(masterKey, salt)
+        val masterKeySK = SecretService.generateStrongSecretKey(masterKey, salt, cipherAlgorithm)
         // not needed anymore
         masterKey.clear()
 

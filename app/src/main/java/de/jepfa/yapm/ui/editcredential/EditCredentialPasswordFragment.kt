@@ -15,6 +15,7 @@ import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SaltService
@@ -217,8 +218,9 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
                                 context?.let {
                                     val salt = SaltService.getSalt(it)
+                                    val cipherAlgorithm = SecretService.getCipherAlgorithm(it)
                                     val obfuscationSK =
-                                        SecretService.generateNormalSecretKey(obfusPasswd1, salt)
+                                        SecretService.generateNormalSecretKey(obfusPasswd1, salt, cipherAlgorithm)
                                     val obfuscationKey = SecretService.secretKeyToKey(obfuscationSK, salt)
                                     generatedPassword.obfuscate(obfuscationKey)
                                     obfuscationKey.clear()
@@ -244,7 +246,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
     }
 
     private fun saveCredential(
-        key: SecretKey,
+        key: SecretKeyHolder,
         editCredentialActivity: EditCredentialActivity
     ) {
         val origCredential = originCredential
@@ -354,7 +356,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
     }
 
     private fun updateCredential(
-        key: SecretKey,
+        key: SecretKeyHolder,
         saveLastPassword: Boolean,
         editCredentialActivity: EditCredentialActivity
     ) {

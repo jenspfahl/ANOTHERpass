@@ -10,6 +10,7 @@ import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromS
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_KEY
+import de.jepfa.yapm.service.secret.SecretService
 
 object ChangePinUseCase {
 
@@ -25,7 +26,8 @@ object ChangePinUseCase {
             return false
         }
 
-        val oldMasterPassphraseSK = getMasterPassPhraseSK(currentPin, masterPassword, salt)
+        val cipherAlgorithm = SecretService.getCipherAlgorithm(activity)
+        val oldMasterPassphraseSK = getMasterPassPhraseSK(currentPin, masterPassword, salt, cipherAlgorithm)
 
         val encEncryptedMasterKey = PreferenceService.getEncrypted(DATA_ENCRYPTED_MASTER_KEY, activity)
         if (encEncryptedMasterKey == null) {
@@ -39,7 +41,7 @@ object ChangePinUseCase {
             return false
         }
 
-        encryptAndStoreMasterKey(masterKey, newPin, masterPassword, salt, activity)
+        encryptAndStoreMasterKey(masterKey, newPin, masterPassword, salt, cipherAlgorithm, activity)
 
         return LoginUseCase.execute(newPin, masterPassword, activity)
 

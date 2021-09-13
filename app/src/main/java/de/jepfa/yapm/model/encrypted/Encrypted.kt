@@ -2,7 +2,7 @@ package de.jepfa.yapm.model.encrypted
 
 import android.util.Base64
 
-data class Encrypted(val type: String = "", val iv: ByteArray, val data: ByteArray) {
+data class Encrypted(val type: String = "", val iv: ByteArray, val data: ByteArray, val cipherAlgorithm: CipherAlgorithm) {
 
     fun debugToString(): String {
         return "[type=${type}, iv=${iv.contentToString()}, data=${data.contentToString()}]"
@@ -26,42 +26,44 @@ data class Encrypted(val type: String = "", val iv: ByteArray, val data: ByteArr
         const val TYPE_ENC_MASTER_KEY = "EMK"
         const val TYPE_ENC_SALT = "SLT"
 
-        private val BAS64_PAIR_DELIMITOR = ':'
+        private val BASE64_PAIR_DELIMITOR = ':'
         private val BASE64_FLAGS = Base64.NO_WRAP or Base64.NO_PADDING
 
         fun empty(): Encrypted {
-            return Encrypted("", ByteArray(0), ByteArray(0))
+            return Encrypted("", ByteArray(0), ByteArray(0), DEFAULT_CIPHER_ALGORITHM)
         }
 
         fun toBase64String(encrypted: Encrypted): String {
             val iv = Base64.encodeToString(encrypted.iv, BASE64_FLAGS)
             val data = Base64.encodeToString(encrypted.data, BASE64_FLAGS)
-            return encrypted.type + BAS64_PAIR_DELIMITOR + iv + BAS64_PAIR_DELIMITOR + data
+            if (encrypted.cipherAlgorithm != null) {
+                return encrypted.type + BASE64_PAIR_DELIMITOR + iv + BASE64_PAIR_DELIMITOR + data + BASE64_PAIR_DELIMITOR + encrypted.cipherAlgorithm.ordinal
+            }
+            else {
+                return encrypted.type + BASE64_PAIR_DELIMITOR + iv + BASE64_PAIR_DELIMITOR + data
+            }
         }
 
         fun fromBase64String(string: String): Encrypted {
-            val splitted = string.split(BAS64_PAIR_DELIMITOR.toString().toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            val splitted = string.split(BASE64_PAIR_DELIMITOR.toString().toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             val type = splitted[0]
             val iv = Base64.decode(splitted[1], BASE64_FLAGS)
             val data = Base64.decode(splitted[2], BASE64_FLAGS)
+            var algo = DEFAULT_CIPHER_ALGORITHM
+            if (splitted.size >= 4) {
+                val algoIdx = splitted[3].toInt()
+                algo = CipherAlgorithm.values()[algoIdx]
+            }
 
-            return Encrypted(type, iv, data)
+            return Encrypted(type, iv, data, algo)
         }
 
         fun toBase64(encrypted: Encrypted): ByteArray {
-            val iv = Base64.encode(encrypted.iv, BASE64_FLAGS)
-            val data = Base64.encode(encrypted.data, BASE64_FLAGS)
-            return encrypted.type.toByteArray() + BAS64_PAIR_DELIMITOR.toByte() + iv + BAS64_PAIR_DELIMITOR.toByte() + data
+            return toBase64String(encrypted).toByteArray()
         }
 
         fun fromBase64(byteArray: ByteArray): Encrypted {
-            val firstDelimiterIndex = byteArray.indexOf(BAS64_PAIR_DELIMITOR.toByte())
-            val lastDelimiterIndex = byteArray.lastIndexOf(BAS64_PAIR_DELIMITOR.toByte())
-            val type = String(byteArray.copyOf(firstDelimiterIndex))
-            val iv = Base64.decode(byteArray.copyOfRange(firstDelimiterIndex + 1, lastDelimiterIndex), BASE64_FLAGS)
-            val data = Base64.decode(byteArray.copyOfRange(lastDelimiterIndex + 1, byteArray.size), BASE64_FLAGS)
-
-            return Encrypted(type, iv, data)
+            return fromBase64String(String(byteArray))
         }
 
     }

@@ -1,8 +1,10 @@
 package de.jepfa.yapm.usecase
 
 import android.content.Context
+import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.DATA_CIPHER_ALGORITHM
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_CREATED_AT
 import de.jepfa.yapm.service.secret.MasterKeyService.encryptAndStoreMasterKey
 import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
@@ -13,11 +15,17 @@ import java.util.*
 
 object CreateVaultUseCase {
 
-    fun execute(pin: Password, masterPasswd: Password, storeMasterPasswd: Boolean, context: Context?): Boolean {
+    fun execute(
+        pin: Password,
+        masterPasswd: Password,
+        storeMasterPasswd: Boolean,
+        cipherAlgorithm: CipherAlgorithm,
+        context: Context?
+    ): Boolean {
         if (context == null) return false
         val salt = SaltService.getSalt(context)
         val masterKey = generateKey(128)
-        encryptAndStoreMasterKey(masterKey, pin, masterPasswd, salt, context)
+        encryptAndStoreMasterKey(masterKey, pin, masterPasswd, salt, cipherAlgorithm, context)
         masterKey.clear()
 
         if (storeMasterPasswd) {
@@ -27,6 +35,7 @@ object CreateVaultUseCase {
             DATA_VAULT_CREATED_AT,
             Constants.SDF_DT_MEDIUM.format(Date()),
             context)
+        PreferenceService.putString(DATA_CIPHER_ALGORITHM, cipherAlgorithm.name, context)
 
         return true
     }

@@ -3,9 +3,10 @@ package de.jepfa.yapm.service.secret
 import android.content.Context
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.secret.Key
+import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.PreferenceService
-import javax.crypto.SecretKey
 
 object MasterPasswordService {
 
@@ -27,8 +28,8 @@ object MasterPasswordService {
         )
     }
 
-    fun generateEncMasterPasswdSK(passwd: Password): SecretKey {
-        val empSK = SecretService.generateNormalSecretKey(passwd, EMP_SALT)
+    fun generateEncMasterPasswdSK(passwd: Password, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
+        val empSK = SecretService.generateNormalSecretKey(passwd, EMP_SALT, cipherAlgorithm)
         passwd.clear()
         return empSK
     }

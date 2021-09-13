@@ -5,6 +5,7 @@ import com.pchmn.materialchips.model.ChipInterface
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.label.LabelChip
 import java.util.*
@@ -22,14 +23,14 @@ object LabelService {
 
     data class Label(val encLabel: EncLabel, val labelChip: LabelChip) // TODO remove this and add id to LabelChip
 
-    fun initLabels(key: SecretKey, encLabels: Set<EncLabel>) {
+    fun initLabels(key: SecretKeyHolder, encLabels: Set<EncLabel>) {
         encLabels
             .forEach {
                 updateLabel(key, it)
             }
     }
 
-    fun updateLabel(key: SecretKey, encLabel: EncLabel) {
+    fun updateLabel(key: SecretKeyHolder, encLabel: EncLabel) {
         val encLabelId = encLabel.id
         if (encLabelId != null) {
             val labelChip = createLabelChip(key, encLabel)
@@ -59,7 +60,7 @@ object LabelService {
         idToLabel.clear()
     }
 
-    fun updateLabelsForCredential(key: SecretKey, credential: EncCredential) {
+    fun updateLabelsForCredential(key: SecretKeyHolder, credential: EncCredential) {
 
         val labels = getLabelsForCredential(key, credential)
 
@@ -97,7 +98,7 @@ object LabelService {
             .toList()
     }
 
-    fun getLabelsForCredential(key: SecretKey, credential: EncCredential): List<Label> {
+    fun getLabelsForCredential(key: SecretKeyHolder, credential: EncCredential): List<Label> {
         if (!credential.isPersistent()) {
             return Collections.emptyList()
         }
@@ -129,7 +130,7 @@ object LabelService {
         return idToLabel[id]
     }
 
-    fun encryptLabelIds(key: SecretKey, chipList: List<ChipInterface>): Encrypted {
+    fun encryptLabelIds(key: SecretKeyHolder, chipList: List<ChipInterface>): Encrypted {
         val ids = chipList
             .map {lookupByLabelName(it.label)}
             .filterNotNull()
@@ -161,7 +162,7 @@ object LabelService {
         return ids.joinToString(separator = ID_SEPARATOR)
     }
 
-    private fun createLabelChip(key: SecretKey, encLabel: EncLabel): LabelChip {
+    private fun createLabelChip(key: SecretKeyHolder, encLabel: EncLabel): LabelChip {
         val name = SecretService.decryptCommonString(key, encLabel.name)
         val desc = SecretService.decryptCommonString(key, encLabel.description)
         return LabelChip(encLabel.color, name, desc)

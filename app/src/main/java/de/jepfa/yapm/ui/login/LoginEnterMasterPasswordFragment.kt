@@ -153,7 +153,10 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                 val masterPasswordTokenKey =
                     decryptKey(masterPasswordTokenSK, encMasterPasswordTokenKey)
                 val baseActivity = getBaseActivity() ?: return false
-                val mptSK = generateStrongSecretKey(masterPasswordTokenKey, getSalt(baseActivity))
+                val salt = getSalt(baseActivity)
+                val cipherAlgorithm = SecretService.getCipherAlgorithm(baseActivity)
+
+                val mptSK = generateStrongSecretKey(masterPasswordTokenKey, salt, cipherAlgorithm)
 
                 val encMasterPassword =
                     SecretService.decryptPassword(mptSK, Encrypted.fromBase64String(scanned))
@@ -177,7 +180,8 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
 
             val baseActivity = getBaseActivity() ?: return false
             val salt = getSalt(baseActivity)
-            val empSK = generateEncMasterPasswdSK(Password(salt.toCharArray()))
+            val cipherAlgorithm = SecretService.getCipherAlgorithm(baseActivity)
+            val empSK = generateEncMasterPasswdSK(Password(salt.toCharArray()), cipherAlgorithm)
             val encMasterPassword =
                 SecretService.decryptPassword(empSK, Encrypted.fromBase64String(scanned))
             if (!encMasterPassword.isValid()) {

@@ -54,6 +54,7 @@ class FileIOService: IntentService("FileIOService") {
         const val JSON_APP_VERSION_NAME = "appVersionName"
         const val JSON_CREATION_DATE = "creationDate"
         const val JSON_VAULT_ID = "vaultId"
+        const val JSON_CIPHER_ALGORITHM = "cipherAlgoritm"
         const val JSON_ENC_MK = "encMk"
         const val JSON_CREDENTIALS = "credentials"
         const val JSON_CREDENTIALS_COUNT = "credentialsCount"
@@ -132,6 +133,9 @@ class FileIOService: IntentService("FileIOService") {
         salt.let {
             root.addProperty(JSON_VAULT_ID, it)
         }
+
+        val cipherAlgorithm = SecretService.getCipherAlgorithm(this)
+        root.addProperty(JSON_CIPHER_ALGORITHM, cipherAlgorithm.name)
 
         if (includeMasterkey) {
             val encStoredMasterKey = PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, this)

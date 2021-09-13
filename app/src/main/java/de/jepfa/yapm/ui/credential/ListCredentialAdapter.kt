@@ -19,6 +19,7 @@ import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
@@ -216,7 +217,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             }
 
 
-            private fun filterByLabels(key: SecretKey?, credentials: List<EncCredential>): List<EncCredential> {
+            private fun filterByLabels(key: SecretKeyHolder?, credentials: List<EncCredential>): List<EncCredential> {
                 key ?: return credentials
                 return credentials
                     .filter {
@@ -285,7 +286,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             }
         }
 
-        fun bind(key: SecretKey?, credential: EncCredential, activity: SecureActivity) {
+        fun bind(key: SecretKeyHolder?, credential: EncCredential, activity: SecureActivity) {
 
             credentialLabelContainerView.removeAllViews()
 

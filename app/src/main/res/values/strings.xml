@@ -25,6 +25,12 @@
     <string name="ULTRA">Ultra</string>
     <string name="EXTREME">Extreme</string>
 
+    <string name="CIPHER_AES_128">AES 128bit</string>
+    <string name="CIPHER_AES_256">AES 256bit</string>
+    <string name="CIPHER_BLOWFISH_128">Blowfish 128bit</string>
+    <string name="CIPHER_BLOWFISH_256">Blowfish 256bit</string>
+    <string name="CIPHER_CHACHACHA20_256">Chachacha20 256bit</string>
+
     <string name="change">Change</string>
     <string name="delete">Delete</string>
 

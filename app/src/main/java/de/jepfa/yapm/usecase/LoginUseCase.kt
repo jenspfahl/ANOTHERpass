@@ -16,11 +16,12 @@ object LoginUseCase {
     fun execute(pin: Password, masterPassword: Password, context: Context?): Boolean {
         if (context == null) return false
         val salt = SaltService.getSalt(context)
+        val cipherAlgorithm = SecretService.getCipherAlgorithm(context)
         val encMasterKey = PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, context)
         if (encMasterKey == null) {
             return false
         }
-        val masterPassPhraseSK = getMasterPassPhraseSK(pin, masterPassword, salt)
+        val masterPassPhraseSK = getMasterPassPhraseSK(pin, masterPassword, salt, cipherAlgorithm)
         val masterSecretKey = getMasterSK(masterPassPhraseSK, salt, encMasterKey)
         if (masterSecretKey == null) {
             return false

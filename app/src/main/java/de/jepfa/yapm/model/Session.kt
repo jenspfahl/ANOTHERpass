@@ -3,9 +3,9 @@ package de.jepfa.yapm.model
 import android.os.Build
 import android.util.Log
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
 import java.util.concurrent.TimeUnit
-import javax.crypto.SecretKey
 
 object Session {
 
@@ -17,11 +17,11 @@ object Session {
     private var lock_timeout: Long = minutesToMillis(DEFAULT_LOCK_TIMEOUT)
     private var logout_timeout: Long = minutesToMillis(DEFAULT_LOGOUT_TIMEOUT)
 
-    private var masterSecretKey: SecretKey? = null
+    private var masterSecretKey: SecretKeyHolder? = null
     private var encMasterPassword: Encrypted? = null
     private var lastUpdated: Long = 0
 
-    fun getMasterKeySK() : SecretKey? {
+    fun getMasterKeySK() : SecretKeyHolder? {
         return masterSecretKey
     }
 
@@ -42,7 +42,7 @@ object Session {
         setLogoutTimeout(logoutTimeoutMinutes)
     }
 
-    fun login(secretKey: SecretKey, encMasterPasswd: Encrypted) {
+    fun login(secretKey: SecretKeyHolder, encMasterPasswd: Encrypted) {
         masterSecretKey = secretKey
         encMasterPassword = encMasterPasswd
         touch()
@@ -73,13 +73,7 @@ object Session {
     }
 
     fun lock() {
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                masterSecretKey?.destroy()
-            }
-        } catch (e: Exception) {
-            Log.w("SESSION", "cannot destroy mSK", e)
-        }
+        masterSecretKey?.destroy()
         masterSecretKey = null
         CurrentCredentialHolder.clear()
         touch()

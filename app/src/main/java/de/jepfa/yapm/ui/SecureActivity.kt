@@ -5,11 +5,11 @@ import android.os.Bundle
 import android.view.MotionEvent
 import android.view.WindowManager
 import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.overlay.OverlayShowingService
 import de.jepfa.yapm.ui.login.LoginActivity
 import de.jepfa.yapm.util.ClipboardUtil
 import java.util.concurrent.TimeUnit
-import javax.crypto.SecretKey
 
 abstract class SecureActivity : BaseActivity() {
 
@@ -39,13 +39,13 @@ abstract class SecureActivity : BaseActivity() {
     protected abstract fun lock()
 
     @get:Synchronized
-    val masterSecretKey: SecretKey?
+    val masterSecretKey: SecretKeyHolder?
         get() {
-            val secret = SecretChecker.getOrAskForSecret(this)
-            return if (secret.isDenied()) {
+            val session = SecretChecker.getOrAskForSecret(this)
+            return if (session.isDenied()) {
                 null
             } else {
-                secret.getMasterKeySK()
+                session.getMasterKeySK()
             }
         }
 

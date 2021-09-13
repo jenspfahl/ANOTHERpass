@@ -2,9 +2,7 @@ package de.jepfa.yapm.usecase
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import de.jepfa.yapm.model.encrypted.EncCredential
-import de.jepfa.yapm.model.encrypted.EncLabel
-import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.encrypted.*
 import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
@@ -25,6 +23,13 @@ object ImportVaultUseCase {
         salt?.let {
             SaltService.storeSaltFromBase64String(it, activity)
         }
+
+        val cipherAlgorithmString = jsonContent.get(FileIOService.JSON_CIPHER_ALGORITHM)?.asString
+        val cipherAlgorith =
+            if (cipherAlgorithmString != null) CipherAlgorithm.valueOf(cipherAlgorithmString)
+            else DEFAULT_CIPHER_ALGORITHM
+
+        PreferenceService.putString(PreferenceService.DATA_CIPHER_ALGORITHM, cipherAlgorith.name, activity)
 
         if (encMasterKey != null) {
             val keyForMK = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)

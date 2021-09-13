@@ -10,6 +10,7 @@ import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
+import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.MasterKeyService
@@ -95,8 +96,9 @@ class CreateVaultSummarizeFragment : BaseFragment() {
                 }
 
                 val pin = decryptPassword(transSK, encPin)
+                val cipherAlgorithm = CipherAlgorithm.AES_128;
 
-                createVault(pin, masterPasswd, switchStorePasswd.isChecked)
+                createVault(pin, masterPasswd, switchStorePasswd.isChecked, cipherAlgorithm)
             }
 
         }
@@ -105,7 +107,8 @@ class CreateVaultSummarizeFragment : BaseFragment() {
     private fun createVault(
         pin: Password,
         masterPasswd: Password,
-        storeMasterPassword: Boolean
+        storeMasterPassword: Boolean,
+        cipherAlgorithm: CipherAlgorithm
     ) {
 
         getBaseActivity()?.getProgressBar()?.let {
@@ -113,7 +116,8 @@ class CreateVaultSummarizeFragment : BaseFragment() {
             AsyncWithProgressBar(
                 getBaseActivity(),
                 {
-                    val success = CreateVaultUseCase.execute(pin, masterPasswd, storeMasterPassword, getBaseActivity())
+                    val success = CreateVaultUseCase.execute(
+                        pin, masterPasswd, storeMasterPassword, cipherAlgorithm, getBaseActivity())
                     if (success) {
                         LoginUseCase.execute(pin, masterPasswd, getBaseActivity())
                     }
