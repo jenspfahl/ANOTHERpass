@@ -25,11 +25,21 @@
     <string name="ULTRA">Ultra</string>
     <string name="EXTREME">Extreme</string>
 
-    <string name="CIPHER_AES_128">AES 128bit</string>
-    <string name="CIPHER_AES_256">AES 256bit</string>
-    <string name="CIPHER_BLOWFISH_128">Blowfish 128bit</string>
-    <string name="CIPHER_BLOWFISH_256">Blowfish 256bit</string>
-    <string name="CIPHER_CHACHACHA20_256">Chachacha20 256bit</string>
+
+    <string name="cipher_name">Encryption algorithm</string>
+    <string name="create_vault_cipher_explanation">Choose an encryption algorithm. You cannot change that later. If in doubt, use the current default.</string>
+
+    <string name="CIPHER_AES_128">AES (128bit key)</string>
+    <string name="CIPHER_AES_256">AES (256bit key)</string>
+    <string name="CIPHER_BLOWFISH_128">Blowfish (128bit key)</string>
+    <string name="CIPHER_BLOWFISH_256">Blowfish (256bit key)</string>
+    <string name="CIPHER_CHACHACHA20_256">Chachacha20 (256bit key)</string>
+
+    <string name="CIPHER_AES_128_desc">This is the standard encryption with a good balance of security and performance. Supported by all Android versions.</string>
+    <string name="CIPHER_AES_256_desc">This is the standard encryption with better security but less performance. Supported by Android 8 and higher.</string>
+    <string name="CIPHER_BLOWFISH_128_desc">This is an alternative encryption with a good balance of security and performance. It is supposed to be harder to crack than AES but therefore slower. Supported by Android 2.3 and higher.</string>
+    <string name="CIPHER_BLOWFISH_256_desc">This is an alternative encryption with better security but less performance. It is supposed to be harder to crack than AES but therefore slower. Supported by Android 2.3 and higher.</string>
+    <string name="CIPHER_CHACHACHA20_256_desc">This is another alternative encryption with around the same security like AES but supposed to be faster. Supported by Android 9 and higher.</string>
 
     <string name="change">Change</string>
     <string name="delete">Delete</string>
@@ -95,6 +105,7 @@
     <string name="drop_vault">Drop vault (delete all)</string>
     <string name="chooser_select_vault_file">Select vault file to import</string>
     <string name="toast_import_vault_failure">The selected file cannot be imported.</string>
+    <string name="toast_import_vault_failure_cipher_not_supported">The selected file is encrypted with an unsupported cipher.</string>
     <string name="quick_access">Quick access</string>
     <string name="generate_encrypted_masterpasswd">Create master export token</string>
     <string name="generate_passwd_first">Generate a password first</string>
@@ -254,6 +265,7 @@
     <string name="show_vault_info">Show vault info</string>
     <string name="vault_info">Vault info</string>
     <string name="vault_id">Vault Id</string>
+    <string name="vault_version">Vault version</string>
     <string name="credential_count">Credential count</string>
     <string name="label_count">Label count</string>
     <string name="vault_created_at">Vault created at</string>
@@ -279,6 +291,7 @@
     <string name="well_known_emp_scanned">\u2705 Well known Encrypted Master Password (EMP) scanned</string>
     <string name="unknown_mpt_scanned">\u274C Unknown Master Password Token (MPT) scanned</string>
     <string name="well_known_mpt_scanned">\u2705 Well known Master Password Token (MPT) scanned</string>
+
 
 
 </resources>

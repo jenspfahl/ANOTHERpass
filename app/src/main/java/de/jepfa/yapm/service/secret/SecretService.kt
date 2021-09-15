@@ -20,6 +20,7 @@ import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
+import javax.crypto.spec.SecretKeySpec
 
 object SecretService {
 
@@ -46,19 +47,24 @@ object SecretService {
         return Key(bytes)
     }
 
+    fun generateSecretKey(key: Key, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
+        val sk = SecretKeySpec(key.data.copyOf(cipherAlgorithm.keyLength/8), cipherAlgorithm.secretKeyAlgorithm)
+        return SecretKeyHolder(sk, cipherAlgorithm)
+    }
+
     fun generateStrongSecretKey(key: Key, salt: Key, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
         return generateStrongSecretKey(Password(key.toCharArray()), salt, cipherAlgorithm)
     }
 
     fun generateStrongSecretKey(password: Password, salt: Key, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
-        return generateSecretKey(password, salt, 65536,cipherAlgorithm)
+        return generatePBESecretKey(password, salt, 65536,cipherAlgorithm)
     }
 
     fun generateNormalSecretKey(password: Password, salt: Key, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
-        return generateSecretKey(password, salt, 1000, cipherAlgorithm)
+        return generatePBESecretKey(password, salt, 1000, cipherAlgorithm)
     }
 
-    private fun generateSecretKey(password: Password, salt: Key, iterations: Int, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
+    private fun generatePBESecretKey(password: Password, salt: Key, iterations: Int, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
         val keySpec = PBEKeySpec(password.toCharArray(), salt.data, iterations, cipherAlgorithm.keyLength)
         val factory = SecretKeyFactory.getInstance(cipherAlgorithm.secretKeyAlgorithm)
         try {
@@ -136,7 +142,16 @@ object SecretService {
 
     private fun encryptData(type: String = "", secretKeyHolder: SecretKeyHolder, data: ByteArray): Encrypted {
         val cipher: Cipher = Cipher.getInstance(secretKeyHolder.cipherAlgorithm.cipherName)
-        cipher.init(Cipher.ENCRYPT_MODE, secretKeyHolder.secretKey)
+
+        if (secretKeyHolder.cipherAlgorithm.integratedIvSupport) {
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeyHolder.secretKey)
+        }
+        else {
+            val iv = ByteArray(cipher.blockSize)
+            random.nextBytes(iv)
+            val ivParams = IvParameterSpec(iv)
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeyHolder.secretKey, ivParams)
+        }
 
         return Encrypted(type, cipher.iv, cipher.doFinal(data), secretKeyHolder.cipherAlgorithm)
     }

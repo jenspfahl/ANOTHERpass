@@ -22,6 +22,7 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.Constants.SDF_DT_MEDIUM
+import de.jepfa.yapm.util.Constants.UNKNOWN_VAULT_VERSION
 import java.lang.reflect.Type
 import java.util.*
 
@@ -54,6 +55,7 @@ class FileIOService: IntentService("FileIOService") {
         const val JSON_APP_VERSION_NAME = "appVersionName"
         const val JSON_CREATION_DATE = "creationDate"
         const val JSON_VAULT_ID = "vaultId"
+        const val JSON_VAULT_VERSION = "vaultVersion"
         const val JSON_CIPHER_ALGORITHM = "cipherAlgoritm"
         const val JSON_ENC_MK = "encMk"
         const val JSON_CREDENTIALS = "credentials"
@@ -133,6 +135,9 @@ class FileIOService: IntentService("FileIOService") {
         salt.let {
             root.addProperty(JSON_VAULT_ID, it)
         }
+
+        val vaultVersion = PreferenceService.getAsString(PreferenceService.DATA_VAULT_VERSION, this) ?: UNKNOWN_VAULT_VERSION.toString()
+        root.addProperty(JSON_VAULT_VERSION, vaultVersion)
 
         val cipherAlgorithm = SecretService.getCipherAlgorithm(this)
         root.addProperty(JSON_CIPHER_ALGORITHM, cipherAlgorithm.name)

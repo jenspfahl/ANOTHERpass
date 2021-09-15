@@ -28,6 +28,7 @@ object PreferenceService {
     const val DATA_MASTER_PASSWORD_TOKEN_KEY = DATA_PREFIX + "mpt"
     const val STATE_MASTER_PASSWD_TOKEN_COUNTER = STATE_PREFIX + "mpt_counter"
 
+    const val DATA_VAULT_VERSION = DATA_PREFIX + "vault_version"
     const val DATA_VAULT_CREATED_AT = DATA_PREFIX + "vault_created_at"
     const val DATA_VAULT_IMPORTED_AT = DATA_PREFIX + "vault_imported_at"
 

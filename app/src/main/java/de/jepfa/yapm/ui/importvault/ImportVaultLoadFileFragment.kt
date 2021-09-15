@@ -2,6 +2,7 @@ package de.jepfa.yapm.ui.importvault
 
 import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,9 +11,12 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
+import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import de.jepfa.yapm.R
+import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.ui.BaseFragment
+import de.jepfa.yapm.usecase.ImportVaultUseCase
 import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.FileUtil
 
@@ -72,10 +76,18 @@ class ImportVaultLoadFileFragment : BaseFragment() {
             if (getImportVaultActivity().jsonContent == null) {
                 Toast.makeText(activity, getString(R.string.toast_import_vault_failure), Toast.LENGTH_LONG).show()
             }
+            else if(!cipherVersionSupported(getImportVaultActivity().jsonContent!!)) {
+                Toast.makeText(activity, getString(R.string.toast_import_vault_failure_cipher_not_supported), Toast.LENGTH_LONG).show()
+            }
             else {
                 findNavController().navigate(R.id.action_importVault_LoadFileFragment_to_ImportFileFragment)
             }
         }
+    }
+
+    private fun cipherVersionSupported(jsonContent: JsonObject): Boolean {
+        val cipherAlgorithm = ImportVaultUseCase.extractCipherAlgorithm(jsonContent)
+        return Build.VERSION.SDK_INT >= cipherAlgorithm.supportedSdkVersion
     }
 
     private fun getImportVaultActivity() : ImportVaultActivity {

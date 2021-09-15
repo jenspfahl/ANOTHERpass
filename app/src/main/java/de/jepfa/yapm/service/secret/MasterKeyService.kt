@@ -30,9 +30,11 @@ object MasterKeyService {
      * Returns the Master Secret Key which is encrypted twice, first with the Android key
      * and second with the PassPhrase key.
      */
-    fun getMasterSK(masterPassPhraseSK: SecretKeyHolder, salt: Key, storedEncMasterKey: Encrypted): SecretKeyHolder? {
+    fun getMasterSK(masterPassPhraseSK: SecretKeyHolder, salt: Key, storedEncMasterKey: Encrypted, useLegacyGeneration: Boolean): SecretKeyHolder? {
         val masterKey = getMasterKey(masterPassPhraseSK, storedEncMasterKey) ?: return null
-        val masterSK = SecretService.generateStrongSecretKey(masterKey, salt, masterPassPhraseSK.cipherAlgorithm)
+        val masterSK =
+            if (useLegacyGeneration) SecretService.generateStrongSecretKey(masterKey, salt, masterPassPhraseSK.cipherAlgorithm)
+            else SecretService.generateSecretKey(masterKey, masterPassPhraseSK.cipherAlgorithm)
         masterKey.clear()
 
         return masterSK
@@ -59,10 +61,10 @@ object MasterKeyService {
 
         val mkSK = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
         val masterPassphrase = SecretService.conjunctPasswords(pin, masterPasswd, salt)
-        val masterSK = SecretService.generateStrongSecretKey(masterPassphrase, salt, cipherAlgorithm)
+        val masterPassphraseSK = SecretService.generateStrongSecretKey(masterPassphrase, salt, cipherAlgorithm)
         masterPassphrase.clear()
 
-        val encryptedMasterKey = SecretService.encryptKey(Encrypted.TYPE_ENC_MASTER_KEY, masterSK, masterKey)
+        val encryptedMasterKey = SecretService.encryptKey(Encrypted.TYPE_ENC_MASTER_KEY, masterPassphraseSK, masterKey)
 
         val encEncryptedMasterKey = SecretService.encryptEncrypted(mkSK, encryptedMasterKey)
 

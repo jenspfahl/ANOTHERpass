@@ -1,5 +1,6 @@
 package de.jepfa.yapm.usecase
 
+import android.os.Build
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import de.jepfa.yapm.model.encrypted.*
@@ -24,12 +25,16 @@ object ImportVaultUseCase {
             SaltService.storeSaltFromBase64String(it, activity)
         }
 
-        val cipherAlgorithmString = jsonContent.get(FileIOService.JSON_CIPHER_ALGORITHM)?.asString
-        val cipherAlgorith =
-            if (cipherAlgorithmString != null) CipherAlgorithm.valueOf(cipherAlgorithmString)
-            else DEFAULT_CIPHER_ALGORITHM
+        val cipherAlgorithm = extractCipherAlgorithm(jsonContent)
 
-        PreferenceService.putString(PreferenceService.DATA_CIPHER_ALGORITHM, cipherAlgorith.name, activity)
+        if (Build.VERSION.SDK_INT < cipherAlgorithm.supportedSdkVersion) {
+            return false
+        }
+
+        val vaultVersion = jsonContent.get(FileIOService.JSON_VAULT_VERSION)?.asString ?: "1"
+        PreferenceService.putString(PreferenceService.DATA_VAULT_VERSION, vaultVersion, activity)
+
+        PreferenceService.putString(PreferenceService.DATA_CIPHER_ALGORITHM, cipherAlgorithm.name, activity)
 
         if (encMasterKey != null) {
             val keyForMK = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
@@ -62,6 +67,14 @@ object ImportVaultUseCase {
             activity)
 
         return true
+    }
+
+    fun extractCipherAlgorithm(jsonContent: JsonObject): CipherAlgorithm {
+        val cipherAlgorithmString = jsonContent.get(FileIOService.JSON_CIPHER_ALGORITHM)?.asString
+        val cipherAlgorithm =
+            if (cipherAlgorithmString != null) CipherAlgorithm.valueOf(cipherAlgorithmString)
+            else DEFAULT_CIPHER_ALGORITHM
+        return cipherAlgorithm
     }
 
 

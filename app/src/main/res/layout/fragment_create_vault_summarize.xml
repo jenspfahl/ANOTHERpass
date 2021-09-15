@@ -78,6 +78,47 @@
                 android:layout_marginBottom="4dp"
                 android:text="@string/store_master_password" />
 
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/create_vault_cipher_explanation"
+                    android:layout_marginHorizontal="8dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatSpinner
+                        android:id="@+id/cipher_selection"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:spinnerMode="dropdown"
+                        android:dropDownSelector="@color/black" />
+
+                    <ImageView
+                        android:id="@+id/imageview_cipher_selection"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:paddingHorizontal="4dp"
+                        android:clickable="true"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_baseline_info_24" />
+
+                </LinearLayout>
+        </LinearLayout>
+
+
             <Button
                 android:id="@+id/button_create_vault"
                 style="?android:textAppearanceSmall"

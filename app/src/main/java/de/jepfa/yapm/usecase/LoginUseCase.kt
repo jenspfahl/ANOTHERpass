@@ -10,6 +10,7 @@ import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_LOCK_TIMEOUT
 import de.jepfa.yapm.service.PreferenceService.PREF_LOGOUT_TIMEOUT
+import de.jepfa.yapm.util.Constants.FAST_KEYGEN_VAULT_VERSION
 
 object LoginUseCase {
 
@@ -22,7 +23,9 @@ object LoginUseCase {
             return false
         }
         val masterPassPhraseSK = getMasterPassPhraseSK(pin, masterPassword, salt, cipherAlgorithm)
-        val masterSecretKey = getMasterSK(masterPassPhraseSK, salt, encMasterKey)
+        val vaultVersion = PreferenceService.getAsInt(PreferenceService.DATA_VAULT_VERSION, context)
+        val useLegacyGeneration = vaultVersion < FAST_KEYGEN_VAULT_VERSION
+        val masterSecretKey = getMasterSK(masterPassPhraseSK, salt, encMasterKey, useLegacyGeneration)
         if (masterSecretKey == null) {
             return false
         }

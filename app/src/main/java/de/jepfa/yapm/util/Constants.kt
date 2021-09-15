@@ -22,4 +22,7 @@ object Constants {
     var NF: NumberFormat = NumberFormat.getNumberInstance()
     var DF: DecimalFormat = NF as DecimalFormat
 
+    var UNKNOWN_VAULT_VERSION = 1
+    var FAST_KEYGEN_VAULT_VERSION = 2
+
 }

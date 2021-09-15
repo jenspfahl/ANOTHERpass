@@ -49,6 +49,6 @@ class BruteForceTest {
 
     private fun crack(salt: Key, pin: Password, masterPassword: Password, encMasterKey: Encrypted): SecretKeyHolder? {
         val masterPassPhraseSK = MasterKeyService.getMasterPassPhraseSK(pin, masterPassword, salt, encMasterKey.cipherAlgorithm)
-        return MasterKeyService.getMasterSK(masterPassPhraseSK, salt, encMasterKey)
+        return MasterKeyService.getMasterSK(masterPassPhraseSK, salt, encMasterKey, false)
     }
 }

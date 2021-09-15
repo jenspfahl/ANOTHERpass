@@ -1,16 +1,20 @@
 package de.jepfa.yapm.ui.createvault
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.AppCompatSpinner
 import androidx.appcompat.widget.SwitchCompat
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm
+import de.jepfa.yapm.model.encrypted.DEFAULT_CIPHER_ALGORITHM
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.MasterKeyService
@@ -27,7 +31,9 @@ import de.jepfa.yapm.usecase.ExportEncMasterPasswordUseCase
 import de.jepfa.yapm.usecase.LoginUseCase
 import de.jepfa.yapm.util.*
 
-class CreateVaultSummarizeFragment : BaseFragment() {
+class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedListener {
+
+    private var cipherAlgorithm = DEFAULT_CIPHER_ALGORITHM
 
     init {
         enableBack = true
@@ -57,6 +63,25 @@ class CreateVaultSummarizeFragment : BaseFragment() {
         val switchStorePasswd: SwitchCompat = view.findViewById(R.id.switch_store_master_password)
         val generatedPasswdView: TextView = view.findViewById(R.id.generated_passwd)
         generatedPasswdView.text = PasswordColorizer.spannableString(masterPasswd, getBaseActivity())
+
+        val cipherSelectionInfo: ImageView = view.findViewById(R.id.imageview_cipher_selection)
+        val cipherSelection: AppCompatSpinner = view.findViewById(R.id.cipher_selection)
+        context?.let { _context ->
+            val cipherSelectionAdapter = ArrayAdapter(
+                _context,
+                android.R.layout.simple_spinner_dropdown_item,
+                CipherAlgorithm.supportedValues()
+                    .map { getString(it.uiLabel)})
+            cipherSelection.adapter = cipherSelectionAdapter
+            cipherSelection.onItemSelectedListener = this
+
+            cipherSelectionInfo.setOnClickListener{
+                AlertDialog.Builder(_context)
+                    .setTitle(getString(cipherAlgorithm.uiLabel))
+                    .setMessage(getString(cipherAlgorithm.description))
+                    .show()
+            }
+        }
 
         val exportAsQrcImageView: ImageView = view.findViewById(R.id.imageview_qrcode)
         exportAsQrcImageView.setOnClickListener {
@@ -96,7 +121,6 @@ class CreateVaultSummarizeFragment : BaseFragment() {
                 }
 
                 val pin = decryptPassword(transSK, encPin)
-                val cipherAlgorithm = CipherAlgorithm.AES_128;
 
                 createVault(pin, masterPasswd, switchStorePasswd.isChecked, cipherAlgorithm)
             }
@@ -138,6 +162,14 @@ class CreateVaultSummarizeFragment : BaseFragment() {
             )
 
         }
+    }
+
+    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        cipherAlgorithm = CipherAlgorithm.supportedValues()[position]
+    }
+
+    override fun onNothingSelected(p0: AdapterView<*>?) {
+        cipherAlgorithm = DEFAULT_CIPHER_ALGORITHM
     }
 }
 

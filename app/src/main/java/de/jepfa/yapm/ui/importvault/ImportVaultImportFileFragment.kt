@@ -80,6 +80,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
         }
 
         val importButton = view.findViewById<Button>(R.id.button_import_loaded_vault)
+
         importButton.setOnClickListener {
             if (mkTextView.text.isEmpty() || encMasterKey == null) {
                 Toast.makeText(getBaseActivity(), getString(R.string.scan_masterkey_first), Toast.LENGTH_LONG).show()
