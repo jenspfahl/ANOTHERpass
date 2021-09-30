@@ -28,7 +28,7 @@ data class EncCredentialEntity (@PrimaryKey(autoGenerate = true) val id: Int?,
                 website: Encrypted,
                 labels: Encrypted,
                 isObfuscated: Boolean,
-                isLastPasswordObfuscated: Boolean
+                isLastPasswordObfuscated: Boolean?
     ) : this(
         id,
         name.toBase64String(),
@@ -39,6 +39,6 @@ data class EncCredentialEntity (@PrimaryKey(autoGenerate = true) val id: Int?,
         website.toBase64String(),
         labels.toBase64String(),
         isObfuscated,
-        isLastPasswordObfuscated)
+        isLastPasswordObfuscated?:false)
 
 }

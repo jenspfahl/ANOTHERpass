@@ -156,7 +156,7 @@ class ShowCredentialActivity : SecureActivity() {
         }
 
         if (id == R.id.menu_export_credential) {
-            ExportCredentialUseCase.startExport(credential, obfuscationKey, this)
+            ExportCredentialUseCase.openStartExportDialog(credential, obfuscationKey, this)
             return true
         }
 

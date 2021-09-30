@@ -81,20 +81,17 @@ object ImportVaultUseCase {
     private fun deserializeCredential(json: JsonElement?): EncCredential? {
         if (json != null) {
             val jsonObject = json.asJsonObject
-            val jsonLastPassword = jsonObject.get(EncCredential.ATTRIB_LAST_PASSWORD)
-            val jsonIsObfuscated = jsonObject.get(EncCredential.ATTRIB_IS_OBFUSCATED)
-            val jsonIsLastPasswordObfuscated = jsonObject.get(EncCredential.ATTRIB_IS_LAST_PASSWORD_OBFUSCATED)
             return EncCredential(
                 jsonObject.get(EncCredential.ATTRIB_ID).asInt,
                 jsonObject.get(EncCredential.ATTRIB_NAME).asString,
                 jsonObject.get(EncCredential.ATTRIB_ADDITIONAL_INFO).asString,
                 jsonObject.get(EncCredential.ATTRIB_USER).asString,
                 jsonObject.get(EncCredential.ATTRIB_PASSWORD).asString,
-                if (jsonLastPassword != null) jsonLastPassword.asString else null,
+                jsonObject.get(EncCredential.ATTRIB_LAST_PASSWORD)?.asString,
                 jsonObject.get(EncCredential.ATTRIB_WEBSITE).asString,
                 jsonObject.get(EncCredential.ATTRIB_LABELS).asString,
-                if (jsonIsObfuscated != null) jsonIsObfuscated.asBoolean else false,
-                if (jsonIsLastPasswordObfuscated != null) jsonIsLastPasswordObfuscated.asBoolean else false
+                jsonObject.get(EncCredential.ATTRIB_IS_OBFUSCATED)?.asBoolean ?: false,
+                jsonObject.get(EncCredential.ATTRIB_IS_LAST_PASSWORD_OBFUSCATED)?.asBoolean ?: false
 
             )
         }

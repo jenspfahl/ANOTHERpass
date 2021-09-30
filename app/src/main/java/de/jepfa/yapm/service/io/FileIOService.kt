@@ -16,6 +16,7 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.export.*
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
@@ -69,6 +70,14 @@ class FileIOService: IntentService("FileIOService") {
         val GSON: Gson = GsonBuilder()
                 .registerTypeAdapter(Encrypted::class.java, EncryptedSerializer())
                 .create()
+
+        fun exportCredential(credential: EncExportableCredential): String {
+            return GSON.toJson(ExportContainer(TYPE_ENC_CREDENTIAL_RECORD, credential))
+        }
+
+        fun exportCredential(credential: PlainShareableCredential): String {
+            return GSON.toJson(ExportContainer(TYPE_PLAIN_CREDENTIAL_RECORD, credential))
+        }
     }
 
     override fun onHandleIntent(intent: Intent?) {

@@ -13,7 +13,7 @@ data class EncCredential(var id: Int?,
                          var website: Encrypted,
                          var labels: Encrypted,
                          var isObfuscated: Boolean,
-                         var isLastPasswordObfuscated: Boolean
+                         var isLastPasswordObfuscated: Boolean?
 ) {
 
     constructor(id: Int?,
@@ -25,7 +25,7 @@ data class EncCredential(var id: Int?,
                 websiteBase64: String,
                 labelsBase64: String,
                 isObfuscated: Boolean,
-                isLastPasswordObfuscated: Boolean) :
+                isLastPasswordObfuscated: Boolean?) :
             this(id,
                 Encrypted.fromBase64String(nameBase64),
                 Encrypted.fromBase64String(additionalInfoBase64),

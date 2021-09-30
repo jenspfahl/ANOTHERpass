@@ -36,7 +36,6 @@ import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_OVERLAY_FEATURE
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_LABELS_IN_LIST
 import de.jepfa.yapm.util.DeobfuscationDialog
 import java.util.*
-import javax.crypto.SecretKey
 
 
 class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity) :
@@ -137,7 +136,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                     val current = getItem(position)
                     return when (item.itemId) {
                         R.id.menu_export_credential -> {
-                            ExportCredentialUseCase.startExport(current, null, listCredentialsActivity)
+                            ExportCredentialUseCase.openStartExportDialog(current, null, listCredentialsActivity)
                             return true
                         }
                         R.id.menu_change_credential -> {

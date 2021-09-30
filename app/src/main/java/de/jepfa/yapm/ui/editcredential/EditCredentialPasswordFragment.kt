@@ -493,7 +493,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 val lastPasswd = editCredentialActivity.current.lastPassword?.let {
                     SecretService.decryptPassword(key, it)
                 }
-                val isLastPasswordObfuscated = editCredentialActivity.current.isLastPasswordObfuscated
+                val isLastPasswordObfuscated = editCredentialActivity.current.isLastPasswordObfuscated ?: false
 
                 if (lastPasswd == null || lastPasswd.isBlank() || !lastPasswd.isValid()) {
                     Toast.makeText(activity, getString(R.string.nothing_to_restore), Toast.LENGTH_LONG).show()
