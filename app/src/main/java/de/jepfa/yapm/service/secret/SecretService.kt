@@ -57,7 +57,7 @@ object SecretService {
     }
 
     fun generateStrongSecretKey(password: Password, salt: Key, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
-        return generatePBESecretKey(password, salt, 65536,cipherAlgorithm)
+        return generatePBESecretKey(password, salt, 65536, cipherAlgorithm)
     }
 
     fun generateNormalSecretKey(password: Password, salt: Key, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {

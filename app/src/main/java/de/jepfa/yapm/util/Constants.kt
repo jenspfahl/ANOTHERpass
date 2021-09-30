@@ -15,6 +15,8 @@ object Constants {
     val MAX_LABELS_PER_CREDENTIAL = 5
     val MAX_CREDENTIAL_PASSWD_LENGTH = 50
 
+    val MASTER_KEY_BYTE_SIZE = 128
+
     var SDF_DT_MEDIUM =
         SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM)
     var SDF_D_INTERNATIONAL: DateFormat = SimpleDateFormat("yyyy-MM-dd")

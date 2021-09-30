@@ -8,6 +8,7 @@ import de.jepfa.yapm.service.PreferenceService.DATA_CIPHER_ALGORITHM
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_CREATED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_VERSION
 import de.jepfa.yapm.service.secret.MasterKeyService.encryptAndStoreMasterKey
+import de.jepfa.yapm.service.secret.MasterKeyService.generateMasterKey
 import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService.generateKey
@@ -26,7 +27,7 @@ object CreateVaultUseCase {
     ): Boolean {
         if (context == null) return false
         val salt = SaltService.getSalt(context)
-        val masterKey = generateKey(128)
+        val masterKey = generateMasterKey()
         encryptAndStoreMasterKey(masterKey, pin, masterPasswd, salt, cipherAlgorithm, context)
         masterKey.clear()
 

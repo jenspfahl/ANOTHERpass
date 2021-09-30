@@ -1,5 +1,6 @@
 package de.jepfa.yapm.service.secretgenerator
 
+import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import java.security.SecureRandom
 
@@ -10,7 +11,7 @@ abstract class GeneratorBase<T : GeneratorSpec> {
         val BRUTEFORCE_ATTEMPTS_SUPERCOMP = 1_000_000_000 // per second
     }
 
-    protected val random = SecureRandom()
+    protected var random = SecureRandom()
 
     abstract fun generate(spec: T): Password
 
@@ -18,5 +19,11 @@ abstract class GeneratorBase<T : GeneratorSpec> {
 
     fun calcBruteForceWaitingSeconds(combinations: Double, tryPerSec: Int): Double {
         return combinations / tryPerSec
+    }
+
+    fun maybeResetPRNG() {
+        if (random.nextInt(5) <= 0) {
+            random = SecureRandom()
+        }
     }
 }

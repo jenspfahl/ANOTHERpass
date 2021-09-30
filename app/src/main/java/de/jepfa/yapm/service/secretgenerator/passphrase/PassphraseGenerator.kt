@@ -39,6 +39,8 @@ class PassphraseGenerator(
             buffer.add(random(specialChars))
         }
 
+        maybeResetPRNG()
+
         return buffer
     }
 

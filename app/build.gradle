@@ -12,8 +12,13 @@ android {
         applicationId "de.jepfa.yapm"
         minSdkVersion 24
         targetSdkVersion 29
-        versionCode 102000
-        versionName "1.2.0"
+        // format: <XXYYZZZ>
+        // XX=major (breaks compatibility to old apps)
+        // YY=minor (new features)
+        // ZZZ=micro (just bugfixes)
+    //  versionCode XXYYZZZ
+        versionCode  103000
+        versionName "1.3.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

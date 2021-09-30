@@ -15,6 +15,7 @@ class PasswordGenerator : GeneratorBase<PasswordGeneratorSpec>() {
         while(true){
             val buffer = generatePassword(spec)
             if (matchSpec(spec, buffer)) {
+                maybeResetPRNG()
                 return Password(buffer)
             }
         }

@@ -7,6 +7,9 @@ import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.secret.SecretService.conjunctPasswords
+import de.jepfa.yapm.service.secret.SecretService.generateKey
+import de.jepfa.yapm.util.Constants.MASTER_KEY_BYTE_SIZE
 
 object MasterKeyService {
 
@@ -38,6 +41,10 @@ object MasterKeyService {
         masterKey.clear()
 
         return masterSK
+    }
+
+    fun generateMasterKey(): Key {
+        return generateKey(MASTER_KEY_BYTE_SIZE)
     }
 
     fun getMasterKey(masterPassPhraseSK: SecretKeyHolder, storedEncMasterKey: Encrypted): Key? {
