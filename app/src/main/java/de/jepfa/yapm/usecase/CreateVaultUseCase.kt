@@ -11,7 +11,6 @@ import de.jepfa.yapm.service.secret.MasterKeyService.encryptAndStoreMasterKey
 import de.jepfa.yapm.service.secret.MasterKeyService.generateMasterKey
 import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
 import de.jepfa.yapm.service.secret.SaltService
-import de.jepfa.yapm.service.secret.SecretService.generateKey
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.Constants.FAST_KEYGEN_VAULT_VERSION
 import java.util.*

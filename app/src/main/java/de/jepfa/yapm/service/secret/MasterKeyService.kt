@@ -7,8 +7,7 @@ import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.service.secret.SecretService.conjunctPasswords
-import de.jepfa.yapm.service.secret.SecretService.generateKey
+import de.jepfa.yapm.service.secret.SecretService.generateRandomKey
 import de.jepfa.yapm.util.Constants.MASTER_KEY_BYTE_SIZE
 
 object MasterKeyService {
@@ -37,14 +36,14 @@ object MasterKeyService {
         val masterKey = getMasterKey(masterPassPhraseSK, storedEncMasterKey) ?: return null
         val masterSK =
             if (useLegacyGeneration) SecretService.generateStrongSecretKey(masterKey, salt, masterPassPhraseSK.cipherAlgorithm)
-            else SecretService.generateSecretKey(masterKey, masterPassPhraseSK.cipherAlgorithm)
+            else SecretService.createSecretKey(masterKey, masterPassPhraseSK.cipherAlgorithm)
         masterKey.clear()
 
         return masterSK
     }
 
     fun generateMasterKey(): Key {
-        return generateKey(MASTER_KEY_BYTE_SIZE)
+        return generateRandomKey(MASTER_KEY_BYTE_SIZE)
     }
 
     fun getMasterKey(masterPassPhraseSK: SecretKeyHolder, storedEncMasterKey: Encrypted): Key? {

@@ -162,7 +162,6 @@ class FileIOService: IntentService("FileIOService") {
 
         }
 
-
         val credentials = getApp().credentialRepository.getAllSync()
 
         root.add(JSON_CREDENTIALS, GSON.toJsonTree(credentials, CREDENTIALS_TYPE))

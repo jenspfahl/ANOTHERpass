@@ -77,6 +77,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
         val editCredentialActivity = getBaseActivity() as EditCredentialActivity
 
+        val editPasswdImageView: ImageView = view.findViewById(R.id.imageview_edit_passwd)
         generatedPasswdView = view.findViewById(R.id.generated_passwd)
         radioStrength = view.findViewById(R.id.radio_strengths)
         passwdTypeTab = view.findViewById(R.id.tab_passwd_type)
@@ -126,7 +127,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 editCredentialActivity.current.isObfuscated)
         }
 
-        generatedPasswdView.setOnLongClickListener {
+        editPasswdImageView.setOnClickListener {
 
             val input = EditText(getBaseActivity())
             input.inputType = InputType.TYPE_CLASS_TEXT

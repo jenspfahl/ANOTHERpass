@@ -22,6 +22,9 @@ import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
 
+/**
+ * Service containing all base functionality for en-/decryption
+ */
 object SecretService {
 
     val ALIAS_KEY_TRANSPORT = "YAPM/keyAlias:TRANS"
@@ -36,24 +39,25 @@ object SecretService {
     private val androidKeyStore = KeyStore.getInstance(ANDROID_KEY_STORE)
 
     fun getCipherAlgorithm(context: Context): CipherAlgorithm {
-        val cipherAlgorithmName = PreferenceService.getAsString(PreferenceService.DATA_CIPHER_ALGORITHM, context)
-        if (cipherAlgorithmName == null) return DEFAULT_CIPHER_ALGORITHM
+        val cipherAlgorithmName =
+            PreferenceService.getAsString(PreferenceService.DATA_CIPHER_ALGORITHM, context)
+                ?: return DEFAULT_CIPHER_ALGORITHM
         return CipherAlgorithm.valueOf(cipherAlgorithmName)
     }
 
-    fun generateKey(length: Int): Key {
+    fun generateRandomKey(length: Int): Key {
         val bytes = ByteArray(length)
         random.nextBytes(bytes)
         return Key(bytes)
     }
 
-    fun generateSecretKey(key: Key, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
-        val sk = SecretKeySpec(key.data.copyOf(cipherAlgorithm.keyLength/8), cipherAlgorithm.secretKeyAlgorithm)
+    fun createSecretKey(data: Key, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
+        val sk = SecretKeySpec(data.data.copyOf(cipherAlgorithm.keyLength/8), cipherAlgorithm.secretKeyAlgorithm)
         return SecretKeyHolder(sk, cipherAlgorithm)
     }
 
-    fun generateStrongSecretKey(key: Key, salt: Key, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
-        return generateStrongSecretKey(Password(key.toCharArray()), salt, cipherAlgorithm)
+    fun generateStrongSecretKey(data: Key, salt: Key, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
+        return generateStrongSecretKey(Password(data.toCharArray()), salt, cipherAlgorithm)
     }
 
     fun generateStrongSecretKey(password: Password, salt: Key, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
@@ -123,7 +127,6 @@ object SecretService {
         return Password(decryptData(secretKeyHolder, encrypted))
     }
 
-    // TODO use CharSequence instead of String
     fun encryptCommonString(secretKeyHolder:  SecretKeyHolder, string: String): Encrypted {
         return encryptData("", secretKeyHolder, string.toByteArray())
     }
@@ -182,7 +185,7 @@ object SecretService {
     }
 
     /*
-    Android SK are alsways AES/GCM/NoPAdding with 128bit
+    Android SK are always AES/GCM/NoPAdding with 128bit
      */
     fun getAndroidSecretKey(alias: String): SecretKeyHolder {
         androidKeyStore.load(null)

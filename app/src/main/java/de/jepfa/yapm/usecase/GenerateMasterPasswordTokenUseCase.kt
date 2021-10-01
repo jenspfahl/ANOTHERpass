@@ -49,7 +49,7 @@ object GenerateMasterPasswordTokenUseCase: SecureActivityUseCase {
             var nextMptNumber = PreferenceService.getAsInt(STATE_MASTER_PASSWD_TOKEN_COUNTER, activity) + 1
             val cipherAlgorithm = SecretService.getCipherAlgorithm(activity)
 
-            val masterPasswordTokenKey = SecretService.generateKey(32)
+            val masterPasswordTokenKey = SecretService.generateRandomKey(32)
             val encMasterPasswordTokenKey = SecretService.encryptKey(mPTKey, masterPasswordTokenKey)
             val masterPasswordTokenSK = SecretService.generateStrongSecretKey(masterPasswordTokenKey, SaltService.getSalt(activity), cipherAlgorithm)
             val type = Encrypted.TYPE_MASTER_PASSWD_TOKEN + "#" + nextMptNumber

@@ -36,7 +36,7 @@ object ExportCredentialUseCase {
                 startExport(mode, credential, obfuscationKey, activity)
                 dialogInterface.dismiss()
             }
-            .setNeutralButton(android.R.string.cancel) { dialog, _ ->
+            .setNegativeButton(android.R.string.cancel) { dialog, _ ->
                 dialog.cancel()
             }
             .show()

@@ -15,7 +15,7 @@ class SecretServiceTest {
 
     @Test
     fun bootstrap() {
-        val salt = SecretService.generateKey(32)
+        val salt = SecretService.generateRandomKey(32)
         val cipherAlgorithm = CipherAlgorithm.CHACHACHA20
         Log.i(TAG, "salt=${salt.debugToString()}")
 
@@ -39,7 +39,7 @@ class SecretServiceTest {
         masterPin.clear()
         masterPassword.clear()
 
-        val masterKey = SecretService.generateKey(128) // key to crypt credentials
+        val masterKey = SecretService.generateRandomKey(128) // key to crypt credentials
         Log.i(TAG, "masterKey=${masterKey.debugToString()}")
 
         // store masterKey encrypted with masterPassPhrase --> AES

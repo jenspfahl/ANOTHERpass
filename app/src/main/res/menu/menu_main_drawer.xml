@@ -37,6 +37,20 @@
         </menu>
     </item>
 
+    <item android:title="@string/import_read" >
+        <menu>
+            <item
+                android:id="@+id/import_credential"
+                android:orderInCategory="85"
+                android:title="@string/import_credential" />
+
+            <item
+                android:id="@+id/test_verify_qr_code_or_nfc_tag"
+                android:orderInCategory="95"
+                android:title="@string/verify_test" />
+        </menu>
+    </item>
+
     <item android:title="@string/security" >
         <menu>
 
@@ -54,12 +68,6 @@
                 android:id="@+id/change_master_password"
                 android:orderInCategory="90"
                 android:title="@string/change_master_password" />
-
-
-            <item
-                android:id="@+id/test_verify_qr_code_or_nfc_tag"
-                android:orderInCategory="95"
-                android:title="@string/verify_test" />
 
             <item
                 android:id="@+id/drop_vault"

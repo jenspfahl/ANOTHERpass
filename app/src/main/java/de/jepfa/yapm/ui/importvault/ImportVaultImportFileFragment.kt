@@ -73,11 +73,19 @@ class ImportVaultImportFileFragment : BaseFragment() {
         val vaultId = if (salt != null) SaltService.saltToVaultId(salt.asString) else R.string.unknown_placeholder
         encMasterKey = jsonContent.get(FileIOService.JSON_ENC_MK)?.asString
 
-        loadedFileStatusTextView.text = getString(R.string.vault_export_info, createdAt, credentialsCount, labelsCount, vaultId)
-
-        encMasterKey?.let {
+        var mkProvidedText = ""
+        if (encMasterKey != null) {
             mkTextView.text = encMasterKey
+            mkProvidedText = getString(R.string.emk_provided)
         }
+        else {
+            mkProvidedText = getString(R.string.emk_not_provided)
+        }
+        loadedFileStatusTextView.text = getString(R.string.vault_export_info, createdAt, credentialsCount, labelsCount, vaultId)
+            .plus(System.lineSeparator())
+            .plus(System.lineSeparator())
+            .plus(mkProvidedText)
+
 
         val importButton = view.findViewById<Button>(R.id.button_import_loaded_vault)
 

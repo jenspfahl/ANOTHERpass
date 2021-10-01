@@ -12,7 +12,6 @@ import android.widget.Toast
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_KEY
 import de.jepfa.yapm.service.PreferenceService.PREF_MAX_LOGIN_ATTEMPTS
 import de.jepfa.yapm.service.PreferenceService.PREF_SELF_DESTRUCTION
 import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_ATTEMPTS
@@ -93,13 +92,10 @@ class LoginActivity : NfcBaseActivity() {
         if (id == R.id.action_reset_vault) {
             AlertDialog.Builder(this)
                 .setTitle(getString(R.string.title_reset_all))
-                .setMessage(getString(R.string.message_extract_all))
+                .setMessage(getString(R.string.message_reset_all))
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(R.string.reset_vault) { dialog, whichButton ->
-                    DropVaultUseCase.dropVaultData(this)
-                    Session.logout()
-                    val intent = Intent(this, LoginActivity::class.java)
-                    startActivity(intent)
+                    doubleCheckDropVault()
                 }
                 .setNegativeButton(android.R.string.no, null)
                 .show()
@@ -177,5 +173,32 @@ class LoginActivity : NfcBaseActivity() {
 
     private fun getMaxLoginAttempts(): Int {
         return PreferenceService.getAsInt(PREF_MAX_LOGIN_ATTEMPTS, this)
+    }
+
+
+    private fun doubleCheckDropVault() {
+        credentialViewModel.allCredentials.observe(this) { credentials ->
+            if (credentials.isEmpty()) {
+                dropAndLogoutVault()
+            }
+            else {
+                AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.title_reset_all))
+                    .setMessage(getString(R.string.message_reset_all_double_check, credentials.size))
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(R.string.reset_vault_and_delete) { dialog, whichButton ->
+                        dropAndLogoutVault()
+                    }
+                    .setNegativeButton(android.R.string.no, null)
+                    .show()
+            }
+        }
+    }
+
+    private fun dropAndLogoutVault() {
+        DropVaultUseCase.dropVaultData(this)
+        Session.logout()
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
     }
 }

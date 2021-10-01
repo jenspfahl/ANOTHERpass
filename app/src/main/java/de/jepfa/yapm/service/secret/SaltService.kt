@@ -7,9 +7,10 @@ import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.service.secret.SecretService.ALIAS_KEY_SALT
 import de.jepfa.yapm.service.secret.SecretService.decryptKey
 import de.jepfa.yapm.service.secret.SecretService.encryptKey
-import de.jepfa.yapm.service.secret.SecretService.generateKey
+import de.jepfa.yapm.service.secret.SecretService.generateRandomKey
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.util.Constants
 import java.util.*
 
 object SaltService {
@@ -51,7 +52,7 @@ object SaltService {
     }
 
     private fun createAndStoreSalt(context: Context): Key {
-        val salt = generateKey(128)
+        val salt = generateRandomKey(Constants.MASTER_KEY_BYTE_SIZE)
         storeSalt(salt, context)
 
         return salt
