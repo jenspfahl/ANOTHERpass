@@ -13,8 +13,8 @@
         <entry key="app/src/main/res/layout/activity_create_or_import_vault.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/activity_nfc.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/fragment_create_vault_summarize.xml" value="0.264" />
-        <entry key="app/src/main/res/layout/fragment_edit_credential_data.xml" value="0.17864583333333334" />
-        <entry key="app/src/main/res/layout/fragment_edit_credential_password.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_edit_credential_data.xml" value="0.264" />
+        <entry key="app/src/main/res/layout/fragment_edit_credential_password.xml" value="0.2" />
         <entry key="app/src/main/res/layout/fragment_import_vault_file.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/fragment_load_vault_file.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/fragment_login_enter_masterpassword.xml" value="0.12681159420289856" />

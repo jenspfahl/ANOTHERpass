@@ -79,7 +79,8 @@ object PreferenceService {
             PreferenceManager.setDefaultValues(context, R.xml.password_generator_preferences, true)
             PreferenceManager.setDefaultValues(context, R.xml.security_preferences, true)
             /*
-            If you add new preference xml files here, don't forget to count up STATE_DEFAULT_INIT_DONE_VERSION
+            If you add new preference xml files here, don't forget to count up STATE_DEFAULT_INIT_DONE_VERSION.
+            Also do so when adding new prefs in existing files
              */
             putString(STATE_DEFAULT_INIT_DONE, STATE_DEFAULT_INIT_DONE_VERSION, context)
             Log.i("PREFS", "default values set with version $STATE_DEFAULT_INIT_DONE_VERSION")

@@ -249,9 +249,9 @@
     <string name="export_plain_credential_record">Export plain credential to share</string>
     <string name="head_export_plain_passwd">"The plain password of '%1$s'</string>
     <string name="sub_export_plain_passwd">Keep this QR code safe since it contains a real plain password!</string>
-    <string name="head_export_enc_credential_record">"The encrypted credential record of '%1$s'</string>
+    <string name="head_export_enc_credential_record">"Encrypted Credential Record (ECR) of '%1$s'</string>
     <string name="sub_export_enc_credential_record">This QR code contains the complete current credential data. It is encrypted with the master key belonging to the current vault and can only be read with the same master key. Use it to backup or outsource specific credentials.</string>
-    <string name="head_export_plain_credential_record">"The plain credential record to share of '%1$s'</string>
+    <string name="head_export_plain_credential_record">"Plain Credential Record (PCR) of '%1$s'</string>
     <string name="sub_export_plain_credential_record">This QR code contains the complete current credential data. Keep this QR code safe since it contains real plain data and passwords! Use it to share specific credentials with other vaults.</string>
 
     <string name="nfc_tag_content">NFC tag content</string>

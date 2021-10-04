@@ -50,25 +50,37 @@ object PasswordColorizer {
 
         val length = spannedString.length
         val stepWidth = getStepWidth(multiLine)
-        if (!raw && colorizePasswd) for (i in 0 until length step stepWidth) {
-            val start1 = i
-            val start2 = ensureLength(start1 + WORD_WIDTH, length)
+        if (colorizePasswd) {
+            if (raw) {
+                spannedString.setSpan(
+                    ForegroundColorSpan(context.getColor(R.color.colorPrimaryDark)),
+                    0,
+                    spannedString.length,
+                    Spanned.SPAN_MARK_MARK
+                )
+            }
+            else {
+                for (i in 0 until length step stepWidth) {
+                    val start1 = i
+                    val start2 = ensureLength(start1 + WORD_WIDTH, length)
 
-            spannedString.setSpan(
-                ForegroundColorSpan(context.getColor(R.color.colorAccent)),
-                start1,
-                start2,
-                Spanned.SPAN_MARK_MARK
-            )
+                    spannedString.setSpan(
+                        ForegroundColorSpan(context.getColor(R.color.colorAccent)),
+                        start1,
+                        start2,
+                        Spanned.SPAN_MARK_MARK
+                    )
 
-            val start3 = ensureLength(start2 + 1, length)
-            val start4 = ensureLength(start3 + WORD_WIDTH, length)
-            spannedString.setSpan(
-                ForegroundColorSpan(context.getColor(R.color.colorPrimaryDark)),
-                start3,
-                start4,
-                Spanned.SPAN_MARK_MARK
-            )
+                    val start3 = ensureLength(start2 + 1, length)
+                    val start4 = ensureLength(start3 + WORD_WIDTH, length)
+                    spannedString.setSpan(
+                        ForegroundColorSpan(context.getColor(R.color.colorPrimaryDark)),
+                        start3,
+                        start4,
+                        Spanned.SPAN_MARK_MARK
+                    )
+                }
+            }
         }
         if (obfuscated) {
             spannedString.setSpan(StyleSpan(Typeface.ITALIC), 0, length, 0)

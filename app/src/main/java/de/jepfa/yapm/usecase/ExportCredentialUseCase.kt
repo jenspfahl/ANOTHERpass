@@ -57,7 +57,7 @@ object ExportCredentialUseCase {
                 tempKey, getSubDesc(mode, activity)
             )
             val tempEncName = SecretService.encryptCommonString(
-                tempKey, credentialName
+                tempKey, getQrCodeHeader(mode, credentialName)
             )
 
             val tempEncQrCode = getQrCodeData(mode, credential, tempKey, key, obfuscationKey)
@@ -72,6 +72,17 @@ object ExportCredentialUseCase {
 
 
             activity.startActivity(intent)
+        }
+    }
+
+    private fun getQrCodeHeader(
+        mode: ExportMode,
+        credentialName: String
+    ) :String {
+        return when (mode) {
+            ExportMode.PLAIN_PASSWD -> credentialName
+            ExportMode.ENC_CREDENTIAL_RECORD -> "$credentialName (ECR)"
+            ExportMode.PLAIN_CREDENTIAL_RECORD -> "$credentialName (PCR)"
         }
     }
 
