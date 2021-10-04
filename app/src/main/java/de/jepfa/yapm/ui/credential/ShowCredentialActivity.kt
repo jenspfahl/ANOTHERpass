@@ -18,6 +18,7 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Key
+import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_COPY_PASSWORD
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_OVERLAY_FEATURE
@@ -36,17 +37,16 @@ import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.DeobfuscationDialog
-import de.jepfa.yapm.util.PasswordColorizer
-import de.jepfa.yapm.util.PasswordColorizer.spannableObfusableString
+import de.jepfa.yapm.util.PasswordColorizer.spannableObfusableAndMaskableString
 
 
 class ShowCredentialActivity : SecureActivity() {
 
     val updateCredentialActivityRequestCode = 1
 
-    private var multiLine = false
-    private var passwordPresentation = PasswordColorizer.PasswordPresentation.SINGLE_LINE
+    private var passwordPresentation = Password.PresentationMode.DEFAULT
     private var maskPassword = false
+    private var multiLine = false
     private var obfuscationKey: Key? = null
 
     private lateinit var credential: EncCredential //TODO change to ?
@@ -75,12 +75,10 @@ class ShowCredentialActivity : SecureActivity() {
 
         val idExtra = intent.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
 
-        multiLine = PreferenceService.getAsBool(PREF_PASSWD_WORDS_ON_NL, this)
-        passwordPresentation =
-            if (multiLine) PasswordColorizer.PasswordPresentation.MULTILINE
-            else PasswordColorizer.PasswordPresentation.SINGLE_LINE
-
         maskPassword = PreferenceService.getAsBool(PREF_MASK_PASSWORD, this)
+        val formatted = PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_SHOW_FORMATTED, this)
+        multiLine = PreferenceService.getAsBool(PREF_PASSWD_WORDS_ON_NL, this)
+        passwordPresentation = Password.PresentationMode.createFromFlags(multiLine, formatted)
 
         appBarLayout = findViewById(R.id.credential_detail_toolbar_layout)
 
@@ -107,7 +105,9 @@ class ShowCredentialActivity : SecureActivity() {
                 maskPassword = false
             }
             else {
-                multiLine = !multiLine //TODO third option show passwd w/o formatting
+                passwordPresentation =
+                    if (multiLine) passwordPresentation.prev()
+                    else passwordPresentation.next()
             }
             updatePasswordView(idExtra)
         }
@@ -172,7 +172,7 @@ class ShowCredentialActivity : SecureActivity() {
         }
 
         if (id == R.id.menu_detach_credential) {
-            DetachHelper.detachPassword(this, credential.password, obfuscationKey, multiLine)
+            DetachHelper.detachPassword(this, credential.password, obfuscationKey, passwordPresentation)
             return true
         }
 
@@ -225,7 +225,7 @@ class ShowCredentialActivity : SecureActivity() {
 
                     val originPassword = decryptPassword(key, credential.password)
                     var spannedString =
-                        spannableObfusableString(originPassword, multiLine, maskPassword, showObfuscated(credential), this)
+                        spannableObfusableAndMaskableString(originPassword, passwordPresentation, maskPassword, showObfuscated(credential), this)
                     passwordTextView.text = spannedString
                     originPassword.clear()
 
@@ -243,9 +243,9 @@ class ShowCredentialActivity : SecureActivity() {
                             passwordForDeobfuscation.deobfuscate(it)
 
                             var spannedString =
-                                spannableObfusableString(
+                                spannableObfusableAndMaskableString(
                                     passwordForDeobfuscation,
-                                    multiLine,
+                                    passwordPresentation,
                                     maskPassword,
                                     showObfuscated(credential),
                                     this
@@ -357,7 +357,7 @@ class ShowCredentialActivity : SecureActivity() {
 
                 additionalInfoTextView.text = additionalInfo
 
-                var spannedString = spannableObfusableString(password, multiLine, maskPassword, showObfuscated(credential),this)
+                var spannedString = spannableObfusableAndMaskableString(password, passwordPresentation, maskPassword, showObfuscated(credential),this)
                 passwordTextView.text = spannedString
 
                 optionsMenu?.findItem(R.id.menu_deobfuscate_password)?.isVisible = credential.isObfuscated

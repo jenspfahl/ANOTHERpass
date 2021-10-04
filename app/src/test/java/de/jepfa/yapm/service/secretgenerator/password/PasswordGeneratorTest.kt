@@ -16,7 +16,7 @@ class PasswordGeneratorTest {
             noDigits = false, excludeSpecialChars = false, onlyLowerCase = false)
         for (i in 1..10) {
             val password = passwordGenerator.generate(spec)
-            println("password = ${password.toStringRepresentation(false)}")
+            println("password = ${password.toStringRepresentation()}")
             password.clear()
         }
 

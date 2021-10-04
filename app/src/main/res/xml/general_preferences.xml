@@ -9,23 +9,36 @@
         app:defaultValue="true"/>
 
     <SwitchPreferenceCompat
-        app:key="YAPM/pref:colored_passwords"
-        app:title="Colorize showed passwords to improve readability"
+        app:key="YAPM/pref:password_show_formatted"
+        app:title="Show formatted passwords"
+        app:summary="Show passwords separated into words and accent highlighting colors for better readability"
         app:allowDividerAbove="true"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
         app:defaultValue="true"/>
 
     <SwitchPreferenceCompat
+        app:key="YAPM/pref:colored_passwords"
+        app:dependency="YAPM/pref:password_show_formatted"
+        app:title="Colorize showed passwords"
+        app:summary="Show passwords with alternating accent colors for each word"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:defaultValue="true"/>
+
+    <SwitchPreferenceCompat
         app:key="YAPM/pref:password_words_on_nl"
+        app:dependency="YAPM/pref:password_show_formatted"
         app:title="Show passwords on multiple line"
+        app:summary="Show password words on multiple lines to increase readability"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
         app:defaultValue="true"/>
 
     <SwitchPreferenceCompat
         app:key="YAPM/pref:colorize_mp_qrcodes"
-        app:title="Colorize master password QR codes"
+        app:title="Colorize QR codes"
+        app:summary="Use colors to show criticality of QR code content"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
         app:allowDividerAbove="true"

@@ -50,6 +50,7 @@ object PreferenceService {
     const val PREF_COLORED_PASSWORD = PREF_PREFIX + "colored_passwords"
     const val PREF_ENABLE_OVERLAY_FEATURE = PREF_PREFIX + "enable_overlay_feature"
     const val PREF_TRANSPARENT_OVERLAY = PREF_PREFIX + "transparent_overlay"
+    const val PREF_PASSWD_SHOW_FORMATTED = PREF_PREFIX + "password_show_formatted"
     const val PREF_PASSWD_WORDS_ON_NL = PREF_PREFIX + "password_words_on_nl"
     const val PREF_SHOW_LABELS_IN_LIST = PREF_PREFIX + "show_labels_in_list"
     const val PREF_COLORIZE_MP_QRCODES = PREF_PREFIX + "colorize_mp_qrcodes"

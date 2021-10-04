@@ -8,57 +8,49 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.model.secret.Password.PresentationMode as PresentationMode
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_COLORED_PASSWORD
 import java.lang.Integer.min
 
 object PasswordColorizer {
 
-    enum class PasswordPresentation {
-        SINGLE_LINE, MULTILINE, RAW
-    }
-
     private const val WORD_WIDTH = 4
 
     fun spannableString(password: Password, context: Context?): CharSequence {
+        val showFormatted = PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_SHOW_FORMATTED, context)
         val multiLine = PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_WORDS_ON_NL, context)
-        return spannableObfusableString(password, multiLine, maskPassword = false, obfuscated = false, context)
-    }
-    fun spannableObfusableString(password: Password, obfuscated: Boolean, context: Context?): CharSequence {
-        val multiLine = PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_WORDS_ON_NL, context)
-        return spannableObfusableString(password, multiLine, maskPassword = false, obfuscated = obfuscated, context)
+        val presentationMode = PresentationMode.createFromFlags(multiLine, showFormatted)
+
+        return spannableObfusableString(password, presentationMode, obfuscated = false, context)
     }
 
-    fun spannableString(password: Password, multiLine: Boolean, context: Context?): CharSequence {
-        return spannableObfusableString(password, multiLine, maskPassword = false, obfuscated = false, context)
+    fun spannableString(password: Password, presentationMode: PresentationMode, context: Context?): CharSequence {
+        return spannableObfusableAndMaskableString(password, presentationMode, maskPassword = false, obfuscated = false, context)
     }
 
-    fun spannableObfusableString(password: Password, multiLine: Boolean, maskPassword: Boolean, obfuscated: Boolean, context: Context?): CharSequence {
-        val colorizePasswd = PreferenceService.getAsBool(PREF_COLORED_PASSWORD, context)
-        if (colorizePasswd) {
-            return colorizePassword(password, multiLine, maskPassword, obfuscated, context)
-        }
-        else {
-            var spannedString = SpannableString(password.toStringRepresentation(multiLine, maskPassword))
-            if (obfuscated) {
-                spannedString.setSpan(StyleSpan(Typeface.ITALIC), 0, spannedString.length, 0)
-            }
-            return spannedString
-        }
+    fun spannableObfusableString(password: Password, presentationMode: PresentationMode, obfuscated: Boolean, context: Context?): CharSequence {
+        return spannableObfusableAndMaskableString(password, presentationMode, maskPassword = false, obfuscated = obfuscated, context)
     }
 
-    private fun colorizePassword(
+    fun spannableObfusableAndMaskableString(
         password: Password,
-        multiLine: Boolean,
+        presentationMode: PresentationMode,
         maskPassword: Boolean,
         obfuscated: Boolean,
         context: Context?
     ): SpannableString {
         if (context == null) return SpannableString("")
-        var spannedString = SpannableString(password.toStringRepresentation(multiLine, maskPassword))
+
+        val multiLine = presentationMode.isMultiLine()
+        val raw = presentationMode == PresentationMode.RAW
+        var spannedString = SpannableString(password.toStringRepresentation(presentationMode, maskPassword))
+
+        val colorizePasswd = PreferenceService.getAsBool(PREF_COLORED_PASSWORD, context)
+
         val length = spannedString.length
         val stepWidth = getStepWidth(multiLine)
-        for (i in 0 until length step stepWidth) {
+        if (!raw && colorizePasswd) for (i in 0 until length step stepWidth) {
             val start1 = i
             val start2 = ensureLength(start1 + WORD_WIDTH, length)
 

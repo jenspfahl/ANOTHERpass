@@ -67,7 +67,7 @@ class ChangeMasterPasswordActivity : SecureActivity() {
                 currentPinTextView.requestFocus()
             }
             else if (generatedPassword.data.isEmpty()) {
-                Toast.makeText(it.context, getString(R.string.generate_passwd_first), Toast.LENGTH_LONG).show()
+                Toast.makeText(it.context, getString(R.string.generate_password_first), Toast.LENGTH_LONG).show()
             }
             else if (!passwordChanged) {
                 Toast.makeText(it.context, getString(R.string.master_password_not_changed), Toast.LENGTH_LONG).show()

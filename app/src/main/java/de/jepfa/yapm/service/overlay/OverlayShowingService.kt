@@ -16,7 +16,6 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.service.PreferenceService.PREF_PASSWD_WORDS_ON_NL
 import de.jepfa.yapm.service.PreferenceService.PREF_TRANSPARENT_OVERLAY
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.util.PasswordColorizer
@@ -30,7 +29,7 @@ class OverlayShowingService : Service(), OnTouchListener {
     private var wm: WindowManager? = null
 
     private var password = Password.empty()
-    private var multiLine = false
+    private var presentationMode = Password.PresentationMode.DEFAULT
 
     private var offsetX = 0f
     private var offsetY = 0f
@@ -55,9 +54,15 @@ class OverlayShowingService : Service(), OnTouchListener {
                 val transSK = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
                 password = SecretService.decryptPassword(transSK, encrypted)
 
-                val multiLineDefault =
-                    PreferenceService.getAsBool(PREF_PASSWD_WORDS_ON_NL, this)
-                multiLine = intent.getBooleanExtra(DetachHelper.EXTRA_MULTILINE, multiLineDefault)
+                val formatted = PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_SHOW_FORMATTED, this)
+                val multiLine = PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_WORDS_ON_NL, this)
+                val presentationModeIdx = intent.getIntExtra(DetachHelper.EXTRA_PRESENTATION_MODE, -1)
+                if (presentationModeIdx == -1) {
+                    presentationMode = Password.PresentationMode.createFromFlags(multiLine, formatted)
+                }
+                else {
+                    presentationMode = Password.PresentationMode.values()[presentationModeIdx]
+                }
 
                 paintIt()
                 return START_STICKY // STOP_FOREGROUND_REMOVE
@@ -204,7 +209,7 @@ class OverlayShowingService : Service(), OnTouchListener {
     }
 
     private fun updateContent() {
-        overlayedButton?.text = PasswordColorizer.spannableString(password, multiLine, this)
+        overlayedButton?.text = PasswordColorizer.spannableString(password, presentationMode, this)
         overlayedButton?.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
         overlayedButton?.setTypeface(Typeface.MONOSPACE, Typeface.BOLD)
         calcOriginalPos()

@@ -111,7 +111,6 @@
     <string name="toast_import_vault_failure_cipher_not_supported">The selected file is encrypted with an unsupported cipher.</string>
     <string name="quick_access">Quick access</string>
     <string name="generate_encrypted_masterpasswd">Create master export token</string>
-    <string name="generate_passwd_first">Generate a password first</string>
     <string name="master_password_not_changed">Master password has not been changed.</string>
     <string name="use_pseudo_phrase">Use pseudo phrases to generate master password</string>
     <string name="help">Online help</string>
@@ -274,6 +273,7 @@
     <string name="label_too_long">Label too long (max %1$d)</string>
     <string name="max_labels_reached">Maximum of labels reached (%1$d)</string>
     <string name="password_strength">Password strength</string>
+    <string name="password_strength_guessed">Password strength (estimated)</string>
     <string name="combinations">Combinations</string>
     <string name="bruteforce_years_pc">Years to brute force with a usual PC</string>
     <string name="bruteforce_year_supercomp">Years to brute force with a super computer</string>

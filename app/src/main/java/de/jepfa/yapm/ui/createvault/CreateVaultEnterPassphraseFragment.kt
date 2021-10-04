@@ -53,7 +53,7 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
         val button = view.findViewById<Button>(R.id.button_next)
         button.setOnClickListener {
             if (generatedPassword.data.isEmpty()) {
-                Toast.makeText(it.context, getString(R.string.generate_passwd_first), Toast.LENGTH_LONG).show()
+                Toast.makeText(it.context, getString(R.string.generate_password_first), Toast.LENGTH_LONG).show()
             }
             else {
                 val transSK = getAndroidSecretKey(ALIAS_KEY_TRANSPORT)

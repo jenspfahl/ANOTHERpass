@@ -4,6 +4,32 @@ import android.text.Editable
 import de.jepfa.obfusser.util.encrypt.Loop
 
 class Password: Secret, CharSequence {
+
+    enum class PresentationMode {
+        IN_WORDS, IN_WORDS_MULTI_LINE, RAW;
+
+        fun prev(): PresentationMode {
+            var prevIdx = ordinal - 1
+            if (prevIdx < 0) prevIdx = values().size - 1
+            return values()[prevIdx]
+        }
+
+        fun next(): PresentationMode {
+            val nextIdx = (ordinal + 1) % values().size
+            return values()[nextIdx]
+        }
+
+        fun isMultiLine(): Boolean = this == IN_WORDS_MULTI_LINE
+
+        companion object {
+            val DEFAULT = IN_WORDS
+            fun createFromFlags(multiLine: Boolean, formatted: Boolean) =
+                if (formatted)
+                    if (multiLine) IN_WORDS_MULTI_LINE else DEFAULT
+                else RAW
+        }
+    }
+
     constructor(passwd: String) : super(passwd.toByteArray())
     constructor(passwd: ByteArray) : super(passwd)
     constructor(passwd: CharArray) : super(passwd.map { it.toByte() }.toByteArray())
@@ -26,15 +52,17 @@ class Password: Secret, CharSequence {
         Loop.loopPassword(this, key, forwards = false)
     }
 
-    fun toStringRepresentation(multiLine: Boolean): String {
-        return toStringRepresentation(multiLine, maskPassword = false)
+    fun toStringRepresentation(): String {
+        return toStringRepresentation(PresentationMode.DEFAULT, maskPassword = false)
     }
 
-    fun toStringRepresentation(multiLine: Boolean, maskPassword: Boolean): String {
+    fun toStringRepresentation(presentationMode: PresentationMode, maskPassword: Boolean): String {
         var presentation = ""
-        var presentationLength = if (maskPassword) 16 else length
+        val multiLine = presentationMode.isMultiLine()
+        val raw = presentationMode == PresentationMode.RAW
+        val presentationLength = if (maskPassword) 16 else length
         for (i in 0 until presentationLength) {
-            if (i != 0 && i % 4 == 0) {
+            if (!raw && i != 0 && i % 4 == 0) {
                 if (i % 8 == 0) {
                     if (multiLine) {
                         presentation += System.lineSeparator()

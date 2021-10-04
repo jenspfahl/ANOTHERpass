@@ -29,7 +29,6 @@ import de.jepfa.yapm.ui.SecureFragment
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.*
 import java.util.*
-import javax.crypto.SecretKey
 
 
 class EditCredentialPasswordFragment : SecureFragment() {
@@ -37,6 +36,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
     val PASSPHRASE_STRENGTH_DEFAULT = SecretStrength.STRONG
     val PASSWORD_STRENGTH_DEFAULT = SecretStrength.STRONG
 
+    private lateinit var editCredentialActivity: EditCredentialActivity
     private lateinit var generatedPasswdView: TextView
     private lateinit var passwdTypeTab: TabLayout
     private lateinit var switchUpperCaseChar: SwitchCompat
@@ -52,7 +52,11 @@ class EditCredentialPasswordFragment : SecureFragment() {
     private val passphraseGenerator = PassphraseGenerator()
     private val passwordGenerator = PasswordGenerator()
 
+    private var passwordPresentation = Password.PresentationMode.DEFAULT
+    private var multiLine = false
+
     private var passwordCombinations: Double? = null
+    private var passwordCombinationsGuessed = false
 
     private var obfuscatePasswordRequired = false
     private var obfuscationKey: Key? = null
@@ -69,15 +73,21 @@ class EditCredentialPasswordFragment : SecureFragment() {
             getSecureActivity()?.let { LockVaultUseCase.execute(it) }
             return null
         }
+
+        editCredentialActivity = getBaseActivity() as EditCredentialActivity
+
+        val formatted = PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_SHOW_FORMATTED, context)
+        multiLine = PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_WORDS_ON_NL, context)
+        passwordPresentation = Password.PresentationMode.createFromFlags(multiLine, formatted)
+
         return inflater.inflate(R.layout.fragment_edit_credential_password, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, null)
 
-        val editCredentialActivity = getBaseActivity() as EditCredentialActivity
-
         val editPasswdImageView: ImageView = view.findViewById(R.id.imageview_edit_passwd)
+        val passwdStrengthImageView: ImageView = view.findViewById(R.id.imageview_passwd_strength)
         generatedPasswdView = view.findViewById(R.id.generated_passwd)
         radioStrength = view.findViewById(R.id.radio_strengths)
         passwdTypeTab = view.findViewById(R.id.tab_passwd_type)
@@ -130,7 +140,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
         editPasswdImageView.setOnClickListener {
 
             val input = EditText(getBaseActivity())
-            input.inputType = InputType.TYPE_CLASS_TEXT
+            input.inputType = InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
             input.setText(generatedPassword, TextView.BufferType.EDITABLE)
 
             val filters = arrayOf<InputFilter>(LengthFilter(Constants.MAX_CREDENTIAL_PASSWD_LENGTH))
@@ -155,8 +165,17 @@ class EditCredentialPasswordFragment : SecureFragment() {
             true
         }
 
-        generatedPasswdView.setOnClickListener {
+        passwdStrengthImageView.setOnClickListener {
             showPasswordStrength()
+        }
+
+        generatedPasswdView.setOnClickListener {
+            if (generatedPassword.data.isNotEmpty()) {
+                passwordPresentation =
+                    if (multiLine) passwordPresentation.prev()
+                    else passwordPresentation.next()
+                refreshPasswordView()
+            }
         }
 
         val buttonSave: Button = view.findViewById(R.id.button_save)
@@ -284,6 +303,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
             (containsLowerCase + containsUpperCase + containsDigits + 10).toDouble(),
             password.length.toDouble()
         )
+        passwordCombinationsGuessed = true
     }
 
     private fun calcPasswordStrength() {
@@ -292,7 +312,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
         } else {
             passwordGenerator.calcCombinationCount(buildPasswordGeneratorSpec())
         }
-
+        passwordCombinationsGuessed = false
     }
 
     private fun showPasswordStrength() {
@@ -304,9 +324,11 @@ class EditCredentialPasswordFragment : SecureFragment() {
             val bruteForceWithSupercomp = passphraseGenerator.calcBruteForceWaitingSeconds(
                 combinations, GeneratorBase.BRUTEFORCE_ATTEMPTS_SUPERCOMP
             )
-
+            val titleId =
+                if (passwordCombinationsGuessed) R.string.password_strength_guessed
+                else R.string.password_strength
             AlertDialog.Builder(context)
-                .setTitle(getString(R.string.password_strength))
+                .setTitle(getString(titleId))
                 .setMessage(
                     getString(R.string.combinations) + ": " +
                             System.lineSeparator() +
@@ -330,6 +352,14 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 )
                 .show()
         }
+        else {
+            Toast.makeText(activity, getString(R.string.generate_password_first), Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun refreshPasswordView() {
+        updatePasswordView(generatedPassword, guessPasswordCombinations = passwordCombinationsGuessed,
+            editCredentialActivity.current.isObfuscated)
     }
 
     private fun updatePasswordView(password: Password, guessPasswordCombinations: Boolean, isObfuscated: Boolean) {
@@ -339,6 +369,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 var spannedString =
                     PasswordColorizer.spannableObfusableString(
                         generatedPassword,
+                        passwordPresentation,
                         isObfuscated,
                         it)
                 generatedPasswdView.text = spannedString
@@ -464,7 +495,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 else {
                     getSecureActivity()?.let {
                         val encPassword = SecretService.encryptPassword(key, generatedPassword)
-                        DetachHelper.detachPassword(it, encPassword, null, null)
+                        DetachHelper.detachPassword(it, encPassword, null, passwordPresentation)
                     }
                 }
             }
