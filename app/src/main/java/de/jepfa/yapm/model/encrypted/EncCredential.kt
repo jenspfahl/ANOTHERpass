@@ -1,6 +1,7 @@
 package de.jepfa.yapm.model.encrypted
 
 import android.content.Intent
+import com.google.gson.JsonElement
 import de.jepfa.yapm.util.getEncryptedExtra
 import de.jepfa.yapm.util.putEncryptedExtra
 
@@ -101,6 +102,22 @@ data class EncCredential(var id: Int?,
             return EncCredential(
                 id, encName, encAdditionalInfo, encUser, encPassword, encLastPassword, encWebsite, encLabels,
                 isObfuscated, isLastPasswordObfuscated)
+        }
+
+        fun fromJson(json: JsonElement): EncCredential {
+            val jsonObject = json.asJsonObject
+            return EncCredential(
+                jsonObject.get(ATTRIB_ID).asInt,
+                jsonObject.get(ATTRIB_NAME).asString,
+                jsonObject.get(ATTRIB_ADDITIONAL_INFO).asString,
+                jsonObject.get(ATTRIB_USER).asString,
+                jsonObject.get(ATTRIB_PASSWORD).asString,
+                jsonObject.get(ATTRIB_LAST_PASSWORD)?.asString,
+                jsonObject.get(ATTRIB_WEBSITE).asString,
+                jsonObject.get(ATTRIB_LABELS).asString,
+                jsonObject.get(ATTRIB_IS_OBFUSCATED)?.asBoolean ?: false,
+                jsonObject.get(ATTRIB_IS_LAST_PASSWORD_OBFUSCATED)?.asBoolean ?: false
+            )
         }
     }
 }

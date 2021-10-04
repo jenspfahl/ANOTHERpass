@@ -55,6 +55,15 @@ data class Encrypted(val type: String = "", val iv: ByteArray, val data: ByteArr
             return Encrypted("", ByteArray(0), ByteArray(0), DEFAULT_CIPHER_ALGORITHM)
         }
 
+        fun isEncryptedBase64String(string: String): Boolean {
+            try {
+                fromBase64String(string)
+            } catch (e: Exception) {
+                return false
+            }
+            return false
+        }
+
         fun toBase64String(encrypted: Encrypted): String {
             val iv = Base64.encodeToString(encrypted.iv, BASE64_FLAGS)
             val data = Base64.encodeToString(encrypted.data, BASE64_FLAGS)

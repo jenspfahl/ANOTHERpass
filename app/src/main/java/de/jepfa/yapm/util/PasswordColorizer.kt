@@ -14,6 +14,10 @@ import java.lang.Integer.min
 
 object PasswordColorizer {
 
+    enum class PasswordPresentation {
+        SINGLE_LINE, MULTILINE, RAW
+    }
+
     private const val WORD_WIDTH = 4
 
     fun spannableString(password: Password, context: Context?): CharSequence {

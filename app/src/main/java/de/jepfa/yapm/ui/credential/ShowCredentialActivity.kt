@@ -36,6 +36,7 @@ import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.DeobfuscationDialog
+import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.PasswordColorizer.spannableObfusableString
 
 
@@ -44,6 +45,7 @@ class ShowCredentialActivity : SecureActivity() {
     val updateCredentialActivityRequestCode = 1
 
     private var multiLine = false
+    private var passwordPresentation = PasswordColorizer.PasswordPresentation.SINGLE_LINE
     private var maskPassword = false
     private var obfuscationKey: Key? = null
 
@@ -74,6 +76,10 @@ class ShowCredentialActivity : SecureActivity() {
         val idExtra = intent.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
 
         multiLine = PreferenceService.getAsBool(PREF_PASSWD_WORDS_ON_NL, this)
+        passwordPresentation =
+            if (multiLine) PasswordColorizer.PasswordPresentation.MULTILINE
+            else PasswordColorizer.PasswordPresentation.SINGLE_LINE
+
         maskPassword = PreferenceService.getAsBool(PREF_MASK_PASSWORD, this)
 
         appBarLayout = findViewById(R.id.credential_detail_toolbar_layout)
@@ -101,7 +107,7 @@ class ShowCredentialActivity : SecureActivity() {
                 maskPassword = false
             }
             else {
-                multiLine = !multiLine
+                multiLine = !multiLine //TODO third option show passwd w/o formatting
             }
             updatePasswordView(idExtra)
         }

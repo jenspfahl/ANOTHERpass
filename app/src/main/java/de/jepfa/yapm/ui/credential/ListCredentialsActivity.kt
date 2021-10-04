@@ -434,6 +434,11 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                 startActivity(intent)
                 return true
             }
+            R.id.import_credential -> {
+              //TODO  val intent = Intent(this, ImportCredentialActivity::class.java)
+              //  startActivity(intent)
+                return true
+            }
             R.id.test_verify_qr_code_or_nfc_tag -> {
                 val intent = Intent(this, VerifyActivity::class.java)
                 startActivity(intent)

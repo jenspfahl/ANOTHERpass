@@ -15,6 +15,7 @@ import com.google.zxing.integration.android.IntentIntegrator
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.service.io.FileIOService
+import de.jepfa.yapm.service.io.JsonService
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.usecase.ImportVaultUseCase
@@ -66,12 +67,12 @@ class ImportVaultImportFileFragment : BaseFragment() {
             return
         }
 
-        val createdAt = jsonContent.get(FileIOService.JSON_CREATION_DATE)?.asString
-        val credentialsCount = jsonContent.get(FileIOService.JSON_CREDENTIALS_COUNT)?.asString
-        val labelsCount = jsonContent.get(FileIOService.JSON_LABELS_COUNT)?.asString
-        val salt = jsonContent.get(FileIOService.JSON_VAULT_ID)
+        val createdAt = jsonContent.get(JsonService.JSON_CREATION_DATE)?.asString
+        val credentialsCount = jsonContent.get(JsonService.JSON_CREDENTIALS_COUNT)?.asString
+        val labelsCount = jsonContent.get(JsonService.JSON_LABELS_COUNT)?.asString
+        val salt = jsonContent.get(JsonService.JSON_VAULT_ID)
         val vaultId = if (salt != null) SaltService.saltToVaultId(salt.asString) else R.string.unknown_placeholder
-        encMasterKey = jsonContent.get(FileIOService.JSON_ENC_MK)?.asString
+        encMasterKey = jsonContent.get(JsonService.JSON_ENC_MK)?.asString
 
         var mkProvidedText = ""
         if (encMasterKey != null) {

@@ -1,5 +1,7 @@
 package de.jepfa.yapm.model.encrypted
 
+import com.google.gson.JsonElement
+
 data class EncLabel(var id: Int?,
                     var name: Encrypted,
                     var description: Encrypted,
@@ -22,5 +24,14 @@ data class EncLabel(var id: Int?,
         const val ATTRIB_DESC = "description"
         const val ATTRIB_COLOR = "color"
 
+        fun fromJson(json: JsonElement): EncLabel {
+            val jsonObject = json.asJsonObject
+            return EncLabel(
+                jsonObject.get(ATTRIB_ID).asInt,
+                jsonObject.get(ATTRIB_NAME).asString,
+                jsonObject.get(ATTRIB_DESC).asString,
+                jsonObject.get(ATTRIB_COLOR)?.asInt
+            )
+        }
     }
 }

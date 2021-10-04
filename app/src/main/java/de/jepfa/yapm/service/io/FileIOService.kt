@@ -10,35 +10,37 @@ import android.os.Handler
 import android.text.TextUtils
 import android.util.Log
 import android.widget.Toast
-import com.google.gson.*
-import com.google.gson.reflect.TypeToken
+import com.google.gson.JsonObject
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.encrypted.EncCredential
-import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.model.encrypted.Encrypted
-import de.jepfa.yapm.model.export.*
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.io.JsonService.CREDENTIALS_TYPE
+import de.jepfa.yapm.service.io.JsonService.GSON
+import de.jepfa.yapm.service.io.JsonService.JSON_APP_VERSION_CODE
+import de.jepfa.yapm.service.io.JsonService.JSON_APP_VERSION_NAME
+import de.jepfa.yapm.service.io.JsonService.JSON_CIPHER_ALGORITHM
+import de.jepfa.yapm.service.io.JsonService.JSON_CREATION_DATE
+import de.jepfa.yapm.service.io.JsonService.JSON_CREDENTIALS
+import de.jepfa.yapm.service.io.JsonService.JSON_CREDENTIALS_COUNT
+import de.jepfa.yapm.service.io.JsonService.JSON_ENC_MK
+import de.jepfa.yapm.service.io.JsonService.JSON_LABELS
+import de.jepfa.yapm.service.io.JsonService.JSON_LABELS_COUNT
+import de.jepfa.yapm.service.io.JsonService.JSON_VAULT_ID
+import de.jepfa.yapm.service.io.JsonService.JSON_VAULT_VERSION
+import de.jepfa.yapm.service.io.JsonService.LABELS_TYPE
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.YapmApp
-import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.Constants.SDF_DT_MEDIUM
 import de.jepfa.yapm.util.Constants.UNKNOWN_VAULT_VERSION
-import java.lang.reflect.Type
+import de.jepfa.yapm.util.DebugInfo
+import de.jepfa.yapm.util.FileUtil
+import de.jepfa.yapm.util.QRCodeUtil
+import de.jepfa.yapm.util.getEncryptedExtra
 import java.util.*
 
 
 class FileIOService: IntentService("FileIOService") {
-
-    class EncryptedSerializer : JsonSerializer<Encrypted> {
-        override fun serialize(src: Encrypted?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
-            src?.let {
-                return JsonPrimitive(it.toBase64String())
-            }
-
-            return JsonPrimitive("")
-        }
-    }
 
     private val handler = Handler()
 
@@ -52,32 +54,6 @@ class FileIOService: IntentService("FileIOService") {
         const val PARAM_QRC_COLOR = "param_qrc_color"
         const val PARAM_INCLUDE_MK = "param_include_mk"
 
-        const val JSON_APP_VERSION_CODE = "appVersionCode"
-        const val JSON_APP_VERSION_NAME = "appVersionName"
-        const val JSON_CREATION_DATE = "creationDate"
-        const val JSON_VAULT_ID = "vaultId"
-        const val JSON_VAULT_VERSION = "vaultVersion"
-        const val JSON_CIPHER_ALGORITHM = "cipherAlgoritm"
-        const val JSON_ENC_MK = "encMk"
-        const val JSON_CREDENTIALS = "credentials"
-        const val JSON_CREDENTIALS_COUNT = "credentialsCount"
-        const val JSON_LABELS = "labels"
-        const val JSON_LABELS_COUNT = "labelsCount"
-
-        val CREDENTIALS_TYPE: Type = object : TypeToken<List<EncCredential>>() {}.type
-        val LABELS_TYPE: Type = object : TypeToken<List<EncLabel>>() {}.type
-
-        val GSON: Gson = GsonBuilder()
-                .registerTypeAdapter(Encrypted::class.java, EncryptedSerializer())
-                .create()
-
-        fun exportCredential(credential: EncExportableCredential): String {
-            return GSON.toJson(ExportContainer(TYPE_ENC_CREDENTIAL_RECORD, credential))
-        }
-
-        fun exportCredential(credential: PlainShareableCredential): String {
-            return GSON.toJson(ExportContainer(TYPE_PLAIN_CREDENTIAL_RECORD, credential))
-        }
     }
 
     override fun onHandleIntent(intent: Intent?) {

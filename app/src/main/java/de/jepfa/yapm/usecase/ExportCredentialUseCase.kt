@@ -2,7 +2,6 @@ package de.jepfa.yapm.usecase
 
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
@@ -13,6 +12,7 @@ import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.io.FileIOService
+import de.jepfa.yapm.service.io.JsonService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
@@ -114,7 +114,7 @@ object ExportCredentialUseCase {
             }
             ExportMode.ENC_CREDENTIAL_RECORD -> {
                 val shortEncCredential = EncExportableCredential(credential)
-                val jsonString = FileIOService.exportCredential(shortEncCredential)
+                val jsonString = JsonService.credentialToJson(shortEncCredential)
                 return SecretService.encryptCommonString(transportKey, jsonString)
             }
             ExportMode.PLAIN_CREDENTIAL_RECORD -> {
@@ -127,7 +127,7 @@ object ExportCredentialUseCase {
                     passwd,
                     SecretService.decryptCommonString(key, credential.website)
                 )
-                val jsonString = FileIOService.exportCredential(shortPlainCredential)
+                val jsonString = JsonService.credentialToJson(shortPlainCredential)
                 val encData = SecretService.encryptCommonString(transportKey, jsonString)
                 passwd.clear()
                 return encData
