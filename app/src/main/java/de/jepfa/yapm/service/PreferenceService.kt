@@ -17,7 +17,7 @@ object PreferenceService {
      * If you add new preference xml files inside #initDefaults, they should be recognised as well.
      * To achieve this, count the version value up here.
      */
-    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_1"
+    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_2"
 
     const val STATE_DEFAULT_INIT_DONE = STATE_PREFIX + "default_init_done"
 
@@ -70,7 +70,7 @@ object PreferenceService {
     fun initDefaults(context: Context?) {
         if (context == null) return
         val defaultInitDone = getAsString(STATE_DEFAULT_INIT_DONE, context)
-        if (defaultInitDone == null || !defaultInitDone.equals(STATE_DEFAULT_INIT_DONE_VERSION)) {
+        if (defaultInitDone == null || defaultInitDone != STATE_DEFAULT_INIT_DONE_VERSION) {
             PreferenceManager.setDefaultValues(context, R.xml.autofill_preferences, true)
             PreferenceManager.setDefaultValues(context, R.xml.clipboard_preferences, true)
             PreferenceManager.setDefaultValues(context, R.xml.general_preferences, true)

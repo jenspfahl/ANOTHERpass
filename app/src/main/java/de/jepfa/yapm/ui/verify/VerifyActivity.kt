@@ -24,7 +24,6 @@ import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.ui.nfc.NfcBaseActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.QRCodeUtil
-import kotlin.math.exp
 
 
 class VerifyActivity : NfcBaseActivity() {
@@ -107,7 +106,7 @@ class VerifyActivity : NfcBaseActivity() {
             checkEncrypted(scanned)
         }
         else {
-            checkPlain(scanned)
+            checkContainer(scanned)
         }
 
     }
@@ -189,20 +188,21 @@ class VerifyActivity : NfcBaseActivity() {
         }
     }
 
-    private fun checkPlain(scanned: String) {
+    private fun checkContainer(scanned: String) {
         val content = JsonService.parse(scanned)
         if (content != null) {
-            val exportContainer = ExportContainer.fromJson(content)
-            when (exportContainer.c) {
-                is EncExportableCredential -> {
-                    verifyResultText.text = getString(R.string.unknown_ecr_scanned)
-                    val ecr = exportContainer.c
-                    if (isKnownECR(ecr)) {
-                        verifyResultText.text = getString(R.string.well_known_ecr_scanned)
+            ExportContainer.fromJson(content)?.let { exportContainer ->
+                when (exportContainer.c) {
+                    is EncExportableCredential -> {
+                        verifyResultText.text = getString(R.string.unknown_ecr_scanned)
+                        val ecr = exportContainer.c
+                        if (isKnownECR(ecr)) {
+                            verifyResultText.text = getString(R.string.well_known_ecr_scanned)
+                        }
                     }
-                }
-                is PlainShareableCredential -> {
-                    verifyResultText.text = getString(R.string.pcr_scanned)
+                    is PlainShareableCredential -> {
+                        verifyResultText.text = getString(R.string.pcr_scanned)
+                    }
                 }
             }
         }
@@ -210,9 +210,13 @@ class VerifyActivity : NfcBaseActivity() {
     }
 
     private fun isKnownECR(ecr: EncExportableCredential): Boolean {
-        val credentialId = ecr.i
-        val encCredentialName = ecr.n
-        // decrypt encCredName and validate credId
+        val encPasswd = ecr.p
+        masterSecretKey?.let{key ->
+            val passwd = SecretService.decryptPassword(key, encPasswd)
+            val isKnown = passwd.isValid()
+            passwd.clear()
+            return isKnown
+        }
         return false
     }
 }

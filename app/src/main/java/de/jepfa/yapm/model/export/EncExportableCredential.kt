@@ -1,6 +1,7 @@
 package de.jepfa.yapm.model.export
 
 import android.content.Intent
+import android.util.Log
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import de.jepfa.yapm.model.encrypted.EncCredential
@@ -47,17 +48,6 @@ data class EncExportableCredential(val i: Int?,
                 isObfuscated
             )
 
-    constructor(jsonObject: JsonObject) :
-            this(jsonObject.get(ATTRIB_ID).asInt,
-                jsonObject.get(ATTRIB_NAME).asString,
-                jsonObject.get(ATTRIB_ADDITIONAL_INFO).asString,
-                jsonObject.get(ATTRIB_USER).asString,
-                jsonObject.get(ATTRIB_PASSWORD).asString,
-                jsonObject.get(ATTRIB_WEBSITE).asString,
-                jsonObject.get(ATTRIB_LABELS).asString,
-                jsonObject.get(ATTRIB_IS_OBFUSCATED)?.asBoolean ?: false,
-            )
-
     fun toEncCredential(): EncCredential {
         return EncCredential(
             i,
@@ -83,9 +73,22 @@ data class EncExportableCredential(val i: Int?,
         const val ATTRIB_LABELS = "l"
         const val ATTRIB_IS_OBFUSCATED = "o"
 
-        fun fromJson(json: JsonElement): EncExportableCredential {
-            val jsonObject = json.asJsonObject
-            return EncExportableCredential(jsonObject)
+        fun fromJson(json: JsonElement): EncExportableCredential? {
+            return try {
+                val jsonObject = json.asJsonObject
+                EncExportableCredential(jsonObject.get(ATTRIB_ID).asInt,
+                    jsonObject.get(ATTRIB_NAME).asString,
+                    jsonObject.get(ATTRIB_ADDITIONAL_INFO).asString,
+                    jsonObject.get(ATTRIB_USER).asString,
+                    jsonObject.get(ATTRIB_PASSWORD).asString,
+                    jsonObject.get(ATTRIB_WEBSITE).asString,
+                    jsonObject.get(ATTRIB_LABELS).asString,
+                    jsonObject.get(ATTRIB_IS_OBFUSCATED)?.asBoolean ?: false,
+                )
+            } catch (e: Exception) {
+                Log.e("ECR", "cannot parse json container", e)
+                null
+            }
         }
     }
 

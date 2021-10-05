@@ -1,5 +1,6 @@
 package de.jepfa.yapm.model.encrypted
 
+import android.util.Log
 import com.google.gson.JsonElement
 
 data class EncLabel(var id: Int?,
@@ -24,14 +25,19 @@ data class EncLabel(var id: Int?,
         const val ATTRIB_DESC = "description"
         const val ATTRIB_COLOR = "color"
 
-        fun fromJson(json: JsonElement): EncLabel {
-            val jsonObject = json.asJsonObject
-            return EncLabel(
-                jsonObject.get(ATTRIB_ID).asInt,
-                jsonObject.get(ATTRIB_NAME).asString,
-                jsonObject.get(ATTRIB_DESC).asString,
-                jsonObject.get(ATTRIB_COLOR)?.asInt
-            )
+        fun fromJson(json: JsonElement): EncLabel? {
+            return try {
+                val jsonObject = json.asJsonObject
+                EncLabel(
+                    jsonObject.get(ATTRIB_ID).asInt,
+                    jsonObject.get(ATTRIB_NAME).asString,
+                    jsonObject.get(ATTRIB_DESC).asString,
+                    jsonObject.get(ATTRIB_COLOR)?.asInt
+                )
+            } catch (e: Exception) {
+                Log.e("ENCL", "cannot parse json container", e)
+                null
+            }
         }
     }
 }

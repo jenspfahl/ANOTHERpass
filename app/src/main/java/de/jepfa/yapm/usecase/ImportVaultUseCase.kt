@@ -1,6 +1,7 @@
 package de.jepfa.yapm.usecase
 
 import android.os.Build
+import android.util.Log
 import com.google.gson.JsonObject
 import de.jepfa.yapm.model.encrypted.*
 import de.jepfa.yapm.service.PreferenceService
@@ -19,6 +20,21 @@ object ImportVaultUseCase {
 
     fun execute(jsonContent: JsonObject, encMasterKey: String?, activity: BaseActivity?): Boolean {
         if (activity == null) return false
+        try {
+            if (readAndImport(jsonContent, activity, encMasterKey)) return false
+        } catch (e: Exception) {
+            Log.e("IMP", "cannot read json", e)
+            return false
+        }
+
+        return true
+    }
+
+    private fun readAndImport(
+        jsonContent: JsonObject,
+        activity: BaseActivity,
+        encMasterKey: String?
+    ): Boolean {
         val salt = jsonContent.get(JsonService.JSON_VAULT_ID)?.asString
         salt?.let {
             SaltService.storeSaltFromBase64String(it, activity)
@@ -27,28 +43,39 @@ object ImportVaultUseCase {
         val cipherAlgorithm = extractCipherAlgorithm(jsonContent)
 
         if (Build.VERSION.SDK_INT < cipherAlgorithm.supportedSdkVersion) {
-            return false
+            return true
         }
 
         val vaultVersion = jsonContent.get(JsonService.JSON_VAULT_VERSION)?.asString ?: "1"
         PreferenceService.putString(PreferenceService.DATA_VAULT_VERSION, vaultVersion, activity)
 
-        PreferenceService.putString(PreferenceService.DATA_CIPHER_ALGORITHM, cipherAlgorithm.name, activity)
+        PreferenceService.putString(
+            PreferenceService.DATA_CIPHER_ALGORITHM,
+            cipherAlgorithm.name,
+            activity
+        )
 
         if (encMasterKey != null) {
             val keyForMK = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
-            val encEncryptedMasterKey = SecretService.encryptEncrypted(keyForMK, Encrypted.fromBase64String(
-                encMasterKey
-            ))
+            val encEncryptedMasterKey = SecretService.encryptEncrypted(
+                keyForMK, Encrypted.fromBase64String(
+                    encMasterKey
+                )
+            )
 
-            PreferenceService.putEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, encEncryptedMasterKey, activity)
+            PreferenceService.putEncrypted(
+                PreferenceService.DATA_ENCRYPTED_MASTER_KEY,
+                encEncryptedMasterKey,
+                activity
+            )
         }
 
         val credentialsJson = jsonContent.getAsJsonArray(JsonService.JSON_CREDENTIALS)
         CoroutineScope(Dispatchers.IO).launch {
             credentialsJson
                 .filterNotNull()
-                .map{ json -> EncCredential.fromJson(json)}
+                .map { json -> EncCredential.fromJson(json) }
+                .filterNotNull()
                 .forEach { c -> activity.getApp().credentialRepository.insert(c) }
         }
 
@@ -56,16 +83,17 @@ object ImportVaultUseCase {
         CoroutineScope(Dispatchers.IO).launch {
             labelsJson
                 .filterNotNull()
-                .map{ json -> EncLabel.fromJson(json)}
+                .map { json -> EncLabel.fromJson(json) }
+                .filterNotNull()
                 .forEach { c -> activity.getApp().labelRepository.insert(c) }
         }
 
         PreferenceService.putString(
             DATA_VAULT_IMPORTED_AT,
             Constants.SDF_DT_MEDIUM.format(Date()),
-            activity)
-
-        return true
+            activity
+        )
+        return false
     }
 
     fun extractCipherAlgorithm(jsonContent: JsonObject): CipherAlgorithm {

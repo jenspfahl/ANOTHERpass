@@ -5,6 +5,7 @@ interface Validable {
     fun isValid(): Boolean
 
     companion object {
-        val FAILED_BYTE_ARRAY = "<<LOCKED>>".toByteArray()
+        const val FAILED_STRING = "<<LOCKED>>"
+        val FAILED_BYTE_ARRAY = FAILED_STRING.toByteArray()
     }
 }
