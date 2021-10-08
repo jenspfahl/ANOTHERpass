@@ -4,21 +4,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.*
+import android.widget.ImageView
 import com.google.zxing.integration.android.IntentIntegrator
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
-import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.export.EncExportableCredential
-import de.jepfa.yapm.model.export.ExportContainer
-import de.jepfa.yapm.model.export.PlainShareableCredential
-import de.jepfa.yapm.model.secret.Password
-import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.service.io.JsonService
 import de.jepfa.yapm.service.nfc.NfcService
-import de.jepfa.yapm.service.secret.MasterPasswordService.generateEncMasterPasswdSK
-import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
-import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.ui.nfc.NfcBaseActivity
@@ -28,8 +19,6 @@ import de.jepfa.yapm.util.toastText
 
 
 abstract class ReadActivityBase : NfcBaseActivity() {
-
-    lateinit var scannedTextView : TextView
 
     init {
         enableBack = true
@@ -44,8 +33,6 @@ abstract class ReadActivityBase : NfcBaseActivity() {
         }
 
         setContentView(getLayoutId())
-
-        scannedTextView  = findViewById(R.id.text_scan_data)
 
         val scanQrCodeImageView = findViewById<ImageView>(R.id.imageview_scan_qrcode)
         scanQrCodeImageView.setOnClickListener {

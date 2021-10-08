@@ -32,7 +32,6 @@ class VerifyActivity : ReadActivityBase() {
 
     override fun handleScannedData(scanned: String) {
         verifyResultText.text = getString(R.string.unknown_qr_code_or_nfc_tag)
-        scannedTextView.text = ndefTag?.data
         if (Encrypted.isEncryptedBase64String(scanned)) {
             checkEncrypted(scanned)
         }

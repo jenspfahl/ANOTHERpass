@@ -45,7 +45,7 @@
                         android:paddingHorizontal="4dp"
                         android:clickable="true"
                         android:layout_gravity="center"
-                        android:src="@drawable/ic_baseline_qr_code_24" />
+                        android:src="@drawable/ic_baseline_qr_code_36" />
 
                     <ImageView
                         android:id="@+id/imageview_nfc_tag"
@@ -54,7 +54,7 @@
                         android:paddingHorizontal="4dp"
                         android:clickable="true"
                         android:layout_gravity="center"
-                        android:src="@drawable/ic_baseline_nfc_24" />
+                        android:src="@drawable/ic_baseline_nfc_36" />
 
                 </LinearLayout>
 

@@ -75,7 +75,7 @@
     <string name="create_vault_summarize_fragment_label">Create Vault 3/3</string>
     <string name="login_explanation_1">Enter your pin to login into your vault.</string>
     <string name="login_explanation_2">Enter your master password to login into your vault.</string>
-    <string name="password">Enter your master password</string>
+    <string name="enter_or_scan_masterpassword">Enter or scan your master password</string>
     <string name="button_login">Login</string>
     <string name="password_required">Password required</string>
     <string name="delete_stored_masterpasswd">Remove stored master password</string>
@@ -300,7 +300,7 @@
     <string name="import_read_credential">Import / read external credential</string>
     <string name="button_close">Close</string>
     <string name="verify_exported_data_explanation">Scan a QR code or read a NFC tag to find out if it is well known for your current vault. This is usefull when you have forgotten what data a QR code of NFC tag contains.</string>
-    <string name="import_exported_data_explanation">Here you can read or import an external credential from a QR code or a NFC tag. The credential will be immediately displayed after you have scanned it. There you have the chance to import it to your vault by clicking on the download icon.</string>
+    <string name="import_exported_data_explanation">Here you can read or import an external credential from a QR code or a NFC tag. The credential will be immediately displayed after you have scanned it. There you have the chance to import it to your vault.</string>
     <string name="scan_qr_or_nfc">Scan QR code or read NFC tag</string>
     <string name="scanning_qrcode">Scanning a QR code</string>
     <string name="unknown_qr_code_or_nfc_tag">Unknown QR code or read NFC tag</string>

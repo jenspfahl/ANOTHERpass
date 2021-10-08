@@ -34,7 +34,6 @@ class ImportCredentialActivity : ReadActivityBase() {
     override fun getLayoutId(): Int = R.layout.activity_import_credential
 
     override fun handleScannedData(scanned: String) {
-        scannedTextView.text = ndefTag?.data
         val credential = extractCredential(scanned)
         if (credential == null) {
             toastText(this, R.string.unknown_qr_code_or_nfc_tag)

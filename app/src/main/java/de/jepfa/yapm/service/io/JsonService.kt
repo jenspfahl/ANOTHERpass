@@ -7,6 +7,7 @@ import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.export.*
+import de.jepfa.yapm.model.secret.Password
 import java.lang.reflect.Type
 
 
@@ -37,8 +38,19 @@ object JsonService {
         }
     }
 
+    class PasswordSerializer : JsonSerializer<Password> {
+        override fun serialize(src: Password?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
+            src?.let {
+                return JsonPrimitive(it.toBase64String())
+            }
+
+            return JsonPrimitive("")
+        }
+    }
+
     val GSON: Gson = GsonBuilder()
             .registerTypeAdapter(Encrypted::class.java, EncryptedSerializer())
+            .registerTypeAdapter(Password::class.java,PasswordSerializer())
             .create()
 
     fun credentialToJson(credential: EncExportableCredential): String {

@@ -1,6 +1,7 @@
 package de.jepfa.yapm.model.secret
 
 import android.text.Editable
+import android.util.Base64
 import de.jepfa.obfusser.util.encrypt.Loop
 
 class Password: Secret, CharSequence {
@@ -93,11 +94,17 @@ class Password: Secret, CharSequence {
         return Password(data.copyOfRange(startIndex, endIndex))
     }
 
+    fun toBase64String(): String {
+        return Base64.encodeToString(data, BASE64_FLAGS)
+    }
+
     override fun toString() : String {
         return String(toCharArray())
     }
 
     companion object {
+        private val BASE64_FLAGS = Base64.NO_WRAP or Base64.NO_PADDING
+
         fun fromEditable(editable: Editable): Password {
 
             val l = editable.length
@@ -108,6 +115,12 @@ class Password: Secret, CharSequence {
 
         fun empty(): Password {
             return Password("")
+        }
+
+
+        fun fromBase64String(string: String): Password {
+            val bytes = Base64.decode(string, BASE64_FLAGS)
+            return Password(bytes)
         }
     }
 }

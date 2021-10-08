@@ -1,5 +1,6 @@
 package de.jepfa.yapm.model.secret
 
+import android.util.Base64
 import de.jepfa.yapm.model.Clearable
 import de.jepfa.yapm.model.Validable
 import java.util.*

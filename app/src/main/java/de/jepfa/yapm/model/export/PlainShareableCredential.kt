@@ -27,7 +27,7 @@ data class PlainShareableCredential(val n: String,
                     jsonObject.get(ATTRIB_NAME).asString,
                     jsonObject.get(ATTRIB_ADDITIONAL_INFO).asString,
                     jsonObject.get(ATTRIB_USER).asString,
-                    Password(jsonObject.get(ATTRIB_PASSWORD).asString),
+                    Password.fromBase64String(jsonObject.get(ATTRIB_PASSWORD).asString),
                     jsonObject.get(ATTRIB_WEBSITE).asString,
                 )
             } catch (e: Exception) {
