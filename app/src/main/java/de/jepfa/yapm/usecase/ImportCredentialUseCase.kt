@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.widget.Toast
+import com.pchmn.materialchips.R2.attr.showText
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.model.encrypted.EncCredential
@@ -11,6 +12,7 @@ import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.util.ClipboardUtil
+import de.jepfa.yapm.util.toastText
 
 object ImportCredentialUseCase {
     fun execute(credential: EncCredential, activity: SecureActivity) {
@@ -48,7 +50,7 @@ object ImportCredentialUseCase {
         if (insert) activity.credentialViewModel.insert(credential)
         else activity.credentialViewModel.update(credential)
 
-        Toast.makeText(activity, "Credential imported", Toast.LENGTH_LONG).show()
+        toastText(activity, "Credential imported")
         val upIntent = Intent(
             activity,
             ListCredentialsActivity::class.java

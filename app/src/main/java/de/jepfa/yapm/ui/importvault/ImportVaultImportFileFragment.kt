@@ -24,6 +24,7 @@ import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.MasterKeyService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.util.QRCodeUtil
+import de.jepfa.yapm.util.toastText
 
 class ImportVaultImportFileFragment : BaseFragment() {
 
@@ -92,12 +93,12 @@ class ImportVaultImportFileFragment : BaseFragment() {
 
         importButton.setOnClickListener {
             if (mkTextView.text.isEmpty() || encMasterKey == null) {
-                Toast.makeText(getBaseActivity(), getString(R.string.scan_masterkey_first), Toast.LENGTH_LONG).show()
+                toastText(getBaseActivity(), R.string.scan_masterkey_first)
                 return@setOnClickListener
             }
 
             if (MasterKeyService.isMasterKeyStored(getImportVaultActivity())) {
-                Toast.makeText(getBaseActivity(), getString(R.string.vault_already_created), Toast.LENGTH_LONG).show()
+                toastText(getBaseActivity(), R.string.vault_already_created)
                 return@setOnClickListener
             }
 
@@ -113,7 +114,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
                 mkTextView.text = encMasterKey
             }
             else {
-                Toast.makeText(getBaseActivity(), getString(R.string.not_an_emk), Toast.LENGTH_LONG).show()
+                toastText(getBaseActivity(), R.string.not_an_emk)
                 return
             }
         } else {
@@ -140,7 +141,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
                 },
                 { success ->
                     if (!success) {
-                        Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
+                        toastText(context, R.string.something_went_wrong)
                     }
                     else {
                         findNavController().navigate(R.id.action_importVault_to_Login)

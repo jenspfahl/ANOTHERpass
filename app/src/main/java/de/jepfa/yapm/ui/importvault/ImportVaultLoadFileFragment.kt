@@ -18,6 +18,7 @@ import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.usecase.ImportVaultUseCase
 import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.FileUtil
+import de.jepfa.yapm.util.toastText
 
 class ImportVaultLoadFileFragment : BaseFragment() {
 
@@ -73,10 +74,10 @@ class ImportVaultLoadFileFragment : BaseFragment() {
             }
 
             if (getImportVaultActivity().jsonContent == null) {
-                Toast.makeText(activity, getString(R.string.toast_import_vault_failure), Toast.LENGTH_LONG).show()
+                toastText(activity, R.string.toast_import_vault_failure)
             }
             else if(!cipherVersionSupported(getImportVaultActivity().jsonContent!!)) {
-                Toast.makeText(activity, getString(R.string.toast_import_vault_failure_cipher_not_supported), Toast.LENGTH_LONG).show()
+                toastText(activity, R.string.toast_import_vault_failure_cipher_not_supported)
             }
             else {
                 findNavController().navigate(R.id.action_importVault_LoadFileFragment_to_ImportFileFragment)

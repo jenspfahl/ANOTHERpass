@@ -382,11 +382,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                             storeMasterPassword(masterPasswd, this)
                             refreshMenuMasterPasswordItem(navigationView.menu)
                             masterPasswd.clear()
-                            Toast.makeText(
-                                this,
-                                getString(R.string.masterpassword_stored),
-                                Toast.LENGTH_LONG
-                            ).show()
+                            toastText(this, R.string.masterpassword_stored)
                         }
                         .setNegativeButton(android.R.string.no, null)
                         .show()
@@ -404,11 +400,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                     .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
                         RemoveStoredMasterPasswordUseCase.execute(this)
                         refreshMenuMasterPasswordItem(navigationView.menu)
-                        Toast.makeText(
-                            this,
-                            getString(R.string.masterpassword_removed),
-                            Toast.LENGTH_LONG
-                        ).show()
+                        toastText(this, R.string.masterpassword_removed)
                     }
                     .setNegativeButton(android.R.string.no, null)
                     .show()

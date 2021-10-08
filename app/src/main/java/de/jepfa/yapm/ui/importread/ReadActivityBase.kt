@@ -24,6 +24,7 @@ import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.ui.nfc.NfcBaseActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.QRCodeUtil
+import de.jepfa.yapm.util.toastText
 
 
 abstract class ReadActivityBase : NfcBaseActivity() {
@@ -64,7 +65,7 @@ abstract class ReadActivityBase : NfcBaseActivity() {
     override fun handleTag() {
         Log.i("VERIFY", "tag detected " + ndefTag?.tagId)
         if (ndefTag != null) {
-            Toast.makeText(this, getString(R.string.nfc_tag_detected), Toast.LENGTH_LONG).show()
+            toastText(this, R.string.nfc_tag_detected)
             ndefTag?.let {
                 handleScannedData(it.data ?: "")
             }

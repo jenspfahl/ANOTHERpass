@@ -25,6 +25,7 @@ import de.jepfa.yapm.ui.label.LabelChip
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.DebugInfo
+import de.jepfa.yapm.util.toastText
 
 
 class EditCredentialDataFragment : SecureFragment() {
@@ -66,11 +67,10 @@ class EditCredentialDataFragment : SecureFragment() {
         val explanationView: TextView = view.findViewById(R.id.edit_credential_explanation)
         explanationView.setOnLongClickListener {
             DebugInfo.toggleDebug()
-            Toast.makeText(
+            toastText(
                 getBaseActivity(),
-                "Debug mode " + if (DebugInfo.isDebug) "ON" else "OFF",
-                Toast.LENGTH_LONG
-            ).show()
+                "Debug mode " + if (DebugInfo.isDebug) "ON" else "OFF"
+            )
             true
         }
 
@@ -207,16 +207,15 @@ class EditCredentialDataFragment : SecureFragment() {
                 editCredentialActivity.resources.getInteger(R.integer.max_label_name_length)
             val chipsCount = editCredentialLabelsView.selectedChipList.size
             if (chipsCount >= Constants.MAX_LABELS_PER_CREDENTIAL) {
-                Toast.makeText(
+                toastText(
                     getBaseActivity(),
-                    getString(R.string.max_labels_reached, Constants.MAX_LABELS_PER_CREDENTIAL),
-                    Toast.LENGTH_LONG
-                ).show()
+                    getString(R.string.max_labels_reached, Constants.MAX_LABELS_PER_CREDENTIAL)
+                )
             } else if (text.length > maxLabelLength) {
-                Toast.makeText(
+                toastText(
                     getBaseActivity(),
-                    getString(R.string.label_too_long, maxLabelLength), Toast.LENGTH_LONG
-                ).show()
+                    getString(R.string.label_too_long, maxLabelLength)
+                )
             } else {
                 val labelName = text.substring(0, text.length - 1)
                 val label = LabelChip(labelName, "")

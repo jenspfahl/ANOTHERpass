@@ -54,7 +54,7 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
         val encMasterPasswd = arguments?.getEncrypted(ARG_ENC_MASTER_PASSWD)
         if (encMasterPasswd == null) {
             Log.e("CV", "No master passwd in extra")
-            Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
+            toastText(context, R.string.something_went_wrong)
             return
         }
         val transSK = getAndroidSecretKey(ALIAS_KEY_TRANSPORT)
@@ -109,14 +109,14 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
 
             context?.let {
                 if (MasterKeyService.isMasterKeyStored(it)) {
-                    Toast.makeText(it, getString(R.string.vault_already_created), Toast.LENGTH_LONG).show()
+                    toastText(it, R.string.vault_already_created)
                     return@setOnClickListener
                 }
 
                 val encPin = arguments?.getEncrypted(CreateVaultActivity.ARG_ENC_PIN)
                 if (encPin == null) {
                     Log.e("CV", "No pin in extra")
-                    Toast.makeText(it, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
+                    toastText(it, R.string.something_went_wrong)
                     return@setOnClickListener
                 }
 
@@ -149,7 +149,7 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
                 },
                 { success ->
                     if (!success) {
-                        Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
+                        toastText(context, R.string.something_went_wrong)
                     }
                     else {
                         LoginUseCase.execute(pin, masterPasswd, getBaseActivity())

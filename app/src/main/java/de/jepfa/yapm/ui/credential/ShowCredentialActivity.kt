@@ -39,6 +39,7 @@ import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.DeobfuscationDialog
 import de.jepfa.yapm.util.PasswordColorizer.spannableObfusableAndMaskableString
+import de.jepfa.yapm.util.toastText
 
 
 class ShowCredentialActivity : SecureActivity() {
@@ -242,7 +243,7 @@ class ShowCredentialActivity : SecureActivity() {
                     passwordTextView.text = spannedString
                     originPassword.clear()
 
-                    Toast.makeText(this, R.string.deobfuscate_restored, Toast.LENGTH_LONG).show()
+                    toastText(this, R.string.deobfuscate_restored)
                 }
                 else {
 
@@ -269,8 +270,7 @@ class ShowCredentialActivity : SecureActivity() {
                             CurrentCredentialHolder.update(credential, it)
                         }
 
-                        Toast.makeText(this, R.string.password_deobfuscated, Toast.LENGTH_LONG)
-                            .show()
+                        toastText(this, R.string.password_deobfuscated)
                     }
                 }
             }

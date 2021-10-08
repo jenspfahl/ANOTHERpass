@@ -15,6 +15,7 @@ import de.jepfa.yapm.service.nfc.NdefTag
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.util.getEncryptedExtra
+import de.jepfa.yapm.util.toastText
 
 
 /**
@@ -75,7 +76,7 @@ class NfcActivity : NfcBaseActivity() {
             title = getString(R.string.title_write_nfc_tag)
             nfcWriteTagButton.setOnClickListener {
                 if (ndefTag == null) {
-                    Toast.makeText(this, R.string.nfc_tapping_needed, Toast.LENGTH_LONG).show()
+                    toastText(this, R.string.nfc_tapping_needed)
                 }
 
                 ndefTag?.let { t ->
@@ -99,10 +100,10 @@ class NfcActivity : NfcBaseActivity() {
         }
 
         if (nfcAdapter == null) {
-            Toast.makeText(this, getString(R.string.nfc_not_supported), Toast.LENGTH_LONG).show()
+            toastText(this, R.string.nfc_not_supported)
         }
         else if (nfcAdapter?.isEnabled == false) {
-            Toast.makeText(this, getString(R.string.nfc_not_enabled), Toast.LENGTH_LONG).show()
+            toastText(this, R.string.nfc_not_enabled)
         }
     }
 
@@ -147,15 +148,15 @@ class NfcActivity : NfcBaseActivity() {
                 val message = NfcService.createNdefMessage(this, data.toByteArray(), withAppRecord)
                 val maxSize = t.getMaxSize()
                 if (maxSize != null && maxSize < message.byteArrayLength) {
-                    Toast.makeText(this, R.string.nfc_not_enough_space, Toast.LENGTH_LONG).show()
+                    toastText(this, R.string.nfc_not_enough_space)
                     return
                 }
                 t.writeData(message)
-                Toast.makeText(this, R.string.nfc_successfully_written, Toast.LENGTH_LONG).show()
+                toastText(this, R.string.nfc_successfully_written)
                 nfcStatusTextView.text = getString(R.string.nfc_tap_again)
             } catch (e: Exception) {
                 Log.e("NFC", "Cannot write tag", e)
-                Toast.makeText(this, R.string.nfc_cannot_write, Toast.LENGTH_LONG).show()
+                toastText(this, R.string.nfc_cannot_write)
             } finally {
                 data.clear()
             }

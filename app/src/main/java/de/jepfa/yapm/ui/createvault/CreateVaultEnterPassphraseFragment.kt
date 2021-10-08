@@ -19,6 +19,7 @@ import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER
 import de.jepfa.yapm.usecase.GenerateMasterPasswordUseCase
 import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.putEncrypted
+import de.jepfa.yapm.util.toastText
 
 
 class CreateVaultEnterPassphraseFragment : BaseFragment() {
@@ -53,7 +54,7 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
         val button = view.findViewById<Button>(R.id.button_next)
         button.setOnClickListener {
             if (generatedPassword.data.isEmpty()) {
-                Toast.makeText(it.context, getString(R.string.generate_password_first), Toast.LENGTH_LONG).show()
+                toastText(it.context, R.string.generate_password_first)
             }
             else {
                 val transSK = getAndroidSecretKey(ALIAS_KEY_TRANSPORT)

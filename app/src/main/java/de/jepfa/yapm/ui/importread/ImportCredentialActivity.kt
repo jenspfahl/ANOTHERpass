@@ -26,6 +26,7 @@ import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.ui.nfc.NfcBaseActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.QRCodeUtil
+import de.jepfa.yapm.util.toastText
 
 
 class ImportCredentialActivity : ReadActivityBase() {
@@ -36,7 +37,7 @@ class ImportCredentialActivity : ReadActivityBase() {
         scannedTextView.text = ndefTag?.data
         val credential = extractCredential(scanned)
         if (credential == null) {
-            Toast.makeText(this, getString(R.string.unknown_qr_code_or_nfc_tag), Toast.LENGTH_LONG).show()
+            toastText(this, R.string.unknown_qr_code_or_nfc_tag)
         }
         else {
             startShowDetailActivity(credential)

@@ -54,7 +54,7 @@ object ClipboardUtil {
 
     private fun copyPassword(password: Password, context: Context) {
         copy("Password", password.toString(), context)
-        Toast.makeText(context, R.string.toast_copied_to_clipboard, Toast.LENGTH_SHORT).show()
+        toastText(context, R.string.toast_copied_to_clipboard)
     }
 
     fun copyTestPasteConsumer(context: Context) {
@@ -66,7 +66,7 @@ object ClipboardUtil {
         )
         PasteContentProvider.enablePushNotification = true
         clipboard.setPrimaryClip(clip)
-        Toast.makeText(context, R.string.toast_test_copypaste_password, Toast.LENGTH_LONG).show()
+        toastText(context, R.string.toast_test_copypaste_password)
 
     }
 

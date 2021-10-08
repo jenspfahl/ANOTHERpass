@@ -16,6 +16,7 @@ import de.jepfa.yapm.ui.AsyncWithProgressBar
 import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
+import de.jepfa.yapm.util.toastText
 
 class ChangeMasterPasswordActivity : SecureActivity() {
 
@@ -67,10 +68,10 @@ class ChangeMasterPasswordActivity : SecureActivity() {
                 currentPinTextView.requestFocus()
             }
             else if (generatedPassword.data.isEmpty()) {
-                Toast.makeText(it.context, getString(R.string.generate_password_first), Toast.LENGTH_LONG).show()
+                toastText(it.context, R.string.generate_password_first)
             }
             else if (!passwordChanged) {
-                Toast.makeText(it.context, getString(R.string.master_password_not_changed), Toast.LENGTH_LONG).show()
+                toastText(it.context, R.string.master_password_not_changed)
             }
             else {
                 changeMasterPin(
@@ -107,7 +108,7 @@ class ChangeMasterPasswordActivity : SecureActivity() {
 
                         generatedPassword.clear()
 
-                        Toast.makeText(baseContext, getString(R.string.masterpassword_changed), Toast.LENGTH_LONG).show()
+                        toastText(baseContext, R.string.masterpassword_changed)
                     }
                     else {
                         currentPinTextView.error = getString(R.string.pin_wrong)

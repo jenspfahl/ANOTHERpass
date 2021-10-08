@@ -15,6 +15,7 @@ import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.ui.AsyncWithProgressBar
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.DebugInfo
+import de.jepfa.yapm.util.toastText
 import java.lang.RuntimeException
 
 class ChangePinActivity : SecureActivity() {
@@ -102,7 +103,7 @@ class ChangePinActivity : SecureActivity() {
                         newPin1.clear()
                         newPin2.clear()
 
-                        Toast.makeText(baseContext, getString(R.string.pin_changed), Toast.LENGTH_LONG).show()
+                        toastText(baseContext, R.string.pin_changed)
                     }
                     else {
                         currentPinTextView.error = getString(R.string.pin_wrong)

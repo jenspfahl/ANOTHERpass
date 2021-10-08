@@ -12,6 +12,7 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.ui.login.LoginActivity
 import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.Constants
+import de.jepfa.yapm.util.toastText
 import java.net.URLEncoder
 
 /*
@@ -42,7 +43,7 @@ class ErrorActivity : AppCompatActivity() {
                     val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(bugReportUrl))
                     startActivity(browserIntent)
 
-                    Toast.makeText(this, R.string.toast_bug_report_copied, Toast.LENGTH_LONG).show()
+                    toastText(this, R.string.toast_bug_report_copied)
                 }
                 .setNegativeButton(android.R.string.cancel, null)
                 .show()

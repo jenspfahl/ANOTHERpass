@@ -24,6 +24,7 @@ import de.jepfa.yapm.ui.nfc.NfcBaseActivity
 import de.jepfa.yapm.usecase.DropVaultUseCase
 import de.jepfa.yapm.usecase.ShowInfoUseCase
 import de.jepfa.yapm.util.Constants
+import de.jepfa.yapm.util.toastText
 
 
 class LoginActivity : NfcBaseActivity() {
@@ -56,7 +57,7 @@ class LoginActivity : NfcBaseActivity() {
             buttonCreateVault.setOnClickListener {
 
                 if (MasterKeyService.isMasterKeyStored(this)) {
-                    Toast.makeText(this, getString(R.string.vault_already_created), Toast.LENGTH_LONG).show()
+                    toastText(this, R.string.vault_already_created)
                     return@setOnClickListener
                 }
 
@@ -66,7 +67,7 @@ class LoginActivity : NfcBaseActivity() {
             val buttonImportVault: Button = findViewById(R.id.button_import_vault)
             buttonImportVault.setOnClickListener {
                 if (MasterKeyService.isMasterKeyStored(this)) {
-                    Toast.makeText(this, getString(R.string.vault_already_created), Toast.LENGTH_LONG).show()
+                    toastText(this, R.string.vault_already_created)
                     return@setOnClickListener
                 }
 
@@ -127,11 +128,11 @@ class LoginActivity : NfcBaseActivity() {
             val selfDestruction = PreferenceService.getAsBool(PREF_SELF_DESTRUCTION, this)
 
             if (selfDestruction) {
-                Toast.makeText(baseContext, R.string.too_may_wrong_logins_self_destruction, Toast.LENGTH_LONG).show()
+                toastText(baseContext, R.string.too_may_wrong_logins_self_destruction)
                 DropVaultUseCase.dropVaultData(this)
             }
             else {
-                Toast.makeText(baseContext, R.string.too_may_wrong_logins, Toast.LENGTH_LONG).show()
+                toastText(baseContext, R.string.too_may_wrong_logins)
                 PreferenceService.delete(PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD, baseContext)
                 PreferenceService.delete(PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY, baseContext)
             }
@@ -144,7 +145,7 @@ class LoginActivity : NfcBaseActivity() {
     override fun handleTag() {
         Log.i("LOGIN", "tag detected " + ndefTag?.tagId)
         if (ndefTag != null && showTagDetectedMessage) {
-            Toast.makeText(this, getString(R.string.nfc_tag_for_login_detected), Toast.LENGTH_LONG).show()
+            toastText(this, R.string.nfc_tag_for_login_detected)
         }
     }
 

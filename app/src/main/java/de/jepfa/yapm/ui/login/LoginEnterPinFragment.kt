@@ -20,6 +20,7 @@ import de.jepfa.yapm.usecase.LoginUseCase
 import de.jepfa.yapm.ui.AsyncWithProgressBar
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.util.putEncrypted
+import de.jepfa.yapm.util.toastText
 import java.util.*
 
 
@@ -65,7 +66,7 @@ class LoginEnterPinFragment : BaseFragment() {
                 val keyForTemp = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
                 val encMasterPasswd = Session.getEncMasterPasswd()
                 if (encMasterPasswd == null) {
-                    Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
+                    toastText(context, R.string.something_went_wrong)
                     return@setOnClickListener
                 }
                 val masterPasswd = SecretService.decryptPassword(keyForTemp, encMasterPasswd)

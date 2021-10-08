@@ -31,6 +31,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_FAST_MASTERPASSWD_LOGIN_WITH
 import de.jepfa.yapm.service.PreferenceService.PREF_FAST_MASTERPASSWD_LOGIN_WITH_QRC
 import de.jepfa.yapm.service.secret.MasterPasswordService.generateEncMasterPasswdSK
 import de.jepfa.yapm.util.QRCodeUtil
+import de.jepfa.yapm.util.toastText
 
 
 class LoginEnterMasterPasswordFragment : BaseFragment() {
@@ -92,7 +93,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
 
             val encPinBase64 = arguments?.getString(CreateVaultActivity.ARG_ENC_PIN)
             if (encPinBase64 == null) {
-                Toast.makeText(context, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
+                toastText(context, R.string.something_went_wrong)
                 return@setOnClickListener
             }
             val encPin = Encrypted.fromBase64String(encPinBase64)
@@ -136,11 +137,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                     getBaseActivity()
                 )
             ) {
-                Toast.makeText(
-                    getBaseActivity(),
-                    getString(R.string.no_mpt_present),
-                    Toast.LENGTH_LONG
-                ).show()
+                toastText(getBaseActivity(), R.string.no_mpt_present)
                 return false
             }
             // decrypt obliviously encrypted master password token
@@ -161,11 +158,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                 val encMasterPassword =
                     SecretService.decryptPassword(mptSK, Encrypted.fromBase64String(scanned))
                 if (!encMasterPassword.isValid()) {
-                    Toast.makeText(
-                        getBaseActivity(),
-                        getString(R.string.invalid_mpt),
-                        Toast.LENGTH_LONG
-                    ).show()
+                    toastText(getBaseActivity(), R.string.invalid_mpt)
                     return false
                 }
 
@@ -185,11 +178,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
             val encMasterPassword =
                 SecretService.decryptPassword(empSK, Encrypted.fromBase64String(scanned))
             if (!encMasterPassword.isValid()) {
-                Toast.makeText(
-                    getBaseActivity(),
-                    getString(R.string.invalid_emp),
-                    Toast.LENGTH_LONG
-                ).show()
+                toastText(getBaseActivity(), R.string.invalid_emp)
                 return false
             }
 
@@ -200,7 +189,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                 return true
             }
         } else {
-            Toast.makeText(getBaseActivity(), getString(R.string.unknown_emp), Toast.LENGTH_LONG).show()
+            toastText(getBaseActivity(), R.string.unknown_emp)
         }
 
         return false

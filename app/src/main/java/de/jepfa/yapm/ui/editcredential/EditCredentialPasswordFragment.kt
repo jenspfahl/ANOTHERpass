@@ -182,7 +182,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
         buttonSave.setOnClickListener {
 
             if (generatedPassword.data.isEmpty()) {
-                Toast.makeText(it.context, getString(R.string.generate_password_first), Toast.LENGTH_LONG).show()
+                toastText(it.context, R.string.generate_password_first)
             }
             else {
                 masterSecretKey?.let{ key ->
@@ -353,7 +353,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 .show()
         }
         else {
-            Toast.makeText(activity, getString(R.string.generate_password_first), Toast.LENGTH_LONG).show()
+            toastText(activity,R.string.generate_password_first)
         }
     }
 
@@ -490,7 +490,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
             masterSecretKey?.let{ key ->
                 if (generatedPassword.data.isEmpty()) {
-                    Toast.makeText(activity, getString(R.string.generate_password_first), Toast.LENGTH_LONG).show()
+                    toastText(activity, R.string.generate_password_first)
                 }
                 else {
                     getSecureActivity()?.let {
@@ -506,7 +506,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
         if (id == R.id.menu_copy_credential) {
             masterSecretKey?.let{ key ->
                 if (generatedPassword.data.isEmpty()) {
-                    Toast.makeText(activity, getString(R.string.generate_password_first), Toast.LENGTH_LONG).show()
+                    toastText(activity, R.string.generate_password_first)
                 }
                 else {
                     getSecureActivity()?.let {
@@ -528,7 +528,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 val isLastPasswordObfuscated = editCredentialActivity.current.isLastPasswordObfuscated ?: false
 
                 if (lastPasswd == null || lastPasswd.isBlank() || !lastPasswd.isValid()) {
-                    Toast.makeText(activity, getString(R.string.nothing_to_restore), Toast.LENGTH_LONG).show()
+                    toastText(activity, R.string.nothing_to_restore)
                 }
                 else {
                     editCredentialActivity.current.isObfuscated = isLastPasswordObfuscated
@@ -556,7 +556,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                     item.isChecked = false
                     unsetObfuscation(editCredentialActivity.current)
 
-                    Toast.makeText(context, R.string.deobfuscate_restored, Toast.LENGTH_LONG).show()
+                    toastText(context, R.string.deobfuscate_restored)
                 }
                 else {
                     context?.let { ctx ->
@@ -572,8 +572,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                             }
                             updateObfuscationMenuItems(editCredentialActivity.current)
 
-                            Toast.makeText(ctx, R.string.password_deobfuscated, Toast.LENGTH_LONG)
-                                .show()
+                            toastText(ctx, R.string.password_deobfuscated)
                         }
                     }
                 }
@@ -586,7 +585,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
             item.isChecked = obfuscatePasswordRequired
 
             if (obfuscatePasswordRequired) {
-                Toast.makeText(context, R.string.obfuscate_while_saving_toast, Toast.LENGTH_LONG).show()
+                toastText(context, R.string.obfuscate_while_saving_toast)
             }
             return true
         }

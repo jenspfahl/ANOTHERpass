@@ -31,12 +31,9 @@ import de.jepfa.yapm.service.io.JsonService.LABELS_TYPE
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.YapmApp
+import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.Constants.SDF_DT_MEDIUM
 import de.jepfa.yapm.util.Constants.UNKNOWN_VAULT_VERSION
-import de.jepfa.yapm.util.DebugInfo
-import de.jepfa.yapm.util.FileUtil
-import de.jepfa.yapm.util.QRCodeUtil
-import de.jepfa.yapm.util.getEncryptedExtra
 import java.util.*
 
 
@@ -85,7 +82,7 @@ class FileIOService: IntentService("FileIOService") {
         }
         if (message.isNotBlank()) {
             handler.post {
-                Toast.makeText(baseContext, message, Toast.LENGTH_LONG).show()
+                toastText(baseContext, message)
             }
         }
 
@@ -175,7 +172,7 @@ class FileIOService: IntentService("FileIOService") {
             message = getString(R.string.qr_code_permission_missing)
         }
         handler.post {
-            Toast.makeText(baseContext, message, Toast.LENGTH_LONG).show()
+            toastText(baseContext, message)
         }
     }
 

@@ -35,6 +35,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_COPY_PASSWORD
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_OVERLAY_FEATURE
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_LABELS_IN_LIST
 import de.jepfa.yapm.util.DeobfuscationDialog
+import de.jepfa.yapm.util.toastText
 import java.util.*
 
 
@@ -96,20 +97,12 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                         }
                     }
 
-                    Toast.makeText(
-                        listCredentialsActivity,
-                        listCredentialsActivity.getString(R.string.credential_used_for_autofill),
-                        Toast.LENGTH_LONG
-                    ).show()
+                    toastText(listCredentialsActivity, R.string.credential_used_for_autofill)
                 }
             }
             else {
                 CurrentCredentialHolder.update(current, null)
-                Toast.makeText(
-                    listCredentialsActivity,
-                    listCredentialsActivity.getString(R.string.credential_used_for_autofill),
-                    Toast.LENGTH_LONG
-                ).show()
+                toastText(listCredentialsActivity, R.string.credential_used_for_autofill)
             }
 
 
