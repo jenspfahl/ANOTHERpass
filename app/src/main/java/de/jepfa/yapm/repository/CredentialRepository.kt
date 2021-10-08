@@ -28,6 +28,11 @@ class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
         return byId.filterNotNull().map {mapToCredential(it)}
     }
 
+    fun findById(id: Int): Flow<EncCredential?> {
+        val byId = encCredentialDao.getById(id)
+        return byId.map {if (it != null) mapToCredential(it) else null}
+    }
+
     fun getAll(): Flow<List<EncCredential>> {
         return encCredentialDao.getAll().filterNotNull().map {mapToCredentials(it)}
     }

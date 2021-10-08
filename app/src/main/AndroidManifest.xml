@@ -33,7 +33,11 @@
         <activity android:name=".ui.importvault.ImportVaultActivity" />
         <activity android:name=".ui.exportvault.ExportVaultActivity" />
         <activity
-            android:name=".ui.verify.VerifyActivity"
+            android:name=".ui.importread.ImportCredentialActivity"
+            android:label="@string/import_read_credential"
+            android:noHistory="false" />
+        <activity
+            android:name=".ui.importread.VerifyActivity"
             android:label="@string/verify_test"
             android:noHistory="false" />
         <activity

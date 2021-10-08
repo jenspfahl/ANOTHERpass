@@ -14,6 +14,10 @@ class CredentialViewModel(private val repository: CredentialRepository) : ViewMo
         return repository.getById(id).asLiveData()
     }
 
+    fun findById(id: Int): LiveData<EncCredential?> {
+        return repository.findById(id).asLiveData()
+    }
+
     fun insert(credential: EncCredential) = viewModelScope.launch {
         repository.insert(credential)
     }    

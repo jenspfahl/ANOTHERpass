@@ -33,6 +33,7 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
 import de.jepfa.yapm.ui.label.LabelDialogOpener
 import de.jepfa.yapm.usecase.ExportCredentialUseCase
+import de.jepfa.yapm.usecase.ImportCredentialUseCase
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.DebugInfo
@@ -44,6 +45,7 @@ class ShowCredentialActivity : SecureActivity() {
 
     val updateCredentialActivityRequestCode = 1
 
+    private var externalMode = false
     private var passwordPresentation = Password.PresentationMode.DEFAULT
     private var maskPassword = false
     private var multiLine = false
@@ -74,6 +76,7 @@ class ShowCredentialActivity : SecureActivity() {
         }
 
         val idExtra = intent.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
+        externalMode = intent.getStringExtra(EXTRA_MODE) ?: EXTRA_MODE_SHOW_EXISTING == EXTRA_MODE_SHOW_EXTERNAL
 
         maskPassword = PreferenceService.getAsBool(PREF_MASK_PASSWORD, this)
         val formatted = PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_SHOW_FORMATTED, this)
@@ -128,7 +131,12 @@ class ShowCredentialActivity : SecureActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.credential_detail_menu, menu)
+        if (externalMode) {
+            menuInflater.inflate(R.menu.credential_detail_menu_import, menu)
+        }
+        else {
+            menuInflater.inflate(R.menu.credential_detail_menu, menu)
+        }
 
         val enableCopyPassword = PreferenceService.getAsBool(PREF_ENABLE_COPY_PASSWORD, this)
         if (!enableCopyPassword) {
@@ -163,6 +171,11 @@ class ShowCredentialActivity : SecureActivity() {
 
         if (id == R.id.menu_export_credential) {
             ExportCredentialUseCase.openStartExportDialog(credential, obfuscationKey, this)
+            return true
+        }
+
+        if (id == R.id.menu_import_credential) {
+            ImportCredentialUseCase.execute(credential, this)
             return true
         }
 
@@ -304,80 +317,103 @@ class ShowCredentialActivity : SecureActivity() {
 
 
     private fun updatePasswordView(idExtra: Int) {
-        credentialViewModel.getById(idExtra).observe(this, {
-            credential = it
+        if (externalMode) {
 
-            masterSecretKey?.let{ key ->
-                val name = decryptCommonString(key, credential.name)
-                val user = decryptCommonString(key, credential.user)
-                val website = decryptCommonString(key, credential.website)
-                val additionalInfo = decryptCommonString(key, credential.additionalInfo)
-                val password = decryptPassword(key, credential.password)
-                obfuscationKey?.let {
-                    password.deobfuscate(it)
-                }
+            credential = EncCredential.fromIntent(intent)
+            updatePasswordView()
+        }
+        else {
+            credentialViewModel.getById(idExtra).observe(this, {
+                credential = it
 
-                appBarLayout.title = name
+                updatePasswordView()
+            })
+        }
+    }
 
-                titleLayout.removeAllViews()
-
-                val labelsForCredential = LabelService.getLabelsForCredential(key, credential)
-                if (labelsForCredential.isNotEmpty()) {
-                    labelsForCredential.forEachIndexed { idx, it ->
-                        val chipView = ChipView(this)
-                        // doesnt work: chipView.setChip(it.labelChip)
-                        chipView.label = it.labelChip.label
-                        chipView.setChipBackgroundColor(it.labelChip.getColor(this))
-                        chipView.setLabelColor(getColor(R.color.white))
-                        chipView.setPadding(16)
-                        chipView.setOnChipClicked {_ ->
-                            LabelDialogOpener.openLabelDialog(this, it)
-                        }
-                        titleLayout.addView(chipView, idx)
-                    }
-                }
-                else {
-                    // add blind label to ensure layouting
-                    val blindView = TextView(this)
-                    blindView.setPadding(16)
-                    titleLayout.addView(blindView)
-                }
-
-                if (user.isEmpty()) {
-                    val userView: ImageView = findViewById(R.id.user_image)
-                    userView.visibility = View.INVISIBLE
-                }
-                userTextView.text = user
-
-                if (website.isEmpty()) {
-                    val websiteView: ImageView = findViewById(R.id.website_image)
-                    websiteView.visibility = View.INVISIBLE
-                }
-                websiteTextView.text = website
-
-                additionalInfoTextView.text = additionalInfo
-
-                var spannedString = spannableObfusableAndMaskableString(password, passwordPresentation, maskPassword, showObfuscated(credential),this)
-                passwordTextView.text = spannedString
-
-                optionsMenu?.findItem(R.id.menu_deobfuscate_password)?.isVisible = credential.isObfuscated
-
-                if (DebugInfo.isDebug) {
-                    passwordTextView.setOnLongClickListener {
-                        val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-                        val icon: Drawable = applicationInfo.loadIcon(packageManager)
-                        val message = credential.toString()
-                        builder.setTitle(R.string.debug)
-                            .setMessage(message)
-                            .setIcon(icon)
-                            .show()
-                        true
-                    }
-                }
+    private fun updatePasswordView() {
+        masterSecretKey?.let { key ->
+            val name = decryptCommonString(key, credential.name)
+            val user = decryptCommonString(key, credential.user)
+            val website = decryptCommonString(key, credential.website)
+            val additionalInfo = decryptCommonString(key, credential.additionalInfo)
+            val password = decryptPassword(key, credential.password)
+            obfuscationKey?.let {
+                password.deobfuscate(it)
             }
 
-            CurrentCredentialHolder.update(credential, obfuscationKey)
-        })
+            appBarLayout.title = name
+
+            titleLayout.removeAllViews()
+
+            val labelsForCredential = LabelService.getLabelsForCredential(key, credential)
+            if (labelsForCredential.isNotEmpty()) {
+                labelsForCredential.forEachIndexed { idx, it ->
+                    val chipView = ChipView(this)
+                    // doesnt work: chipView.setChip(it.labelChip)
+                    chipView.label = it.labelChip.label
+                    chipView.setChipBackgroundColor(it.labelChip.getColor(this))
+                    chipView.setLabelColor(getColor(R.color.white))
+                    chipView.setPadding(16)
+                    chipView.setOnChipClicked { _ ->
+                        LabelDialogOpener.openLabelDialog(this, it)
+                    }
+                    titleLayout.addView(chipView, idx)
+                }
+            } else {
+                // add blind label to ensure layouting
+                val blindView = TextView(this)
+                blindView.setPadding(16)
+                titleLayout.addView(blindView)
+            }
+
+            if (user.isEmpty()) {
+                val userView: ImageView = findViewById(R.id.user_image)
+                userView.visibility = View.INVISIBLE
+            }
+            userTextView.text = user
+
+            if (website.isEmpty()) {
+                val websiteView: ImageView = findViewById(R.id.website_image)
+                websiteView.visibility = View.INVISIBLE
+            }
+            websiteTextView.text = website
+
+            additionalInfoTextView.text = additionalInfo
+
+            var spannedString = spannableObfusableAndMaskableString(
+                password,
+                passwordPresentation,
+                maskPassword,
+                showObfuscated(credential),
+                this
+            )
+            passwordTextView.text = spannedString
+
+            optionsMenu?.findItem(R.id.menu_deobfuscate_password)?.isVisible =
+                credential.isObfuscated
+
+            if (DebugInfo.isDebug) {
+                passwordTextView.setOnLongClickListener {
+                    val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+                    val icon: Drawable = applicationInfo.loadIcon(packageManager)
+                    val message = credential.toString()
+                    builder.setTitle(R.string.debug)
+                        .setMessage(message)
+                        .setIcon(icon)
+                        .show()
+                    true
+                }
+            }
+        }
+
+        CurrentCredentialHolder.update(credential, obfuscationKey)
+    }
+
+    companion object {
+        const val EXTRA_MODE = "de.jepfa.yapm.ui.ShowCredentialActivity.mode"
+        const val EXTRA_MODE_SHOW_EXISTING = "de.jepfa.yapm.ui.ShowCredentialActivity.mode.show_existing"
+        const val EXTRA_MODE_SHOW_EXTERNAL = "de.jepfa.yapm.ui.ShowCredentialActivity.mode.show_external"
     }
 
 }

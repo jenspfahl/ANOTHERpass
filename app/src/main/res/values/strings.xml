@@ -86,6 +86,7 @@
     <string name="title_change_credential_with_title">Change \'%1$s\'</string>
     <string name="detach">Detach</string>
     <string name="export">Export</string>
+    <string name="import_title">Import</string>
     <string name="import_read">Import / Read</string>
     <string name="export_credential">Export credential</string>
     <string name="export_credential_desc">Export credential to either backup, outsource or share it.</string>
@@ -295,9 +296,11 @@
     <string name="message_deobfuscate_password">This password was obfuscated while creation. You can de-obfuscate it with your obfuscation code.</string>
     <string name="deobfuscate_restored">Origin password restored</string>
     <string name="verify_test">Verify QR code / NFC tag</string>
-    <string name="import_credential">Import / read external credential</string>
+    <string name="import_credential">Import credential</string>
+    <string name="import_read_credential">Import / read external credential</string>
     <string name="button_close">Close</string>
     <string name="verify_exported_data_explanation">Scan a QR code or read a NFC tag to find out if it is well known for your current vault. This is usefull when you have forgotten what data a QR code of NFC tag contains.</string>
+    <string name="import_exported_data_explanation">Here you can read or import an external credential from a QR code or a NFC tag. The credential will be immediately displayed after you have scanned it. There you have the chance to import it to your vault by clicking on the download icon.</string>
     <string name="scan_qr_or_nfc">Scan QR code or read NFC tag</string>
     <string name="scanning_qrcode">Scanning a QR code</string>
     <string name="unknown_qr_code_or_nfc_tag">Unknown QR code or read NFC tag</string>
@@ -307,12 +310,13 @@
     <string name="well_known_emp_scanned">\u2705 Well known Encrypted Master Password (EMP) scanned</string>
     <string name="unknown_mpt_scanned">\u274C Unknown Master Password Token (MPT) scanned</string>
     <string name="well_known_mpt_scanned">\u2705 Well known Master Password Token (MPT) scanned</string>
-    <string name="well_known_ecr_scanned">\u2705 Well known Encrypted Credential Record (ECR) scanned</string>
+    <string name="well_known_ecr_scanned">\u2705 Well known Encrypted Credential Record (ECR) with name \'%1$s\' scanned</string>
     <string name="unknown_ecr_scanned">\u274C Unknown Encrypted Credential Record (ECR) scanned</string>
     <string name="pcr_scanned">\u2705 Plain Credential Record (ECR) scanned</string>
 
     <string name="emk_provided">Encrypted Master Key provided.</string>
     <string name="emk_not_provided">Encrypted Master Key not in the file, you need to scan it below.</string>
+    <string name="credential_already_exists">That credential already exists. Update?</string>
 
 
 </resources>

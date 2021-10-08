@@ -47,9 +47,10 @@ import de.jepfa.yapm.ui.changelogin.ChangeMasterPasswordActivity
 import de.jepfa.yapm.ui.changelogin.ChangePinActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
 import de.jepfa.yapm.ui.exportvault.ExportVaultActivity
+import de.jepfa.yapm.ui.importread.ImportCredentialActivity
 import de.jepfa.yapm.ui.label.ListLabelsActivity
 import de.jepfa.yapm.ui.settings.SettingsActivity
-import de.jepfa.yapm.ui.verify.VerifyActivity
+import de.jepfa.yapm.ui.importread.VerifyActivity
 import de.jepfa.yapm.usecase.*
 import de.jepfa.yapm.util.*
 import java.util.*
@@ -435,8 +436,8 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                 return true
             }
             R.id.import_credential -> {
-              //TODO  val intent = Intent(this, ImportCredentialActivity::class.java)
-              //  startActivity(intent)
+                val intent = Intent(this, ImportCredentialActivity::class.java)
+                startActivity(intent)
                 return true
             }
             R.id.test_verify_qr_code_or_nfc_tag -> {

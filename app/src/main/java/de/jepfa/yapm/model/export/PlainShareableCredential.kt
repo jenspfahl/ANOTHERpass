@@ -3,6 +3,7 @@ package de.jepfa.yapm.model.export
 import android.util.Log
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Password
 
 
