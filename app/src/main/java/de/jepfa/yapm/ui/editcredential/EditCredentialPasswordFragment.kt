@@ -396,8 +396,9 @@ class EditCredentialPasswordFragment : SecureFragment() {
         generatedPassword.clear()
 
         if (saveLastPassword) {
-            editCredentialActivity.current.lastPassword = editCredentialActivity.original?.password
-            editCredentialActivity.current.isLastPasswordObfuscated = editCredentialActivity.original?.isObfuscated ?: false
+            editCredentialActivity.original?.let { original ->
+                editCredentialActivity.current.backupForRestore(original)
+            }
         }
         editCredentialActivity.current.password = encPassword
 
@@ -525,13 +526,11 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 val lastPasswd = editCredentialActivity.current.lastPassword?.let {
                     SecretService.decryptPassword(key, it)
                 }
-                val isLastPasswordObfuscated = editCredentialActivity.current.isLastPasswordObfuscated ?: false
-
                 if (lastPasswd == null || lastPasswd.isBlank() || !lastPasswd.isValid()) {
                     toastText(activity, R.string.nothing_to_restore)
                 }
                 else {
-                    editCredentialActivity.current.isObfuscated = isLastPasswordObfuscated
+                    editCredentialActivity.current.restore()
                     unsetObfuscation(editCredentialActivity.current)
                     updatePasswordView(lastPasswd, guessPasswordCombinations = true,
                         editCredentialActivity.current.isObfuscated)

@@ -316,7 +316,8 @@
 
     <string name="emk_provided">Encrypted Master Key provided.</string>
     <string name="emk_not_provided">Encrypted Master Key not in the file, you need to scan it below.</string>
-    <string name="credential_already_exists">That credential already exists. Update?</string>
+    <string name="credential_already_exists">This credential already exists. Importing will overwrite the existing one. Continue?</string>
+    <string name="credential_imported">Credential \'%1$s\' imported</string>
 
 
 </resources>

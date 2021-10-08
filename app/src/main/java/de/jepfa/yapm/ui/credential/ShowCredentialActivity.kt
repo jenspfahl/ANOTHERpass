@@ -176,7 +176,10 @@ class ShowCredentialActivity : SecureActivity() {
         }
 
         if (id == R.id.menu_import_credential) {
-            ImportCredentialUseCase.execute(credential, this)
+            ImportCredentialUseCase.execute(credential, this) {
+                val upIntent = Intent(this, ListCredentialsActivity::class.java)
+                navigateUpTo(upIntent)
+            }
             return true
         }
 

@@ -1,21 +1,14 @@
 package de.jepfa.yapm.usecase
 
-import android.app.Activity
 import android.app.AlertDialog
-import android.content.Intent
-import android.widget.Toast
-import com.pchmn.materialchips.R2.attr.showText
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.model.encrypted.EncCredential
-import de.jepfa.yapm.model.secret.Key
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.ui.credential.ListCredentialsActivity
-import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.toastText
 
 object ImportCredentialUseCase {
-    fun execute(credential: EncCredential, activity: SecureActivity) {
+    fun execute(credential: EncCredential, activity: SecureActivity, successHandler: () -> Unit) {
         val credentialId = credential.id
         if (credentialId != null) {
             activity.credentialViewModel.findById(credentialId).observe(activity) { existingCredential ->
@@ -26,36 +19,39 @@ object ImportCredentialUseCase {
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
 
-                            credential.id = existingCredential.id //TODO mapp here to existing
-                            saveAndNavigateBack(insert = false, activity, credential)
+                            existingCredential.backupForRestore()
+                            existingCredential.copyData(credential)
+
+                            saveAndNavigateBack(isNew = false, activity, existingCredential, successHandler)
                         }
                         .setNegativeButton(android.R.string.no, null)
                         .show()
                 }
                 else {
-                    saveAndNavigateBack(insert = true, activity, credential)
+                    saveAndNavigateBack(isNew = true, activity, credential, successHandler)
                 }
             }
         }
         else {
-            saveAndNavigateBack(insert = true, activity, credential)
+            saveAndNavigateBack(isNew = true, activity, credential, successHandler)
         }
     }
 
     private fun saveAndNavigateBack(
-        insert: Boolean,
+        isNew: Boolean,
         activity: SecureActivity,
-        credential: EncCredential
+        credential: EncCredential,
+        successHandler: () -> Unit
     ) {
-        if (insert) activity.credentialViewModel.insert(credential)
+        if (isNew) activity.credentialViewModel.insert(credential)
         else activity.credentialViewModel.update(credential)
 
-        toastText(activity, "Credential imported")
-        val upIntent = Intent(
-            activity,
-            ListCredentialsActivity::class.java
-        ) //TODO dont do it if abort insert/update
-        activity.navigateUpTo(upIntent)
+        activity.masterSecretKey?.let { key ->
+            val name = SecretService.decryptCommonString(key, credential.name)
+            toastText(activity, activity.getString(R.string.credential_imported, name))
+        }
+        successHandler.invoke()
+
     }
 
 }

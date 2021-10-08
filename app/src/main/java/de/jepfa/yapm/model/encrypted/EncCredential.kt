@@ -46,6 +46,34 @@ data class EncCredential(var id: Int?,
         return id != null
     }
 
+    fun backupForRestore() {
+        backupForRestore(this)
+    }
+
+    fun backupForRestore(other: EncCredential) {
+        lastPassword = other.password
+        isLastPasswordObfuscated = other.isObfuscated
+    }
+
+    fun restore() {
+        lastPassword?.let {
+            password = it
+        }
+        isLastPasswordObfuscated?.let {
+            isObfuscated = it
+        }
+    }
+
+    fun copyData(other: EncCredential) {
+        name = other.name
+        labels = other.labels
+        user = other.user
+        website = other.website
+        additionalInfo = other.additionalInfo
+        isObfuscated = other.isObfuscated
+        password = other.password
+    }
+
     fun applyExtras(intent: Intent) {
         intent.putExtra(EXTRA_CREDENTIAL_ID, id)
         intent.putEncryptedExtra(EXTRA_CREDENTIAL_NAME, name)
