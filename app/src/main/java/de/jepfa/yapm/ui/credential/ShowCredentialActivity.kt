@@ -35,11 +35,8 @@ import de.jepfa.yapm.ui.label.LabelDialogOpener
 import de.jepfa.yapm.usecase.ExportCredentialUseCase
 import de.jepfa.yapm.usecase.ImportCredentialUseCase
 import de.jepfa.yapm.usecase.LockVaultUseCase
-import de.jepfa.yapm.util.ClipboardUtil
-import de.jepfa.yapm.util.DebugInfo
-import de.jepfa.yapm.util.DeobfuscationDialog
+import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.PasswordColorizer.spannableObfusableAndMaskableString
-import de.jepfa.yapm.util.toastText
 
 
 class ShowCredentialActivity : SecureActivity() {
@@ -212,10 +209,11 @@ class ShowCredentialActivity : SecureActivity() {
 
             masterSecretKey?.let{ key ->
                 val decName = decryptCommonString(key, credential.name)
+                val name = enrichId(this, decName, credential.id)
 
                 AlertDialog.Builder(this)
                         .setTitle(R.string.title_delete_credential)
-                        .setMessage(getString(R.string.message_delete_credential, decName))
+                        .setMessage(getString(R.string.message_delete_credential, name))
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
                             credentialViewModel.delete(credential)
@@ -336,7 +334,8 @@ class ShowCredentialActivity : SecureActivity() {
 
     private fun updatePasswordView() {
         masterSecretKey?.let { key ->
-            val name = decryptCommonString(key, credential.name)
+            val decName = decryptCommonString(key, credential.name)
+            val name = enrichId(this, decName, credential.id)
             val user = decryptCommonString(key, credential.user)
             val website = decryptCommonString(key, credential.website)
             val additionalInfo = decryptCommonString(key, credential.additionalInfo)

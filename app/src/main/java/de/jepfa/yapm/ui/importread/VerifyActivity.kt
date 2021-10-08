@@ -131,7 +131,8 @@ class VerifyActivity : ReadActivityBase() {
                         }
                     }
                     is PlainShareableCredential -> {
-                        verifyResultText.text = getString(R.string.pcr_scanned)
+                        val pcr = exportContainer.c
+                        verifyResultText.text = getString(R.string.pcr_scanned, pcr.n)
                     }
                     else -> return@let
                 }

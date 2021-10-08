@@ -35,6 +35,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_COPY_PASSWORD
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_OVERLAY_FEATURE
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_LABELS_IN_LIST
 import de.jepfa.yapm.util.DeobfuscationDialog
+import de.jepfa.yapm.util.enrichId
 import de.jepfa.yapm.util.toastText
 import java.util.*
 
@@ -142,10 +143,11 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                         R.id.menu_delete_credential -> {
                             listCredentialsActivity.masterSecretKey?.let{ key ->
                                 val decName = SecretService.decryptCommonString(key, current.name)
+                                val name = enrichId(listCredentialsActivity, decName, current.id)
 
                                 AlertDialog.Builder(listCredentialsActivity)
                                         .setTitle(R.string.title_delete_credential)
-                                        .setMessage(listCredentialsActivity.getString(R.string.message_delete_credential, decName))
+                                        .setMessage(listCredentialsActivity.getString(R.string.message_delete_credential, name))
                                         .setIcon(android.R.drawable.ic_dialog_alert)
                                         .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
                                             listCredentialsActivity.deleteCredential(current)
@@ -159,6 +161,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                     }
                 }
             })
+
             popup.inflate(R.menu.credential_list_menu)
             popup.show()
         }
@@ -189,6 +192,8 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                         var name: String
                         if (key != null) {
                             name = SecretService.decryptCommonString(key, credential.name)
+                            name = enrichId(listCredentialsActivity, name, credential.id)
+
                             if (name.toLowerCase(Locale.ROOT).contains(charString.toLowerCase(Locale.ROOT))) {
                                 filteredList.add(credential)
                             }
@@ -285,6 +290,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             var name = itemView.context.getString(R.string.unknown_placeholder)
             if (key != null) {
                 name = SecretService.decryptCommonString(key, credential.name)
+                name = enrichId(activity, name, credential.id)
 
                 val showLabels = PreferenceService.getAsBool(PREF_SHOW_LABELS_IN_LIST, itemView.context)
                 if (showLabels) {
@@ -324,4 +330,5 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             return oldItem.id == newItem.id
         }
     }
+
 }

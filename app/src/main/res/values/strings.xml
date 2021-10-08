@@ -199,6 +199,7 @@
     <string name="pref_header_overlay">Password overlay dialog</string>
     <string name="HYPER">Hyper</string>
     <string name="sort_by_recent">Sort by recent</string>
+    <string name="show_ids">Show identifiers</string>
     <string name="nothing_placeholder">…</string>
     <string name="unknown_placeholder">\???</string>
     <string name="tab_pseudo_phrase">Pseudo phrase</string>
@@ -312,7 +313,7 @@
     <string name="well_known_mpt_scanned">\u2705 Well known Master Password Token (MPT) scanned</string>
     <string name="well_known_ecr_scanned">\u2705 Well known Encrypted Credential Record (ECR) with name \'%1$s\' scanned</string>
     <string name="unknown_ecr_scanned">\u274C Unknown Encrypted Credential Record (ECR) scanned</string>
-    <string name="pcr_scanned">\u2705 Plain Credential Record (ECR) scanned</string>
+    <string name="pcr_scanned">\u2705 Plain Credential Record (ECR) with name \'%1$s\' scanned</string>
 
     <string name="emk_provided">Encrypted Master Key provided.</string>
     <string name="emk_not_provided">Encrypted Master Key not in the file, you need to scan it below.</string>

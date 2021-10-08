@@ -25,6 +25,7 @@ import de.jepfa.yapm.ui.label.LabelChip
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.DebugInfo
+import de.jepfa.yapm.util.enrichId
 import de.jepfa.yapm.util.toastText
 
 
@@ -133,7 +134,8 @@ class EditCredentialDataFragment : SecureFragment() {
                         it.additionalInfo
                     )
 
-                    getBaseActivity()?.title = getString(R.string.title_change_credential_with_title, name)
+                    val enrichedName = enrichId(editCredentialActivity, name, it.id)
+                    editCredentialActivity.title = getString(R.string.title_change_credential_with_title, enrichedName)
 
                     editCredentialNameView.setText(name)
                     editCredentialUserView.setText(user)

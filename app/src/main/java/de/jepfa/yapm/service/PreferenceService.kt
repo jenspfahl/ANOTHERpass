@@ -65,6 +65,7 @@ object PreferenceService {
     const val STATE_LOGIN_ATTEMPTS = STATE_PREFIX + "login_attempts"
 
     const val PREF_SORT_BY_RECENT = PREF_PREFIX + "sort_by_recent"
+    const val PREF_SHOW_IDS = PREF_PREFIX + "show_ids"
 
 
     fun initDefaults(context: Context?) {

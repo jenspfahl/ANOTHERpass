@@ -34,6 +34,7 @@ import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
+import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_IDS
 import de.jepfa.yapm.service.PreferenceService.PREF_SORT_BY_RECENT
 import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
 import de.jepfa.yapm.service.autofill.ResponseFiller
@@ -195,6 +196,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         refreshMenuLockItem(menu.findItem(R.id.menu_lock_items))
         refreshMenuFiltersItem(menu.findItem(R.id.menu_filter))
         refreshMenuSortedByItem(menu.findItem(R.id.menu_sort_by_recent))
+        refreshMenuShowIdsItem(menu.findItem(R.id.menu_show_ids))
 
         return super.onCreateOptionsMenu(menu)
     }
@@ -290,6 +292,12 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
             R.id.menu_sort_by_recent -> {
                 PreferenceService.toggleBoolean(PREF_SORT_BY_RECENT, this)
                 refreshMenuSortedByItem(item)
+                refreshCredentials()
+                return true
+            }
+            R.id.menu_show_ids -> {
+                PreferenceService.toggleBoolean(PREF_SHOW_IDS, this)
+                refreshMenuShowIdsItem(item)
                 refreshCredentials()
                 return true
             }
@@ -568,6 +576,11 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
     private fun refreshMenuSortedByItem(item: MenuItem) {
         val sortedByRecent = PreferenceService.getAsBool(PREF_SORT_BY_RECENT, this)
         item.isChecked = sortedByRecent
+    }
+
+    private fun refreshMenuShowIdsItem(item: MenuItem) {
+        val showIds = PreferenceService.getAsBool(PREF_SHOW_IDS, this)
+        item.isChecked = showIds
     }
 
     fun deleteCredential(credential: EncCredential) {

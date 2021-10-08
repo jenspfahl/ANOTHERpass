@@ -40,6 +40,12 @@
         android:title="@string/sort_by_recent"
         app:showAsAction="never">
     </item>
+    <item
+        android:id="@+id/menu_show_ids"
+        android:checkable="true"
+        android:title="@string/show_ids"
+        app:showAsAction="never">
+    </item>
 
 
 </menu>
