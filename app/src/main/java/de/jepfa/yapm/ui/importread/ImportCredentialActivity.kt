@@ -87,6 +87,7 @@ class ImportCredentialActivity : ReadActivityBase() {
                 encWebsite,
                 encLabels,
                 false,
+                null,
                 null
             )
             return credential

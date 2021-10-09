@@ -188,7 +188,8 @@ class EditCredentialDataFragment : SecureFragment() {
                         encWebsite,
                         encLabels,
                         editCredentialActivity.original?.isObfuscated ?: false,
-                        editCredentialActivity.original?.isLastPasswordObfuscated ?: false
+                        editCredentialActivity.original?.isLastPasswordObfuscated ?: false,
+                        null
                     )
                     editCredentialActivity.current = credentialToSave
 

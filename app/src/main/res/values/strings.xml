@@ -198,8 +198,13 @@
     <string name="edit_password_message">Here you can change the password manually which is not recommended. Generated passwords are mostly stronger.</string>
     <string name="pref_header_overlay">Password overlay dialog</string>
     <string name="HYPER">Hyper</string>
-    <string name="sort_by_recent">Sort by recent</string>
-    <string name="show_ids">Show identifiers</string>
+    <string name="sort_order">Sort order</string>
+    <string name="credential_sort_by">Sort credentials by</string>
+    <string name="credential_sort_by_name_asc">Credential name (A..Z)</string>
+    <string name="credential_sort_by_name_desc">Credential name (Z..A)</string>
+    <string name="credential_sort_by_recently_modified">Recently modified (recent first)</string>
+    <string name="credential_sort_by_id">Credential identifier</string>
+    <string name="show_ids">Show credential identifiers</string>
     <string name="nothing_placeholder">…</string>
     <string name="unknown_placeholder">\???</string>
     <string name="tab_pseudo_phrase">Pseudo phrase</string>

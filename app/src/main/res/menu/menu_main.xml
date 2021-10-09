@@ -35,9 +35,8 @@
     </item>
 
     <item
-        android:id="@+id/menu_sort_by_recent"
-        android:checkable="true"
-        android:title="@string/sort_by_recent"
+        android:id="@+id/menu_sort_order"
+        android:title="@string/sort_order"
         app:showAsAction="never">
     </item>
     <item

@@ -13,7 +13,7 @@ import de.jepfa.yapm.database.dao.EncLabelDao
 import de.jepfa.yapm.database.entity.EncCredentialEntity
 import de.jepfa.yapm.database.entity.EncLabelEntity
 
-const val DB_VERSION = 3
+const val DB_VERSION = 4
 
 @Database(
     entities = [EncCredentialEntity::class, EncLabelEntity::class],
@@ -48,12 +48,18 @@ abstract class YapmDatabase : RoomDatabase() {
                                 database.execSQL("ALTER TABLE EncCredentialEntity ADD COLUMN isLastPasswordObfuscated INTEGER NOT NULL DEFAULT 0")
                             }
                         }
+                        val migration3to4 = object : Migration(3, 4) {
+                            override fun migrate(database: SupportSQLiteDatabase) {
+                                database.execSQL("ALTER TABLE EncCredentialEntity ADD COLUMN modifyTimestamp INTEGER NOT NULL DEFAULT 0")
+                                database.execSQL("UPDATE EncCredentialEntity SET modifyTimestamp=id")
+                            }
+                        }
 
                         INSTANCE = Room.databaseBuilder(
                             context.applicationContext,
                             YapmDatabase::class.java, "yapm_database"
                         )
-                        .addMigrations(migration1to2, migration2to3)
+                        .addMigrations(migration1to2, migration2to3, migration3to4)
                         .build()
                     }
                 }

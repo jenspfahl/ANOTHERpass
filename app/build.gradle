@@ -18,7 +18,8 @@ android {
         // ZZZ=micro (just bugfixes)
     //  versionCode XXYYZZZ
         versionCode  103000
-        versionName "1.3.0"
+        // remove _rc when release
+        versionName "1.3.0_rc"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

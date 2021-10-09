@@ -59,6 +59,7 @@ data class EncExportableCredential(val i: Int?,
             w,
             l,
             o,
+            null,
             null
         )
     }

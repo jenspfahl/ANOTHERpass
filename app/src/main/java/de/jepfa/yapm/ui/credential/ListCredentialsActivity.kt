@@ -34,8 +34,8 @@ import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
-import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_IDS
-import de.jepfa.yapm.service.PreferenceService.PREF_SORT_BY_RECENT
+import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_CREDENTIAL_IDS
+import de.jepfa.yapm.service.PreferenceService.PREF_CREDENTIAL_SORT_ORDER
 import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
 import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.service.label.LabelFilter
@@ -195,7 +195,6 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
         refreshMenuLockItem(menu.findItem(R.id.menu_lock_items))
         refreshMenuFiltersItem(menu.findItem(R.id.menu_filter))
-        refreshMenuSortedByItem(menu.findItem(R.id.menu_sort_by_recent))
         refreshMenuShowIdsItem(menu.findItem(R.id.menu_show_ids))
 
         return super.onCreateOptionsMenu(menu)
@@ -289,14 +288,28 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
                 return true
             }
-            R.id.menu_sort_by_recent -> {
-                PreferenceService.toggleBoolean(PREF_SORT_BY_RECENT, this)
-                refreshMenuSortedByItem(item)
-                refreshCredentials()
+            R.id.menu_sort_order -> {
+                val prefSortOrder = getPrefSortOrder()
+                val listItems = CredentialSortOrder.values().map { getString(it.labelId) }.toTypedArray()
+
+                androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle(R.string.export_credential)
+                    .setSingleChoiceItems(listItems, prefSortOrder.ordinal) { dialogInterface, i ->
+                        dialogInterface.dismiss()
+
+                        val newSortOrder = CredentialSortOrder.values()[i]
+                        PreferenceService.putString(PREF_CREDENTIAL_SORT_ORDER, newSortOrder.name, this)
+                        refreshCredentials()
+                    }
+                    .setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                        dialog.cancel()
+                    }
+                    .show()
+
                 return true
             }
             R.id.menu_show_ids -> {
-                PreferenceService.toggleBoolean(PREF_SHOW_IDS, this)
+                PreferenceService.toggleBoolean(PREF_SHOW_CREDENTIAL_IDS, this)
                 refreshMenuShowIdsItem(item)
                 refreshCredentials()
                 return true
@@ -521,18 +534,33 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                 var sortedCredentials = credentials
 
                 masterSecretKey?.let { key ->
+
                     credentials.forEach { LabelService.updateLabelsForCredential(key, it) }
 
-                    val sortedByRecent = PreferenceService.getAsBool(PREF_SORT_BY_RECENT, this)
-                    if (sortedByRecent) {
-                        sortedCredentials = credentials
-                            .sortedBy { it.id }
-                            .reversed()
-                    } else {
-                        sortedCredentials = credentials
-                            .sortedBy {
-                                SecretService.decryptCommonString(key, it.name).toLowerCase(Locale.ROOT)
-                            }
+                    when (getPrefSortOrder()) {
+                        CredentialSortOrder.CREDENTIAL_NAME_ASC -> {
+                            sortedCredentials = credentials
+                                .sortedBy {
+                                    SecretService.decryptCommonString(key, it.name).toLowerCase(Locale.ROOT)
+                                }
+                        }
+                        CredentialSortOrder.CREDENTIAL_NAME_DESC -> {
+                            sortedCredentials = credentials
+                                .sortedBy {
+                                    SecretService.decryptCommonString(key, it.name).toLowerCase(Locale.ROOT)
+                                }
+                                .reversed()
+                        }
+                        CredentialSortOrder.RECENTLY_MODIFIED -> {
+                            sortedCredentials = credentials
+                                .sortedBy { it.modifyTimestamp }
+                                .reversed()
+                        }
+                        CredentialSortOrder.CREDENTIAL_IDENTIFIER -> {
+                            sortedCredentials = credentials
+                                .sortedBy { it.id }
+                        }
+
                     }
                 }
 
@@ -573,14 +601,17 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         }
     }
 
-    private fun refreshMenuSortedByItem(item: MenuItem) {
-        val sortedByRecent = PreferenceService.getAsBool(PREF_SORT_BY_RECENT, this)
-        item.isChecked = sortedByRecent
+    private fun refreshMenuShowIdsItem(item: MenuItem) {
+        val showIds = PreferenceService.getAsBool(PREF_SHOW_CREDENTIAL_IDS, this)
+        item.isChecked = showIds
     }
 
-    private fun refreshMenuShowIdsItem(item: MenuItem) {
-        val showIds = PreferenceService.getAsBool(PREF_SHOW_IDS, this)
-        item.isChecked = showIds
+    private fun getPrefSortOrder(): CredentialSortOrder {
+        val sortOrderAsString = PreferenceService.getAsString(PREF_CREDENTIAL_SORT_ORDER, this)
+        if (sortOrderAsString != null) {
+            return CredentialSortOrder.valueOf(sortOrderAsString)
+        }
+        return CredentialSortOrder.DEFAULT
     }
 
     fun deleteCredential(credential: EncCredential) {

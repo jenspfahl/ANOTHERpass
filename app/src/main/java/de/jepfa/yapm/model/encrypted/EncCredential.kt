@@ -15,7 +15,8 @@ data class EncCredential(var id: Int?,
                          var website: Encrypted,
                          var labels: Encrypted,
                          var isObfuscated: Boolean,
-                         var isLastPasswordObfuscated: Boolean?
+                         var isLastPasswordObfuscated: Boolean?,
+                         val modifyTimestamp: Long? // readonly, is set by CredentialRepository during saving
 ) {
 
     constructor(id: Int?,
@@ -27,7 +28,8 @@ data class EncCredential(var id: Int?,
                 websiteBase64: String,
                 labelsBase64: String,
                 isObfuscated: Boolean,
-                isLastPasswordObfuscated: Boolean?) :
+                isLastPasswordObfuscated: Boolean?,
+                modifyTimestamp: Long?) :
             this(id,
                 Encrypted.fromBase64String(nameBase64),
                 Encrypted.fromBase64String(additionalInfoBase64),
@@ -37,7 +39,8 @@ data class EncCredential(var id: Int?,
                 Encrypted.fromBase64String(websiteBase64),
                 Encrypted.fromBase64String(labelsBase64),
                 isObfuscated,
-                isLastPasswordObfuscated
+                isLastPasswordObfuscated,
+                modifyTimestamp
             )
 
 
@@ -85,6 +88,7 @@ data class EncCredential(var id: Int?,
         intent.putEncryptedExtra(EXTRA_CREDENTIAL_LABELS, labels)
         intent.putExtra(EXTRA_CREDENTIAL_IS_OBFUSCATED, isObfuscated)
         intent.putExtra(EXTRA_CREDENTIAL_IS_LAST_PASSWORD_OBFUSCATED, isLastPasswordObfuscated)
+        intent.putExtra(EXTRA_CREDENTIAL_MODIFY_TIMESTAMP, modifyTimestamp)
 
     }
 
@@ -99,6 +103,7 @@ data class EncCredential(var id: Int?,
         const val EXTRA_CREDENTIAL_LABELS = "de.jepfa.yapm.ui.credential.labels"
         const val EXTRA_CREDENTIAL_IS_OBFUSCATED = "de.jepfa.yapm.ui.credential.isObfuscated"
         const val EXTRA_CREDENTIAL_IS_LAST_PASSWORD_OBFUSCATED = "de.jepfa.yapm.ui.credential.isLastPasswordObfuscated"
+        const val EXTRA_CREDENTIAL_MODIFY_TIMESTAMP = "de.jepfa.yapm.ui.credential.modifyTimestamp"
 
         const val ATTRIB_ID = "id"
         const val ATTRIB_NAME = "name"
@@ -110,6 +115,7 @@ data class EncCredential(var id: Int?,
         const val ATTRIB_LABELS = "labels"
         const val ATTRIB_IS_OBFUSCATED = "isObfuscated"
         const val ATTRIB_IS_LAST_PASSWORD_OBFUSCATED = "isLastPasswordObfuscated"
+        const val ATTRIB_MODIFY_TIMESTAMP = "modifyTimestamp"
 
         fun fromIntent(intent: Intent): EncCredential {
             var id: Int? = null
@@ -127,10 +133,11 @@ data class EncCredential(var id: Int?,
             val isObfuscated = intent.getBooleanExtra(EXTRA_CREDENTIAL_IS_OBFUSCATED, false)
             val isLastPasswordObfuscated = intent.getBooleanExtra(
                 EXTRA_CREDENTIAL_IS_LAST_PASSWORD_OBFUSCATED, false)
+            var modifyTimestamp = intent.getLongExtra(EXTRA_CREDENTIAL_MODIFY_TIMESTAMP, 0)
 
             return EncCredential(
                 id, encName, encAdditionalInfo, encUser, encPassword, encLastPassword, encWebsite, encLabels,
-                isObfuscated, isLastPasswordObfuscated)
+                isObfuscated, isLastPasswordObfuscated, modifyTimestamp)
         }
 
         fun fromJson(json: JsonElement): EncCredential? {
@@ -146,7 +153,8 @@ data class EncCredential(var id: Int?,
                     jsonObject.get(ATTRIB_WEBSITE).asString,
                     jsonObject.get(ATTRIB_LABELS).asString,
                     jsonObject.get(ATTRIB_IS_OBFUSCATED)?.asBoolean ?: false,
-                    jsonObject.get(ATTRIB_IS_LAST_PASSWORD_OBFUSCATED)?.asBoolean ?: false
+                    jsonObject.get(ATTRIB_IS_LAST_PASSWORD_OBFUSCATED)?.asBoolean ?: false,
+                    jsonObject.get(ATTRIB_MODIFY_TIMESTAMP)?.asLong
                 )
             } catch (e: Exception) {
                 Log.e("ENCC", "cannot parse json container", e)

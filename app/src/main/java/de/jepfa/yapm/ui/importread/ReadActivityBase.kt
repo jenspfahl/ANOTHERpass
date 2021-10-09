@@ -15,6 +15,7 @@ import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.ui.nfc.NfcBaseActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.util.QRCodeUtil
+import de.jepfa.yapm.util.enrichId
 import de.jepfa.yapm.util.toastText
 
 
@@ -99,7 +100,8 @@ abstract class ReadActivityBase : NfcBaseActivity() {
             val isKnown = passwd.isValid()
             passwd.clear()
             if (isKnown) {
-                return name
+                val enrichedName = enrichId(this, name, ecr.i)
+                return enrichedName
             }
         }
         return null

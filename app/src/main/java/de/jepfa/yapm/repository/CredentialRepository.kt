@@ -30,7 +30,7 @@ class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
 
     fun findById(id: Int): Flow<EncCredential?> {
         val byId = encCredentialDao.getById(id)
-        return byId.map {if (it != null) mapToCredential(it) else null}
+        return byId.map { mapToCredential(it) }
     }
 
     fun getAll(): Flow<List<EncCredential>> {
@@ -55,7 +55,8 @@ class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
                 entity.website,
                 entity.labels,
                 entity.isObfuscated,
-                entity.isLastPasswordObfuscated)
+                entity.isLastPasswordObfuscated,
+                entity.modifyTimestamp)
     }
 
     private fun mapToEntity(encCredential: EncCredential): EncCredentialEntity {
@@ -68,7 +69,8 @@ class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
                 encCredential.website,
                 encCredential.labels,
                 encCredential.isObfuscated,
-                encCredential.isLastPasswordObfuscated)
+                encCredential.isLastPasswordObfuscated,
+                System.currentTimeMillis()) // always update modify timestamp
     }
 
 }

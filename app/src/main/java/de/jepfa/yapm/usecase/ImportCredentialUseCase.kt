@@ -5,6 +5,7 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.util.enrichId
 import de.jepfa.yapm.util.toastText
 
 object ImportCredentialUseCase {
@@ -48,7 +49,8 @@ object ImportCredentialUseCase {
 
         activity.masterSecretKey?.let { key ->
             val name = SecretService.decryptCommonString(key, credential.name)
-            toastText(activity, activity.getString(R.string.credential_imported, name))
+            val enrichedName = enrichId(activity, name, credential.id)
+            toastText(activity, activity.getString(R.string.credential_imported, enrichedName))
         }
         successHandler.invoke()
 
