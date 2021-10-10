@@ -293,7 +293,8 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                 val listItems = CredentialSortOrder.values().map { getString(it.labelId) }.toTypedArray()
 
                 androidx.appcompat.app.AlertDialog.Builder(this)
-                    .setTitle(R.string.export_credential)
+                    .setIcon(R.drawable.ic_baseline_sort_24)
+                    .setTitle(R.string.sort_order)
                     .setSingleChoiceItems(listItems, prefSortOrder.ordinal) { dialogInterface, i ->
                         dialogInterface.dismiss()
 

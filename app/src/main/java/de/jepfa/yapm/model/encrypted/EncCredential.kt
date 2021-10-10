@@ -16,7 +16,7 @@ data class EncCredential(var id: Int?,
                          var labels: Encrypted,
                          var isObfuscated: Boolean,
                          var isLastPasswordObfuscated: Boolean?,
-                         val modifyTimestamp: Long? // readonly, is set by CredentialRepository during saving
+                         var modifyTimestamp: Long?
 ) {
 
     constructor(id: Int?,
@@ -75,6 +75,10 @@ data class EncCredential(var id: Int?,
         additionalInfo = other.additionalInfo
         isObfuscated = other.isObfuscated
         password = other.password
+    }
+
+    fun touchModify() {
+        modifyTimestamp = System.currentTimeMillis()
     }
 
     fun applyExtras(intent: Intent) {

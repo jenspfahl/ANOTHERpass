@@ -70,7 +70,7 @@ class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
                 encCredential.labels,
                 encCredential.isObfuscated,
                 encCredential.isLastPasswordObfuscated,
-                System.currentTimeMillis()) // always update modify timestamp
+                encCredential.modifyTimestamp ?: encCredential.id?.toLong() ?: 0)
     }
 
 }

@@ -19,14 +19,17 @@ class CredentialViewModel(private val repository: CredentialRepository) : ViewMo
     }
 
     fun insert(credential: EncCredential) = viewModelScope.launch {
+        credential.touchModify()
         repository.insert(credential)
     }    
 
     fun update(credential: EncCredential) = viewModelScope.launch {
+        credential.touchModify()
         repository.update(credential)
     }
 
     fun delete(credential: EncCredential)  = viewModelScope.launch {
+        credential.touchModify()
         repository.delete(credential)
     }
 }
