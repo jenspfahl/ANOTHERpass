@@ -24,6 +24,7 @@ object JsonService {
     const val JSON_CREDENTIALS_COUNT = "credentialsCount"
     const val JSON_LABELS = "labels"
     const val JSON_LABELS_COUNT = "labelsCount"
+    const val JSON_APP_SETTINGS = "appSettings"
 
     val CREDENTIALS_TYPE: Type = object : TypeToken<List<EncCredential>>() {}.type
     val LABELS_TYPE: Type = object : TypeToken<List<EncLabel>>() {}.type

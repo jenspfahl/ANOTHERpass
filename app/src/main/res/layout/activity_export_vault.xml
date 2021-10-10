@@ -19,21 +19,37 @@
             android:layout_height="wrap_content"
             android:text="@string/export_vault_explanation"
             android:paddingHorizontal="24dp"
-            app:layout_constraintBottom_toTopOf="@id/switch_include_enc_masterkey"
+            app:layout_constraintBottom_toTopOf="@id/export_options"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/switch_include_enc_masterkey"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:id="@+id/export_options"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="24pt"
-            android:text="@string/include_enc_masterkey"
+            android:orientation="vertical"
             app:layout_constraintBottom_toTopOf="@id/button_export_vault"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/export_vault_explanation"/>
+            app:layout_constraintTop_toBottomOf="@id/export_vault_explanation">
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switch_include_enc_masterkey"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="24pt"
+                android:text="@string/include_enc_masterkey" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switch_include_prefs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="24pt"
+                android:text="@string/include_preferences" />
+
+
+        </LinearLayout>
 
         <Button
             android:id="@+id/button_export_vault"
@@ -47,7 +63,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/switch_include_enc_masterkey" />
+            app:layout_constraintTop_toBottomOf="@id/export_options" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

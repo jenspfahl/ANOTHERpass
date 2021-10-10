@@ -7,6 +7,7 @@ import de.jepfa.yapm.model.encrypted.*
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_IMPORTED_AT
 import de.jepfa.yapm.service.io.JsonService
+import de.jepfa.yapm.service.io.JsonService.JSON_APP_SETTINGS
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
@@ -86,6 +87,21 @@ object ImportVaultUseCase {
                 .map { json -> EncLabel.fromJson(json) }
                 .filterNotNull()
                 .forEach { c -> activity.getApp().labelRepository.insert(c) }
+        }
+
+        val appSettings = jsonContent.get(JSON_APP_SETTINGS)?.asJsonObject
+        if (appSettings != null) {
+            appSettings.entrySet()
+                .filter { (k,v) -> v.isJsonPrimitive }
+                .forEach { (k,v) ->
+                if (v.asJsonPrimitive.isString) {
+                    PreferenceService.putString(k, v.asString, activity)
+                }
+                else if (v.asJsonPrimitive.isBoolean) {
+                    PreferenceService.putBoolean(k, v.asBoolean, activity)
+                }
+            }
+
         }
 
         PreferenceService.putString(

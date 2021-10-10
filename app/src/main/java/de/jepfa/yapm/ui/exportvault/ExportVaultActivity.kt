@@ -19,6 +19,7 @@ class ExportVaultActivity : SecureActivity() {
     private val saveAsFile = 1
 
     private lateinit var includeMasterKeySwitch: SwitchCompat
+    private lateinit var includePrefsSwitch: SwitchCompat
 
     init {
         enableBack = true
@@ -35,6 +36,7 @@ class ExportVaultActivity : SecureActivity() {
         setContentView(R.layout.activity_export_vault)
 
         includeMasterKeySwitch = findViewById(R.id.switch_include_enc_masterkey)
+        includePrefsSwitch = findViewById(R.id.switch_include_prefs)
 
         findViewById<Button>(R.id.button_export_vault).setOnClickListener {
             masterSecretKey?.let{ key ->
@@ -62,6 +64,7 @@ class ExportVaultActivity : SecureActivity() {
                 val intent = Intent(this, FileIOService::class.java)
                 intent.action = FileIOService.ACTION_EXPORT_VAULT
                 intent.putExtra(FileIOService.PARAM_INCLUDE_MK, includeMasterKeySwitch.isChecked)
+                intent.putExtra(FileIOService.PARAM_INCLUDE_PREFS, includePrefsSwitch.isChecked)
                 intent.putExtra(FileIOService.PARAM_FILE_URI, it)
                 startService(intent)
 

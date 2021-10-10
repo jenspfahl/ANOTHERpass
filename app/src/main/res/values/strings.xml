@@ -98,6 +98,7 @@
     <string name="export_vault_explanation">Here you can export your complete vault into a file for backup purposes. Use this file to import your vault after a fresh new app installation without data. You have the choice to include or exclude the encrypted masterkey. If you exclude it, export the masterkey by your own and store it on a safe place. You need it to import the vault file. The separation of encrypted master key and vault file might be sense to make the vault file useless for hackers even if they guess your pin and master password.</string>
     <string name="button_export_vault">Export vault</string>
     <string name="include_enc_masterkey">Include encrypted masterkey</string>
+    <string name="include_preferences">Include current app settings</string>
     <string name="too_may_wrong_logins">Too many login attempts, all tokens declined</string>
     <string name="too_may_wrong_logins_self_destruction">Too many login attempts, vault completely deleted</string>
     <string name="import_vault_explanation">Select a vault file to import. Note: You need the pin and the master password and, depending on the file, the encrypted masterkey.</string>

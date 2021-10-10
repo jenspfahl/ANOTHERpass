@@ -1,6 +1,7 @@
 package de.jepfa.yapm.service
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.preference.PreferenceManager
 import de.jepfa.yapm.R
@@ -99,10 +100,7 @@ object PreferenceService {
 
     fun getAsBool(prefKey: String, context: Context?): Boolean {
         if (context == null) return false
-        val defaultSharedPreferences = PreferenceManager
-            .getDefaultSharedPreferences(context)
-        return defaultSharedPreferences
-            .getBoolean(prefKey, false)
+        return getDefault(context).getBoolean(prefKey, false)
     }
 
     fun getAsString(prefKey: String, context: Context?): String? {
@@ -111,18 +109,12 @@ object PreferenceService {
 
     fun getAsStringSet(prefKey: String, context: Context?): Set<String>? {
         if (context == null) return null
-        val defaultSharedPreferences = PreferenceManager
-            .getDefaultSharedPreferences(context)
-        return defaultSharedPreferences
-            .getStringSet(prefKey, null)
+        return getDefault(context).getStringSet(prefKey, null)
     }
 
     private fun get(prefKey: String, context: Context?): String? {
         if (context == null) return null
-        val defaultSharedPreferences = PreferenceManager
-                .getDefaultSharedPreferences(context)
-        return defaultSharedPreferences
-                .getString(prefKey, null)
+        return getDefault(context).getString(prefKey, null)
     }
 
     fun isPresent(prefKey: String, context: Context?): Boolean {
@@ -134,19 +126,13 @@ object PreferenceService {
     }
 
     fun putString(prefKey: String, value: String, context: Context) {
-        val defaultSharedPreferences = PreferenceManager
-                .getDefaultSharedPreferences(context)
-
-        val editor = defaultSharedPreferences.edit()
+        val editor = getDefault(context).edit()
         editor.putString(prefKey, value)
         editor.apply()
     }
 
     fun putBoolean(prefKey: String, value: Boolean, context: Context) {
-        val defaultSharedPreferences = PreferenceManager
-                .getDefaultSharedPreferences(context)
-
-        val editor = defaultSharedPreferences.edit()
+        val editor = getDefault(context).edit()
         editor.putBoolean(prefKey, value)
         editor.apply()
     }
@@ -157,12 +143,16 @@ object PreferenceService {
     }
 
     fun delete(prefKey: String, context: Context) {
-        val defaultSharedPreferences = PreferenceManager
-                .getDefaultSharedPreferences(context)
-
-        val editor = defaultSharedPreferences.edit()
+        val editor = getDefault(context).edit()
         editor.putString(prefKey, null)
         editor.apply()
     }
 
+    fun getAllPrefs(context: Context): Map<String, Any?> {
+        return getDefault(context).all.filter { (k, _) -> k.startsWith(PREF_PREFIX) }
+    }
+
+    private fun getDefault(context: Context?): SharedPreferences {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+    }
 }

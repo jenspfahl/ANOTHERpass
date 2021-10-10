@@ -9,7 +9,6 @@ import android.net.Uri
 import android.os.Handler
 import android.text.TextUtils
 import android.util.Log
-import android.widget.Toast
 import com.google.gson.JsonObject
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
@@ -25,6 +24,7 @@ import de.jepfa.yapm.service.io.JsonService.JSON_CREDENTIALS_COUNT
 import de.jepfa.yapm.service.io.JsonService.JSON_ENC_MK
 import de.jepfa.yapm.service.io.JsonService.JSON_LABELS
 import de.jepfa.yapm.service.io.JsonService.JSON_LABELS_COUNT
+import de.jepfa.yapm.service.io.JsonService.JSON_APP_SETTINGS
 import de.jepfa.yapm.service.io.JsonService.JSON_VAULT_ID
 import de.jepfa.yapm.service.io.JsonService.JSON_VAULT_VERSION
 import de.jepfa.yapm.service.io.JsonService.LABELS_TYPE
@@ -50,6 +50,7 @@ class FileIOService: IntentService("FileIOService") {
         const val PARAM_QRC_HEADER = "param_qrc_header"
         const val PARAM_QRC_COLOR = "param_qrc_color"
         const val PARAM_INCLUDE_MK = "param_include_mk"
+        const val PARAM_INCLUDE_PREFS = "param_include_prefs"
 
     }
 
@@ -66,7 +67,9 @@ class FileIOService: IntentService("FileIOService") {
     private fun exportVault(intent: Intent) {
         var message: String
         if (FileUtil.isExternalStorageWritable()) {
-            val jsonData = exportToJson(intent.getBooleanExtra(PARAM_INCLUDE_MK, false))
+            val includeMasterkey = intent.getBooleanExtra(PARAM_INCLUDE_MK, false)
+            val includePreferences = intent.getBooleanExtra(PARAM_INCLUDE_PREFS, false)
+            val jsonData = exportToJson(includeMasterkey, includePreferences)
             val uri = intent.getParcelableExtra<Uri>(PARAM_FILE_URI)
             val success = writeExportFile(uri, jsonData)
 
@@ -103,7 +106,7 @@ class FileIOService: IntentService("FileIOService") {
         return success
     }
 
-    private fun exportToJson(includeMasterkey: Boolean): JsonObject {
+    private fun exportToJson(includeMasterkey: Boolean, includePreferences: Boolean): JsonObject {
         val root = JsonObject()
         try {
             root.addProperty(JSON_APP_VERSION_CODE, DebugInfo.getVersionCode(applicationContext))
@@ -145,6 +148,11 @@ class FileIOService: IntentService("FileIOService") {
 
         root.add(JSON_LABELS, GSON.toJsonTree(labels, LABELS_TYPE))
         root.addProperty(JSON_LABELS_COUNT, labels.size)
+
+        if (includePreferences) {
+            val allPrefs = PreferenceService.getAllPrefs(this)
+            root.add(JSON_APP_SETTINGS, GSON.toJsonTree(allPrefs))
+        }
 
         return root
     }
