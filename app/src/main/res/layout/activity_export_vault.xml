@@ -39,6 +39,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="24pt"
+                android:layout_marginBottom="8dp"
                 android:text="@string/include_enc_masterkey" />
 
             <androidx.appcompat.widget.SwitchCompat
@@ -46,6 +47,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="24pt"
+                android:checked="true"
                 android:text="@string/include_preferences" />
 
 
