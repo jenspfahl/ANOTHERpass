@@ -1,8 +1,6 @@
 <resources>
-    <!-- Base application theme. -->
 
-    <!-- Base application theme. -->
-    <style name="Theme.YetAnotherPasswordManager" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="Theme.YetAnotherPasswordManager" parent="Theme.MaterialComponents.Light.DarkActionBar.Bridge">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -13,7 +11,4 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="Theme.YetAnotherPasswordManager.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="Theme.YetAnotherPasswordManager.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

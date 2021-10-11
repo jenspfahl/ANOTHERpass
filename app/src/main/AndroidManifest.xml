@@ -63,7 +63,7 @@
         <activity
             android:name=".ui.credential.ShowCredentialActivity"
             android:noHistory="false"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/Theme.YetAnotherPasswordManager.NoActionBar" />
         <activity
             android:name=".ui.editcredential.EditCredentialActivity"
             android:noHistory="false" />

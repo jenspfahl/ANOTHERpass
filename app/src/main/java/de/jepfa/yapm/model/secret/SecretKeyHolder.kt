@@ -10,7 +10,7 @@ data class SecretKeyHolder(val secretKey: SecretKey, val cipherAlgorithm: Cipher
     fun destroy() {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                secretKey?.destroy()
+                secretKey.destroy()
             }
         } catch (e: Exception) {
             Log.w("SESSION", "cannot destroy mSK", e)
