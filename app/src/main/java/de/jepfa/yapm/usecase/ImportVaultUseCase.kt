@@ -92,14 +92,22 @@ object ImportVaultUseCase {
         val appSettings = jsonContent.get(JSON_APP_SETTINGS)?.asJsonObject
         if (appSettings != null) {
             appSettings.entrySet()
-                .filter { (k,v) -> v.isJsonPrimitive }
                 .forEach { (k,v) ->
-                if (v.asJsonPrimitive.isString) {
-                    PreferenceService.putString(k, v.asString, activity)
-                }
-                else if (v.asJsonPrimitive.isBoolean) {
-                    PreferenceService.putBoolean(k, v.asBoolean, activity)
-                }
+                    if (v.isJsonPrimitive) {
+                        if (v.asJsonPrimitive.isString) {
+                            PreferenceService.putString(k, v.asString, activity)
+                        } else if (v.asJsonPrimitive.isBoolean) {
+                            PreferenceService.putBoolean(k, v.asBoolean, activity)
+                        }
+                    }
+                    else if (v.isJsonArray) {
+                        val stringValues = v.asJsonArray
+                            .filter { it.isJsonPrimitive }
+                            .filter { it.asJsonPrimitive.isString }
+                            .map { v -> v.asJsonPrimitive.asString }
+                            .toSet()
+                        PreferenceService.putStringSet(k, stringValues, activity)
+                    }
             }
 
         }

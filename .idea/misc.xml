@@ -30,9 +30,9 @@
         <entry key="app/src/main/res/layout/fragment_create_vault_summarize.xml" value="0.264" />
         <entry key="app/src/main/res/layout/fragment_edit_credential_data.xml" value="0.264" />
         <entry key="app/src/main/res/layout/fragment_edit_credential_password.xml" value="0.2" />
-        <entry key="app/src/main/res/layout/fragment_import_vault_file.xml" value="0.4" />
+        <entry key="app/src/main/res/layout/fragment_import_vault_file.xml" value="0.8" />
         <entry key="app/src/main/res/layout/fragment_load_vault_file.xml" value="0.17864583333333334" />
-        <entry key="app/src/main/res/layout/fragment_login_enter_masterpassword.xml" value="0.4" />
+        <entry key="app/src/main/res/layout/fragment_login_enter_masterpassword.xml" value="0.2234527687296417" />
         <entry key="app/src/main/res/menu/credential_detail_menu_import.xml" value="0.3015625" />
         <entry key="app/src/main/res/menu/menu_main.xml" value="0.264" />
         <entry key="app/src/main/res/menu/menu_main_drawer.xml" value="0.4" />

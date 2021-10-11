@@ -131,6 +131,12 @@ object PreferenceService {
         editor.apply()
     }
 
+    fun putStringSet(prefKey: String, value: Set<String>, context: Context) {
+        val editor = getDefault(context).edit()
+        editor.putStringSet(prefKey, value)
+        editor.apply()
+    }
+
     fun putBoolean(prefKey: String, value: Boolean, context: Context) {
         val editor = getDefault(context).edit()
         editor.putBoolean(prefKey, value)
