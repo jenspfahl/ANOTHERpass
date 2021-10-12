@@ -13,7 +13,8 @@ import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.setPadding
 import com.google.android.material.appbar.CollapsingToolbarLayout
-import com.pchmn.materialchips.ChipView
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.model.encrypted.EncCredential
@@ -52,6 +53,7 @@ class ShowCredentialActivity : SecureActivity() {
     private lateinit var credential: EncCredential //TODO change to ?
     private lateinit var appBarLayout: CollapsingToolbarLayout
     private lateinit var titleLayout: LinearLayout
+    private lateinit var toolbarChipGroup: ChipGroup
     private lateinit var passwordTextView: TextView
     private lateinit var userTextView: TextView
     private lateinit var websiteTextView: TextView
@@ -66,6 +68,7 @@ class ShowCredentialActivity : SecureActivity() {
         setSupportActionBar(toolbar)
 
         titleLayout = findViewById(R.id.collapsing_toolbar_layout_title)
+        toolbarChipGroup = findViewById(R.id.toolbab_chip_group)
         titleLayout.post {
             // this is important to ensure labels are faded out when collapsing the app bar
             val layoutParams = toolbar.layoutParams as CollapsingToolbarLayout.LayoutParams
@@ -346,21 +349,15 @@ class ShowCredentialActivity : SecureActivity() {
 
             appBarLayout.title = name
 
-            titleLayout.removeAllViews()
+            toolbarChipGroup.removeAllViews()
 
             val labelsForCredential = LabelService.getLabelsForCredential(key, credential)
             if (labelsForCredential.isNotEmpty()) {
-                labelsForCredential.forEachIndexed { idx, it ->
-                    val chipView = ChipView(this)
-                    // doesnt work: chipView.setChip(it.labelChip)
-                    chipView.label = it.labelChip.label
-                    chipView.setChipBackgroundColor(it.labelChip.getColor(this))
-                    chipView.setLabelColor(getColor(R.color.white))
-                    chipView.setPadding(16)
-                    chipView.setOnChipClicked { _ ->
-                        LabelDialogOpener.openLabelDialog(this, it)
+                labelsForCredential.forEachIndexed { idx, label ->
+                    val chip = createAndAddLabelChip(label, toolbarChipGroup, this)
+                    chip.setOnClickListener { _ ->
+                        LabelDialogOpener.openLabelDialog(this, label)
                     }
-                    titleLayout.addView(chipView, idx)
                 }
             } else {
                 // add blind label to ensure layouting

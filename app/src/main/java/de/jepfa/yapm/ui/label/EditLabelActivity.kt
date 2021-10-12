@@ -1,34 +1,32 @@
 package de.jepfa.yapm.ui.label
 
-import android.graphics.drawable.Drawable
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.TextUtils
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.core.view.setPadding
-import com.pchmn.materialchips.ChipView
+import com.google.android.material.chip.Chip
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.util.DebugInfo
+import de.jepfa.yapm.util.createAndAddLabelChip
 import de.jepfa.yapm.util.getIntExtra
 import java.util.*
 
 
 class EditLabelActivity : SecureActivity() {
 
-    private var label: LabelService.Label? = null
+    private var label: Label? = null
     private var labelColor : Int? = null
     private lateinit var labelNameTextView: TextView
     private lateinit var labelDescTextView: TextView
-    private lateinit var labelColorChipView: ChipView
+    private lateinit var labelColorChip: Chip
     private lateinit var colorDialog: AlertDialog
 
     init {
@@ -39,12 +37,10 @@ class EditLabelActivity : SecureActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_label)
 
-        labelNameTextView  = findViewById(R.id.edit_label_name)
-        labelDescTextView  = findViewById(R.id.edit_label_desc)
-        labelColorChipView  = findViewById(R.id.edit_label_color)
-
-        labelColorChipView.setChipBackgroundColor(getColor(LabelChip.DEFAULT_CHIP_COLOR_ID))
-
+        labelNameTextView = findViewById(R.id.edit_label_name)
+        labelDescTextView = findViewById(R.id.edit_label_desc)
+        labelColorChip = findViewById(R.id.edit_label_color)
+        labelColorChip.chipBackgroundColor = getColorStateList(Label.DEFAULT_CHIP_COLOR_ID)
 
         val labelId = intent.getIntExtra(EncLabel.EXTRA_LABEL_ID)
         if (labelId != null) {
@@ -55,26 +51,14 @@ class EditLabelActivity : SecureActivity() {
             setTitle(R.string.title_new_label)
         }
         label?.let {
-            labelNameTextView.text = it.labelChip.label
-            labelDescTextView.text = it.labelChip.description
-            labelColor = it.labelChip.rgbColor
-            labelColorChipView.setChipBackgroundColor(it.labelChip.getColor(this))
+            labelNameTextView.text = it.name
+            labelDescTextView.text = it.description
+            labelColor = it.colorRGB
+            labelColorChip.chipBackgroundColor = ColorStateList.valueOf(it.getColor(this))
 
-            if (DebugInfo.isDebug) {
-                findViewById<TextView>(R.id.edit_label_explanation)?.setOnLongClickListener { view ->
-                    val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-                    val icon: Drawable = applicationInfo.loadIcon(packageManager)
-                    val message = it.encLabel.toString()
-                    builder.setTitle(R.string.debug)
-                        .setMessage(message)
-                        .setIcon(icon)
-                        .show()
-                    true
-                }
-            }
         }
 
-        labelColorChipView.setOnChipClicked {
+        labelColorChip.setOnClickListener {
             val inflater: LayoutInflater = layoutInflater
             val labelsView: View = inflater.inflate(R.layout.content_dynamic_labels_list, null)
             val labelsContainer: LinearLayout = labelsView.findViewById(R.id.dynamic_labels)
@@ -82,20 +66,17 @@ class EditLabelActivity : SecureActivity() {
             val labelColors = resources.getIntArray(R.array.label_colors)
 
             labelColors.forEachIndexed { idx, color ->
-                val chipView = ChipView(this)
-                // doesnt work: chipView.setChip(it.labelChip)
-                chipView.label = labelNameTextView.text.toString().toUpperCase(Locale.ROOT)
-                chipView.setChipBackgroundColor(color)
-                chipView.setLabelColor(getColor(R.color.white))
-                chipView.setPadding(8)
-                chipView.gravity = Gravity.CENTER_HORIZONTAL
-                chipView.setOnChipClicked {dialog ->
+                val labelName = labelNameTextView.text.toString()
+                val labelDesc = labelDescTextView.text.toString()
+                val label = Label(labelName, labelDesc)
+                val chip = createAndAddLabelChip(label, labelsContainer, this)
+                chip.chipBackgroundColor = ColorStateList.valueOf(color)
+
+                chip.setOnClickListener {_ ->
                     labelColor = color
-                    labelColorChipView.setChipBackgroundColor(color)
+                    labelColorChip.chipBackgroundColor = ColorStateList.valueOf(color)
                     colorDialog.dismiss()
                 }
-
-                labelsContainer.addView(chipView)
             }
 
             colorDialog = AlertDialog.Builder(this)
@@ -117,16 +98,16 @@ class EditLabelActivity : SecureActivity() {
                 return@setOnClickListener
             }
             val existingLabel = LabelService.lookupByLabelName(labelNameTextView.text.toString())
-            if (existingLabel != null && existingLabel.encLabel.id != labelId) {
+            if (existingLabel != null && existingLabel.labelId != labelId) {
                 labelNameTextView.error = getString(R.string.error_labelname_in_use)
                 labelNameTextView.requestFocus()
                 return@setOnClickListener
             }
-
-            updateLabel(labelId,
+            val label = Label(labelId,
                 labelNameTextView.text.toString(),
                 labelDescTextView.text.toString(),
                 labelColor)
+            updateLabel(label)
 
             finish()
 
@@ -138,12 +119,12 @@ class EditLabelActivity : SecureActivity() {
         finish()
     }
 
-    private fun updateLabel(id: Int?, name: String, desc: String, color: Int?) {
+    private fun updateLabel(label: Label) {
 
         masterSecretKey?.let { key ->
-            val encName = SecretService.encryptCommonString(key, name)
-            val encDesc = SecretService.encryptCommonString(key, desc)
-            val encLabel = EncLabel(id, encName, encDesc, color)
+            val encName = SecretService.encryptCommonString(key, label.name)
+            val encDesc = SecretService.encryptCommonString(key, label.description)
+            val encLabel = EncLabel(label.labelId, encName, encDesc, label.colorRGB)
 
             if (encLabel.isPersistent()) {
                 labelViewModel.update(encLabel)
@@ -151,7 +132,7 @@ class EditLabelActivity : SecureActivity() {
             else {
                 labelViewModel.insert(encLabel)
             }
-            LabelService.updateLabel(key, encLabel)
+            LabelService.updateLabel(label)
         }
     }
 }

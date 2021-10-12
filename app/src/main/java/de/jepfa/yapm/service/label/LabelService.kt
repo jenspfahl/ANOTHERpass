@@ -1,16 +1,14 @@
 package de.jepfa.yapm.service.label
 
 import android.util.Log
-import com.pchmn.materialchips.model.ChipInterface
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.secret.SecretService
-import de.jepfa.yapm.ui.label.LabelChip
+import de.jepfa.yapm.ui.label.Label
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import javax.crypto.SecretKey
 import kotlin.collections.HashSet
 
 object LabelService {
@@ -21,34 +19,32 @@ object LabelService {
     private val nameToLabel: MutableMap<String, Label> = ConcurrentHashMap(16)
     private val idToLabel: MutableMap<Int, Label> = ConcurrentHashMap(16)
 
-    data class Label(val encLabel: EncLabel, val labelChip: LabelChip) // TODO remove this and add id to LabelChip
-
     fun initLabels(key: SecretKeyHolder, encLabels: Set<EncLabel>) {
         encLabels
-            .forEach {
-                updateLabel(key, it)
+            .forEach { encLabel ->
+                encLabel.id?.let {
+                    val label = createLabel(key, encLabel)
+                    updateLabel(label)
+                }
             }
     }
 
-    fun updateLabel(key: SecretKeyHolder, encLabel: EncLabel) {
-        val encLabelId = encLabel.id
-        if (encLabelId != null) {
-            val labelChip = createLabelChip(key, encLabel)
-
-            val label = Label(encLabel, labelChip)
-            val existing = idToLabel.get(encLabelId)
+    fun updateLabel(label: Label) {
+        val labelId = label.labelId
+        if (labelId != null) {
+            val existing = idToLabel[labelId]
             if (existing != null) {
                 // important for name updates
-                nameToLabel.remove(existing.labelChip.label)
+                nameToLabel.remove(existing.name)
             }
-            nameToLabel.put(label.labelChip.label, label)
-            idToLabel.put(encLabelId, label)
+            nameToLabel[label.name] = label
+            idToLabel[labelId] = label
         }
     }
 
     fun removeLabel(label: Label) {
-        nameToLabel.remove(label.labelChip.label)
-        label.encLabel.id?.let {
+        nameToLabel.remove(label.name)
+        label.labelId?.let {
             idToLabel.remove(it)
             labelIdToCredentialIds.remove(it)
         }
@@ -67,15 +63,15 @@ object LabelService {
         labels
             .forEach { label ->
                 val credentialId = credential.id
-                val labelId = label.encLabel.id
+                val labelId = label.labelId
                 if (credentialId != null && labelId != null) {
-                    val labelIdMapping = labelIdToCredentialIds.get(labelId)
+                    val labelIdMapping = labelIdToCredentialIds[labelId]
                     if (labelIdMapping != null) {
                         labelIdMapping.add(credentialId)
                     } else {
                         val credentialIds = HashSet<Int>()
                         credentialIds.add(credentialId)
-                        labelIdToCredentialIds.put(labelId, credentialIds)
+                        labelIdToCredentialIds[labelId] = credentialIds
                     }
                 }
             }
@@ -87,14 +83,7 @@ object LabelService {
 
     fun getAllLabels(): List<Label> {
         return nameToLabel.values
-            .sortedBy { it.labelChip.label }
-            .toList()
-    }
-
-    fun getAllLabelChips(): List<LabelChip> {
-        return nameToLabel.values
-            .map { it.labelChip }
-            .sortedBy { it.label }
+            .sortedBy { it.name }
             .toList()
     }
 
@@ -108,7 +97,7 @@ object LabelService {
         return labels
             .map { label ->
                 val credentialId = credential.id
-                val labelId = label.encLabel.id
+                val labelId = label.labelId
                 if (credentialId != null && labelId != null) {
                     lookupByLabelId(labelId)
                 }
@@ -117,7 +106,7 @@ object LabelService {
                 }
             }
             .filterNotNull()
-            .sortedBy { it.labelChip.label }
+            .sortedBy { it.name }
             .toList()
 
     }
@@ -130,11 +119,11 @@ object LabelService {
         return idToLabel[id]
     }
 
-    fun encryptLabelIds(key: SecretKeyHolder, chipList: List<ChipInterface>): Encrypted {
-        val ids = chipList
-            .map {lookupByLabelName(it.label)}
+    fun encryptLabelIds(key: SecretKeyHolder, labelNames: List<String>): Encrypted {
+        val ids = labelNames
+            .map {lookupByLabelName(it)}
             .filterNotNull()
-            .map { it.encLabel.id }
+            .map { it.labelId }
             .filterNotNull()
             .toSet()
 
@@ -162,10 +151,10 @@ object LabelService {
         return ids.joinToString(separator = ID_SEPARATOR)
     }
 
-    private fun createLabelChip(key: SecretKeyHolder, encLabel: EncLabel): LabelChip {
+    private fun createLabel(key: SecretKeyHolder, encLabel: EncLabel): Label {
         val name = SecretService.decryptCommonString(key, encLabel.name)
         val desc = SecretService.decryptCommonString(key, encLabel.description)
-        return LabelChip(encLabel.color, name, desc)
+        return Label(encLabel.id, name, desc, encLabel.color)
     }
 
 }

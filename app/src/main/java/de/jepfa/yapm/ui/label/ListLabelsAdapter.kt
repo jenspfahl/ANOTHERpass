@@ -2,25 +2,26 @@ package de.jepfa.yapm.ui.label
 
 import android.app.AlertDialog
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.pchmn.materialchips.ChipView
+import com.google.android.material.chip.Chip
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.label.LabelService
-import javax.crypto.SecretKey
+import de.jepfa.yapm.util.DebugInfo
 
 
-class ListLabelsAdapter(val listLabelsActivity: ListLabelsActivity) :
-        ListAdapter<LabelService.Label, ListLabelsAdapter.LabelViewHolder>(LabelsComparator()) {
+class ListLabelsAdapter(private val listLabelsActivity: ListLabelsActivity) :
+        ListAdapter<Label, ListLabelsAdapter.LabelViewHolder>(LabelsComparator()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LabelViewHolder {
         val holder = LabelViewHolder.create(parent)
@@ -33,7 +34,7 @@ class ListLabelsAdapter(val listLabelsActivity: ListLabelsActivity) :
             val current = getItem(pos)
 
             val intent = Intent(listLabelsActivity, EditLabelActivity::class.java)
-            intent.putExtra(EncLabel.EXTRA_LABEL_ID, current.encLabel.id)
+            intent.putExtra(EncLabel.EXTRA_LABEL_ID, current.labelId)
             listLabelsActivity.startActivity(intent)
 
         }
@@ -45,7 +46,7 @@ class ListLabelsAdapter(val listLabelsActivity: ListLabelsActivity) :
 
                 AlertDialog.Builder(listLabelsActivity)
                         .setTitle(R.string.title_delete_label)
-                        .setMessage(listLabelsActivity.getString(R.string.message_delete_label, current.labelChip.label))
+                        .setMessage(listLabelsActivity.getString(R.string.message_delete_label, current.name))
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
                             listLabelsActivity.deleteLabel(current)
@@ -53,7 +54,25 @@ class ListLabelsAdapter(val listLabelsActivity: ListLabelsActivity) :
                         .setNegativeButton(android.R.string.no, null)
                         .show()
             }
+        }
 
+        holder.listenForLongClick { pos, _ ->
+            if (DebugInfo.isDebug) {
+                val current = getItem(pos)
+                current.labelId?.let { id ->
+                    listLabelsActivity.labelViewModel.getById(id).observe(listLabelsActivity) { encLabel ->
+                        val builder: androidx.appcompat.app.AlertDialog.Builder = androidx.appcompat.app.AlertDialog.Builder(listLabelsActivity)
+                        val icon: Drawable = listLabelsActivity.applicationInfo.loadIcon(listLabelsActivity.packageManager)
+                        val message = encLabel.toString()
+                        builder.setTitle(R.string.debug)
+                            .setMessage(message)
+                            .setIcon(icon)
+                            .show()
+                    }
+
+                }
+                true
+            }
         }
 
         return holder
@@ -67,16 +86,23 @@ class ListLabelsAdapter(val listLabelsActivity: ListLabelsActivity) :
     }
 
     class LabelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val labelChipView: ChipView = itemView.findViewById(R.id.label_chip)
+        private val labelChip: Chip = itemView.findViewById(R.id.label_chip)
         private val labelUsageTextView: TextView = itemView.findViewById(R.id.label_usage)
         private val labelDeleteImageView: ImageView = itemView.findViewById(R.id.label_delete)
 
         fun listenForEditLabel(event: (position: Int, type: Int) -> Unit) {
-            labelChipView.setOnChipClicked {
+            labelChip.setOnClickListener {
                 event.invoke(adapterPosition, itemViewType)
             }
             labelUsageTextView.setOnClickListener {
                 event.invoke(adapterPosition, itemViewType)
+            }
+        }
+
+        fun listenForLongClick(event: (position: Int, type: Int) -> Unit) {
+            labelChip.setOnLongClickListener {
+                event.invoke(adapterPosition, itemViewType)
+                true
             }
         }
 
@@ -86,16 +112,15 @@ class ListLabelsAdapter(val listLabelsActivity: ListLabelsActivity) :
             }
         }
 
-        fun bind(key: SecretKeyHolder?, label: LabelService.Label) {
+        fun bind(key: SecretKeyHolder?, label: Label) {
             var name = itemView.context.getString(R.string.unknown_placeholder)
             if (key != null) {
-                name = label.labelChip.label
+                name = label.name
 
             }
-            labelChipView.label = name
-            labelChipView.setChipBackgroundColor(label.labelChip.getColor(itemView.context))
-            labelChipView.setLabelColor(ContextCompat.getColor(itemView.context, R.color.white))
-            val labelId = label.encLabel.id
+            labelChip.text = name
+            labelChip.chipBackgroundColor = ColorStateList.valueOf(label.getColor(itemView.context))
+            val labelId = label.labelId
             if (labelId != null) {
                 val usageCount = LabelService.getCredentialIdsForLabelId(labelId)?.size
                 if (usageCount == null || usageCount == 0) {
@@ -121,13 +146,13 @@ class ListLabelsAdapter(val listLabelsActivity: ListLabelsActivity) :
         }
     }
 
-    class LabelsComparator : DiffUtil.ItemCallback<LabelService.Label>() {
-        override fun areItemsTheSame(oldItem: LabelService.Label, newItem: LabelService.Label): Boolean {
+    class LabelsComparator : DiffUtil.ItemCallback<Label>() {
+        override fun areItemsTheSame(oldItem: Label, newItem: Label): Boolean {
             return oldItem === newItem
         }
 
-        override fun areContentsTheSame(oldItem: LabelService.Label, newItem: LabelService.Label): Boolean {
-            return oldItem.encLabel.id == newItem.encLabel.id
+        override fun areContentsTheSame(oldItem: Label, newItem: Label): Boolean {
+            return oldItem.labelId == newItem.labelId
         }
     }
 }

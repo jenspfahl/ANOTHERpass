@@ -10,9 +10,10 @@
         android:padding="@dimen/big_padding"
         >
 
-        <com.pchmn.materialchips.ChipView
+        <com.google.android.material.chip.Chip
             android:id="@+id/label_chip"
-            app:label="label"
+            android:textAlignment="center"
+            android:textColor="@color/white"
             android:layout_weight="0.75" />
 
         <TextView

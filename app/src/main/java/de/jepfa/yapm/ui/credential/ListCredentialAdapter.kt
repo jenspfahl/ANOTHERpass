@@ -11,11 +11,11 @@ import android.widget.*
 import android.widget.LinearLayout
 import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat.getColor
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.pchmn.materialchips.ChipView
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.model.encrypted.EncCredential
@@ -28,15 +28,12 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
 import de.jepfa.yapm.ui.label.LabelDialogOpener
-import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.usecase.ExportCredentialUseCase
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_COPY_PASSWORD
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_OVERLAY_FEATURE
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_LABELS_IN_LIST
-import de.jepfa.yapm.util.DeobfuscationDialog
-import de.jepfa.yapm.util.enrichId
-import de.jepfa.yapm.util.toastText
+import de.jepfa.yapm.util.*
 import java.util.*
 
 
@@ -238,7 +235,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         private val credentialDetachImageView: ImageView = itemView.findViewById(R.id.credential_detach)
         private val credentialCopyImageView: ImageView = itemView.findViewById(R.id.credential_copy)
         private val credentialMenuImageView: ImageView = itemView.findViewById(R.id.credential_menu_popup)
-        private val credentialLabelContainerView: LinearLayout = itemView.findViewById(R.id.label_container)
+        private val credentialLabelContainerGroup: ChipGroup = itemView.findViewById(R.id.label_container)
         private val credentialToolbarContainerView: ConstraintLayout = itemView.findViewById(R.id.toolbar_container)
 
         fun hideCopyPasswordIcon() {
@@ -285,7 +282,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
 
         fun bind(key: SecretKeyHolder?, credential: EncCredential, activity: SecureActivity) {
 
-            credentialLabelContainerView.removeAllViews()
+            credentialLabelContainerGroup.removeAllViews()
 
             var name = itemView.context.getString(R.string.unknown_placeholder)
             if (key != null) {
@@ -294,17 +291,11 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
 
                 val showLabels = PreferenceService.getAsBool(PREF_SHOW_LABELS_IN_LIST, itemView.context)
                 if (showLabels) {
-                    LabelService.getLabelsForCredential(key, credential).forEachIndexed { idx, it ->
-                        val chipView = ChipView(itemView.context)
-                        // doesnt work: chipView.setChip(it.labelChip)
-                        chipView.label = it.labelChip.label
-                        chipView.setChipBackgroundColor(it.labelChip.getColor(itemView.context))
-                        chipView.setLabelColor(getColor(itemView.context, R.color.white))
-                        chipView.setPadding(16, 0, 16, 0)
-                        chipView.setOnChipClicked {_ ->
-                            LabelDialogOpener.openLabelDialog(activity, it)
+                    LabelService.getLabelsForCredential(key, credential).forEachIndexed { idx, label ->
+                        val chip = createAndAddLabelChip(label, credentialLabelContainerGroup, itemView.context)
+                        chip.setOnClickListener { _ ->
+                            LabelDialogOpener.openLabelDialog(activity, label)
                         }
-                        credentialLabelContainerView.addView(chipView, idx)
                     }
                 }
             }

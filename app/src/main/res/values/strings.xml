@@ -280,6 +280,7 @@
     <string name="nothing_to_restore">Nothing to restore</string>
     <string name="label_too_long">Label too long (max %1$d)</string>
     <string name="max_labels_reached">Maximum of labels reached (%1$d)</string>
+    <string name="label_already_in_ist">This label has already been added</string>
     <string name="password_strength">Password strength</string>
     <string name="password_strength_guessed">Password strength (estimated)</string>
     <string name="combinations">Combinations</string>

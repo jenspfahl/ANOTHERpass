@@ -3,14 +3,14 @@ package de.jepfa.yapm.ui.editcredential
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.*
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
+import androidx.core.view.iterator
+import androidx.core.view.size
+import androidx.core.widget.doAfterTextChanged
 import androidx.navigation.fragment.findNavController
-import com.pchmn.materialchips.ChipsInput
-import com.pchmn.materialchips.ChipsInput.ChipsListener
-import com.pchmn.materialchips.model.ChipInterface
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
+
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.*
 import de.jepfa.yapm.model.encrypted.EncCredential
@@ -21,12 +21,10 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.encryptCommonString
 import de.jepfa.yapm.ui.SecureFragment
-import de.jepfa.yapm.ui.label.LabelChip
+import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.usecase.LockVaultUseCase
-import de.jepfa.yapm.util.Constants
-import de.jepfa.yapm.util.DebugInfo
-import de.jepfa.yapm.util.enrichId
-import de.jepfa.yapm.util.toastText
+import de.jepfa.yapm.util.*
+import kotlin.collections.ArrayList
 
 
 class EditCredentialDataFragment : SecureFragment() {
@@ -34,7 +32,8 @@ class EditCredentialDataFragment : SecureFragment() {
     private val LAST_CHARS = listOf(' ', '\t', System.lineSeparator())
 
     private lateinit var editCredentialNameView: EditText
-    private lateinit var editCredentialLabelsView: ChipsInput
+    private lateinit var editCredentialLabelsTextView: AutoCompleteTextView
+    private lateinit var editCredentialLabelsChipGroup: ChipGroup
     private lateinit var editCredentialUserView: EditText
     private lateinit var editCredentialWebsiteView: EditText
     private lateinit var editCredentialAdditionalInfoView: EditText
@@ -60,7 +59,8 @@ class EditCredentialDataFragment : SecureFragment() {
         val editCredentialActivity = getBaseActivity() as EditCredentialActivity
 
         editCredentialNameView = view.findViewById(R.id.edit_credential_name)
-        editCredentialLabelsView = view.findViewById(R.id.edit_credential_labels)
+        editCredentialLabelsTextView = view.findViewById(R.id.edit_credential_labels_textview)
+        editCredentialLabelsChipGroup = view.findViewById(R.id.edit_credential_labels_chipgroup)
         editCredentialUserView = view.findViewById(R.id.edit_credential_user)
         editCredentialWebsiteView = view.findViewById(R.id.edit_credential_website)
         editCredentialAdditionalInfoView = view.findViewById(R.id.edit_credential_additional_info)
@@ -75,51 +75,45 @@ class EditCredentialDataFragment : SecureFragment() {
             true
         }
 
-        getBaseActivity()?.let {
-            it.labelViewModel.allLabels.observe(it, { labels ->
-                masterSecretKey?.let{ key ->
-                    // Wrapping the result of getAllLabelChips into an ArrayList is a hack to
-                    // avoid sorting a SingletonList (which is returned if size==1)
-                    // inside com.pchmn.materialchips - lib
-                    // which would fail with a UnsupportedOperationException
-                    editCredentialLabelsView.filterableList = ArrayList(LabelService.getAllLabelChips())
-                }
-                editCredentialNameView.requestFocus()
-            })
+        val allLabelAdapter = ArrayAdapter(
+            editCredentialActivity,
+            android.R.layout.simple_dropdown_item_1line,
+            ArrayList<String>()
+        )
+
+        editCredentialLabelsTextView.setAdapter(allLabelAdapter)
+        editCredentialLabelsTextView.setOnItemClickListener { parent, _, position, _ ->
+            editCredentialLabelsTextView.text = null
+            val selected = parent.getItemAtPosition(position) as String
+
+            addChipToLabelGroup(
+                selected,
+                editCredentialLabelsChipGroup,
+                allLabelAdapter)
         }
 
-        editCredentialLabelsView.addChipsListener(object : ChipsListener {
-            override fun onChipAdded(chip: ChipInterface, newSize: Int) {
-
-                val key = masterSecretKey
-                if (key != null && editCredentialLabelsView.filterableList != null) {
-                    val exising = LabelService.lookupByLabelName(chip.label)
-                    if (exising == null) {
-                        val encName = encryptCommonString(key, chip.label)
-                        val encDesc = encryptCommonString(key, "")
-                        val encLabel = EncLabel(null, encName, encDesc, null)
-                        getBaseActivity()?.labelViewModel?.insert(encLabel)
-                    }
-                }
+        editCredentialLabelsTextView.setOnFocusChangeListener { v, hasFocus ->
+            if (!hasFocus) {
+                val unfinishedText = editCredentialLabelsTextView.text.toString()
+                addChipToLabelGroup(
+                    unfinishedText,
+                    editCredentialLabelsChipGroup,
+                    allLabelAdapter)
+                editCredentialLabelsTextView.text = null
             }
-
-            override fun onChipRemoved(chip: ChipInterface, newSize: Int) {
+        }
+        editCredentialLabelsTextView.doAfterTextChanged {
+            val committedText = it.toString()
+            if (isCommittedLabelName(committedText)) {
+                val labelName = clearCommittedLabelName(committedText)
+                addChipToLabelGroup(
+                    labelName,
+                    editCredentialLabelsChipGroup,
+                    allLabelAdapter)
+                editCredentialLabelsTextView.text = null
             }
-
-            override fun onTextChanged(text: CharSequence) {
-                addLabel(text, editCredentialActivity)
-            }
-        })
-
-        /*
-        TODO doesn't work since editCredentialLabelsView.editText return a new ChipsInputEditText ll the time.
-         The origin is encapsulated in ChipsAdapter which is encapsulated in ChipsInput.
-         Need to fork that lib and change it,
-        editCredentialLabelsView.editText.setOnFocusChangeListener { view, focusGained ->
-            if (!focusGained) {
-                addLabel(editCredentialLabelsView.editText.editableText.toString(), editCredentialActivity)
-            }
-        }*/
+        }
+        val allLabels = LabelService.getAllLabels()
 
         //fill UI
         if (editCredentialActivity.isUpdate()) {
@@ -142,16 +136,29 @@ class EditCredentialDataFragment : SecureFragment() {
                     editCredentialWebsiteView.setText(website)
                     editCredentialAdditionalInfoView.setText(additionalInfo)
 
-                    LabelService.updateLabelsForCredential(key, it)
-
-                    LabelService.getLabelsForCredential(key, it)
-                        .forEachIndexed { idx, label ->
-                            editCredentialLabelsView.addChip(label.labelChip)
-                            editCredentialLabelsView.selectedChipList + label.labelChip
-                        }
                     editCredentialNameView.requestFocus()
+
+                    LabelService.updateLabelsForCredential(key, it)
+                    val allLabelsForCredential = LabelService.getLabelsForCredential(key, it)
+
+                    val labelSuggestions = allLabels
+                        .filterNot { allLabelsForCredential.contains(it) }
+                        .map { it.name }
+
+                    allLabelAdapter.addAll(labelSuggestions)
+
+                    allLabelsForCredential
+                        .forEachIndexed { _, label ->
+                            createAndAddChip(label, editCredentialLabelsChipGroup, allLabelAdapter)
+                        }
+
                 }
             })
+        }
+        else {
+            val labelSuggestions = allLabels
+                .map { it.name }
+            allLabelAdapter.addAll(labelSuggestions)
         }
 
         val buttonNext: Button = view.findViewById(R.id.button_next)
@@ -175,7 +182,7 @@ class EditCredentialDataFragment : SecureFragment() {
                     val encWebsite = encryptCommonString(key, website)
                     val encLabels = LabelService.encryptLabelIds(
                         key,
-                        editCredentialLabelsView.selectedChipList
+                        mapToLabelName(editCredentialLabelsChipGroup)
                     )
 
                     val credentialToSave = EncCredential(
@@ -200,36 +207,96 @@ class EditCredentialDataFragment : SecureFragment() {
         }
     }
 
-    private fun addLabel(
-        text: CharSequence,
-        editCredentialActivity: EditCredentialActivity
-    ) {
-        if (text.isNotBlank() && isCommitLabel(text)) {
+    private fun mapToLabelName(chipGroup: ChipGroup): List<String> {
+        val chipNames = ArrayList<String>(chipGroup.size)
+        chipGroup.iterator().forEach {
+            val chip = it as Chip
+            chipNames.add(chip.text.toString())
+        }
+        return chipNames.toList()
+    }
 
-            val maxLabelLength =
-                editCredentialActivity.resources.getInteger(R.integer.max_label_name_length)
-            val chipsCount = editCredentialLabelsView.selectedChipList.size
-            if (chipsCount >= Constants.MAX_LABELS_PER_CREDENTIAL) {
+    private fun addChipToLabelGroup(
+        labelName: String,
+        chipGroup: ChipGroup,
+        allLabelAdapter: ArrayAdapter<String>
+    ) {
+        if (labelName.isNotBlank()) {
+            val label = LabelService.lookupByLabelName(labelName) ?: Label(labelName)
+            val maxLabelLength = resources.getInteger(R.integer.max_label_name_length)
+            val chipsCount = chipGroup.size
+            if (containsLabel(chipGroup, label)) {
                 toastText(
-                    getBaseActivity(),
+                    context,
+                    R.string.label_already_in_ist)
+            }
+            else if (chipsCount >= Constants.MAX_LABELS_PER_CREDENTIAL) {
+                toastText(
+                    context,
                     getString(R.string.max_labels_reached, Constants.MAX_LABELS_PER_CREDENTIAL)
                 )
-            } else if (text.length > maxLabelLength) {
+            } else if (label.name.length > maxLabelLength) {
                 toastText(
-                    getBaseActivity(),
+                    context,
                     getString(R.string.label_too_long, maxLabelLength)
                 )
             } else {
-                val labelName = text.substring(0, text.length - 1)
-                val label = LabelChip(labelName, "")
-                editCredentialLabelsView.addChip(label)
+                createAndAddChip(label, chipGroup, allLabelAdapter)
+
+                // save label
+                masterSecretKey?.let { key ->
+                    val existing = LabelService.lookupByLabelName(label.name)
+                    if (existing == null) {
+                        val encName = encryptCommonString(key, label.name)
+                        val encDesc = encryptCommonString(key, "")
+                        val encLabel = EncLabel(null, encName, encDesc, null)
+                        getBaseActivity()?.labelViewModel?.insert(encLabel)
+                    }
+                }
             }
         }
     }
 
-    private fun isCommitLabel(text: CharSequence): Boolean {
+    private fun containsLabel(chipGroup: ChipGroup, label: Label): Boolean {
+        for (child in chipGroup) {
+            if (child is Chip) {
+                if (child.text == label.name) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    private fun createAndAddChip(
+        label: Label,
+        chipGroup: ChipGroup,
+        allLabelAdapter: ArrayAdapter<String>
+    ): Chip {
+        val chip = createAndAddLabelChip(label, chipGroup, context)
+        allLabelAdapter.remove(chip.text.toString())
+
+        chip.isCloseIconVisible = true
+        chip.setOnCloseIconClickListener {
+            chipGroup.removeView(chip)
+            allLabelAdapter.add(chip.text.toString())
+        }
+        return chip
+    }
+
+    private fun isCommittedLabelName(text: String): Boolean {
+        if (text.isEmpty()) {
+            return false
+        }
+
         val lastChar = text.last()
         return lastChar in LAST_CHARS
     }
 
+    private fun clearCommittedLabelName(text: String): String {
+        if (text.isEmpty()) {
+            return text
+        }
+        return text.substring(0, text.length - 1)
+    }
 }

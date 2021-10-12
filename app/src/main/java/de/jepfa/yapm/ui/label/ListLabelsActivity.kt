@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.jepfa.yapm.R
+import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.ui.SecureActivity
 
@@ -58,9 +59,9 @@ class ListLabelsActivity : SecureActivity() {
 
     }
 
-    fun deleteLabel(label: LabelService.Label) {
+    fun deleteLabel(label: Label) {
         val key = masterSecretKey
-        val labelId =label.encLabel.id
+        val labelId =label.labelId
         if (key != null && labelId != null) {
             val credentialsToUpdate = LabelService.getCredentialIdsForLabelId(labelId)
             credentialsToUpdate?.forEach { credentialId ->
@@ -69,8 +70,8 @@ class ListLabelsActivity : SecureActivity() {
                         val labels = LabelService.getLabelsForCredential(key, credential)
 
                         val remainingLabelChips = labels
-                            .filterNot { it.encLabel.id == labelId}
-                            .map { it.labelChip }
+                            .filterNot { it.labelId == labelId}
+                            .map { it.name }
                         LabelService.encryptLabelIds(key, remainingLabelChips)
                         LabelService.updateLabelsForCredential(key, credential)
                     }
@@ -78,11 +79,12 @@ class ListLabelsActivity : SecureActivity() {
 
             }
             LabelService.removeLabel(label)
-            labelViewModel.delete(label.encLabel)
+            LabelFilter.unsetFilterFor(label)
+            labelViewModel.deleteById(label.labelId)
         }
     }
 
     override fun lock() {
-       // listLabelsAdapter.submitList(emptyList())
+       // TODO listLabelsAdapter.submitList(emptyList())
     }
 }

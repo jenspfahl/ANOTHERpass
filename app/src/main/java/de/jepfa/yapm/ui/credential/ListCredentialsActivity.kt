@@ -21,21 +21,20 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.MenuItemCompat
-import androidx.core.view.setPadding
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.chip.Chip
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
-import com.pchmn.materialchips.ChipView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
-import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_CREDENTIAL_IDS
 import de.jepfa.yapm.service.PreferenceService.PREF_CREDENTIAL_SORT_ORDER
+import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_CREDENTIAL_IDS
 import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
 import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.service.label.LabelFilter
@@ -49,9 +48,9 @@ import de.jepfa.yapm.ui.changelogin.ChangePinActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
 import de.jepfa.yapm.ui.exportvault.ExportVaultActivity
 import de.jepfa.yapm.ui.importread.ImportCredentialActivity
+import de.jepfa.yapm.ui.importread.VerifyActivity
 import de.jepfa.yapm.ui.label.ListLabelsActivity
 import de.jepfa.yapm.ui.settings.SettingsActivity
-import de.jepfa.yapm.ui.importread.VerifyActivity
 import de.jepfa.yapm.usecase.*
 import de.jepfa.yapm.util.*
 import java.util.*
@@ -221,24 +220,14 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                 val labelsContainer: LinearLayout = labelsView.findViewById(R.id.dynamic_labels)
 
                 val allLabels = LabelService.getAllLabels()
-                val checkBoxes = ArrayList<CheckBox>(allLabels.size)
+                val allChips = ArrayList<Chip>(allLabels.size)
 
-                allLabels.forEachIndexed { idx, it ->
-                    val chipView = ChipView(this)
-                    // doesnt work: chipView.setChip(it.labelChip)
-                    chipView.label = it.labelChip.label
-                    chipView.setChipBackgroundColor(it.labelChip.getColor(this))
-                    chipView.setLabelColor(getColor(R.color.white))
-
-                    chipView.setPadding(16)
-                    val row = LinearLayout(this)
-                    val checkBox = CheckBox(this)
-                    checkBox.isChecked = LabelFilter.isFilterFor(it)
-                    checkBoxes.add(checkBox)
-
-                    row.addView(checkBox)
-                    row.addView(chipView)
-                    labelsContainer.addView(row)
+                allLabels.forEachIndexed { idx, label ->
+                    val chip = createAndAddLabelChip(label, labelsContainer, this)
+                    chip.isClickable = true
+                    chip.isCheckable = true
+                    chip.isChecked = LabelFilter.isFilterFor(label)
+                    allChips.add(chip)
                 }
 
                 val dialog = AlertDialog.Builder(this)
@@ -253,9 +242,10 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                 dialog.setOnShowListener {
                     val buttonPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                     buttonPositive.setOnClickListener {
-                        for (i in 0 until checkBoxes.size) {
-                            val checked = checkBoxes[i].isChecked
-                            val labelId = allLabels[i].encLabel.id
+                        LabelFilter.unsetAllFilters()
+                        for (i in 0 until allChips.size) {
+                            val checked = allChips[i].isChecked
+                            val labelId = allLabels[i].labelId
                             if (labelId != null) {
                                 val label = LabelService.lookupByLabelId(labelId)
                                 if (label != null) {
@@ -280,7 +270,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
                     val buttonNeutral = dialog.getButton(AlertDialog.BUTTON_NEUTRAL)
                     buttonNeutral.setOnClickListener {
-                        checkBoxes.forEach { it.isChecked = false }
+                        allChips.forEach { it.isChecked = false }
                     }
                 }
 

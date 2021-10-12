@@ -64,14 +64,14 @@
             </com.google.android.material.textfield.TextInputLayout>
 
 
-            <com.pchmn.materialchips.ChipView
+            <com.google.android.material.chip.Chip
                 android:id="@+id/edit_label_color"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center"
+                android:textAlignment="center"
                 android:layout_marginTop="32dp"
-                app:label="@string/choose_color"
-                app:labelColor="@color/white"/>
+                android:text="@string/choose_color"
+                android:textColor="@color/white"/>
 
             <Button
                 android:id="@+id/button_save"
