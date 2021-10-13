@@ -21,6 +21,7 @@ import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secretgenerator.*
+import de.jepfa.yapm.service.secretgenerator.passphrase.DEFAULT_SPECIAL_CHARS
 import de.jepfa.yapm.service.secretgenerator.passphrase.PassphraseGenerator
 import de.jepfa.yapm.service.secretgenerator.passphrase.PassphraseGeneratorSpec
 import de.jepfa.yapm.service.secretgenerator.password.PasswordGenerator
@@ -209,7 +210,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                         val builder = AlertDialog.Builder(context)
                         val dialog: AlertDialog = builder
                             .setTitle(R.string.obfuscate_while_saving)
-                            .setMessage(R.string.obfuscate_while_saving_message)
+                            .setMessage(getString(R.string.obfuscate_while_saving_message, DEFAULT_SPECIAL_CHARS))
                             .setView(inputView)
                             .setPositiveButton(android.R.string.ok, null)
                             .setNegativeButton(android.R.string.cancel, null)

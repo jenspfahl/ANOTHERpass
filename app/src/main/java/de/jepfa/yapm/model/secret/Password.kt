@@ -3,6 +3,7 @@ package de.jepfa.yapm.model.secret
 import android.text.Editable
 import android.util.Base64
 import de.jepfa.obfusser.util.encrypt.Loop
+import java.nio.charset.Charset
 
 class Password: Secret, CharSequence {
 
@@ -31,9 +32,9 @@ class Password: Secret, CharSequence {
         }
     }
 
-    constructor(passwd: String) : super(passwd.toByteArray())
+    constructor(passwd: String) : this(passwd.toByteArray())
+    constructor(passwd: CharArray) : this(passwd.map { it.toByte() }.toByteArray())
     constructor(passwd: ByteArray) : super(passwd)
-    constructor(passwd: CharArray) : super(passwd.map { it.toByte() }.toByteArray())
 
     fun add(other: Char) {
         val buffer = data + other.toByte()
@@ -87,7 +88,7 @@ class Password: Secret, CharSequence {
         get() = data.size
 
     override fun get(index: Int): Char {
-        return toCharArray()[index]
+        return toCharArray(Charset.defaultCharset())[index]
     }
 
     override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
@@ -99,7 +100,7 @@ class Password: Secret, CharSequence {
     }
 
     override fun toString() : String {
-        return String(toCharArray())
+        return String(toCharArray(Charset.defaultCharset()))
     }
 
     companion object {

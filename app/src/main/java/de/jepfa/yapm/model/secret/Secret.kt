@@ -3,6 +3,8 @@ package de.jepfa.yapm.model.secret
 import android.util.Base64
 import de.jepfa.yapm.model.Clearable
 import de.jepfa.yapm.model.Validable
+import java.nio.ByteBuffer
+import java.nio.charset.Charset
 import java.util.*
 
 open class Secret(var data: ByteArray) : Clearable, Validable {
@@ -32,6 +34,11 @@ open class Secret(var data: ByteArray) : Clearable, Validable {
 
     fun toCharArray(): CharArray {
         return data.map { it.toChar() }.toCharArray()
+    }
+
+    fun toCharArray(charset: Charset): CharArray {
+        val charBuffer = charset.decode(ByteBuffer.wrap(data))
+        return charBuffer.array()
     }
 
     override fun clear() {
