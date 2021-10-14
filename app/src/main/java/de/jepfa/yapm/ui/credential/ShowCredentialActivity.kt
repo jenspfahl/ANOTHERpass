@@ -13,7 +13,6 @@ import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.setPadding
 import com.google.android.material.appbar.CollapsingToolbarLayout
-import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
@@ -32,6 +31,7 @@ import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.decryptPassword
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
+import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.ui.label.LabelDialogOpener
 import de.jepfa.yapm.usecase.ExportCredentialUseCase
 import de.jepfa.yapm.usecase.ImportCredentialUseCase
@@ -68,7 +68,7 @@ class ShowCredentialActivity : SecureActivity() {
         setSupportActionBar(toolbar)
 
         titleLayout = findViewById(R.id.collapsing_toolbar_layout_title)
-        toolbarChipGroup = findViewById(R.id.toolbab_chip_group)
+        toolbarChipGroup = findViewById(R.id.toolbar_chip_group)
         titleLayout.post {
             // this is important to ensure labels are faded out when collapsing the app bar
             val layoutParams = toolbar.layoutParams as CollapsingToolbarLayout.LayoutParams
@@ -353,8 +353,9 @@ class ShowCredentialActivity : SecureActivity() {
 
             val labelsForCredential = LabelService.getLabelsForCredential(key, credential)
             if (labelsForCredential.isNotEmpty()) {
+                val thinner = shouldMakeLabelThinner(labelsForCredential)
                 labelsForCredential.forEachIndexed { idx, label ->
-                    val chip = createAndAddLabelChip(label, toolbarChipGroup, thinner = false, this)
+                    val chip = createAndAddLabelChip(label, toolbarChipGroup, thinner, this)
                     chip.setOnClickListener { _ ->
                         LabelDialogOpener.openLabelDialog(this, label)
                     }
@@ -407,6 +408,12 @@ class ShowCredentialActivity : SecureActivity() {
         }
 
         CurrentCredentialHolder.update(credential, obfuscationKey)
+    }
+
+    private fun shouldMakeLabelThinner(labels: List<Label>): Boolean {
+        val totalLabelsLength = labels.map { it.name.length }.sum()
+        val maxLabelLength = resources.getInteger(R.integer.max_label_name_length)
+        return totalLabelsLength > maxLabelLength * 2
     }
 
     companion object {
