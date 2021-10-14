@@ -7,9 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.service.label.LabelService
@@ -69,7 +71,7 @@ class EditLabelActivity : SecureActivity() {
                 val labelName = labelNameTextView.text.toString()
                 val labelDesc = labelDescTextView.text.toString()
                 val label = Label(labelName, labelDesc)
-                val chip = createAndAddLabelChip(label, labelsContainer, this)
+                val chip = createAndAddLabelChip(label, labelsContainer, thinner = false, this)
                 chip.chipBackgroundColor = ColorStateList.valueOf(color)
 
                 chip.setOnClickListener {_ ->
@@ -79,10 +81,14 @@ class EditLabelActivity : SecureActivity() {
                 }
             }
 
-            colorDialog = AlertDialog.Builder(this)
+            val builder = AlertDialog.Builder(this)
+            val container = ScrollView(builder.context)
+            container.addView(labelsView)
+
+            colorDialog = builder
                 .setTitle(getString(R.string.choose_color))
                 .setIcon(R.drawable.ic_baseline_label_24)
-                .setView(labelsView)
+                .setView(container)
                 .setNegativeButton(android.R.string.cancel, null)
                 .create()
 

@@ -273,7 +273,7 @@ class EditCredentialDataFragment : SecureFragment() {
         chipGroup: ChipGroup,
         allLabelAdapter: ArrayAdapter<String>
     ): Chip {
-        val chip = createAndAddLabelChip(label, chipGroup, context)
+        val chip = createAndAddLabelChip(label, chipGroup, thinner = false, context)
         allLabelAdapter.remove(chip.text.toString())
 
         chip.isCloseIconVisible = true

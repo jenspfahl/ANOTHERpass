@@ -354,7 +354,7 @@ class ShowCredentialActivity : SecureActivity() {
             val labelsForCredential = LabelService.getLabelsForCredential(key, credential)
             if (labelsForCredential.isNotEmpty()) {
                 labelsForCredential.forEachIndexed { idx, label ->
-                    val chip = createAndAddLabelChip(label, toolbarChipGroup, this)
+                    val chip = createAndAddLabelChip(label, toolbarChipGroup, thinner = false, this)
                     chip.setOnClickListener { _ ->
                         LabelDialogOpener.openLabelDialog(this, label)
                     }

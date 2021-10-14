@@ -7,7 +7,7 @@
     <TableRow
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:padding="@dimen/big_padding"
+        android:paddingHorizontal="@dimen/big_padding"
         >
 
         <com.google.android.material.chip.Chip

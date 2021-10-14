@@ -292,7 +292,11 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                 val showLabels = PreferenceService.getAsBool(PREF_SHOW_LABELS_IN_LIST, itemView.context)
                 if (showLabels) {
                     LabelService.getLabelsForCredential(key, credential).forEachIndexed { idx, label ->
-                        val chip = createAndAddLabelChip(label, credentialLabelContainerGroup, itemView.context)
+                        val chip = createAndAddLabelChip(
+                            label,
+                            credentialLabelContainerGroup,
+                            thinner = true,
+                            itemView.context)
                         chip.setOnClickListener { _ ->
                             LabelDialogOpener.openLabelDialog(activity, label)
                         }

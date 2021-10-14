@@ -26,12 +26,16 @@
         <entry key="app/src/main/res/layout/activity_edit_label.xml" value="0.33747178329571104" />
         <entry key="app/src/main/res/layout/activity_export_vault.xml" value="0.4" />
         <entry key="app/src/main/res/layout/activity_import_credential.xml" value="0.264" />
+        <entry key="app/src/main/res/layout/activity_list_labels.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.10885416666666667" />
         <entry key="app/src/main/res/layout/activity_nfc.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/activity_qr_code.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/activity_show_credential.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/activity_verify.xml" value="0.264" />
+        <entry key="app/src/main/res/layout/content_autofill_view.xml" value="0.17864583333333334" />
+        <entry key="app/src/main/res/layout/content_create_vault.xml" value="0.1296875" />
         <entry key="app/src/main/res/layout/content_dynamic_labels_list.xml" value="0.17864583333333334" />
+        <entry key="app/src/main/res/layout/content_label_chip.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/content_list_credentials.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/fragment_create_vault_summarize.xml" value="0.264" />
         <entry key="app/src/main/res/layout/fragment_edit_credential_data.xml" value="0.1" />
@@ -39,7 +43,7 @@
         <entry key="app/src/main/res/layout/fragment_import_vault_file.xml" value="0.8" />
         <entry key="app/src/main/res/layout/fragment_load_vault_file.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/fragment_login_enter_masterpassword.xml" value="0.2234527687296417" />
-        <entry key="app/src/main/res/layout/recyclerview_credential.xml" value="0.17864583333333334" />
+        <entry key="app/src/main/res/layout/recyclerview_credential.xml" value="0.2" />
         <entry key="app/src/main/res/layout/recyclerview_label.xml" value="0.15572916666666667" />
         <entry key="app/src/main/res/menu/credential_detail_menu_import.xml" value="0.3015625" />
         <entry key="app/src/main/res/menu/menu_main.xml" value="0.264" />

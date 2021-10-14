@@ -25,6 +25,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import de.jepfa.yapm.R
@@ -223,17 +224,20 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                 val allChips = ArrayList<Chip>(allLabels.size)
 
                 allLabels.forEachIndexed { idx, label ->
-                    val chip = createAndAddLabelChip(label, labelsContainer, this)
+                    val chip = createAndAddLabelChip(label, labelsContainer, thinner = false, this)
                     chip.isClickable = true
                     chip.isCheckable = true
                     chip.isChecked = LabelFilter.isFilterFor(label)
                     allChips.add(chip)
                 }
+                val builder = androidx.appcompat.app.AlertDialog.Builder(this)
+                val container = ScrollView(builder.context)
+                container.addView(labelsView)
 
                 val dialog = AlertDialog.Builder(this)
                     .setTitle(getString(R.string.filter))
                     .setIcon(R.drawable.ic_baseline_filter_list_24)
-                    .setView(labelsView)
+                    .setView(container)
                     .setNeutralButton(getString(R.string.deselect_all), null)
                     .setPositiveButton(android.R.string.ok, null)
                     .setNegativeButton(android.R.string.cancel, null)

@@ -159,7 +159,6 @@
     <string name="filter">Filter by labels</string>
     <string name="pref_header_autofill">Auto fill support</string>
     <string name="title_activity_list_label">Manage Labels</string>
-    <!-- Strings used for fragments for navigation -->
     <string name="action_labels">Manage labels</string>
     <string name="label_data_params">Change the label name and description and color here</string>
     <string name="choose_color">Choose a color</string>

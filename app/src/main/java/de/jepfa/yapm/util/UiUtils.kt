@@ -30,11 +30,19 @@ fun enrichId(context: Context, name: String, id: Int?): String {
 fun createAndAddLabelChip(
     label: Label,
     container: ViewGroup,
+    thinner: Boolean,
     context: Context?
 ): Chip {
     val chip = Chip(context)
     chip.text = label.name
     chip.textAlignment = View.TEXT_ALIGNMENT_CENTER
+    if (thinner) {
+        chip.textSize = 12.0f
+        chip.chipCornerRadius = 32.0f
+        chip.chipMinHeight = 24.0f
+        chip.setEnsureMinTouchTargetSize(true)
+        chip.ensureAccessibleTouchTarget(32)
+    }
     context?.let {
         chip.chipBackgroundColor = ColorStateList.valueOf(label.getColor(it))
         chip.setTextColor(it.getColor(android.R.color.white))
