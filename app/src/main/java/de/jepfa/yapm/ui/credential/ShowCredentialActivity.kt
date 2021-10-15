@@ -12,6 +12,7 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.setPadding
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.chip.ChipGroup
 import de.jepfa.yapm.R
@@ -51,7 +52,8 @@ class ShowCredentialActivity : SecureActivity() {
     private var obfuscationKey: Key? = null
 
     private lateinit var credential: EncCredential //TODO change to ?
-    private lateinit var appBarLayout: CollapsingToolbarLayout
+    private lateinit var toolBarLayout: CollapsingToolbarLayout
+    private lateinit var appBarLayout: AppBarLayout
     private lateinit var titleLayout: LinearLayout
     private lateinit var toolbarChipGroup: ChipGroup
     private lateinit var passwordTextView: TextView
@@ -59,6 +61,10 @@ class ShowCredentialActivity : SecureActivity() {
     private lateinit var websiteTextView: TextView
     private lateinit var additionalInfoTextView: TextView
     private var optionsMenu: Menu? = null
+
+    init {
+        enableBack = true
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,7 +90,8 @@ class ShowCredentialActivity : SecureActivity() {
         multiLine = PreferenceService.getAsBool(PREF_PASSWD_WORDS_ON_NL, this)
         passwordPresentation = Password.PresentationMode.createFromFlags(multiLine, formatted)
 
-        appBarLayout = findViewById(R.id.credential_detail_toolbar_layout)
+        toolBarLayout = findViewById(R.id.credential_detail_toolbar_layout)
+        appBarLayout = findViewById(R.id.credential_detail_appbar_layout)
 
         userTextView  = findViewById(R.id.user)
         websiteTextView  = findViewById(R.id.website)
@@ -159,11 +166,6 @@ class ShowCredentialActivity : SecureActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
-        if (id == android.R.id.home) {
-            val upIntent = Intent(this, ListCredentialsActivity::class.java)
-            navigateUpTo(upIntent)
-            return true
-        }
 
         if (Session.isDenied()) {
             LockVaultUseCase.execute(this)
@@ -347,7 +349,7 @@ class ShowCredentialActivity : SecureActivity() {
                 password.deobfuscate(it)
             }
 
-            appBarLayout.title = name
+            toolBarLayout.title = name
 
             toolbarChipGroup.removeAllViews()
 
@@ -365,6 +367,7 @@ class ShowCredentialActivity : SecureActivity() {
                 val blindView = TextView(this)
                 blindView.setPadding(16)
                 titleLayout.addView(blindView)
+                appBarLayout.layoutParams.height -= 50
             }
 
             if (user.isEmpty()) {
