@@ -140,10 +140,10 @@ class ShowCredentialActivity : SecureActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         if (externalMode) {
-            menuInflater.inflate(R.menu.credential_detail_menu_import, menu)
+            menuInflater.inflate(R.menu.menu_credential_detail_import, menu)
         }
         else {
-            menuInflater.inflate(R.menu.credential_detail_menu, menu)
+            menuInflater.inflate(R.menu.menu_credential_detail, menu)
         }
 
         val enableCopyPassword = PreferenceService.getAsBool(PREF_ENABLE_COPY_PASSWORD, this)

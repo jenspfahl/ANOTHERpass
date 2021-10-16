@@ -72,7 +72,7 @@ class ListLabelsActivity : SecureActivity() {
             return false
         }
 
-        menuInflater.inflate(R.menu.list_labels_menu, menu)
+        menuInflater.inflate(R.menu.menu_label_list, menu)
 
         return super.onCreateOptionsMenu(menu)
     }

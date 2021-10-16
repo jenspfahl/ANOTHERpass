@@ -595,7 +595,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.credential_edit_menu, menu)
+        inflater.inflate(R.menu.menu_credential_edit, menu)
 
         optionsMenu = menu
 

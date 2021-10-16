@@ -82,7 +82,7 @@ class QrCodeActivity : SecureActivity() {
             return false
         }
 
-        menuInflater.inflate(R.menu.qrcode_menu, menu)
+        menuInflater.inflate(R.menu.menu_qrcode, menu)
 
         return super.onCreateOptionsMenu(menu)
     }

@@ -158,7 +158,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                 }
             })
 
-            popup.inflate(R.menu.credential_list_menu)
+            popup.inflate(R.menu.menu_credential_list)
             popup.show()
         }
 
