@@ -18,6 +18,9 @@ interface EncLabelDao {
     @Query("DELETE FROM EncLabelEntity WHERE id = :id")
     suspend fun deleteById(id: Int)
 
+    @Query("DELETE FROM EncLabelEntity WHERE id IN (:ids)")
+    suspend fun deleteByIds(ids: List<Int>)
+
     @Query("SELECT * FROM EncLabelEntity WHERE id = :id")
     fun getById(id: Int): Flow<EncLabelEntity>
 

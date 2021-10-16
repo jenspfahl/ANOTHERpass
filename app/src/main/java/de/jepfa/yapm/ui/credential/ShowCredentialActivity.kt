@@ -353,7 +353,7 @@ class ShowCredentialActivity : SecureActivity() {
 
             toolbarChipGroup.removeAllViews()
 
-            val labelsForCredential = LabelService.getLabelsForCredential(key, credential)
+            val labelsForCredential = LabelService.decryptLabelsForCredential(key, credential)
             if (labelsForCredential.isNotEmpty()) {
                 val thinner = shouldMakeLabelThinner(labelsForCredential)
                 labelsForCredential.forEachIndexed { idx, label ->

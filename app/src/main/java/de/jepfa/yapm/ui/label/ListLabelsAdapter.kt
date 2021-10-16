@@ -17,6 +17,7 @@ import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.usecase.label.DeleteLabelUseCase
 import de.jepfa.yapm.util.DebugInfo
 
 
@@ -49,7 +50,8 @@ class ListLabelsAdapter(private val listLabelsActivity: ListLabelsActivity) :
                         .setMessage(listLabelsActivity.getString(R.string.message_delete_label, current.name))
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
-                            listLabelsActivity.deleteLabel(current)
+                            DeleteLabelUseCase.execute(current, listLabelsActivity)
+
                         }
                         .setNegativeButton(android.R.string.no, null)
                         .show()

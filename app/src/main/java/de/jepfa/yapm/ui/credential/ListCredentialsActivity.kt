@@ -57,6 +57,9 @@ import de.jepfa.yapm.util.*
 import java.util.*
 import kotlin.collections.ArrayList
 
+/**
+ * This is the main activity
+ */
 class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationItemSelectedListener  {
 
     var assistStructure: AssistStructure? = null

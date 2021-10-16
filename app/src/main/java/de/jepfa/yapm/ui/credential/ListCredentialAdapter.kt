@@ -14,7 +14,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
@@ -215,7 +214,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                 key ?: return credentials
                 return credentials
                     .filter {
-                        val labels = LabelService.getLabelsForCredential(key, it)
+                        val labels = LabelService.decryptLabelsForCredential(key, it)
                         LabelFilter.isFilterFor(labels)
                     }
                     .toList()
@@ -291,7 +290,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
 
                 val showLabels = PreferenceService.getAsBool(PREF_SHOW_LABELS_IN_LIST, itemView.context)
                 if (showLabels) {
-                    LabelService.getLabelsForCredential(key, credential).forEachIndexed { idx, label ->
+                    LabelService.decryptLabelsForCredential(key, credential).forEachIndexed { idx, label ->
                         val chip = createAndAddLabelChip(
                             label,
                             credentialLabelContainerGroup,

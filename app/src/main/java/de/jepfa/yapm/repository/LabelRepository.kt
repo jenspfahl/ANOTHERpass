@@ -28,6 +28,11 @@ class LabelRepository(private val encLabelDao: EncLabelDao) {
         encLabelDao.deleteById(id)
     }
 
+    @WorkerThread
+    suspend fun deleteByIds(ids: List<Int>) {
+        encLabelDao.deleteByIds(ids)
+    }
+
     fun getById(id: Int): Flow<EncLabel> {
         val encLabel = encLabelDao.getById(id)
         return encLabel.filterNotNull().map { mapToLabel(it)}

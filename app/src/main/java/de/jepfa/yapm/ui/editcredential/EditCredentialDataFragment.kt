@@ -139,7 +139,7 @@ class EditCredentialDataFragment : SecureFragment() {
                     editCredentialNameView.requestFocus()
 
                     LabelService.updateLabelsForCredential(key, it)
-                    val allLabelsForCredential = LabelService.getLabelsForCredential(key, it)
+                    val allLabelsForCredential = LabelService.decryptLabelsForCredential(key, it)
 
                     val labelSuggestions = allLabels
                         .filterNot { allLabelsForCredential.contains(it) }

@@ -28,6 +28,9 @@ class LabelViewModel(private val repository: LabelRepository) : ViewModel() {
     fun deleteById(id: Int)  = viewModelScope.launch {
         repository.deleteById(id)
     }
+    fun deleteByIds(ids: List<Int>)  = viewModelScope.launch {
+        repository.deleteByIds(ids)
+    }
 }
 
 

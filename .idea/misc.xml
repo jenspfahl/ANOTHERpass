@@ -22,6 +22,7 @@
         <entry key="app/src/main/res/drawable/ic_baseline_qr_code_scanner_48.xml" value="0.17604166666666668" />
         <entry key="app/src/main/res/drawable/ic_baseline_sort_24.xml" value="0.321875" />
         <entry key="app/src/main/res/layout/activity_change_master_password.xml" value="0.17864583333333334" />
+        <entry key="app/src/main/res/layout/activity_change_pin.xml" value="0.20244565217391305" />
         <entry key="app/src/main/res/layout/activity_create_or_import_vault.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/activity_edit_label.xml" value="0.33747178329571104" />
         <entry key="app/src/main/res/layout/activity_export_vault.xml" value="0.4" />

@@ -58,7 +58,7 @@ object LabelService {
 
     fun updateLabelsForCredential(key: SecretKeyHolder, credential: EncCredential) {
 
-        val labels = getLabelsForCredential(key, credential)
+        val labels = decryptLabelsForCredential(key, credential)
 
         labels
             .forEach { label ->
@@ -87,7 +87,7 @@ object LabelService {
             .toList()
     }
 
-    fun getLabelsForCredential(key: SecretKeyHolder, credential: EncCredential): List<Label> {
+    fun decryptLabelsForCredential(key: SecretKeyHolder, credential: EncCredential): List<Label> {
         if (!credential.isPersistent()) {
             return Collections.emptyList()
         }

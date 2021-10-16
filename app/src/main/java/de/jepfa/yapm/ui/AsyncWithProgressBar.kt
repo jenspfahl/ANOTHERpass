@@ -9,9 +9,12 @@ import android.widget.ProgressBar
 class AsyncWithProgressBar(
     val activity: BaseActivity?,
     val backgroundHandler: () -> Boolean,
-    val postHandler: (backgroundResult: Boolean) -> Unit
+    private val postHandler: (backgroundResult: Boolean) -> Unit
 ) : AsyncTask<Void, Void, Boolean>()
 {
+    constructor(activity: BaseActivity?,
+                backgroundHandler: () -> Boolean): this(activity, backgroundHandler, {})
+
     private lateinit var progressBar: ProgressBar
     init {
         val activityProgressBar = activity?.getProgressBar()

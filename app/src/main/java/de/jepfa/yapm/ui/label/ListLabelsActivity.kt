@@ -1,5 +1,6 @@
 package de.jepfa.yapm.ui.label
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
@@ -11,14 +12,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
-import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.ui.AsyncWithProgressBar
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.ui.nfc.NfcActivity
-import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
-import de.jepfa.yapm.util.PermissionChecker
-import de.jepfa.yapm.util.putEncryptedExtra
+import de.jepfa.yapm.usecase.label.DeleteUnusedLabelUseCase
 
 class ListLabelsActivity : SecureActivity() {
 
@@ -28,6 +26,7 @@ class ListLabelsActivity : SecureActivity() {
         enableBack = true
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list_labels)
@@ -105,48 +104,10 @@ class ListLabelsActivity : SecureActivity() {
     }
 
     private fun deleteUnusedLabels() {
-        LabelService.getAllLabels()
-            .forEach { label ->
-                val labelId = label.labelId
-                if (labelId != null) {
-                    val notUsed =
-                        LabelService.getCredentialIdsForLabelId(labelId)?.isEmpty() ?: true
-                    if (notUsed) {
-                        label.let {
-                            deleteLabel(it)
-                        }
-                    }
-                }
-        }
-
-    }
-
-    fun deleteLabel(label: Label) {
-        val key = masterSecretKey
-        val labelId =label.labelId
-        if (key != null && labelId != null) {
-            val credentialsToUpdate = LabelService.getCredentialIdsForLabelId(labelId)
-            credentialsToUpdate?.forEach { credentialId ->
-                credentialViewModel.getById(credentialId).observe(this, { credential ->
-                    credential?.let {
-                        val labels = LabelService.getLabelsForCredential(key, credential)
-
-                        val remainingLabelChips = labels
-                            .filterNot { it.labelId == labelId}
-                            .map { it.name }
-                        LabelService.encryptLabelIds(key, remainingLabelChips)
-                        LabelService.updateLabelsForCredential(key, credential)
-                    }
-                })
-
-            }
-            LabelService.removeLabel(label)
-            LabelFilter.unsetFilterFor(label)
-            labelViewModel.deleteById(label.labelId)
-        }
+        AsyncWithProgressBar(this) { DeleteUnusedLabelUseCase.execute(Unit, this) }
     }
 
     override fun lock() {
-       // TODO listLabelsAdapter.submitList(emptyList())
+       listLabelsAdapter.submitList(emptyList())
     }
 }
