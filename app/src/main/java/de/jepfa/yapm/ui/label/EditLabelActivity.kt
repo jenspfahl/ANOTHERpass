@@ -1,6 +1,5 @@
 package de.jepfa.yapm.ui.label
 
-import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.TextUtils
@@ -14,7 +13,6 @@ import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.model.encrypted.EncLabel
@@ -22,7 +20,6 @@ import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
-import de.jepfa.yapm.usecase.label.DeleteLabelUseCase
 import de.jepfa.yapm.util.createAndAddLabelChip
 import de.jepfa.yapm.util.getIntExtra
 import java.util.*
@@ -150,19 +147,7 @@ class EditLabelActivity : SecureActivity() {
 
         if (id == R.id.menu_delete_label) {
             label?.let { current ->
-                android.app.AlertDialog.Builder(this)
-                    .setTitle(R.string.title_delete_label)
-                    .setMessage(getString(R.string.message_delete_label, current.name))
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
-                        DeleteLabelUseCase.execute(current, this)
-
-                        val upIntent = Intent(this.intent)
-                        navigateUpTo(upIntent)
-                    }
-                    .setNegativeButton(android.R.string.no, null)
-                    .show()
-
+                LabelDialogs.openDeleteLabel(current, this)
             }
 
             return true

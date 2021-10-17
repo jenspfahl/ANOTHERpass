@@ -17,6 +17,7 @@ import de.jepfa.yapm.ui.AsyncWithProgressBar
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.LockVaultUseCase
 import de.jepfa.yapm.usecase.label.DeleteUnusedLabelUseCase
+import de.jepfa.yapm.util.toastText
 
 class ListLabelsActivity : SecureActivity() {
 
@@ -38,7 +39,7 @@ class ListLabelsActivity : SecureActivity() {
 
         labelViewModel.allLabels.observe(this, { labels ->
             masterSecretKey?.let{ key ->
-                LabelService.initLabels(key, labels.toSet())
+                LabelService.initLabels(key, labels.toSet()) //TODO bad solution, better just looking for updates
                 listLabelsAdapter.submitList(LabelService.getAllLabels())
             }
         })
@@ -104,7 +105,14 @@ class ListLabelsActivity : SecureActivity() {
     }
 
     private fun deleteUnusedLabels() {
-        AsyncWithProgressBar(this) { DeleteUnusedLabelUseCase.execute(Unit, this) }
+        AsyncWithProgressBar(this,
+            { DeleteUnusedLabelUseCase.execute(Unit, this) },
+            { success ->
+              if (!success) {
+                  toastText(this, R.string.no_unused_credentials_to_delete)
+                    //TODO better return number of deleted creds
+              }
+            })
     }
 
     override fun lock() {

@@ -1,6 +1,5 @@
 package de.jepfa.yapm.util
 
-import android.annotation.SuppressLint
 import android.net.Uri
 import java.text.DateFormat
 import java.text.DecimalFormat
@@ -9,7 +8,8 @@ import java.text.SimpleDateFormat
 
 object Constants {
     val HOMEPAGE = Uri.parse("https://anotherpass.jepfa.de")
-    val BUG_REPORT_SITE = "https://github.com/jenspfahl/anotherpass/issues/new?title=%s&body=%s"
+    val FOSS_SITE = "https://github.com/jenspfahl/anotherpass"
+    val BUG_REPORT_SITE = FOSS_SITE + "/issues/new?title=%s&body=%s"
 
     val MIN_PIN_LENGTH = 6
     val MAX_LABELS_PER_CREDENTIAL = 5

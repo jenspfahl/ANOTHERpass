@@ -49,6 +49,7 @@ class ShowCredentialActivity : SecureActivity() {
     private var passwordPresentation = Password.PresentationMode.DEFAULT
     private var maskPassword = false
     private var multiLine = false
+    private var isAppBarAdjusted = false
     private var obfuscationKey: Key? = null
 
     private lateinit var credential: EncCredential //TODO change to ?
@@ -98,19 +99,6 @@ class ShowCredentialActivity : SecureActivity() {
         additionalInfoTextView  = findViewById(R.id.additional_info)
         passwordTextView = findViewById(R.id.passwd)
 
-        websiteTextView.setOnClickListener {
-            val uri: Uri? = try {
-            Uri.parse(ensureHttp(websiteTextView.text.toString()))
-            } catch (e: Exception) {
-                null
-            }
-
-            if (uri != null) {
-                val browserIntent = Intent(Intent.ACTION_VIEW, uri)
-                startActivity(browserIntent)
-            }
-        }
-
         passwordTextView.setOnClickListener {
             if (maskPassword) {
                 maskPassword = false
@@ -127,15 +115,6 @@ class ShowCredentialActivity : SecureActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-    }
-
-    private fun ensureHttp(s: String): String {
-        if (s.startsWith(prefix = "http", ignoreCase = true)) {
-            return s
-        }
-        else {
-            return "http://" + s
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -367,7 +346,10 @@ class ShowCredentialActivity : SecureActivity() {
                 val blindView = TextView(this)
                 blindView.setPadding(16)
                 titleLayout.addView(blindView)
-                appBarLayout.layoutParams.height -= 50
+                if (!isAppBarAdjusted) {
+                    appBarLayout.layoutParams.height -= 50
+                    isAppBarAdjusted = true
+                }
             }
 
             if (user.isEmpty()) {
@@ -376,11 +358,15 @@ class ShowCredentialActivity : SecureActivity() {
             }
             userTextView.text = user
 
+            val websiteView: ImageView = findViewById(R.id.website_image)
+            websiteTextView.text = website
             if (website.isEmpty()) {
-                val websiteView: ImageView = findViewById(R.id.website_image)
                 websiteView.visibility = View.INVISIBLE
             }
-            websiteTextView.text = website
+            else {
+                websiteView.visibility = View.VISIBLE
+                linkify(websiteTextView)
+            }
 
             additionalInfoTextView.text = additionalInfo
 

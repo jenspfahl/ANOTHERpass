@@ -327,6 +327,10 @@
     <string name="credential_imported">Credential \'%1$s\' imported</string>
     <string name="delete_unused_labels">Delete all unused labels</string>
     <string name="message_delete_unused_labels">Do you really want to delete all unused labels?</string>
+    <string name="no_unused_credentials_to_delete">No unused credentials to delete</string>
+    <string name="unused_credentials_deleted">%1$d unused credentials deleted</string>
+    <string name="this_app_is_foss">This app is Open Source and published under the MIT licence.</string>
+    <string name="visit_foss_site">Visit %1$s to inspect the licence, the code and to report issues or bugs.</string>
 
 
 </resources>

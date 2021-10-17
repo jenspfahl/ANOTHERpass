@@ -1,9 +1,14 @@
 package de.jepfa.yapm.util
 
+import android.app.Dialog
 import android.content.Context
 import android.content.res.ColorStateList
+import android.text.SpannableString
+import android.text.method.LinkMovementMethod
+import android.text.util.Linkify
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
@@ -50,3 +55,31 @@ fun createAndAddLabelChip(
     container.addView(chip)
     return chip
 }
+
+fun linkify(s: SpannableString) {
+    Linkify.addLinks(s, Linkify.WEB_URLS)
+}
+
+fun linkify(textView: TextView) {
+    textView.text = ensureHttp(textView.text.toString())
+    Linkify.addLinks(textView, Linkify.WEB_URLS)
+    textView.movementMethod = LinkMovementMethod.getInstance()
+}
+
+fun linkifyDialogMessage(dialog: Dialog) {
+    val msgTextView = dialog.findViewById<TextView>(android.R.id.message)
+    msgTextView?.let {
+        it.movementMethod = LinkMovementMethod.getInstance()
+    }
+}
+
+
+private fun ensureHttp(s: String): String {
+    if (s.startsWith(prefix = "http", ignoreCase = true)) {
+        return s
+    }
+    else {
+        return "http://" + s
+    }
+}
+
