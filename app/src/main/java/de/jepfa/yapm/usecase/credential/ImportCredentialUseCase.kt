@@ -1,16 +1,21 @@
-package de.jepfa.yapm.usecase
+package de.jepfa.yapm.usecase.credential
 
 import android.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.usecase.InputUseCase
+import de.jepfa.yapm.usecase.UseCase
 import de.jepfa.yapm.util.enrichId
 import de.jepfa.yapm.util.toastText
 
-object ImportCredentialUseCase {
-    fun execute(credential: EncCredential, activity: SecureActivity, successHandler: () -> Unit) {
-        val credentialId = credential.id
+object ImportCredentialUseCase: InputUseCase<ImportCredentialUseCase.Input, SecureActivity>() {
+
+    data class Input(val credential: EncCredential, val successHandler: () -> Unit)
+
+    override fun doExecute(input: Input, activity: SecureActivity): Boolean {
+        val credentialId = input.credential.id
         if (credentialId != null) {
             activity.credentialViewModel.findById(credentialId).observe(activity) { existingCredential ->
                 if (existingCredential != null) {
@@ -21,21 +26,23 @@ object ImportCredentialUseCase {
                         .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
 
                             existingCredential.backupForRestore()
-                            existingCredential.copyData(credential)
+                            existingCredential.copyData(input.credential)
 
-                            saveAndNavigateBack(isNew = false, activity, existingCredential, successHandler)
+                            saveAndNavigateBack(isNew = false, activity, existingCredential, input.successHandler)
                         }
                         .setNegativeButton(android.R.string.no, null)
                         .show()
                 }
                 else {
-                    saveAndNavigateBack(isNew = true, activity, credential, successHandler)
+                    saveAndNavigateBack(isNew = true, activity, input.credential, input.successHandler)
                 }
             }
         }
         else {
-            saveAndNavigateBack(isNew = true, activity, credential, successHandler)
+            saveAndNavigateBack(isNew = true, activity, input.credential, input.successHandler)
         }
+
+        return true
     }
 
     private fun saveAndNavigateBack(

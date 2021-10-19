@@ -14,12 +14,12 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.chip.Chip
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.usecase.LockVaultUseCase
+import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.createAndAddLabelChip
 import de.jepfa.yapm.util.getIntExtra
 import java.util.*

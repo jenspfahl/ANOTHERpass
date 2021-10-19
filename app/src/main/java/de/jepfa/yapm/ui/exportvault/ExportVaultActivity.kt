@@ -5,11 +5,11 @@ import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.widget.SwitchCompat
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
-import de.jepfa.yapm.usecase.LockVaultUseCase
+import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.Constants.SDF_D_INTERNATIONAL
 import de.jepfa.yapm.util.PermissionChecker
 import java.util.*

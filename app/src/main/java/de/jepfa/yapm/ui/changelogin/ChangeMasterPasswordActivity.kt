@@ -2,20 +2,23 @@ package de.jepfa.yapm.ui.changelogin
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
 import de.jepfa.yapm.R
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.secret.Password
-import de.jepfa.yapm.model.Session
-import de.jepfa.yapm.service.secret.MasterPasswordService
-import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.usecase.ChangeMasterPasswordUseCase
-import de.jepfa.yapm.usecase.GenerateMasterPasswordUseCase
-import de.jepfa.yapm.usecase.LockVaultUseCase
-import de.jepfa.yapm.ui.AsyncWithProgressBar
-import de.jepfa.yapm.util.PasswordColorizer
+import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
+import de.jepfa.yapm.service.secret.MasterPasswordService
+import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
+import de.jepfa.yapm.usecase.secret.ChangeMasterPasswordUseCase
+import de.jepfa.yapm.usecase.secret.GenerateMasterPasswordUseCase
+import de.jepfa.yapm.usecase.vault.LockVaultUseCase
+import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.toastText
 
 class ChangeMasterPasswordActivity : SecureActivity() {
@@ -53,7 +56,7 @@ class ChangeMasterPasswordActivity : SecureActivity() {
 
         val buttonGeneratePasswd: Button = findViewById(R.id.button_generate_passwd)
         buttonGeneratePasswd.setOnClickListener {
-            generatedPassword = GenerateMasterPasswordUseCase.execute(pseudoPhraseSwitch.isChecked)
+            generatedPassword = GenerateMasterPasswordUseCase.execute(pseudoPhraseSwitch.isChecked, this).data
             generatedPasswdView.text = PasswordColorizer.spannableString(generatedPassword, this)
             passwordChanged = true
         }
@@ -96,26 +99,24 @@ class ChangeMasterPasswordActivity : SecureActivity() {
 
         getProgressBar()?.let {
 
-            AsyncWithProgressBar(
-                this,
-                {
-                    ChangeMasterPasswordUseCase.execute(currentPin, generatedPassword, storeMasterPassword, this)
-                },
-                { success ->
-                    if (success) {
-                        val upIntent = Intent(intent)
-                        navigateUpTo(upIntent)
+            UseCaseBackgroundLauncher(ChangeMasterPasswordUseCase)
+                .launch(this,
+                    ChangeMasterPasswordUseCase.Input(LoginData(currentPin, generatedPassword), storeMasterPassword))
+                    { output ->
+                        if (output.success) {
+                            val upIntent = Intent(intent)
+                            navigateUpTo(upIntent)
 
-                        generatedPassword.clear()
+                            generatedPassword.clear()
 
-                        toastText(baseContext, R.string.masterpassword_changed)
+                            toastText(baseContext, R.string.masterpassword_changed)
+                        }
+                        else {
+                            currentPinTextView.error = getString(R.string.pin_wrong)
+                            currentPinTextView.requestFocus()
+                        }
                     }
-                    else {
-                        currentPinTextView.error = getString(R.string.pin_wrong)
-                        currentPinTextView.requestFocus()
-                    }
-                }
-            )
+
 
         }
     }

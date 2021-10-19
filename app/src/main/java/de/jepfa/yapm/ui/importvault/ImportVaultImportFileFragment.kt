@@ -8,21 +8,20 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.google.gson.JsonObject
 import com.google.zxing.integration.android.IntentIntegrator
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
-import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.service.io.JsonService
-import de.jepfa.yapm.ui.BaseFragment
-import de.jepfa.yapm.ui.nfc.NfcActivity
-import de.jepfa.yapm.usecase.ImportVaultUseCase
-import de.jepfa.yapm.ui.AsyncWithProgressBar
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.MasterKeyService
 import de.jepfa.yapm.service.secret.SaltService
+import de.jepfa.yapm.ui.BaseActivity
+import de.jepfa.yapm.ui.BaseFragment
+import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
+import de.jepfa.yapm.ui.nfc.NfcActivity
+import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
 import de.jepfa.yapm.util.QRCodeUtil
 import de.jepfa.yapm.util.toastText
 
@@ -102,7 +101,9 @@ class ImportVaultImportFileFragment : BaseFragment() {
                 return@setOnClickListener
             }
 
-            importVault(jsonContent, encMasterKey)
+            getBaseActivity()?.let {
+                importVault(jsonContent, encMasterKey, it)
+            }
         }
     }
 
@@ -128,28 +129,20 @@ class ImportVaultImportFileFragment : BaseFragment() {
 
     private fun importVault(
         jsonContent: JsonObject,
-        encMasterKey: String?
+        encMasterKey: String?,
+        activity: BaseActivity
     ) {
-
-        getBaseActivity()?.getProgressBar()?.let {
-
-            AsyncWithProgressBar(
-                getBaseActivity(),
-                {
-                    val success = ImportVaultUseCase.execute(jsonContent, encMasterKey, getBaseActivity())
-                    success
-                },
-                { success ->
-                    if (!success) {
-                        toastText(context, R.string.something_went_wrong)
-                    }
-                    else {
-                        findNavController().navigate(R.id.action_importVault_to_Login)
-                        getBaseActivity()?.finish()
-                    }
+        UseCaseBackgroundLauncher(ImportVaultUseCase)
+            .launch(activity, ImportVaultUseCase.Input(jsonContent, encMasterKey))
+            { output ->
+                if (!output.success) {
+                    toastText(context, R.string.something_went_wrong)
                 }
-            )
-        }
+                else {
+                    findNavController().navigate(R.id.action_importVault_to_Login)
+                    getBaseActivity()?.finish()
+                }
+            }
     }
 
     private fun getScannedFromIntent(requestCode: Int, resultCode: Int, data: Intent?): String? {

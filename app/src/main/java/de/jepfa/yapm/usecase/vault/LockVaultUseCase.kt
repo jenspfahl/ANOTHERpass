@@ -1,10 +1,11 @@
-package de.jepfa.yapm.usecase
+package de.jepfa.yapm.usecase.vault
 
-import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.usecase.BasicUseCase
 import de.jepfa.yapm.util.ClipboardUtil
 
-object LockVaultUseCase: SecureActivityUseCase {
+object LockVaultUseCase: BasicUseCase<SecureActivity>() {
 
     override fun execute(activity: SecureActivity): Boolean {
         Session.lock()

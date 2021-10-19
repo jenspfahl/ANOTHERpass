@@ -1,28 +1,28 @@
-package de.jepfa.yapm.usecase
+package de.jepfa.yapm.usecase.vault
 
 import android.os.Build
 import android.util.Log
 import com.google.gson.JsonObject
 import de.jepfa.yapm.model.encrypted.*
 import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_IMPORTED_AT
 import de.jepfa.yapm.service.io.JsonService
-import de.jepfa.yapm.service.io.JsonService.JSON_APP_SETTINGS
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
+import de.jepfa.yapm.usecase.InputUseCase
 import de.jepfa.yapm.util.Constants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
-object ImportVaultUseCase {
+object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, BaseActivity>() {
 
-    fun execute(jsonContent: JsonObject, encMasterKey: String?, activity: BaseActivity?): Boolean {
-        if (activity == null) return false
+    data class Input(val jsonContent: JsonObject, val encMasterKey: String?)
+
+    override fun doExecute(input: Input, activity: BaseActivity): Boolean {
         try {
-            if (readAndImport(jsonContent, activity, encMasterKey)) return false
+            if (readAndImport(input.jsonContent, activity, input.encMasterKey)) return false
         } catch (e: Exception) {
             Log.e("IMP", "cannot read json", e)
             return false
@@ -89,7 +89,7 @@ object ImportVaultUseCase {
                 .forEach { c -> activity.getApp().labelRepository.insert(c) }
         }
 
-        val appSettings = jsonContent.get(JSON_APP_SETTINGS)?.asJsonObject
+        val appSettings = jsonContent.get(JsonService.JSON_APP_SETTINGS)?.asJsonObject
         if (appSettings != null) {
             appSettings.entrySet()
                 .forEach { (k,v) ->
@@ -113,7 +113,7 @@ object ImportVaultUseCase {
         }
 
         PreferenceService.putString(
-            DATA_VAULT_IMPORTED_AT,
+            PreferenceService.DATA_VAULT_IMPORTED_AT,
             Constants.SDF_DT_MEDIUM.format(Date()),
             activity
         )
@@ -127,5 +127,6 @@ object ImportVaultUseCase {
             else DEFAULT_CIPHER_ALGORITHM
         return cipherAlgorithm
     }
+
 
 }

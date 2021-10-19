@@ -16,7 +16,7 @@ import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.chip.ChipGroup
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
@@ -34,9 +34,9 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
 import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.ui.label.LabelDialogOpener
-import de.jepfa.yapm.usecase.ExportCredentialUseCase
-import de.jepfa.yapm.usecase.ImportCredentialUseCase
-import de.jepfa.yapm.usecase.LockVaultUseCase
+import de.jepfa.yapm.usecase.credential.ExportCredentialUseCase
+import de.jepfa.yapm.usecase.credential.ImportCredentialUseCase
+import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.PasswordColorizer.spannableObfusableAndMaskableString
 
@@ -157,10 +157,13 @@ class ShowCredentialActivity : SecureActivity() {
         }
 
         if (id == R.id.menu_import_credential) {
-            ImportCredentialUseCase.execute(credential, this) {
+            val input = ImportCredentialUseCase.Input(credential)
+            {
                 val upIntent = Intent(this, ListCredentialsActivity::class.java)
                 navigateUpTo(upIntent)
             }
+
+            ImportCredentialUseCase.execute(input, this)
             return true
         }
 

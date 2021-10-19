@@ -8,11 +8,13 @@ import android.widget.TextView
 import android.widget.Toast
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
-import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.model.session.LoginData
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.usecase.ChangePinUseCase
-import de.jepfa.yapm.usecase.LockVaultUseCase
+import de.jepfa.yapm.usecase.secret.ChangePinUseCase
+import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.ui.AsyncWithProgressBar
+import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.toastText
@@ -90,13 +92,10 @@ class ChangePinActivity : SecureActivity() {
 
         getProgressBar()?.let {
 
-            AsyncWithProgressBar(
-                this,
-                {
-                    ChangePinUseCase.execute(currentPin, newPin1, this)
-                },
-                { success ->
-                    if (success) {
+            UseCaseBackgroundLauncher(ChangePinUseCase)
+                .launch(this, LoginData(currentPin, newPin1))
+                { output ->
+                    if (output.success) {
                         val upIntent = Intent(intent)
                         navigateUpTo(upIntent)
 
@@ -110,8 +109,6 @@ class ChangePinActivity : SecureActivity() {
                         currentPinTextView.requestFocus()
                     }
                 }
-            )
-
         }
     }
 

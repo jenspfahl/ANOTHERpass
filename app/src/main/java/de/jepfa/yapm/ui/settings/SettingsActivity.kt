@@ -5,11 +5,11 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.preference.*
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.usecase.LockVaultUseCase
+import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.ClipboardUtil
 
 private const val TITLE_TAG = "settingsActivityTitle"

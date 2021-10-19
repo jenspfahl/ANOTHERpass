@@ -13,7 +13,7 @@ import android.view.*
 import android.view.View.OnTouchListener
 import android.widget.Button
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_TRANSPARENT_OVERLAY

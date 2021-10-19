@@ -1,30 +1,32 @@
-package de.jepfa.yapm.usecase
+package de.jepfa.yapm.usecase.credential
 
 import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
-import de.jepfa.yapm.model.export.EncExportableCredential
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.export.EncExportableCredential
 import de.jepfa.yapm.model.export.PlainShareableCredential
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
-import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.service.io.JsonService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
+import de.jepfa.yapm.usecase.InputUseCase
 import de.jepfa.yapm.util.putEncryptedExtra
 
-object ExportCredentialUseCase {
+object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, SecureActivity>() {
 
     enum class ExportMode(val labelId: Int, val colorId: Int? = null) {
         PLAIN_PASSWD(R.string.export_plain_passwd, Color.RED),
         PLAIN_CREDENTIAL_RECORD(R.string.export_plain_credential_record, Color.RED),
         ENC_CREDENTIAL_RECORD(R.string.export_enc_credential_record),
     }
+
+    data class Input(val mode: ExportMode, val credential: EncCredential, val obfuscationKey: Key?)
 
     fun openStartExportDialog(credential: EncCredential, obfuscationKey: Key?, activity: SecureActivity) {
         val listItems = ExportMode.values().map { activity.getString(it.labelId) }.toTypedArray()
@@ -34,7 +36,7 @@ object ExportCredentialUseCase {
             .setTitle(R.string.export_credential)
             .setSingleChoiceItems(listItems, -1) { dialogInterface, i ->
                 val mode = ExportMode.values()[i]
-                startExport(mode, credential, obfuscationKey, activity)
+                execute(Input(mode, credential, obfuscationKey), activity)
                 dialogInterface.dismiss()
             }
             .setNegativeButton(android.R.string.cancel) { dialog, _ ->
@@ -43,37 +45,41 @@ object ExportCredentialUseCase {
             .show()
     }
 
-    fun startExport(mode: ExportMode, credential: EncCredential, obfuscationKey: Key?, activity: SecureActivity) {
+    override fun doExecute(input: Input, activity: SecureActivity): Boolean {
         activity.masterSecretKey?.let{ key ->
             val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
             val credentialName = SecretService.decryptCommonString(
                 key,
-                credential.name
+                input.credential.name
             )
             val tempEncHeader = SecretService.encryptCommonString(
-                tempKey, getHeaderDesc(mode, activity, credentialName)
+                tempKey, getHeaderDesc(input.mode, activity, credentialName)
             )
 
             val tempEncSubtext = SecretService.encryptCommonString(
-                tempKey, getSubDesc(mode, activity)
+                tempKey, getSubDesc(input.mode, activity)
             )
             val tempEncName = SecretService.encryptCommonString(
-                tempKey, getQrCodeHeader(mode, credentialName)
+                tempKey, getQrCodeHeader(input.mode, credentialName)
             )
 
-            val tempEncQrCode = getQrCodeData(mode, credential, tempKey, key, obfuscationKey)
+            val tempEncQrCode = getQrCodeData(input.mode, input.credential, tempKey, key, input.obfuscationKey)
 
             val intent = Intent(activity, QrCodeActivity::class.java)
-            intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, credential.id)
+            intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, input.credential.id)
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_HEADLINE, tempEncHeader)
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_SUBTEXT, tempEncSubtext)
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE, tempEncQrCode)
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE_HEADER, tempEncName)
-            intent.putExtra(QrCodeActivity.EXTRA_COLOR, mode.colorId)
+            intent.putExtra(QrCodeActivity.EXTRA_COLOR, input.mode.colorId)
 
 
             activity.startActivity(intent)
+
+            return true
         }
+
+        return false
     }
 
     private fun getQrCodeHeader(

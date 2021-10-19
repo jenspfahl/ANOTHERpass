@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.widget.SwitchCompat
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
@@ -16,7 +15,7 @@ import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER_PASSWD
-import de.jepfa.yapm.usecase.GenerateMasterPasswordUseCase
+import de.jepfa.yapm.usecase.secret.GenerateMasterPasswordUseCase
 import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.putEncrypted
 import de.jepfa.yapm.util.toastText
@@ -46,9 +45,11 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
 
         val buttonGeneratePasswd: Button = view.findViewById(R.id.button_generate_passwd)
         buttonGeneratePasswd.setOnClickListener {
-            generatedPassword = GenerateMasterPasswordUseCase.execute(pseudoPhraseSwitch.isChecked)
-            var spannedString = PasswordColorizer.spannableString(generatedPassword, getBaseActivity())
-            generatedPasswdView.text = spannedString
+           getBaseActivity()?.let { baseActivity ->
+               generatedPassword = GenerateMasterPasswordUseCase.execute(pseudoPhraseSwitch.isChecked, baseActivity).data
+               var spannedString = PasswordColorizer.spannableString(generatedPassword, getBaseActivity())
+               generatedPasswdView.text = spannedString
+           }
         }
 
         val button = view.findViewById<Button>(R.id.button_next)

@@ -1,15 +1,16 @@
-package de.jepfa.yapm.usecase
+package de.jepfa.yapm.usecase.vault
 
-import de.jepfa.yapm.model.Session
-import de.jepfa.yapm.ui.BaseActivity
-import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.ui.BaseActivity
+import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.usecase.BasicUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-object DropVaultUseCase: SecureActivityUseCase {
+object DropVaultUseCase: BasicUseCase<SecureActivity>() {
 
     override fun execute(activity: SecureActivity): Boolean {
         Session.logout()

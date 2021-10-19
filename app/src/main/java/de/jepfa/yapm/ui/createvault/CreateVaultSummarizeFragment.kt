@@ -1,7 +1,6 @@
 package de.jepfa.yapm.ui.createvault
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -16,19 +15,20 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.encrypted.DEFAULT_CIPHER_ALGORITHM
 import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.MasterKeyService
 import de.jepfa.yapm.service.secret.SecretService.ALIAS_KEY_TRANSPORT
 import de.jepfa.yapm.service.secret.SecretService.decryptPassword
 import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
-import de.jepfa.yapm.ui.AsyncWithProgressBar
+import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.BaseFragment
+import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER_PASSWD
 import de.jepfa.yapm.ui.nfc.NfcActivity
-import de.jepfa.yapm.usecase.CreateVaultUseCase
-import de.jepfa.yapm.usecase.ExportEncMasterPasswordUseCase
-import de.jepfa.yapm.usecase.LoginUseCase
+import de.jepfa.yapm.usecase.secret.ExportEncMasterPasswordUseCase
+import de.jepfa.yapm.usecase.vault.CreateVaultUseCase
 import de.jepfa.yapm.util.*
 
 class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedListener {
@@ -87,7 +87,10 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
         exportAsQrcImageView.setOnClickListener {
             val tempKey = getAndroidSecretKey(ALIAS_KEY_TRANSPORT)
             val encMasterPasswd = encryptPassword(tempKey, masterPasswd)
-            ExportEncMasterPasswordUseCase.execute(encMasterPasswd, true, getBaseActivity())
+            getBaseActivity()?.let { baseActivity ->
+                ExportEncMasterPasswordUseCase.execute(
+                    ExportEncMasterPasswordUseCase.Input(encMasterPasswd, true), baseActivity)
+            }
         }
         val exportAsNfcImageView: ImageView = view.findViewById(R.id.imageview_nfc_tag)
         if (!NfcService.isNfcAvailable(getBaseActivity())) {
@@ -122,7 +125,9 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
 
                 val pin = decryptPassword(transSK, encPin)
 
-                createVault(pin, masterPasswd, switchStorePasswd.isChecked, cipherAlgorithm)
+                getBaseActivity()?.let {
+                    createVault(pin, masterPasswd, switchStorePasswd.isChecked, cipherAlgorithm, it)
+                }
             }
 
         }
@@ -132,36 +137,30 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
         pin: Password,
         masterPasswd: Password,
         storeMasterPassword: Boolean,
-        cipherAlgorithm: CipherAlgorithm
+        cipherAlgorithm: CipherAlgorithm,
+        activity: BaseActivity
     ) {
 
-        getBaseActivity()?.getProgressBar()?.let {
 
-            AsyncWithProgressBar(
-                getBaseActivity(),
-                {
-                    val success = CreateVaultUseCase.execute(
-                        pin, masterPasswd, storeMasterPassword, cipherAlgorithm, getBaseActivity())
-                    if (success) {
-                        LoginUseCase.execute(pin, masterPasswd, getBaseActivity())
-                    }
-                    success
-                },
-                { success ->
-                    if (!success) {
-                        toastText(context, R.string.something_went_wrong)
-                    }
-                    else {
-                        LoginUseCase.execute(pin, masterPasswd, getBaseActivity())
-                        pin.clear()
-                        masterPasswd.clear()
-                        findNavController().navigate(R.id.action_Create_Vault_to_ThirdFragment_to_Root)
-                        getBaseActivity()?.finish()
-                    }
+        val input = CreateVaultUseCase.Input(
+            LoginData(pin, masterPasswd),
+            storeMasterPassword,
+            cipherAlgorithm
+        )
+        UseCaseBackgroundLauncher(CreateVaultUseCase)
+            .launch(activity, input)
+            { output ->
+                if (!output.success) {
+                    toastText(context, R.string.something_went_wrong)
                 }
-            )
+                else {
+                    pin.clear()
+                    masterPasswd.clear()
+                    findNavController().navigate(R.id.action_Create_Vault_to_ThirdFragment_to_Root)
+                    getBaseActivity()?.finish()
+                }
+            }
 
-        }
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {

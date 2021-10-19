@@ -18,7 +18,7 @@ import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
-import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
@@ -176,7 +176,7 @@ object ResponseFiller {
         ).intentSender
 
         val message =
-            if (Session.isDenied()) context.getString(R.string.login_with_yapm) 
+            if (Session.isDenied()) context.getString(R.string.login_with_yapm)
             else context.getString(R.string.select_credential_for_autofill)
         responseBuilder.setAuthentication(
             fields.getAutofillIds(),

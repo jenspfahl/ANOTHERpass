@@ -4,12 +4,12 @@ import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.label.Label
-import de.jepfa.yapm.usecase.SecureActivityUseCase2
+import de.jepfa.yapm.usecase.InputUseCase
 
 
-object DeleteLabelUseCase: SecureActivityUseCase2<Label> {
+object DeleteLabelUseCase: InputUseCase<Label, SecureActivity>() {
 
-    override fun execute(label: Label, activity: SecureActivity): Boolean {
+    override fun doExecute(label: Label, activity: SecureActivity): Boolean {
         val key = activity.masterSecretKey
         val labelId = label.labelId
         if (key != null && labelId != null) {

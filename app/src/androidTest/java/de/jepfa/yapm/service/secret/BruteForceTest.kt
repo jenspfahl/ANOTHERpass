@@ -9,9 +9,10 @@ import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
+import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.usecase.CreateVaultUseCase
-import de.jepfa.yapm.usecase.LoginUseCase
+import de.jepfa.yapm.usecase.vault.CreateVaultUseCase
+import de.jepfa.yapm.usecase.session.LoginUseCase
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,7 +32,9 @@ class BruteForceTest {
     @Before
     fun setup() {
         context = InstrumentationRegistry.getInstrumentation().context
-        CreateVaultUseCase.execute(pin, masterPassword, false, cipherAlgorithm, context)
+        CreateVaultUseCase.execute(
+            CreateVaultUseCase.Input(LoginData(pin, masterPassword), false, cipherAlgorithm),
+            context)
     }
 
     @Test
@@ -52,6 +55,6 @@ class BruteForceTest {
     }
 
     private fun login(pin: Password, masterPassword: Password): Boolean {
-        return LoginUseCase.execute(pin, masterPassword, context)
+        return LoginUseCase.execute(LoginData(pin, masterPassword), context).success
     }
 }

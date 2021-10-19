@@ -2,7 +2,7 @@ package de.jepfa.yapm.model.secret
 
 import android.os.Build
 import android.util.Log
-import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import javax.crypto.SecretKey
 

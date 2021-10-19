@@ -15,7 +15,7 @@ import com.google.gson.JsonObject
 import de.jepfa.yapm.R
 import de.jepfa.yapm.service.io.JsonService
 import de.jepfa.yapm.ui.BaseFragment
-import de.jepfa.yapm.usecase.ImportVaultUseCase
+import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
 import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.FileUtil
 import de.jepfa.yapm.util.toastText

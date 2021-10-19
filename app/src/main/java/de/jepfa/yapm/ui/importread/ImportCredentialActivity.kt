@@ -7,7 +7,7 @@ import android.view.View
 import android.widget.*
 import com.google.zxing.integration.android.IntentIntegrator
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.export.EncExportableCredential
@@ -24,7 +24,7 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.credential.ShowCredentialActivity
 import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.ui.nfc.NfcBaseActivity
-import de.jepfa.yapm.usecase.LockVaultUseCase
+import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.QRCodeUtil
 import de.jepfa.yapm.util.toastText
 

@@ -11,11 +11,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.label.LabelService
-import de.jepfa.yapm.ui.AsyncWithProgressBar
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.usecase.LockVaultUseCase
+import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
+import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.usecase.label.DeleteUnusedLabelUseCase
 import de.jepfa.yapm.util.toastText
 
@@ -105,14 +105,10 @@ class ListLabelsActivity : SecureActivity() {
     }
 
     private fun deleteUnusedLabels() {
-        AsyncWithProgressBar(this,
-            { DeleteUnusedLabelUseCase.execute(Unit, this) },
-            { success ->
-              if (!success) {
-                  toastText(this, R.string.no_unused_credentials_to_delete)
-                    //TODO better return number of deleted creds
-              }
-            })
+        UseCaseBackgroundLauncher(DeleteUnusedLabelUseCase)
+            .launch(this, Unit)
+            { result -> toastText(this, result.data) }
+
     }
 
     override fun lock() {

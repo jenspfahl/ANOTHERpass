@@ -12,24 +12,25 @@ import com.google.zxing.integration.android.IntentIntegrator
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.model.session.LoginData
+import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
+import de.jepfa.yapm.service.PreferenceService.PREF_FAST_MASTERPASSWD_LOGIN_WITH_NFC
+import de.jepfa.yapm.service.PreferenceService.PREF_FAST_MASTERPASSWD_LOGIN_WITH_QRC
+import de.jepfa.yapm.service.nfc.NfcService
+import de.jepfa.yapm.service.secret.MasterPasswordService.generateEncMasterPasswdSK
+import de.jepfa.yapm.service.secret.SaltService.getSalt
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.ALIAS_KEY_MP_TOKEN
 import de.jepfa.yapm.service.secret.SecretService.decryptKey
 import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.service.secret.SecretService.generateStrongSecretKey
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
-import de.jepfa.yapm.service.secret.SaltService.getSalt
 import de.jepfa.yapm.ui.BaseFragment
+import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.ui.nfc.NfcActivity
-import de.jepfa.yapm.usecase.LoginUseCase
-import de.jepfa.yapm.ui.AsyncWithProgressBar
-import de.jepfa.yapm.service.nfc.NfcService
-import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
-import de.jepfa.yapm.service.PreferenceService.PREF_FAST_MASTERPASSWD_LOGIN_WITH_NFC
-import de.jepfa.yapm.service.PreferenceService.PREF_FAST_MASTERPASSWD_LOGIN_WITH_QRC
-import de.jepfa.yapm.service.secret.MasterPasswordService.generateEncMasterPasswdSK
+import de.jepfa.yapm.usecase.session.LoginUseCase
 import de.jepfa.yapm.util.QRCodeUtil
 import de.jepfa.yapm.util.toastText
 
@@ -219,17 +220,10 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
 
         loginActivity.getProgressBar()?.let {
 
-            AsyncWithProgressBar(
-                loginActivity,
-                {
-                    LoginUseCase.execute(
-                        userPin,
-                        masterPassword,
-                        loginActivity
-                    )
-                },
-                { success ->
-                    if (!success) {
+            UseCaseBackgroundLauncher(LoginUseCase)
+                .launch(loginActivity, LoginData(userPin, masterPassword))
+                { output ->
+                    if (!output.success) {
                         loginActivity.handleFailedLoginAttempt()
                         masterPasswdTextView.error = "${getString(R.string.password_wrong)} ${loginActivity.getLoginAttemptMessage()}"
                         masterPasswdTextView.requestFocus()
@@ -237,7 +231,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                         if (isStoreMasterPassword) {
                             val keyForMP = getAndroidSecretKey(SecretService.ALIAS_KEY_MP)
                             val encPasswd = encryptPassword(keyForMP, masterPassword)
-                            val baseActivity = getBaseActivity() ?: return@AsyncWithProgressBar
+                            val baseActivity = getBaseActivity() ?: return@launch
 
                             PreferenceService.putEncrypted(DATA_ENCRYPTED_MASTER_PASSWORD, encPasswd, baseActivity)
                         }
@@ -250,7 +244,6 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                         loginActivity.loginSuccessful()
                     }
                 }
-            )
 
         }
 

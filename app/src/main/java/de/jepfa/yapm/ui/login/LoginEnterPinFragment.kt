@@ -8,17 +8,17 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
-import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.model.session.LoginData
+import de.jepfa.yapm.model.session.Session
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseFragment
+import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
-import de.jepfa.yapm.usecase.LoginUseCase
-import de.jepfa.yapm.ui.AsyncWithProgressBar
-import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.usecase.session.LoginUseCase
 import de.jepfa.yapm.util.putEncrypted
 import de.jepfa.yapm.util.toastText
 import java.util.*
@@ -100,17 +100,10 @@ class LoginEnterPinFragment : BaseFragment() {
 
         loginActivity.getProgressBar()?.let {
 
-            AsyncWithProgressBar(
-                loginActivity,
-                {
-                    LoginUseCase.execute(
-                        userPin,
-                        masterPasswd,
-                        getBaseActivity()
-                    )
-                },
-                { success ->
-                    if (!success) {
+            UseCaseBackgroundLauncher(LoginUseCase)
+                .launch(loginActivity, LoginData(userPin, masterPasswd))
+                { output ->
+                    if (!output.success) {
                         loginActivity.handleFailedLoginAttempt()
                         pinTextView.error = "${getString(R.string.password_wrong)} ${loginActivity.getLoginAttemptMessage()}"
                         pinTextView.requestFocus()
@@ -122,7 +115,6 @@ class LoginEnterPinFragment : BaseFragment() {
                         loginActivity.loginSuccessful()
                     }
                 }
-            )
         }
     }
 }

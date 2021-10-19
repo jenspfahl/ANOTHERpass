@@ -25,13 +25,12 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.Session
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Key
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
 import de.jepfa.yapm.service.PreferenceService.PREF_CREDENTIAL_SORT_ORDER
@@ -53,6 +52,15 @@ import de.jepfa.yapm.ui.importread.VerifyActivity
 import de.jepfa.yapm.ui.label.ListLabelsActivity
 import de.jepfa.yapm.ui.settings.SettingsActivity
 import de.jepfa.yapm.usecase.*
+import de.jepfa.yapm.usecase.app.ShowInfoUseCase
+import de.jepfa.yapm.usecase.secret.ExportEncMasterKeyUseCase
+import de.jepfa.yapm.usecase.secret.ExportEncMasterPasswordUseCase
+import de.jepfa.yapm.usecase.secret.GenerateMasterPasswordTokenUseCase
+import de.jepfa.yapm.usecase.secret.RemoveStoredMasterPasswordUseCase
+import de.jepfa.yapm.usecase.session.LogoutUseCase
+import de.jepfa.yapm.usecase.vault.DropVaultUseCase
+import de.jepfa.yapm.usecase.vault.LockVaultUseCase
+import de.jepfa.yapm.usecase.vault.ShowVaultInfoUseCase
 import de.jepfa.yapm.util.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -432,7 +440,8 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
             R.id.export_encrypted_masterpasswd -> {
                 val encMasterPasswd = Session.getEncMasterPasswd()
                 if (encMasterPasswd != null) {
-                    ExportEncMasterPasswordUseCase.execute(encMasterPasswd, false, this)
+                    ExportEncMasterPasswordUseCase.execute(
+                        ExportEncMasterPasswordUseCase.Input(encMasterPasswd, false), this)
                     return true
                 } else {
                     return false
@@ -468,7 +477,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
             }
             R.id.show_vault_info -> {
                 val labelCount = LabelService.getAllLabels().size
-                ShowVaultInfoUseCase.execute(this, credentialCount, labelCount)
+                ShowVaultInfoUseCase.execute(ShowVaultInfoUseCase.Input(credentialCount, labelCount), this)
 
                 return true
             }

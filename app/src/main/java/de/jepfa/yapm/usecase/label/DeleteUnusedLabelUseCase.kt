@@ -4,13 +4,14 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.usecase.SecureActivityUseCase2
-import de.jepfa.yapm.util.toastText
+import de.jepfa.yapm.usecase.OutputUseCase
+import de.jepfa.yapm.usecase.UseCase
+import de.jepfa.yapm.usecase.UseCaseOutput
 
 
-object DeleteUnusedLabelUseCase: SecureActivityUseCase2<Unit> {
+object DeleteUnusedLabelUseCase: OutputUseCase<String, SecureActivity>() {
 
-    override fun execute(unit: Unit, activity: SecureActivity): Boolean {
+    override fun execute(activity: SecureActivity): UseCaseOutput<String> {
         val deleteCandidates = LabelService.getAllLabels()
             .filter { label ->
                 val labelId = label.labelId
@@ -23,7 +24,7 @@ object DeleteUnusedLabelUseCase: SecureActivityUseCase2<Unit> {
             }.toList()
 
         if (deleteCandidates.isEmpty()) {
-            return false
+            return UseCaseOutput(false, activity.getString(R.string.no_unused_credentials_to_delete))
         }
         // update model
         deleteCandidates.forEach { label ->
@@ -37,10 +38,8 @@ object DeleteUnusedLabelUseCase: SecureActivityUseCase2<Unit> {
             .toList()
 
         activity.labelViewModel.deleteByIds(deleteCandidateIds)
-        
-      //  toastText(activity, activity.getString(R.string.unused_credentials_deleted, deleteCandidateIds.size))
-        
-        return true
+
+        return UseCaseOutput(true, activity.getString(R.string.unused_credentials_deleted, deleteCandidateIds.size))
     }
 
 }

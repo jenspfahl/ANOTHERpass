@@ -9,7 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.service.nfc.NdefTag
 import de.jepfa.yapm.service.secret.SecretService

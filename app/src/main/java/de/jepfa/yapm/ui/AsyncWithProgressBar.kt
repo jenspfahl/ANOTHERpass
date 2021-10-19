@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.ProgressBar
+import de.jepfa.yapm.usecase.UseCaseOutput
 
 class AsyncWithProgressBar(
     val activity: BaseActivity?,

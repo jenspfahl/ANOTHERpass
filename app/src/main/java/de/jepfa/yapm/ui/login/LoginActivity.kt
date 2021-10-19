@@ -10,7 +10,7 @@ import android.view.MenuItem
 import android.widget.Button
 import android.widget.Toast
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.Session
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_MAX_LOGIN_ATTEMPTS
 import de.jepfa.yapm.service.PreferenceService.PREF_SELF_DESTRUCTION
@@ -21,8 +21,8 @@ import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.ui.importvault.ImportVaultActivity
 import de.jepfa.yapm.ui.nfc.NfcBaseActivity
-import de.jepfa.yapm.usecase.DropVaultUseCase
-import de.jepfa.yapm.usecase.ShowInfoUseCase
+import de.jepfa.yapm.usecase.vault.DropVaultUseCase
+import de.jepfa.yapm.usecase.app.ShowInfoUseCase
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.toastText
 
