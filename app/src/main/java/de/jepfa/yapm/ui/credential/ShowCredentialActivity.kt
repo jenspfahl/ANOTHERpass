@@ -4,7 +4,6 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -20,6 +19,7 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_COPY_PASSWORD
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_OVERLAY_FEATURE
@@ -31,7 +31,6 @@ import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.decryptPassword
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
 import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.ui.label.LabelDialogOpener
@@ -109,7 +108,9 @@ class ShowCredentialActivity : SecureActivity() {
                     if (multiLine) passwordPresentation.prev()
                     else passwordPresentation.next()
             }
-            updatePasswordView(idExtra)
+            masterSecretKey?.let { key ->
+                updatePasswordTextView(key, true)
+            }
         }
 
         updatePasswordView(idExtra)
@@ -225,11 +226,7 @@ class ShowCredentialActivity : SecureActivity() {
 
                     CurrentCredentialHolder.clear()
 
-                    val originPassword = decryptPassword(key, credential.password)
-                    var spannedString =
-                        spannableObfusableAndMaskableString(originPassword, passwordPresentation, maskPassword, showObfuscated(credential), this)
-                    passwordTextView.text = spannedString
-                    originPassword.clear()
+                    updatePasswordTextView(key, false)
 
                     toastText(this, R.string.deobfuscate_restored)
                 }
@@ -326,10 +323,6 @@ class ShowCredentialActivity : SecureActivity() {
             val user = decryptCommonString(key, credential.user)
             val website = decryptCommonString(key, credential.website)
             val additionalInfo = decryptCommonString(key, credential.additionalInfo)
-            val password = decryptPassword(key, credential.password)
-            obfuscationKey?.let {
-                password.deobfuscate(it)
-            }
 
             toolBarLayout.title = name
 
@@ -373,14 +366,7 @@ class ShowCredentialActivity : SecureActivity() {
 
             additionalInfoTextView.text = additionalInfo
 
-            var spannedString = spannableObfusableAndMaskableString(
-                password,
-                passwordPresentation,
-                maskPassword,
-                showObfuscated(credential),
-                this
-            )
-            passwordTextView.text = spannedString
+            updatePasswordTextView(key, true)
 
             optionsMenu?.findItem(R.id.menu_deobfuscate_password)?.isVisible =
                 credential.isObfuscated
@@ -400,6 +386,24 @@ class ShowCredentialActivity : SecureActivity() {
         }
 
         CurrentCredentialHolder.update(credential, obfuscationKey)
+    }
+
+    private fun updatePasswordTextView(key: SecretKeyHolder, alloeDeobfuscate: Boolean) {
+        val password = decryptPassword(key, credential.password)
+        if (alloeDeobfuscate) {
+            obfuscationKey?.let {
+                password.deobfuscate(it)
+            }
+        }
+        var spannedString = spannableObfusableAndMaskableString(
+            password,
+            passwordPresentation,
+            maskPassword,
+            showObfuscated(credential),
+            this
+        )
+        passwordTextView.text = spannedString
+        password.clear()
     }
 
     private fun shouldMakeLabelThinner(labels: List<Label>): Boolean {

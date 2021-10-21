@@ -1,5 +1,6 @@
 package de.jepfa.yapm.ui.label
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
@@ -51,7 +52,7 @@ class ListLabelsAdapter(private val listLabelsActivity: ListLabelsActivity) :
                 val current = getItem(pos)
                 current.labelId?.let { id ->
                     listLabelsActivity.labelViewModel.getById(id).observe(listLabelsActivity) { encLabel ->
-                        val builder: androidx.appcompat.app.AlertDialog.Builder = androidx.appcompat.app.AlertDialog.Builder(listLabelsActivity)
+                        val builder: AlertDialog.Builder = AlertDialog.Builder(listLabelsActivity)
                         val icon: Drawable = listLabelsActivity.applicationInfo.loadIcon(listLabelsActivity.packageManager)
                         val message = encLabel.toString()
                         builder.setTitle(R.string.debug)
