@@ -1,11 +1,11 @@
 package de.jepfa.yapm.service.secret
 
 import android.content.Context
-import de.jepfa.yapm.model.secret.Password
-import de.jepfa.yapm.model.session.Session
-import de.jepfa.yapm.model.encrypted.CipherAlgorithm
+import de.jepfa.yapm.model.encrypted.DEFAULT_CIPHER_ALGORITHM
 import de.jepfa.yapm.model.secret.Key
+import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 
 object MasterPasswordService {
@@ -28,9 +28,14 @@ object MasterPasswordService {
         )
     }
 
-    fun generateEncMasterPasswdSK(passwd: Password, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
-        val empSK = SecretService.generateNormalSecretKey(passwd, EMP_SALT, cipherAlgorithm)
-        passwd.clear()
+    /**
+     * Generates a SK to encrypt the Master Password. It uses always DEFAULT_CIPHER_ALGORITHM,
+     * not the selected one from the user
+     */
+    fun generateEncMasterPasswdSK(context: Context): SecretKeyHolder {
+        val saltAsPassword = Password(SaltService.getSalt(context).data)
+        val empSK = SecretService.generateNormalSecretKey(saltAsPassword, EMP_SALT, DEFAULT_CIPHER_ALGORITHM)
+        saltAsPassword.clear()
         return empSK
     }
 

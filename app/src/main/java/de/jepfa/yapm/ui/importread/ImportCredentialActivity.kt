@@ -36,7 +36,7 @@ class ImportCredentialActivity : ReadActivityBase() {
     override fun handleScannedData(scanned: String) {
         val credential = extractCredential(scanned)
         if (credential == null) {
-            toastText(this, R.string.unknown_qr_code_or_nfc_tag)
+            toastText(this, R.string.qr_code_or_nfc_tag_not_a_credential)
         }
         else {
             startShowDetailActivity(credential)

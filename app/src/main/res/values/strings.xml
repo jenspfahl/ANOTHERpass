@@ -310,7 +310,8 @@
     <string name="import_exported_data_explanation">Here you can read or import an external credential from a QR code or a NFC tag. The credential will be immediately displayed after you have scanned it. There you have the chance to import it to your vault.</string>
     <string name="scan_qr_or_nfc">Scan QR code or read NFC tag</string>
     <string name="scanning_qrcode">Scanning a QR code</string>
-    <string name="unknown_qr_code_or_nfc_tag">Unknown QR code or read NFC tag</string>
+    <string name="unknown_qr_code_or_nfc_tag">Unknown QR code or NFC tag</string>
+    <string name="qr_code_or_nfc_tag_not_a_credential">QR code or NFC tag doesn\'t contain a readable credential</string>
     <string name="unknown_emk_scanned">\u274C Unknown Encrypted Master Key (EMK) scanned</string>
     <string name="well_known_emk_scanned">\u2705 Well known Encrypted Master Key (EMK) scanned</string>
     <string name="unknown_emp_scanned">\u274C Unknown Encrypted Master Password (EMP) scanned</string>

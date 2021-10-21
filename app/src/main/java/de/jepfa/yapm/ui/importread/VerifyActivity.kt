@@ -4,10 +4,10 @@ import android.os.Bundle
 import android.widget.*
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.encrypted.EncryptedType.Types.*
 import de.jepfa.yapm.model.export.EncExportableCredential
 import de.jepfa.yapm.model.export.ExportContainer
 import de.jepfa.yapm.model.export.PlainShareableCredential
-import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.JsonService
 import de.jepfa.yapm.service.secret.MasterPasswordService.generateEncMasterPasswdSK
@@ -32,8 +32,9 @@ class VerifyActivity : ReadActivityBase() {
 
     override fun handleScannedData(scanned: String) {
         verifyResultText.text = getString(R.string.unknown_qr_code_or_nfc_tag)
-        if (Encrypted.isEncryptedBase64String(scanned)) {
-            checkEncrypted(scanned)
+        val encrypted = Encrypted.fromEncryptedBase64StringWithCheck(scanned)
+        if (encrypted != null) {
+            checkEncrypted(encrypted)
         }
         else {
             checkContainer(scanned)
@@ -41,17 +42,15 @@ class VerifyActivity : ReadActivityBase() {
 
     }
 
-    private fun checkEncrypted(scanned: String) {
-        if (scanned.startsWith(Encrypted.TYPE_ENC_MASTER_KEY)) {
-            checkEMK(scanned)
-        } else if (scanned.startsWith(Encrypted.TYPE_ENC_MASTER_PASSWD)) {
-            checkEMP(scanned)
-        } else if (scanned.startsWith(Encrypted.TYPE_MASTER_PASSWD_TOKEN)) {
-            checkMPT(scanned)
+    private fun checkEncrypted(encrypted: Encrypted) {
+        when (encrypted.type?.type) {
+            ENC_MASTER_KEY -> checkEMK(encrypted)
+            ENC_MASTER_PASSWD -> checkEMP(encrypted)
+            MASTER_PASSWD_TOKEN -> checkMPT(encrypted)
         }
     }
 
-    private fun checkEMK(scanned: String) {
+    private fun checkEMK(emk: Encrypted) {
         verifyResultText.text = getString(R.string.unknown_emk_scanned)
 
         val encStoredMasterKey =
@@ -60,21 +59,18 @@ class VerifyActivity : ReadActivityBase() {
         if (key != null && encStoredMasterKey != null) {
             val mkKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
             val encMasterKey = SecretService.decryptEncrypted(mkKey, encStoredMasterKey)
-            val scannedEMK = Encrypted.fromBase64String(scanned)
-            if (encMasterKey == scannedEMK) {
+            if (encMasterKey == emk) {
                 verifyResultText.text = getString(R.string.well_known_emk_scanned)
             }
         }
     }
 
-    private fun checkEMP(scanned: String) {
+    private fun checkEMP(emp: Encrypted) {
         verifyResultText.text = getString(R.string.unknown_emp_scanned)
 
-        val salt = SaltService.getSalt(this)
-        val cipherAlgorithm = SecretService.getCipherAlgorithm(this)
-        val empSK = generateEncMasterPasswdSK(Password(salt.toCharArray()), cipherAlgorithm)
+        val empSK = generateEncMasterPasswdSK(this)
         val scannedMasterPassword =
-            SecretService.decryptPassword(empSK, Encrypted.fromBase64String(scanned))
+            SecretService.decryptPassword(empSK, emp)
         val masterPassword = getMasterPasswordFromSession()
         if (masterPassword != null && scannedMasterPassword.isValid() && scannedMasterPassword.isEqual(
                 masterPassword
@@ -85,7 +81,7 @@ class VerifyActivity : ReadActivityBase() {
         masterPassword?.clear()
     }
 
-    private fun checkMPT(scanned: String) {
+    private fun checkMPT(mpt: Encrypted) {
         verifyResultText.text = getString(R.string.unknown_mpt_scanned)
 
         val encMasterPasswordTokenKey = PreferenceService.getEncrypted(
@@ -104,10 +100,10 @@ class VerifyActivity : ReadActivityBase() {
                 cipherAlgorithm
             )
 
-            val encMasterPasswordFromScanned =
-                SecretService.decryptPassword(mptSK, Encrypted.fromBase64String(scanned))
+            val decMPT =
+                SecretService.decryptPassword(mptSK, mpt)
             val masterPassword = getMasterPasswordFromSession()
-            if (masterPassword != null && encMasterPasswordFromScanned.isValid() && encMasterPasswordFromScanned.isEqual(
+            if (masterPassword != null && decMPT.isValid() && decMPT.isEqual(
                     masterPassword
                 )
             ) {

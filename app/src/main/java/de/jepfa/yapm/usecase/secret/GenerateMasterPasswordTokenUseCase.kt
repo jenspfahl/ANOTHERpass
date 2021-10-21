@@ -4,19 +4,21 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
 import de.jepfa.yapm.R
+import de.jepfa.yapm.model.encrypted.EncryptedType
+import de.jepfa.yapm.model.encrypted.EncryptedType.Types.MASTER_PASSWD_TOKEN
 import de.jepfa.yapm.model.session.Session
-import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.usecase.BasicUseCase
 import de.jepfa.yapm.util.putEncryptedExtra
 
 object GenerateMasterPasswordTokenUseCase: BasicUseCase<SecureActivity>() {
 
-    override fun execute(activity: SecureActivity): Boolean {
+    fun openDialog(activity: SecureActivity) {
         val mptCounter = PreferenceService.getAsInt(
             PreferenceService.STATE_MASTER_PASSWD_TOKEN_COUNTER,
             activity
@@ -27,19 +29,19 @@ object GenerateMasterPasswordTokenUseCase: BasicUseCase<SecureActivity>() {
                     .setMessage(activity.getString(R.string.message_generate_mpt, mptCounter))
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
-                        generateMasterPasswordToken(activity)
+                        UseCaseBackgroundLauncher(GenerateMasterPasswordTokenUseCase)
+                            .launch(activity, Unit)
                     }
                     .setNegativeButton(android.R.string.no, null)
                     .show()
 
         }
         else {
-            generateMasterPasswordToken(activity)
-        }
-        return true
+            UseCaseBackgroundLauncher(GenerateMasterPasswordTokenUseCase)
+                .launch(activity, Unit)        }
     }
 
-    private fun generateMasterPasswordToken(activity: SecureActivity) {
+    override fun execute(activity: SecureActivity): Boolean {
         val key = activity.masterSecretKey
         val encMasterPasswd = Session.getEncMasterPasswd()
         if (key != null && encMasterPasswd != null) {
@@ -60,7 +62,7 @@ object GenerateMasterPasswordTokenUseCase: BasicUseCase<SecureActivity>() {
                 SaltService.getSalt(activity),
                 cipherAlgorithm
             )
-            val type = Encrypted.TYPE_MASTER_PASSWD_TOKEN + "#" + nextMptNumber
+            val type = EncryptedType(MASTER_PASSWD_TOKEN, nextMptNumber.toString())
             val masterPasswordToken =
                 SecretService.encryptPassword(type, masterPasswordTokenSK, masterPassword)
             val encMasterPasswordToken =
@@ -75,7 +77,7 @@ object GenerateMasterPasswordTokenUseCase: BasicUseCase<SecureActivity>() {
                 activity.getString(R.string.sub_generate_mpt)
             )
             val encQrcHeader =
-                SecretService.encryptCommonString(tempKey, encMasterPasswordToken.type)
+                SecretService.encryptCommonString(tempKey, encMasterPasswordToken.type?.toString() ?: "")
             val encQrc = encMasterPasswordToken
 
             PreferenceService.putEncrypted(
@@ -102,6 +104,8 @@ object GenerateMasterPasswordTokenUseCase: BasicUseCase<SecureActivity>() {
 
             masterPassword.clear()
         }
+
+        return true
     }
 
 }

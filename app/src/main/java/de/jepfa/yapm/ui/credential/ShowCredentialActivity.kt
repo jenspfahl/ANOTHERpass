@@ -31,6 +31,7 @@ import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.decryptPassword
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
 import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.ui.label.LabelDialogOpener
@@ -162,7 +163,6 @@ class ShowCredentialActivity : SecureActivity() {
                 val upIntent = Intent(this, ListCredentialsActivity::class.java)
                 navigateUpTo(upIntent)
             }
-
             ImportCredentialUseCase.execute(input, this)
             return true
         }

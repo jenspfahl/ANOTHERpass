@@ -47,7 +47,7 @@ class NfcActivity : NfcBaseActivity() {
         val nfcImageView: ImageView = findViewById(R.id.imageview_nfc_icon)
         val nfcWriteTagButton: Button = findViewById(R.id.button_write_nfc_tag)
 
-        nfcImageView.setOnClickListener {
+        nfcImageView.setOnLongClickListener {
             ndefTag?.let {tag ->
                 val text =
                     "UUD=${tag.tagId} \n" +
@@ -61,6 +61,7 @@ class NfcActivity : NfcBaseActivity() {
                     .setMessage(text)
                     .show()
             }
+            true
         }
 
         mode = intent.getStringExtra(EXTRA_MODE)

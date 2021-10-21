@@ -2,14 +2,15 @@ package de.jepfa.yapm.service.secret
 
 import android.content.Context
 import android.util.Base64
+import de.jepfa.yapm.model.encrypted.EncryptedType
+import de.jepfa.yapm.model.encrypted.EncryptedType.Types.ENC_SALT
 import de.jepfa.yapm.model.secret.Key
-import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.SecretService.ALIAS_KEY_SALT
 import de.jepfa.yapm.service.secret.SecretService.decryptKey
 import de.jepfa.yapm.service.secret.SecretService.encryptKey
 import de.jepfa.yapm.service.secret.SecretService.generateRandomKey
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
-import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.util.Constants
 import java.util.*
 
@@ -40,7 +41,7 @@ object SaltService {
 
     private fun storeSalt(salt: Key, context: Context) {
         val saltKey = getAndroidSecretKey(ALIAS_KEY_SALT)
-        val encSalt = encryptKey(Encrypted.TYPE_ENC_SALT, saltKey, salt)
+        val encSalt = encryptKey(EncryptedType(ENC_SALT), saltKey, salt)
         PreferenceService.putEncrypted(PreferenceService.DATA_SALT, encSalt, context)
     }
 

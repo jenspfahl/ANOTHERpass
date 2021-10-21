@@ -9,6 +9,7 @@ import de.jepfa.yapm.model.Validable.Companion.FAILED_BYTE_ARRAY
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.encrypted.DEFAULT_CIPHER_ALGORITHM
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.encrypted.EncryptedType
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.PreferenceService
@@ -104,10 +105,10 @@ object SecretService {
     }
 
     fun encryptKey(secretKeyHolder:  SecretKeyHolder, key: Key): Encrypted {
-        return encryptData("", secretKeyHolder, key.data)
+        return encryptData(null, secretKeyHolder, key.data)
     }
 
-    fun encryptKey(type: String, secretKeyHolder:  SecretKeyHolder, key: Key): Encrypted {
+    fun encryptKey(type: EncryptedType, secretKeyHolder:  SecretKeyHolder, key: Key): Encrypted {
         return encryptData(type, secretKeyHolder, key.data)
     }
 
@@ -116,10 +117,10 @@ object SecretService {
     }
 
     fun encryptPassword(secretKeyHolder:  SecretKeyHolder, password: Password): Encrypted {
-        return encryptData("", secretKeyHolder, password.toByteArray())
+        return encryptData(null, secretKeyHolder, password.toByteArray())
     }
 
-    fun encryptPassword(type: String, secretKeyHolder:  SecretKeyHolder, password: Password): Encrypted {
+    fun encryptPassword(type: EncryptedType, secretKeyHolder:  SecretKeyHolder, password: Password): Encrypted {
         return encryptData(type, secretKeyHolder, password.toByteArray())
     }
 
@@ -128,7 +129,7 @@ object SecretService {
     }
 
     fun encryptCommonString(secretKeyHolder:  SecretKeyHolder, string: String): Encrypted {
-        return encryptData("", secretKeyHolder, string.toByteArray())
+        return encryptData(null, secretKeyHolder, string.toByteArray())
     }
 
     fun decryptCommonString(secretKeyHolder:  SecretKeyHolder, encrypted: Encrypted): String {
@@ -143,7 +144,7 @@ object SecretService {
         return Encrypted.fromBase64(decryptData(secretKeyHolder, encrypted))
     }
 
-    private fun encryptData(type: String = "", secretKeyHolder: SecretKeyHolder, data: ByteArray): Encrypted {
+    private fun encryptData(type: EncryptedType?, secretKeyHolder: SecretKeyHolder, data: ByteArray): Encrypted {
         val cipher: Cipher = Cipher.getInstance(secretKeyHolder.cipherAlgorithm.cipherName)
 
         if (secretKeyHolder.cipherAlgorithm.integratedIvSupport) {

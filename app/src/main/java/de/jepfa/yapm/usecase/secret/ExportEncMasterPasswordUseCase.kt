@@ -4,9 +4,9 @@ import android.content.Intent
 import android.graphics.Color
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
-import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.model.encrypted.EncryptedType
+import de.jepfa.yapm.model.encrypted.EncryptedType.Types.ENC_MASTER_PASSWD
 import de.jepfa.yapm.service.secret.MasterPasswordService
-import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
@@ -26,15 +26,10 @@ object ExportEncMasterPasswordUseCase:
         val encSub =
             SecretService.encryptCommonString(tempKey, activity.getString(R.string.sub_export_emp))
         val masterPassword = SecretService.decryptPassword(tempKey, input.encMasterPasswd)
-        val salt = SaltService.getSalt(activity)
-        val cipherAlgorithm = SecretService.getCipherAlgorithm(activity)
-        val empSK = MasterPasswordService.generateEncMasterPasswdSK(
-            Password(salt.toCharArray()),
-            cipherAlgorithm
-        )
+        val empSK = MasterPasswordService.generateEncMasterPasswdSK(activity)
         val encMasterPasswd =
-            SecretService.encryptPassword(Encrypted.TYPE_ENC_MASTER_PASSWD, empSK, masterPassword)
-        val encQrcHeader = SecretService.encryptCommonString(tempKey, encMasterPasswd.type)
+            SecretService.encryptPassword(EncryptedType(ENC_MASTER_PASSWD), empSK, masterPassword)
+        val encQrcHeader = SecretService.encryptCommonString(tempKey, encMasterPasswd.type?.toString() ?: "")
         val encQrc = SecretService.encryptEncrypted(tempKey, encMasterPasswd)
         masterPassword.clear()
 

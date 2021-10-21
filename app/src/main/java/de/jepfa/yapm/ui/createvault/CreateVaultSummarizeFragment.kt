@@ -1,6 +1,5 @@
 package de.jepfa.yapm.ui.createvault
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -26,7 +25,6 @@ import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER_PASSWD
-import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.usecase.secret.ExportEncMasterPasswordUseCase
 import de.jepfa.yapm.usecase.vault.CreateVaultUseCase
 import de.jepfa.yapm.util.*
@@ -99,13 +97,10 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
         exportAsNfcImageView.setOnClickListener {
             val tempKey = getAndroidSecretKey(ALIAS_KEY_TRANSPORT)
             val encMasterPasswd = encryptPassword(tempKey, masterPasswd)
-
-            val intent = Intent(getBaseActivity(), NfcActivity::class.java)
-            intent.putExtra(NfcActivity.EXTRA_NO_SESSION_CHECK, true)
-            intent.putExtra(NfcActivity.EXTRA_MODE, NfcActivity.EXTRA_MODE_RW)
-            intent.putExtra(NfcActivity.EXTRA_WITH_APP_RECORD, false)
-            intent.putEncryptedExtra(NfcActivity.EXTRA_DATA, encMasterPasswd)
-            startActivity(intent)
+            getBaseActivity()?.let { baseActivity ->
+                ExportEncMasterPasswordUseCase.execute(
+                    ExportEncMasterPasswordUseCase.Input(encMasterPasswd, true), baseActivity)
+            }
         }
 
         view.findViewById<Button>(R.id.button_create_vault).setOnClickListener {

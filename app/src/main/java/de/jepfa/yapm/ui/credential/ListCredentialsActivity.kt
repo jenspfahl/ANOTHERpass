@@ -43,6 +43,7 @@ import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromS
 import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.changelogin.ChangeMasterPasswordActivity
 import de.jepfa.yapm.ui.changelogin.ChangePinActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
@@ -435,20 +436,25 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                 return true
             }
             R.id.generate_encrypted_masterpasswd -> {
-                return GenerateMasterPasswordTokenUseCase.execute(this)
+                GenerateMasterPasswordTokenUseCase.openDialog(this)
+                return true
             }
             R.id.export_encrypted_masterpasswd -> {
                 val encMasterPasswd = Session.getEncMasterPasswd()
                 if (encMasterPasswd != null) {
-                    ExportEncMasterPasswordUseCase.execute(
-                        ExportEncMasterPasswordUseCase.Input(encMasterPasswd, false), this)
+                    UseCaseBackgroundLauncher(ExportEncMasterPasswordUseCase)
+                        .launch(this,
+                            ExportEncMasterPasswordUseCase.Input(encMasterPasswd, false)
+                        )
                     return true
                 } else {
                     return false
                 }
             }
             R.id.export_masterkey -> {
-                return ExportEncMasterKeyUseCase.execute(this)
+                UseCaseBackgroundLauncher(ExportEncMasterKeyUseCase)
+                    .launch(this, Unit)
+                return true
             }
             R.id.export_vault -> {
                 val intent = Intent(this, ExportVaultActivity::class.java)

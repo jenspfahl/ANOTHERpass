@@ -5,20 +5,16 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
-import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.usecase.secret.ChangePinUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
-import de.jepfa.yapm.ui.AsyncWithProgressBar
-import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.toastText
-import java.lang.RuntimeException
 
 class ChangePinActivity : SecureActivity() {
 
@@ -93,7 +89,7 @@ class ChangePinActivity : SecureActivity() {
         getProgressBar()?.let {
 
             UseCaseBackgroundLauncher(ChangePinUseCase)
-                .launch(this, LoginData(currentPin, newPin1))
+                .launch(this, ChangePinUseCase.Input(currentPin, newPin1))
                 { output ->
                     if (output.success) {
                         val upIntent = Intent(intent)

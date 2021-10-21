@@ -14,6 +14,7 @@ import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.io.JsonService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.usecase.InputUseCase
 import de.jepfa.yapm.util.putEncryptedExtra
@@ -36,7 +37,8 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
             .setTitle(R.string.export_credential)
             .setSingleChoiceItems(listItems, -1) { dialogInterface, i ->
                 val mode = ExportMode.values()[i]
-                execute(Input(mode, credential, obfuscationKey), activity)
+                UseCaseBackgroundLauncher(this)
+                    .launch(activity, Input(mode, credential, obfuscationKey))
                 dialogInterface.dismiss()
             }
             .setNegativeButton(android.R.string.cancel) { dialog, _ ->
@@ -72,7 +74,6 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE, tempEncQrCode)
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE_HEADER, tempEncName)
             intent.putExtra(QrCodeActivity.EXTRA_COLOR, input.mode.colorId)
-
 
             activity.startActivity(intent)
 

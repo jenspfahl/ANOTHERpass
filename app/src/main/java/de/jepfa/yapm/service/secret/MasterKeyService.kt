@@ -3,6 +3,8 @@ package de.jepfa.yapm.service.secret
 import android.content.Context
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.encrypted.EncryptedType
+import de.jepfa.yapm.model.encrypted.EncryptedType.Types.ENC_MASTER_KEY
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
@@ -70,7 +72,7 @@ object MasterKeyService {
         val masterPassphraseSK = SecretService.generateStrongSecretKey(masterPassphrase, salt, cipherAlgorithm)
         masterPassphrase.clear()
 
-        val encryptedMasterKey = SecretService.encryptKey(Encrypted.TYPE_ENC_MASTER_KEY, masterPassphraseSK, masterKey)
+        val encryptedMasterKey = SecretService.encryptKey(EncryptedType(ENC_MASTER_KEY), masterPassphraseSK, masterKey)
 
         val encEncryptedMasterKey = SecretService.encryptEncrypted(mkSK, encryptedMasterKey)
 

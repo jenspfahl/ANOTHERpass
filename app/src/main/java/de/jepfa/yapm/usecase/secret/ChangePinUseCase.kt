@@ -1,6 +1,7 @@
 package de.jepfa.yapm.usecase.secret
 
 import android.util.Log
+import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.MasterKeyService
@@ -11,12 +12,13 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.InputUseCase
 import de.jepfa.yapm.usecase.session.LoginUseCase
 
-object ChangePinUseCase: InputUseCase<LoginData, SecureActivity>() {
+object ChangePinUseCase: InputUseCase<ChangePinUseCase.Input, SecureActivity>() {
 
     private const val TAG = "CHANGE_PIN"
 
+    data class Input(val currentPin: Password, val newPin: Password)
 
-    override fun doExecute(loginData: LoginData, activity: SecureActivity): Boolean {
+    override fun doExecute(input: Input, activity: SecureActivity): Boolean {
 
         val salt = SaltService.getSalt(activity)
         val masterPassword = MasterPasswordService.getMasterPasswordFromSession()
@@ -27,7 +29,7 @@ object ChangePinUseCase: InputUseCase<LoginData, SecureActivity>() {
 
         val cipherAlgorithm = SecretService.getCipherAlgorithm(activity)
         val oldMasterPassphraseSK = MasterKeyService.getMasterPassPhraseSK(
-            loginData.pin,
+            input.currentPin,
             masterPassword,
             salt,
             cipherAlgorithm
@@ -48,14 +50,14 @@ object ChangePinUseCase: InputUseCase<LoginData, SecureActivity>() {
 
         MasterKeyService.encryptAndStoreMasterKey(
             masterKey,
-            loginData.pin,
+            input.newPin,
             masterPassword,
             salt,
             cipherAlgorithm,
             activity
         )
 
-        return LoginUseCase.execute(LoginData(loginData.pin, masterPassword), activity).success
+        return LoginUseCase.execute(LoginData(input.newPin, masterPassword), activity).success
     }
 
 }

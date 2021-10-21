@@ -1,8 +1,16 @@
 package de.jepfa.yapm.model.encrypted
 
 import android.util.Base64
+import android.util.Log
 
-data class Encrypted(val type: String = "", val iv: ByteArray, val data: ByteArray, val cipherAlgorithm: CipherAlgorithm) {
+data class Encrypted(val type: EncryptedType?, val iv: ByteArray, val data: ByteArray, val cipherAlgorithm: CipherAlgorithm) {
+
+    fun isType(otherType: EncryptedType.Types): Boolean {
+        if (type == null) {
+            return false
+        }
+        return type.type == otherType
+    }
 
     fun debugToString(): String {
         return "[type=${type}, iv=${iv.contentToString()}, data=${data.contentToString()}]"
@@ -43,31 +51,29 @@ data class Encrypted(val type: String = "", val iv: ByteArray, val data: ByteArr
     }
 
     companion object {
-        const val TYPE_MASTER_PASSWD_TOKEN = "MPT"
-        const val TYPE_ENC_MASTER_PASSWD = "EMP"
-        const val TYPE_ENC_MASTER_KEY = "EMK"
-        const val TYPE_ENC_SALT = "SLT"
 
         private val BASE64_PAIR_DELIMITOR = ':'
         private val BASE64_FLAGS = Base64.NO_WRAP or Base64.NO_PADDING
 
         fun empty(): Encrypted {
-            return Encrypted("", ByteArray(0), ByteArray(0), DEFAULT_CIPHER_ALGORITHM)
+            return Encrypted(null, ByteArray(0), ByteArray(0), DEFAULT_CIPHER_ALGORITHM)
         }
 
-        fun isEncryptedBase64String(string: String): Boolean {
-            try {
-                fromBase64String(string)
-            } catch (e: Exception) {
-                return false
-            }
-            return false
-        }
 
         fun toBase64String(encrypted: Encrypted): String {
+            val type = encrypted.type?.toString() ?: ""
             val iv = Base64.encodeToString(encrypted.iv, BASE64_FLAGS)
             val data = Base64.encodeToString(encrypted.data, BASE64_FLAGS)
-            return encrypted.type + BASE64_PAIR_DELIMITOR + iv + BASE64_PAIR_DELIMITOR + data + BASE64_PAIR_DELIMITOR + encrypted.cipherAlgorithm.ordinal
+            return type + BASE64_PAIR_DELIMITOR + iv + BASE64_PAIR_DELIMITOR + data + BASE64_PAIR_DELIMITOR + encrypted.cipherAlgorithm.ordinal
+        }
+
+        fun fromEncryptedBase64StringWithCheck(string: String): Encrypted? {
+            try {
+                return fromBase64String(string)
+            } catch (e: Exception) {
+                Log.w("ENC", "cannot read Encrypted", e)
+                return null
+            }
         }
 
         fun fromBase64String(string: String): Encrypted {
@@ -81,7 +87,7 @@ data class Encrypted(val type: String = "", val iv: ByteArray, val data: ByteArr
                 algo = CipherAlgorithm.values()[algoIdx]
             }
 
-            return Encrypted(type, iv, data, algo)
+            return Encrypted(EncryptedType.of(type), iv, data, algo)
         }
 
         fun toBase64(encrypted: Encrypted): ByteArray {

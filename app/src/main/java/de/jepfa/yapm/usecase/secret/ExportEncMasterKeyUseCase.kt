@@ -29,7 +29,7 @@ object ExportEncMasterKeyUseCase: BasicUseCase<SecureActivity>() {
                 tempKey,
                 activity.getString(R.string.sub_export_emk)
             )
-            val encQrcHeader = SecretService.encryptCommonString(tempKey, encMasterKey.type)
+            val encQrcHeader = SecretService.encryptCommonString(tempKey, encMasterKey.type?.toString()?: "")
             val encQrc = SecretService.encryptEncrypted(tempKey, encMasterKey)
 
             val intent = Intent(activity, QrCodeActivity::class.java)

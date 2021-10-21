@@ -11,6 +11,7 @@ import androidx.appcompat.widget.SwitchCompat
 import com.google.zxing.integration.android.IntentIntegrator
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.encrypted.EncryptedType.Types.*
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.service.PreferenceService
@@ -132,54 +133,63 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
     }
 
     private fun readAndUpdateMasterPassword(scanned: String): Boolean {
-        if (scanned.startsWith(Encrypted.TYPE_MASTER_PASSWD_TOKEN)) {
-            if (!PreferenceService.isPresent(
-                    PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY,
-                    getBaseActivity()
-                )
-            ) {
-                toastText(getBaseActivity(), R.string.no_mpt_present)
-                return false
-            }
-            // decrypt obliviously encrypted master password token
-            val encMasterPasswordTokenKey = PreferenceService.getEncrypted(
+        val encrypted = Encrypted.fromEncryptedBase64StringWithCheck(scanned)
+        return when (encrypted?.type?.type) {
+            ENC_MASTER_PASSWD -> readEMP(encrypted)
+            MASTER_PASSWD_TOKEN -> readMPT(encrypted)
+            else -> return false
+        }
+
+    }
+
+    private fun readEMP(emp: Encrypted): Boolean {
+        val baseActivity = getBaseActivity() ?: return false
+        val empSK = generateEncMasterPasswdSK(baseActivity)
+        val encMasterPassword =
+            SecretService.decryptPassword(empSK, emp)
+        if (!encMasterPassword.isValid()) {
+            toastText(getBaseActivity(), R.string.invalid_emp)
+            return false
+        }
+
+        masterPasswdTextView.setText(encMasterPassword)
+
+        if (isFastLoginWithQrCode() || isFastLoginWithNfcTag()) {
+            loginButton.performClick()
+            return true
+        }
+
+        return false
+    }
+
+    private fun readMPT(mpt: Encrypted): Boolean {
+        if (!PreferenceService.isPresent(
                 PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY,
                 getBaseActivity()
             )
-            encMasterPasswordTokenKey?.let {
-                val masterPasswordTokenSK = getAndroidSecretKey(ALIAS_KEY_MP_TOKEN)
-                val masterPasswordTokenKey =
-                    decryptKey(masterPasswordTokenSK, encMasterPasswordTokenKey)
-                val baseActivity = getBaseActivity() ?: return false
-                val salt = getSalt(baseActivity)
-                val cipherAlgorithm = SecretService.getCipherAlgorithm(baseActivity)
-
-                val mptSK = generateStrongSecretKey(masterPasswordTokenKey, salt, cipherAlgorithm)
-
-                val encMasterPassword =
-                    SecretService.decryptPassword(mptSK, Encrypted.fromBase64String(scanned))
-                if (!encMasterPassword.isValid()) {
-                    toastText(getBaseActivity(), R.string.invalid_mpt)
-                    return false
-                }
-
-                masterPasswdTextView.setText(encMasterPassword)
-
-                if (isFastLoginWithQrCode() || isFastLoginWithNfcTag()) {
-                    loginButton.performClick()
-                    return true
-                }
-            }
-        } else if (scanned.startsWith(Encrypted.TYPE_ENC_MASTER_PASSWD)) {
-
+        ) {
+            toastText(getBaseActivity(), R.string.no_mpt_present)
+            return true
+        }
+        // decrypt obliviously encrypted master password token
+        val encMasterPasswordTokenKey = PreferenceService.getEncrypted(
+            PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY,
+            getBaseActivity()
+        )
+        encMasterPasswordTokenKey?.let {
+            val masterPasswordTokenSK = getAndroidSecretKey(ALIAS_KEY_MP_TOKEN)
+            val masterPasswordTokenKey =
+                decryptKey(masterPasswordTokenSK, encMasterPasswordTokenKey)
             val baseActivity = getBaseActivity() ?: return false
             val salt = getSalt(baseActivity)
             val cipherAlgorithm = SecretService.getCipherAlgorithm(baseActivity)
-            val empSK = generateEncMasterPasswdSK(Password(salt.toCharArray()), cipherAlgorithm)
+
+            val mptSK = generateStrongSecretKey(masterPasswordTokenKey, salt, cipherAlgorithm)
+
             val encMasterPassword =
-                SecretService.decryptPassword(empSK, Encrypted.fromBase64String(scanned))
+                SecretService.decryptPassword(mptSK, mpt)
             if (!encMasterPassword.isValid()) {
-                toastText(getBaseActivity(), R.string.invalid_emp)
+                toastText(getBaseActivity(), R.string.invalid_mpt)
                 return false
             }
 
@@ -189,10 +199,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                 loginButton.performClick()
                 return true
             }
-        } else {
-            toastText(getBaseActivity(), R.string.unknown_emp)
         }
-
         return false
     }
 

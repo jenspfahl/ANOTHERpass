@@ -13,6 +13,7 @@ import com.google.gson.JsonObject
 import com.google.zxing.integration.android.IntentIntegrator
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.encrypted.EncryptedType.Types.ENC_MASTER_KEY
 import de.jepfa.yapm.service.io.JsonService
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.MasterKeyService
@@ -109,8 +110,10 @@ class ImportVaultImportFileFragment : BaseFragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val scanned = getScannedFromIntent(requestCode, resultCode, data)
+
         if (scanned != null) {
-            if (scanned.startsWith(Encrypted.TYPE_ENC_MASTER_KEY)) {
+            val encrypted = Encrypted.fromEncryptedBase64StringWithCheck(scanned)
+            if (encrypted != null && encrypted.isType(ENC_MASTER_KEY)) {
                 encMasterKey = scanned
                 mkTextView.text = encMasterKey
             }
