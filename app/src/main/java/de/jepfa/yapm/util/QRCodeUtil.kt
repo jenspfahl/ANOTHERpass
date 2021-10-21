@@ -19,12 +19,19 @@ import de.jepfa.yapm.service.PreferenceService.PREF_COLORIZE_MP_QRCODES
 
 object QRCodeUtil {
 
+    private val MAX_HEADER_LENGTH = 20
+
     fun generateQRCode(header: String?, data: String, color: Int = Color.BLACK, context: Context): Bitmap {
+        var cutHeader = header
+        if (header != null && header.length > MAX_HEADER_LENGTH) {
+            cutHeader = header.substring(0, MAX_HEADER_LENGTH) + "..."
+        }
         val colorize = PreferenceService.getAsBool(PREF_COLORIZE_MP_QRCODES, context)
         val printColor = if (colorize) color else Color.BLACK
 
-        val width = 500
-        val height = 500
+        var size =  if (data.length > 256) 550 else 500
+        val width = size
+        val height = size
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val codeWriter = MultiFormatWriter()
         try {
@@ -38,15 +45,15 @@ object QRCodeUtil {
             Log.d("QrCodeActivity", "generateQRCode: ${e.message}")
         }
 
-        header?.let {
+        cutHeader?.let {
             val textPaint = TextPaint()
             textPaint.isAntiAlias = true
             textPaint.textSize = 32f
             textPaint.color = printColor
 
-            val textWidth = textPaint.measureText(header).toInt()
+            val textWidth = textPaint.measureText(cutHeader).toInt()
             val canvas = Canvas(bitmap)
-            canvas.drawText(header, (width - textWidth) / 2f, 25f, textPaint)
+            canvas.drawText(cutHeader, (width - textWidth) / 2f, 25f, textPaint)
         }
         return bitmap
     }
