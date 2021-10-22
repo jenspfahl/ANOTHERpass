@@ -10,7 +10,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.navigation.fragment.findNavController
 import com.google.gson.JsonObject
-import com.google.zxing.integration.android.IntentIntegrator
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.encrypted.EncryptedType.Types.ENC_MASTER_KEY
@@ -153,10 +152,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
             return data?.getStringExtra(NfcActivity.EXTRA_SCANNED_NDC_TAG_DATA)
         }
         else {
-            val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
-            if (result != null && result.contents != null) {
-                return result.contents
-            }
+            return QRCodeUtil.extractContentFromIntent(requestCode, resultCode, data)
         }
         return null
     }

@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
-import com.google.zxing.integration.android.IntentIntegrator
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.encrypted.EncryptedType.Types.*
@@ -33,6 +32,7 @@ import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.usecase.session.LoginUseCase
 import de.jepfa.yapm.util.QRCodeUtil
+import de.jepfa.yapm.util.QRCodeUtil.extractContentFromIntent
 import de.jepfa.yapm.util.toastText
 
 
@@ -208,10 +208,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
             return data?.getStringExtra(NfcActivity.EXTRA_SCANNED_NDC_TAG_DATA)
         }
         else {
-            val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
-            if (result != null && result.contents != null) {
-                return result.contents
-            }
+            return extractContentFromIntent(requestCode, resultCode, data)
         }
         return null
     }

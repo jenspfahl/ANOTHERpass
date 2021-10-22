@@ -5,10 +5,9 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
-import com.google.zxing.integration.android.IntentIntegrator
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.export.EncExportableCredential
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.nfc.NfcActivity
@@ -78,10 +77,7 @@ abstract class ReadActivityBase : NfcBaseActivity() {
             return data?.getStringExtra(NfcActivity.EXTRA_SCANNED_NDC_TAG_DATA)
         }
         else {
-            val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
-            if (result != null && result.contents != null) {
-                return result.contents
-            }
+            return QRCodeUtil.extractContentFromIntent(requestCode, resultCode, data)
         }
         return null
     }

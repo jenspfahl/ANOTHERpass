@@ -2,6 +2,7 @@ package de.jepfa.yapm.util
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -15,6 +16,8 @@ import com.google.zxing.integration.android.IntentIntegrator
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.ui.qrcode.CaptureActivity
 import de.jepfa.yapm.service.PreferenceService.PREF_COLORIZE_MP_QRCODES
+import java.nio.ByteBuffer
+import java.nio.charset.Charset
 
 
 object QRCodeUtil {
@@ -80,5 +83,14 @@ object QRCodeUtil {
             setBeepEnabled(false)
         }
         integrator.initiateScan()
+    }
+
+    fun extractContentFromIntent(requestCode: Int, resultCode: Int, data: Intent?): String? {
+        val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
+        if (result != null && result.contents != null) {
+            val withoutTrailingZeroChars = result.contents.substringBefore(0.toChar())
+            return withoutTrailingZeroChars
+        }
+        return null
     }
 }
