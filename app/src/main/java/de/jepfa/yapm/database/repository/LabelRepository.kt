@@ -1,4 +1,4 @@
-package de.jepfa.yapm.repository
+package de.jepfa.yapm.database.repository
 
 import androidx.annotation.WorkerThread
 import de.jepfa.yapm.database.dao.EncLabelDao

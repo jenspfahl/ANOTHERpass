@@ -2,7 +2,7 @@ package de.jepfa.yapm.viewmodel
 
 import androidx.lifecycle.*
 import de.jepfa.yapm.model.encrypted.EncLabel
-import de.jepfa.yapm.repository.LabelRepository
+import de.jepfa.yapm.database.repository.LabelRepository
 import de.jepfa.yapm.ui.YapmApp
 import kotlinx.coroutines.launch
 

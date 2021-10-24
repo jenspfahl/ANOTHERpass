@@ -1,4 +1,4 @@
-package de.jepfa.yapm.repository
+package de.jepfa.yapm.database.repository
 
 import androidx.annotation.WorkerThread
 import de.jepfa.yapm.database.dao.EncCredentialDao
@@ -30,7 +30,7 @@ class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
 
     fun findById(id: Int): Flow<EncCredential?> {
         val byId = encCredentialDao.getById(id)
-        return byId.map { mapToCredential(it) }
+        return byId.map { if (it != null) mapToCredential(it) else null }
     }
 
     fun getAll(): Flow<List<EncCredential>> {

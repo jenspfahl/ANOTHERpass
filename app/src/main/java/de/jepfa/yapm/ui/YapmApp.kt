@@ -2,8 +2,8 @@ package de.jepfa.yapm.ui
 
 import android.app.Application
 import de.jepfa.yapm.database.YapmDatabase
-import de.jepfa.yapm.repository.CredentialRepository
-import de.jepfa.yapm.repository.LabelRepository
+import de.jepfa.yapm.database.repository.CredentialRepository
+import de.jepfa.yapm.database.repository.LabelRepository
 import de.jepfa.yapm.service.PreferenceService
 
 class YapmApp : Application() {
