@@ -2,6 +2,7 @@ package de.jepfa.yapm.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.MotionEvent
 import android.view.WindowManager
 import de.jepfa.yapm.model.session.Session
@@ -66,14 +67,14 @@ abstract class SecureActivity : BaseActivity() {
      */
     object SecretChecker {
 
-        val fromSecretChecker = "fromSecretChecker"
-        val fromAutofill = "fromAutofill"
-        val loginRequestCode = 38632
+        const val fromSecretChecker = "fromSecretChecker"
+        const val fromAutofill = "fromAutofill"
+        const val loginRequestCode = 38632
 
-        private val DELTA_LOGIN_ACTIVITY_INTENTED = TimeUnit.SECONDS.toMillis(1)
+        private val DELTA_LOGIN_ACTIVITY_INTENDED = TimeUnit.SECONDS.toMillis(3)
 
         @Volatile
-        private var loginActivityIntented: Long = 0
+        private var loginActivityIntended: Long = 0
 
         @Synchronized
         fun getOrAskForSecret(activity: SecureActivity): Session {
@@ -91,7 +92,7 @@ abstract class SecureActivity : BaseActivity() {
                     activity.closeOverlayDialogs()
                 }
 
-                if (!isLoginIntented()) {
+                if (!isLoginIntended()) {
                     val intent = Intent(activity, LoginActivity::class.java)
                     intent.putExtras(activity.intent)
                     intent.putExtra(fromSecretChecker, true)
@@ -104,7 +105,7 @@ abstract class SecureActivity : BaseActivity() {
                         activity.finish()
                     }
 
-                    loginIntented()
+                    loginIntended(activity)
                 }
             } else {
                 Session.touch()
@@ -112,13 +113,14 @@ abstract class SecureActivity : BaseActivity() {
             return Session
         }
 
-        private fun isLoginIntented(): Boolean {
+        private fun isLoginIntended(): Boolean {
             val current = System.currentTimeMillis()
-            return  loginActivityIntented >= current - DELTA_LOGIN_ACTIVITY_INTENTED
+            return  loginActivityIntended >= current - DELTA_LOGIN_ACTIVITY_INTENDED
         }
 
-        private fun loginIntented() {
-            loginActivityIntented = System.currentTimeMillis()
+        private fun loginIntended(activity: SecureActivity) {
+            loginActivityIntended = System.currentTimeMillis()
+            Log.i("CS", "login intended at $loginActivityIntended from $activity")
         }
     }
 }

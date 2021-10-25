@@ -42,11 +42,15 @@ class LoginEnterPinFragment : BaseFragment() {
         val pinTextView: EditText = view.findViewById(R.id.edittext_enter_pin)
         val nextButton = view.findViewById<Button>(R.id.button_login_next)
 
+        // this is to perform next step out of the keyboard
         pinTextView.imeOptions = EditorInfo.IME_ACTION_DONE
         pinTextView.setOnEditorActionListener{ textView, id, keyEvent ->
             nextButton.performClick()
             true
         }
+
+        pinTextView.requestFocus()
+
 
         nextButton.setOnClickListener {
 

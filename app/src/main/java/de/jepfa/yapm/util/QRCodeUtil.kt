@@ -14,10 +14,8 @@ import com.google.zxing.MultiFormatWriter
 import com.google.zxing.WriterException
 import com.google.zxing.integration.android.IntentIntegrator
 import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.ui.qrcode.CaptureActivity
 import de.jepfa.yapm.service.PreferenceService.PREF_COLORIZE_MP_QRCODES
-import java.nio.ByteBuffer
-import java.nio.charset.Charset
+import de.jepfa.yapm.ui.qrcode.CaptureActivity
 
 
 object QRCodeUtil {

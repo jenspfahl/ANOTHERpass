@@ -176,7 +176,7 @@ object ResponseFiller {
         ).intentSender
 
         val message =
-            if (Session.isDenied()) context.getString(R.string.login_with_yapm)
+            if (Session.isDenied()) context.getString(R.string.login_required_first)
             else context.getString(R.string.select_credential_for_autofill)
         responseBuilder.setAuthentication(
             fields.getAutofillIds(),

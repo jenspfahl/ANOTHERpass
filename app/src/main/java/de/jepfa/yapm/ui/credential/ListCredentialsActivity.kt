@@ -71,7 +71,8 @@ import kotlin.collections.ArrayList
  */
 class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationItemSelectedListener  {
 
-    var assistStructure: AssistStructure? = null
+    private var assistStructure: AssistStructure? = null
+    private var credentialsRecycleView: RecyclerView? = null
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var toggle: ActionBarDrawerToggle
@@ -91,6 +92,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         listCredentialAdapter = ListCredentialAdapter(this)
         recyclerView.adapter = listCredentialAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
+        credentialsRecycleView = recyclerView
 
         CurrentCredentialHolder.clear()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -355,7 +357,11 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
     override fun lock() {
         LabelService.clearAll()
-        listCredentialAdapter?.notifyDataSetChanged()
+        credentialsRecycleView?.let {
+            it.post {
+                listCredentialAdapter?.notifyDataSetChanged()
+            }
+        }
     }
 
     fun shouldPushBackAutoFill() : Boolean {
