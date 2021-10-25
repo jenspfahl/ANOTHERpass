@@ -8,6 +8,7 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.InputUseCase
 import de.jepfa.yapm.usecase.UseCase
 import de.jepfa.yapm.util.enrichId
+import de.jepfa.yapm.util.observeOnce
 import de.jepfa.yapm.util.toastText
 
 object ImportCredentialUseCase: InputUseCase<ImportCredentialUseCase.Input, SecureActivity>() {
@@ -17,7 +18,7 @@ object ImportCredentialUseCase: InputUseCase<ImportCredentialUseCase.Input, Secu
     override fun doExecute(input: Input, activity: SecureActivity): Boolean {
         val credentialId = input.credential.id
         if (credentialId != null) {
-            activity.credentialViewModel.findById(credentialId).observe(activity) { existingCredential ->
+            activity.credentialViewModel.findById(credentialId).observeOnce(activity) { existingCredential ->
                 if (existingCredential != null) {
                     AlertDialog.Builder(activity)
                         .setTitle(R.string.import_credential)

@@ -4,6 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import de.jepfa.yapm.model.encrypted.Encrypted
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -58,5 +61,14 @@ fun Double.toReadableFormat(scale: Int): String {
 
 fun Double.secondsToYear(): Double {
     return this / 60 / 60 / 24 / 365
+}
+
+fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
+    observe(lifecycleOwner, object : Observer<T> {
+        override fun onChanged(t: T?) {
+            observer.onChanged(t)
+            removeObserver(this)
+        }
+    })
 }
 

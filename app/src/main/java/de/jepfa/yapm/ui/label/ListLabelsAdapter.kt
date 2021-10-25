@@ -18,6 +18,7 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.util.DebugInfo
+import de.jepfa.yapm.util.observeOnce
 
 
 class ListLabelsAdapter(private val listLabelsActivity: ListLabelsActivity) :
@@ -51,7 +52,7 @@ class ListLabelsAdapter(private val listLabelsActivity: ListLabelsActivity) :
             if (DebugInfo.isDebug) {
                 val current = getItem(pos)
                 current.labelId?.let { id ->
-                    listLabelsActivity.labelViewModel.getById(id).observe(listLabelsActivity) { encLabel ->
+                    listLabelsActivity.labelViewModel.getById(id).observeOnce(listLabelsActivity) { encLabel ->
                         val builder: AlertDialog.Builder = AlertDialog.Builder(listLabelsActivity)
                         val icon: Drawable = listLabelsActivity.applicationInfo.loadIcon(listLabelsActivity.packageManager)
                         val message = encLabel.toString()

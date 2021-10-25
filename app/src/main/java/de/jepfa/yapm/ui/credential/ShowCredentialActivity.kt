@@ -84,26 +84,27 @@ class ShowCredentialActivity : SecureActivity() {
         }
 
         val idExtra = intent.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
-        externalMode = intent.getStringExtra(EXTRA_MODE) ?: EXTRA_MODE_SHOW_EXISTING == EXTRA_MODE_SHOW_EXTERNAL
+        externalMode =
+            intent.getStringExtra(EXTRA_MODE) ?: EXTRA_MODE_SHOW_EXISTING == EXTRA_MODE_SHOW_EXTERNAL
 
         maskPassword = PreferenceService.getAsBool(PREF_MASK_PASSWORD, this)
-        val formatted = PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_SHOW_FORMATTED, this)
+        val formatted =
+            PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_SHOW_FORMATTED, this)
         multiLine = PreferenceService.getAsBool(PREF_PASSWD_WORDS_ON_NL, this)
         passwordPresentation = Password.PresentationMode.createFromFlags(multiLine, formatted)
 
         toolBarLayout = findViewById(R.id.credential_detail_toolbar_layout)
         appBarLayout = findViewById(R.id.credential_detail_appbar_layout)
 
-        userTextView  = findViewById(R.id.user)
-        websiteTextView  = findViewById(R.id.website)
-        additionalInfoTextView  = findViewById(R.id.additional_info)
+        userTextView = findViewById(R.id.user)
+        websiteTextView = findViewById(R.id.website)
+        additionalInfoTextView = findViewById(R.id.additional_info)
         passwordTextView = findViewById(R.id.passwd)
 
         passwordTextView.setOnClickListener {
             if (maskPassword) {
                 maskPassword = false
-            }
-            else {
+            } else {
                 passwordPresentation =
                     if (multiLine) passwordPresentation.prev()
                     else passwordPresentation.next()
@@ -113,7 +114,17 @@ class ShowCredentialActivity : SecureActivity() {
             }
         }
 
-        updatePasswordView(idExtra)
+        if (externalMode) {
+
+            credential = EncCredential.fromIntent(intent)
+            updatePasswordView()
+        } else {
+            credentialViewModel.getById(idExtra).observe(this, {
+                credential = it
+
+                updatePasswordView()
+            })
+        }
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -122,8 +133,7 @@ class ShowCredentialActivity : SecureActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         if (externalMode) {
             menuInflater.inflate(R.menu.menu_credential_detail_import, menu)
-        }
-        else {
+        } else {
             menuInflater.inflate(R.menu.menu_credential_detail, menu)
         }
 
@@ -174,7 +184,12 @@ class ShowCredentialActivity : SecureActivity() {
         }
 
         if (id == R.id.menu_detach_credential) {
-            DetachHelper.detachPassword(this, credential.password, obfuscationKey, passwordPresentation)
+            DetachHelper.detachPassword(
+                this,
+                credential.password,
+                obfuscationKey,
+                passwordPresentation
+            )
             return true
         }
 
@@ -195,29 +210,29 @@ class ShowCredentialActivity : SecureActivity() {
 
         if (id == R.id.menu_delete_credential) {
 
-            masterSecretKey?.let{ key ->
+            masterSecretKey?.let { key ->
                 val decName = decryptCommonString(key, credential.name)
                 val name = enrichId(this, decName, credential.id)
 
                 AlertDialog.Builder(this)
-                        .setTitle(R.string.title_delete_credential)
-                        .setMessage(getString(R.string.message_delete_credential, name))
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
-                            credentialViewModel.delete(credential)
+                    .setTitle(R.string.title_delete_credential)
+                    .setMessage(getString(R.string.message_delete_credential, name))
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                        credentialViewModel.delete(credential)
 
-                            val upIntent = Intent(this, ListCredentialsActivity::class.java)
-                            navigateUpTo(upIntent)
-                        }
-                        .setNegativeButton(android.R.string.no, null)
-                        .show()
+                        val upIntent = Intent(this, ListCredentialsActivity::class.java)
+                        navigateUpTo(upIntent)
+                    }
+                    .setNegativeButton(android.R.string.no, null)
+                    .show()
             }
             return true
         }
 
         if (id == R.id.menu_deobfuscate_password) {
 
-            masterSecretKey?.let{ key ->
+            masterSecretKey?.let { key ->
 
                 if (obfuscationKey != null) {
                     obfuscationKey?.clear()
@@ -229,8 +244,7 @@ class ShowCredentialActivity : SecureActivity() {
                     updatePasswordTextView(key, false)
 
                     toastText(this, R.string.deobfuscate_restored)
-                }
-                else {
+                } else {
 
                     DeobfuscationDialog.openDeobfuscationDialog(this) { deobfuscationKey ->
                         maskPassword = false
@@ -301,21 +315,6 @@ class ShowCredentialActivity : SecureActivity() {
     }
 
 
-    private fun updatePasswordView(idExtra: Int) {
-        if (externalMode) {
-
-            credential = EncCredential.fromIntent(intent)
-            updatePasswordView()
-        }
-        else {
-            credentialViewModel.getById(idExtra).observe(this, {
-                credential = it
-
-                updatePasswordView()
-            })
-        }
-    }
-
     private fun updatePasswordView() {
         masterSecretKey?.let { key ->
             val decName = decryptCommonString(key, credential.name)
@@ -358,8 +357,7 @@ class ShowCredentialActivity : SecureActivity() {
             websiteTextView.text = website
             if (website.isEmpty()) {
                 websiteView.visibility = View.INVISIBLE
-            }
-            else {
+            } else {
                 websiteView.visibility = View.VISIBLE
                 linkify(websiteTextView)
             }
@@ -414,8 +412,10 @@ class ShowCredentialActivity : SecureActivity() {
 
     companion object {
         const val EXTRA_MODE = "de.jepfa.yapm.ui.ShowCredentialActivity.mode"
-        const val EXTRA_MODE_SHOW_EXISTING = "de.jepfa.yapm.ui.ShowCredentialActivity.mode.show_existing"
-        const val EXTRA_MODE_SHOW_EXTERNAL = "de.jepfa.yapm.ui.ShowCredentialActivity.mode.show_external"
+        const val EXTRA_MODE_SHOW_EXISTING =
+            "de.jepfa.yapm.ui.ShowCredentialActivity.mode.show_existing"
+        const val EXTRA_MODE_SHOW_EXTERNAL =
+            "de.jepfa.yapm.ui.ShowCredentialActivity.mode.show_external"
     }
 
 }

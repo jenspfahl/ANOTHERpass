@@ -541,6 +541,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
     }
 
     private fun refreshCredentials() {
+        credentialViewModel.allCredentials.removeObservers(this)
         credentialViewModel.allCredentials.observe(this, { credentials ->
             credentials?.let { credentials ->
                 credentialCount = credentials.size

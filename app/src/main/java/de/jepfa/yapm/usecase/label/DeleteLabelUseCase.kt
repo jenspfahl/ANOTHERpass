@@ -5,6 +5,7 @@ import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.usecase.InputUseCase
+import de.jepfa.yapm.util.observeOnce
 
 
 object DeleteLabelUseCase: InputUseCase<Label, SecureActivity>() {
@@ -15,7 +16,7 @@ object DeleteLabelUseCase: InputUseCase<Label, SecureActivity>() {
         if (key != null && labelId != null) {
             val credentialsToUpdate = LabelService.getCredentialIdsForLabelId(labelId)
             credentialsToUpdate?.forEach { credentialId ->
-                activity.credentialViewModel.getById(credentialId).observe(activity) { credential ->
+                activity.credentialViewModel.getById(credentialId).observeOnce(activity) { credential ->
                     credential?.let {
                         val labels = LabelService.decryptLabelsForCredential(key, credential)
 

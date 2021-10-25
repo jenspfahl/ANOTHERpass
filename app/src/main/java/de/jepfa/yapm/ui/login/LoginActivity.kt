@@ -24,6 +24,7 @@ import de.jepfa.yapm.ui.nfc.NfcBaseActivity
 import de.jepfa.yapm.usecase.vault.DropVaultUseCase
 import de.jepfa.yapm.usecase.app.ShowInfoUseCase
 import de.jepfa.yapm.util.Constants
+import de.jepfa.yapm.util.observeOnce
 import de.jepfa.yapm.util.toastText
 
 
@@ -178,7 +179,7 @@ class LoginActivity : NfcBaseActivity() {
 
 
     private fun doubleCheckDropVault() {
-        credentialViewModel.allCredentials.observe(this) { credentials ->
+        credentialViewModel.allCredentials.observeOnce(this) { credentials ->
             if (credentials.isEmpty()) {
                 dropAndLogoutVault()
             }
