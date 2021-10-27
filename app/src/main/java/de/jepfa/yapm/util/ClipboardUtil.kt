@@ -4,16 +4,15 @@ import android.app.AlertDialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.widget.Toast
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.provider.PasteContentProvider
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.PREF_WARN_BEFORE_COPY_TO_CB
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.service.PreferenceService.PREF_WARN_BEFORE_COPY_TO_CB
 
 object ClipboardUtil {
 
@@ -46,14 +45,14 @@ object ClipboardUtil {
         }
     }
 
-    fun copy(label: String, text: String, context: Context) {
+    fun copy(label: String, text: CharSequence, context: Context) {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText(label, text)
         clipboard.setPrimaryClip(clip)
     }
 
     private fun copyPassword(password: Password, context: Context) {
-        copy("Password", password.toString(), context)
+        copy("Password", password.toRawFormattedPassword(), context)
         toastText(context, R.string.toast_copied_to_clipboard)
     }
 

@@ -22,7 +22,7 @@ object QRCodeUtil {
 
     private val MAX_HEADER_LENGTH = 20
 
-    fun generateQRCode(header: String?, data: String, color: Int = Color.BLACK, context: Context): Bitmap {
+    fun generateQRCode(header: String?, data: CharSequence, color: Int = Color.BLACK, context: Context): Bitmap {
         var cutHeader = header
         if (header != null && header.length > MAX_HEADER_LENGTH) {
             cutHeader = header.substring(0, MAX_HEADER_LENGTH) + "..."
@@ -30,13 +30,13 @@ object QRCodeUtil {
         val colorize = PreferenceService.getAsBool(PREF_COLORIZE_MP_QRCODES, context)
         val printColor = if (colorize) color else Color.BLACK
 
-        var size =  if (data.length > 256) 550 else 500
+        val size =  if (data.length > 256) 550 else 500
         val width = size
         val height = size
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val codeWriter = MultiFormatWriter()
         try {
-            val bitMatrix = codeWriter.encode(data, BarcodeFormat.QR_CODE, width, height)
+            val bitMatrix = codeWriter.encode(data.toString(), BarcodeFormat.QR_CODE, width, height)
             for (x in 0 until width) {
                 for (y in 0 until height) {
                     bitmap.setPixel(x, y, if (bitMatrix[x, y]) printColor else Color.WHITE)

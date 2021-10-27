@@ -38,7 +38,9 @@ open class Secret(var data: ByteArray) : Clearable, Validable {
 
     fun toCharArray(charset: Charset): CharArray {
         val charBuffer = charset.decode(ByteBuffer.wrap(data))
-        return charBuffer.array()
+        val charArray = CharArray(charBuffer.limit())
+        charBuffer.get(charArray)
+        return charArray
     }
 
     override fun clear() {

@@ -168,11 +168,6 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
 
-        if (Session.isDenied()) {
-            LockVaultUseCase.execute(this)
-            return false
-        }
-
         menuInflater.inflate(R.menu.menu_main, menu)
 
         val searchItem: MenuItem = menu.findItem(R.id.action_search)

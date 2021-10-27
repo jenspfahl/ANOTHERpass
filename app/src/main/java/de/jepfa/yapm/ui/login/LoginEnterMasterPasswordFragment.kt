@@ -145,14 +145,15 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
     private fun readEMP(emp: Encrypted): Boolean {
         val baseActivity = getBaseActivity() ?: return false
         val empSK = generateEncMasterPasswdSK(baseActivity)
-        val encMasterPassword =
+        val masterPassword =
             SecretService.decryptPassword(empSK, emp)
-        if (!encMasterPassword.isValid()) {
+        if (!masterPassword.isValid()) {
             toastText(getBaseActivity(), R.string.invalid_emp)
             return false
         }
 
-        masterPasswdTextView.setText(encMasterPassword)
+        masterPasswdTextView.setText(masterPassword.toRawFormattedPassword())
+        masterPassword.clear()
 
         if (isFastLoginWithQrCode() || isFastLoginWithNfcTag()) {
             loginButton.performClick()
@@ -186,14 +187,15 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
 
             val mptSK = generateStrongSecretKey(masterPasswordTokenKey, salt, cipherAlgorithm)
 
-            val encMasterPassword =
+            val masterPassword =
                 SecretService.decryptPassword(mptSK, mpt)
-            if (!encMasterPassword.isValid()) {
+            if (!masterPassword.isValid()) {
                 toastText(getBaseActivity(), R.string.invalid_mpt)
                 return false
             }
 
-            masterPasswdTextView.setText(encMasterPassword)
+            masterPasswdTextView.setText(masterPassword.toRawFormattedPassword())
+            masterPassword.clear()
 
             if (isFastLoginWithQrCode() || isFastLoginWithNfcTag()) {
                 loginButton.performClick()

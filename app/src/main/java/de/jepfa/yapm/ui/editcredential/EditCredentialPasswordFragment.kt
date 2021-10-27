@@ -53,7 +53,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
     private val passphraseGenerator = PassphraseGenerator()
     private val passwordGenerator = PasswordGenerator()
 
-    private var passwordPresentation = Password.PresentationMode.DEFAULT
+    private var passwordPresentation = Password.FormattingStyle.DEFAULT
     private var multiLine = false
 
     private var passwordCombinations: Double? = null
@@ -79,7 +79,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
         val formatted = PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_SHOW_FORMATTED, context)
         multiLine = PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_WORDS_ON_NL, context)
-        passwordPresentation = Password.PresentationMode.createFromFlags(multiLine, formatted)
+        passwordPresentation = Password.FormattingStyle.createFromFlags(multiLine, formatted)
 
         return inflater.inflate(R.layout.fragment_edit_credential_password, container, false)
     }
@@ -142,7 +142,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
             val input = EditText(getBaseActivity())
             input.inputType = InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-            input.setText(generatedPassword, TextView.BufferType.EDITABLE)
+            input.setText(generatedPassword.toRawFormattedPassword(), TextView.BufferType.EDITABLE)
 
             val filters = arrayOf<InputFilter>(LengthFilter(Constants.MAX_CREDENTIAL_PASSWD_LENGTH))
             input.setFilters(filters)
@@ -297,9 +297,9 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
     private fun guessPasswordCombinations(password: Password) {
         // rudimentary combination calculation by assuming a-Z, A-Z, 0-9 and 10 potential special chars
-        val containsLowerCase = if (password.toString().contains(Regex("[a-z]"))) 26 else 0
-        val containsUpperCase = if (password.toString().contains(Regex("[A-Z]"))) 26 else 0
-        val containsDigits = if (password.toString().contains(Regex("[0-9]"))) 10 else 0
+        val containsLowerCase = if (password.contains(Regex("[a-z]"))) 26 else 0
+        val containsUpperCase = if (password.contains(Regex("[A-Z]"))) 26 else 0
+        val containsDigits = if (password.contains(Regex("[0-9]"))) 10 else 0
         passwordCombinations = Math.pow(
             (containsLowerCase + containsUpperCase + containsDigits + 10).toDouble(),
             password.length.toDouble()

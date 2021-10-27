@@ -20,7 +20,7 @@ class PassphraseGenerator(
 
 
     override fun generate(spec: PassphraseGeneratorSpec): Password {
-        var buffer = Password(CharArray(0))
+        val buffer = Password(CharArray(0))
 
         for (i in 0 until strengthToWordCount(spec.strength)) {
             val word = generateWord()

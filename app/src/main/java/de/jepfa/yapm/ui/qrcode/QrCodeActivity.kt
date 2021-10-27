@@ -64,12 +64,12 @@ class QrCodeActivity : SecureActivity() {
         subTextView.text = sub
 
         if (!qrc.isEmpty()) {
-            val bitmap = generateQRCode(qrcHeader, qrc.toString(), qrcColor, this)
+            val bitmap = generateQRCode(qrcHeader, qrc.toRawFormattedPassword(), qrcColor, this)
             qrCodeImageView.setImageBitmap(bitmap)
             qrCodeImageView.setOnLongClickListener {
                 AlertDialog.Builder(this)
                         .setTitle(head)
-                        .setMessage(qrc.toString())
+                        .setMessage(qrc.toRawFormattedPassword())
                         .show()
                 true
             }

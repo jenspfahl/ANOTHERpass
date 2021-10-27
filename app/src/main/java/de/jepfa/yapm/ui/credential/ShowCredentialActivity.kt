@@ -46,13 +46,13 @@ class ShowCredentialActivity : SecureActivity() {
     val updateCredentialActivityRequestCode = 1
 
     private var externalMode = false
-    private var passwordPresentation = Password.PresentationMode.DEFAULT
+    private var passwordPresentation = Password.FormattingStyle.DEFAULT
     private var maskPassword = false
     private var multiLine = false
     private var isAppBarAdjusted = false
     private var obfuscationKey: Key? = null
+    private var credential: EncCredential? = null
 
-    private lateinit var credential: EncCredential //TODO change to ?
     private lateinit var toolBarLayout: CollapsingToolbarLayout
     private lateinit var appBarLayout: AppBarLayout
     private lateinit var titleLayout: LinearLayout
@@ -91,7 +91,7 @@ class ShowCredentialActivity : SecureActivity() {
         val formatted =
             PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_SHOW_FORMATTED, this)
         multiLine = PreferenceService.getAsBool(PREF_PASSWD_WORDS_ON_NL, this)
-        passwordPresentation = Password.PresentationMode.createFromFlags(multiLine, formatted)
+        passwordPresentation = Password.FormattingStyle.createFromFlags(multiLine, formatted)
 
         toolBarLayout = findViewById(R.id.credential_detail_toolbar_layout)
         appBarLayout = findViewById(R.id.credential_detail_appbar_layout)
@@ -110,24 +110,33 @@ class ShowCredentialActivity : SecureActivity() {
                     else passwordPresentation.next()
             }
             masterSecretKey?.let { key ->
-                updatePasswordTextView(key, true)
+                credential?.let { credential ->
+                    updatePasswordTextView(key, credential, true)
+                }
             }
         }
 
         if (externalMode) {
 
             credential = EncCredential.fromIntent(intent)
-            updatePasswordView()
+            credential?.let {
+                updatePasswordView(it)
+            }
         } else {
             credentialViewModel.getById(idExtra).observe(this, {
                 credential = it
 
-                updatePasswordView()
+                updatePasswordView(it)
             })
         }
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        credential?.let { CurrentCredentialHolder.update(it, obfuscationKey) }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -147,7 +156,7 @@ class ShowCredentialActivity : SecureActivity() {
             menu.findItem(R.id.menu_detach_credential)?.isVisible = false
         }
 
-        menu.findItem(R.id.menu_deobfuscate_password)?.isVisible = credential.isObfuscated
+        menu.findItem(R.id.menu_deobfuscate_password)?.isVisible = credential?.isObfuscated ?: false
 
 
         optionsMenu = menu
@@ -156,6 +165,7 @@ class ShowCredentialActivity : SecureActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
         val id = item.itemId
 
         if (Session.isDenied()) {
@@ -163,117 +173,119 @@ class ShowCredentialActivity : SecureActivity() {
             return false
         }
 
-        if (id == R.id.menu_export_credential) {
-            ExportCredentialUseCase.openStartExportDialog(credential, obfuscationKey, this)
-            return true
-        }
-
-        if (id == R.id.menu_import_credential) {
-            val input = ImportCredentialUseCase.Input(credential)
-            {
-                val upIntent = Intent(this, ListCredentialsActivity::class.java)
-                navigateUpTo(upIntent)
+        credential?.let { credential ->
+            if (id == R.id.menu_export_credential) {
+                ExportCredentialUseCase.openStartExportDialog(credential, obfuscationKey, this)
+                return true
             }
-            ImportCredentialUseCase.execute(input, this)
-            return true
-        }
 
-        if (id == R.id.menu_lock_items) {
-            LockVaultUseCase.execute(this)
-            return true
-        }
-
-        if (id == R.id.menu_detach_credential) {
-            DetachHelper.detachPassword(
-                this,
-                credential.password,
-                obfuscationKey,
-                passwordPresentation
-            )
-            return true
-        }
-
-        if (id == R.id.menu_copy_credential) {
-            ClipboardUtil.copyEncPasswordWithCheck(credential.password, obfuscationKey, this)
-            return true
-        }
-
-        if (id == R.id.menu_change_credential) {
-
-            val intent = Intent(this, EditCredentialActivity::class.java)
-            intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, credential.id)
-
-            startActivityForResult(intent, updateCredentialActivityRequestCode)
-
-            return true
-        }
-
-        if (id == R.id.menu_delete_credential) {
-
-            masterSecretKey?.let { key ->
-                val decName = decryptCommonString(key, credential.name)
-                val name = enrichId(this, decName, credential.id)
-
-                AlertDialog.Builder(this)
-                    .setTitle(R.string.title_delete_credential)
-                    .setMessage(getString(R.string.message_delete_credential, name))
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
-                        credentialViewModel.delete(credential)
-
-                        val upIntent = Intent(this, ListCredentialsActivity::class.java)
-                        navigateUpTo(upIntent)
-                    }
-                    .setNegativeButton(android.R.string.no, null)
-                    .show()
+            if (id == R.id.menu_import_credential) {
+                val input = ImportCredentialUseCase.Input(credential)
+                {
+                    val upIntent = Intent(this, ListCredentialsActivity::class.java)
+                    navigateUpTo(upIntent)
+                }
+                ImportCredentialUseCase.execute(input, this)
+                return true
             }
-            return true
-        }
 
-        if (id == R.id.menu_deobfuscate_password) {
+            if (id == R.id.menu_lock_items) {
+                LockVaultUseCase.execute(this)
+                return true
+            }
 
-            masterSecretKey?.let { key ->
+            if (id == R.id.menu_detach_credential) {
+                DetachHelper.detachPassword(
+                    this,
+                    credential.password,
+                    obfuscationKey,
+                    passwordPresentation
+                )
+                return true
+            }
 
-                if (obfuscationKey != null) {
-                    obfuscationKey?.clear()
-                    obfuscationKey = null
-                    item.isChecked = false
+            if (id == R.id.menu_copy_credential) {
+                ClipboardUtil.copyEncPasswordWithCheck(credential.password, obfuscationKey, this)
+                return true
+            }
 
-                    CurrentCredentialHolder.clear()
+            if (id == R.id.menu_change_credential) {
 
-                    updatePasswordTextView(key, false)
+                val intent = Intent(this, EditCredentialActivity::class.java)
+                intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, credential.id)
 
-                    toastText(this, R.string.deobfuscate_restored)
-                } else {
+                startActivityForResult(intent, updateCredentialActivityRequestCode)
 
-                    DeobfuscationDialog.openDeobfuscationDialog(this) { deobfuscationKey ->
-                        maskPassword = false
-                        item.isChecked = true
+                return true
+            }
 
-                        obfuscationKey = deobfuscationKey
-                        obfuscationKey?.let {
-                            val passwordForDeobfuscation = decryptPassword(key, credential.password)
-                            passwordForDeobfuscation.deobfuscate(it)
+            if (id == R.id.menu_delete_credential) {
 
-                            var spannedString =
-                                spannableObfusableAndMaskableString(
-                                    passwordForDeobfuscation,
-                                    passwordPresentation,
-                                    maskPassword,
-                                    showObfuscated(credential),
-                                    this
-                                )
-                            passwordForDeobfuscation.clear()
+                masterSecretKey?.let { key ->
+                    val decName = decryptCommonString(key, credential.name)
+                    val name = enrichId(this, decName, credential.id)
 
-                            passwordTextView.text = spannedString
-                            CurrentCredentialHolder.update(credential, it)
+                    AlertDialog.Builder(this)
+                        .setTitle(R.string.title_delete_credential)
+                        .setMessage(getString(R.string.message_delete_credential, name))
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                            credentialViewModel.delete(credential)
+
+                            val upIntent = Intent(this, ListCredentialsActivity::class.java)
+                            navigateUpTo(upIntent)
                         }
+                        .setNegativeButton(android.R.string.no, null)
+                        .show()
+                }
+                return true
+            }
 
-                        toastText(this, R.string.password_deobfuscated)
+            if (id == R.id.menu_deobfuscate_password) {
+
+                masterSecretKey?.let { key ->
+
+                    if (obfuscationKey != null) {
+                        obfuscationKey?.clear()
+                        obfuscationKey = null
+                        item.isChecked = false
+
+                        CurrentCredentialHolder.clear()
+
+                        updatePasswordTextView(key, credential, false)
+
+                        toastText(this, R.string.deobfuscate_restored)
+                    } else {
+
+                        DeobfuscationDialog.openDeobfuscationDialog(this) { deobfuscationKey ->
+                            maskPassword = false
+                            item.isChecked = true
+
+                            obfuscationKey = deobfuscationKey
+                            obfuscationKey?.let {
+                                val passwordForDeobfuscation = decryptPassword(key, credential.password)
+                                passwordForDeobfuscation.deobfuscate(it)
+
+                                var spannedString =
+                                    spannableObfusableAndMaskableString(
+                                        passwordForDeobfuscation,
+                                        passwordPresentation,
+                                        maskPassword,
+                                        showObfuscated(credential),
+                                        this
+                                    )
+                                passwordForDeobfuscation.clear()
+
+                                passwordTextView.text = spannedString
+                                CurrentCredentialHolder.update(credential, it)
+                            }
+
+                            toastText(this, R.string.password_deobfuscated)
+                        }
                     }
                 }
+                return true
             }
-            return true
         }
 
         return super.onOptionsItemSelected(item)
@@ -315,7 +327,7 @@ class ShowCredentialActivity : SecureActivity() {
     }
 
 
-    private fun updatePasswordView() {
+    private fun updatePasswordView(credential: EncCredential) {
         masterSecretKey?.let { key ->
             val decName = decryptCommonString(key, credential.name)
             val name = enrichId(this, decName, credential.id)
@@ -364,7 +376,7 @@ class ShowCredentialActivity : SecureActivity() {
 
             additionalInfoTextView.text = additionalInfo
 
-            updatePasswordTextView(key, true)
+            updatePasswordTextView(key, credential, true)
 
             optionsMenu?.findItem(R.id.menu_deobfuscate_password)?.isVisible =
                 credential.isObfuscated
@@ -386,9 +398,13 @@ class ShowCredentialActivity : SecureActivity() {
         CurrentCredentialHolder.update(credential, obfuscationKey)
     }
 
-    private fun updatePasswordTextView(key: SecretKeyHolder, alloeDeobfuscate: Boolean) {
+    private fun updatePasswordTextView(
+        key: SecretKeyHolder,
+        credential: EncCredential,
+        allowDeobfuscate: Boolean
+    ) {
         val password = decryptPassword(key, credential.password)
-        if (alloeDeobfuscate) {
+        if (allowDeobfuscate) {
             obfuscationKey?.let {
                 password.deobfuscate(it)
             }

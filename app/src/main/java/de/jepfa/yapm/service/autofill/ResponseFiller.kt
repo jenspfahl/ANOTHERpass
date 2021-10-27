@@ -302,11 +302,11 @@ object ResponseFiller {
         return createDataSets(fields,
             R.drawable.ic_baseline_vpn_key_24,
             context.getString(R.string.paste_passwd_for_autofill, name),
-            password.toString(),
+            password.toRawFormattedPassword(),
             context)
     }
 
-    private fun createDataSets(fields : Set<ViewNode>, iconId: Int, text: String, content: String, context: Context): List<Dataset> {
+    private fun createDataSets(fields : Set<ViewNode>, iconId: Int, text: String, content: CharSequence, context: Context): List<Dataset> {
         return fields
             .map { createDataSet(it, iconId, text, content, context) }
             .filterNotNull()
@@ -316,7 +316,7 @@ object ResponseFiller {
         field: ViewNode,
         iconId : Int,
         text: String,
-        content: String,
+        content: CharSequence,
         context: Context
     ): Dataset? {
 

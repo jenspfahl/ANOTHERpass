@@ -18,7 +18,7 @@ class PassphraseGeneratorTest {
 
         for (i in 0..100) {
             val passphrase = passphraseGenerator.generate(spec)
-            println("passphrase = ${passphrase.toStringRepresentation()}")
+            println("passphrase = ${passphrase.toFormattedPassword()}")
             passphrase.clear()
         }
 

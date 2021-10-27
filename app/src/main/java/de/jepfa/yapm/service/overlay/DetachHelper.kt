@@ -11,7 +11,6 @@ import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.ALIAS_KEY_TRANSPORT
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.putEncryptedExtra
 
@@ -19,7 +18,7 @@ object DetachHelper {
     val EXTRA_PASSWD = "password"
     val EXTRA_PRESENTATION_MODE = "presentationMode"
 
-    fun detachPassword(activity: SecureActivity, encPassword: Encrypted, obfuscationKey : Key?, presentationMode: Password.PresentationMode?) =
+    fun detachPassword(activity: SecureActivity, encPassword: Encrypted, obfuscationKey : Key?, formattingStyle: Password.FormattingStyle?) =
             if (!PermissionChecker.hasOverlayPermission(activity)) {
 
                 AlertDialog.Builder(activity)
@@ -49,7 +48,7 @@ object DetachHelper {
 
                     val intent = Intent(activity, OverlayShowingService::class.java)
                     intent.putEncryptedExtra(EXTRA_PASSWD, encPassword)
-                    intent.putExtra(EXTRA_PRESENTATION_MODE, presentationMode?.ordinal)
+                    intent.putExtra(EXTRA_PRESENTATION_MODE, formattingStyle?.ordinal)
                     activity.startService(intent)
 
                     activity.moveTaskToBack(true)

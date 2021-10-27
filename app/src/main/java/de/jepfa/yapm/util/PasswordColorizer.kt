@@ -8,7 +8,7 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
-import de.jepfa.yapm.model.secret.Password.PresentationMode as PresentationMode
+import de.jepfa.yapm.model.secret.Password.FormattingStyle as PresentationMode
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_COLORED_PASSWORD
 import java.lang.Integer.min
@@ -20,7 +20,7 @@ object PasswordColorizer {
     fun spannableString(password: Password, context: Context?): CharSequence {
         val showFormatted = PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_SHOW_FORMATTED, context)
         val multiLine = PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_WORDS_ON_NL, context)
-        val presentationMode = PresentationMode.createFromFlags(multiLine, showFormatted)
+        val presentationMode = Password.FormattingStyle.createFromFlags(multiLine, showFormatted)
 
         return spannableObfusableString(password, presentationMode, obfuscated = false, context)
     }
@@ -44,7 +44,7 @@ object PasswordColorizer {
 
         val multiLine = presentationMode.isMultiLine()
         val raw = presentationMode == PresentationMode.RAW
-        var spannedString = SpannableString(password.toStringRepresentation(presentationMode, maskPassword))
+        var spannedString = SpannableString(password.toFormattedPassword(presentationMode, maskPassword))
 
         val colorizePasswd = PreferenceService.getAsBool(PREF_COLORED_PASSWORD, context)
 

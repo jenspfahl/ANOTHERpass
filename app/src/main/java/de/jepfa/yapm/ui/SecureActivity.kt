@@ -71,7 +71,7 @@ abstract class SecureActivity : BaseActivity() {
         const val fromAutofill = "fromAutofill"
         const val loginRequestCode = 38632
 
-        private val DELTA_LOGIN_ACTIVITY_INTENDED = TimeUnit.SECONDS.toMillis(3)
+        private val DELTA_LOGIN_ACTIVITY_INTENDED = TimeUnit.SECONDS.toMillis(5)
 
         @Volatile
         private var loginActivityIntended: Long = 0

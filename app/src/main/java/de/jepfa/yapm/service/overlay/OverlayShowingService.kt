@@ -29,7 +29,7 @@ class OverlayShowingService : Service(), OnTouchListener {
     private var wm: WindowManager? = null
 
     private var password = Password.empty()
-    private var presentationMode = Password.PresentationMode.DEFAULT
+    private var presentationMode = Password.FormattingStyle.DEFAULT
 
     private var offsetX = 0f
     private var offsetY = 0f
@@ -58,10 +58,10 @@ class OverlayShowingService : Service(), OnTouchListener {
                 val multiLine = PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_WORDS_ON_NL, this)
                 val presentationModeIdx = intent.getIntExtra(DetachHelper.EXTRA_PRESENTATION_MODE, -1)
                 if (presentationModeIdx == -1) {
-                    presentationMode = Password.PresentationMode.createFromFlags(multiLine, formatted)
+                    presentationMode = Password.FormattingStyle.createFromFlags(multiLine, formatted)
                 }
                 else {
-                    presentationMode = Password.PresentationMode.values()[presentationModeIdx]
+                    presentationMode = Password.FormattingStyle.values()[presentationModeIdx]
                 }
 
                 paintIt()
