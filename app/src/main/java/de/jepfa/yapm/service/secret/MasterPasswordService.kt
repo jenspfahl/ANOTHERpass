@@ -33,7 +33,7 @@ object MasterPasswordService {
      * not the selected one from the user
      */
     fun generateEncMasterPasswdSK(context: Context): SecretKeyHolder {
-        val saltAsPassword = Password(SaltService.getSalt(context).data)
+        val saltAsPassword = Password(SaltService.getSalt(context))
         val empSK = SecretService.generateNormalSecretKey(saltAsPassword, EMP_SALT, DEFAULT_CIPHER_ALGORITHM)
         saltAsPassword.clear()
         return empSK

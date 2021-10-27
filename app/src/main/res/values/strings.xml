@@ -95,13 +95,13 @@
     <string name="export_vault">Save vault as file</string>
     <string name="qrc_download_as_img">Save Qr code as image</string>
     <string name="download_as_nfc_tag">Push as NFC tag</string>
-    <string name="export_vault_explanation">Here you can export your complete vault into a file for backup purposes. Use this file to import your vault after a fresh new app installation without data. You have the choice to include or exclude the encrypted master key. If you exclude it, export the master key by your own and store it on a safe place. You need it to import the vault file. The separation of encrypted master key and vault file might be sense to make the vault file useless for hackers even if they guess your pin and master password.</string>
+    <string name="export_vault_explanation">Here you can export your complete vault into a file for backup purposes. Use this file to import your vault after a fresh new app installation without data. You have the choice to include or exclude the Encrypted Master Key. If you exclude it, export the master key by your own and store it on a safe place. You need it to import the vault file. The separation of Encrypted Master Key and vault file might be sense to make the vault file useless for hackers even if they guess your pin and master password.</string>
     <string name="button_export_vault">Export vault</string>
-    <string name="include_enc_masterkey">Include encrypted master key</string>
+    <string name="include_enc_masterkey">Include Encrypted Master Key</string>
     <string name="include_preferences">Include current app settings</string>
     <string name="too_may_wrong_logins">Too many login attempts, all tokens declined</string>
     <string name="too_may_wrong_logins_self_destruction">Too many login attempts, vault completely deleted</string>
-    <string name="import_vault_explanation">Select a vault file to import. Note: You need the pin and the master password and, depending on the file, the encrypted master key.</string>
+    <string name="import_vault_explanation">Select a vault file to import. Note: You need the pin and the master password and, depending on the file, the Encrypted Master Key.</string>
     <string name="import_vault_load_file_fragment_label" tools:ignore="TypographyFractions">Import Vault 1/2</string>
     <string name="import_vault_import_file_fragment_label">Import Vault 2/2</string>
     <string name="button_load_vault">Load vault file</string>
@@ -119,13 +119,13 @@
     <string name="about">About</string>
     <string name="title_about_the_app">About the app</string>
     <string name="change_pin">Change pin</string>
-    <string name="change_pin_explanation">Change your pin by enter your current one and a new one repeated. Note, that the encrypted master key will be changed, so you need to export it again. This also effects old vault export files with the old key.</string>
+    <string name="change_pin_explanation">Change your pin by enter your current one and a new one repeated. Note, that the Encrypted Master Key will be changed, so you need to export it again. This also effects old vault export files with the old key.</string>
     <string name="button_change">Change</string>
     <string name="new_pin">Enter new pin</string>
     <string name="repeat_new_pin">Repeat new pin</string>
     <string name="current_pin">Enter current pin</string>
     <string name="change_master_password">Change master password</string>
-    <string name="change_master_password_explanation">Change your master password by enter your current pin and generate a new master password. Note, that the encrypted master key will be changed, so you need to export it again. This also effects old vault export files with the old key. You should also export your master password and tokens again.</string>
+    <string name="change_master_password_explanation">Change your master password by enter your current pin and generate a new master password. Note, that the Encrypted Master Key will be changed, so you need to export it again. This also effects old vault export files with the old key. You should also export your master password and tokens again.</string>
     <string name="security">Privacy</string>
     <string name="delete_stored_masterpasswd_confirmation">Do you want to delete the stored master password from this device? For future logins you will need the master password then.</string>
     <string name="pref_header_general">General</string>
@@ -213,7 +213,7 @@
 
     <string name="vault_export_info">"Vault (Id = %4$s) exported at %1$s, contains %2$s credentials and %3$s labels"</string>
     <string name="scan_masterkey_first">Scan your master key first</string>
-    <string name="not_an_emk">This is not an encrypted master key</string>
+    <string name="not_an_emk">This is not an Encrypted Master Key</string>
 
     <string name="label_never_used">Never used</string>
     <string name="label_used_once">Used %1$d time</string>
@@ -317,7 +317,7 @@
     <string name="unknown_emp_scanned">\u274C Unknown Encrypted Master Password (EMP) scanned</string>
     <string name="well_known_emp_scanned">\u2705 Well known Encrypted Master Password (EMP) scanned</string>
     <string name="unknown_mpt_scanned">\u274C Unknown Master Password Token (MPT) scanned</string>
-    <string name="well_known_mpt_scanned">\u2705 Well known Master Password Token (MPT #%1$d) scanned</string>
+    <string name="well_known_mpt_scanned">\u2705 Well known Master Password Token (MPT #%1$s) scanned</string>
     <string name="well_known_ecr_scanned">\u2705 Well known Encrypted Credential Record (ECR) with name \'%1$s\' scanned</string>
     <string name="unknown_ecr_scanned">\u274C Unknown Encrypted Credential Record (ECR) scanned</string>
     <string name="pcr_scanned">\u2705 Plain Credential Record (ECR) with name \'%1$s\' scanned</string>

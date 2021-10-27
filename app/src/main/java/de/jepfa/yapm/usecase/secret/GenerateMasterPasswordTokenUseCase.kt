@@ -46,27 +46,27 @@ object GenerateMasterPasswordTokenUseCase: BasicUseCase<SecureActivity>() {
         val encMasterPasswd = Session.getEncMasterPasswd()
         if (key != null && encMasterPasswd != null) {
             val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
-            val mPTKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP_TOKEN)
+            val mptKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP_TOKEN)
             val masterPassword = SecretService.decryptPassword(tempKey, encMasterPasswd)
 
-            var nextMptNumber = PreferenceService.getAsInt(
+            val nextMptNumber = PreferenceService.getAsInt(
                 PreferenceService.STATE_MASTER_PASSWD_TOKEN_COUNTER,
                 activity
             ) + 1
             val cipherAlgorithm = SecretService.getCipherAlgorithm(activity)
 
             val masterPasswordTokenKey = SecretService.generateRandomKey(32)
-            val encMasterPasswordTokenKey = SecretService.encryptKey(mPTKey, masterPasswordTokenKey)
+            val encMasterPasswordTokenKey = SecretService.encryptKey(mptKey, masterPasswordTokenKey)
             val masterPasswordTokenSK = SecretService.generateStrongSecretKey(
                 masterPasswordTokenKey,
                 SaltService.getSalt(activity),
                 cipherAlgorithm
             )
             val type = EncryptedType(MASTER_PASSWD_TOKEN, nextMptNumber.toString())
-            val masterPasswordToken =
+            val tokenizedMasterPassword =
                 SecretService.encryptPassword(type, masterPasswordTokenSK, masterPassword)
-            val encMasterPasswordToken =
-                SecretService.encryptEncrypted(tempKey, masterPasswordToken)
+            val encTokenizedMasterPassword =
+                SecretService.encryptEncrypted(tempKey, tokenizedMasterPassword)
 
             val encHead = SecretService.encryptCommonString(
                 tempKey,
@@ -77,8 +77,8 @@ object GenerateMasterPasswordTokenUseCase: BasicUseCase<SecureActivity>() {
                 activity.getString(R.string.sub_generate_mpt)
             )
             val encQrcHeader =
-                SecretService.encryptCommonString(tempKey, encMasterPasswordToken.type?.toString() ?: "")
-            val encQrc = encMasterPasswordToken
+                SecretService.encryptCommonString(tempKey, encTokenizedMasterPassword.type?.toString() ?: "")
+            val encQrc = encTokenizedMasterPassword
 
             PreferenceService.putEncrypted(
                 PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY,
@@ -90,7 +90,6 @@ object GenerateMasterPasswordTokenUseCase: BasicUseCase<SecureActivity>() {
                 nextMptNumber.toString(),
                 activity
             )
-
 
             val intent = Intent(activity, QrCodeActivity::class.java)
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_HEADLINE, encHead)

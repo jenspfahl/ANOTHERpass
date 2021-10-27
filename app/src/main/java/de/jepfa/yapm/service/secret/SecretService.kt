@@ -70,7 +70,7 @@ object SecretService {
     }
 
     private fun generatePBESecretKey(password: Password, salt: Key, iterations: Int, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
-        val keySpec = PBEKeySpec(password.toCharArray(), salt.data, iterations, cipherAlgorithm.keyLength)
+        val keySpec = PBEKeySpec(password.toEncodedCharArray(), salt.data, iterations, cipherAlgorithm.keyLength)
         val factory = SecretKeyFactory.getInstance(cipherAlgorithm.secretKeyAlgorithm)
         try {
             return SecretKeyHolder(factory.generateSecret(keySpec), cipherAlgorithm)

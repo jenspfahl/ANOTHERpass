@@ -14,14 +14,14 @@ class PasswordTest {
         System.out.println("bytes: " + Arrays.toString(passwd.toByteArray()))
         Assert.assertEquals("abc", passwd.toRawFormattedPassword().toString())
         Assert.assertEquals("abc", passwd.toString())
-        Assert.assertArrayEquals("abc".toCharArray(), passwd.toCharArray())
+        Assert.assertArrayEquals("abc".toCharArray(), passwd.toEncodedCharArray())
     }
 
     @Test
     fun testNonAscii() {
         val passwd = Password("abä")
         System.out.println("bytes: " + Arrays.toString(passwd.toByteArray()))
-        System.out.println("chars: " + Arrays.toString(passwd.toCharArray()))
+        System.out.println("chars: " + Arrays.toString(passwd.toEncodedCharArray()))
         System.out.println("chars of ${Charset.defaultCharset()}: " + Arrays.toString(passwd.decodeToCharArray()))
         System.out.println("byte: " + 'ä'.toByte())
         Assert.assertEquals("abä", passwd.toRawFormattedPassword().toString())

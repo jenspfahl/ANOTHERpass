@@ -124,13 +124,21 @@ class Password: Secret, CharSequence {
         }
     }
 
-    constructor(key: Key) : this(key.data.map { it.toChar() }.toCharArray())
-    constructor(editable: Editable) : this(fromEditable(editable))
+    /**
+     * Use this constructor only for testing
+     */
     constructor(passwd: String) : this(passwd.toByteArray())
-    constructor(passwd: CharArray) : this(passwd.map { it.toByte() }.toByteArray())
-    constructor(passwd: ByteArray) : super(passwd)
+    constructor(key: Key) : this(key.data)
+    constructor(editable: Editable) : this(fromEditable(editable))
+    constructor(chars: CharArray) : this(chars.map { it.toByte() }.toByteArray())
+    constructor(bytes: ByteArray) : super(bytes)
 
-    fun toCharArray(): CharArray {
+    /**
+     * Returns a CharArray 1:1 mapped from the underlying ByteArray.
+     * Don't use this for non-ascii passwords since the result may look wrong! For that
+     * use #decodeToCharArray instead.
+     */
+    fun toEncodedCharArray(): CharArray {
         return data.map { it.toChar() }.toCharArray()
     }
 
@@ -175,7 +183,7 @@ class Password: Secret, CharSequence {
      * Returns the char at position index of the encoded password.
      * Use #toFormattedPassword to work with non-ASCII passwords
      */
-    override fun get(index: Int) = toCharArray()[index]
+    override fun get(index: Int) = toEncodedCharArray()[index]
 
     override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
         return Password(data.copyOfRange(startIndex, endIndex))
