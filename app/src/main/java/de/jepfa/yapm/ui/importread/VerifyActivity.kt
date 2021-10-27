@@ -107,7 +107,7 @@ class VerifyActivity : ReadActivityBase() {
                     masterPassword
                 )
             ) {
-                verifyResultText.text = getString(R.string.well_known_mpt_scanned)
+                verifyResultText.text = getString(R.string.well_known_mpt_scanned, mpt.type?.payload ?: "")
             }
             masterPassword?.clear()
             masterPasswordTokenKey.clear()

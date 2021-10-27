@@ -118,6 +118,8 @@ class EditCredentialDataFragment : SecureFragment() {
 
         //fill UI
         if (editCredentialActivity.isUpdate()) {
+            editCredentialActivity.hideKeyboard(editCredentialNameView)
+
             editCredentialActivity.load().observe(editCredentialActivity, {
                 editCredentialActivity.original = it
                 masterSecretKey?.let{ key ->
@@ -136,8 +138,6 @@ class EditCredentialDataFragment : SecureFragment() {
                     editCredentialUserView.setText(user)
                     editCredentialWebsiteView.setText(website)
                     editCredentialAdditionalInfoView.setText(additionalInfo)
-
-                    editCredentialNameView.requestFocus()
 
                     LabelService.updateLabelsForCredential(key, it)
                     val allLabelsForCredential = LabelService.decryptLabelsForCredential(key, it)
@@ -160,6 +160,7 @@ class EditCredentialDataFragment : SecureFragment() {
             val labelSuggestions = allLabels
                 .map { it.name }
             allLabelAdapter.addAll(labelSuggestions)
+            editCredentialNameView.requestFocus()
         }
 
         val buttonNext: Button = view.findViewById(R.id.button_next)

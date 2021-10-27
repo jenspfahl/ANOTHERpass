@@ -46,9 +46,9 @@ class ChangePinActivity : SecureActivity() {
 
         findViewById<Button>(R.id.button_change).setOnClickListener {
 
-            val currentPin = Password.fromEditable(currentPinTextView.text)
-            val newPin1 = Password.fromEditable(newPin1TextView.text)
-            val newPin2 = Password.fromEditable(newPin2TextView.text)
+            val currentPin = Password(currentPinTextView.text)
+            val newPin1 = Password(newPin1TextView.text)
+            val newPin2 = Password(newPin2TextView.text)
 
             if (currentPin.isEmpty()) {
                 currentPinTextView.error = getString(R.string.pin_required)

@@ -56,7 +56,7 @@ class LoginEnterPinFragment : BaseFragment() {
 
             val keyForTemp = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
 
-            val userPin = Password.fromEditable(pinTextView.text)
+            val userPin = Password(pinTextView.text)
             if (userPin.isEmpty()) {
                 pinTextView.error = getString(R.string.pin_required)
                 pinTextView.requestFocus()
@@ -99,8 +99,6 @@ class LoginEnterPinFragment : BaseFragment() {
         masterPasswd: Password,
         loginActivity: LoginActivity
     ) {
-
-        loginActivity.hideKeyboard(pinTextView)
 
         loginActivity.getProgressBar()?.let {
 

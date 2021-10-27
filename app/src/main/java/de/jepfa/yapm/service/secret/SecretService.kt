@@ -58,7 +58,7 @@ object SecretService {
     }
 
     fun generateStrongSecretKey(data: Key, salt: Key, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
-        return generateStrongSecretKey(Password(data.toCharArray()), salt, cipherAlgorithm)
+        return generateStrongSecretKey(Password(data), salt, cipherAlgorithm)
     }
 
     fun generateStrongSecretKey(password: Password, salt: Key, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {

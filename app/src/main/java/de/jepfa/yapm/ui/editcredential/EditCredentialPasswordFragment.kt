@@ -152,7 +152,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 .setMessage(R.string.edit_password_message)
                 .setView(input)
                 .setPositiveButton(android.R.string.ok) { dialog, which ->
-                    val password = Password(input.text.toString())
+                    val password = Password(input.text)
                     editCredentialActivity.current.isObfuscated = false
                     unsetObfuscation(editCredentialActivity.current)
                     updatePasswordView(password, guessPasswordCombinations = true,
@@ -219,8 +219,8 @@ class EditCredentialPasswordFragment : SecureFragment() {
                         dialog.setOnShowListener {
                             val buttonPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                             buttonPositive.setOnClickListener {
-                                val obfusPasswd1 = Password.fromEditable(pwd1.text)
-                                val obfusPasswd2 = Password.fromEditable(pwd2.text)
+                                val obfusPasswd1 = Password(pwd1.text)
+                                val obfusPasswd2 = Password(pwd2.text)
                                 if (obfusPasswd1.isEmpty()) {
                                     pwd1.setError(getString(R.string.error_field_required))
                                     pwd1.requestFocus()

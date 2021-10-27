@@ -64,7 +64,7 @@ class ChangeMasterPasswordActivity : SecureActivity() {
         val changeButton = findViewById<Button>(R.id.button_change)
         changeButton.setOnClickListener {
 
-            val currentPin = Password.fromEditable(currentPinTextView.text)
+            val currentPin = Password(currentPinTextView.text)
 
             if (currentPin.isEmpty()) {
                 currentPinTextView.error = getString(R.string.pin_required)

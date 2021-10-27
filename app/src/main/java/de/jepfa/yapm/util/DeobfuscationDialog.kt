@@ -42,7 +42,7 @@ object DeobfuscationDialog {
         dialog.setOnShowListener {
             val buttonPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
             buttonPositive.setOnClickListener {
-                val obfusPasswd = Password.fromEditable(inputText.text)
+                val obfusPasswd = Password(inputText.text)
                 if (obfusPasswd == null || obfusPasswd.isEmpty()) {
                     inputText.setError(context.getString(R.string.error_field_required))
                     inputText.requestFocus()

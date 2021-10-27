@@ -41,8 +41,8 @@ class CreateVaultEnterPinFragment : BaseFragment() {
 
         view.findViewById<Button>(R.id.button_next).setOnClickListener {
 
-            val pin1 = Password.fromEditable(pin1TextView.text)
-            val pin2 = Password.fromEditable(pin2TextView.text)
+            val pin1 = Password(pin1TextView.text)
+            val pin2 = Password(pin2TextView.text)
 
             if (pin1.isEmpty()) {
                 pin1TextView.error = getString(R.string.pin_required)

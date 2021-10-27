@@ -84,7 +84,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         loginButton.setOnClickListener {
 
 
-            val masterPassword = Password.fromEditable(masterPasswdTextView.text)
+            val masterPassword = Password(masterPasswdTextView.text)
             if (masterPassword.isEmpty()) {
                 masterPasswdTextView.error = getString(R.string.password_required)
                 masterPasswdTextView.requestFocus()
