@@ -595,6 +595,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     fun deleteCredential(credential: EncCredential) {
         credentialViewModel.delete(credential)
+        toastText(this, R.string.credential_deleted)
     }
 
 }

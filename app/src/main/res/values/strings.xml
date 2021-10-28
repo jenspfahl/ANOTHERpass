@@ -332,6 +332,7 @@
     <string name="unused_credentials_deleted">%1$d unused credentials deleted</string>
     <string name="this_app_is_foss">This app is Open Source and published under the MIT licence.</string>
     <string name="visit_foss_site">Visit %1$s to inspect the licence, the code and to report issues or bugs.</string>
+    <string name="credential_deleted">Credential deleted</string>
 
 
 </resources>

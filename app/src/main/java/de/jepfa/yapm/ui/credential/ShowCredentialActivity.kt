@@ -231,6 +231,7 @@ class ShowCredentialActivity : SecureActivity() {
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
                             credentialViewModel.delete(credential)
+                            toastText(this, R.string.credential_deleted)
 
                             val upIntent = Intent(this, ListCredentialsActivity::class.java)
                             navigateUpTo(upIntent)
