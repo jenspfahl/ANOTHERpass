@@ -165,19 +165,19 @@ object SecretService {
             Log.e("SS", "cipher algorithm missmatch")
             return FAILED_BYTE_ARRAY
         }
-        val encryptionIv = encrypted.iv
-        val encryptedData = encrypted.data
-        val cipher = Cipher.getInstance(encrypted.cipherAlgorithm.cipherName)
-        if (secretKeyHolder.cipherAlgorithm.gcmSupport) {
-            val spec = GCMParameterSpec(128, encryptionIv)
-            cipher.init(Cipher.DECRYPT_MODE, secretKeyHolder.secretKey, spec)
-        }
-        else {
-            val ivParams = IvParameterSpec(encryptionIv)
-            cipher.init(Cipher.DECRYPT_MODE, secretKeyHolder.secretKey, ivParams)
-        }
 
         try {
+            val encryptionIv = encrypted.iv
+            val encryptedData = encrypted.data
+            val cipher = Cipher.getInstance(encrypted.cipherAlgorithm.cipherName)
+            if (secretKeyHolder.cipherAlgorithm.gcmSupport) {
+                val spec = GCMParameterSpec(128, encryptionIv)
+                cipher.init(Cipher.DECRYPT_MODE, secretKeyHolder.secretKey, spec)
+            }
+            else {
+                val ivParams = IvParameterSpec(encryptionIv)
+                cipher.init(Cipher.DECRYPT_MODE, secretKeyHolder.secretKey, ivParams)
+            }
             return cipher.doFinal(encryptedData)
         } catch (e: GeneralSecurityException) {
             Log.e("SS", "unable to decrypt")

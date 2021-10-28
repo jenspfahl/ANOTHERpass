@@ -3,18 +3,13 @@ package de.jepfa.yapm.ui.credential
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.SearchManager
-import android.app.assist.AssistStructure
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.os.Bundle
 import android.view.*
-import android.view.autofill.AutofillManager
-import android.view.autofill.AutofillManager.EXTRA_AUTHENTICATION_RESULT
 import android.widget.*
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
@@ -29,20 +24,16 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
-import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
 import de.jepfa.yapm.service.PreferenceService.PREF_CREDENTIAL_SORT_ORDER
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_CREDENTIAL_IDS
-import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
-import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
 import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
 import de.jepfa.yapm.service.secret.SecretService
-import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.changelogin.ChangeMasterPasswordActivity
 import de.jepfa.yapm.ui.changelogin.ChangePinActivity
@@ -69,9 +60,8 @@ import kotlin.collections.ArrayList
 /**
  * This is the main activity
  */
-class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationItemSelectedListener  {
+class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.OnNavigationItemSelectedListener  {
 
-    private var assistStructure: AssistStructure? = null
     private var credentialsRecycleView: RecyclerView? = null
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
@@ -94,11 +84,6 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         recyclerView.layoutManager = LinearLayoutManager(this)
         credentialsRecycleView = recyclerView
 
-        CurrentCredentialHolder.clear()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            assistStructure = intent.getParcelableExtra(AutofillManager.EXTRA_ASSIST_STRUCTURE)
-        }
-
         refreshCredentials()
 
         labelViewModel.allLabels.observe(this, { labels ->
@@ -110,6 +95,7 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
             val intent = Intent(this@ListCredentialsActivity, EditCredentialActivity::class.java)
+            intent.putExtras(this.intent) // forward all extras, especially needed for Autofill
             startActivityForResult(intent, newOrUpdateCredentialActivityRequestCode)
         }
 
@@ -336,6 +322,9 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                 else {
                     credentialViewModel.insert(credential)
                 }
+                if (shouldPushBackAutoFill()) {
+                    pushBackAutofill()
+                }
             }
         }
 
@@ -357,31 +346,6 @@ class ListCredentialsActivity : SecureActivity(), NavigationView.OnNavigationIte
                 listCredentialAdapter?.notifyDataSetChanged()
             }
         }
-    }
-
-    fun shouldPushBackAutoFill() : Boolean {
-        return assistStructure != null
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun pushBackAutofill(credential: EncCredential, deobfuscationKey: Key?) {
-        val structure = assistStructure
-        if (structure != null) {
-            CurrentCredentialHolder.update(credential, deobfuscationKey)
-            val replyIntent = Intent().apply {
-                val fillResponse = ResponseFiller.createFillResponse(
-                    structure,
-                    allowCreateAuthentication = false,
-                    applicationContext
-                )
-                putExtra(EXTRA_AUTHENTICATION_RESULT, fillResponse)
-            }
-            assistStructure = null
-            setResult(Activity.RESULT_OK, replyIntent)
-            finish()
-
-        }
-
     }
 
     private fun refreshMenuLockItem(lockItem: MenuItem) {

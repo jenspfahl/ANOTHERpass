@@ -6,13 +6,16 @@ import android.os.Bundle
 import androidx.lifecycle.LiveData
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.session.Session
+import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.ui.credential.AutofillPushBackActivityBase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 
 
-class EditCredentialActivity : SecureActivity() {
+class EditCredentialActivity : AutofillPushBackActivityBase() {
 
     var currentId: Int? = null
     lateinit var current: EncCredential
@@ -55,9 +58,13 @@ class EditCredentialActivity : SecureActivity() {
         return credentialViewModel.getById(currentId!!)
     }
 
-    fun reply() {
+    fun reply(deobfuscationKey: Key?) {
         val replyIntent = Intent()
         current.applyExtras(replyIntent)
+
+        if (shouldPushBackAutoFill()) {
+            CurrentCredentialHolder.update(current, deobfuscationKey)
+        }
 
         setResult(Activity.RESULT_OK, replyIntent)
         finish()

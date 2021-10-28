@@ -17,6 +17,7 @@ import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
@@ -403,7 +404,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
         }
         editCredentialActivity.current.password = encPassword
 
-        editCredentialActivity.reply()
+        editCredentialActivity.reply(obfuscationKey)
     }
 
     private fun generatePassword() : Password {

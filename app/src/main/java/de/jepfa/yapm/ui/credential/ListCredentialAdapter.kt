@@ -62,15 +62,13 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             val current = getItem(pos)
 
             if (listCredentialsActivity.shouldPushBackAutoFill()) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     if (current.isObfuscated) {
-                        DeobfuscationDialog.openDeobfuscationDialog(listCredentialsActivity) { deobfuscationKey ->
-                            listCredentialsActivity.pushBackAutofill(current, deobfuscationKey)
-                        }
+                    DeobfuscationDialog.openDeobfuscationDialog(listCredentialsActivity) { deobfuscationKey ->
+                        listCredentialsActivity.pushBackAutofill(current, deobfuscationKey)
                     }
-                    else {
-                        listCredentialsActivity.pushBackAutofill(current, null)
-                    }
+                }
+                else {
+                    listCredentialsActivity.pushBackAutofill(current, null)
                 }
             }
             else {
@@ -89,9 +87,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             if (current.isObfuscated) {
                 DeobfuscationDialog.openDeobfuscationDialog(listCredentialsActivity) { deobfuscationKey ->
                     if (listCredentialsActivity.shouldPushBackAutoFill()) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            listCredentialsActivity.pushBackAutofill(current, deobfuscationKey)
-                        }
+                        listCredentialsActivity.pushBackAutofill(current, deobfuscationKey)
                     }
 
                     toastText(listCredentialsActivity, R.string.credential_used_for_autofill)
