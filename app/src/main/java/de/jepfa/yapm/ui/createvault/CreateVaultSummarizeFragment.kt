@@ -99,7 +99,10 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
             val encMasterPasswd = encryptPassword(tempKey, masterPasswd)
             getBaseActivity()?.let { baseActivity ->
                 ExportEncMasterPasswordUseCase.execute(
-                    ExportEncMasterPasswordUseCase.Input(encMasterPasswd, true), baseActivity)
+                    ExportEncMasterPasswordUseCase.Input(
+                        encMasterPasswd,
+                        noSessionCheck = true, directlyToNfcActivity = true
+                    ), baseActivity)
             }
         }
 
