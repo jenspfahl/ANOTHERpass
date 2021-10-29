@@ -334,5 +334,8 @@
     <string name="visit_foss_site">Visit %1$s to inspect the licence, the code and to report issues or bugs.</string>
     <string name="credential_deleted">Credential deleted</string>
 
+    <string name="dark_mode_auto">System default</string>
+    <string name="dark_mode_on">Dark</string>
+    <string name="dark_mode_off">Light</string>
 
 </resources>

@@ -1,5 +1,16 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <ListPreference
+        app:defaultValue="-1"
+        app:entries="@array/dark_mode_entries"
+        app:entryValues="@array/dark_mode_values"
+        app:key="YAPM/pref:dark_mode"
+        app:title="Theme"
+        app:iconSpaceReserved="false"
+        app:allowDividerBelow="true"
+        app:singleLineTitle="false"
+        app:useSimpleSummaryProvider="true" />
+
     <SwitchPreferenceCompat
         app:key="YAPM/pref:show_labels_in_list"
         app:title="Show labels in overview list"

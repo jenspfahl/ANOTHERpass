@@ -3,6 +3,7 @@ package de.jepfa.yapm.ui.settings
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.*
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.session.Session
@@ -91,6 +92,20 @@ class SettingsActivity : SecureActivity(),
     class GeneralSettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.general_preferences, rootKey)
+
+            val darkModePref = findPreference<ListPreference>(
+                PreferenceService.PREF_DARK_MODE)
+
+            darkModePref?.let {
+                it.setOnPreferenceChangeListener { preference, newValue ->
+                    val currentDarkMode = AppCompatDelegate.getDefaultNightMode()
+                    val newDarkMode = newValue.toString().toInt()
+                    if (currentDarkMode != newDarkMode) {
+                        AppCompatDelegate.setDefaultNightMode(newDarkMode)
+                    }
+                    true
+                }
+            }
         }
     }
 

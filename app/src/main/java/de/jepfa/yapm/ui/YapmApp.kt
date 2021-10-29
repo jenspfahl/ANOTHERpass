@@ -1,6 +1,7 @@
 package de.jepfa.yapm.ui
 
 import android.app.Application
+import androidx.appcompat.app.AppCompatDelegate
 import de.jepfa.yapm.database.YapmDatabase
 import de.jepfa.yapm.database.repository.CredentialRepository
 import de.jepfa.yapm.database.repository.LabelRepository
@@ -14,6 +15,8 @@ class YapmApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        PreferenceService.initDefaults(this.applicationContext,)
+        PreferenceService.initDefaults(this.applicationContext)
+        val darkMode = PreferenceService.getAsInt(PreferenceService.PREF_DARK_MODE, this.applicationContext)
+        AppCompatDelegate.setDefaultNightMode(darkMode)
     }
 }

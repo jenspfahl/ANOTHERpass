@@ -82,4 +82,18 @@
         <item>@color/Fuchsia</item>
         <item>@color/Purple</item>
     </integer-array>
+
+    <string-array name="dark_mode_entries">
+        <item>@string/dark_mode_on</item>
+        <item>@string/dark_mode_off</item>
+        <item>@string/dark_mode_auto</item>
+    </string-array>
+
+    <string-array name="dark_mode_values">
+        <item>2</item>
+        <item>1</item>
+        <item>-1</item>
+    </string-array>
+
+
 </resources>

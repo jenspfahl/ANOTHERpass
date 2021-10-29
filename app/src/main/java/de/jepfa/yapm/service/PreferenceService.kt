@@ -18,7 +18,7 @@ object PreferenceService {
      * If you add new preference xml files inside #initDefaults, they should be recognised as well.
      * To achieve this, count the version value up here.
      */
-    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_3"
+    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_4"
 
     const val STATE_DEFAULT_INIT_DONE = STATE_PREFIX + "default_init_done"
 
@@ -68,6 +68,8 @@ object PreferenceService {
 
     const val PREF_CREDENTIAL_SORT_ORDER = PREF_PREFIX + "credential_sort_order"
     const val PREF_SHOW_CREDENTIAL_IDS = PREF_PREFIX + "show_credential_ids"
+
+    const val PREF_DARK_MODE = PREF_PREFIX + "dark_mode"
 
 
     fun initDefaults(context: Context?) {
