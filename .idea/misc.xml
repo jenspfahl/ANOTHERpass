@@ -47,6 +47,7 @@
         <entry key="app/src/main/res/layout/fragment_import_vault_file.xml" value="0.8" />
         <entry key="app/src/main/res/layout/fragment_load_vault_file.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/fragment_login_enter_masterpassword.xml" value="0.2234527687296417" />
+        <entry key="app/src/main/res/layout/fragment_login_enter_pin.xml" value="0.21331521739130435" />
         <entry key="app/src/main/res/layout/nav_header_main.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/recyclerview_credential.xml" value="0.536" />
         <entry key="app/src/main/res/layout/recyclerview_label.xml" value="0.15572916666666667" />
@@ -57,8 +58,14 @@
         <entry key="app/src/main/res/menu/menu_main.xml" value="0.264" />
         <entry key="app/src/main/res/menu/menu_main_drawer.xml" value="0.4" />
         <entry key="app/src/main/res/menu/qrcode_menu.xml" value="0.3015625" />
+        <entry key="app/src/main/res/xml/autofill_preferences.xml" value="0.21331521739130435" />
+        <entry key="app/src/main/res/xml/clipboard_preferences.xml" value="0.21331521739130435" />
         <entry key="app/src/main/res/xml/general_preferences.xml" value="0.264" />
+        <entry key="app/src/main/res/xml/header_preferences.xml" value="0.21331521739130435" />
+        <entry key="app/src/main/res/xml/login_preferences.xml" value="0.21331521739130435" />
+        <entry key="app/src/main/res/xml/overlay_preferences.xml" value="0.21331521739130435" />
         <entry key="app/src/main/res/xml/password_generator_preferences.xml" value="0.17864583333333334" />
+        <entry key="app/src/main/res/xml/security_preferences.xml" value="0.21331521739130435" />
       </map>
     </option>
   </component>

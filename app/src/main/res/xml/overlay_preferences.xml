@@ -2,15 +2,15 @@
 
     <SwitchPreferenceCompat
         app:key="YAPM/pref:enable_overlay_feature"
-        app:title="Enable password overlay dialog feature"
-        app:summary="Password overlay dialog is shown on top of all apps to easily read and copy-type passwords"
+        app:title="@string/pref_overlay_enable"
+        app:summary="@string/pref_overlay_summary_enable"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
         app:defaultValue="true"/>
 
     <SwitchPreferenceCompat
         app:key="YAPM/pref:transparent_overlay"
-        app:title="Transparent password overlay"
+        app:title="@string/pref_overlay_transparent_overlay"
         app:dependency="YAPM/pref:enable_overlay_feature"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"

@@ -239,7 +239,7 @@
     <string name="masterpassword_removed">Stored master password removed from device</string>
     <string name="title_drop_vault">Drop vault</string>
     <string name="message_drop_vault">You are going to delete ALL your credentials and login data.</string>
-    <string name="deselect_all">Deselect all</string>
+    <string name="deselect_all">Reset</string>
     <string name="title_copy_password">Copy password</string>
     <string name="message_copy_password">Copying passwords to clipboard may leak your password since any other app can listen to clipboard changes and read from it. Further it can remain there when you use a clipboard with history function (e.g. Samsung). " Use 'Privacy/Test C&amp;P password' to figure out if someone reads the clipboard beside you. You can disable this warning in 'Settings/Security'.</string>
     <string name="head_generate_mpt">Your Master Password Token \#%1$d</string>
@@ -337,5 +337,36 @@
     <string name="dark_mode_auto">System default</string>
     <string name="dark_mode_on">Dark</string>
     <string name="dark_mode_off">Light</string>
+    <string name="pref_general_theme">Theme</string>
+    <string name="pref_general_show_labels">Show labels in overview list</string>
+    <string name="pref_general_show_formatted_passwords">Show formatted passwords</string>
+    <string name="pref_general_summary_show_formatted_passwords">Show passwords separated into words and accent highlighting colors for better readability</string>
+    <string name="pref_general_colorize_passwords">Colorize showed passwords</string>
+    <string name="pref_general_summary_colorize_passwords">Show passwords with alternating accent colors for each word</string>
+    <string name="pref_general_passwords_multiple_lines">Show passwords on multiple line</string>
+    <string name="pref_general_summary_passwords_multiple_lines">Show password words on multiple lines to increase readability</string>
+    <string name="pref_general_colorize_qrcodes">Use colors to show criticality of QR code content</string>
+    <string name="pref_general_qrcodes_with_header">Print a short content info as header on top of the QR code</string>
+    <string name="pref_autofill_summary_off_suggest">Suggesting autofill only on identified user or password fields. With this option, the app could miss some fields, e.g. in web browsers.</string>
+    <string name="pref_autofill_summary_on_suggest">Suggesting autofill on every text field.</string>
+    <string name="pref_autofill_exclude_apps">Exclude apps from Autofill</string>
+    <string name="pref_clipboard_enable">Enable copying password to clipboard</string>
+    <string name="pref_clipboard_summary_enable">Copying passwords to clipboard is dangerous and could leak your password to any other app that observe the system clipboard. Use this option with care!</string>
+    <string name="pref_clipboard_show_warning">Show warning when copying password to clipboard</string>
+    <string name="pref_login_drop_vault">DROP VAULT(!!!) after max failed login attempts</string>
+    <string name="pref_login_summary_off_drop_vault">If somebody gathers your master password (or token) the pin is the only protection anymore. Self destruction may protect your data in a hard way. Ensure you have always a backup of your vault!</string>
+    <string name="pref_login_summary_on_drop_vault">If somebody gathers your master password (or token) the pin is the only protection anymore. Self destruction is activated after defined maximum login attempts. Ensure you have always a backup of your vault!</string>
+    <string name="pref_login_scan_qrcode">Scan master password QR code and login immediately</string>
+    <string name="pref_login_summary_off_scan_qrcode">Master password can be typed manually or scanned from QR code</string>
+    <string name="pref_login_summary_on_scan_qrcode">Opens the QR code scanner immediately if master password is not stored on device and logs in afterwards</string>
+    <string name="pref_login_scan_nfctag">Read master password NFC tag and login immediately</string>
+    <string name="pref_login_summary_off_scan_nfctag">Master password can also be read from NFC tag</string>
+    <string name="pref_login_summary_on_scan_nfc_tag">Opens the NFC tag reader immediately if master password is not stored on device and logs in afterwards</string>
+    <string name="pref_overlay_enable">Enable password overlay dialog feature</string>
+    <string name="pref_overlay_summary_enable">Password overlay dialog is shown on top of all apps to easily read and copy-type passwords</string>
+    <string name="pref_overlay_transparent_overlay">Transparent password overlay</string>
+    <string name="pref_password_generator_use_pseudophrase">Use pseudo phrase to generate new passwords</string>
+    <string name="pref_password_generator_password_strength">Default password stength</string>
+    <string name="pref_security_mask_password">Mask password when showing a credential (can be unmasked by clicking on it)</string>
 
 </resources>

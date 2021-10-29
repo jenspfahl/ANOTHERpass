@@ -5,7 +5,7 @@
         app:entries="@array/dark_mode_entries"
         app:entryValues="@array/dark_mode_values"
         app:key="YAPM/pref:dark_mode"
-        app:title="Theme"
+        app:title="@string/pref_general_theme"
         app:iconSpaceReserved="false"
         app:allowDividerBelow="true"
         app:singleLineTitle="false"
@@ -13,7 +13,7 @@
 
     <SwitchPreferenceCompat
         app:key="YAPM/pref:show_labels_in_list"
-        app:title="Show labels in overview list"
+        app:title="@string/pref_general_show_labels"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
@@ -21,8 +21,8 @@
 
     <SwitchPreferenceCompat
         app:key="YAPM/pref:password_show_formatted"
-        app:title="Show formatted passwords"
-        app:summary="Show passwords separated into words and accent highlighting colors for better readability"
+        app:title="@string/pref_general_show_formatted_passwords"
+        app:summary="@string/pref_general_summary_show_formatted_passwords"
         app:allowDividerAbove="true"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
@@ -31,8 +31,8 @@
     <SwitchPreferenceCompat
         app:key="YAPM/pref:colored_passwords"
         app:dependency="YAPM/pref:password_show_formatted"
-        app:title="Colorize showed passwords"
-        app:summary="Show passwords with alternating accent colors for each word"
+        app:title="@string/pref_general_colorize_passwords"
+        app:summary="@string/pref_general_summary_colorize_passwords"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
         app:defaultValue="true"/>
@@ -40,8 +40,8 @@
     <SwitchPreferenceCompat
         app:key="YAPM/pref:password_words_on_nl"
         app:dependency="YAPM/pref:password_show_formatted"
-        app:title="Show passwords on multiple line"
-        app:summary="Show password words on multiple lines to increase readability"
+        app:title="@string/pref_general_passwords_multiple_lines"
+        app:summary="@string/pref_general_summary_passwords_multiple_lines"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
         app:defaultValue="true"/>
@@ -49,7 +49,7 @@
     <SwitchPreferenceCompat
         app:key="YAPM/pref:colorize_mp_qrcodes"
         app:title="Colorize QR codes"
-        app:summary="Use colors to show criticality of QR code content"
+        app:summary="@string/pref_general_colorize_qrcodes"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
         app:allowDividerAbove="true"
@@ -58,7 +58,7 @@
     <SwitchPreferenceCompat
         app:key="YAPM/pref:qrcodes_with_header"
         app:title="Print QR code header"
-        app:summary="Print a short content info as header on top of the QR code"
+        app:summary="@string/pref_general_qrcodes_with_header"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
         app:defaultValue="true"/>

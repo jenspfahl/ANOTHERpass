@@ -13,29 +13,29 @@
 
     <SwitchPreferenceCompat
         app:key="YAPM/pref:drop_vault_if_login_declined"
-        app:summaryOff="If somebody gathers your master password (or token) the pin is the only protection anymore. Self destruction may protect your data in a hard way. Ensure you have always a backup of your vault!"
-        app:summaryOn="If somebody gathers your master password (or token) the pin is the only protection anymore. Self destruction is activated after defined maximum login attempts. Ensure you have always a backup of your vault!"
+        app:summaryOff="@string/pref_login_summary_off_drop_vault"
+        app:summaryOn="@string/pref_login_summary_on_drop_vault"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
-        app:title="DROP VAULT(!!!) after max failed login attempts"
+        app:title="@string/pref_login_drop_vault"
         app:defaultValue="false"
         app:allowDividerBelow="true"/>
 
     <SwitchPreferenceCompat
         app:key="YAPM/pref:fast_mp_login_with_qrc"
-        app:summaryOff="Master password can be typed manually or scanned from QR code"
-        app:summaryOn="Opens the QR code scanner immediately if master password is not stored on device and logs in afterwards"
+        app:summaryOff="@string/pref_login_summary_off_scan_qrcode"
+        app:summaryOn="@string/pref_login_summary_on_scan_qrcode"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
-        app:title="Scan master password QR code and login immediately"
+        app:title="@string/pref_login_scan_qrcode"
         app:allowDividerAbove="true"/>
 
     <SwitchPreferenceCompat
         app:key="YAPM/pref:fast_mp_login_with_nfc"
-        app:summaryOff="Master password can also be read from NFC tag"
-        app:summaryOn="Opens the NFC tag reader immediately if master password is not stored on device and logs in afterwards"
+        app:summaryOff="@string/pref_login_summary_off_scan_nfctag"
+        app:summaryOn="@string/pref_login_summary_on_scan_nfc_tag"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
-        app:title="Read master password NFC tag and login immediately"/>
+        app:title="@string/pref_login_scan_nfctag"/>
 
 </PreferenceScreen>
