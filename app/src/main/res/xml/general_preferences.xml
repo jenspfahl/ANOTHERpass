@@ -44,4 +44,12 @@
         app:allowDividerAbove="true"
         app:defaultValue="true"/>
 
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:qrcodes_with_header"
+        app:title="Print QR code header"
+        app:summary="Print a short content info as header on top of the QR code"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:defaultValue="true"/>
+
 </PreferenceScreen>

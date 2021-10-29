@@ -1,14 +1,12 @@
 package de.jepfa.yapm.ui.credential
 
-import android.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.content.Intent
-import android.os.Build
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import android.widget.LinearLayout
 import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DiffUtil
@@ -16,9 +14,13 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.ChipGroup
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.SecretKeyHolder
+import de.jepfa.yapm.model.session.Session
+import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_COPY_PASSWORD
+import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_OVERLAY_FEATURE
+import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_LABELS_IN_LIST
 import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
@@ -28,10 +30,6 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
 import de.jepfa.yapm.ui.label.LabelDialogOpener
 import de.jepfa.yapm.usecase.credential.ExportCredentialUseCase
-import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_COPY_PASSWORD
-import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_OVERLAY_FEATURE
-import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_LABELS_IN_LIST
 import de.jepfa.yapm.util.*
 import java.util.*
 

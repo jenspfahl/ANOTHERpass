@@ -1,6 +1,6 @@
 package de.jepfa.yapm.ui.qrcode
 
-import android.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -69,7 +69,7 @@ class QrCodeActivity : SecureActivity() {
             qrCodeImageView.setOnLongClickListener {
                 AlertDialog.Builder(this)
                         .setTitle(head)
-                        .setMessage(qrc.toRawFormattedPassword())
+                        .setMessage(qrc.toRawFormattedPassword() + System.lineSeparator() + "Size: ${qrc.length}")
                         .show()
                 true
             }

@@ -1,6 +1,6 @@
 package de.jepfa.yapm.ui.label
 
-import android.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable

@@ -1,6 +1,6 @@
 package de.jepfa.yapm.util
 
-import android.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.content.Context
 import android.text.InputFilter
 import android.text.InputType

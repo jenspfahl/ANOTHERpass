@@ -10,11 +10,13 @@ import android.text.TextPaint
 import android.util.Log
 import androidx.fragment.app.Fragment
 import com.google.zxing.BarcodeFormat
+import com.google.zxing.EncodeHintType
 import com.google.zxing.MultiFormatWriter
 import com.google.zxing.WriterException
 import com.google.zxing.integration.android.IntentIntegrator
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_COLORIZE_MP_QRCODES
+import de.jepfa.yapm.service.PreferenceService.PREF_QRCODES_WITH_HEADER
 import de.jepfa.yapm.ui.qrcode.CaptureActivity
 
 
@@ -28,15 +30,22 @@ object QRCodeUtil {
             cutHeader = header.substring(0, MAX_HEADER_LENGTH) + "..."
         }
         val colorize = PreferenceService.getAsBool(PREF_COLORIZE_MP_QRCODES, context)
+        val showHeader = PreferenceService.getAsBool(PREF_QRCODES_WITH_HEADER, context)
         val printColor = if (colorize) color else Color.BLACK
 
-        val size =  if (data.length > 256) 550 else 500
+        val isBig = data.length >= 200
+        val size =  if (isBig) 550 else 500
         val width = size
         val height = size
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val codeWriter = MultiFormatWriter()
         try {
-            val bitMatrix = codeWriter.encode(data.toString(), BarcodeFormat.QR_CODE, width, height)
+            val bitMatrix = codeWriter.encode(
+                data.toString(),
+                BarcodeFormat.QR_CODE,
+                width,
+                height,
+                mapOf(Pair(EncodeHintType.MARGIN, 3)))
             for (x in 0 until width) {
                 for (y in 0 until height) {
                     bitmap.setPixel(x, y, if (bitMatrix[x, y]) printColor else Color.WHITE)
@@ -46,15 +55,22 @@ object QRCodeUtil {
             Log.d("QrCodeActivity", "generateQRCode: ${e.message}")
         }
 
-        cutHeader?.let {
-            val textPaint = TextPaint()
-            textPaint.isAntiAlias = true
-            textPaint.textSize = 32f
-            textPaint.color = printColor
+        if (showHeader) {
+            cutHeader?.let {
+                val textPaint = TextPaint()
+                textPaint.isAntiAlias = true
+                textPaint.textSize = if (isBig) 28f else 32f
+                textPaint.color = printColor
 
-            val textWidth = textPaint.measureText(cutHeader).toInt()
-            val canvas = Canvas(bitmap)
-            canvas.drawText(cutHeader, (width - textWidth) / 2f, 25f, textPaint)
+                val textWidth = textPaint.measureText(cutHeader).toInt()
+                val canvas = Canvas(bitmap)
+                canvas.drawText(
+                    cutHeader,
+                    (width - textWidth) / 2f,
+                    if (isBig) 25f else 35f,
+                    textPaint
+                )
+            }
         }
         return bitmap
     }

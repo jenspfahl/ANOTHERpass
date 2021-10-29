@@ -1,6 +1,6 @@
 package de.jepfa.yapm.ui.editcredential
 
-import android.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputFilter.LengthFilter
@@ -147,7 +147,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
             val filters = arrayOf<InputFilter>(LengthFilter(Constants.MAX_CREDENTIAL_PASSWD_LENGTH))
             input.setFilters(filters)
 
-            AlertDialog.Builder(getBaseActivity())
+            AlertDialog.Builder(editCredentialActivity)
                 .setTitle(R.string.edit_password)
                 .setMessage(R.string.edit_password_message)
                 .setView(input)
@@ -207,7 +207,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                         pwd2.setFilters(filters)
                         inputView.addView(pwd2)
 
-                        val builder = AlertDialog.Builder(context)
+                        val builder = AlertDialog.Builder(editCredentialActivity)
                         val dialog: AlertDialog = builder
                             .setTitle(R.string.obfuscate_while_saving)
                             .setMessage(getString(R.string.obfuscate_while_saving_message, DEFAULT_SPECIAL_CHARS))
@@ -328,7 +328,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
             val titleId =
                 if (passwordCombinationsGuessed) R.string.password_strength_guessed
                 else R.string.password_strength
-            AlertDialog.Builder(context)
+            AlertDialog.Builder(editCredentialActivity)
                 .setTitle(getString(titleId))
                 .setMessage(
                     getString(R.string.combinations) + ": " +

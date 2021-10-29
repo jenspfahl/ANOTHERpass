@@ -1,6 +1,6 @@
 package de.jepfa.yapm.ui.label
 
-import android.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.label.DeleteLabelUseCase

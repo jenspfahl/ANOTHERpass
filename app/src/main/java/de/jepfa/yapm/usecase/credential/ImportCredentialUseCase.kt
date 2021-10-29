@@ -1,6 +1,6 @@
 package de.jepfa.yapm.usecase.credential
 
-import android.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.service.secret.SecretService

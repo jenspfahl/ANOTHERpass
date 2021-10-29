@@ -1,6 +1,6 @@
 <resources>
 
-    <style name="Theme.YetAnotherPasswordManager" parent="Theme.MaterialComponents.Light.DarkActionBar.Bridge">
+    <style name="Theme.YetAnotherPasswordManager" parent="Theme.MaterialComponents.DayNight.DarkActionBar.Bridge">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>

@@ -1,6 +1,6 @@
 package de.jepfa.yapm.ui.errorhandling
 
-import android.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle

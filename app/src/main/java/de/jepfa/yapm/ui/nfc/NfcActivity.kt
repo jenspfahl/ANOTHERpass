@@ -1,6 +1,6 @@
 package de.jepfa.yapm.ui.nfc
 
-import android.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.View

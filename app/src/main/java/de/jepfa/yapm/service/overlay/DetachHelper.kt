@@ -1,6 +1,6 @@
 package de.jepfa.yapm.service.overlay
 
-import android.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
