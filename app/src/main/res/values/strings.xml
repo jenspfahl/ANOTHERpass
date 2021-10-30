@@ -368,5 +368,7 @@
     <string name="pref_password_generator_use_pseudophrase">Use pseudo phrase to generate new passwords</string>
     <string name="pref_password_generator_password_strength">Default password stength</string>
     <string name="pref_security_mask_password">Mask password when showing a credential (can be unmasked by clicking on it)</string>
+    <string name="licences">Licences</string>
+    <string name="licences_title">Used open source licences</string>
 
 </resources>
