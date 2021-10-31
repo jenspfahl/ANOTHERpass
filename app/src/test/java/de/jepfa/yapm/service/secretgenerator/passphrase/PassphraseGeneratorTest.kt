@@ -6,6 +6,7 @@ import de.jepfa.yapm.service.secretgenerator.SecretStrength
 import de.jepfa.yapm.util.secondsToYear
 import org.junit.Assert
 import org.junit.Test
+import java.util.concurrent.atomic.AtomicInteger
 
 class PassphraseGeneratorTest {
 
@@ -13,7 +14,7 @@ class PassphraseGeneratorTest {
     fun generateAndClearPassphrase() {
         val spec = PassphraseGeneratorSpec(
             SecretStrength.STRONG,
-                wordBeginningUpperCase = true, addDigit = false, addSpecialChar = true)
+            wordBeginningUpperCase = true, addDigit = false, addSpecialChar = true)
         val passphraseGenerator = PassphraseGenerator()
 
         for (i in 0..100) {
@@ -49,6 +50,31 @@ class PassphraseGeneratorTest {
         println("hits=$hits")
         println("real combinations: ${hits.size}")
         println("calculated combinations: $combinationCount")
+
+        Assert.assertEquals(hits.size, combinationCount)
+
+    }
+
+    @Test
+    fun testCalcCombinationsRealWord() {
+        val spec = PassphraseGeneratorSpec(SecretStrength.ONE_WORD)
+        val passphraseGenerator = PassphraseGenerator()
+
+        val combinationCount = passphraseGenerator.calcCombinationCount(spec).toInt()
+        println("calculated combinations: $combinationCount")
+
+        val hits = HashSet<String>()
+        val counter = AtomicInteger()
+        while (hits.size < combinationCount) {
+            val passphrase = passphraseGenerator.generate(spec)
+            hits.add(passphrase.toString())
+            passphrase.clear()
+            if (counter.incrementAndGet() % 100000 == 0) {
+                println("current attempt: ${counter.get()} (${hits.size} < ${combinationCount})")
+            }
+        }
+
+        println("real combinations: ${hits.size}")
 
         Assert.assertEquals(hits.size, combinationCount)
 
