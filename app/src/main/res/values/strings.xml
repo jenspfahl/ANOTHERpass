@@ -74,7 +74,7 @@
     <string name="store_master_password">Store master password on this device</string>
     <string name="create_vault_summarize_fragment_label">Create Vault 3/3</string>
     <string name="login_explanation_1">Enter your pin to login into your vault.</string>
-    <string name="login_explanation_2">Enter your master password to login into your vault.</string>
+    <string name="login_explanation_2">Scan your Encrypted Master Password or your Master Password Token to login into your vault by clicking on the QR-code or NFC icon. If you have noted it, enter it here manually.</string>
     <string name="enter_or_scan_masterpassword">Enter or scan your master password</string>
     <string name="button_login">Login</string>
     <string name="password_required">Password required</string>
