@@ -1,26 +1,30 @@
 package de.jepfa.yapm.ui.qrcode
 
-import androidx.appcompat.app.AlertDialog
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.session.Session
-import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.io.FileIOService
+import de.jepfa.yapm.service.nfc.NfcService
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.PermissionChecker
-import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.util.QRCodeUtil.generateQRCode
 import de.jepfa.yapm.util.getEncryptedExtra
 import de.jepfa.yapm.util.putEncryptedExtra
+import de.jepfa.yapm.util.toastText
+import java.util.*
+
 
 class QrCodeActivity : SecureActivity() {
 
@@ -28,6 +32,7 @@ class QrCodeActivity : SecureActivity() {
 
     private lateinit var head: String
     private lateinit var encQRC: Encrypted
+    private var bitmap: Bitmap? = null
 
     init {
         enableBack = true
@@ -64,7 +69,7 @@ class QrCodeActivity : SecureActivity() {
         subTextView.text = sub
 
         if (!qrc.isEmpty()) {
-            val bitmap = generateQRCode(qrcHeader, qrc.toRawFormattedPassword(), qrcColor, this)
+            bitmap = generateQRCode(qrcHeader, qrc.toRawFormattedPassword(), qrcColor, this)
             qrCodeImageView.setImageBitmap(bitmap)
             qrCodeImageView.setOnLongClickListener {
                 AlertDialog.Builder(this)
@@ -107,11 +112,30 @@ class QrCodeActivity : SecureActivity() {
         if (id == R.id.menu_download_qrc) {
             PermissionChecker.verifyRWStoragePermissions(this)
             if (PermissionChecker.hasRWStoragePermissions(this)) {
-                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
-                intent.addCategory(Intent.CATEGORY_OPENABLE)
-                intent.type = "image/jpeg"
-                intent.putExtra(Intent.EXTRA_TITLE, getFileName(head))
-                startActivityForResult(Intent.createChooser(intent, getString(R.string.save_as)), saveAsImage)
+                val downloadIntent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+                downloadIntent.addCategory(Intent.CATEGORY_OPENABLE)
+                downloadIntent.type = "image/jpeg"
+                downloadIntent.putExtra(Intent.EXTRA_TITLE, getFileName(head))
+                startActivityForResult(Intent.createChooser(downloadIntent, getString(R.string.save_as)), saveAsImage)
+            }
+        }
+
+        if (id == R.id.menu_share_as_qrc) {
+            val shareIntent = Intent()
+            bitmap?.let { bitmap ->
+                val contentUri = FileIOService.createTempImageContentUri(this, bitmap, getBaseFileName(head))
+                if (contentUri != null) {
+
+                    shareIntent.action = Intent.ACTION_SEND
+                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    shareIntent.setDataAndType(contentUri, contentResolver.getType(contentUri))
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri)
+                    shareIntent.putExtra(Intent.EXTRA_SUBJECT, head)
+                    startActivity(Intent.createChooser(shareIntent, getString(R.string.send_to)))
+                }
+                else {
+                    toastText(this, getString(R.string.cannot_share))
+                }
             }
         }
 
@@ -119,15 +143,22 @@ class QrCodeActivity : SecureActivity() {
             val withAppRecord = intent.getBooleanExtra(EXTRA_NFC_WITH_APP_RECORD, false)
             val noSessionCheck = intent.getBooleanExtra(EXTRA_NO_SESSION_CHECK, false)
 
-            val intent = Intent(this, NfcActivity::class.java)
-            intent.putExtra(NfcActivity.EXTRA_MODE, NfcActivity.EXTRA_MODE_RW)
-            intent.putExtra(NfcActivity.EXTRA_WITH_APP_RECORD, withAppRecord)
-            intent.putExtra(NfcActivity.EXTRA_NO_SESSION_CHECK, noSessionCheck)
-            intent.putEncryptedExtra(NfcActivity.EXTRA_DATA, encQRC)
-            startActivity(intent)
+            val nfcIntent = Intent(this, NfcActivity::class.java)
+            nfcIntent.putExtra(NfcActivity.EXTRA_MODE, NfcActivity.EXTRA_MODE_RW)
+            nfcIntent.putExtra(NfcActivity.EXTRA_WITH_APP_RECORD, withAppRecord)
+            nfcIntent.putExtra(NfcActivity.EXTRA_NO_SESSION_CHECK, noSessionCheck)
+            nfcIntent.putEncryptedExtra(NfcActivity.EXTRA_DATA, encQRC)
+            startActivity(nfcIntent)
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun getBaseFileName(head: String): String {
+        if (head.isBlank()) {
+            return UUID.randomUUID().toString()
+        }
+        return head
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

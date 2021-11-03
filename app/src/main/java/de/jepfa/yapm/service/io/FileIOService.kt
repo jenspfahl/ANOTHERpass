@@ -1,6 +1,8 @@
 package de.jepfa.yapm.service.io
 
 import android.app.IntentService
+import android.content.ContentResolver
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -9,12 +11,15 @@ import android.net.Uri
 import android.os.Handler
 import android.text.TextUtils
 import android.util.Log
+import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import com.google.gson.JsonObject
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.JsonService.CREDENTIALS_TYPE
 import de.jepfa.yapm.service.io.JsonService.GSON
+import de.jepfa.yapm.service.io.JsonService.JSON_APP_SETTINGS
 import de.jepfa.yapm.service.io.JsonService.JSON_APP_VERSION_CODE
 import de.jepfa.yapm.service.io.JsonService.JSON_APP_VERSION_NAME
 import de.jepfa.yapm.service.io.JsonService.JSON_CIPHER_ALGORITHM
@@ -24,7 +29,6 @@ import de.jepfa.yapm.service.io.JsonService.JSON_CREDENTIALS_COUNT
 import de.jepfa.yapm.service.io.JsonService.JSON_ENC_MK
 import de.jepfa.yapm.service.io.JsonService.JSON_LABELS
 import de.jepfa.yapm.service.io.JsonService.JSON_LABELS_COUNT
-import de.jepfa.yapm.service.io.JsonService.JSON_APP_SETTINGS
 import de.jepfa.yapm.service.io.JsonService.JSON_VAULT_ID
 import de.jepfa.yapm.service.io.JsonService.JSON_VAULT_VERSION
 import de.jepfa.yapm.service.io.JsonService.LABELS_TYPE
@@ -34,6 +38,8 @@ import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.Constants.SDF_DT_MEDIUM
 import de.jepfa.yapm.util.Constants.UNKNOWN_VAULT_VERSION
+import java.io.File
+import java.io.IOException
 import java.util.*
 
 
@@ -42,6 +48,42 @@ class FileIOService: IntentService("FileIOService") {
     private val handler = Handler()
 
     companion object {
+
+        fun bitmapToJpegFile(contentResolver: ContentResolver, bitmap: Bitmap, destUri: Uri): Boolean {
+            try {
+                val fileOutStream = contentResolver.openOutputStream(destUri)
+                return bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fileOutStream)
+            } catch (e: IOException) {
+                Log.e("FS", "cannot create file", e)
+                return false
+            }
+        }
+
+        fun createTempImageContentUri(context: Context, bitmap: Bitmap, baseFileName: String): Uri? {
+            try {
+                val sharesPath = File(context.cacheDir, "shares")
+                sharesPath.mkdir()
+                val tempFile =
+                    File.createTempFile(baseFileName, ".jpeg", sharesPath)
+                val success = bitmapToJpegFile(context.contentResolver, bitmap, tempFile.toUri())
+                if (success) {
+                    return FileProvider.getUriForFile(context, "de.jepfa.yapm.fileprovider", tempFile)
+                }
+            } catch (e: Exception) {
+                Log.e("FS", "cannot create content uri", e)
+            }
+            return null
+        }
+
+        fun clearSharesCache(context: Context) {
+            try {
+                val sharesPath = File(context.cacheDir, "shares")
+                sharesPath.delete();
+            } catch (e: Exception) {
+                Log.e("FS", "cannot clear shares cache", e)
+            }
+        }
+
         const val ACTION_SAVE_QRC = "action_saveQrc"
         const val ACTION_EXPORT_VAULT = "action_exportVault"
 
@@ -169,11 +211,14 @@ class FileIOService: IntentService("FileIOService") {
             val qrc = SecretService.decryptPassword(tempKey, encQrc)
             val header = SecretService.decryptCommonString(tempKey, encHeader)
 
-            val fileOutStream = contentResolver.openOutputStream(uri)
             val bitmap = QRCodeUtil.generateQRCode(header, qrc.toRawFormattedPassword(), qrcColor, this)
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fileOutStream)
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fileOutStream)
-            message = getString(R.string.qr_code_saved)
+            val success = bitmapToJpegFile(contentResolver, bitmap, uri)
+            if (success) {
+                message = getString(R.string.qr_code_saved)
+            }
+            else {
+                message = getString(R.string.qr_code_save_failed)
+            }
 
         }
         else {

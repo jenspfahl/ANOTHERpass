@@ -21,7 +21,7 @@ import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_COPY_PASSWORD
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_OVERLAY_FEATURE
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_LABELS_IN_LIST
-import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
+import de.jepfa.yapm.service.autofill.AutofillCredentialHolder
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.overlay.DetachHelper
@@ -92,7 +92,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                 }
             }
             else {
-                CurrentCredentialHolder.update(current, null)
+                AutofillCredentialHolder.update(current, null)
                 toastText(listCredentialsActivity, R.string.credential_used_for_autofill)
             }
 

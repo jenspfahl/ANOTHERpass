@@ -57,9 +57,11 @@
         <entry key="app/src/main/res/menu/menu_label_list.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/menu/menu_main.xml" value="0.264" />
         <entry key="app/src/main/res/menu/menu_main_drawer.xml" value="0.4" />
+        <entry key="app/src/main/res/menu/menu_qrcode.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/menu/qrcode_menu.xml" value="0.3015625" />
         <entry key="app/src/main/res/xml/autofill_preferences.xml" value="0.21331521739130435" />
         <entry key="app/src/main/res/xml/clipboard_preferences.xml" value="0.21331521739130435" />
+        <entry key="app/src/main/res/xml/filepaths.xml" value="0.1" />
         <entry key="app/src/main/res/xml/general_preferences.xml" value="0.264" />
         <entry key="app/src/main/res/xml/header_preferences.xml" value="0.21331521739130435" />
         <entry key="app/src/main/res/xml/login_preferences.xml" value="0.21331521739130435" />

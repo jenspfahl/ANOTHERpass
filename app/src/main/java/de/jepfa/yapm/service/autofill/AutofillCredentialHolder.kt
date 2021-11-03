@@ -3,7 +3,7 @@ package de.jepfa.yapm.service.autofill
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Key
 
-object CurrentCredentialHolder {
+object AutofillCredentialHolder {
 
     var currentCredential : EncCredential? = null
         private set

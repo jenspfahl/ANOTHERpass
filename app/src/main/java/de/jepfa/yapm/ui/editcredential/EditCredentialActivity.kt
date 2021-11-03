@@ -8,9 +8,8 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.session.Session
-import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
+import de.jepfa.yapm.service.autofill.AutofillCredentialHolder
 import de.jepfa.yapm.service.label.LabelService
-import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.credential.AutofillPushBackActivityBase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 
@@ -63,7 +62,7 @@ class EditCredentialActivity : AutofillPushBackActivityBase() {
         current.applyExtras(replyIntent)
 
         if (shouldPushBackAutoFill()) {
-            CurrentCredentialHolder.update(current, deobfuscationKey)
+            AutofillCredentialHolder.update(current, deobfuscationKey)
         }
 
         setResult(Activity.RESULT_OK, replyIntent)

@@ -116,7 +116,7 @@ object ResponseFiller {
         val fields = identifyFields(structure, suggestEverywhere) ?: return null
 
         val key = Session.getMasterKeySK()
-        val credential = CurrentCredentialHolder.currentCredential
+        val credential = AutofillCredentialHolder.currentCredential
         if (key == null || Session.isDenied() || credential == null) {
             if (allowCreateAuthentication) {
                 if (suggestEverywhere || fields.hasCredentialFields()) {
@@ -130,7 +130,7 @@ object ResponseFiller {
         val name = SecretService.decryptCommonString(key, credential.name)
         val user = SecretService.decryptCommonString(key, credential.user)
         val password = SecretService.decryptPassword(key, credential.password)
-        CurrentCredentialHolder.obfuscationKey?.let {
+        AutofillCredentialHolder.obfuscationKey?.let {
             password.deobfuscate(it)
         }
 

@@ -22,10 +22,20 @@
 
         <provider
             android:name=".provider.PasteContentProvider"
-            android:authorities="de.jepfa.yapm"
+            android:authorities="de.jepfa.yapm.paste_checker"
             android:enabled="true"
             android:exported="true"
-            tools:ignore="ExportedContentProvider" />
+            tools:ignore="ExportedContentProvider"/>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="de.jepfa.yapm.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
 
         <activity
             android:name=".ui.settings.SettingsActivity"

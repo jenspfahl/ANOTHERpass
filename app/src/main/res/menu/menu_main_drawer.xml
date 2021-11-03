@@ -51,7 +51,7 @@
         </menu>
     </item>
 
-    <item android:title="@string/security" >
+    <item android:title="@string/vault" >
         <menu>
 
             <item

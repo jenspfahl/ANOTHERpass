@@ -25,7 +25,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_COPY_PASSWORD
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_OVERLAY_FEATURE
 import de.jepfa.yapm.service.PreferenceService.PREF_MASK_PASSWORD
 import de.jepfa.yapm.service.PreferenceService.PREF_PASSWD_WORDS_ON_NL
-import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
+import de.jepfa.yapm.service.autofill.AutofillCredentialHolder
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
@@ -136,7 +136,7 @@ class ShowCredentialActivity : SecureActivity() {
 
     override fun onResume() {
         super.onResume()
-        credential?.let { CurrentCredentialHolder.update(it, obfuscationKey) }
+        credential?.let { AutofillCredentialHolder.update(it, obfuscationKey) }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -251,7 +251,7 @@ class ShowCredentialActivity : SecureActivity() {
                         obfuscationKey = null
                         item.isChecked = false
 
-                        CurrentCredentialHolder.clear()
+                        AutofillCredentialHolder.clear()
 
                         updatePasswordTextView(key, credential, false)
 
@@ -278,7 +278,7 @@ class ShowCredentialActivity : SecureActivity() {
                                 passwordForDeobfuscation.clear()
 
                                 passwordTextView.text = spannedString
-                                CurrentCredentialHolder.update(credential, it)
+                                AutofillCredentialHolder.update(credential, it)
                             }
 
                             toastText(this, R.string.password_deobfuscated)
@@ -396,7 +396,7 @@ class ShowCredentialActivity : SecureActivity() {
             }
         }
 
-        CurrentCredentialHolder.update(credential, obfuscationKey)
+        AutofillCredentialHolder.update(credential, obfuscationKey)
     }
 
     private fun updatePasswordTextView(

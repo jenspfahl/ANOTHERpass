@@ -92,7 +92,7 @@
     <string name="export_credential_desc">Export credential to either backup, outsource or share it.</string>
     <string name="export_masterkey">Export master key</string>
     <string name="export_masterpasswd">Export master password</string>
-    <string name="export_vault">Save vault as file</string>
+    <string name="export_vault">Export vault as file</string>
     <string name="qrc_download_as_img">Save Qr code as image</string>
     <string name="download_as_nfc_tag">Push as NFC tag</string>
     <string name="export_vault_explanation">Here you can export your complete vault into a file for backup purposes. Use this file to import your vault after a fresh new app installation without data. You have the choice to include or exclude the Encrypted Master Key. If you exclude it, export the master key by your own and store it on a safe place. You need it to import the vault file. The separation of Encrypted Master Key and vault file might be sense to make the vault file useless for hackers even if they guess your pin and master password.</string>
@@ -126,7 +126,7 @@
     <string name="current_pin">Enter current pin</string>
     <string name="change_master_password">Change master password</string>
     <string name="change_master_password_explanation">Change your master password by enter your current pin and generate a new master password. Note, that the Encrypted Master Key will be changed, so you need to export it again. This also effects old vault export files with the old key. You should also export your master password and tokens again.</string>
-    <string name="security">Privacy</string>
+    <string name="vault">Vault</string>
     <string name="delete_stored_masterpasswd_confirmation">Do you want to delete the stored master password from this device? For future logins you will need the master password then.</string>
     <string name="pref_header_general">General</string>
     <string name="pref_header_security">Security</string>
@@ -228,6 +228,7 @@
     <string name="backup_failed">Error while creating the backup file</string>
     <string name="backup_permission_missing">Permission to write to external storage is missing</string>
     <string name="qr_code_saved">QR code as image saved</string>
+    <string name="qr_code_save_failed">Cannot save the QR code as image</string>
     <string name="qr_code_permission_missing">Permission to write to external storage is missing</string>
     <string name="title_missing_overlay_permission">Missing permission</string>
     <string name="message_missing_overlay_permission">App cannot draw over other apps. Enable permission and try again.</string>
@@ -370,5 +371,7 @@
     <string name="pref_security_mask_password">Mask password when showing a credential (can be unmasked by clicking on it)</string>
     <string name="licences">Licences</string>
     <string name="licences_title">Used open source licences</string>
+    <string name="send_to">Send to</string>
+    <string name="cannot_share">Unable to share this QR code</string>
 
 </resources>

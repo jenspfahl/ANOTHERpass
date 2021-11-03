@@ -9,7 +9,7 @@ import android.view.autofill.AutofillManager
 import android.view.autofill.AutofillManager.EXTRA_AUTHENTICATION_RESULT
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Key
-import de.jepfa.yapm.service.autofill.CurrentCredentialHolder
+import de.jepfa.yapm.service.autofill.AutofillCredentialHolder
 import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.ui.SecureActivity
 
@@ -20,7 +20,7 @@ abstract class AutofillPushBackActivityBase : SecureActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        CurrentCredentialHolder.clear()
+        AutofillCredentialHolder.clear()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             assistStructure = intent.getParcelableExtra(AutofillManager.EXTRA_ASSIST_STRUCTURE)
         }
@@ -32,7 +32,7 @@ abstract class AutofillPushBackActivityBase : SecureActivity() {
     }
 
     fun pushBackAutofill(credential: EncCredential, deobfuscationKey: Key?) {
-        CurrentCredentialHolder.update(credential, deobfuscationKey)
+        AutofillCredentialHolder.update(credential, deobfuscationKey)
         pushBackAutofill()
     }
 

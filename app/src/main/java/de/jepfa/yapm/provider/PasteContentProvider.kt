@@ -12,7 +12,7 @@ import de.jepfa.yapm.util.NotificationHelper
 class PasteContentProvider : ContentProvider() {
 
     companion object {
-        val contentUri: Uri = Uri.parse("content://de.jepfa.yapm/paste_checker")
+        val contentUri: Uri = Uri.parse("content://de.jepfa.yapm.paste_checker")
 
         var enablePushNotification = false
     }
