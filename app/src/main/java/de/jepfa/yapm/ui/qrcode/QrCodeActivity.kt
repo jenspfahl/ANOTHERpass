@@ -112,11 +112,22 @@ class QrCodeActivity : SecureActivity() {
         if (id == R.id.menu_download_qrc) {
             PermissionChecker.verifyRWStoragePermissions(this)
             if (PermissionChecker.hasRWStoragePermissions(this)) {
-                val downloadIntent = Intent(Intent.ACTION_CREATE_DOCUMENT)
-                downloadIntent.addCategory(Intent.CATEGORY_OPENABLE)
-                downloadIntent.type = "image/jpeg"
-                downloadIntent.putExtra(Intent.EXTRA_TITLE, getFileName(head))
-                startActivityForResult(Intent.createChooser(downloadIntent, getString(R.string.save_as)), saveAsImage)
+
+                AlertDialog.Builder(this)
+                    .setTitle(R.string.qrc_download_as_img)
+                    .setMessage(R.string.hint_store_qr_as_file)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(R.string.title_continue) { dialog, _ ->
+                        dialog.dismiss()
+                        val downloadIntent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+                        downloadIntent.addCategory(Intent.CATEGORY_OPENABLE)
+                        downloadIntent.type = "image/jpeg"
+                        downloadIntent.putExtra(Intent.EXTRA_TITLE, getFileName(head))
+                        startActivityForResult(Intent.createChooser(downloadIntent, getString(R.string.save_as)), saveAsImage)
+                    }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show()
+
             }
         }
 

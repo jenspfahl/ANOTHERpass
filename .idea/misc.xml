@@ -11,6 +11,8 @@
         <entry key="../../../Android/Sdk/platforms/android-29/data/res/layout/simple_dropdown_item_1line.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/drawable/ic_baseline_delete_24.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_edit_16.xml" value="0.19895833333333332" />
+        <entry key="app/src/main/res/drawable/ic_baseline_filter_list_24.xml" value="0.19895833333333332" />
+        <entry key="app/src/main/res/drawable/ic_baseline_filter_list_24_white.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_fitness_center_16.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_import_export_24.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_nfc_24.xml" value="0.19895833333333332" />
@@ -22,7 +24,13 @@
         <entry key="app/src/main/res/drawable/ic_baseline_qr_code_68_gray.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_qr_code_scanner_24.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_qr_code_scanner_48.xml" value="0.17604166666666668" />
+        <entry key="app/src/main/res/drawable/ic_baseline_save_alt_24.xml" value="0.19895833333333332" />
+        <entry key="app/src/main/res/drawable/ic_baseline_share_24.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_sort_24.xml" value="0.321875" />
+        <entry key="app/src/main/res/drawable/ic_baseline_sort_24_white.xml" value="0.19895833333333332" />
+        <entry key="app/src/main/res/drawable/ic_baseline_vpn_key_24_white.xml" value="0.19895833333333332" />
+        <entry key="app/src/main/res/drawable/ic_security_black_24dp.xml" value="0.19895833333333332" />
+        <entry key="app/src/main/res/drawable/ic_settings_black_24dp.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/layout/activity_change_master_password.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/activity_change_pin.xml" value="0.20244565217391305" />
         <entry key="app/src/main/res/layout/activity_create_or_import_vault.xml" value="0.17864583333333334" />

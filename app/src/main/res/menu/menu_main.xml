@@ -39,6 +39,7 @@
         android:title="@string/sort_order"
         app:showAsAction="never">
     </item>
+
     <item
         android:id="@+id/menu_show_ids"
         android:checkable="true"
