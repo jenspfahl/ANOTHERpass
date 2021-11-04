@@ -5,7 +5,7 @@ import android.util.Log
 import com.google.gson.JsonObject
 import de.jepfa.yapm.model.encrypted.*
 import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.service.io.JsonService
+import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
@@ -36,7 +36,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, BaseActivity>(
         activity: BaseActivity,
         encMasterKey: String?
     ): Boolean {
-        val salt = jsonContent.get(JsonService.JSON_VAULT_ID)?.asString
+        val salt = jsonContent.get(VaultExportService.JSON_VAULT_ID)?.asString
         salt?.let {
             SaltService.storeSaltFromBase64String(it, activity)
         }
@@ -47,7 +47,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, BaseActivity>(
             return true
         }
 
-        val vaultVersion = jsonContent.get(JsonService.JSON_VAULT_VERSION)?.asString ?: "1"
+        val vaultVersion = jsonContent.get(VaultExportService.JSON_VAULT_VERSION)?.asString ?: "1"
         PreferenceService.putString(PreferenceService.DATA_VAULT_VERSION, vaultVersion, activity)
 
         PreferenceService.putString(
@@ -71,7 +71,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, BaseActivity>(
             )
         }
 
-        val credentialsJson = jsonContent.getAsJsonArray(JsonService.JSON_CREDENTIALS)
+        val credentialsJson = jsonContent.getAsJsonArray(VaultExportService.JSON_CREDENTIALS)
         CoroutineScope(Dispatchers.IO).launch {
             credentialsJson
                 .filterNotNull()
@@ -80,7 +80,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, BaseActivity>(
                 .forEach { c -> activity.getApp().credentialRepository.insert(c) }
         }
 
-        val labelsJson = jsonContent.getAsJsonArray(JsonService.JSON_LABELS)
+        val labelsJson = jsonContent.getAsJsonArray(VaultExportService.JSON_LABELS)
         CoroutineScope(Dispatchers.IO).launch {
             labelsJson
                 .filterNotNull()
@@ -89,7 +89,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, BaseActivity>(
                 .forEach { c -> activity.getApp().labelRepository.insert(c) }
         }
 
-        val appSettings = jsonContent.get(JsonService.JSON_APP_SETTINGS)?.asJsonObject
+        val appSettings = jsonContent.get(VaultExportService.JSON_APP_SETTINGS)?.asJsonObject
         if (appSettings != null) {
             appSettings.entrySet()
                 .forEach { (k,v) ->
@@ -121,7 +121,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, BaseActivity>(
     }
 
     fun extractCipherAlgorithm(jsonContent: JsonObject): CipherAlgorithm {
-        val cipherAlgorithmString = jsonContent.get(JsonService.JSON_CIPHER_ALGORITHM)?.asString
+        val cipherAlgorithmString = jsonContent.get(VaultExportService.JSON_CIPHER_ALGORITHM)?.asString
         val cipherAlgorithm =
             if (cipherAlgorithmString != null) CipherAlgorithm.valueOf(cipherAlgorithmString)
             else DEFAULT_CIPHER_ALGORITHM

@@ -13,7 +13,7 @@ import com.google.gson.JsonObject
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.encrypted.EncryptedType.Types.ENC_MASTER_KEY
-import de.jepfa.yapm.service.io.JsonService
+import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.MasterKeyService
 import de.jepfa.yapm.service.secret.SaltService
@@ -67,12 +67,12 @@ class ImportVaultImportFileFragment : BaseFragment() {
             return
         }
 
-        val createdAt = jsonContent.get(JsonService.JSON_CREATION_DATE)?.asString
-        val credentialsCount = jsonContent.get(JsonService.JSON_CREDENTIALS_COUNT)?.asString
-        val labelsCount = jsonContent.get(JsonService.JSON_LABELS_COUNT)?.asString
-        val salt = jsonContent.get(JsonService.JSON_VAULT_ID)
+        val createdAt = jsonContent.get(VaultExportService.JSON_CREATION_DATE)?.asString
+        val credentialsCount = jsonContent.get(VaultExportService.JSON_CREDENTIALS_COUNT)?.asString
+        val labelsCount = jsonContent.get(VaultExportService.JSON_LABELS_COUNT)?.asString
+        val salt = jsonContent.get(VaultExportService.JSON_VAULT_ID)
         val vaultId = if (salt != null) SaltService.saltToVaultId(salt.asString) else R.string.unknown_placeholder
-        encMasterKey = jsonContent.get(JsonService.JSON_ENC_MK)?.asString
+        encMasterKey = jsonContent.get(VaultExportService.JSON_ENC_MK)?.asString
 
         var mkProvidedText = ""
         if (encMasterKey != null) {

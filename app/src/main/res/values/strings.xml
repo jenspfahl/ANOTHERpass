@@ -96,6 +96,7 @@
     <string name="qrc_download_as_img">Save QR code as image</string>
     <string name="download_as_nfc_tag">Push as NFC tag</string>
     <string name="export_vault_explanation">Here you can export your complete vault into a file for backup purposes. Use this file to import your vault after a fresh new app installation without data. You have the choice to include or exclude the Encrypted Master Key. If you exclude it, export the master key by your own and store it on a safe place. You need it to import the vault file. The separation of Encrypted Master Key and vault file might be sense to make the vault file useless for hackers even if they guess your pin and master password.</string>
+    <string name="button_share_vault">Share vault</string>
     <string name="button_export_vault">Export vault</string>
     <string name="include_enc_masterkey">Include Encrypted Master Key</string>
     <string name="include_preferences">Include current app settings</string>
@@ -372,7 +373,8 @@
     <string name="licences">Licences</string>
     <string name="licences_title">Used open source licences</string>
     <string name="send_to">Send to</string>
-    <string name="cannot_share">Unable to share this QR code</string>
+    <string name="cannot_share_qr_code">Unable to share this QR code</string>
+    <string name="cannot_share_vault">Unable to share the vault file</string>
     <string name="hint_store_qr_as_file">Please note if you store sensitive QR codes in your device storage, other apps could access these codes as well.</string>
 
 </resources>

@@ -2,45 +2,22 @@ package de.jepfa.yapm.service.io
 
 import android.app.IntentService
 import android.content.ContentResolver
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
 import android.os.Handler
-import android.text.TextUtils
 import android.util.Log
-import androidx.core.content.FileProvider
-import androidx.core.net.toUri
-import com.google.gson.JsonObject
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
-import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.service.io.JsonService.CREDENTIALS_TYPE
-import de.jepfa.yapm.service.io.JsonService.GSON
-import de.jepfa.yapm.service.io.JsonService.JSON_APP_SETTINGS
-import de.jepfa.yapm.service.io.JsonService.JSON_APP_VERSION_CODE
-import de.jepfa.yapm.service.io.JsonService.JSON_APP_VERSION_NAME
-import de.jepfa.yapm.service.io.JsonService.JSON_CIPHER_ALGORITHM
-import de.jepfa.yapm.service.io.JsonService.JSON_CREATION_DATE
-import de.jepfa.yapm.service.io.JsonService.JSON_CREDENTIALS
-import de.jepfa.yapm.service.io.JsonService.JSON_CREDENTIALS_COUNT
-import de.jepfa.yapm.service.io.JsonService.JSON_ENC_MK
-import de.jepfa.yapm.service.io.JsonService.JSON_LABELS
-import de.jepfa.yapm.service.io.JsonService.JSON_LABELS_COUNT
-import de.jepfa.yapm.service.io.JsonService.JSON_VAULT_ID
-import de.jepfa.yapm.service.io.JsonService.JSON_VAULT_VERSION
-import de.jepfa.yapm.service.io.JsonService.LABELS_TYPE
-import de.jepfa.yapm.service.secret.SaltService
+import de.jepfa.yapm.service.io.VaultExportService.createVaultFile
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.YapmApp
-import de.jepfa.yapm.util.*
-import de.jepfa.yapm.util.Constants.SDF_DT_MEDIUM
-import de.jepfa.yapm.util.Constants.UNKNOWN_VAULT_VERSION
-import java.io.File
+import de.jepfa.yapm.util.FileUtil
+import de.jepfa.yapm.util.QRCodeUtil
+import de.jepfa.yapm.util.getEncryptedExtra
+import de.jepfa.yapm.util.toastText
 import java.io.IOException
-import java.util.*
 
 
 class FileIOService: IntentService("FileIOService") {
@@ -49,51 +26,25 @@ class FileIOService: IntentService("FileIOService") {
 
     companion object {
 
-        fun bitmapToJpegFile(contentResolver: ContentResolver, bitmap: Bitmap, destUri: Uri): Boolean {
-            try {
-                val fileOutStream = contentResolver.openOutputStream(destUri)
-                return bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fileOutStream)
-            } catch (e: IOException) {
-                Log.e("FS", "cannot create file", e)
-                return false
-            }
-        }
-
-        fun createTempImageContentUri(context: Context, bitmap: Bitmap, baseFileName: String): Uri? {
-            try {
-                val sharesPath = File(context.cacheDir, "shares")
-                sharesPath.mkdir()
-                val tempFile =
-                    File.createTempFile(baseFileName, ".jpeg", sharesPath)
-                val success = bitmapToJpegFile(context.contentResolver, bitmap, tempFile.toUri())
-                if (success) {
-                    return FileProvider.getUriForFile(context, "de.jepfa.yapm.fileprovider", tempFile)
-                }
-            } catch (e: Exception) {
-                Log.e("FS", "cannot create content uri", e)
-            }
-            return null
-        }
-
-        fun clearSharesCache(context: Context) {
-            try {
-                val sharesPath = File(context.cacheDir, "shares")
-                sharesPath.delete();
-            } catch (e: Exception) {
-                Log.e("FS", "cannot clear shares cache", e)
-            }
-        }
-
         const val ACTION_SAVE_QRC = "action_saveQrc"
         const val ACTION_EXPORT_VAULT = "action_exportVault"
 
-        const val PARAM_FILE_URI = "param_fileUrl"
+        const val PARAM_FILE_URI = "param_file_url"
         const val PARAM_QRC = "param_qrc"
         const val PARAM_QRC_HEADER = "param_qrc_header"
         const val PARAM_QRC_COLOR = "param_qrc_color"
         const val PARAM_INCLUDE_MK = "param_include_mk"
         const val PARAM_INCLUDE_PREFS = "param_include_prefs"
 
+        internal fun bitmapToJpegFile(contentResolver: ContentResolver, bitmap: Bitmap, destUri: Uri): Boolean {
+            return try {
+                val fileOutStream = contentResolver.openOutputStream(destUri)
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fileOutStream)
+            } catch (e: IOException) {
+                Log.e("TS", "cannot create file", e)
+                false
+            }
+        }
     }
 
     override fun onHandleIntent(intent: Intent?) {
@@ -111,9 +62,8 @@ class FileIOService: IntentService("FileIOService") {
         if (FileUtil.isExternalStorageWritable()) {
             val includeMasterkey = intent.getBooleanExtra(PARAM_INCLUDE_MK, false)
             val includePreferences = intent.getBooleanExtra(PARAM_INCLUDE_PREFS, false)
-            val jsonData = exportToJson(includeMasterkey, includePreferences)
             val uri = intent.getParcelableExtra<Uri>(PARAM_FILE_URI)
-            val success = writeExportFile(uri, jsonData)
+            val success = createVaultFile(applicationContext, getApp(), includeMasterkey, includePreferences, uri)
 
             if (success) {
                 message = getString(R.string.backup_file_saved)
@@ -131,72 +81,6 @@ class FileIOService: IntentService("FileIOService") {
             }
         }
 
-    }
-
-    private fun writeExportFile(uri: Uri, jsonData: JsonObject): Boolean {
-        var success = false
-        try {
-            success = FileUtil.writeFile(this, uri, jsonData.toString())
-            val content: String? = FileUtil.readFile(this, uri)
-            if (TextUtils.isEmpty(content)) {
-                Log.e("BACKUP", "Empty file created: $uri")
-                success = false
-            }
-        } catch (e: Exception) {
-            Log.e("BACKUP", "Cannot write file $uri", e)
-        }
-        return success
-    }
-
-    private fun exportToJson(includeMasterkey: Boolean, includePreferences: Boolean): JsonObject {
-        val root = JsonObject()
-        try {
-            root.addProperty(JSON_APP_VERSION_CODE, DebugInfo.getVersionCode(applicationContext))
-            root.addProperty(JSON_APP_VERSION_NAME, DebugInfo.getVersionName(applicationContext))
-        } catch (e: PackageManager.NameNotFoundException) {
-            Log.e("BACKUPALL", "cannot get version code", e)
-        }
-
-        root.addProperty(JSON_CREATION_DATE, SDF_DT_MEDIUM.format(Date()))
-        val salt = SaltService.getSaltAsBase64String(this)
-        salt.let {
-            root.addProperty(JSON_VAULT_ID, it)
-        }
-
-        val vaultVersion = PreferenceService.getAsString(PreferenceService.DATA_VAULT_VERSION, this) ?: UNKNOWN_VAULT_VERSION.toString()
-        root.addProperty(JSON_VAULT_VERSION, vaultVersion)
-
-        val cipherAlgorithm = SecretService.getCipherAlgorithm(this)
-        root.addProperty(JSON_CIPHER_ALGORITHM, cipherAlgorithm.name)
-
-        if (includeMasterkey) {
-            val encStoredMasterKey = PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, this)
-            if (encStoredMasterKey != null) {
-
-                val mkKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
-                val encMasterKeyBase64 = SecretService.decryptEncrypted(mkKey, encStoredMasterKey).toBase64String()
-                root.addProperty(JSON_ENC_MK, encMasterKeyBase64)
-            }
-
-        }
-
-        val credentials = getApp().credentialRepository.getAllSync()
-
-        root.add(JSON_CREDENTIALS, GSON.toJsonTree(credentials, CREDENTIALS_TYPE))
-        root.addProperty(JSON_CREDENTIALS_COUNT, credentials.size)
-
-
-        val labels = getApp().labelRepository.getAllSync()
-
-        root.add(JSON_LABELS, GSON.toJsonTree(labels, LABELS_TYPE))
-        root.addProperty(JSON_LABELS_COUNT, labels.size)
-
-        if (includePreferences) {
-            val allPrefs = PreferenceService.getAllPrefs(this)
-            root.add(JSON_APP_SETTINGS, GSON.toJsonTree(allPrefs))
-        }
-
-        return root
     }
 
     private fun saveQrCodeAsImage(intent: Intent) {

@@ -29,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintBottom_toTopOf="@id/button_export_vault"
+            app:layout_constraintBottom_toTopOf="@+id/export_vault_buttons"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/export_vault_explanation">
@@ -50,25 +50,54 @@
                 android:checked="true"
                 android:text="@string/include_preferences" />
 
-
         </LinearLayout>
 
-        <Button
-            android:id="@+id/button_export_vault"
+        <LinearLayout
+            android:id="@+id/export_vault_buttons"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/button_export_vault"
-            android:background="@color/colorAccent"
-            android:textColor="@color/buttonLabel"
-            android:paddingHorizontal="10dp"
-            android:textStyle="bold"
+            android:orientation="vertical"
+            android:gravity="center"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/export_options" />
+            app:layout_constraintTop_toBottomOf="@id/export_options">
 
+            <Button
+                android:id="@+id/button_share_vault"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_baseline_share_24_white"
+                android:text="@string/button_share_vault"
+                android:background="@color/colorAccent"
+                android:textColor="@color/buttonLabel"
+                android:layout_margin="10dp"
+                android:drawablePadding="10dp"
+                android:padding="10dp"
+                android:textStyle="bold" />
+
+
+            <Button
+                android:id="@+id/button_export_vault"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_baseline_save_alt_24_white"
+                android:text="@string/button_export_vault"
+                android:background="@color/colorAccent"
+                android:textColor="@color/buttonLabel"
+                android:layout_margin="10dp"
+                android:drawablePadding="10dp"
+                android:padding="10dp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

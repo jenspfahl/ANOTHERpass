@@ -3,7 +3,7 @@ package de.jepfa.yapm.usecase.session
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.service.io.FileIOService
+import de.jepfa.yapm.service.io.TempFileService
 import de.jepfa.yapm.service.secret.MasterKeyService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
@@ -38,7 +38,7 @@ object LoginUseCase: InputUseCase<LoginData, BaseActivity>() {
             PreferenceService.getAsInt(PreferenceService.PREF_LOGOUT_TIMEOUT, baseActivity)
         )
 
-        FileIOService.clearSharesCache(baseActivity)
+        TempFileService.clearSharesCache(baseActivity)
 
         return true
 

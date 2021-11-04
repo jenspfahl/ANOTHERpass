@@ -9,7 +9,7 @@ import de.jepfa.yapm.model.export.EncExportableCredential
 import de.jepfa.yapm.model.export.ExportContainer
 import de.jepfa.yapm.model.export.PlainShareableCredential
 import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.service.io.JsonService
+import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.service.secret.MasterPasswordService.generateEncMasterPasswdSK
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
 import de.jepfa.yapm.service.secret.SaltService
@@ -115,7 +115,7 @@ class VerifyActivity : ReadActivityBase() {
     }
 
     private fun checkContainer(scanned: String) {
-        val content = JsonService.parse(scanned)
+        val content = VaultExportService.parseVaultFileContent(scanned)
         if (content != null) {
             ExportContainer.fromJson(content)?.let { exportContainer ->
                 when (exportContainer.c) {

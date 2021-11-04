@@ -13,6 +13,7 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.io.FileIOService
+import de.jepfa.yapm.service.io.TempFileService
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
@@ -132,11 +133,10 @@ class QrCodeActivity : SecureActivity() {
         }
 
         if (id == R.id.menu_share_as_qrc) {
-            val shareIntent = Intent()
             bitmap?.let { bitmap ->
-                val contentUri = FileIOService.createTempImageContentUri(this, bitmap, getBaseFileName(head))
+                val contentUri = TempFileService.createTempImageContentUri(this, bitmap, getBaseFileName(head))
                 if (contentUri != null) {
-
+                    val shareIntent = Intent()
                     shareIntent.action = Intent.ACTION_SEND
                     shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     shareIntent.setDataAndType(contentUri, contentResolver.getType(contentUri))
@@ -145,7 +145,7 @@ class QrCodeActivity : SecureActivity() {
                     startActivity(Intent.createChooser(shareIntent, getString(R.string.send_to)))
                 }
                 else {
-                    toastText(this, getString(R.string.cannot_share))
+                    toastText(this, R.string.cannot_share_qr_code)
                 }
             }
         }

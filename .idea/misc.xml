@@ -35,7 +35,7 @@
         <entry key="app/src/main/res/layout/activity_change_pin.xml" value="0.20244565217391305" />
         <entry key="app/src/main/res/layout/activity_create_or_import_vault.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/activity_edit_label.xml" value="0.33747178329571104" />
-        <entry key="app/src/main/res/layout/activity_export_vault.xml" value="0.4" />
+        <entry key="app/src/main/res/layout/activity_export_vault.xml" value="0.264" />
         <entry key="app/src/main/res/layout/activity_import_credential.xml" value="0.264" />
         <entry key="app/src/main/res/layout/activity_list_credentials.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/activity_list_labels.xml" value="0.17864583333333334" />

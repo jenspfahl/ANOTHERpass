@@ -11,7 +11,7 @@ import de.jepfa.yapm.model.export.PlainShareableCredential
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
-import de.jepfa.yapm.service.io.JsonService
+import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
@@ -133,7 +133,7 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
             }
             ExportMode.ENC_CREDENTIAL_RECORD -> {
                 val shortEncCredential = EncExportableCredential(credential)
-                val jsonString = JsonService.credentialToJson(shortEncCredential)
+                val jsonString = VaultExportService.credentialToJson(shortEncCredential)
                 return SecretService.encryptCommonString(transportKey, jsonString)
             }
             ExportMode.PLAIN_CREDENTIAL_RECORD -> {
@@ -146,7 +146,7 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
                     passwd,
                     SecretService.decryptCommonString(key, credential.website)
                 )
-                val jsonString = JsonService.credentialToJson(shortPlainCredential)
+                val jsonString = VaultExportService.credentialToJson(shortPlainCredential)
                 val encData = SecretService.encryptCommonString(transportKey, jsonString)
                 passwd.clear()
                 return encData

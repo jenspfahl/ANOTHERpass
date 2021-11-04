@@ -9,11 +9,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.google.gson.JsonObject
 import de.jepfa.yapm.R
-import de.jepfa.yapm.service.io.JsonService
+import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
 import de.jepfa.yapm.util.PermissionChecker
@@ -65,7 +64,7 @@ class ImportVaultLoadFileFragment : BaseFragment() {
                         val baseActivity = getBaseActivity() ?: return
                         val content = FileUtil.readFile(baseActivity, selectedFile)
                         if (content != null) {
-                            getImportVaultActivity().jsonContent = JsonService.parse(content)
+                            getImportVaultActivity().jsonContent = VaultExportService.parseVaultFileContent(content)
                         }
                     } catch (e: Exception) {
                         Log.e("RESTORE", "cannot import file $selectedFile", e)
