@@ -65,16 +65,18 @@
 
             <Button
                 android:id="@+id/button_share_vault"
+
+                style="?android:textAppearanceSmall"
+                android:background="@color/white"
+                android:textColor="@color/colorAccent"
+                android:textStyle="normal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableStart="@drawable/ic_baseline_share_24_white"
+                android:drawableStart="@drawable/ic_baseline_share_24"
                 android:text="@string/button_share_vault"
-                android:background="@color/colorAccent"
-                android:textColor="@color/buttonLabel"
                 android:layout_margin="10dp"
                 android:drawablePadding="10dp"
-                android:padding="10dp"
-                android:textStyle="bold" />
+                android:padding="10dp"/>
 
 
             <Button
