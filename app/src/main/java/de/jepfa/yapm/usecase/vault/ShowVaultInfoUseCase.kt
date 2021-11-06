@@ -20,8 +20,7 @@ object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActi
         val builder: AlertDialog.Builder = AlertDialog.Builder(activity)
         val icon: Drawable = activity.applicationInfo.loadIcon(activity.packageManager)
 
-        val saltBase64 = SaltService.getSaltAsBase64String(activity)
-        val vaultId = SaltService.saltToVaultId(saltBase64)
+        val vaultId = SaltService.getVaultId(activity)
         val vaultVersion = PreferenceService.getAsString(
             PreferenceService.DATA_VAULT_VERSION,
             activity

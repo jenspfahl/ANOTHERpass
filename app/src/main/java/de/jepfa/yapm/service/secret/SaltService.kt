@@ -45,6 +45,11 @@ object SaltService {
         PreferenceService.putEncrypted(PreferenceService.DATA_SALT, encSalt, context)
     }
 
+    fun getVaultId(context: Context): String {
+        val saltBase64 = getSaltAsBase64String(context)
+        return saltToVaultId(saltBase64)
+    }
+
     fun saltToVaultId(saltAsBase64String: String): String {
         return saltAsBase64String
             .toLowerCase(Locale.ROOT)

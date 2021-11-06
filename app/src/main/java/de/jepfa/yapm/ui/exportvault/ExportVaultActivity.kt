@@ -13,8 +13,6 @@ import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.usecase.vault.ShareVaultUseCase
 import de.jepfa.yapm.util.PermissionChecker
-import de.jepfa.yapm.util.toastText
-import java.util.*
 
 class ExportVaultActivity : SecureActivity() {
 
@@ -47,7 +45,7 @@ class ExportVaultActivity : SecureActivity() {
                     val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
                     intent.addCategory(Intent.CATEGORY_OPENABLE)
                     intent.type = "text/json"
-                    intent.putExtra(Intent.EXTRA_TITLE, ShareVaultUseCase.getBackupFileName())
+                    intent.putExtra(Intent.EXTRA_TITLE, ShareVaultUseCase.getBackupFileName(this))
                     startActivityForResult(Intent.createChooser(intent, getString(R.string.save_as)), saveAsFile)
                 }
             }
@@ -60,25 +58,7 @@ class ExportVaultActivity : SecureActivity() {
                 )
                 UseCaseBackgroundLauncher(ShareVaultUseCase).launch(this, input)
                 { output ->
-                    val uri = output.data
-                    if (uri != null) {
-                        val shareIntent = Intent()
-                        shareIntent.action = Intent.ACTION_SEND
-                        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                        shareIntent.setDataAndType(uri, contentResolver.getType(uri))
-                        shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
-                        shareIntent.putExtra(Intent.EXTRA_SUBJECT,
-                            ShareVaultUseCase.getBackupFileName()
-                        )
-                        startActivity(
-                            Intent.createChooser(
-                                shareIntent,
-                                getString(R.string.send_to)
-                            )
-                        )
-                        return@launch
-                    }
-                    toastText(this, R.string.cannot_share_vault)
+                    ShareVaultUseCase.startShareActivity(output.data, this)
                 }
             }
         }
