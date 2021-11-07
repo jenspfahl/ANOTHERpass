@@ -252,7 +252,9 @@ class EditCredentialDataFragment : SecureFragment() {
                         val encName = encryptCommonString(key, label.name)
                         val encDesc = encryptCommonString(key, "")
                         val encLabel = EncLabel(null, encName, encDesc, null)
-                        getBaseActivity()?.labelViewModel?.insert(encLabel)
+                        getBaseActivity()?.let{
+                            it.labelViewModel?.insert(encLabel, it)
+                        }
                     }
                 }
             }

@@ -23,13 +23,7 @@ object DropVaultUseCase: BasicUseCase<SecureActivity>() {
 
     fun dropVaultData(activity: BaseActivity) {
 
-        PreferenceService.delete(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, activity)
-        PreferenceService.delete(PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD, activity)
-        PreferenceService.delete(PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY, activity)
-        PreferenceService.delete(PreferenceService.DATA_SALT, activity)
-        PreferenceService.delete(PreferenceService.DATA_CIPHER_ALGORITHM, activity)
-        PreferenceService.delete(PreferenceService.DATA_VAULT_CREATED_AT, activity)
-        PreferenceService.delete(PreferenceService.DATA_VAULT_IMPORTED_AT, activity)
+        PreferenceService.deleteAllStates(activity)
         LabelService.clearAll()
         CoroutineScope(Dispatchers.IO).launch {
             activity.getApp().database?.clearAllTables()

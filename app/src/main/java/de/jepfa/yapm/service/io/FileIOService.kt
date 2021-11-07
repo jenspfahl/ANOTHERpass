@@ -10,6 +10,7 @@ import android.os.Handler
 import android.util.Log
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.VaultExportService.createVaultFile
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.YapmApp
@@ -67,6 +68,7 @@ class FileIOService: IntentService("FileIOService") {
 
             if (success) {
                 message = getString(R.string.backup_file_saved)
+                PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_EXPORTED_AT, applicationContext)
             }
             else {
                 message = getString(R.string.backup_failed)

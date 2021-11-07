@@ -10,11 +10,9 @@ import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.usecase.InputUseCase
-import de.jepfa.yapm.util.Constants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.*
 
 object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, BaseActivity>() {
 
@@ -112,11 +110,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, BaseActivity>(
 
         }
 
-        PreferenceService.putString(
-            PreferenceService.DATA_VAULT_IMPORTED_AT,
-            Constants.SDF_DT_MEDIUM.format(Date()),
-            activity
-        )
+        PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_IMPORTED_AT, activity)
         return false
     }
 

@@ -22,12 +22,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
 import de.jepfa.yapm.service.PreferenceService.PREF_CREDENTIAL_SORT_ORDER
+import de.jepfa.yapm.service.PreferenceService.PREF_DONT_SHOW_EXPORT_VAULT_REMINDER
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_CREDENTIAL_IDS
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
@@ -134,6 +136,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
 
+        showReminders(navigationView)
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -317,10 +320,10 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
                 val credential = EncCredential.fromIntent(it)
                 if (credential.isPersistent()) {
-                    credentialViewModel.update(credential)
+                    credentialViewModel.update(credential, this)
                 }
                 else {
-                    credentialViewModel.insert(credential)
+                    credentialViewModel.insert(credential, this)
                 }
                 if (shouldPushBackAutoFill()) {
                     pushBackAutofill()
@@ -591,6 +594,19 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             return CredentialSortOrder.valueOf(sortOrderAsString)
         }
         return CredentialSortOrder.DEFAULT
+    }
+
+    private fun showReminders(v: View) {
+        Snackbar.make(v, "Your vault wasn't exported for backup after recent modifications.", 10_000)
+            .setAction("Export vault") {
+                val intent = Intent(this, ExportVaultActivity::class.java)
+                startActivity(intent)
+            }
+            .setAction("Don't ask again") {
+                //PreferenceService.putBoolean(PREF_DONT_SHOW_EXPORT_VAULT_REMINDER, true, this)
+                toastText(this, "You can manage this reminder in the Settings")
+            }
+          //  .show()
     }
 
     fun deleteCredential(credential: EncCredential) {

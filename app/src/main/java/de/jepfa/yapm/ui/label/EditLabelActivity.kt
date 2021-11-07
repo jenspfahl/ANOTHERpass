@@ -170,10 +170,10 @@ class EditLabelActivity : SecureActivity() {
             val encLabel = EncLabel(label.labelId, encName, encDesc, label.colorRGB)
 
             if (encLabel.isPersistent()) {
-                labelViewModel.update(encLabel)
+                labelViewModel.update(encLabel, this)
             }
             else {
-                labelViewModel.insert(encLabel)
+                labelViewModel.insert(encLabel, this)
             }
             LabelService.updateLabel(label)
         }

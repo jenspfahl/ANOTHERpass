@@ -6,6 +6,8 @@ import android.util.Log
 import androidx.preference.PreferenceManager
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.util.Constants
+import java.util.*
 
 object PreferenceService {
 
@@ -32,6 +34,9 @@ object PreferenceService {
     const val DATA_VAULT_VERSION = DATA_PREFIX + "vault_version"
     const val DATA_VAULT_CREATED_AT = DATA_PREFIX + "vault_created_at"
     const val DATA_VAULT_IMPORTED_AT = DATA_PREFIX + "vault_imported_at"
+    const val DATA_VAULT_EXPORTED_AT = DATA_PREFIX + "vault_exported_at"
+    const val DATA_VAULT_EXPORT_NOTIFICATION_SHOWED_AT = DATA_PREFIX + "vault_export_notification_showed_at"
+    const val DATA_VAULT_MODIFIED_AT_AT = DATA_PREFIX + "vault_modified_at"
 
     const val PREF_MAX_LOGIN_ATTEMPTS = PREF_PREFIX + "max_login_attempts"
     const val PREF_SELF_DESTRUCTION = PREF_PREFIX + "drop_vault_if_login_declined"
@@ -70,6 +75,7 @@ object PreferenceService {
     const val PREF_SHOW_CREDENTIAL_IDS = PREF_PREFIX + "show_credential_ids"
 
     const val PREF_DARK_MODE = PREF_PREFIX + "dark_mode"
+    const val PREF_DONT_SHOW_EXPORT_VAULT_REMINDER = PREF_PREFIX + "dont show export vault reminder"
 
 
     fun initDefaults(context: Context?) {
@@ -94,6 +100,11 @@ object PreferenceService {
 
     fun getEncrypted(prefKey: String, context: Context?): Encrypted? {
         return get(prefKey, context)?.let { Encrypted.fromBase64String(it)}
+    }
+
+    fun getAsDate(prefKey: String, context: Context): Date? {
+        val timestampAsString = get(prefKey, context) ?: return null
+        return Constants.SDF_DT_MEDIUM.parse(timestampAsString)
     }
 
     fun getAsInt(prefKey: String, context: Context?): Int {
@@ -128,6 +139,14 @@ object PreferenceService {
         putString(prefKey, encrypted.toBase64String(), context)
     }
 
+    fun putCurrentDate(prefKey: String, context: Context) {
+        putString(
+            prefKey,
+            Constants.SDF_DT_MEDIUM.format(Date()),
+            context
+        )
+    }
+
     fun putString(prefKey: String, value: String, context: Context) {
         val editor = getDefault(context).edit()
         editor.putString(prefKey, value)
@@ -155,6 +174,12 @@ object PreferenceService {
         val editor = getDefault(context).edit()
         editor.putString(prefKey, null)
         editor.apply()
+    }
+
+    fun deleteAllStates(context: Context) {
+        val allStates = getDefault(context).all
+            .filter { (k, _) -> k.startsWith(STATE_PREFIX) }
+            .forEach { (k, _) -> delete(k, context)}
     }
 
     fun getAllPrefs(context: Context): Map<String, Any?> {

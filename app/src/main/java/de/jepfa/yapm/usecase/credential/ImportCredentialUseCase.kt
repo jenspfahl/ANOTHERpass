@@ -6,7 +6,6 @@ import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.InputUseCase
-import de.jepfa.yapm.usecase.UseCase
 import de.jepfa.yapm.util.enrichId
 import de.jepfa.yapm.util.observeOnce
 import de.jepfa.yapm.util.toastText
@@ -52,8 +51,8 @@ object ImportCredentialUseCase: InputUseCase<ImportCredentialUseCase.Input, Secu
         credential: EncCredential,
         successHandler: () -> Unit
     ) {
-        if (isNew) activity.credentialViewModel.insert(credential)
-        else activity.credentialViewModel.update(credential)
+        if (isNew) activity.credentialViewModel.insert(credential, activity)
+        else activity.credentialViewModel.update(credential, activity)
 
         activity.masterSecretKey?.let { key ->
             val name = SecretService.decryptCommonString(key, credential.name)

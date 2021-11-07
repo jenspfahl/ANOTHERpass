@@ -10,7 +10,6 @@ import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.usecase.InputUseCase
 import de.jepfa.yapm.usecase.session.LoginUseCase
 import de.jepfa.yapm.util.Constants
-import java.util.*
 
 object CreateVaultUseCase: InputUseCase<CreateVaultUseCase.Input, BaseActivity>() {
 
@@ -34,11 +33,7 @@ object CreateVaultUseCase: InputUseCase<CreateVaultUseCase.Input, BaseActivity>(
         if (input.storeMasterPasswd) {
             MasterPasswordService.storeMasterPassword(input.loginData.masterPassword, activity)
         }
-        PreferenceService.putString(
-            PreferenceService.DATA_VAULT_CREATED_AT,
-            Constants.SDF_DT_MEDIUM.format(Date()),
-            activity
-        )
+        PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_CREATED_AT, activity)
         PreferenceService.putString(
             PreferenceService.DATA_VAULT_VERSION,
             Constants.FAST_KEYGEN_VAULT_VERSION.toString(),

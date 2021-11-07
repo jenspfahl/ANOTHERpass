@@ -1,8 +1,10 @@
 package de.jepfa.yapm.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.*
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.database.repository.CredentialRepository
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.ui.YapmApp
 import kotlinx.coroutines.launch
 
@@ -18,14 +20,16 @@ class CredentialViewModel(private val repository: CredentialRepository) : ViewMo
         return repository.findById(id).asLiveData()
     }
 
-    fun insert(credential: EncCredential) = viewModelScope.launch {
+    fun insert(credential: EncCredential, context: Context) = viewModelScope.launch {
         credential.touchModify()
         repository.insert(credential)
+        PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_MODIFIED_AT_AT, context)
     }    
 
-    fun update(credential: EncCredential) = viewModelScope.launch {
+    fun update(credential: EncCredential, context: Context) = viewModelScope.launch {
         credential.touchModify()
         repository.update(credential)
+        PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_MODIFIED_AT_AT, context)
     }
 
     fun delete(credential: EncCredential)  = viewModelScope.launch {

@@ -304,7 +304,7 @@ class ShowCredentialActivity : SecureActivity() {
                     obfuscationKey?.clear()
                     obfuscationKey = null
                     optionsMenu?.findItem(R.id.menu_deobfuscate_password)?.isChecked = false
-                    credentialViewModel.update(credential)
+                    credentialViewModel.update(credential, this)
                 }
             }
         }

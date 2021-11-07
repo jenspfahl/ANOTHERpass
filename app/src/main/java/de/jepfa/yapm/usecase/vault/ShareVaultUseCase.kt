@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.net.Uri
 import androidx.core.net.toUri
 import de.jepfa.yapm.R
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.TempFileService
 import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.service.secret.SaltService
@@ -58,7 +59,7 @@ object ShareVaultUseCase: UseCase<ShareVaultUseCase.Input, Uri?, SecureActivity>
                 override fun onReceive(context: Context?, intent: Intent?) {
                     context?.let {
                         context.unregisterReceiver(this)
-                        // TODO save vault export timestamp
+                        PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_EXPORTED_AT, activity)
                         val upIntent = Intent(activity.intent)
                         activity.navigateUpTo(upIntent)
                     }
