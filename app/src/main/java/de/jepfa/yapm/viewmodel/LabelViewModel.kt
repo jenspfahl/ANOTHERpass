@@ -18,12 +18,12 @@ class LabelViewModel(private val repository: LabelRepository) : ViewModel() {
 
     fun insert(label: EncLabel, context: Context) = viewModelScope.launch {
         repository.insert(label)
-        PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_MODIFIED_AT_AT, context)
+        PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_MODIFIED_AT, context)
     }
 
     fun update(label: EncLabel, context: Context) = viewModelScope.launch {
         repository.update(label)
-        PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_MODIFIED_AT_AT, context)
+        PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_MODIFIED_AT, context)
     }
 
     fun delete(label: EncLabel)  = viewModelScope.launch {

@@ -1,7 +1,6 @@
 package de.jepfa.yapm.ui.credential
 
 import android.app.Activity
-import androidx.appcompat.app.AlertDialog
 import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
@@ -11,6 +10,7 @@ import android.os.Bundle
 import android.view.*
 import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
@@ -22,17 +22,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
 import de.jepfa.yapm.service.PreferenceService.PREF_CREDENTIAL_SORT_ORDER
-import de.jepfa.yapm.service.PreferenceService.PREF_DONT_SHOW_EXPORT_VAULT_REMINDER
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_CREDENTIAL_IDS
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.notification.ReminderService
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
 import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
 import de.jepfa.yapm.service.secret.SecretService
@@ -136,7 +135,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
 
-        showReminders(navigationView)
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -147,6 +145,10 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     override fun onResume() {
         super.onResume()
         listCredentialAdapter?.notifyDataSetChanged()
+        val showed = ReminderService.showReminders(ReminderService.Vault, navigationView, this)
+        if (!showed) {
+            ReminderService.showReminders(ReminderService.MasterKey, navigationView, this)
+        }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -594,19 +596,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             return CredentialSortOrder.valueOf(sortOrderAsString)
         }
         return CredentialSortOrder.DEFAULT
-    }
-
-    private fun showReminders(v: View) {
-        Snackbar.make(v, "Your vault wasn't exported for backup after recent modifications.", 10_000)
-            .setAction("Export vault") {
-                val intent = Intent(this, ExportVaultActivity::class.java)
-                startActivity(intent)
-            }
-            .setAction("Don't ask again") {
-                //PreferenceService.putBoolean(PREF_DONT_SHOW_EXPORT_VAULT_REMINDER, true, this)
-                toastText(this, "You can manage this reminder in the Settings")
-            }
-          //  .show()
     }
 
     fun deleteCredential(credential: EncCredential) {

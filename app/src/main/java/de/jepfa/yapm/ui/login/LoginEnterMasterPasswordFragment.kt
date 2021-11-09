@@ -121,6 +121,8 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         else if (isFastLoginWithNfcTag()) {
             scanNfcImageView.performClick()
         }
+
+        getBaseActivity()?.hideKeyboard(masterPasswdTextView)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

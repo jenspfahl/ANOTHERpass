@@ -17,10 +17,10 @@ object PreferenceService {
     private const val ACTION_PREFIX = "YAPM/action:"
 
     /**
-     * If you add new preference xml files inside #initDefaults, they should be recognised as well.
+     * TODO If you add new preference xml files inside #initDefaults, they should be recognised as well.
      * To achieve this, count the version value up here.
      */
-    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_4"
+    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_6"
 
     const val STATE_DEFAULT_INIT_DONE = STATE_PREFIX + "default_init_done"
 
@@ -34,9 +34,19 @@ object PreferenceService {
     const val DATA_VAULT_VERSION = DATA_PREFIX + "vault_version"
     const val DATA_VAULT_CREATED_AT = DATA_PREFIX + "vault_created_at"
     const val DATA_VAULT_IMPORTED_AT = DATA_PREFIX + "vault_imported_at"
+
     const val DATA_VAULT_EXPORTED_AT = DATA_PREFIX + "vault_exported_at"
+    const val DATA_VAULT_MODIFIED_AT = DATA_PREFIX + "vault_modified_at"
     const val DATA_VAULT_EXPORT_NOTIFICATION_SHOWED_AT = DATA_PREFIX + "vault_export_notification_showed_at"
-    const val DATA_VAULT_MODIFIED_AT_AT = DATA_PREFIX + "vault_modified_at"
+    const val DATA_VAULT_EXPORT_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "vault_export_notification_showed_as"
+    const val PREF_SHOW_EXPORT_VAULT_REMINDER = PREF_PREFIX + "show_export_vault_reminder"
+
+
+    const val DATA_MK_EXPORTED_AT = DATA_PREFIX + "mk_exported_at"
+    const val DATA_MK_MODIFIED_AT = DATA_PREFIX + "mk_modified_at"
+    const val DATA_MK_EXPORT_NOTIFICATION_SHOWED_AT = DATA_PREFIX + "mk_export_notification_showed_at"
+    const val DATA_MK_EXPORT_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "mk_export_notification_showed_as"
+    const val PREF_SHOW_EXPORT_MK_REMINDER = PREF_PREFIX + "show_export_mk_reminder"
 
     const val PREF_MAX_LOGIN_ATTEMPTS = PREF_PREFIX + "max_login_attempts"
     const val PREF_SELF_DESTRUCTION = PREF_PREFIX + "drop_vault_if_login_declined"
@@ -75,7 +85,6 @@ object PreferenceService {
     const val PREF_SHOW_CREDENTIAL_IDS = PREF_PREFIX + "show_credential_ids"
 
     const val PREF_DARK_MODE = PREF_PREFIX + "dark_mode"
-    const val PREF_DONT_SHOW_EXPORT_VAULT_REMINDER = PREF_PREFIX + "dont show export vault reminder"
 
 
     fun initDefaults(context: Context?) {
@@ -176,9 +185,9 @@ object PreferenceService {
         editor.apply()
     }
 
-    fun deleteAllStates(context: Context) {
-        val allStates = getDefault(context).all
-            .filter { (k, _) -> k.startsWith(STATE_PREFIX) }
+    fun deleteAllData(context: Context) {
+        getDefault(context).all
+            .filter { (k, _) -> k.startsWith(DATA_PREFIX) }
             .forEach { (k, _) -> delete(k, context)}
     }
 

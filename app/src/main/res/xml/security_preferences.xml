@@ -29,4 +29,22 @@
         app:singleLineTitle="false"
         app:defaultValue="false"/>
 
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:show_export_vault_reminder"
+        app:title="@string/show_export_vault_reminder"
+        app:summary="@string/summary_show_export_vault_reminder"
+        app:allowDividerAbove="true"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:defaultValue="true"/>
+
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:show_export_mk_reminder"
+        app:title="@string/show_export_mk_reminder"
+        app:summary="@string/summary_show_export_mk_reminder"
+        app:allowDividerAbove="false"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:defaultValue="true"/>
+
 </PreferenceScreen>

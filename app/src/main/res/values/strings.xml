@@ -74,7 +74,7 @@
     <string name="store_master_password">Store master password on this device</string>
     <string name="create_vault_summarize_fragment_label">Create Vault 3/3</string>
     <string name="login_explanation_1">Enter your pin to login into your vault.</string>
-    <string name="login_explanation_2">Scan your Encrypted Master Password or your Master Password Token to login into your vault by clicking on the QR-code or NFC icon. If you have noted it, enter it here manually.</string>
+    <string name="login_explanation_2">Scan your Encrypted Master Password or your Master Password Token by clicking on the QR-code or NFC icon. If you have noted it, enter it here manually.</string>
     <string name="enter_or_scan_masterpassword">Enter or scan your master password</string>
     <string name="button_login">Login</string>
     <string name="password_required">Password required</string>
@@ -92,7 +92,8 @@
     <string name="export_credential_desc">Export credential to either backup, outsource or share it.</string>
     <string name="export_masterkey">Export master key</string>
     <string name="export_masterpasswd">Export master password</string>
-    <string name="export_vault">Export vault as file</string>
+    <string name="export_vault">Export vault</string>
+    <string name="export_vault_as_file">Export vault as file</string>
     <string name="qrc_download_as_img">Save QR code as image</string>
     <string name="download_as_nfc_tag">Push as NFC tag</string>
     <string name="export_vault_explanation">Here you can share or export your complete vault into a file for backup purposes. Use this file to import your vault after a fresh new app installation without data. You have the choice to include or exclude the Encrypted Master Key. If you exclude it, export the master key by your own and store it on a safe place. You need it to import the vault file. The separation of Encrypted Master Key and vault file might be sense to make the vault file useless for hackers even if they guess your pin and master password.</string>
@@ -376,5 +377,13 @@
     <string name="cannot_share_qr_code">Unable to share this QR code</string>
     <string name="cannot_share_vault">Unable to share the vault file</string>
     <string name="hint_store_qr_as_file">Please note if you store sensitive QR codes in your device storage, other apps could access these codes as well.</string>
+    <string name="show_export_vault_reminder">Reminder to export vault</string>
+    <string name="summary_show_export_vault_reminder">Show a reminder when the vault has changed and needs to be exported.</string>
+    <string name="show_export_mk_reminder">Reminder to export Encrypted Master Key</string>
+    <string name="summary_show_export_mk_reminder">Show a reminder when the Encrypted Master Key has changed and needs to be exported.</string>
+    <string name="export_vault_reminder">Vault should be exported after recent modifications.</string>
+    <string name="export_mk_reminder">Master key should be exported after recent modifications.</string>
+    <string name="dont_ask_again">Don\'t ask again</string>
+    <string name="manage_reminder_settings_hint">You can manage reminder under Settings / Security</string>
 
 </resources>

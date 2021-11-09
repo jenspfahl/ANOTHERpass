@@ -23,13 +23,13 @@ class CredentialViewModel(private val repository: CredentialRepository) : ViewMo
     fun insert(credential: EncCredential, context: Context) = viewModelScope.launch {
         credential.touchModify()
         repository.insert(credential)
-        PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_MODIFIED_AT_AT, context)
+        PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_MODIFIED_AT, context)
     }    
 
     fun update(credential: EncCredential, context: Context) = viewModelScope.launch {
         credential.touchModify()
         repository.update(credential)
-        PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_MODIFIED_AT_AT, context)
+        PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_MODIFIED_AT, context)
     }
 
     fun delete(credential: EncCredential)  = viewModelScope.launch {

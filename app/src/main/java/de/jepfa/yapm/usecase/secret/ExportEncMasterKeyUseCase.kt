@@ -41,6 +41,8 @@ object ExportEncMasterKeyUseCase: BasicUseCase<SecureActivity>() {
 
             activity.startActivity(intent)
 
+            PreferenceService.putCurrentDate(PreferenceService.DATA_MK_EXPORTED_AT, activity)
+
             return true
         }
         else {

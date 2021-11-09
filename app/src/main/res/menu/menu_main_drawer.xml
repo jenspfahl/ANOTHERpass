@@ -33,7 +33,7 @@
             <item
                 android:id="@+id/export_vault"
                 android:orderInCategory="50"
-                android:title="@string/export_vault" />
+                android:title="@string/export_vault_as_file" />
         </menu>
     </item>
 

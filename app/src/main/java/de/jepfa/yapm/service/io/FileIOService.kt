@@ -61,14 +61,17 @@ class FileIOService: IntentService("FileIOService") {
     private fun exportVault(intent: Intent) {
         var message: String
         if (FileUtil.isExternalStorageWritable()) {
-            val includeMasterkey = intent.getBooleanExtra(PARAM_INCLUDE_MK, false)
+            val includeMasterKey = intent.getBooleanExtra(PARAM_INCLUDE_MK, false)
             val includePreferences = intent.getBooleanExtra(PARAM_INCLUDE_PREFS, false)
             val uri = intent.getParcelableExtra<Uri>(PARAM_FILE_URI)
-            val success = createVaultFile(applicationContext, getApp(), includeMasterkey, includePreferences, uri)
+            val success = createVaultFile(applicationContext, getApp(), includeMasterKey, includePreferences, uri)
 
             if (success) {
                 message = getString(R.string.backup_file_saved)
                 PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_EXPORTED_AT, applicationContext)
+                if (includeMasterKey) {
+                    PreferenceService.putCurrentDate(PreferenceService.DATA_MK_EXPORTED_AT, applicationContext)
+                }
             }
             else {
                 message = getString(R.string.backup_failed)

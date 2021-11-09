@@ -23,7 +23,7 @@ object DropVaultUseCase: BasicUseCase<SecureActivity>() {
 
     fun dropVaultData(activity: BaseActivity) {
 
-        PreferenceService.deleteAllStates(activity)
+        PreferenceService.deleteAllData(activity)
         LabelService.clearAll()
         CoroutineScope(Dispatchers.IO).launch {
             activity.getApp().database?.clearAllTables()

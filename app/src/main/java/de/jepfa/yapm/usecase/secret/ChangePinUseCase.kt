@@ -56,7 +56,7 @@ object ChangePinUseCase: InputUseCase<ChangePinUseCase.Input, SecureActivity>() 
             cipherAlgorithm,
             activity
         )
-        PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_MODIFIED_AT_AT, activity)
+        PreferenceService.putCurrentDate(PreferenceService.DATA_MK_MODIFIED_AT, activity)
 
         return LoginUseCase.execute(LoginData(input.newPin, masterPassword), activity).success
     }
