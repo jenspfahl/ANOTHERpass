@@ -101,7 +101,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
             val encPin = Encrypted.fromBase64String(encPinBase64)
             val masterPin = SecretService.decryptPassword(keyForTemp, encPin)
 
-            login( masterPin, masterPassword, switchStorePasswd.isChecked, loginActivity)
+            login(masterPin, masterPassword, switchStorePasswd.isChecked, loginActivity)
         }
 
         val scannedNdefTag = loginActivity.ndefTag?.data

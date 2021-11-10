@@ -6,6 +6,9 @@ import android.widget.Button
 import androidx.appcompat.widget.SwitchCompat
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.session.Session
+import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.PREF_INCLUDE_MASTER_KEY_IN_BACKUP_FILE
+import de.jepfa.yapm.service.PreferenceService.PREF_INCLUDE_SETTINGS_IN_BACKUP_FILE
 import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
@@ -36,7 +39,20 @@ class ExportVaultActivity : SecureActivity() {
         setContentView(R.layout.activity_export_vault)
 
         includeMasterKeySwitch = findViewById(R.id.switch_include_enc_masterkey)
+        includeMasterKeySwitch.isChecked = PreferenceService.getAsBool(
+            PREF_INCLUDE_MASTER_KEY_IN_BACKUP_FILE, true, this)
+        includeMasterKeySwitch.setOnClickListener {
+            PreferenceService.putBoolean(
+                PREF_INCLUDE_MASTER_KEY_IN_BACKUP_FILE, includeMasterKeySwitch.isChecked, this)
+        }
+
         includePrefsSwitch = findViewById(R.id.switch_include_prefs)
+        includePrefsSwitch.isChecked = PreferenceService.getAsBool(
+            PREF_INCLUDE_SETTINGS_IN_BACKUP_FILE, true, this)
+        includePrefsSwitch.setOnClickListener {
+            PreferenceService.putBoolean(
+                PREF_INCLUDE_SETTINGS_IN_BACKUP_FILE, includePrefsSwitch.isChecked, this)
+        }
 
         findViewById<Button>(R.id.button_export_vault).setOnClickListener {
             masterSecretKey?.let{ key ->

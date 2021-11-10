@@ -86,6 +86,10 @@ object PreferenceService {
 
     const val PREF_DARK_MODE = PREF_PREFIX + "dark_mode"
 
+    const val PREF_INCLUDE_MASTER_KEY_IN_BACKUP_FILE = PREF_PREFIX + "include_master_key_in_backup_file"
+    const val PREF_INCLUDE_SETTINGS_IN_BACKUP_FILE = PREF_PREFIX + "include_settings_in_backup_file"
+
+
 
     fun initDefaults(context: Context?) {
         if (context == null) return
@@ -124,6 +128,11 @@ object PreferenceService {
     fun getAsBool(prefKey: String, context: Context?): Boolean {
         if (context == null) return false
         return getDefault(context).getBoolean(prefKey, false)
+    }
+
+    fun getAsBool(prefKey: String, defaultValue: Boolean, context: Context?): Boolean {
+        if (context == null) return defaultValue
+        return getDefault(context).getBoolean(prefKey, defaultValue)
     }
 
     fun getAsString(prefKey: String, context: Context?): String? {
