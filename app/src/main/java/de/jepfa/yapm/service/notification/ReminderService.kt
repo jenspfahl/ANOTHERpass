@@ -24,6 +24,8 @@ import java.util.*
 
 object ReminderService {
 
+    const val SHOW_AFTER_SECONDS = 60 * 10 // 10 minutes
+
     interface ReminderConfig {
         val prefShowReminder: String
         val dataNotificationShowedAt: String
@@ -72,7 +74,7 @@ object ReminderService {
         val notificationShowedAt = PreferenceService.getAsDate(config.dataNotificationShowedAt, activity)
         val vaultModifiedAt = PreferenceService.getAsDate(config.dataTargetModifiedAt, activity)
         val vaultExportedAt = PreferenceService.getAsDate(config.dataTargetExportedAt, activity)
-        if (dateOlderThanSeconds(notificationShowedAt, 30) && dateOlderThan(vaultExportedAt, vaultModifiedAt)) {
+        if (dateOlderThanSeconds(notificationShowedAt, SHOW_AFTER_SECONDS) && dateOlderThan(vaultExportedAt, vaultModifiedAt)) {
             val snackBar = Snackbar.make(
                 view,
                 config.notificationText,

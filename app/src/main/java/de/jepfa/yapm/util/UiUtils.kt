@@ -12,6 +12,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import com.google.android.material.resources.TextAppearance
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.ui.label.Label
 
@@ -49,8 +50,10 @@ fun createAndAddLabelChip(
         chip.ensureAccessibleTouchTarget(32)
     }
     context?.let {
-        chip.chipBackgroundColor = ColorStateList.valueOf(label.getColor(it))
-        chip.setTextColor(it.getColor(android.R.color.white))
+        if (label.labelId != -1) {
+            chip.chipBackgroundColor = ColorStateList.valueOf(label.getColor(it))
+            chip.setTextColor(it.getColor(android.R.color.white))
+        }
     }
     container.addView(chip)
     return chip

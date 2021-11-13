@@ -242,7 +242,7 @@
     <string name="masterpassword_removed">Stored master password removed from device</string>
     <string name="title_drop_vault">Drop vault</string>
     <string name="message_drop_vault">You are going to delete ALL your credentials and login data.</string>
-    <string name="deselect_all">Reset</string>
+    <string name="reset_all">None / All</string>
     <string name="title_copy_password">Copy password</string>
     <string name="message_copy_password">Copying passwords to clipboard may leak your password since any other app can listen to clipboard changes and read from it. Further it can remain there when you use a clipboard with history function (e.g. Samsung). " Use 'Privacy/Test C&amp;P password' to figure out if someone reads the clipboard beside you. You can disable this warning in 'Settings/Security'.</string>
     <string name="head_generate_mpt">Your Master Password Token \#%1$d</string>
@@ -385,5 +385,6 @@
     <string name="export_mk_reminder">Master key should be exported after recent modifications.</string>
     <string name="dont_ask_again">Don\'t ask again</string>
     <string name="manage_reminder_settings_hint">You can manage reminder under Settings / Security</string>
+    <string name="no_label">WITH NO LABELS</string>
 
 </resources>

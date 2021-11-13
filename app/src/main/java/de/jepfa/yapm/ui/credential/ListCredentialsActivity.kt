@@ -30,6 +30,7 @@ import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
 import de.jepfa.yapm.service.PreferenceService.PREF_CREDENTIAL_SORT_ORDER
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_CREDENTIAL_IDS
 import de.jepfa.yapm.service.label.LabelFilter
+import de.jepfa.yapm.service.label.LabelFilter.WITH_NO_LABELS_ID
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.notification.ReminderService
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
@@ -42,6 +43,7 @@ import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
 import de.jepfa.yapm.ui.exportvault.ExportVaultActivity
 import de.jepfa.yapm.ui.importread.ImportCredentialActivity
 import de.jepfa.yapm.ui.importread.VerifyActivity
+import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.ui.label.ListLabelsActivity
 import de.jepfa.yapm.ui.settings.SettingsActivity
 import de.jepfa.yapm.usecase.*
@@ -144,7 +146,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     override fun onResume() {
         super.onResume()
-        listCredentialAdapter?.notifyDataSetChanged()
         val showed = ReminderService.showReminders(ReminderService.Vault, navigationView, this)
         if (!showed) {
             ReminderService.showReminders(ReminderService.MasterKey, navigationView, this)
@@ -220,17 +221,20 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 val labelsView: View = inflater.inflate(R.layout.content_dynamic_labels_list, null)
                 val labelsContainer: LinearLayout = labelsView.findViewById(R.id.dynamic_labels)
 
-                val allLabels = LabelService.getAllLabels()
+                val allLabels = ArrayList<Label>()
+                val noLabel = Label(WITH_NO_LABELS_ID, getString(R.string.no_label), "", null)
+                allLabels.add(noLabel)
+                allLabels.addAll(LabelService.getAllLabels())
                 val allChips = ArrayList<Chip>(allLabels.size)
 
-                allLabels.forEachIndexed { idx, label ->
+                allLabels.forEachIndexed { _, label ->
                     val chip = createAndAddLabelChip(label, labelsContainer, thinner = false, this)
                     chip.isClickable = true
                     chip.isCheckable = true
                     chip.isChecked = LabelFilter.isFilterFor(label)
                     allChips.add(chip)
                 }
-                val builder = androidx.appcompat.app.AlertDialog.Builder(this)
+                val builder = AlertDialog.Builder(this)
                 val container = ScrollView(builder.context)
                 container.addView(labelsView)
 
@@ -238,7 +242,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     .setTitle(getString(R.string.filter))
                     .setIcon(R.drawable.ic_baseline_filter_list_24)
                     .setView(container)
-                    .setNeutralButton(getString(R.string.deselect_all), null)
+                    .setNeutralButton(getString(R.string.reset_all), null)
                     .setPositiveButton(android.R.string.ok, null)
                     .setNegativeButton(android.R.string.cancel, null)
                     .create()
@@ -251,7 +255,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                             val checked = allChips[i].isChecked
                             val labelId = allLabels[i].labelId
                             if (labelId != null) {
-                                val label = LabelService.lookupByLabelId(labelId)
+                                val label =
+                                    if (labelId == WITH_NO_LABELS_ID) noLabel
+                                    else LabelService.lookupByLabelId(labelId)
                                 if (label != null) {
                                     if (checked) {
                                         LabelFilter.setFilterFor(label)
@@ -274,7 +280,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
                     val buttonNeutral = dialog.getButton(AlertDialog.BUTTON_NEUTRAL)
                     buttonNeutral.setOnClickListener {
-                        allChips.forEach { it.isChecked = false }
+                        val nonSelected = allChips.none { it.isChecked }
+                        allChips.forEach { it.isChecked = nonSelected }
                     }
                 }
 

@@ -198,28 +198,27 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             override fun publishResults(charSequence: CharSequence, filterResults: FilterResults) {
                 val pubCredentials = filterResults.values as List<EncCredential?>
                 submitList(pubCredentials)
-
-                // refresh the list with filtered data
-                notifyDataSetChanged()
             }
 
-
-            private fun filterByLabels(key: SecretKeyHolder?, credentials: List<EncCredential>): List<EncCredential> {
-                key ?: return credentials
-                return credentials
-                    .filter {
-                        val labels = LabelService.decryptLabelsForCredential(key, it)
-                        LabelFilter.isFilterFor(labels)
-                    }
-                    .toList()
-            }
         }
     }
 
     fun submitOriginList(list: List<EncCredential>) {
         originList = list
-        submitList(list)
+        val key = listCredentialsActivity.masterSecretKey
+        val filteredList = filterByLabels(key, list)
+        submitList(filteredList)
 
+    }
+
+    private fun filterByLabels(key: SecretKeyHolder?, credentials: List<EncCredential>): List<EncCredential> {
+        key ?: return credentials
+        return credentials
+            .filter {
+                val labels = LabelService.decryptLabelsForCredential(key, it)
+                LabelFilter.isFilterFor(labels)
+            }
+            .toList()
     }
 
     class CredentialViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
