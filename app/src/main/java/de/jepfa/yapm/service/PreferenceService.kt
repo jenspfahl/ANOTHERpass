@@ -89,6 +89,7 @@ object PreferenceService {
     const val PREF_INCLUDE_MASTER_KEY_IN_BACKUP_FILE = PREF_PREFIX + "include_master_key_in_backup_file"
     const val PREF_INCLUDE_SETTINGS_IN_BACKUP_FILE = PREF_PREFIX + "include_settings_in_backup_file"
 
+    const val DATA_USED_LABEL_FILTER = DATA_PREFIX + "used_label_filter"
 
 
     fun initDefaults(context: Context?) {

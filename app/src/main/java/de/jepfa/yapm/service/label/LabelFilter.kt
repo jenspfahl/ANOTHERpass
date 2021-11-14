@@ -1,40 +1,57 @@
 package de.jepfa.yapm.service.label
 
+import android.content.Context
+import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.DATA_USED_LABEL_FILTER
 import de.jepfa.yapm.ui.label.Label
 import java.util.concurrent.ConcurrentHashMap
 
 object LabelFilter {
     const val WITH_NO_LABELS_ID = -1
 
-    private val filterByLabelNames: MutableMap<String, Label> = ConcurrentHashMap(32)
+    private val filterByLabelIds: MutableMap<Int, Label> = ConcurrentHashMap(32)
     private var filterByNoLabels = false
 
+    fun initState(context: Context, allLabels: List<Label>) {
+        val idsAsString = PreferenceService.getAsStringSet(DATA_USED_LABEL_FILTER, context)
+        val ids = idsAsString?.map { it.toInt() }
+        ids?.forEach { id ->
+            if (id == WITH_NO_LABELS_ID) {
+                filterByNoLabels = true
+            }
+            val label = allLabels.find { it.labelId == id }
+            if (label != null) {
+                filterByLabelIds.putIfAbsent(id, label)
+            }
+        }
+    }
+
+    fun persistState(context: Context) {
+        val idsAsString = filterByLabelIds.keys.map { it.toString() }.toSet()
+        PreferenceService.putStringSet(DATA_USED_LABEL_FILTER, idsAsString, context)
+    }
 
     fun setFilterFor(label: Label) {
         if (isAssociatedWithNoLabels(label)) {
             filterByNoLabels = true
         }
-        else {
-            filterByLabelNames.put(label.name, label)
-        }
+        label.labelId?.let { filterByLabelIds.put(it, label) }
     }
 
     fun unsetFilterFor(label: Label) {
         if (isAssociatedWithNoLabels(label)) {
             filterByNoLabels = false
         }
-        else {
-            filterByLabelNames.remove(label.name)
-        }
+        label.labelId?.let { filterByLabelIds.remove(it, label) }
     }
 
     fun unsetAllFilters() {
         filterByNoLabels = false
-        filterByLabelNames.clear()
+        filterByLabelIds.clear()
     }
 
     fun hasFilters(): Boolean {
-        return !filterByLabelNames.none() || filterByNoLabels == true
+        return !filterByLabelIds.none()
     }
 
     fun isFilterFor(labels: Collection<Label>): Boolean {
@@ -45,7 +62,7 @@ object LabelFilter {
     }
 
     fun isFilterFor(label: Label): Boolean {
-        return filterByLabelNames.containsKey(label.name) || (isAssociatedWithNoLabels(label) && filterByNoLabels)
+        return filterByLabelIds.containsKey(label.labelId) || (isAssociatedWithNoLabels(label) && filterByNoLabels)
     }
 
     private fun isAssociatedWithNoLabels(label: Label) =

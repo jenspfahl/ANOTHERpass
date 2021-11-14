@@ -92,6 +92,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         labelViewModel.allLabels.observe(this, { labels ->
             masterSecretKey?.let{ key ->
                 LabelService.initLabels(key, labels.toSet())
+                LabelFilter.initState(this, LabelService.getAllLabels())
             }
         })
 
@@ -268,6 +269,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                             }
                         }
 
+                        LabelFilter.persistState(this)
                         listCredentialAdapter?.filter?.filter("")
                         refreshMenuFiltersItem(item)
                         dialog.dismiss()
@@ -293,7 +295,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 val prefSortOrder = getPrefSortOrder()
                 val listItems = CredentialSortOrder.values().map { getString(it.labelId) }.toTypedArray()
 
-                androidx.appcompat.app.AlertDialog.Builder(this)
+                AlertDialog.Builder(this)
                     .setIcon(R.drawable.ic_baseline_sort_24)
                     .setTitle(R.string.sort_order)
                     .setSingleChoiceItems(listItems, prefSortOrder.ordinal) { dialogInterface, i ->
@@ -313,7 +315,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             R.id.menu_show_ids -> {
                 PreferenceService.toggleBoolean(PREF_SHOW_CREDENTIAL_IDS, this)
                 refreshMenuShowIdsItem(item)
-                refreshCredentials()
+                listCredentialAdapter?.notifyDataSetChanged()
                 return true
             }
             else -> super.onOptionsItemSelected(item)
