@@ -93,7 +93,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             masterSecretKey?.let{ key ->
                 LabelService.initLabels(key, labels.toSet())
                 LabelFilter.initState(this, LabelService.getAllLabels())
-                listCredentialAdapter?.notifyDataSetChanged()
+                if (LabelFilter.hasFilters()) {
+                    refreshCredentials()
+                }
             }
         })
 
