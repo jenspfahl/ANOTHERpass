@@ -93,6 +93,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             masterSecretKey?.let{ key ->
                 LabelService.initLabels(key, labels.toSet())
                 LabelFilter.initState(this, LabelService.getAllLabels())
+                listCredentialAdapter?.notifyDataSetChanged()
             }
         })
 
@@ -198,6 +199,13 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         refreshMenuLockItem(menu.findItem(R.id.menu_lock_items))
         refreshMenuFiltersItem(menu.findItem(R.id.menu_filter))
         refreshMenuShowIdsItem(menu.findItem(R.id.menu_show_ids))
+
+
+        labelViewModel.allLabels.observe(this, { labels ->
+            masterSecretKey?.let{ key ->
+                refreshMenuFiltersItem(menu.findItem(R.id.menu_filter))
+            }
+        })
 
         return super.onCreateOptionsMenu(menu)
     }

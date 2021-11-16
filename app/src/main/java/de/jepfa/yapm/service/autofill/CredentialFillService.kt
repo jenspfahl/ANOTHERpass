@@ -19,6 +19,7 @@ class CredentialFillService: AutofillService() {
     ) {
 
         if (cancellationSignal.isCanceled) {
+            fillCallback.onSuccess(null)
             return
         }
 
@@ -27,9 +28,8 @@ class CredentialFillService: AutofillService() {
 
         val fillResponse = createFillResponse(structure,
             allowCreateAuthentication = true, context = applicationContext)
-        fillResponse?.let {
-            fillCallback.onSuccess(it)
-        }
+
+        fillCallback.onSuccess(fillResponse)
 
     }
 

@@ -13,12 +13,18 @@
         <entry key="app/src/main/res/drawable/ic_baseline_edit_16.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_filter_list_24.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_filter_list_24_white.xml" value="0.19895833333333332" />
+        <entry key="app/src/main/res/drawable/ic_baseline_filter_list_with_with_dot_24dp.xml" value="0.321875" />
         <entry key="app/src/main/res/drawable/ic_baseline_fitness_center_16.xml" value="0.19895833333333332" />
+        <entry key="app/src/main/res/drawable/ic_baseline_help_outline_24.xml" value="0.12916666666666668" />
+        <entry key="app/src/main/res/drawable/ic_baseline_help_outline_24_white.xml" value="0.12916666666666668" />
         <entry key="app/src/main/res/drawable/ic_baseline_import_export_24.xml" value="0.19895833333333332" />
+        <entry key="app/src/main/res/drawable/ic_baseline_label_24.xml" value="0.12916666666666668" />
         <entry key="app/src/main/res/drawable/ic_baseline_nfc_24.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_nfc_36.xml" value="0.321875" />
         <entry key="app/src/main/res/drawable/ic_baseline_nfc_48.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_nfc_64.xml" value="0.19895833333333332" />
+        <entry key="app/src/main/res/drawable/ic_baseline_north_east_24.xml" value="0.12916666666666668" />
+        <entry key="app/src/main/res/drawable/ic_baseline_person_24.xml" value="0.12916666666666668" />
         <entry key="app/src/main/res/drawable/ic_baseline_qr_code_24.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_qr_code_24_white.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_qr_code_36.xml" value="0.20416666666666666" />
