@@ -15,7 +15,7 @@ The motivation for this app was curiosity of how encryption works, how to implem
 >* no internet connection needed, all is offline
 >* export and import credential vault
 >* share and outsource credentials
->* obfuscate credentials
+>* obfuscate passwords
 >* self desctruction mode
 
 For more information see [https://anotherpass.jepfa.de](https://anotherpass.jepfa.de)
