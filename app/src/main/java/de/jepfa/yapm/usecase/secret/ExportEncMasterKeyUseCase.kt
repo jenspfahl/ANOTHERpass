@@ -3,6 +3,7 @@ package de.jepfa.yapm.usecase.secret
 import android.content.Intent
 import de.jepfa.yapm.R
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
@@ -17,8 +18,8 @@ object ExportEncMasterKeyUseCase: BasicUseCase<SecureActivity>() {
         val key = activity.masterSecretKey
         if (key != null && encStoredMasterKey != null) {
 
-            val mkKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
-            val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
+            val mkKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_MK, activity)
+            val tempKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, activity)
             val encMasterKey = SecretService.decryptEncrypted(mkKey, encStoredMasterKey)
 
             val encHead = SecretService.encryptCommonString(

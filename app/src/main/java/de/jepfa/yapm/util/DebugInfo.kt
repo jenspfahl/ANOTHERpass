@@ -7,6 +7,7 @@ import de.jepfa.yapm.database.YapmDatabase
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_CIPHER_ALGORITHM
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_VERSION
+import de.jepfa.yapm.service.biometrix.BiometricUtils
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.util.Constants.UNKNOWN_VAULT_VERSION
@@ -52,12 +53,16 @@ object DebugInfo {
         sb.addFormattedLine("Product", Build.PRODUCT)
         sb.addFormattedLine("NFC available", NfcService.isNfcAvailable(context))
         sb.addFormattedLine("NFC enabled", NfcService.isNfcEnabled(context))
+        sb.addFormattedLine("Has StrongBox support", SecretService.hasStrongBoxSupport(context))
+        sb.addFormattedLine("Has biometrics support", BiometricUtils.isHardwareSupported(context))
+        sb.addFormattedLine("Is fingerprint enroled", BiometricUtils.isFingerprintAvailable(context))
 
         sb.append("\n************ PERMISSIONS ************\n")
         sb.addFormattedLine("Read Storage granted", PermissionChecker.hasReadStoragePermissions(context))
         sb.addFormattedLine("Read/write storage granted", PermissionChecker.hasRWStoragePermissions(context))
         sb.addFormattedLine("Overlay dialog granted", PermissionChecker.hasOverlayPermission(context))
         sb.addFormattedLine("Camera granted", PermissionChecker.hasCameraPermission(context))
+        sb.addFormattedLine("Biometric granted", BiometricUtils.isPermissionGranted(context))
 
         sb.append("\n************ FIRMWARE ************\n")
         sb.addFormattedLine("SDK", Build.VERSION.SDK)

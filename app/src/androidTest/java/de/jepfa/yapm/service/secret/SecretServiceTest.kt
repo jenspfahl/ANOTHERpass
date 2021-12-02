@@ -1,7 +1,9 @@
 package de.jepfa.yapm.service.secret
 
+import android.content.Context
 import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.secret.Password
 import org.junit.Assert
@@ -13,8 +15,12 @@ class SecretServiceTest {
 
     val TAG = "YAPM/SS"
 
+    lateinit var context: Context
+
     @Test
     fun bootstrap() {
+        context = InstrumentationRegistry.getInstrumentation().context
+
         val salt = SecretService.generateRandomKey(32)
         val cipherAlgorithm = CipherAlgorithm.CHACHACHA20
         Log.i(TAG, "salt=${salt.debugToString()}")
@@ -24,7 +30,7 @@ class SecretServiceTest {
         val masterPassword = Password("h9w4mlwmaf") // generated and securelly stored by the user (owning)
 
         // optionally store masterPassword encrypted in the app4
-        val androidSecretKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
+        val androidSecretKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_MK, context)
         val encMasterPassword = SecretService.encryptPassword(androidSecretKey, masterPassword)
         Log.i(TAG, "encMasterPassword=${encMasterPassword.debugToString()}")
 

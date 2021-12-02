@@ -4,6 +4,7 @@ import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.TempFileService
+import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.MasterKeyService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
@@ -28,9 +29,10 @@ object LoginUseCase: InputUseCase<LoginData, BaseActivity>() {
             masterPassPhraseSK,
             salt,
             encMasterKey,
-            useLegacyGeneration
+            useLegacyGeneration,
+            baseActivity
         ) ?: return false
-        val key = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
+        val key = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, baseActivity)
         val encMasterPassword = SecretService.encryptPassword(key, loginData.masterPassword)
         Session.login(masterSecretKey, encMasterPassword)
         Session.setTimeouts(

@@ -6,6 +6,7 @@ import com.google.gson.JsonObject
 import de.jepfa.yapm.model.encrypted.*
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.VaultExportService
+import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
@@ -55,7 +56,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, BaseActivity>(
         )
 
         if (encMasterKey != null) {
-            val keyForMK = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
+            val keyForMK = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_MK, activity)
             val encEncryptedMasterKey = SecretService.encryptEncrypted(
                 keyForMK, Encrypted.fromBase64String(
                     encMasterKey

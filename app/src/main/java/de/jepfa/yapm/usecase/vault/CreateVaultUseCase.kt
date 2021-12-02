@@ -1,5 +1,6 @@
 package de.jepfa.yapm.usecase.vault
 
+import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.service.PreferenceService
@@ -10,6 +11,7 @@ import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.usecase.InputUseCase
 import de.jepfa.yapm.usecase.session.LoginUseCase
 import de.jepfa.yapm.util.Constants
+import de.jepfa.yapm.util.toastText
 
 object CreateVaultUseCase: InputUseCase<CreateVaultUseCase.Input, BaseActivity>() {
 
@@ -30,9 +32,6 @@ object CreateVaultUseCase: InputUseCase<CreateVaultUseCase.Input, BaseActivity>(
         )
         masterKey.clear()
 
-        if (input.storeMasterPasswd) {
-            MasterPasswordService.storeMasterPassword(input.loginData.masterPassword, activity)
-        }
         PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_CREATED_AT, activity)
         PreferenceService.putString(
             PreferenceService.DATA_VAULT_VERSION,
@@ -45,7 +44,22 @@ object CreateVaultUseCase: InputUseCase<CreateVaultUseCase.Input, BaseActivity>(
             activity
         )
 
-        return LoginUseCase.execute(input.loginData, activity).success
+        if (input.storeMasterPasswd) {
+            MasterPasswordService.storeMasterPassword(input.loginData.masterPassword, activity,
+                {
+                    toastText(activity, R.string.masterpassword_stored)
+                    LoginUseCase.execute(input.loginData, activity)
+                },
+                {
+                    toastText(activity, R.string.masterpassword_not_stored)
+                    LoginUseCase.execute(input.loginData, activity)
+                })
+
+            return true
+        }
+        else {
+            return LoginUseCase.execute(input.loginData, activity).success
+        }
     }
 
 }

@@ -1,6 +1,8 @@
 package de.jepfa.yapm.service.secret
 
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Log
@@ -13,6 +15,7 @@ import de.jepfa.yapm.model.encrypted.EncryptedType
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.biometrix.BiometricUtils
 import java.security.*
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -27,12 +30,6 @@ import javax.crypto.spec.SecretKeySpec
  * Service containing all base functionality for en-/decryption
  */
 object SecretService {
-
-    val ALIAS_KEY_TRANSPORT = "YAPM/keyAlias:TRANS"
-    val ALIAS_KEY_SALT = "YAPM/keyAlias:SALT"
-    val ALIAS_KEY_MK = "YAPM/keyAlias:MK"
-    val ALIAS_KEY_MP = "YAPM/keyAlias:MP"
-    val ALIAS_KEY_MP_TOKEN = "YAPM/keyAlias:MPT"
 
     private val ANDROID_KEY_STORE = "AndroidKeyStore"
 
@@ -144,6 +141,11 @@ object SecretService {
         return Encrypted.fromBase64(decryptData(secretKeyHolder, encrypted))
     }
 
+    fun hasStrongBoxSupport(context: Context): Boolean {
+        return context.packageManager
+            .hasSystemFeature(PackageManager.FEATURE_STRONGBOX_KEYSTORE)
+    }
+
     private fun encryptData(type: EncryptedType?, secretKeyHolder: SecretKeyHolder, data: ByteArray): Encrypted {
         val cipher: Cipher = Cipher.getInstance(secretKeyHolder.cipherAlgorithm.cipherName)
 
@@ -188,25 +190,43 @@ object SecretService {
     /*
     Android SK are always AES/GCM/NoPAdding with 128bit
      */
-    fun getAndroidSecretKey(alias: String): SecretKeyHolder {
+    fun getAndroidSecretKey(androidKey: AndroidKey, context: Context): SecretKeyHolder {
         androidKeyStore.load(null)
-        val entry: KeyStore.Entry? = androidKeyStore.getEntry(alias, null)
+        val entry: KeyStore.Entry? = androidKeyStore.getEntry(androidKey.alias, null)
 
-        val sk = (entry as? KeyStore.SecretKeyEntry)?.secretKey ?: initAndroidSecretKey(alias)
+        val sk = (entry as? KeyStore.SecretKeyEntry)?.secretKey ?: initAndroidSecretKey(androidKey, context)
         return SecretKeyHolder(sk, DEFAULT_CIPHER_ALGORITHM)
     }
 
-    private fun initAndroidSecretKey(alias: String): SecretKey {
+    fun removeAndroidSecretKey(androidKey: AndroidKey) {
+        androidKeyStore.load(null)
+        androidKeyStore.deleteEntry(androidKey.alias)
+    }
+
+    private fun initAndroidSecretKey(androidKey: AndroidKey, context: Context): SecretKey {
         val keyGenerator = KeyGenerator
                 .getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE)
 
-        val spec = KeyGenParameterSpec.Builder(alias,
+        val spec = KeyGenParameterSpec.Builder(androidKey.alias,
                 KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
                 .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
                 .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-                .build()
 
-        keyGenerator.init(spec)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            spec
+                .setIsStrongBoxBacked(androidKey.boxed && hasStrongBoxSupport(context))
+                .setUnlockedDeviceRequired(true)
+
+            if (androidKey.requireUserAuth && BiometricUtils.isFingerprintAvailable(context)) {
+                spec
+                    .setUserAuthenticationRequired(true)
+                    .setUserAuthenticationValidityDurationSeconds(-1)
+                    .setInvalidatedByBiometricEnrollment(true)
+
+            }
+        }
+
+        keyGenerator.init(spec.build())
 
         return keyGenerator.generateKey()
     }

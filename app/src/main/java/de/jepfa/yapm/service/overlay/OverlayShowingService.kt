@@ -17,6 +17,7 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_TRANSPARENT_OVERLAY
+import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.getEncryptedExtra
@@ -51,7 +52,7 @@ class OverlayShowingService : Service(), OnTouchListener {
         if (encrypted != null && !Session.isDenied()) {
             val masterKeySK = Session.getMasterKeySK()
             if (masterKeySK != null) {
-                val transSK = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
+                val transSK = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, applicationContext)
                 password = SecretService.decryptPassword(transSK, encrypted)
 
                 val formatted = PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_SHOW_FORMATTED, this)

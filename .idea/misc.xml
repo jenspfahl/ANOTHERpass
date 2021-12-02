@@ -67,6 +67,8 @@
         <entry key="app/src/main/res/layout/nav_header_main.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/recyclerview_credential.xml" value="0.536" />
         <entry key="app/src/main/res/layout/recyclerview_label.xml" value="0.15572916666666667" />
+        <entry key="app/src/main/res/layout/view_biometrix_bottom_sheet.xml" value="0.4" />
+        <entry key="app/src/main/res/layout/view_bottom_sheet.xml" value="0.15572916666666667" />
         <entry key="app/src/main/res/menu/credential_detail_menu_import.xml" value="0.3015625" />
         <entry key="app/src/main/res/menu/list_labels_menu.xml" value="0.3015625" />
         <entry key="app/src/main/res/menu/menu_label_edit.xml" value="0.17864583333333334" />

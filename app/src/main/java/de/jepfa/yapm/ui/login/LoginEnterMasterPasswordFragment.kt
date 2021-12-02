@@ -14,16 +14,15 @@ import de.jepfa.yapm.model.encrypted.EncryptedType.Types.*
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
 import de.jepfa.yapm.service.PreferenceService.PREF_FAST_MASTERPASSWD_LOGIN_WITH_NFC
 import de.jepfa.yapm.service.PreferenceService.PREF_FAST_MASTERPASSWD_LOGIN_WITH_QRC
 import de.jepfa.yapm.service.nfc.NfcService
-import de.jepfa.yapm.service.secret.MasterPasswordService.generateEncMasterPasswdSK
+import de.jepfa.yapm.service.secret.AndroidKey
+import de.jepfa.yapm.service.secret.MasterPasswordService
+import de.jepfa.yapm.service.secret.MasterPasswordService.generateEncMasterPasswdSKForExport
 import de.jepfa.yapm.service.secret.SaltService.getSalt
 import de.jepfa.yapm.service.secret.SecretService
-import de.jepfa.yapm.service.secret.SecretService.ALIAS_KEY_MP_TOKEN
 import de.jepfa.yapm.service.secret.SecretService.decryptKey
-import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.service.secret.SecretService.generateStrongSecretKey
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.ui.BaseFragment
@@ -91,7 +90,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                 return@setOnClickListener
             }
 
-            val keyForTemp = getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
+            val keyForTemp = getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, view.context)
 
             val encPinBase64 = arguments?.getString(CreateVaultActivity.ARG_ENC_PIN)
             if (encPinBase64 == null) {
@@ -146,7 +145,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
 
     private fun readEMP(emp: Encrypted): Boolean {
         val baseActivity = getBaseActivity() ?: return false
-        val empSK = generateEncMasterPasswdSK(baseActivity)
+        val empSK = generateEncMasterPasswdSKForExport(baseActivity)
         val masterPassword =
             SecretService.decryptPassword(empSK, emp)
         if (!masterPassword.isValid()) {
@@ -180,10 +179,10 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
             getBaseActivity()
         )
         encMasterPasswordTokenKey?.let {
-            val masterPasswordTokenSK = getAndroidSecretKey(ALIAS_KEY_MP_TOKEN)
+            val baseActivity = getBaseActivity() ?: return false
+            val masterPasswordTokenSK = getAndroidSecretKey(AndroidKey.ALIAS_KEY_MP_TOKEN, baseActivity)
             val masterPasswordTokenKey =
                 decryptKey(masterPasswordTokenSK, encMasterPasswordTokenKey)
-            val baseActivity = getBaseActivity() ?: return false
             val salt = getSalt(baseActivity)
             val cipherAlgorithm = SecretService.getCipherAlgorithm(baseActivity)
 
@@ -237,24 +236,37 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                         masterPasswdTextView.requestFocus()
                     } else {
                         if (isStoreMasterPassword) {
-                            val keyForMP = getAndroidSecretKey(SecretService.ALIAS_KEY_MP)
-                            val encPasswd = encryptPassword(keyForMP, masterPassword)
-                            val baseActivity = getBaseActivity() ?: return@launch
-
-                            PreferenceService.putEncrypted(DATA_ENCRYPTED_MASTER_PASSWORD, encPasswd, baseActivity)
+                            MasterPasswordService.storeMasterPassword(masterPassword, loginActivity,
+                                {
+                                    cleanupAndLogin(userPin, masterPassword, loginActivity)
+                                    toastText(loginActivity, R.string.masterpassword_stored)
+                                },
+                                {
+                                    cleanupAndLogin(userPin, masterPassword, loginActivity)
+                                    toastText(loginActivity, R.string.masterpassword_not_stored)
+                                })
                         }
-
-                        userPin.clear()
-                        masterPassword.clear()
-                        masterPasswdTextView.setText("")
-                        arguments?.remove(CreateVaultActivity.ARG_ENC_PIN)
-
-                        loginActivity.loginSuccessful()
+                        else {
+                            cleanupAndLogin(userPin, masterPassword, loginActivity)
+                        }
                     }
                 }
 
         }
 
+    }
+
+    private fun cleanupAndLogin(
+        userPin: Password,
+        masterPassword: Password,
+        loginActivity: LoginActivity
+    ) {
+        userPin.clear()
+        masterPassword.clear()
+        masterPasswdTextView.setText("")
+        arguments?.remove(CreateVaultActivity.ARG_ENC_PIN)
+
+        loginActivity.loginSuccessful()
     }
 
     private fun isFastLoginWithQrCode(): Boolean {

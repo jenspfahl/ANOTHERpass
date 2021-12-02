@@ -10,7 +10,8 @@ import de.jepfa.yapm.model.export.ExportContainer
 import de.jepfa.yapm.model.export.PlainShareableCredential
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.VaultExportService
-import de.jepfa.yapm.service.secret.MasterPasswordService.generateEncMasterPasswdSK
+import de.jepfa.yapm.service.secret.AndroidKey
+import de.jepfa.yapm.service.secret.MasterPasswordService.generateEncMasterPasswdSKForExport
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
@@ -57,7 +58,7 @@ class VerifyActivity : ReadActivityBase() {
             PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, this)
         val key = masterSecretKey
         if (key != null && encStoredMasterKey != null) {
-            val mkKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
+            val mkKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_MK, this)
             val encMasterKey = SecretService.decryptEncrypted(mkKey, encStoredMasterKey)
             if (encMasterKey == emk) {
                 verifyResultText.text = getString(R.string.well_known_emk_scanned)
@@ -68,10 +69,10 @@ class VerifyActivity : ReadActivityBase() {
     private fun checkEMP(emp: Encrypted) {
         verifyResultText.text = getString(R.string.unknown_emp_scanned)
 
-        val empSK = generateEncMasterPasswdSK(this)
+        val empSK = generateEncMasterPasswdSKForExport(this)
         val scannedMasterPassword =
             SecretService.decryptPassword(empSK, emp)
-        val masterPassword = getMasterPasswordFromSession()
+        val masterPassword = getMasterPasswordFromSession(this)
         if (masterPassword != null && scannedMasterPassword.isValid() && scannedMasterPassword.isEqual(
                 masterPassword
             )
@@ -90,7 +91,7 @@ class VerifyActivity : ReadActivityBase() {
         )
         encMasterPasswordTokenKey?.let {
             val masterPasswordTokenSK =
-                SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP_TOKEN)
+                SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_MP_TOKEN, this)
             val masterPasswordTokenKey =
                 SecretService.decryptKey(masterPasswordTokenSK, encMasterPasswordTokenKey)
             val cipherAlgorithm = SecretService.getCipherAlgorithm(this)
@@ -102,7 +103,7 @@ class VerifyActivity : ReadActivityBase() {
 
             val decMPT =
                 SecretService.decryptPassword(mptSK, mpt)
-            val masterPassword = getMasterPasswordFromSession()
+            val masterPassword = getMasterPasswordFromSession(this)
             if (masterPassword != null && decMPT.isValid() && decMPT.isEqual(
                     masterPassword
                 )

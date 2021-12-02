@@ -6,6 +6,7 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.encrypted.EncryptedType
 import de.jepfa.yapm.model.encrypted.EncryptedType.Types.ENC_MASTER_PASSWD
+import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
@@ -20,14 +21,14 @@ object ExportEncMasterPasswordUseCase:
     data class Input(val encMasterPasswd: Encrypted, val noSessionCheck: Boolean, val directlyToNfcActivity: Boolean = false)
 
     override fun doExecute(input: Input, activity: BaseActivity): Boolean {
-        val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
+        val tempKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, activity)
 
         val encHead =
             SecretService.encryptCommonString(tempKey, activity.getString(R.string.head_export_emp))
         val encSub =
             SecretService.encryptCommonString(tempKey, activity.getString(R.string.sub_export_emp))
         val masterPassword = SecretService.decryptPassword(tempKey, input.encMasterPasswd)
-        val empSK = MasterPasswordService.generateEncMasterPasswdSK(activity)
+        val empSK = MasterPasswordService.generateEncMasterPasswdSKForExport(activity)
         val encMasterPasswd =
             SecretService.encryptPassword(EncryptedType(ENC_MASTER_PASSWD), empSK, masterPassword)
         val encQrcHeader = SecretService.encryptCommonString(tempKey, encMasterPasswd.type?.toString() ?: "")

@@ -64,6 +64,8 @@ object ReminderService {
                 .launch(activity, Unit)
         }
     }
+
+    //TODO new reminder to setup biometrics or renew stored EMP
     
     fun showReminders(config: ReminderConfig, view: View, activity: SecureActivity): Boolean {
         val remindEnabled = PreferenceService.getAsBool(config.prefShowReminder, activity)

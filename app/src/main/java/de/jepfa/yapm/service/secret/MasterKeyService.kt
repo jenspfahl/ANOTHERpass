@@ -34,8 +34,13 @@ object MasterKeyService {
      * Returns the Master Secret Key which is encrypted twice, first with the Android key
      * and second with the PassPhrase key.
      */
-    fun getMasterSK(masterPassPhraseSK: SecretKeyHolder, salt: Key, storedEncMasterKey: Encrypted, useLegacyGeneration: Boolean): SecretKeyHolder? {
-        val masterKey = getMasterKey(masterPassPhraseSK, storedEncMasterKey) ?: return null
+    fun getMasterSK(masterPassPhraseSK: SecretKeyHolder,
+                    salt: Key,
+                    storedEncMasterKey: Encrypted,
+                    useLegacyGeneration: Boolean,
+                    context: Context
+    ): SecretKeyHolder? {
+        val masterKey = getMasterKey(masterPassPhraseSK, storedEncMasterKey, context) ?: return null
         val masterSK =
             if (useLegacyGeneration) SecretService.generateStrongSecretKey(masterKey, salt, masterPassPhraseSK.cipherAlgorithm)
             else SecretService.createSecretKey(masterKey, masterPassPhraseSK.cipherAlgorithm)
@@ -48,8 +53,8 @@ object MasterKeyService {
         return generateRandomKey(MASTER_KEY_BYTE_SIZE)
     }
 
-    fun getMasterKey(masterPassPhraseSK: SecretKeyHolder, storedEncMasterKey: Encrypted): Key? {
-        val androidSK = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
+    fun getMasterKey(masterPassPhraseSK: SecretKeyHolder, storedEncMasterKey: Encrypted, context: Context): Key? {
+        val androidSK = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_MK, context)
 
         val encMasterKey = SecretService.decryptEncrypted(androidSK, storedEncMasterKey)
         val masterKey = SecretService.decryptKey(masterPassPhraseSK, encMasterKey)
@@ -67,7 +72,7 @@ object MasterKeyService {
         cipherAlgorithm: CipherAlgorithm,
         context: Context) {
 
-        val mkSK = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
+        val mkSK = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_MK, context)
         val masterPassphrase = SecretService.conjunctPasswords(pin, masterPasswd, salt)
         val masterPassphraseSK = SecretService.generateStrongSecretKey(masterPassphrase, salt, cipherAlgorithm)
         masterPassphrase.clear()

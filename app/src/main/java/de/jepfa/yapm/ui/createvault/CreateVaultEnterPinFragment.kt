@@ -9,7 +9,7 @@ import android.widget.EditText
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
-import de.jepfa.yapm.service.secret.SecretService.ALIAS_KEY_TRANSPORT
+import de.jepfa.yapm.service.secret.AndroidKey.ALIAS_KEY_TRANSPORT
 import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.ui.BaseFragment
@@ -57,7 +57,7 @@ class CreateVaultEnterPinFragment : BaseFragment() {
                 pin2TextView.requestFocus()
             }
             else {
-                val transSK = getAndroidSecretKey(ALIAS_KEY_TRANSPORT)
+                val transSK = getAndroidSecretKey(ALIAS_KEY_TRANSPORT, view.context)
                 val encPin = encryptPassword(transSK, pin1)
                 val encMasterPasswd = arguments?.getString(ARG_ENC_MASTER_PASSWD)
                 val args = Bundle()

@@ -17,6 +17,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_SELF_DESTRUCTION
 import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_ATTEMPTS
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.MasterKeyService
+import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.ui.importvault.ImportVaultActivity
@@ -134,7 +135,7 @@ class LoginActivity : NfcBaseActivity() {
             }
             else {
                 toastText(baseContext, R.string.too_may_wrong_logins)
-                PreferenceService.delete(PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD, baseContext)
+                MasterPasswordService.deleteStoredMasterPassword(baseContext)
                 PreferenceService.delete(PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY, baseContext)
             }
             Session.logout()

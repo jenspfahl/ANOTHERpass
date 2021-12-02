@@ -13,6 +13,7 @@ import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.export.*
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.YapmApp
@@ -138,7 +139,7 @@ object VaultExportService {
             val encStoredMasterKey = PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, context)
             if (encStoredMasterKey != null) {
 
-                val mkKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MK)
+                val mkKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_MK, context)
                 val encMasterKeyBase64 = SecretService.decryptEncrypted(mkKey, encStoredMasterKey).toBase64String()
                 root.addProperty(JSON_ENC_MK, encMasterKeyBase64)
             }

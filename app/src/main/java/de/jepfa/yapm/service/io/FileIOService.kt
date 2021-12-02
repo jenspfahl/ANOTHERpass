@@ -12,6 +12,7 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.VaultExportService.createVaultFile
+import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.util.FileUtil
@@ -91,7 +92,7 @@ class FileIOService: IntentService("FileIOService") {
     private fun saveQrCodeAsImage(intent: Intent) {
         var message: String
         if (FileUtil.isExternalStorageWritable()) {
-            val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
+            val tempKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, applicationContext)
 
             val uri = intent.getParcelableExtra<Uri>(PARAM_FILE_URI)
             val encQrc = intent.getEncryptedExtra(PARAM_QRC, Encrypted.empty())

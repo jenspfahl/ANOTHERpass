@@ -8,8 +8,8 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SecretService
-import de.jepfa.yapm.service.secret.SecretService.ALIAS_KEY_TRANSPORT
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.putEncryptedExtra
@@ -43,7 +43,7 @@ object DetachHelper {
                     obfuscationKey?.let {
                         password.deobfuscate(it)
                     }
-                    val transSK = SecretService.getAndroidSecretKey(ALIAS_KEY_TRANSPORT)
+                    val transSK = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, activity)
                     val encPassword = SecretService.encryptPassword(transSK, password)
 
                     val intent = Intent(activity, OverlayShowingService::class.java)

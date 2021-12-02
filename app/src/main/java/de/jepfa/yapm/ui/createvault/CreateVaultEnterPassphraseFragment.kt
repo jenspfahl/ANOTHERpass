@@ -10,7 +10,7 @@ import androidx.appcompat.widget.SwitchCompat
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
-import de.jepfa.yapm.service.secret.SecretService.ALIAS_KEY_TRANSPORT
+import de.jepfa.yapm.service.secret.AndroidKey.ALIAS_KEY_TRANSPORT
 import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.ui.BaseFragment
@@ -58,7 +58,7 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
                 toastText(it.context, R.string.generate_password_first)
             }
             else {
-                val transSK = getAndroidSecretKey(ALIAS_KEY_TRANSPORT)
+                val transSK = getAndroidSecretKey(ALIAS_KEY_TRANSPORT, view.context)
                 val encPassword = encryptPassword(transSK, generatedPassword)
                 generatedPassword.clear()
 

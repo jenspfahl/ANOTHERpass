@@ -14,10 +14,13 @@ import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.secret.AndroidKey
+import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
+import de.jepfa.yapm.usecase.secret.RemoveStoredMasterPasswordUseCase
 import de.jepfa.yapm.usecase.session.LoginUseCase
 import de.jepfa.yapm.util.putEncrypted
 import de.jepfa.yapm.util.toastText
@@ -54,7 +57,7 @@ class LoginEnterPinFragment : BaseFragment() {
 
         nextButton.setOnClickListener {
 
-            val keyForTemp = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
+            val keyForTemp = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, view.context)
 
             val userPin = Password(pinTextView.text)
             if (userPin.isEmpty()) {
@@ -64,10 +67,10 @@ class LoginEnterPinFragment : BaseFragment() {
                 return@setOnClickListener
             }
 
-            val encStoredMasterPasswd = PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD, getBaseActivity())
+            pinTextView.text = null
 
             if (!Session.isLoggedOut()) {
-                val keyForTemp = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
+                val keyForTemp = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, view.context)
                 val encMasterPasswd = Session.getEncMasterPasswd()
                 if (encMasterPasswd == null) {
                     toastText(context, R.string.something_went_wrong)
@@ -77,18 +80,19 @@ class LoginEnterPinFragment : BaseFragment() {
 
                 login(pinTextView, userPin, masterPasswd, loginActivity)
             }
-            else if (encStoredMasterPasswd != null) {
+            else {
+                MasterPasswordService.getMasterPasswordFromStore(
+                    loginActivity, {
+                        login(pinTextView, userPin, it, loginActivity)
+                    }
+                    , {
+                        val encUserPin = SecretService.encryptPassword(keyForTemp, userPin)
+                        val args = Bundle()
+                        args.putEncrypted(CreateVaultActivity.ARG_ENC_PIN, encUserPin)
 
-                val keyForMP = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP)
-                val storedMasterPasswd = SecretService.decryptPassword(keyForMP, encStoredMasterPasswd)
-
-                login(pinTextView, userPin, storedMasterPasswd, loginActivity)
-            } else {
-                val encUserPin = SecretService.encryptPassword(keyForTemp, userPin)
-                val args = Bundle()
-                args.putEncrypted(CreateVaultActivity.ARG_ENC_PIN, encUserPin)
-
-                findNavController().navigate(R.id.action_Login_PinFragment_to_MasterPasswordFragment, args)
+                        findNavController().navigate(R.id.action_Login_PinFragment_to_MasterPasswordFragment, args)
+                    }
+                )
             }
         }
     }

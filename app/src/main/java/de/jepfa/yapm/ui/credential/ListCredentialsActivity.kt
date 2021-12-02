@@ -388,7 +388,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         when (item.itemId) {
 
             R.id.store_masterpasswd -> {
-                val masterPasswd = getMasterPasswordFromSession()
+                val masterPasswd = getMasterPasswordFromSession(this)
                 if (masterPasswd != null) {
 
                     AlertDialog.Builder(this)
@@ -396,10 +396,16 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         .setMessage(getString(R.string.store_masterpasswd_confirmation))
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
-                            storeMasterPassword(masterPasswd, this)
-                            refreshMenuMasterPasswordItem(navigationView.menu)
-                            masterPasswd.clear()
-                            toastText(this, R.string.masterpassword_stored)
+                            storeMasterPassword(masterPasswd, this,
+                                {
+                                    refreshMenuMasterPasswordItem(navigationView.menu)
+                                    masterPasswd.clear()
+                                    toastText(this, R.string.masterpassword_stored)
+                                },
+                                {
+                                    masterPasswd.clear()
+                                    toastText(this, R.string.masterpassword_not_stored)
+                                })
                         }
                         .setNegativeButton(android.R.string.no, null)
                         .show()

@@ -239,6 +239,7 @@
     <string name="pin_changed">Pin successfully changed</string>
     <string name="credential_used_for_autofill">Credential used for Autofill</string>
     <string name="masterpassword_stored">Master password stored on device</string>
+    <string name="masterpassword_not_stored">Master password couldn\'t be stored</string>
     <string name="masterpassword_removed">Stored master password removed from device</string>
     <string name="title_drop_vault">Drop vault</string>
     <string name="message_drop_vault">You are going to delete ALL your credentials and login data.</string>
@@ -386,5 +387,14 @@
     <string name="dont_ask_again">Don\'t ask again</string>
     <string name="manage_reminder_settings_hint">You can manage reminder under Settings / Security</string>
     <string name="no_label">WITH NO LABELS</string>
+    <string name="biometric_failed">Cannot authorize biometric</string>
+    <string name="auth_with_biometrics">Authorize with biometrics</string>
+    <string name="auth_to_encrypt_emp">Authentication required to encrypt and store Master Password.</string>
+    <string name="auth_to_decrypt_emp">Authentication required to decrypt stored Master Password.</string>
+    <string name="cancelled_by_user">Cancelled</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="biometric_permission_not_granted">Biometric permission not granted</string>
+    <string name="biometric_not_supported">Biometric not available on this device</string>
+    <string name="fingerprint_not_enrolled">Fingerprint not enrolled for this device</string>
 
 </resources>

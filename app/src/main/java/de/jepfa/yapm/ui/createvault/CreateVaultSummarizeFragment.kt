@@ -17,7 +17,7 @@ import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.MasterKeyService
-import de.jepfa.yapm.service.secret.SecretService.ALIAS_KEY_TRANSPORT
+import de.jepfa.yapm.service.secret.AndroidKey.ALIAS_KEY_TRANSPORT
 import de.jepfa.yapm.service.secret.SecretService.decryptPassword
 import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
@@ -55,7 +55,7 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
             toastText(context, R.string.something_went_wrong)
             return
         }
-        val transSK = getAndroidSecretKey(ALIAS_KEY_TRANSPORT)
+        val transSK = getAndroidSecretKey(ALIAS_KEY_TRANSPORT, view.context)
         val masterPasswd = decryptPassword(transSK, encMasterPasswd)
 
         val switchStorePasswd: SwitchCompat = view.findViewById(R.id.switch_store_master_password)
@@ -83,7 +83,7 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
 
         val exportAsQrcImageView: ImageView = view.findViewById(R.id.imageview_qrcode)
         exportAsQrcImageView.setOnClickListener {
-            val tempKey = getAndroidSecretKey(ALIAS_KEY_TRANSPORT)
+            val tempKey = getAndroidSecretKey(ALIAS_KEY_TRANSPORT, view.context)
             val encMasterPasswd = encryptPassword(tempKey, masterPasswd)
             getBaseActivity()?.let { baseActivity ->
                 ExportEncMasterPasswordUseCase.execute(
@@ -95,7 +95,7 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
             exportAsNfcImageView.visibility = View.GONE
         }
         exportAsNfcImageView.setOnClickListener {
-            val tempKey = getAndroidSecretKey(ALIAS_KEY_TRANSPORT)
+            val tempKey = getAndroidSecretKey(ALIAS_KEY_TRANSPORT, view.context)
             val encMasterPasswd = encryptPassword(tempKey, masterPasswd)
             getBaseActivity()?.let { baseActivity ->
                 ExportEncMasterPasswordUseCase.execute(

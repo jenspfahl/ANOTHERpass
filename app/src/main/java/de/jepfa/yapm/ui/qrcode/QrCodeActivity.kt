@@ -15,6 +15,7 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.service.io.TempFileService
 import de.jepfa.yapm.service.nfc.NfcService
+import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.nfc.NfcActivity
@@ -60,7 +61,7 @@ class QrCodeActivity : SecureActivity() {
         encQRC = intent.getEncryptedExtra(EXTRA_QRCODE, Encrypted.empty())
         val qrcColor = intent.getIntExtra(EXTRA_COLOR, Color.BLACK)
 
-        val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
+        val tempKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, this)
         head = SecretService.decryptCommonString(tempKey, encHead)
         val sub = SecretService.decryptCommonString(tempKey, encSub)
         val qrcHeader = SecretService.decryptCommonString(tempKey, encQrcHeader)

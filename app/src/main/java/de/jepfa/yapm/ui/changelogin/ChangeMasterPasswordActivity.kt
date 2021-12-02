@@ -11,7 +11,6 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
 import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
@@ -45,10 +44,9 @@ class ChangeMasterPasswordActivity : SecureActivity() {
         val switchStorePasswd: SwitchCompat = findViewById(R.id.switch_store_master_password)
         val generatedPasswdView: TextView = findViewById(R.id.generated_passwd)
 
-        val storedMasterPasswdPresent = PreferenceService.isPresent(DATA_ENCRYPTED_MASTER_PASSWORD, this)
-        switchStorePasswd.isChecked = storedMasterPasswdPresent
+        switchStorePasswd.isChecked = MasterPasswordService.isMasterPasswordStored(this)
 
-        val masterPasswd = MasterPasswordService.getMasterPasswordFromSession()
+        val masterPasswd = MasterPasswordService.getMasterPasswordFromSession(this)
         if (!Session.isDenied() && masterPasswd != null) {
             generatedPassword = masterPasswd
             generatedPasswdView.text = PasswordColorizer.spannableString(generatedPassword, this)

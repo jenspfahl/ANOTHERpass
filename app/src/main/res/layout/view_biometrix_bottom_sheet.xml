@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="15dp">
+
+    <ImageView
+        android:id="@+id/img_logo"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@mipmap/ic_launcher_round"
+        />
+
+    <LinearLayout
+        android:id="@+id/title_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/img_logo"
+        android:layout_marginStart="@dimen/big_padding"
+        android:layout_toEndOf="@+id/img_logo"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/item_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textSize="18sp"
+            android:text="@string/auth_with_biometrics"/>
+
+        <TextView
+            android:id="@+id/item_subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/app_name"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <TextView
+
+        android:id="@+id/item_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/title_view"
+        android:layout_margin="@dimen/big_padding"
+        />
+
+    <ImageView
+        android:id="@+id/img_fingerprint"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_below="@id/item_description"
+        android:layout_centerHorizontal="true"
+        android:padding="14dp"
+        android:src="@drawable/ic_baseline_fingerprint_24" />
+
+
+    <TextView
+        android:id="@+id/item_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/img_fingerprint"
+        android:layout_margin="8dp"
+        android:gravity="center" />
+
+
+    <Button
+        android:id="@+id/btn_cancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/item_status"
+        android:text="@android:string/cancel"
+/>
+
+</RelativeLayout>

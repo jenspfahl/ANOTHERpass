@@ -14,6 +14,7 @@ import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.service.nfc.NdefTag
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.nfc.NfcService
+import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.util.getEncryptedExtra
 import de.jepfa.yapm.util.toastText
 
@@ -142,7 +143,7 @@ class NfcActivity : NfcBaseActivity() {
 
     private fun writeTag(t: NdefTag, withAppRecord: Boolean) {
         encData?.let { eD ->
-            val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
+            val tempKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, this)
             val data = SecretService.decryptPassword(tempKey, eD)
 
             try {

@@ -8,6 +8,7 @@ import de.jepfa.yapm.model.encrypted.EncryptedType
 import de.jepfa.yapm.model.encrypted.EncryptedType.Types.MASTER_PASSWD_TOKEN
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
@@ -45,8 +46,8 @@ object GenerateMasterPasswordTokenUseCase: BasicUseCase<SecureActivity>() {
         val key = activity.masterSecretKey
         val encMasterPasswd = Session.getEncMasterPasswd()
         if (key != null && encMasterPasswd != null) {
-            val tempKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_TRANSPORT)
-            val mptKey = SecretService.getAndroidSecretKey(SecretService.ALIAS_KEY_MP_TOKEN)
+            val tempKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, activity)
+            val mptKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_MP_TOKEN, activity)
             val masterPassword = SecretService.decryptPassword(tempKey, encMasterPasswd)
 
             val nextMptNumber = PreferenceService.getAsInt(

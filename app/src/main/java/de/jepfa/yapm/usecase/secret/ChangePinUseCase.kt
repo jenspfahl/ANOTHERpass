@@ -21,7 +21,7 @@ object ChangePinUseCase: InputUseCase<ChangePinUseCase.Input, SecureActivity>() 
     override fun doExecute(input: Input, activity: SecureActivity): Boolean {
 
         val salt = SaltService.getSalt(activity)
-        val masterPassword = MasterPasswordService.getMasterPasswordFromSession()
+        val masterPassword = MasterPasswordService.getMasterPasswordFromSession(activity)
         if (masterPassword == null) {
             Log.e(TAG, "master password not at Session")
             return false
@@ -42,7 +42,7 @@ object ChangePinUseCase: InputUseCase<ChangePinUseCase.Input, SecureActivity>() 
             return false
         }
 
-        val masterKey = MasterKeyService.getMasterKey(oldMasterPassphraseSK, encEncryptedMasterKey)
+        val masterKey = MasterKeyService.getMasterKey(oldMasterPassphraseSK, encEncryptedMasterKey, activity)
         if (masterKey == null) {
             Log.e(TAG, "cannot decrypt master key, pin wrong?")
             return false
