@@ -1,15 +1,21 @@
 This offline password app manages generated strong passwords which are easy to type (but almost impossible to crack).
 
-It also comes with a clever two factor authentication to login into your vault. These factors are knowledge (your pin) and ownership (the master password). So instead of remembering a long and complicated master password you just remember the pin and have your master password with you as QR code or NFC tag.
+It also comes with a clever two factor authentication to login into your vault. These factors are knowledge (your pin) and ownership (the master password). So instead of remembering a long and complicated master password you just remember the pin and have your master password with you (as QR code or NFC tag), or use your fingerprint to get it from your device.
+
+<b>Core features of the app</b>
 
 - easy two factor authentification
 - no complicated master password to memorize
 - easy to read generated passwords
 - strong modern encryption
 - Autofill support
+- biometrics (e.g. fingerprint) for stored master password
 - no unsecure clipboard function by default
 - no internet connection needed, all is offline
 - export and import credential vault
 - share and outsource credentials
 - obfuscate passwords
 - self desctruction mode
+
+
+For detailed information see https://anotherpass.jepfa.de
