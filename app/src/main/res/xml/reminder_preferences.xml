@@ -1,0 +1,41 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ListPreference
+        app:defaultValue="600"
+        app:entries="@array/reminder_period_entries"
+        app:entryValues="@array/reminder_period_values"
+        app:key="YAPM/pref:reminder_period"
+        app:title="@string/reminder_period_title"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:useSimpleSummaryProvider="true"/>
+
+
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:show_export_vault_reminder"
+        app:title="@string/show_export_vault_reminder"
+        app:summary="@string/summary_show_export_vault_reminder"
+        app:allowDividerAbove="true"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:defaultValue="true"/>
+
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:show_export_mk_reminder"
+        app:title="@string/show_export_mk_reminder"
+        app:summary="@string/summary_show_export_mk_reminder"
+        app:allowDividerAbove="false"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:defaultValue="true"/>
+
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:show_biometric_smp_reminder"
+        app:title="@string/show_biometric_smp_reminder"
+        app:summary="@string/summary_show_biometric_smp_reminder"
+        app:allowDividerAbove="false"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:defaultValue="true"/>
+
+</PreferenceScreen>

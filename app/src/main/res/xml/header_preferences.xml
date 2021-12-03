@@ -43,4 +43,10 @@
         app:key="autofill_header"
         app:title="@string/pref_header_autofill" />
 
+    <Preference
+        app:fragment="de.jepfa.yapm.ui.settings.SettingsActivity$ReminderSettingsFragment"
+        app:icon="@drawable/ic_baseline_replay_24"
+        app:key="security_header"
+        app:title="@string/pref_header_reminder" />
+
 </PreferenceScreen>

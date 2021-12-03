@@ -8,6 +8,7 @@ import androidx.preference.*
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.biometrix.BiometricUtils
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
@@ -157,6 +158,10 @@ class SettingsActivity : SecureActivity(),
                     true
                 }
             }
+
+            findPreference<SwitchPreferenceCompat>(PreferenceService.PREF_AUTH_SMP_WITH_BIOMETRIC)?.let { pref ->
+                activity?.let { pref.isEnabled = BiometricUtils.isHardwareSupported(it) }
+            }
         }
     }
 
@@ -214,4 +219,15 @@ class SettingsActivity : SecureActivity(),
             return ai.flags and mask == 0
         }
     }
+
+    class ReminderSettingsFragment : PreferenceFragmentCompat() {
+        override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            setPreferencesFromResource(R.xml.reminder_preferences, rootKey)
+
+            findPreference<SwitchPreferenceCompat>(PreferenceService.PREF_SHOW_BIOMETRIC_SMP_REMINDER)?.let { pref ->
+                activity?.let { pref.isEnabled = BiometricUtils.isHardwareSupported(it) }
+            }
+        }
+    }
+
 }

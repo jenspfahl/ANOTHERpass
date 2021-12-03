@@ -382,19 +382,28 @@
     <string name="summary_show_export_vault_reminder">Show a reminder when the vault has changed and needs to be exported.</string>
     <string name="show_export_mk_reminder">Reminder to export Encrypted Master Key</string>
     <string name="summary_show_export_mk_reminder">Show a reminder when the Encrypted Master Key has changed and needs to be exported.</string>
+    <string name="show_biometric_smp_reminder">Reminder to setup biometrics for stored master password</string>
+    <string name="summary_show_biometric_smp_reminder">Show a reminder when the stored master password is not protected by a biometric (e.g. a fingerprint) but the device would support it.</string>
     <string name="export_vault_reminder">Vault should be exported after recent modifications.</string>
     <string name="export_mk_reminder">Master key should be exported after recent modifications.</string>
-    <string name="dont_ask_again">Don\'t ask again</string>
-    <string name="manage_reminder_settings_hint">You can manage reminder under Settings / Security</string>
+    <string name="biometric_smp_reminder">Biometrics should be used for stored master password.</string>
+    <string name="show_biometric_smp_howto">How?</string>
+    <string name="dont_ask_again">Don\'t nag again</string>
+    <string name="manage_reminder_settings_hint">You can manage reminder under Settings / Reminders</string>
     <string name="no_label">WITH NO LABELS</string>
     <string name="biometric_failed">Cannot authorize biometric</string>
     <string name="auth_with_biometrics">Authorize with biometrics</string>
-    <string name="auth_to_encrypt_emp">Authentication required to encrypt and store Master Password.</string>
-    <string name="auth_to_decrypt_emp">Authentication required to decrypt stored Master Password.</string>
-    <string name="cancelled_by_user">Cancelled</string>
+    <string name="auth_to_encrypt_emp">Authentication required to encrypt and store master password.</string>
+    <string name="auth_to_decrypt_emp">Authentication required to decrypt stored master password.</string>
     <string name="unknown_error">Unknown error</string>
     <string name="biometric_permission_not_granted">Biometric permission not granted</string>
     <string name="biometric_not_supported">Biometric not available on this device</string>
     <string name="fingerprint_not_enrolled">Fingerprint not enrolled for this device</string>
+    <string name="howto_biometrics_for_smp_title">How to use biometrics for stored master password</string>
+    <string name="howto_biometrics_for_smp_text">First, enrol fingerprints on your device. Next, remove stored master password and set it again authenticated with your fingerprint.</string>
+    <string name="pref_header_reminder">Reminders</string>
+    <string name="reminder_period_title">How often to show reminders</string>
+    <string name="pref_auth_smp_with_biometric_title">Authorize stored master passwords with biometric</string>
+    <string name="pref_auth_smp_with_biometric_summary">It is highly recommend to protect stored master passwords with e.g. a fingerprint to mitigate the risk of getting it stolen by compromised malware. (Only if your device supports it.) Note: An already stored master password is not touched by changeing this setting now. You have to remove it and set it again to take this setting in effect.</string>
 
 </resources>

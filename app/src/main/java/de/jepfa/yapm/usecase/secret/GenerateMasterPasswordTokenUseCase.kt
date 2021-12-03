@@ -103,6 +103,7 @@ object GenerateMasterPasswordTokenUseCase: BasicUseCase<SecureActivity>() {
             activity.startActivity(intent)
 
             masterPassword.clear()
+            masterPasswordTokenKey.clear()
         }
 
         return true

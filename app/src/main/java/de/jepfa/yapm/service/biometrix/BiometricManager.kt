@@ -13,9 +13,12 @@ import de.jepfa.yapm.service.biometrix.BiometricUtils.isHardwareSupported
 import de.jepfa.yapm.service.biometrix.BiometricUtils.isPermissionGranted
 import javax.crypto.Cipher
 
+/*
+Taken and modified from https://github.com/FSecureLABS/android-keystore-audit/tree/master/keystorecrypto-app
+ */
 class BiometricManager(cipher: Cipher, context: Context): BiometricManagerV23(cipher, context) {
 
-    fun authenticate(description: String, biometricCallback: BiometricCallback) {
+    fun authenticate(description: String, cancelText: String, biometricCallback: BiometricCallback) {
         try {
             if (!isPermissionGranted(context)) {
                 biometricCallback.onAuthenticationError(context.getString(R.string.biometric_permission_not_granted))
@@ -27,7 +30,7 @@ class BiometricManager(cipher: Cipher, context: Context): BiometricManagerV23(ci
                 biometricCallback.onAuthenticationError(context.getString(R.string.fingerprint_not_enrolled))
             }
             else {
-                displayBiometricDialog(description, biometricCallback)
+                displayBiometricDialog(description, cancelText, biometricCallback)
             }
         } catch (e: Exception) {
             Log.e("BIOMgr", "couldn't auth", e)
@@ -35,22 +38,30 @@ class BiometricManager(cipher: Cipher, context: Context): BiometricManagerV23(ci
         }
     }
 
-    private fun displayBiometricDialog(description: String, biometricCallback: BiometricCallback) {
+    private fun displayBiometricDialog(
+        description: String,
+        cancelText: String,
+        biometricCallback: BiometricCallback
+    ) {
         if (isBiometricPromptEnabled) {
-            displayBiometricPrompt(description, biometricCallback)
+            displayBiometricPrompt(description, cancelText, biometricCallback)
         } else {
-            displayBiometricPromptV23(description, biometricCallback)
+            displayBiometricPromptV23(description, cancelText, biometricCallback)
         }
     }
 
     @TargetApi(Build.VERSION_CODES.P)
-    private fun displayBiometricPrompt(description: String, biometricCallback: BiometricCallback) {
+    private fun displayBiometricPrompt(
+        description: String,
+        cancelText: String,
+        biometricCallback: BiometricCallback
+    ) {
         val crypto = BiometricPrompt.CryptoObject(cipher)
         BiometricPrompt.Builder(context)
             .setTitle(context.getString(R.string.auth_with_biometrics))
             .setDescription(description)
             .setNegativeButton(
-                context.getString(android.R.string.cancel),
+                cancelText,
                 context.mainExecutor,
                 { _, _ -> biometricCallback.onAuthenticationCancelled() })
             .build()

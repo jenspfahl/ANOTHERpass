@@ -96,4 +96,20 @@
     </string-array>
 
 
+    <string-array name="reminder_period_entries">
+        <item>every 10 minutes</item>
+        <item>every 30 minutes</item>
+        <item>every hour</item>
+        <item>once a day</item>
+        <item>once a week</item>
+    </string-array>
+
+    <string-array name="reminder_period_values">
+        <item>600</item>
+        <item>1800</item>
+        <item>3600</item>
+        <item>86400</item>
+        <item>604800</item>
+    </string-array>
+
 </resources>

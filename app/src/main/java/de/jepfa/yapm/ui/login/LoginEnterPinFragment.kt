@@ -8,6 +8,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
@@ -54,6 +55,19 @@ class LoginEnterPinFragment : BaseFragment() {
 
         pinTextView.requestFocus()
 
+        nextButton.setOnLongClickListener{
+            AlertDialog.Builder(loginActivity)
+                .setTitle(getString(R.string.delete_stored_masterpasswd))
+                .setMessage(getString(R.string.delete_stored_masterpasswd_confirmation))
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                    RemoveStoredMasterPasswordUseCase.execute(loginActivity)
+                    toastText(loginActivity, R.string.masterpassword_removed)
+                }
+                .setNegativeButton(android.R.string.no, null)
+                .show()
+            true
+        }
 
         nextButton.setOnClickListener {
 

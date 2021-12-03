@@ -20,7 +20,7 @@ object PreferenceService {
      * TODO If you add new preference xml files inside #initDefaults, they should be recognised as well.
      * To achieve this, count the version value up here.
      */
-    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_6"
+    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_9"
 
     const val STATE_DEFAULT_INIT_DONE = STATE_PREFIX + "default_init_done"
 
@@ -47,6 +47,10 @@ object PreferenceService {
     const val DATA_MK_EXPORT_NOTIFICATION_SHOWED_AT = DATA_PREFIX + "mk_export_notification_showed_at"
     const val DATA_MK_EXPORT_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "mk_export_notification_showed_as"
     const val PREF_SHOW_EXPORT_MK_REMINDER = PREF_PREFIX + "show_export_mk_reminder"
+
+    const val DATA_BIOMETRIC_SMP_NOTIFICATION_SHOWED_AT = DATA_PREFIX + "biometric_smp_notification_showed_at"
+    const val DATA_BIOMETRIC_SMP_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "biometric_smp_notification_showed_as"
+    const val PREF_SHOW_BIOMETRIC_SMP_REMINDER = PREF_PREFIX + "show_biometric_smp_reminder"
 
     const val PREF_MAX_LOGIN_ATTEMPTS = PREF_PREFIX + "max_login_attempts"
     const val PREF_SELF_DESTRUCTION = PREF_PREFIX + "drop_vault_if_login_declined"
@@ -91,6 +95,10 @@ object PreferenceService {
 
     const val DATA_USED_LABEL_FILTER = DATA_PREFIX + "used_label_filter"
 
+    const val PREF_REMINDER_PERIOD = PREF_PREFIX + "reminder_period"
+    const val PREF_AUTH_SMP_WITH_BIOMETRIC= PREF_PREFIX + "auth_smp_with_biometric"
+
+
 
     fun initDefaults(context: Context?) {
         if (context == null) return
@@ -103,6 +111,7 @@ object PreferenceService {
             PreferenceManager.setDefaultValues(context, R.xml.overlay_preferences, true)
             PreferenceManager.setDefaultValues(context, R.xml.password_generator_preferences, true)
             PreferenceManager.setDefaultValues(context, R.xml.security_preferences, true)
+            PreferenceManager.setDefaultValues(context, R.xml.reminder_preferences, true)
             /*
             If you add new preference xml files here, don't forget to count up STATE_DEFAULT_INIT_DONE_VERSION.
             Also do so when adding new prefs in existing files

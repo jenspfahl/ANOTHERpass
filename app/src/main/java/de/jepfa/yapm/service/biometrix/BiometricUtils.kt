@@ -10,7 +10,7 @@ import android.content.pm.PackageManager
 import android.hardware.biometrics.BiometricPrompt
 
 /*
-Taken from https://github.com/FSecureLABS/android-keystore-audit/tree/master/keystorecrypto-app
+Taken and modified from https://github.com/FSecureLABS/android-keystore-audit/tree/master/keystorecrypto-app
  */
 @SuppressLint("MissingPermission")
 object BiometricUtils {

@@ -2,7 +2,9 @@ package de.jepfa.yapm.service.biometrix
 
 import javax.crypto.Cipher
 
-// Based on https://github.com/anitaa1990/Biometric-Auth-Sample
+/*
+Taken and modified from https://github.com/FSecureLABS/android-keystore-audit/tree/master/keystorecrypto-app
+ */
 interface BiometricCallback {
     fun onAuthenticationFailed()
     fun onAuthenticationCancelled()

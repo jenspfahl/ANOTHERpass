@@ -2,7 +2,6 @@ package de.jepfa.yapm.service.secret
 
 import android.content.Context
 import android.util.Log
-import com.google.android.material.snackbar.Snackbar
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.DEFAULT_CIPHER_ALGORITHM
 import de.jepfa.yapm.model.encrypted.Encrypted
@@ -13,6 +12,7 @@ import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
+import de.jepfa.yapm.service.PreferenceService.PREF_AUTH_SMP_WITH_BIOMETRIC
 import de.jepfa.yapm.service.biometrix.BiometricCallback
 import de.jepfa.yapm.service.biometrix.BiometricManager
 import de.jepfa.yapm.service.biometrix.BiometricUtils
@@ -23,6 +23,16 @@ import javax.crypto.spec.GCMParameterSpec
 object MasterPasswordService {
 
     private const val MODE_WITH_AUTH = "wa"
+
+    /*
+    Fake key to fake encrypt exported master passwords (EMPs). In fact, master passwords cannot be encrypted while exported.
+    To encrypt it with the PIN wouldn't bring more security effort since both together are still needed to encrypt the Encrypted Master Key (EMK).
+    Furthermore it would make hackers give the chance to crack the PIN by brute forcing an exported Encrypted Master Password.
+    Since PINs may be weak per definition this should be strongest refrained!
+    Why then pseudo-encrypt master password for export? To make reading it by common users more uncomfortable.
+    By the way an EMP can be used to login into a certain vault if the PIN is known. This is the purpose of it.
+    Therefore EMPs are like real keys, you should never loose it with a remark to your real address ;-)
+     */
     private val EMP_SALT = Key(byteArrayOf(12, 57, 33, 75, 22, -33, 1, 123, -72, -82, 42, 100, -18, 54, 92, 23, -89, -21, -1, 95, -51, 11, 4, -99))
 
     fun getMasterPasswordFromSession(context: Context) : Password? {
@@ -34,6 +44,13 @@ object MasterPasswordService {
     fun isMasterPasswordStored(context: Context) =
         PreferenceService.isPresent(DATA_ENCRYPTED_MASTER_PASSWORD, context)
 
+    fun isMasterPasswordStoredWithAuth(context: Context): Boolean {
+        val encStoredMasterPasswd = PreferenceService.getEncrypted(DATA_ENCRYPTED_MASTER_PASSWORD, context)
+        return isEncMasterPasswordRequiresBiometrics(encStoredMasterPasswd)
+    }
+
+    fun isEncMasterPasswordRequiresBiometrics(encStoredMasterPasswd: Encrypted?) =
+        encStoredMasterPasswd?.type?.payload == MODE_WITH_AUTH
 
     fun getMasterPasswordFromStore(context: Context,
                                    handlePasswordReceived: (masterPassword: Password) -> Unit,
@@ -45,7 +62,7 @@ object MasterPasswordService {
             return
         }
 
-        if (encStoredMasterPasswd.type?.payload == MODE_WITH_AUTH && BiometricUtils.isBiometricsAvailable(context)) {
+        if (isEncMasterPasswordRequiresBiometrics(encStoredMasterPasswd) && BiometricUtils.isBiometricsAvailable(context)) {
             decryptWithBiometrics(
                 context,
                 encStoredMasterPasswd,
@@ -65,12 +82,13 @@ object MasterPasswordService {
         }
     }
 
-
     fun storeMasterPassword(masterPassword: Password,
                             context: Context,
                             handlePasswordStored: () -> Unit,
                             handleNothingStored: () -> Unit) {
-        if (BiometricUtils.isBiometricsAvailable(context)) {
+
+        val useBiometrics = PreferenceService.getAsBool(PREF_AUTH_SMP_WITH_BIOMETRIC, context)
+        if (useBiometrics && BiometricUtils.isBiometricsAvailable(context)) {
             encryptWithBiometrics(
                 context,
                 masterPassword,
@@ -114,49 +132,55 @@ object MasterPasswordService {
         handlePasswordStored: () -> Unit,
         handleNothingStored: () -> Unit
     ) {
-        val key = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_MP_WITH_AUTH, context)
-        val cipher = createEncryptCipher(key)
-        BiometricManager(cipher, context).authenticate(
-            context.getString(R.string.auth_to_encrypt_emp),
-            object : BiometricCallback {
+        try {
+            val key = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_MP_WITH_AUTH, context)
+            val cipher = createEncryptCipher(key)
+            BiometricManager(cipher, context).authenticate(
+                context.getString(R.string.auth_to_encrypt_emp),
+                context.getString(android.R.string.cancel),
+                object : BiometricCallback {
 
-            override fun onAuthenticationFailed() {
-                toastText(context, R.string.biometric_failed)
-                handleNothingStored()
-            }
-
-            override fun onAuthenticationCancelled() {
-                toastText(context, context.getString(R.string.cancelled_by_user))
-                handleNothingStored()
-            }
-
-            override fun onAuthenticationSuccessful(result: Cipher?) {
-                if (result != null) {
-
-                    val encMasterPasswd = encryptMasterPassword(result, masterPassword, MODE_WITH_AUTH)
-
-                    if (encMasterPasswd != null) {
-                        PreferenceService.putEncrypted(
-                            DATA_ENCRYPTED_MASTER_PASSWORD,
-                            encMasterPasswd,
-                            context
-                        )
-                        handlePasswordStored()
-                    }
-                    else {
-                        handleNothingStored()
-                    }
-                } else {
+                override fun onAuthenticationFailed() {
                     toastText(context, R.string.biometric_failed)
+                }
+
+                override fun onAuthenticationCancelled() {
                     handleNothingStored()
                 }
-            }
 
-            override fun onAuthenticationError(errString: CharSequence) {
-                toastText(context, errString.toString())
-            }
+                override fun onAuthenticationSuccessful(result: Cipher?) {
+                    if (result != null) {
 
-        })
+                        val encMasterPasswd = encryptMasterPassword(result, masterPassword, MODE_WITH_AUTH)
+
+                        if (encMasterPasswd != null) {
+                            PreferenceService.putEncrypted(
+                                DATA_ENCRYPTED_MASTER_PASSWORD,
+                                encMasterPasswd,
+                                context
+                            )
+                            handlePasswordStored()
+                        }
+                        else {
+                            handleNothingStored()
+                        }
+                    } else {
+                        toastText(context, R.string.biometric_failed)
+                        handleNothingStored()
+                    }
+                }
+
+                override fun onAuthenticationError(errString: CharSequence) {
+                    toastText(context, errString.toString())
+                }
+
+            })
+        } catch (e: Exception) {
+            Log.e("MPS", "cannot encrypt with biometric", e)
+            toastText(context, R.string.biometric_failed)
+            deleteStoredMasterPassword(context)
+            handleNothingStored()
+        }
     }
 
     private fun decryptWithBiometrics(
@@ -165,39 +189,45 @@ object MasterPasswordService {
         handlePasswordReceived: (masterPassword: Password) -> Unit,
         handleNothingReceived: () -> Unit
     ) {
-        val key = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_MP_WITH_AUTH, context)
-        val cipher = createDecryptCipher(key, encStoredMasterPasswd)
-        BiometricManager(cipher, context).authenticate(
-            context.getString(R.string.auth_to_decrypt_emp),
-            object : BiometricCallback {
+        try {
+            val key = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_MP_WITH_AUTH, context)
+            val cipher = createDecryptCipher(key, encStoredMasterPasswd)
+            BiometricManager(cipher, context).authenticate(
+                context.getString(R.string.auth_to_decrypt_emp),
+                context.getString(R.string.auth_to_decrypt_emp_omit),
+                object : BiometricCallback {
 
-            override fun onAuthenticationFailed() {
-                toastText(context, R.string.biometric_failed)
-                handleNothingReceived()
-            }
+                override fun onAuthenticationFailed() {
+                    toastText(context, R.string.biometric_failed)
+                }
 
-            override fun onAuthenticationCancelled() {
-                toastText(context, context.getString(R.string.cancelled_by_user))
-                handleNothingReceived()
-            }
+                override fun onAuthenticationCancelled() {
+                    handleNothingReceived()
+                }
 
-            override fun onAuthenticationSuccessful(result: Cipher?) {
-                if (result != null) {
-                    val masterPasswd = decryptMasterPassword(result, encStoredMasterPasswd)
-
-                    masterPasswd?.let(handlePasswordReceived)
-                        ?: run(handleNothingReceived)
-                } else {
+                override fun onAuthenticationSuccessful(result: Cipher?) {
+                    if (result != null) {
+                        val masterPasswd = decryptMasterPassword(result, encStoredMasterPasswd)
+                        if (masterPasswd != null) {
+                            handlePasswordReceived(masterPasswd)
+                            return
+                        }
+                    }
                     toastText(context, R.string.biometric_failed)
                     handleNothingReceived()
                 }
-            }
 
-            override fun onAuthenticationError(errString: CharSequence) {
-                toastText(context, errString.toString())
-            }
+                override fun onAuthenticationError(errString: CharSequence) {
+                    toastText(context, errString.toString())
+                }
 
-        })
+            })
+        } catch (e: Exception) {
+            Log.e("MPS", "cannot decrypt with biometric", e)
+            toastText(context, R.string.biometric_failed)
+            deleteStoredMasterPassword(context)
+            handleNothingReceived()
+        }
     }
 
     private fun createEncryptCipher(secretKeyHolder: SecretKeyHolder) : Cipher {

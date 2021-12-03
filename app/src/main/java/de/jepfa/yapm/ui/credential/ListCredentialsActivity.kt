@@ -150,9 +150,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     override fun onResume() {
         super.onResume()
-        val showed = ReminderService.showReminders(ReminderService.Vault, navigationView, this)
+        var showed = ReminderService.showReminders(ReminderService.Vault, navigationView, this)
         if (!showed) {
-            ReminderService.showReminders(ReminderService.MasterKey, navigationView, this)
+            showed = ReminderService.showReminders(ReminderService.MasterKey, navigationView, this)
+        }
+        if (!showed) {
+            showed = ReminderService.showReminders(ReminderService.StoredMasterPassword, navigationView, this)
         }
     }
 

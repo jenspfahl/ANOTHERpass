@@ -8,6 +8,9 @@ import androidx.core.os.CancellationSignal
 import de.jepfa.yapm.R
 import javax.crypto.Cipher
 
+/*
+Taken and modified from https://github.com/FSecureLABS/android-keystore-audit/tree/master/keystorecrypto-app
+ */
 @TargetApi(Build.VERSION_CODES.M)
 open class BiometricManagerV23(val cipher: Cipher, val context: Context) {
 
@@ -20,7 +23,11 @@ open class BiometricManagerV23(val cipher: Cipher, val context: Context) {
 
     }
 
-    fun displayBiometricPromptV23(description: String, biometricCallback: BiometricCallback) {
+    fun displayBiometricPromptV23(
+        description: String,
+        cancelText: String,
+        biometricCallback: BiometricCallback
+    ) {
         val fingerprintManagerCompat = FingerprintManagerCompat.from(context)
         fingerprintManagerCompat.authenticate(cryptoObject, 0, CancellationSignal(),
             object : FingerprintManagerCompat.AuthenticationCallback() {
@@ -48,13 +55,18 @@ open class BiometricManagerV23(val cipher: Cipher, val context: Context) {
                 }
             }, null
         )
-        displayBiometricDialog(description, biometricCallback)
+        displayBiometricDialog(description, cancelText, biometricCallback)
     }
 
-    private fun displayBiometricDialog(description: String, biometricCallback: BiometricCallback) {
+    private fun displayBiometricDialog(
+        description: String,
+        cancelText: String,
+        biometricCallback: BiometricCallback
+    ) {
         biometricDialogV23 = BiometricDialogV23(context, biometricCallback)
         biometricDialogV23.setTitle(context.getString(R.string.auth_with_biometrics))
         biometricDialogV23.setDescription(description)
+        biometricDialogV23.setCancelText(cancelText)
         biometricDialogV23.show()
     }
 
