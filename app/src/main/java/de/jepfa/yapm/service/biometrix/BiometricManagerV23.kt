@@ -51,7 +51,6 @@ open class BiometricManagerV23(val cipher: Cipher, val context: Context) {
                 override fun onAuthenticationFailed() {
                     super.onAuthenticationFailed()
                     updateStatus(context.getString(R.string.biometric_failed))
-                    biometricCallback.onAuthenticationFailed()
                 }
             }, null
         )

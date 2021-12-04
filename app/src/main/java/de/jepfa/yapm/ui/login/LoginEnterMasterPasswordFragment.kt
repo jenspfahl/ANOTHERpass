@@ -60,6 +60,8 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
 
         masterPasswdTextView = view.findViewById(R.id.edittext_enter_masterpassword)
         val switchStorePasswd: SwitchCompat = view.findViewById(R.id.switch_store_master_password)
+        switchStorePasswd.isChecked = MasterPasswordService.isMasterPasswordStored(loginActivity)
+
         loginButton = view.findViewById(R.id.button_login)
 
         val scanQrCodeImageView: ImageView = view.findViewById(R.id.imageview_scan_qrcode)
@@ -90,17 +92,37 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                 return@setOnClickListener
             }
 
-            val keyForTemp = getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, view.context)
-
             val encPinBase64 = arguments?.getString(CreateVaultActivity.ARG_ENC_PIN)
             if (encPinBase64 == null) {
                 toastText(context, R.string.something_went_wrong)
                 return@setOnClickListener
             }
-            val encPin = Encrypted.fromBase64String(encPinBase64)
-            val masterPin = SecretService.decryptPassword(keyForTemp, encPin)
 
-            login(masterPin, masterPassword, switchStorePasswd.isChecked, loginActivity)
+            val keyForTemp = getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, view.context)
+
+            val encPin = Encrypted.fromBase64String(encPinBase64)
+            val pin = SecretService.decryptPassword(keyForTemp, encPin)
+
+            if (switchStorePasswd.isChecked) {
+                val masterPasswdAlreadyStored = MasterPasswordService.isMasterPasswordStored(loginActivity)
+                if (masterPasswdAlreadyStored) {
+                    login(pin, masterPassword, loginActivity)
+                }
+                else {
+                    MasterPasswordService.storeMasterPassword(masterPassword, loginActivity,
+                        {
+                            login(pin, masterPassword, loginActivity)
+                            toastText(loginActivity, R.string.masterpassword_stored)
+                        },
+                        {
+                            toastText(loginActivity, R.string.masterpassword_not_stored)
+                        })
+                }
+            }
+            else {
+                MasterPasswordService.deleteStoredMasterPassword(loginActivity)
+                login(pin, masterPassword, loginActivity)
+            }
         }
 
         val scannedNdefTag = loginActivity.ndefTag?.data
@@ -219,7 +241,6 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
     private fun login(
         userPin: Password,
         masterPassword: Password,
-        isStoreMasterPassword: Boolean,
         loginActivity: LoginActivity
     ) {
 
@@ -231,24 +252,12 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                 .launch(loginActivity, LoginData(userPin, masterPassword))
                 { output ->
                     if (!output.success) {
+                        MasterPasswordService.deleteStoredMasterPassword(loginActivity)
                         loginActivity.handleFailedLoginAttempt()
                         masterPasswdTextView.error = "${getString(R.string.password_wrong)} ${loginActivity.getLoginAttemptMessage()}"
                         masterPasswdTextView.requestFocus()
                     } else {
-                        if (isStoreMasterPassword) {
-                            MasterPasswordService.storeMasterPassword(masterPassword, loginActivity,
-                                {
-                                    cleanupAndLogin(userPin, masterPassword, loginActivity)
-                                    toastText(loginActivity, R.string.masterpassword_stored)
-                                },
-                                {
-                                    cleanupAndLogin(userPin, masterPassword, loginActivity)
-                                    toastText(loginActivity, R.string.masterpassword_not_stored)
-                                })
-                        }
-                        else {
-                            cleanupAndLogin(userPin, masterPassword, loginActivity)
-                        }
+                        cleanupAndLogin(userPin, masterPassword, loginActivity)
                     }
                 }
 

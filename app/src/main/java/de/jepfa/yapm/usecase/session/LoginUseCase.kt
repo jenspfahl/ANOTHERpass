@@ -42,7 +42,7 @@ object LoginUseCase: InputUseCase<LoginData, BaseActivity>() {
         )
 
         TempFileService.clearSharesCache(baseActivity)
-
+        loginData.clear()
         return true
 
     }

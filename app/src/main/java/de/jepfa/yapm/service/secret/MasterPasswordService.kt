@@ -77,6 +77,8 @@ object MasterPasswordService {
                 handlePasswordReceived(masterPassword)
             }
             else {
+                Log.w("MPS", "stored master password not valid")
+                deleteStoredMasterPassword(context)
                 handleNothingReceived()
             }
         }
@@ -140,18 +142,16 @@ object MasterPasswordService {
                 context.getString(android.R.string.cancel),
                 object : BiometricCallback {
 
-                override fun onAuthenticationFailed() {
-                    toastText(context, R.string.biometric_failed)
-                }
-
                 override fun onAuthenticationCancelled() {
+                    deleteStoredMasterPassword(context)
                     handleNothingStored()
                 }
 
                 override fun onAuthenticationSuccessful(result: Cipher?) {
                     if (result != null) {
 
-                        val encMasterPasswd = encryptMasterPassword(result, masterPassword, MODE_WITH_AUTH)
+                        val encMasterPasswd =
+                            encryptMasterPassword(result, masterPassword, MODE_WITH_AUTH)
 
                         if (encMasterPasswd != null) {
                             PreferenceService.putEncrypted(
@@ -160,14 +160,13 @@ object MasterPasswordService {
                                 context
                             )
                             handlePasswordStored()
+                            return
                         }
-                        else {
-                            handleNothingStored()
-                        }
-                    } else {
-                        toastText(context, R.string.biometric_failed)
-                        handleNothingStored()
                     }
+
+                    toastText(context, R.string.biometric_failed)
+                    deleteStoredMasterPassword(context)
+                    handleNothingStored()
                 }
 
                 override fun onAuthenticationError(errString: CharSequence) {
@@ -196,10 +195,6 @@ object MasterPasswordService {
                 context.getString(R.string.auth_to_decrypt_emp),
                 context.getString(R.string.auth_to_decrypt_emp_omit),
                 object : BiometricCallback {
-
-                override fun onAuthenticationFailed() {
-                    toastText(context, R.string.biometric_failed)
-                }
 
                 override fun onAuthenticationCancelled() {
                     handleNothingReceived()

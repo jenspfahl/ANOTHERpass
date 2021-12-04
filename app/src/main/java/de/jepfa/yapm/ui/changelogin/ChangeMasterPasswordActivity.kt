@@ -2,21 +2,25 @@ package de.jepfa.yapm.ui.changelogin
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputFilter
+import android.text.InputType
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SwitchCompat
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.LoginData
-import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.usecase.secret.ChangeMasterPasswordUseCase
 import de.jepfa.yapm.usecase.secret.GenerateMasterPasswordUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
+import de.jepfa.yapm.util.Constants
+import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.toastText
 
@@ -53,6 +57,36 @@ class ChangeMasterPasswordActivity : SecureActivity() {
         }
 
         val buttonGeneratePasswd: Button = findViewById(R.id.button_generate_passwd)
+
+        if (DebugInfo.isDebug) {
+            buttonGeneratePasswd.setOnLongClickListener {
+
+                val input = EditText(it.context)
+                input.inputType = InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                input.setText(generatedPassword.toRawFormattedPassword(), TextView.BufferType.EDITABLE)
+
+                val filters = arrayOf<InputFilter>(InputFilter.LengthFilter(Constants.MAX_CREDENTIAL_PASSWD_LENGTH))
+                input.setFilters(filters)
+
+                AlertDialog.Builder(it.context)
+                    .setTitle(R.string.edit_password)
+                    .setMessage(R.string.edit_password_message)
+                    .setView(input)
+                    .setPositiveButton(android.R.string.ok) { dialog, which ->
+                        generatedPassword = Password(input.text)
+                        var spannedString = PasswordColorizer.spannableString(generatedPassword, it.context)
+                        generatedPasswdView.text = spannedString
+                        passwordChanged = true
+                    }
+                    .setNegativeButton(android.R.string.cancel) { dialog, which ->
+                        dialog.cancel()
+                    }
+                    .show()
+
+                true
+            }
+        }
+
         buttonGeneratePasswd.setOnClickListener {
             generatedPassword = GenerateMasterPasswordUseCase.execute(pseudoPhraseSwitch.isChecked, this).data
             generatedPasswdView.text = PasswordColorizer.spannableString(generatedPassword, this)
@@ -75,10 +109,21 @@ class ChangeMasterPasswordActivity : SecureActivity() {
                 toastText(it.context, R.string.master_password_not_changed)
             }
             else {
-                changeMasterPin(
-                    currentPinTextView,
-                    currentPin,
-                    storeMasterPassword = switchStorePasswd.isChecked)
+
+                if (switchStorePasswd.isChecked) {
+                    MasterPasswordService.storeMasterPassword(generatedPassword, this,
+                        {
+                            changeMasterPin(currentPinTextView, currentPin)
+                        },
+                        {
+                            toastText(this, R.string.masterpassword_not_stored)
+                        })
+                }
+                else {
+                    MasterPasswordService.deleteStoredMasterPassword(this)
+                    changeMasterPin(currentPinTextView, currentPin)
+                }
+
             }
         }
     }
@@ -89,8 +134,7 @@ class ChangeMasterPasswordActivity : SecureActivity() {
 
     private fun changeMasterPin(
         currentPinTextView: TextView,
-        currentPin: Password,
-        storeMasterPassword: Boolean
+        currentPin: Password
     ) {
 
         hideKeyboard(currentPinTextView)
@@ -99,7 +143,7 @@ class ChangeMasterPasswordActivity : SecureActivity() {
 
             UseCaseBackgroundLauncher(ChangeMasterPasswordUseCase)
                 .launch(this,
-                    ChangeMasterPasswordUseCase.Input(LoginData(currentPin, generatedPassword), storeMasterPassword))
+                    LoginData(currentPin, generatedPassword))
                     { output ->
                         if (output.success) {
                             val upIntent = Intent(intent)

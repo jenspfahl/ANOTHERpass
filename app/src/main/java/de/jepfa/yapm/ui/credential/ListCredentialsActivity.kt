@@ -150,6 +150,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     override fun onResume() {
         super.onResume()
+        refreshMenuMasterPasswordItem(navigationView.menu)
+
         var showed = ReminderService.showReminders(ReminderService.Vault, navigationView, this)
         if (!showed) {
             showed = ReminderService.showReminders(ReminderService.MasterKey, navigationView, this)
@@ -406,6 +408,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                                     toastText(this, R.string.masterpassword_stored)
                                 },
                                 {
+                                    refreshMenuMasterPasswordItem(navigationView.menu)
                                     masterPasswd.clear()
                                     toastText(this, R.string.masterpassword_not_stored)
                                 })

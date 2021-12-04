@@ -18,6 +18,7 @@ import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.MasterKeyService
 import de.jepfa.yapm.service.secret.AndroidKey.ALIAS_KEY_TRANSPORT
+import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.service.secret.SecretService.decryptPassword
 import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
@@ -123,8 +124,21 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
 
                 val pin = decryptPassword(transSK, encPin)
 
-                getBaseActivity()?.let {
-                    createVault(pin, masterPasswd, switchStorePasswd.isChecked, cipherAlgorithm, it)
+                getBaseActivity()?.let { baseActivity ->
+
+                    if (switchStorePasswd.isChecked) {
+                        MasterPasswordService.storeMasterPassword(masterPasswd, baseActivity,
+                            {
+                                createVault(pin, masterPasswd, cipherAlgorithm, baseActivity)
+                            },
+                            {
+                                toastText(activity, R.string.masterpassword_not_stored)
+                            })
+                    }
+                    else {
+                        createVault(pin, masterPasswd, cipherAlgorithm, baseActivity)
+                    }
+
                 }
             }
 
@@ -134,7 +148,6 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
     private fun createVault(
         pin: Password,
         masterPasswd: Password,
-        storeMasterPassword: Boolean,
         cipherAlgorithm: CipherAlgorithm,
         activity: BaseActivity
     ) {
@@ -142,7 +155,6 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
 
         val input = CreateVaultUseCase.Input(
             LoginData(pin, masterPasswd),
-            storeMasterPassword,
             cipherAlgorithm
         )
         UseCaseBackgroundLauncher(CreateVaultUseCase)

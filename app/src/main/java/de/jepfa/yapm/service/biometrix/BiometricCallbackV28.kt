@@ -22,8 +22,4 @@ class BiometricCallbackV28(private val biometricCallback: BiometricCallback) :
         biometricCallback.onAuthenticationError(errString)
     }
 
-    override fun onAuthenticationFailed() {
-        super.onAuthenticationFailed()
-        biometricCallback.onAuthenticationFailed()
-    }
 }

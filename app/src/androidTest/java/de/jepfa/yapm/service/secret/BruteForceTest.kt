@@ -40,7 +40,7 @@ class BruteForceTest {
     fun testBruteForce() {
         loginScenario.onActivity { loginActivity ->
             CreateVaultUseCase.execute(
-                CreateVaultUseCase.Input(LoginData(pin, masterPassword), false, cipherAlgorithm),
+                CreateVaultUseCase.Input(LoginData(pin, masterPassword), cipherAlgorithm),
                 loginActivity)
             attack(loginActivity)
         }
