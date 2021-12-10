@@ -8,8 +8,8 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.NFC" />
-    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
-    <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
 
     <application
         android:name=".ui.YapmApp"
@@ -22,23 +22,26 @@
         android:theme="@style/Theme.YetAnotherPasswordManager"
         tools:replace="android:allowBackup">
 
+
         <provider
             android:name=".provider.PasteContentProvider"
             android:authorities="de.jepfa.yapm.paste_checker"
             android:enabled="true"
             android:exported="true"
-            tools:ignore="ExportedContentProvider"/>
-
+            tools:ignore="ExportedContentProvider" />
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="de.jepfa.yapm.fileprovider"
-            android:grantUriPermissions="true"
-            android:exported="false">
+            android:exported="false"
+            android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
         </provider>
 
+        <activity
+            android:name=".ui.intro.IntroActivity"
+            android:theme="@style/Theme.YetAnotherPasswordManager.NoActionBar" />
         <activity
             android:name=".ui.settings.SettingsActivity"
             android:label="@string/title_activity_settings" />
@@ -94,12 +97,15 @@
             android:theme="@style/Theme.YetAnotherPasswordManager.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
-                <data android:mimeType="appliation/de.jepfa.yapm"/>
+
+                <data android:mimeType="appliation/de.jepfa.yapm" />
             </intent-filter>
         </activity>
         <activity
@@ -109,9 +115,7 @@
             android:name=".ui.login.LoginActivity"
             android:label="@string/app_name"
             android:noHistory="false"
-            android:windowSoftInputMode="adjustResize">
-        </activity>
-
+            android:windowSoftInputMode="adjustResize"></activity>
         <activity
             android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
             android:theme="@style/Theme.YetAnotherPasswordManager" />

@@ -94,6 +94,7 @@ object PreferenceService {
     const val PREF_INCLUDE_SETTINGS_IN_BACKUP_FILE = PREF_PREFIX + "include_settings_in_backup_file"
 
     const val DATA_USED_LABEL_FILTER = DATA_PREFIX + "used_label_filter"
+    const val STATE_INTRO_SHOWED = STATE_PREFIX + "intro_showed"
 
     const val PREF_REMINDER_PERIOD = PREF_PREFIX + "reminder_period"
     const val PREF_AUTH_SMP_WITH_BIOMETRIC= PREF_PREFIX + "auth_smp_with_biometric"

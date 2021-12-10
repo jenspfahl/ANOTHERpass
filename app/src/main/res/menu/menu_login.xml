@@ -16,6 +16,12 @@
     </item>
 
     <item
+        android:id="@+id/menu_intro"
+        app:showAsAction="never"
+        android:title="@string/intro">
+    </item>
+
+    <item
         android:id="@+id/menu_about"
         app:showAsAction="never"
         android:title="@string/about">

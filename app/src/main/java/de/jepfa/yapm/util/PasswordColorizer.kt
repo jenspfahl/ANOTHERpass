@@ -65,7 +65,7 @@ object PasswordColorizer {
                     val start2 = ensureLength(start1 + WORD_WIDTH, length)
 
                     spannedString.setSpan(
-                        ForegroundColorSpan(context.getColor(R.color.colorPwdAccent)),
+                        ForegroundColorSpan(context.getColor(R.color.colorAltAccent)),
                         start1,
                         start2,
                         Spanned.SPAN_MARK_MARK

@@ -8,10 +8,10 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
-import android.widget.Toast
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.STATE_INTRO_SHOWED
 import de.jepfa.yapm.service.PreferenceService.PREF_MAX_LOGIN_ATTEMPTS
 import de.jepfa.yapm.service.PreferenceService.PREF_SELF_DESTRUCTION
 import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_ATTEMPTS
@@ -22,6 +22,7 @@ import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.ui.importvault.ImportVaultActivity
 import de.jepfa.yapm.ui.nfc.NfcBaseActivity
+import de.jepfa.yapm.ui.intro.IntroActivity
 import de.jepfa.yapm.usecase.vault.DropVaultUseCase
 import de.jepfa.yapm.usecase.app.ShowInfoUseCase
 import de.jepfa.yapm.util.Constants
@@ -44,6 +45,13 @@ class LoginActivity : NfcBaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(null)
+
+        val introShowed = PreferenceService.getAsBool(STATE_INTRO_SHOWED, this)
+        val isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofill, false)
+        if (!introShowed && !isFromAutofill && Session.isLoggedOut()) {
+            val intent = Intent(this, IntroActivity::class.java)
+            startActivity(intent)
+        }
 
         loginAttempts = PreferenceService.getAsInt(STATE_LOGIN_ATTEMPTS,  this)
 
@@ -89,6 +97,12 @@ class LoginActivity : NfcBaseActivity() {
         if (id == R.id.action_login_help) {
             val browserIntent = Intent(Intent.ACTION_VIEW, Constants.HOMEPAGE)
             startActivity(browserIntent)
+            return true
+        }
+
+        if (id == R.id.menu_intro) {
+            val intent = Intent(this, IntroActivity::class.java)
+            startActivity(intent)
             return true
         }
 

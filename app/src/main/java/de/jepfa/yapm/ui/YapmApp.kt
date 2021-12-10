@@ -23,5 +23,6 @@ class YapmApp : Application() {
 
         // first thing after app start is to remove old transport key to get them exchanged / new generated
         SecretService.removeAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT)
+
     }
 }

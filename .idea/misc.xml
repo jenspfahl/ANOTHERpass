@@ -19,6 +19,7 @@
         <entry key="app/src/main/res/drawable/ic_baseline_help_outline_24_white.xml" value="0.12916666666666668" />
         <entry key="app/src/main/res/drawable/ic_baseline_import_export_24.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_label_24.xml" value="0.12916666666666668" />
+        <entry key="app/src/main/res/drawable/ic_baseline_memory_24.xml" value="0.321875" />
         <entry key="app/src/main/res/drawable/ic_baseline_nfc_24.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_nfc_36.xml" value="0.321875" />
         <entry key="app/src/main/res/drawable/ic_baseline_nfc_48.xml" value="0.19895833333333332" />
@@ -30,6 +31,7 @@
         <entry key="app/src/main/res/drawable/ic_baseline_qr_code_36.xml" value="0.20416666666666666" />
         <entry key="app/src/main/res/drawable/ic_baseline_qr_code_68_gray.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_qr_code_scanner_24.xml" value="0.19895833333333332" />
+        <entry key="app/src/main/res/drawable/ic_baseline_qr_code_scanner_36.xml" value="0.321875" />
         <entry key="app/src/main/res/drawable/ic_baseline_qr_code_scanner_48.xml" value="0.17604166666666668" />
         <entry key="app/src/main/res/drawable/ic_baseline_save_alt_24.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_share_24.xml" value="0.19895833333333332" />
@@ -37,8 +39,18 @@
         <entry key="app/src/main/res/drawable/ic_baseline_sort_24.xml" value="0.321875" />
         <entry key="app/src/main/res/drawable/ic_baseline_sort_24_white.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_vpn_key_24_white.xml" value="0.19895833333333332" />
+        <entry key="app/src/main/res/drawable/ic_keywithqrcode_normal.xml" value="0.321875" />
         <entry key="app/src/main/res/drawable/ic_security_black_24dp.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_settings_black_24dp.xml" value="0.19895833333333332" />
+        <entry key="app/src/main/res/drawable/ic_twotone_cloud_off_24.xml" value="0.246875" />
+        <entry key="app/src/main/res/drawable/ic_twotone_copy_attent_black_48dp.xml" value="0.246875" />
+        <entry key="app/src/main/res/drawable/ic_twotone_edit_24.xml" value="0.321875" />
+        <entry key="app/src/main/res/drawable/ic_twotone_fingerprint_24.xml" value="0.321875" />
+        <entry key="app/src/main/res/drawable/ic_twotone_lock_24.xml" value="0.246875" />
+        <entry key="app/src/main/res/drawable/ic_twotone_memory_24.xml" value="0.246875" />
+        <entry key="app/src/main/res/drawable/ic_twotone_nfc_24.xml" value="0.321875" />
+        <entry key="app/src/main/res/drawable/ic_twotone_psychology_24.xml" value="0.321875" />
+        <entry key="app/src/main/res/drawable/ic_twotone_qr_code_24.xml" value="0.321875" />
         <entry key="app/src/main/res/layout/activity_change_master_password.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/activity_change_pin.xml" value="0.20244565217391305" />
         <entry key="app/src/main/res/layout/activity_create_or_import_vault.xml" value="0.17864583333333334" />
@@ -49,6 +61,7 @@
         <entry key="app/src/main/res/layout/activity_list_labels.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.10885416666666667" />
         <entry key="app/src/main/res/layout/activity_nfc.xml" value="0.17864583333333334" />
+        <entry key="app/src/main/res/layout/activity_onboarding.xml" value="0.15572916666666667" />
         <entry key="app/src/main/res/layout/activity_qr_code.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/activity_show_credential.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_verify.xml" value="0.264" />
@@ -61,6 +74,13 @@
         <entry key="app/src/main/res/layout/fragment_edit_credential_data.xml" value="0.264" />
         <entry key="app/src/main/res/layout/fragment_edit_credential_password.xml" value="0.2" />
         <entry key="app/src/main/res/layout/fragment_import_vault_file.xml" value="0.8" />
+        <entry key="app/src/main/res/layout/fragment_intor_1.xml" value="0.10885416666666667" />
+        <entry key="app/src/main/res/layout/fragment_intro2.xml" value="0.15572916666666667" />
+        <entry key="app/src/main/res/layout/fragment_intro_1.xml" value="0.16799999999999998" />
+        <entry key="app/src/main/res/layout/fragment_intro_2.xml" value="0.2" />
+        <entry key="app/src/main/res/layout/fragment_intro_3.xml" value="0.2" />
+        <entry key="app/src/main/res/layout/fragment_intro_4.xml" value="0.3015625" />
+        <entry key="app/src/main/res/layout/fragment_intro_5.xml" value="0.2" />
         <entry key="app/src/main/res/layout/fragment_load_vault_file.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/fragment_login_enter_masterpassword.xml" value="0.264" />
         <entry key="app/src/main/res/layout/fragment_login_enter_pin.xml" value="0.21331521739130435" />
