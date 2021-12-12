@@ -497,7 +497,11 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 else {
                     getSecureActivity()?.let {
                         val encPassword = SecretService.encryptPassword(key, generatedPassword)
-                        DetachHelper.detachPassword(it, encPassword, null, passwordPresentation)
+                        DetachHelper.detachPassword(it,
+                            editCredentialActivity.current.user,
+                            encPassword,
+                            null,
+                            passwordPresentation)
                     }
                 }
             }

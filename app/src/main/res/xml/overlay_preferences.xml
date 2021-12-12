@@ -16,5 +16,24 @@
         app:singleLineTitle="false"
         app:defaultValue="true"/>
 
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:overlay_show_user"
+        app:title="@string/pref_overlay_show_user"
+        app:dependency="YAPM/pref:enable_overlay_feature"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:defaultValue="true"/>
+
+    <ListPreference
+        app:defaultValue="16"
+        app:entries="@array/overlay_size_entries"
+        app:entryValues="@array/overlay_size_values"
+        app:key="YAPM/pref:overlay_size"
+        app:title="@string/pref_overlay_size_title"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:useSimpleSummaryProvider="true"/>
+
+
 
 </PreferenceScreen>

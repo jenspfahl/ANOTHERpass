@@ -104,7 +104,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         holder.listenForDetachPasswd { pos, _ ->
 
             val current = getItem(pos)
-            DetachHelper.detachPassword(listCredentialsActivity, current.password, null, null)
+            DetachHelper.detachPassword(listCredentialsActivity, current.user, current.password, null, null)
         }
 
         holder.listenForCopyPasswd { pos, _ ->

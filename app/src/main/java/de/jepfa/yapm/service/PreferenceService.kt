@@ -20,7 +20,7 @@ object PreferenceService {
      * TODO If you add new preference xml files inside #initDefaults, they should be recognised as well.
      * To achieve this, count the version value up here.
      */
-    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_9"
+    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_11"
 
     const val STATE_DEFAULT_INIT_DONE = STATE_PREFIX + "default_init_done"
 
@@ -68,8 +68,12 @@ object PreferenceService {
     const val PREF_FAST_MASTERPASSWD_LOGIN_WITH_QRC = PREF_PREFIX + "fast_mp_login_with_qrc"
     const val PREF_FAST_MASTERPASSWD_LOGIN_WITH_NFC = PREF_PREFIX + "fast_mp_login_with_nfc"
     const val PREF_COLORED_PASSWORD = PREF_PREFIX + "colored_passwords"
+
     const val PREF_ENABLE_OVERLAY_FEATURE = PREF_PREFIX + "enable_overlay_feature"
     const val PREF_TRANSPARENT_OVERLAY = PREF_PREFIX + "transparent_overlay"
+    const val PREF_OVERLAY_SHOW_USER = PREF_PREFIX + "overlay_show_user"
+    const val PREF_OVERLAY_SIZE = PREF_PREFIX + "overlay_size"
+
     const val PREF_PASSWD_SHOW_FORMATTED = PREF_PREFIX + "password_show_formatted"
     const val PREF_PASSWD_WORDS_ON_NL = PREF_PREFIX + "password_words_on_nl"
     const val PREF_SHOW_LABELS_IN_LIST = PREF_PREFIX + "show_labels_in_list"
@@ -97,8 +101,7 @@ object PreferenceService {
     const val STATE_INTRO_SHOWED = STATE_PREFIX + "intro_showed"
 
     const val PREF_REMINDER_PERIOD = PREF_PREFIX + "reminder_period"
-    const val PREF_AUTH_SMP_WITH_BIOMETRIC= PREF_PREFIX + "auth_smp_with_biometric"
-
+    const val PREF_AUTH_SMP_WITH_BIOMETRIC = PREF_PREFIX + "auth_smp_with_biometric"
 
 
     fun initDefaults(context: Context?) {

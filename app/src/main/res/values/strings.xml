@@ -370,6 +370,8 @@
     <string name="pref_overlay_enable">Enable password overlay dialog feature</string>
     <string name="pref_overlay_summary_enable">Password overlay dialog is shown on top of all apps to easily read and copy-type passwords</string>
     <string name="pref_overlay_transparent_overlay">Transparent password overlay</string>
+    <string name="pref_overlay_show_user">Show user if present</string>
+    <string name="pref_overlay_size_title">Overlay dialog size</string>
     <string name="pref_password_generator_use_pseudophrase">Use pseudo phrase to generate new passwords</string>
     <string name="pref_password_generator_password_strength">Default password stength</string>
     <string name="pref_security_mask_password">Mask password when showing a credential (can be unmasked by clicking on it)</string>

@@ -9,6 +9,7 @@ import android.graphics.PixelFormat
 import android.graphics.Typeface
 import android.os.Build
 import android.os.IBinder
+import android.text.SpannableStringBuilder
 import android.view.*
 import android.view.View.OnTouchListener
 import android.widget.Button
@@ -16,6 +17,8 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.PREF_OVERLAY_SHOW_USER
+import de.jepfa.yapm.service.PreferenceService.PREF_OVERLAY_SIZE
 import de.jepfa.yapm.service.PreferenceService.PREF_TRANSPARENT_OVERLAY
 import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SecretService
@@ -29,6 +32,7 @@ class OverlayShowingService : Service(), OnTouchListener {
     private var overlayedButton: Button? = null
     private var wm: WindowManager? = null
 
+    private var user = ""
     private var password = Password.empty()
     private var presentationMode = Password.FormattingStyle.DEFAULT
 
@@ -48,12 +52,20 @@ class OverlayShowingService : Service(), OnTouchListener {
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         clearIt()
-        val encrypted = intent.getEncryptedExtra(DetachHelper.EXTRA_PASSWD)
-        if (encrypted != null && !Session.isDenied()) {
+        val encryptedPasswd = intent.getEncryptedExtra(DetachHelper.EXTRA_PASSWD)
+        if (encryptedPasswd != null && !Session.isDenied()) {
             val masterKeySK = Session.getMasterKeySK()
             if (masterKeySK != null) {
                 val transSK = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, applicationContext)
-                password = SecretService.decryptPassword(transSK, encrypted)
+                password = SecretService.decryptPassword(transSK, encryptedPasswd)
+
+                val encryptedUser = intent.getEncryptedExtra(DetachHelper.EXTRA_USER)
+                if (encryptedUser != null) {
+                    user = SecretService.decryptCommonString(transSK, encryptedUser)
+                }
+                else {
+                    user = ""
+                }
 
                 val formatted = PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_SHOW_FORMATTED, this)
                 val multiLine = PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_WORDS_ON_NL, this)
@@ -210,9 +222,24 @@ class OverlayShowingService : Service(), OnTouchListener {
     }
 
     private fun updateContent() {
-        overlayedButton?.text = PasswordColorizer.spannableString(password, presentationMode, this)
+        val showUser = PreferenceService.getAsBool(PREF_OVERLAY_SHOW_USER, applicationContext)
+        if (showUser && user.isNotBlank()) {
+            overlayedButton?.text = SpannableStringBuilder(user)
+                .append(System.lineSeparator())
+                .append(System.lineSeparator())
+                .append(PasswordColorizer.spannableString(password, presentationMode, this))
+        }
+        else {
+            overlayedButton?.text =
+                PasswordColorizer.spannableString(password, presentationMode, this)
+
+        }
         overlayedButton?.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
         overlayedButton?.setTypeface(Typeface.MONOSPACE, Typeface.BOLD)
+
+        val overlaySize = PreferenceService.getAsInt(PREF_OVERLAY_SIZE, applicationContext)
+        overlayedButton?.textSize = overlaySize.toFloat()
+
         calcOriginalPos()
     }
     private fun updateRemove() {

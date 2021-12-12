@@ -16,9 +16,15 @@ import de.jepfa.yapm.util.putEncryptedExtra
 
 object DetachHelper {
     val EXTRA_PASSWD = "password"
+    val EXTRA_USER = "user"
     val EXTRA_PRESENTATION_MODE = "presentationMode"
 
-    fun detachPassword(activity: SecureActivity, encPassword: Encrypted, obfuscationKey : Key?, formattingStyle: Password.FormattingStyle?) =
+    fun detachPassword(
+        activity: SecureActivity,
+        encUser: Encrypted,
+        encPassword: Encrypted,
+        obfuscationKey : Key?,
+        formattingStyle: Password.FormattingStyle?) =
             if (!PermissionChecker.hasOverlayPermission(activity)) {
 
                 AlertDialog.Builder(activity)
@@ -39,6 +45,7 @@ object DetachHelper {
             } else {
 
                 activity.masterSecretKey?.let{ key ->
+                    val user = SecretService.decryptCommonString(key, encUser)
                     val password = SecretService.decryptPassword(key, encPassword)
                     obfuscationKey?.let {
                         password.deobfuscate(it)
@@ -48,6 +55,12 @@ object DetachHelper {
 
                     val intent = Intent(activity, OverlayShowingService::class.java)
                     intent.putEncryptedExtra(EXTRA_PASSWD, encPassword)
+
+                    if (user.isNotBlank()) {
+                        val encUser = SecretService.encryptCommonString(transSK, user)
+                        intent.putEncryptedExtra(EXTRA_USER, encUser)
+                    }
+
                     intent.putExtra(EXTRA_PRESENTATION_MODE, formattingStyle?.ordinal)
                     activity.startService(intent)
 

@@ -112,4 +112,16 @@
         <item>604800</item>
     </string-array>
 
+    <string-array name="overlay_size_entries">
+        <item>Small</item>
+        <item>Medium</item>
+        <item>Big</item>
+    </string-array>
+
+    <string-array name="overlay_size_values">
+        <item>12</item>
+        <item>16</item>
+        <item>22</item>
+    </string-array>
+
 </resources>
