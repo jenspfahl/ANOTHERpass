@@ -8,7 +8,11 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
+import androidx.navigation.fragment.NavHostFragment
 import de.jepfa.yapm.R
+import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.encrypted.EncryptedType
+import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.STATE_INTRO_SHOWED
@@ -16,8 +20,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_MAX_LOGIN_ATTEMPTS
 import de.jepfa.yapm.service.PreferenceService.PREF_SELF_DESTRUCTION
 import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_ATTEMPTS
 import de.jepfa.yapm.service.nfc.NfcService
-import de.jepfa.yapm.service.secret.MasterKeyService
-import de.jepfa.yapm.service.secret.MasterPasswordService
+import de.jepfa.yapm.service.secret.*
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.ui.importvault.ImportVaultActivity
@@ -163,6 +166,14 @@ class LoginActivity : NfcBaseActivity() {
         if (ndefTag != null && showTagDetectedMessage) {
             toastText(this, R.string.nfc_tag_for_login_detected)
         }
+
+        val navFragment = supportFragmentManager.primaryNavigationFragment
+        if (navFragment != null && navFragment is NavHostFragment) {
+            val currFragment = navFragment.childFragmentManager.primaryNavigationFragment
+            if (currFragment is LoginEnterMasterPasswordFragment) {
+                currFragment.updateMasterKeyFromNfcTag()
+            }
+        }
     }
 
     override fun lock() {
@@ -186,6 +197,66 @@ class LoginActivity : NfcBaseActivity() {
             startActivity(intent)
         }
         finish()
+    }
+
+    internal fun readMasterPassword(scanned: String): Password? {
+        val encrypted = Encrypted.fromEncryptedBase64StringWithCheck(scanned)
+        return when (encrypted?.type?.type) {
+            EncryptedType.Types.ENC_MASTER_PASSWD -> readEMP(encrypted)
+            EncryptedType.Types.MASTER_PASSWD_TOKEN -> readMPT(encrypted)
+            else -> {
+                toastText(this, R.string.invalid_emp_mpt)
+                return null
+            }
+        }
+    }
+
+    private fun readEMP(emp: Encrypted): Password? {
+        val empSK = MasterPasswordService.generateEncMasterPasswdSKForExport(this)
+        val masterPassword =
+            SecretService.decryptPassword(empSK, emp)
+        if (!masterPassword.isValid()) {
+            toastText(this, R.string.invalid_emp)
+            return null
+        }
+
+        return masterPassword
+    }
+
+    private fun readMPT(mpt: Encrypted): Password? {
+        if (!PreferenceService.isPresent(
+                PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY,
+                this
+            )
+        ) {
+            toastText(this, R.string.no_mpt_present)
+            return null
+        }
+        // decrypt obliviously encrypted master password token
+        val encMasterPasswordTokenKey = PreferenceService.getEncrypted(
+            PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY,
+            this
+        )
+        encMasterPasswordTokenKey?.let {
+            val masterPasswordTokenSK =
+                SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_MP_TOKEN, this)
+            val masterPasswordTokenKey =
+                SecretService.decryptKey(masterPasswordTokenSK, encMasterPasswordTokenKey)
+            val salt = SaltService.getSalt(this)
+            val cipherAlgorithm = SecretService.getCipherAlgorithm(this)
+
+            val mptSK =
+                SecretService.generateStrongSecretKey(masterPasswordTokenKey, salt, cipherAlgorithm)
+
+            val masterPassword =
+                SecretService.decryptPassword(mptSK, mpt)
+            if (masterPassword.isValid()) {
+                return masterPassword
+            }
+
+        }
+        toastText(this, R.string.invalid_mpt)
+        return null
     }
 
     private fun getMaxLoginAttempts(): Int {

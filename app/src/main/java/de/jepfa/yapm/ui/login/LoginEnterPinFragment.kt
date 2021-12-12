@@ -11,6 +11,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
+import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.encrypted.EncryptedType
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.model.session.Session
@@ -82,6 +84,7 @@ class LoginEnterPinFragment : BaseFragment() {
             }
 
             pinTextView.text = null
+            val scannedNdefTag = loginActivity.ndefTag?.data
 
             if (!Session.isLoggedOut()) {
                 val keyForTemp = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, view.context)
@@ -94,10 +97,16 @@ class LoginEnterPinFragment : BaseFragment() {
 
                 login(pinTextView, userPin, masterPasswd, loginActivity)
             }
+            else if (scannedNdefTag != null) {
+                val masterPasswd = loginActivity.readMasterPassword(scannedNdefTag)
+                if (masterPasswd != null) {
+                    login(pinTextView, userPin, masterPasswd, loginActivity)
+                }
+            }
             else {
                 MasterPasswordService.getMasterPasswordFromStore(
-                    loginActivity, {
-                        login(pinTextView, userPin, it, loginActivity)
+                    loginActivity, { masterPasswd ->
+                        login(pinTextView, userPin, masterPasswd, loginActivity)
                     }
                     , {
                         val encUserPin = SecretService.encryptPassword(keyForTemp, userPin)

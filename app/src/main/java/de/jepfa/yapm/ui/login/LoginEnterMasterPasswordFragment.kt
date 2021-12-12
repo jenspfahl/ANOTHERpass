@@ -129,7 +129,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         if (scannedNdefTag != null) {
             Log.i("LOGIN", "Tag available")
 
-            val loginIntented = readAndUpdateMasterPassword(scannedNdefTag)
+            val loginIntented = readAndUpdateMasterPassword(scannedNdefTag, loginActivity)
             if (loginIntented) {
                 Log.i("LOGIN", "NDEF tag scanned and fast login granted")
                 return
@@ -149,31 +149,27 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val scanned = getScannedFromIntent(requestCode, resultCode, data)
         if (scanned != null) {
-            readAndUpdateMasterPassword(scanned)
+            val loginActivity = getBaseActivity() as LoginActivity
+            readAndUpdateMasterPassword(scanned, loginActivity)
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }
     }
 
-    private fun readAndUpdateMasterPassword(scanned: String): Boolean {
-        val encrypted = Encrypted.fromEncryptedBase64StringWithCheck(scanned)
-        return when (encrypted?.type?.type) {
-            ENC_MASTER_PASSWD -> readEMP(encrypted)
-            MASTER_PASSWD_TOKEN -> readMPT(encrypted)
-            else -> return false
-        }
 
+    fun updateMasterKeyFromNfcTag() {
+        val loginActivity = getBaseActivity() as LoginActivity
+
+        val scannedNdefTag = loginActivity.ndefTag?.data
+        if (scannedNdefTag != null) {
+            Log.i("LOGIN", "Tag available")
+            readAndUpdateMasterPassword(scannedNdefTag, loginActivity)
+        }
     }
 
-    private fun readEMP(emp: Encrypted): Boolean {
-        val baseActivity = getBaseActivity() ?: return false
-        val empSK = generateEncMasterPasswdSKForExport(baseActivity)
-        val masterPassword =
-            SecretService.decryptPassword(empSK, emp)
-        if (!masterPassword.isValid()) {
-            toastText(getBaseActivity(), R.string.invalid_emp)
-            return false
-        }
+
+    private fun readAndUpdateMasterPassword(scanned: String, loginActivity: LoginActivity): Boolean {
+        val masterPassword = loginActivity.readMasterPassword(scanned) ?: return false
 
         masterPasswdTextView.setText(masterPassword.toRawFormattedPassword())
         masterPassword.clear()
@@ -186,47 +182,6 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         return false
     }
 
-    private fun readMPT(mpt: Encrypted): Boolean {
-        if (!PreferenceService.isPresent(
-                PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY,
-                getBaseActivity()
-            )
-        ) {
-            toastText(getBaseActivity(), R.string.no_mpt_present)
-            return true
-        }
-        // decrypt obliviously encrypted master password token
-        val encMasterPasswordTokenKey = PreferenceService.getEncrypted(
-            PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY,
-            getBaseActivity()
-        )
-        encMasterPasswordTokenKey?.let {
-            val baseActivity = getBaseActivity() ?: return false
-            val masterPasswordTokenSK = getAndroidSecretKey(AndroidKey.ALIAS_KEY_MP_TOKEN, baseActivity)
-            val masterPasswordTokenKey =
-                decryptKey(masterPasswordTokenSK, encMasterPasswordTokenKey)
-            val salt = getSalt(baseActivity)
-            val cipherAlgorithm = SecretService.getCipherAlgorithm(baseActivity)
-
-            val mptSK = generateStrongSecretKey(masterPasswordTokenKey, salt, cipherAlgorithm)
-
-            val masterPassword =
-                SecretService.decryptPassword(mptSK, mpt)
-            if (!masterPassword.isValid()) {
-                toastText(getBaseActivity(), R.string.invalid_mpt)
-                return false
-            }
-
-            masterPasswdTextView.setText(masterPassword.toRawFormattedPassword())
-            masterPassword.clear()
-
-            if (isFastLoginWithQrCode() || isFastLoginWithNfcTag()) {
-                loginButton.performClick()
-                return true
-            }
-        }
-        return false
-    }
 
     private fun getScannedFromIntent(requestCode: Int, resultCode: Int, data: Intent?): String? {
         if (requestCode == NfcActivity.ACTION_READ_NFC_TAG) {
