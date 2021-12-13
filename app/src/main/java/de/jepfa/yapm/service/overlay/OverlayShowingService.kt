@@ -24,6 +24,12 @@ import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.getEncryptedExtra
+import android.app.ActivityManager.RunningTaskInfo
+
+import android.app.Activity
+
+import android.app.ActivityManager
+import de.jepfa.yapm.service.PreferenceService.PREF_OVERLAY_CLOSE_ALL
 
 
 class OverlayShowingService : Service(), OnTouchListener {
@@ -35,6 +41,7 @@ class OverlayShowingService : Service(), OnTouchListener {
     private var user = ""
     private var password = Password.empty()
     private var presentationMode = Password.FormattingStyle.DEFAULT
+    private var multiLine = false
 
     private var offsetX = 0f
     private var offsetY = 0f
@@ -43,6 +50,7 @@ class OverlayShowingService : Service(), OnTouchListener {
 
     private var moving = false
     private var dropToRemove = false
+    private var dropToGoBack = false
 
 
 
@@ -52,6 +60,7 @@ class OverlayShowingService : Service(), OnTouchListener {
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         clearIt()
+        multiLine = PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_WORDS_ON_NL, this)
         val encryptedPasswd = intent.getEncryptedExtra(DetachHelper.EXTRA_PASSWD)
         if (encryptedPasswd != null && !Session.isDenied()) {
             val masterKeySK = Session.getMasterKeySK()
@@ -100,6 +109,9 @@ class OverlayShowingService : Service(), OnTouchListener {
                 setBackgroundColor(0x77feccff)
             }
             compoundDrawablePadding = 12
+
+            val overlaySize = PreferenceService.getAsInt(PREF_OVERLAY_SIZE, applicationContext)
+            textSize = overlaySize.toFloat()
         }
 
         overlayedButton?.setOnTouchListener(this)
@@ -182,9 +194,24 @@ class OverlayShowingService : Service(), OnTouchListener {
             MotionEvent.ACTION_UP -> {
                 if (dropToRemove) {
                     clearIt()
+                    val closeAll = PreferenceService.getAsBool(PREF_OVERLAY_CLOSE_ALL, applicationContext)
+                    if (closeAll) {
+                        Session.logout()
+                        closeAll()
+                    }
+                    return true
+                }
+                if (dropToGoBack) {
+                    bringToFront()
                     return true
                 }
                 if (moving) {
+                    return true
+                }
+                else {
+                    presentationMode = if (multiLine) presentationMode.prev()
+                    else presentationMode.next()
+                    updateContent()
                     return true
                 }
             }
@@ -207,9 +234,13 @@ class OverlayShowingService : Service(), OnTouchListener {
         if (event.rawY < 50) {
             updateRemove()
             dropToRemove = true
-        } else if (dropToRemove) {
+        } else if (event.rawX < 50) {
+            updateBack()
+            dropToGoBack = true
+        } else if (dropToRemove || dropToGoBack) {
             updateContent()
             dropToRemove = false
+            dropToGoBack = false
         }
     }
 
@@ -234,19 +265,42 @@ class OverlayShowingService : Service(), OnTouchListener {
                 PasswordColorizer.spannableString(password, presentationMode, this)
 
         }
-        overlayedButton?.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+        overlayedButton?.setCompoundDrawablesWithIntrinsicBounds(0, R.mipmap.ic_launcher_round,0, 0)
         overlayedButton?.setTypeface(Typeface.MONOSPACE, Typeface.BOLD)
-
-        val overlaySize = PreferenceService.getAsInt(PREF_OVERLAY_SIZE, applicationContext)
-        overlayedButton?.textSize = overlaySize.toFloat()
 
         calcOriginalPos()
     }
+
     private fun updateRemove() {
-        overlayedButton?.text = getString(R.string.drop_to_reove)
+        val closeAll = PreferenceService.getAsBool(PREF_OVERLAY_CLOSE_ALL, applicationContext)
+        if (closeAll) {
+            overlayedButton?.text = getString(R.string.drop_to_close)
+        }
+        else {
+            overlayedButton?.text = getString(R.string.drop_to_remove)
+        }
         overlayedButton?.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_close_12, 0, 0)
         overlayedButton?.typeface = null
         calcOriginalPos()
+    }
+
+    private fun updateBack() {
+        overlayedButton?.text = getString(R.string.drop_to_go_back)
+        overlayedButton?.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_arrow_back_24, 0, 0)
+        overlayedButton?.typeface = null
+        calcOriginalPos()
+    }
+
+    private fun closeAll() {
+        val am = getSystemService(ACTIVITY_SERVICE) as ActivityManager
+        am.appTasks.first().finishAndRemoveTask()
+
+    }
+
+    private fun bringToFront() {
+        val am = getSystemService(ACTIVITY_SERVICE) as ActivityManager
+        am.appTasks.first().moveToFront()
+
     }
 
 }

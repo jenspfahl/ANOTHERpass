@@ -211,9 +211,12 @@
     <string name="unknown_placeholder">\???</string>
     <string name="tab_pseudo_phrase">Pseudo phrase</string>
     <string name="tab_ordinary">Ordinary password</string>
-    <string name="drop_to_reove">DROP TO REMOVE</string>
+    <string name="drop_to_close">DROP TO CLOSE</string>
+    <string name="drop_to_remove">DROP TO REMOVE</string>
+    <string name="drop_to_go_back">DROP TO GO BACK</string>
 
     <string name="vault_export_info">"Vault (Id = %4$s) exported at %1$s, contains %2$s credentials and %3$s labels"</string>
+    <string name="vault_export_info2">"Vault file exported at %1$s, contains %2$s credentials and %3$s labels"</string>
     <string name="scan_masterkey_first">Scan your master key first</string>
     <string name="not_an_emk">This is not an Encrypted Master Key</string>
 
@@ -371,6 +374,7 @@
     <string name="pref_overlay_summary_enable">Password overlay dialog is shown on top of all apps to easily read and copy-type passwords</string>
     <string name="pref_overlay_transparent_overlay">Transparent password overlay</string>
     <string name="pref_overlay_show_user">Show user if present</string>
+    <string name="pref_overlay_close_all">Close entire app and logout when overlay is dropped</string>
     <string name="pref_overlay_size_title">Overlay dialog size</string>
     <string name="pref_password_generator_use_pseudophrase">Use pseudo phrase to generate new passwords</string>
     <string name="pref_password_generator_password_strength">Default password stength</string>

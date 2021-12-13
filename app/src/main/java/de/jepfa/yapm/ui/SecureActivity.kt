@@ -29,6 +29,7 @@ abstract class SecureActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        closeOverlayDialogs()
         checkSecret()
     }
 

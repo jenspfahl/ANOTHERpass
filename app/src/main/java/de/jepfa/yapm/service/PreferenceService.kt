@@ -20,7 +20,7 @@ object PreferenceService {
      * TODO If you add new preference xml files inside #initDefaults, they should be recognised as well.
      * To achieve this, count the version value up here.
      */
-    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_11"
+    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_12"
 
     const val STATE_DEFAULT_INIT_DONE = STATE_PREFIX + "default_init_done"
 
@@ -73,6 +73,7 @@ object PreferenceService {
     const val PREF_TRANSPARENT_OVERLAY = PREF_PREFIX + "transparent_overlay"
     const val PREF_OVERLAY_SHOW_USER = PREF_PREFIX + "overlay_show_user"
     const val PREF_OVERLAY_SIZE = PREF_PREFIX + "overlay_size"
+    const val PREF_OVERLAY_CLOSE_ALL = PREF_PREFIX + "overlay_close_all"
 
     const val PREF_PASSWD_SHOW_FORMATTED = PREF_PREFIX + "password_show_formatted"
     const val PREF_PASSWD_WORDS_ON_NL = PREF_PREFIX + "password_words_on_nl"

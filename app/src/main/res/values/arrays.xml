@@ -121,7 +121,7 @@
     <string-array name="overlay_size_values">
         <item>12</item>
         <item>16</item>
-        <item>22</item>
+        <item>20</item>
     </string-array>
 
 </resources>

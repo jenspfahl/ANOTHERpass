@@ -24,6 +24,14 @@
         app:singleLineTitle="false"
         app:defaultValue="true"/>
 
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:overlay_close_all"
+        app:title="@string/pref_overlay_close_all"
+        app:dependency="YAPM/pref:enable_overlay_feature"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:defaultValue="true"/>
+
     <ListPreference
         app:defaultValue="16"
         app:entries="@array/overlay_size_entries"
