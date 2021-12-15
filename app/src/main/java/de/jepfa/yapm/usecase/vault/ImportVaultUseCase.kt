@@ -35,6 +35,10 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, BaseActivity>(
         activity: BaseActivity,
         encMasterKey: String?
     ): Boolean {
+
+        // this is to have a clean baseline
+        PreferenceService.deleteAllData(activity)
+
         val salt = jsonContent.get(VaultExportService.JSON_VAULT_ID)?.asString
         salt?.let {
             SaltService.storeSaltFromBase64String(it, activity)

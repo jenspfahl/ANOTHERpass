@@ -58,6 +58,7 @@ object ChangeMasterPasswordUseCase:
 
         PreferenceService.delete(PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY, activity)
         PreferenceService.putCurrentDate(PreferenceService.DATA_MK_MODIFIED_AT, activity)
+        PreferenceService.putCurrentDate(PreferenceService.DATA_MP_MODIFIED_AT, activity)
 
         return LoginUseCase.execute(loginData, activity).success
 

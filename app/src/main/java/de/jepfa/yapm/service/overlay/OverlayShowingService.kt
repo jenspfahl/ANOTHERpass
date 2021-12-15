@@ -29,6 +29,9 @@ import android.app.ActivityManager.RunningTaskInfo
 import android.app.Activity
 
 import android.app.ActivityManager
+import androidx.core.view.marginStart
+import androidx.core.view.marginTop
+import androidx.core.view.setPadding
 import de.jepfa.yapm.service.PreferenceService.PREF_OVERLAY_CLOSE_ALL
 
 
@@ -106,9 +109,10 @@ class OverlayShowingService : Service(), OnTouchListener {
             setPadding(24, 12, 24, 12)
             val isTransparent = PreferenceService.getAsBool(PREF_TRANSPARENT_OVERLAY, this@OverlayShowingService)
             if (isTransparent) {
-                setBackgroundColor(0x77feccff)
+                alpha = 0.7f
             }
             compoundDrawablePadding = 12
+            setPadding(24)
 
             val overlaySize = PreferenceService.getAsInt(PREF_OVERLAY_SIZE, applicationContext)
             textSize = overlaySize.toFloat()

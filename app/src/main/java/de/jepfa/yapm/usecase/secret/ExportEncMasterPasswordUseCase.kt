@@ -6,6 +6,7 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.encrypted.EncryptedType
 import de.jepfa.yapm.model.encrypted.EncryptedType.Types.ENC_MASTER_PASSWD
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.service.secret.SecretService
@@ -34,6 +35,8 @@ object ExportEncMasterPasswordUseCase:
         val encQrcHeader = SecretService.encryptCommonString(tempKey, encMasterPasswd.type?.toString() ?: "")
         val encQrc = SecretService.encryptEncrypted(tempKey, encMasterPasswd)
         masterPassword.clear()
+
+        PreferenceService.putCurrentDate(PreferenceService.DATA_MP_EXPORTED_AT, activity)
 
         if (input.directlyToNfcActivity) {
             val intent = Intent(activity, NfcActivity::class.java)

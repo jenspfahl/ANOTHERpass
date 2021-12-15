@@ -18,6 +18,8 @@ object ExportEncMasterKeyUseCase: BasicUseCase<SecureActivity>() {
         val key = activity.masterSecretKey
         if (key != null && encStoredMasterKey != null) {
 
+            PreferenceService.putCurrentDate(PreferenceService.DATA_MK_EXPORTED_AT, activity)
+
             val mkKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_MK, activity)
             val tempKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, activity)
             val encMasterKey = SecretService.decryptEncrypted(mkKey, encStoredMasterKey)
@@ -41,8 +43,6 @@ object ExportEncMasterKeyUseCase: BasicUseCase<SecureActivity>() {
             intent.putExtra(QrCodeActivity.EXTRA_NFC_WITH_APP_RECORD, true)
 
             activity.startActivity(intent)
-
-            PreferenceService.putCurrentDate(PreferenceService.DATA_MK_EXPORTED_AT, activity)
 
             return true
         }

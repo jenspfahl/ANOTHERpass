@@ -3,9 +3,11 @@ package de.jepfa.yapm.service.notification
 import android.content.Context
 import android.content.Intent
 import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.snackbar.Snackbar
 import de.jepfa.yapm.R
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_MK_EXPORTED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_MK_EXPORT_NOTIFICATION_SHOWED_AS
@@ -13,6 +15,10 @@ import de.jepfa.yapm.service.PreferenceService.DATA_MK_EXPORT_NOTIFICATION_SHOWE
 import de.jepfa.yapm.service.PreferenceService.DATA_MK_MODIFIED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_BIOMETRIC_SMP_NOTIFICATION_SHOWED_AS
 import de.jepfa.yapm.service.PreferenceService.DATA_BIOMETRIC_SMP_NOTIFICATION_SHOWED_AT
+import de.jepfa.yapm.service.PreferenceService.DATA_MP_EXPORTED_AT
+import de.jepfa.yapm.service.PreferenceService.DATA_MP_EXPORT_NOTIFICATION_SHOWED_AS
+import de.jepfa.yapm.service.PreferenceService.DATA_MP_EXPORT_NOTIFICATION_SHOWED_AT
+import de.jepfa.yapm.service.PreferenceService.DATA_MP_MODIFIED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_EXPORTED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_EXPORT_NOTIFICATION_SHOWED_AS
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_EXPORT_NOTIFICATION_SHOWED_AT
@@ -20,6 +26,7 @@ import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_MODIFIED_AT
 import de.jepfa.yapm.service.PreferenceService.PREF_REMINDER_PERIOD
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_EXPORT_MK_REMINDER
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_BIOMETRIC_SMP_REMINDER
+import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_EXPORT_MP_REMINDER
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_EXPORT_VAULT_REMINDER
 import de.jepfa.yapm.service.biometrix.BiometricUtils
 import de.jepfa.yapm.service.secret.MasterPasswordService
@@ -27,6 +34,7 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.exportvault.ExportVaultActivity
 import de.jepfa.yapm.usecase.secret.ExportEncMasterKeyUseCase
+import de.jepfa.yapm.usecase.secret.ExportEncMasterPasswordUseCase
 import de.jepfa.yapm.util.toastText
 import java.util.*
 
@@ -63,7 +71,7 @@ object ReminderService {
         override val dataNotificationShowedAt = DATA_MK_EXPORT_NOTIFICATION_SHOWED_AT
         override val dataNotificationShowedAs = DATA_MK_EXPORT_NOTIFICATION_SHOWED_AS
         override val notificationText = R.string.export_mk_reminder
-        override val notificationAction = R.string.export_masterkey
+        override val notificationAction = R.string.action_export_masterkey
         override val condition = { activity: SecureActivity ->
             dateOlderThan(DATA_MK_EXPORTED_AT, DATA_MK_MODIFIED_AT, activity)
         }
@@ -72,6 +80,25 @@ object ReminderService {
                 .launch(activity, Unit)
         }
     }
+
+    object MasterPassword: ReminderConfig {
+        override val prefShowReminder = PREF_SHOW_EXPORT_MP_REMINDER
+        override val dataNotificationShowedAt = DATA_MP_EXPORT_NOTIFICATION_SHOWED_AT
+        override val dataNotificationShowedAs = DATA_MP_EXPORT_NOTIFICATION_SHOWED_AS
+        override val notificationText = R.string.export_mp_reminder
+        override val notificationAction = R.string.action_export_masterpasswd
+        override val condition = { activity: SecureActivity ->
+            dateOlderThan(DATA_MP_EXPORTED_AT, DATA_MP_MODIFIED_AT, activity)
+        }
+        override val action: (SecureActivity) -> Unit = { activity: SecureActivity ->
+            val encMasterPasswd = Session.getEncMasterPasswd()
+            encMasterPasswd?.let {
+                UseCaseBackgroundLauncher(ExportEncMasterPasswordUseCase)
+                    .launch(activity, ExportEncMasterPasswordUseCase.Input(it, false))
+            }
+        }
+    }
+
     object StoredMasterPassword: ReminderConfig {
         override val prefShowReminder = PREF_SHOW_BIOMETRIC_SMP_REMINDER
         override val dataNotificationShowedAt = DATA_BIOMETRIC_SMP_NOTIFICATION_SHOWED_AT
@@ -106,6 +133,10 @@ object ReminderService {
                 config.notificationText,
                 7_000
             )
+
+            snackBar.view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)?.apply {
+                maxLines = 3
+            }
 
             val notificationShowedAs = PreferenceService.getAsBool(config.dataNotificationShowedAs, activity)
             if (notificationShowedAs) {

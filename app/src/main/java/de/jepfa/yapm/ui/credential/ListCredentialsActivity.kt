@@ -152,12 +152,17 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         super.onResume()
         refreshMenuMasterPasswordItem(navigationView.menu)
 
-        var showed = ReminderService.showReminders(ReminderService.Vault, navigationView, this)
+        val view: View = findViewById(R.id.content_list_credentials)
+
+        var showed = ReminderService.showReminders(ReminderService.MasterPassword, view, this)
         if (!showed) {
-            showed = ReminderService.showReminders(ReminderService.MasterKey, navigationView, this)
+            showed = ReminderService.showReminders(ReminderService.Vault, view, this)
         }
         if (!showed) {
-            showed = ReminderService.showReminders(ReminderService.StoredMasterPassword, navigationView, this)
+            showed = ReminderService.showReminders(ReminderService.MasterKey, view, this)
+        }
+        if (!showed) {
+            showed = ReminderService.showReminders(ReminderService.StoredMasterPassword, view, this)
         }
     }
 

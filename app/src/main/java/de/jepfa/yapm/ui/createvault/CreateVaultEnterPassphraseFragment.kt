@@ -14,6 +14,7 @@ import androidx.appcompat.widget.SwitchCompat
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.AndroidKey.ALIAS_KEY_TRANSPORT
 import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
@@ -91,6 +92,8 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
                 val transSK = getAndroidSecretKey(ALIAS_KEY_TRANSPORT, view.context)
                 val encPassword = encryptPassword(transSK, generatedPassword)
                 generatedPassword.clear()
+
+                PreferenceService.putCurrentDate(PreferenceService.DATA_MP_MODIFIED_AT, button.context)
 
                 val args = Bundle()
                 args.putEncrypted(ARG_ENC_MASTER_PASSWD, encPassword)

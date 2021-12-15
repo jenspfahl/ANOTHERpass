@@ -20,7 +20,7 @@ object PreferenceService {
      * TODO If you add new preference xml files inside #initDefaults, they should be recognised as well.
      * To achieve this, count the version value up here.
      */
-    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_12"
+    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_13"
 
     const val STATE_DEFAULT_INIT_DONE = STATE_PREFIX + "default_init_done"
 
@@ -41,12 +41,17 @@ object PreferenceService {
     const val DATA_VAULT_EXPORT_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "vault_export_notification_showed_as"
     const val PREF_SHOW_EXPORT_VAULT_REMINDER = PREF_PREFIX + "show_export_vault_reminder"
 
-
     const val DATA_MK_EXPORTED_AT = DATA_PREFIX + "mk_exported_at"
     const val DATA_MK_MODIFIED_AT = DATA_PREFIX + "mk_modified_at"
     const val DATA_MK_EXPORT_NOTIFICATION_SHOWED_AT = DATA_PREFIX + "mk_export_notification_showed_at"
     const val DATA_MK_EXPORT_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "mk_export_notification_showed_as"
     const val PREF_SHOW_EXPORT_MK_REMINDER = PREF_PREFIX + "show_export_mk_reminder"
+
+    const val DATA_MP_EXPORTED_AT = DATA_PREFIX + "mp_exported_at"
+    const val DATA_MP_MODIFIED_AT = DATA_PREFIX + "mp_modified_at"
+    const val DATA_MP_EXPORT_NOTIFICATION_SHOWED_AT = DATA_PREFIX + "mp_export_notification_showed_at"
+    const val DATA_MP_EXPORT_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "mp_export_notification_showed_as"
+    const val PREF_SHOW_EXPORT_MP_REMINDER = PREF_PREFIX + "show_export_mp_reminder"
 
     const val DATA_BIOMETRIC_SMP_NOTIFICATION_SHOWED_AT = DATA_PREFIX + "biometric_smp_notification_showed_at"
     const val DATA_BIOMETRIC_SMP_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "biometric_smp_notification_showed_as"

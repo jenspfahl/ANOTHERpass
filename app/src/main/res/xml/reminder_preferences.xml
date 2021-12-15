@@ -20,6 +20,17 @@
         app:singleLineTitle="false"
         app:defaultValue="true"/>
 
+
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:show_export_mp_reminder"
+        app:title="@string/show_export_mp_reminder"
+        app:summary="@string/summary_show_export_mp_reminder"
+        app:allowDividerAbove="false"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:defaultValue="true"/>
+
+
     <SwitchPreferenceCompat
         app:key="YAPM/pref:show_export_mk_reminder"
         app:title="@string/show_export_mk_reminder"

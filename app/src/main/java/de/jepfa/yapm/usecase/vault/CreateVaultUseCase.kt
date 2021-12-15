@@ -29,6 +29,7 @@ object CreateVaultUseCase: InputUseCase<CreateVaultUseCase.Input, BaseActivity>(
         masterKey.clear()
 
         PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_CREATED_AT, activity)
+
         PreferenceService.putString(
             PreferenceService.DATA_VAULT_VERSION,
             Constants.FAST_KEYGEN_VAULT_VERSION.toString(),
