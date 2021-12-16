@@ -107,6 +107,16 @@ class SettingsActivity : SecureActivity(),
                     true
                 }
             }
+
+            val showLabelsInListPref = findPreference<SwitchPreferenceCompat>(
+                PreferenceService.PREF_SHOW_LABELS_IN_LIST)
+
+            showLabelsInListPref?.let {
+                it.setOnPreferenceChangeListener { preference, newValue ->
+                    PreferenceService.putBoolean(PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_RELOAD, true, preference.context)
+                    true
+                }
+            }
         }
     }
 
@@ -174,12 +184,32 @@ class SettingsActivity : SecureActivity(),
     class OverlaySettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.overlay_preferences, rootKey)
+
+            val enableOverlayPref = findPreference<SwitchPreferenceCompat>(
+                PreferenceService.PREF_ENABLE_OVERLAY_FEATURE)
+
+            enableOverlayPref?.let {
+                it.setOnPreferenceChangeListener { preference, newValue ->
+                    PreferenceService.putBoolean(PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_RELOAD, true, preference.context)
+                    true
+                }
+            }
         }
     }
 
     class ClipboardSettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.clipboard_preferences, rootKey)
+
+            val enableCopyPasswdPref = findPreference<SwitchPreferenceCompat>(
+                PreferenceService.PREF_ENABLE_COPY_PASSWORD)
+
+            enableCopyPasswdPref?.let {
+                it.setOnPreferenceChangeListener { preference, newValue ->
+                    PreferenceService.putBoolean(PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_RELOAD, true, preference.context)
+                    true
+                }
+            }
 
             findPreference<Preference>(PreferenceService.ACTION_TEST_COPY_PASSWORD)?.let {
                 it.setOnPreferenceClickListener { preference ->
