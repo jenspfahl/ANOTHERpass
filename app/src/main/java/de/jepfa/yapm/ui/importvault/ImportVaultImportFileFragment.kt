@@ -135,7 +135,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
         activity: BaseActivity
     ) {
         UseCaseBackgroundLauncher(ImportVaultUseCase)
-            .launch(activity, ImportVaultUseCase.Input(jsonContent, encMasterKey))
+            .launch(activity, ImportVaultUseCase.Input(jsonContent, encMasterKey, override = false))
             { output ->
                 if (!output.success) {
                     toastText(context, R.string.something_went_wrong)

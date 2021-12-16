@@ -3,6 +3,7 @@ package de.jepfa.yapm.database.repository
 import androidx.annotation.WorkerThread
 import de.jepfa.yapm.database.dao.EncLabelDao
 import de.jepfa.yapm.database.entity.EncLabelEntity
+import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncLabel
 import kotlinx.coroutines.flow.*
 
@@ -31,6 +32,17 @@ class LabelRepository(private val encLabelDao: EncLabelDao) {
     @WorkerThread
     suspend fun deleteByIds(ids: List<Int>) {
         encLabelDao.deleteByIds(ids)
+    }
+
+    @WorkerThread
+    suspend fun findByIdSync(id: Int): EncLabel? {
+        val entity = encLabelDao.getByIdSync(id)
+        if (entity != null) {
+            return mapToLabel(entity)
+        }
+        else {
+            return null
+        }
     }
 
     fun getById(id: Int): Flow<EncLabel> {

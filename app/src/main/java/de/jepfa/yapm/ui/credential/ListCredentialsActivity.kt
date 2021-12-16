@@ -44,6 +44,7 @@ import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
 import de.jepfa.yapm.ui.exportvault.ExportVaultActivity
 import de.jepfa.yapm.ui.importread.ImportCredentialActivity
 import de.jepfa.yapm.ui.importread.VerifyActivity
+import de.jepfa.yapm.ui.importvault.ImportVaultActivity
 import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.ui.label.ListLabelsActivity
 import de.jepfa.yapm.ui.settings.SettingsActivity
@@ -481,6 +482,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             }
             R.id.test_verify_qr_code_or_nfc_tag -> {
                 val intent = Intent(this, VerifyActivity::class.java)
+                startActivity(intent)
+                return true
+            }
+            R.id.import_vault -> {
+                val intent = Intent(this, ImportVaultActivity::class.java)
+                intent.putExtra(ImportVaultActivity.EXTRA_MODE, ImportVaultActivity.EXTRA_MODE_OVERRIDE_IMPORT)
                 startActivity(intent)
                 return true
             }

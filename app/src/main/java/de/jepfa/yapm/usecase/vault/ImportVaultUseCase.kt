@@ -17,17 +17,21 @@ import kotlinx.coroutines.launch
 
 object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, BaseActivity>() {
 
-    data class Input(val jsonContent: JsonObject, val encMasterKey: String?)
+    data class Input(val jsonContent: JsonObject, val encMasterKey: String?, val override: Boolean)
 
     override fun doExecute(input: Input, activity: BaseActivity): Boolean {
         try {
-            if (readAndImport(input.jsonContent, activity, input.encMasterKey)) return false
+            val success =
+                if (input.override)
+                    readAndOverride(input.jsonContent, activity)
+                else
+                    readAndImport(input.jsonContent, activity, input.encMasterKey)
+
+            return success
         } catch (e: Exception) {
             Log.e("IMP", "cannot read json", e)
             return false
         }
-
-        return true
     }
 
     private fun readAndImport(
@@ -47,7 +51,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, BaseActivity>(
         val cipherAlgorithm = extractCipherAlgorithm(jsonContent)
 
         if (Build.VERSION.SDK_INT < cipherAlgorithm.supportedSdkVersion) {
-            return true
+            return false
         }
 
         val vaultVersion = jsonContent.get(VaultExportService.JSON_VAULT_VERSION)?.asString ?: "1"
@@ -116,7 +120,51 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, BaseActivity>(
         }
 
         PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_IMPORTED_AT, activity)
-        return false
+        return true
+    }
+
+    private fun readAndOverride(
+        jsonContent: JsonObject,
+        activity: BaseActivity
+    ): Boolean {
+        val app = activity.getApp()
+        val credentialsJson = jsonContent.getAsJsonArray(VaultExportService.JSON_CREDENTIALS)
+        CoroutineScope(Dispatchers.IO).launch {
+            credentialsJson
+                .filterNotNull()
+                .map { json -> EncCredential.fromJson(json) }
+                .filterNotNull()
+                .filter { it.id != null }
+                .forEach { c ->
+                    val existingC = app.credentialRepository.findByIdSync(c.id!!)
+                    if (existingC == null) {
+                        app.credentialRepository.insert(c)
+                    }
+                    else {
+                        app.credentialRepository.update(c)
+                    }
+                }
+        }
+
+        val labelsJson = jsonContent.getAsJsonArray(VaultExportService.JSON_LABELS)
+        CoroutineScope(Dispatchers.IO).launch {
+            labelsJson
+                .filterNotNull()
+                .map { json -> EncLabel.fromJson(json) }
+                .filterNotNull()
+                .filter { it.id != null }
+                .forEach { l ->
+                    val existingC = app.labelRepository.findByIdSync(l.id!!)
+                    if (existingC == null) {
+                        app.labelRepository.insert(l)
+                    }
+                    else {
+                        app.labelRepository.update(l)
+                    }
+                }
+        }
+
+        return true
     }
 
     fun extractCipherAlgorithm(jsonContent: JsonObject): CipherAlgorithm {

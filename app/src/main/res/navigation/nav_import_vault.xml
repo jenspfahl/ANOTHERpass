@@ -14,6 +14,10 @@
             android:id="@+id/action_importVault_LoadFileFragment_to_ImportFileFragment"
             app:destination="@id/ImportVaultImportFileFragment" />
 
+       <action
+            android:id="@+id/action_importVault_LoadFileFragment_to_ImportFileOVerrideVaultFragment"
+            app:destination="@id/ImportVaultFileOverrideVaultFragment" />
+
     </fragment>
 
     <fragment
@@ -25,6 +29,15 @@
         <action
             android:id="@+id/action_importVault_to_Login"
             app:destination="@id/LoginActivity" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/ImportVaultFileOverrideVaultFragment"
+        android:name="de.jepfa.yapm.ui.importvault.ImportVaultFileOverrideVaultFragment"
+        android:label="@string/import_vault_import_file_fragment_label"
+        tools:layout="@layout/fragment_import_vault_file_override_vault">
+
 
     </fragment>
 

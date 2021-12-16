@@ -23,6 +23,17 @@ class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
         encCredentialDao.delete(mapToEntity(encCredential))
     }
 
+    @WorkerThread
+    suspend fun findByIdSync(id: Int): EncCredential? {
+        val entity = encCredentialDao.getByIdSync(id)
+        if (entity != null) {
+            return mapToCredential(entity)
+        }
+        else {
+            return null
+        }
+    }
+
     fun getById(id: Int): Flow<EncCredential> {
         val byId = encCredentialDao.getById(id)
         return byId.filterNotNull().map {mapToCredential(it)}

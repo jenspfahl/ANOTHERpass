@@ -107,6 +107,7 @@
     <string name="too_may_wrong_logins">Too many login attempts, all tokens declined</string>
     <string name="too_may_wrong_logins_self_destruction">Too many login attempts, vault completely deleted</string>
     <string name="import_vault_explanation">Select a vault file to import. Note: You need the pin and the master password and, depending on the file, the Encrypted Master Key.</string>
+    <string name="import_vault_to_vault_explanation">Select a vault file to import. Note: The vault file must belong to the same vault as the current vault (Id = %1$s).</string>
     <string name="import_vault_load_file_fragment_label" tools:ignore="TypographyFractions">Import Vault 1/2</string>
     <string name="import_vault_import_file_fragment_label">Import Vault 2/2</string>
     <string name="button_load_vault">Load vault file</string>
@@ -116,6 +117,7 @@
     <string name="chooser_select_vault_file">Select vault file to import</string>
     <string name="toast_import_vault_failure">The selected file cannot be imported.</string>
     <string name="toast_import_vault_failure_cipher_not_supported">The selected file is encrypted with an unsupported cipher.</string>
+    <string name="toast_import_vault_failure_no_vault_match">The selected file doesn\'t belong to the current vault.</string>
     <string name="quick_access">Quick access</string>
     <string name="generate_encrypted_masterpasswd">Create master export token</string>
     <string name="master_password_not_changed">Master password has not been changed.</string>

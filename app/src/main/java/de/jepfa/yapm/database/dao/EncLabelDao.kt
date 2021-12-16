@@ -1,6 +1,7 @@
 package de.jepfa.yapm.database.dao
 
 import androidx.room.*
+import de.jepfa.yapm.database.entity.EncCredentialEntity
 import de.jepfa.yapm.database.entity.EncLabelEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -23,6 +24,9 @@ interface EncLabelDao {
 
     @Query("SELECT * FROM EncLabelEntity WHERE id = :id")
     fun getById(id: Int): Flow<EncLabelEntity>
+
+    @Query("SELECT * FROM EncLabelEntity WHERE id = :id")
+    suspend fun getByIdSync(id: Int): EncLabelEntity?
 
     @Query("SELECT * FROM EncLabelEntity WHERE name = :encName")
     fun getByEncName(encName: String): Flow<EncLabelEntity>
