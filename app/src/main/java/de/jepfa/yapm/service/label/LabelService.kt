@@ -151,7 +151,7 @@ object LabelService {
         return ids.joinToString(separator = ID_SEPARATOR)
     }
 
-    private fun createLabel(key: SecretKeyHolder, encLabel: EncLabel): Label {
+    fun createLabel(key: SecretKeyHolder, encLabel: EncLabel): Label {
         val name = SecretService.decryptCommonString(key, encLabel.name)
         val desc = SecretService.decryptCommonString(key, encLabel.description)
         return Label(encLabel.id, name, desc, encLabel.color)

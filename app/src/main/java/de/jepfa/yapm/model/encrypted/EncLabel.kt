@@ -4,9 +4,9 @@ import android.util.Log
 import com.google.gson.JsonElement
 
 data class EncLabel(var id: Int?,
-                    var name: Encrypted,
+                    override var name: Encrypted,
                     var description: Encrypted,
-                    var color: Int?) {
+                    var color: Int?): EncNamed {
 
     constructor(id: Int?, nameBase64: String, descriptionBase64: String, color: Int?) :
             this(id,

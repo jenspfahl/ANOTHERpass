@@ -7,7 +7,7 @@ import de.jepfa.yapm.util.getEncryptedExtra
 import de.jepfa.yapm.util.putEncryptedExtra
 
 data class EncCredential(var id: Int?,
-                         var name: Encrypted,
+                         override var name: Encrypted,
                          var additionalInfo: Encrypted,
                          var user: Encrypted,
                          var password: Encrypted,
@@ -17,7 +17,7 @@ data class EncCredential(var id: Int?,
                          var isObfuscated: Boolean,
                          var isLastPasswordObfuscated: Boolean?,
                          var modifyTimestamp: Long?
-) {
+): EncNamed {
 
     constructor(id: Int?,
                 nameBase64: String,

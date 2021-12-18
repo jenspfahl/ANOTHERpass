@@ -17,13 +17,23 @@ import kotlinx.coroutines.launch
 
 object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, BaseActivity>() {
 
-    data class Input(val jsonContent: JsonObject, val encMasterKey: String?, val override: Boolean)
+    data class Input(
+        val jsonContent: JsonObject,
+        val encMasterKey: String?,
+        val override: Boolean,
+        val credentialIdsToOverride: Set<Int>? = null,
+        val labelIdsToOverride: Set<Int>? = null,
+        )
 
     override fun doExecute(input: Input, activity: BaseActivity): Boolean {
         try {
             val success =
                 if (input.override)
-                    readAndOverride(input.jsonContent, activity)
+                    readAndOverride(
+                        input.jsonContent,
+                        input.credentialIdsToOverride!!,
+                        input.labelIdsToOverride!!,
+                        activity)
                 else
                     readAndImport(input.jsonContent, activity, input.encMasterKey)
 
@@ -125,6 +135,8 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, BaseActivity>(
 
     private fun readAndOverride(
         jsonContent: JsonObject,
+        credentialIdsToOverride: Set<Int>,
+        labelIdsToOverride: Set<Int>,
         activity: BaseActivity
     ): Boolean {
         val app = activity.getApp()
@@ -134,7 +146,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, BaseActivity>(
                 .filterNotNull()
                 .map { json -> EncCredential.fromJson(json) }
                 .filterNotNull()
-                .filter { it.id != null }
+                .filter { credentialIdsToOverride.contains(it.id) }
                 .forEach { c ->
                     val existingC = app.credentialRepository.findByIdSync(c.id!!)
                     if (existingC == null) {
@@ -152,7 +164,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, BaseActivity>(
                 .filterNotNull()
                 .map { json -> EncLabel.fromJson(json) }
                 .filterNotNull()
-                .filter { it.id != null }
+                .filter { labelIdsToOverride.contains(it.id) }
                 .forEach { l ->
                     val existingC = app.labelRepository.findByIdSync(l.id!!)
                     if (existingC == null) {
