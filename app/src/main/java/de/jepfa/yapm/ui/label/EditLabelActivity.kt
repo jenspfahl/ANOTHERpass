@@ -147,7 +147,7 @@ class EditLabelActivity : SecureActivity() {
 
         if (id == R.id.menu_delete_label) {
             label?.let { current ->
-                LabelDialogs.openDeleteLabel(current, this)
+                LabelDialogs.openDeleteLabel(current, this, finishActivityAfterDelete = true)
             }
 
             return true

@@ -137,6 +137,12 @@ class ShowCredentialActivity : SecureActivity() {
     override fun onResume() {
         super.onResume()
         credential?.let { AutofillCredentialHolder.update(it, obfuscationKey) }
+
+        val requestReload = PreferenceService.getAsBool(PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_RELOAD, applicationContext)
+        if (requestReload) {
+            recreate()
+            PreferenceService.delete(PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_RELOAD, applicationContext)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
