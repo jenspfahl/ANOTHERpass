@@ -14,6 +14,7 @@ import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.util.createAndAddLabelChip
+import de.jepfa.yapm.util.enrichId
 import kotlin.collections.HashMap
 
 class ImportVaultFileOverrideVaultNamedAdapter(
@@ -122,22 +123,12 @@ class ImportVaultFileOverrideVaultNamedAdapter(
 
             if (child.newNamed is EncCredential) {
                 if (origName == null || origName == newName) {
-                    val textView = TextView(activity)
-                    textView.text = newName
-                    linearLayout.addView(textView)
+                    createAndAddCredentialNameTextView(newName, child.newNamed, linearLayout)
                 }
                 else {
-                    val origTextView = TextView(activity)
-                    origTextView.text = origName
-                    linearLayout.addView(origTextView)
-
-                    val separatorView = ImageView(activity)
-                    separatorView.setImageDrawable(activity.getDrawable(R.drawable.ic_baseline_arrow_forward_12))
-                    linearLayout.addView(separatorView)
-
-                    val newTextView = TextView(activity)
-                    newTextView.text = newName
-                    linearLayout.addView(newTextView)
+                    createAndAddCredentialNameTextView(origName, child.newNamed, linearLayout)
+                    createAndAddSeparator(linearLayout)
+                    createAndAddCredentialNameTextView(newName, child.newNamed, linearLayout)
                 }
             }
             else if (child.newNamed is EncLabel) {
@@ -152,9 +143,7 @@ class ImportVaultFileOverrideVaultNamedAdapter(
                     val origLabel = LabelService.createLabel(key, origEncLabel)
                     createAndAddLabelChip(origLabel, linearLayout, true, activity)
 
-                    val separatorView = ImageView(activity)
-                    separatorView.setImageDrawable(activity.getDrawable(R.drawable.ic_baseline_arrow_forward_12))
-                    linearLayout.addView(separatorView)
+                    createAndAddSeparator(linearLayout)
 
                     val newLabel = LabelService.createLabel(key, newEncLabel)
                     createAndAddLabelChip(newLabel, linearLayout, true, activity)
@@ -174,6 +163,24 @@ class ImportVaultFileOverrideVaultNamedAdapter(
 
     private fun getInflater() = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
+
+    private fun createAndAddSeparator(linearLayout: LinearLayout) {
+        val separatorView = ImageView(activity)
+        separatorView.setImageDrawable(activity.getDrawable(R.drawable.ic_baseline_arrow_forward_12))
+        separatorView.setPadding(0, 10, 0, 0)
+        linearLayout.addView(separatorView)
+    }
+
+    private fun createAndAddCredentialNameTextView(
+        name: String,
+        credential: EncCredential,
+        linearLayout: LinearLayout
+    ) {
+        val newTextView = TextView(activity)
+        newTextView.text = enrichId(activity, name, credential.id)
+        newTextView.setTypeface(null, Typeface.BOLD)
+        linearLayout.addView(newTextView)
+    }
 
     private fun getCheckedChildrenCount(group: GroupType): Int {
         return checkedChildren.filter { it.value == group }.count()

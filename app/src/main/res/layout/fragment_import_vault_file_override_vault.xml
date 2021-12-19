@@ -7,69 +7,66 @@
     android:layout_height="match_parent"
     tools:context=".ui.importvault.ImportVaultActivity">
 
-    <androidx.core.widget.NestedScrollView
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:orientation="vertical">
 
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+
+        <TextView
+            android:id="@+id/explanation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="15dp"
+            android:text="Here you see the content of the loaded vault file. You can check or uncheck each record to define which should be imported to your current app vault." />
+
+
+        <TextView
+            android:id="@+id/loaded_file_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:text="@string/nothing_placeholder" />
+
+        <ExpandableListView
+            android:id="@+id/expandable_list_credentials"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="15dp">
+        </ExpandableListView>
+
+        <ExpandableListView
+            android:id="@+id/expandable_list_labels"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="15dp">
+        </ExpandableListView>
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switch_copy_orig"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:text="@string/copy_origin" />
 
 
-            <TextView
-                android:id="@+id/loaded_file_status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="15dp"
-                android:text="@string/nothing_placeholder"
-                app:layout_constraintBottom_toTopOf="@id/expandable_lists"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
 
-            <LinearLayout
-                android:id="@+id/expandable_lists"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toTopOf="@id/button_import_loaded_vault"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/loaded_file_status">
-
-                <ExpandableListView
-                    android:id="@+id/expandable_list_credentials"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingHorizontal="15dp">
-                </ExpandableListView>
-
-                <ExpandableListView
-                    android:id="@+id/expandable_list_labels"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingHorizontal="15dp">
-                </ExpandableListView>
-
-            </LinearLayout>
-
-            <Button
-                android:id="@+id/button_import_loaded_vault"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/button_import_vault"
-                android:background="@color/colorAccent"
-                android:textColor="@color/buttonLabel"
-                android:paddingHorizontal="10dp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/expandable_lists" />
+        <Button
+            android:id="@+id/button_import_loaded_vault"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/big_padding"
+            android:text="@string/button_import_vault"
+            android:background="@color/colorAccent"
+            android:textColor="@color/buttonLabel"
+            android:paddingHorizontal="10dp"
+            android:textStyle="bold" />
 
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.core.widget.NestedScrollView>
+
+    </LinearLayout>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

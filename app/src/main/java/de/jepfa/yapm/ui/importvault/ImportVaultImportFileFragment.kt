@@ -19,6 +19,7 @@ import de.jepfa.yapm.service.secret.MasterKeyService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.BaseFragment
+import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
@@ -101,7 +102,8 @@ class ImportVaultImportFileFragment : BaseFragment() {
                 return@setOnClickListener
             }
 
-            getBaseActivity()?.let {
+            val importVaultActivity: ImportVaultActivity? = getBaseActivityAs()
+            importVaultActivity?.let {
                 importVault(jsonContent, encMasterKey, it)
             }
         }
@@ -132,10 +134,14 @@ class ImportVaultImportFileFragment : BaseFragment() {
     private fun importVault(
         jsonContent: JsonObject,
         encMasterKey: String?,
-        activity: BaseActivity
+        activity: SecureActivity
     ) {
         UseCaseBackgroundLauncher(ImportVaultUseCase)
-            .launch(activity, ImportVaultUseCase.Input(jsonContent, encMasterKey, override = false))
+            .launch(activity, ImportVaultUseCase.Input(
+                jsonContent,
+                encMasterKey,
+                override = false)
+            )
             { output ->
                 if (!output.success) {
                     toastText(context, R.string.something_went_wrong)

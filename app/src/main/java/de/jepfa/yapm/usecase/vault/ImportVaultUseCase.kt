@@ -3,6 +3,7 @@ package de.jepfa.yapm.usecase.vault
 import android.os.Build
 import android.util.Log
 import com.google.gson.JsonObject
+import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.*
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.VaultExportService
@@ -10,12 +11,13 @@ import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
+import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.InputUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, BaseActivity>() {
+object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity>() {
 
     data class Input(
         val jsonContent: JsonObject,
@@ -23,9 +25,10 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, BaseActivity>(
         val override: Boolean,
         val credentialIdsToOverride: Set<Int>? = null,
         val labelIdsToOverride: Set<Int>? = null,
-        )
+        val copyOrigin: Boolean = false,
+    )
 
-    override fun doExecute(input: Input, activity: BaseActivity): Boolean {
+    override fun doExecute(input: Input, activity: SecureActivity): Boolean {
         try {
             val success =
                 if (input.override)
@@ -33,6 +36,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, BaseActivity>(
                         input.jsonContent,
                         input.credentialIdsToOverride!!,
                         input.labelIdsToOverride!!,
+                        input.copyOrigin,
                         activity)
                 else
                     readAndImport(input.jsonContent, activity, input.encMasterKey)
@@ -137,7 +141,8 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, BaseActivity>(
         jsonContent: JsonObject,
         credentialIdsToOverride: Set<Int>,
         labelIdsToOverride: Set<Int>,
-        activity: BaseActivity
+        copyOrigin: Boolean,
+        activity: SecureActivity
     ): Boolean {
         val app = activity.getApp()
         val credentialsJson = jsonContent.getAsJsonArray(VaultExportService.JSON_CREDENTIALS)
@@ -153,6 +158,12 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, BaseActivity>(
                         app.credentialRepository.insert(c)
                     }
                     else {
+                        if (copyOrigin) {
+                            val copyOfExistingC = existingC.copy()
+                            copyOfExistingC.id = null
+                            copyOfExistingC.name = copyName(existingC.name, activity)
+                            app.credentialRepository.insert(copyOfExistingC)
+                        }
                         app.credentialRepository.update(c)
                     }
                 }
@@ -166,11 +177,17 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, BaseActivity>(
                 .filterNotNull()
                 .filter { labelIdsToOverride.contains(it.id) }
                 .forEach { l ->
-                    val existingC = app.labelRepository.findByIdSync(l.id!!)
-                    if (existingC == null) {
+                    val existingL = app.labelRepository.findByIdSync(l.id!!)
+                    if (existingL == null) {
                         app.labelRepository.insert(l)
                     }
                     else {
+                        if (copyOrigin) {
+                            val copyOfExistingL = existingL.copy()
+                            copyOfExistingL.id = null
+                            copyOfExistingL.name = copyName(existingL.name, activity)
+                            app.labelRepository.insert(copyOfExistingL)
+                        }
                         app.labelRepository.update(l)
                     }
                 }
@@ -187,5 +204,17 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, BaseActivity>(
         return cipherAlgorithm
     }
 
+
+    private fun copyName(name: Encrypted, activity: SecureActivity): Encrypted {
+        val key = activity.masterSecretKey
+        if (key != null) {
+            val name = SecretService.decryptCommonString(key, name)
+            val newName = activity.getString(R.string.copy_of_name, name)
+            return SecretService.encryptCommonString(key, newName)
+        }
+        else {
+            return name
+        }
+    }
 
 }

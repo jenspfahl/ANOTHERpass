@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ExpandableListView
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.SwitchCompat
 import com.google.gson.JsonObject
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
@@ -17,6 +19,7 @@ import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.BaseFragment
+import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.importvault.ImportVaultFileOverrideVaultNamedAdapter.GroupType
 import de.jepfa.yapm.ui.importvault.ImportVaultFileOverrideVaultNamedAdapter.ChildType
@@ -136,20 +139,45 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
             }
         }
 
+        val copyOrigSwitch = view.findViewById<SwitchCompat>(R.id.switch_copy_orig)
         val importButton = view.findViewById<Button>(R.id.button_import_loaded_vault)
 
         importButton.setOnClickListener {
 
-            getBaseActivity()?.let { baseActivity ->
-                PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, baseActivity)?.let { encMasterKey ->
-                    importVault(
-                        jsonContent,
-                        encMasterKey,
-                        credentialsToOverride.map { it.id }.toSet(),
-                        labelsToOverride.map { it.id }.toSet(),
-                        baseActivity)
-                }
+            val importVaultActivity: ImportVaultActivity? = getBaseActivityAs()
+
+            if (credentialsToOverride.isEmpty() && labelsToOverride.isEmpty()) {
+                toastText(importVaultActivity, R.string.nothing_to_import)
+                return@setOnClickListener
             }
+
+            importVaultActivity?.let{ activity ->
+                AlertDialog.Builder(activity)
+                    .setTitle(R.string.import_vault_as_file)
+                    .setMessage(activity.getString(R.string.message_import_vault_records, credentialsToOverride.size, labelsToOverride.size))
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+
+                        importVaultActivity?.let { activity ->
+                            PreferenceService
+                                .getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, activity)
+                                ?.let { encMasterKey ->
+                                    importVault(
+                                        jsonContent,
+                                        encMasterKey,
+                                        credentialsToOverride.map { it.id }.toSet(),
+                                        labelsToOverride.map { it.id }.toSet(),
+                                        copyOrigSwitch.isChecked,
+                                        activity)
+                                }
+                        }
+
+                    }
+                    .setNegativeButton(android.R.string.no, null)
+                    .show()
+
+            }
+
         }
     }
 
@@ -162,7 +190,8 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
         encMasterKey: Encrypted,
         credentialIdsToOverride: Set<Int>,
         labelIdsToOverride: Set<Int>,
-        activity: BaseActivity
+        copyOrigin: Boolean,
+        activity: SecureActivity
     ) {
         UseCaseBackgroundLauncher(ImportVaultUseCase)
             .launch(activity, ImportVaultUseCase.Input(
@@ -170,7 +199,9 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
                 encMasterKey.toBase64String(),
                 credentialIdsToOverride = credentialIdsToOverride,
                 labelIdsToOverride = labelIdsToOverride,
-                override = true))
+                override = true,
+                copyOrigin = copyOrigin)
+            )
             { output ->
                 if (!output.success) {
                     toastText(context, R.string.something_went_wrong)

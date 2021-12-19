@@ -87,7 +87,7 @@
         <entry key="app/src/main/res/layout/fragment_edit_credential_data.xml" value="0.264" />
         <entry key="app/src/main/res/layout/fragment_edit_credential_password.xml" value="0.2" />
         <entry key="app/src/main/res/layout/fragment_import_vault_file.xml" value="0.2" />
-        <entry key="app/src/main/res/layout/fragment_import_vault_file_override_vault.xml" value="0.176" />
+        <entry key="app/src/main/res/layout/fragment_import_vault_file_override_vault.xml" value="0.2" />
         <entry key="app/src/main/res/layout/fragment_intor_1.xml" value="0.10885416666666667" />
         <entry key="app/src/main/res/layout/fragment_intro2.xml" value="0.15572916666666667" />
         <entry key="app/src/main/res/layout/fragment_intro_1.xml" value="0.16799999999999998" />
