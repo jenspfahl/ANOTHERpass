@@ -16,6 +16,7 @@ import com.google.android.material.chip.Chip
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.encrypted.EncLabel
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
@@ -118,6 +119,7 @@ class EditLabelActivity : SecureActivity() {
                 labelColor)
             updateLabel(label)
 
+            PreferenceService.putBoolean(PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_RELOAD, true, this)
             finish()
 
         }
