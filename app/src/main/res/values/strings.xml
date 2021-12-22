@@ -252,7 +252,7 @@
     <string name="masterpassword_removed">Stored master password removed from device</string>
     <string name="title_drop_vault">Drop vault</string>
     <string name="message_drop_vault">You are going to delete ALL your credentials and login data.</string>
-    <string name="reset_all">None / All</string>
+    <string name="select_none_all">None / All</string>
     <string name="title_copy_password">Copy password</string>
     <string name="message_copy_password">Copying passwords to clipboard may leak your password since any other app can listen to clipboard changes and read from it. Further it can remain there when you use a clipboard with history function (e.g. Samsung). " Use 'Privacy/Test C&amp;P password' to figure out if someone reads the clipboard beside you. You can disable this warning in 'Settings/Security'.</string>
     <string name="head_generate_mpt">Your Master Password Token \#%1$d</string>
@@ -445,10 +445,10 @@
     <string name="intro_5_bullet_3">Strong encryption of ALL sensitive vault data with at least 128 bit keys.</string>
     <string name="intro_5_bullet_4">ANOTHERpass uses a security chip if present for secure keys.</string>
     
-    <string name="credentials_to_be_inserted">%1$d of %2$d credentials to be inserted</string>
-    <string name="credentials_to_be_updated">%1$d of %2$d credentials to be updated</string>
-    <string name="labels_to_be_inserted">%1$d of %2$d labels to be inserted</string>
-    <string name="labels_to_be_updated">%1$d of %2$d labels to be updated</string>
+    <string name="credentials_to_be_inserted">%1$d of %2$d credentials to be re-created</string>
+    <string name="credentials_to_be_updated">%1$d of %2$d credentials to be restored</string>
+    <string name="labels_to_be_inserted">%1$d of %2$d labels to be re-created</string>
+    <string name="labels_to_be_updated">%1$d of %2$d labels to be restored</string>
     <string name="copy_of_name">%1$s (orig)</string>
     <string name="nothing_to_import">Nothing to import</string>
     <string name="copy_origin">Make a copy of the origin record before updating it. Its name will be followed by \'(orig)\'.</string>

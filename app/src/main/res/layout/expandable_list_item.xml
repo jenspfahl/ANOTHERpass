@@ -5,11 +5,12 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:id="@+id/expandable_linear_layout"
+        android:id="@+id/expandable_container"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:padding="10dp">
+        android:paddingVertical="10dp"
+        android:paddingEnd="10dp">
 
         <CheckBox
             android:id="@+id/expandable_check_box"

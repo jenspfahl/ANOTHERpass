@@ -33,14 +33,24 @@ fun enrichId(context: Context, name: String, id: Int?): String {
     return if (showIds) "$name [:${id?:"new"}]" else name
 }
 
+fun cutText(text: String, length: Int): String {
+    if (text.length < length) {
+        return text
+    }
+    else {
+        return text.substring(0, length) + "..."
+    }
+}
+
 fun createAndAddLabelChip(
     label: Label,
     container: ViewGroup,
     thinner: Boolean,
-    context: Context?
+    context: Context?,
+    maxLength: Int? = null
 ): Chip {
     val chip = Chip(context)
-    chip.text = label.name
+    chip.text = if (maxLength != null) cutText(label.name, maxLength) else label.name
     chip.textAlignment = View.TEXT_ALIGNMENT_CENTER
     if (thinner) {
         chip.textSize = 12.0f

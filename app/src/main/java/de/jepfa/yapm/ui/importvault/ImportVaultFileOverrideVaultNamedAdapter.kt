@@ -14,10 +14,12 @@ import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.util.createAndAddLabelChip
+import de.jepfa.yapm.util.cutText
 import de.jepfa.yapm.util.enrichId
 import kotlin.collections.HashMap
 
 class ImportVaultFileOverrideVaultNamedAdapter(
+    private val selectNoneAll: CheckBox,
     private val activity: SecureActivity,
     private val dataMap: HashMap<GroupType, List<ChildType>>
 ): BaseExpandableListAdapter() {
@@ -33,13 +35,14 @@ class ImportVaultFileOverrideVaultNamedAdapter(
 
     private var titleList: List<GroupType>
     private val checkedChildren = HashMap<ChildType, GroupType>()
+    private val checkBoxes = HashMap<CheckBox, GroupType>()
+
+    private val MAX_NAMED_LENGTH = 15
 
     init {
-        dataMap.forEach {group, elems ->
-            elems.forEach { elem ->
-                checkedChildren[elem] = group
-            }
-        }
+        fillCheckedChildrenWithAllNamed()
+        selectNoneAll.isChecked = true
+
         titleList = GroupType.values().filter { dataMap.keys.contains(it) }.toList()
 
     }
@@ -109,12 +112,14 @@ class ImportVaultFileOverrideVaultNamedAdapter(
                 } else {
                     checkedChildren.remove(child)
                 }
+                selectNoneAll.isChecked = checkedChildren.isNotEmpty()
                 notifyDataSetChanged()
             }
             checkBox.isChecked = checkedChildren.containsKey(child)
         }
+        checkBoxes[checkBox] = group
 
-        val linearLayout = view.findViewById<LinearLayout>(R.id.expandable_linear_layout)
+        val namedContainer = view.findViewById<ViewGroup>(R.id.expandable_container)
 
         activity.masterSecretKey?.let { key ->
 
@@ -122,31 +127,31 @@ class ImportVaultFileOverrideVaultNamedAdapter(
             val newName = SecretService.decryptCommonString(key, child.newNamed.name)
 
             if (child.newNamed is EncCredential) {
-                if (origName == null || origName == newName) {
-                    createAndAddCredentialNameTextView(newName, child.newNamed, linearLayout)
+                if (origName == null) {
+                    createAndAddCredentialNameTextView(newName, child.newNamed, namedContainer)
                 }
                 else {
-                    createAndAddCredentialNameTextView(origName, child.newNamed, linearLayout)
-                    createAndAddSeparator(linearLayout)
-                    createAndAddCredentialNameTextView(newName, child.newNamed, linearLayout)
+                    createAndAddCredentialNameTextView(origName, child.newNamed, namedContainer, cutText = true)
+                    createAndAddSeparator(namedContainer)
+                    createAndAddCredentialNameTextView(newName, child.newNamed, namedContainer, cutText = true)
                 }
             }
             else if (child.newNamed is EncLabel) {
                 val newEncLabel = child.newNamed as EncLabel
                 val origEncLabel = child.origNamed as? EncLabel
-                if (origEncLabel == null || (origName == newName && origEncLabel.color == newEncLabel.color)) {
+                if (origEncLabel == null) {
                     val encLabel = child.newNamed
                     val label = LabelService.createLabel(key, encLabel)
-                    createAndAddLabelChip(label, linearLayout, true, activity)
+                    createAndAddLabelChip(label, namedContainer, true, activity)
                 }
                 else {
                     val origLabel = LabelService.createLabel(key, origEncLabel)
-                    createAndAddLabelChip(origLabel, linearLayout, true, activity)
+                    createAndAddLabelChip(origLabel, namedContainer, true, activity, MAX_NAMED_LENGTH)
 
-                    createAndAddSeparator(linearLayout)
+                    createAndAddSeparator(namedContainer)
 
                     val newLabel = LabelService.createLabel(key, newEncLabel)
-                    createAndAddLabelChip(newLabel, linearLayout, true, activity)
+                    createAndAddLabelChip(newLabel, namedContainer, true, activity, MAX_NAMED_LENGTH)
                 }
             }
             
@@ -161,29 +166,54 @@ class ImportVaultFileOverrideVaultNamedAdapter(
 
     fun getCheckedChildren(): Set<ChildType> = checkedChildren.keys
 
+    fun selectNoneAllClicked() {
+        val nonSelected = checkedChildren.isEmpty()
+        checkBoxes.forEach {
+            it.key.isChecked = nonSelected
+        }
+        if (nonSelected) {
+            fillCheckedChildrenWithAllNamed()
+        }
+        else {
+            checkedChildren.clear()
+        }
+        selectNoneAll.isChecked = checkedChildren.isNotEmpty()
+        notifyDataSetChanged()
+    }
+
     private fun getInflater() = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
 
-    private fun createAndAddSeparator(linearLayout: LinearLayout) {
+    private fun createAndAddSeparator(container: ViewGroup) {
         val separatorView = ImageView(activity)
         separatorView.setImageDrawable(activity.getDrawable(R.drawable.ic_baseline_arrow_forward_12))
         separatorView.setPadding(0, 10, 0, 0)
-        linearLayout.addView(separatorView)
+        container.addView(separatorView)
     }
 
     private fun createAndAddCredentialNameTextView(
         name: String,
         credential: EncCredential,
-        linearLayout: LinearLayout
+        container: ViewGroup,
+        cutText: Boolean = false
     ) {
         val newTextView = TextView(activity)
-        newTextView.text = enrichId(activity, name, credential.id)
+        newTextView.text = enrichId(activity, if (cutText) cutText(name, MAX_NAMED_LENGTH) else name, credential.id)
         newTextView.setTypeface(null, Typeface.BOLD)
-        linearLayout.addView(newTextView)
+        container.addView(newTextView)
     }
 
     private fun getCheckedChildrenCount(group: GroupType): Int {
         return checkedChildren.filter { it.value == group }.count()
     }
+
+    private fun fillCheckedChildrenWithAllNamed() {
+        dataMap.forEach { group, elems ->
+            elems.forEach { elem ->
+                checkedChildren[elem] = group
+            }
+        }
+    }
+
 
 }

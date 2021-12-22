@@ -271,7 +271,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     .setTitle(getString(R.string.filter))
                     .setIcon(R.drawable.ic_baseline_filter_list_24)
                     .setView(container)
-                    .setNeutralButton(getString(R.string.reset_all), null)
+                    .setNeutralButton(getString(R.string.select_none_all), null)
                     .setPositiveButton(android.R.string.ok, null)
                     .setNegativeButton(android.R.string.cancel, null)
                     .create()
