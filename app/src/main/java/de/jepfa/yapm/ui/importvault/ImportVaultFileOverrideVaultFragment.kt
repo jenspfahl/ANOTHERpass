@@ -15,9 +15,12 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.VaultExportService
+import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SaltService
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
@@ -86,6 +89,7 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
                         existingCredentialIds.contains(it.id)
                                 && !existingCredentials.contains(it) // Note:this compares the whole data of a credential
                     }
+                    .filterNot { isContentEqualTo(importVaultActivity.masterSecretKey, it, existingCredentials) }
                     .map { c -> ChildType(c.id!!, existingCredentials.find { it.id == c.id }, c) }
 
                 credentialsToInsert = createExpandableView(
@@ -129,6 +133,7 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
                         existingLabelIds.contains(it.id)
                                 && !existingLabels.contains(it) // Note:this compares the whole data of a label
                     }
+                    .filterNot { isContentEqualTo(importVaultActivity.masterSecretKey, it) }
                     .map { l -> ChildType(l.id!!, existingLabels.find { it.id == l.id }, l) }
 
                 labelsToInsert = createExpandableView(
@@ -208,6 +213,74 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
 
         }
     }
+
+    private fun isContentEqualTo(
+        masterSecretKey: SecretKeyHolder?,
+        externalCredential: EncCredential,
+        existingCredentials: List<EncCredential>): Boolean {
+        if (masterSecretKey == null) {
+            return false
+        }
+        
+        val externalName = SecretService.decryptCommonString(masterSecretKey, externalCredential.name)
+        val externalPasswd = SecretService.decryptPassword(masterSecretKey, externalCredential.password)
+        val externalUser = SecretService.decryptCommonString(masterSecretKey, externalCredential.user)
+        val externalWebsite = SecretService.decryptCommonString(masterSecretKey, externalCredential.website)
+        val externalAdditionalInfo =
+            SecretService.decryptCommonString(masterSecretKey, externalCredential.additionalInfo)
+        val externalLabelIds =
+            LabelService.decryptLabelsIdsForCredential(masterSecretKey, externalCredential)
+
+        val existingCredential = existingCredentials.find { it.id == externalCredential.id }
+        if (existingCredential == null) {
+            return false
+        }
+
+        val existingName = SecretService.decryptCommonString(masterSecretKey, existingCredential.name)
+        val existingPasswd = SecretService.decryptPassword(masterSecretKey, existingCredential.password)
+        val existingUser = SecretService.decryptCommonString(masterSecretKey, existingCredential.user)
+        val existingWebsite = SecretService.decryptCommonString(masterSecretKey, existingCredential.website)
+        val existingAdditionalInfo =
+            SecretService.decryptCommonString(masterSecretKey, existingCredential.additionalInfo)
+        val existingLabelIds =
+            LabelService.decryptLabelsIdsForCredential(masterSecretKey, existingCredential)
+
+        val contentEquals = externalName == existingName
+                && externalPasswd == existingPasswd
+                && externalUser == existingUser
+                && externalWebsite == existingWebsite
+                && externalAdditionalInfo == existingAdditionalInfo
+                && externalLabelIds == existingLabelIds
+
+        externalPasswd.clear()
+        existingPasswd.clear()
+
+        return contentEquals
+    }
+
+    private fun isContentEqualTo(
+        masterSecretKey: SecretKeyHolder?,
+        externalLabel: EncLabel): Boolean {
+        if (masterSecretKey == null) {
+            return false
+        }
+
+        val externalName = SecretService.decryptCommonString(masterSecretKey, externalLabel.name)
+        val externalDescription = SecretService.decryptCommonString(masterSecretKey, externalLabel.description)
+
+
+        val existingLabel = LabelService.lookupByLabelId(externalLabel.id!!)
+        if (existingLabel == null) {
+            return false
+        }
+
+        val existingName = existingLabel.name
+        val existingDescription = existingLabel.description
+
+        return externalName == existingName
+                && externalDescription == existingDescription
+    }
+
 
     private fun createExpandableView(
         credentialsToBeInserted: List<ChildType>,

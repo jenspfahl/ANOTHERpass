@@ -111,6 +111,21 @@ object LabelService {
 
     }
 
+    fun decryptLabelsIdsForCredential(key: SecretKeyHolder, credential: EncCredential): List<Int> {
+        if (!credential.isPersistent()) {
+            return Collections.emptyList()
+        }
+        val labelsString = SecretService.decryptCommonString(key, credential.labels)
+        val labels = stringIdsToLabels(labelsString)
+
+        return labels
+            .map { it.labelId }
+            .filterNotNull()
+            .sorted()
+            .toList()
+
+    }
+
     fun lookupByLabelName(labelName: String): Label? {
         return nameToLabel[labelName.toUpperCase(Locale.ROOT)]
     }
