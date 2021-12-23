@@ -190,7 +190,7 @@ class SettingsActivity : SecureActivity(),
 
             enableOverlayPref?.let {
                 it.setOnPreferenceChangeListener { preference, newValue ->
-                    PreferenceService.putBoolean(PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_RELOAD, true, preference.context)
+                    PreferenceService.putBoolean(PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD, true, preference.context)
                     true
                 }
             }
@@ -206,7 +206,7 @@ class SettingsActivity : SecureActivity(),
 
             enableCopyPasswdPref?.let {
                 it.setOnPreferenceChangeListener { preference, newValue ->
-                    PreferenceService.putBoolean(PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_RELOAD, true, preference.context)
+                    PreferenceService.putBoolean(PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD, true, preference.context)
                     true
                 }
             }
