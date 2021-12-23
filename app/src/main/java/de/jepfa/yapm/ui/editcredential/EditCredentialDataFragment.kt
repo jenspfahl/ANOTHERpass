@@ -12,12 +12,12 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.*
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.encryptCommonString
@@ -114,7 +114,7 @@ class EditCredentialDataFragment : SecureFragment() {
                 editCredentialLabelsTextView.text = null
             }
         }
-        val allLabels = LabelService.getAllLabels()
+        val allLabels = LabelService.defaultHolder.getAllLabels()
 
         //fill UI
         if (editCredentialActivity.isUpdate()) {
@@ -139,8 +139,8 @@ class EditCredentialDataFragment : SecureFragment() {
                     editCredentialWebsiteView.setText(website)
                     editCredentialAdditionalInfoView.setText(additionalInfo)
 
-                    LabelService.updateLabelsForCredential(key, it)
-                    val allLabelsForCredential = LabelService.decryptLabelsForCredential(key, it)
+                    LabelService.defaultHolder.updateLabelsForCredential(key, it)
+                    val allLabelsForCredential = LabelService.defaultHolder.decryptLabelsForCredential(key, it)
 
                     val labelSuggestions = allLabels
                         .filterNot { allLabelsForCredential.contains(it) }
@@ -182,7 +182,7 @@ class EditCredentialDataFragment : SecureFragment() {
                     val encUser = encryptCommonString(key, user)
                     val encPassword = SecretService.encryptPassword(key, Password.empty())
                     val encWebsite = encryptCommonString(key, website)
-                    val encLabels = LabelService.encryptLabelIds(
+                    val encLabels = LabelService.defaultHolder.encryptLabelIds(
                         key,
                         mapToLabelName(editCredentialLabelsChipGroup)
                     )
@@ -224,7 +224,7 @@ class EditCredentialDataFragment : SecureFragment() {
         allLabelAdapter: ArrayAdapter<String>
     ) {
         if (labelName.isNotBlank()) {
-            val label = LabelService.lookupByLabelName(labelName) ?: Label(labelName)
+            val label = LabelService.defaultHolder.lookupByLabelName(labelName) ?: Label(labelName)
             val maxLabelLength = resources.getInteger(R.integer.max_label_name_length)
             val chipsCount = chipGroup.size
             if (containsLabel(chipGroup, label)) {
@@ -247,7 +247,7 @@ class EditCredentialDataFragment : SecureFragment() {
 
                 // save label
                 masterSecretKey?.let { key ->
-                    val existing = LabelService.lookupByLabelName(label.name)
+                    val existing = LabelService.defaultHolder.lookupByLabelName(label.name)
                     if (existing == null) {
                         val encName = encryptCommonString(key, label.name)
                         val encDesc = encryptCommonString(key, "")

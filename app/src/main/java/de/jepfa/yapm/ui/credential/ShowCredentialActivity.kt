@@ -45,9 +45,11 @@ import de.jepfa.yapm.util.PasswordColorizer.spannableObfusableAndMaskableString
 
 class ShowCredentialActivity : SecureActivity() {
 
+    private enum class Mode {NORMAL, EXTERNAL_FROM_RECORD, EXTERNAL_FROM_FILE}
+
     val updateCredentialActivityRequestCode = 1
 
-    private var externalMode = false
+    private var mode = Mode.NORMAL
     private var passwordPresentation = Password.FormattingStyle.DEFAULT
     private var maskPassword = false
     private var multiLine = false
@@ -86,8 +88,11 @@ class ShowCredentialActivity : SecureActivity() {
         }
 
         val idExtra = intent.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
-        externalMode =
-            intent.getStringExtra(EXTRA_MODE) ?: EXTRA_MODE_SHOW_EXISTING == EXTRA_MODE_SHOW_EXTERNAL
+        mode = when (intent.getStringExtra(EXTRA_MODE)) {
+            EXTRA_MODE_SHOW_EXTERNAL_FROM_RECORD -> Mode.EXTERNAL_FROM_RECORD
+            EXTRA_MODE_SHOW_EXTERNAL_FROM_VAULT_FILE -> Mode.EXTERNAL_FROM_FILE
+            else -> Mode.NORMAL
+        }
 
         maskPassword = PreferenceService.getAsBool(PREF_MASK_PASSWORD, this)
         val formatted =
@@ -118,7 +123,7 @@ class ShowCredentialActivity : SecureActivity() {
             }
         }
 
-        if (externalMode) {
+        if (mode != Mode.NORMAL) {
 
             credential = EncCredential.fromIntent(intent)
             credential?.let {
@@ -148,11 +153,9 @@ class ShowCredentialActivity : SecureActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val showRawMenu = intent.hasExtra(EXTRA_SHOW_RAW_MENU)
-        if (showRawMenu) {
+        if (mode == Mode.EXTERNAL_FROM_FILE) {
             menuInflater.inflate(R.menu.menu_credential_detail_raw, menu)
-
-        } else if (externalMode) {
+        } else if (mode == Mode.EXTERNAL_FROM_RECORD) {
             menuInflater.inflate(R.menu.menu_credential_detail_import, menu)
         } else {
             menuInflater.inflate(R.menu.menu_credential_detail, menu)
@@ -353,7 +356,8 @@ class ShowCredentialActivity : SecureActivity() {
 
             toolbarChipGroup.removeAllViews()
 
-            val labelsForCredential = LabelService.decryptLabelsForCredential(key, credential)
+            val labelHolder = if (mode == Mode.EXTERNAL_FROM_FILE) LabelService.externalHolder else LabelService.defaultHolder
+            val labelsForCredential = labelHolder.decryptLabelsForCredential(key, credential)
             if (labelsForCredential.isNotEmpty()) {
                 val thinner = shouldMakeLabelThinner(labelsForCredential)
                 labelsForCredential.forEachIndexed { idx, label ->
@@ -444,10 +448,10 @@ class ShowCredentialActivity : SecureActivity() {
         const val EXTRA_MODE = "de.jepfa.yapm.ui.ShowCredentialActivity.mode"
         const val EXTRA_MODE_SHOW_EXISTING =
             "de.jepfa.yapm.ui.ShowCredentialActivity.mode.show_existing"
-        const val EXTRA_MODE_SHOW_EXTERNAL =
-            "de.jepfa.yapm.ui.ShowCredentialActivity.mode.show_external"
-        const val EXTRA_SHOW_RAW_MENU =
-            "de.jepfa.yapm.ui.ShowCredentialActivity.show_raw_menu"
+        const val EXTRA_MODE_SHOW_EXTERNAL_FROM_RECORD =
+            "de.jepfa.yapm.ui.ShowCredentialActivity.mode.show_external_from_record"
+        const val EXTRA_MODE_SHOW_EXTERNAL_FROM_VAULT_FILE =
+            "de.jepfa.yapm.ui.ShowCredentialActivity.mde.show_external_from_vault_file"
     }
 
 }

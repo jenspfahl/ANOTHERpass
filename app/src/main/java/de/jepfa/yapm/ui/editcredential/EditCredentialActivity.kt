@@ -10,6 +10,7 @@ import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.autofill.AutofillCredentialHolder
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.ui.credential.AutofillPushBackActivityBase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 
@@ -31,7 +32,7 @@ class EditCredentialActivity : AutofillPushBackActivityBase() {
 
         labelViewModel.allLabels.observe(this, { labels ->
             masterSecretKey?.let{ key ->
-                LabelService.initLabels(key, labels.toSet())
+                LabelService.defaultHolder.initLabels(key, labels.toSet())
             }
         })
 

@@ -18,6 +18,7 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
@@ -50,7 +51,7 @@ class EditLabelActivity : SecureActivity() {
 
         val labelId = intent.getIntExtra(EncLabel.EXTRA_LABEL_ID)
         if (labelId != null) {
-            label = LabelService.lookupByLabelId(labelId)
+            label = LabelService.defaultHolder.lookupByLabelId(labelId)
             setTitle(R.string.title_change_label)
         }
         else {
@@ -107,7 +108,7 @@ class EditLabelActivity : SecureActivity() {
                 labelNameTextView.requestFocus()
                 return@setOnClickListener
             }
-            val existingLabel = LabelService.lookupByLabelName(labelNameTextView.text.toString())
+            val existingLabel = LabelService.defaultHolder.lookupByLabelName(labelNameTextView.text.toString())
             if (existingLabel != null && existingLabel.labelId != labelId) {
                 labelNameTextView.error = getString(R.string.error_labelname_in_use)
                 labelNameTextView.requestFocus()
@@ -177,7 +178,7 @@ class EditLabelActivity : SecureActivity() {
             else {
                 labelViewModel.insert(encLabel, this)
             }
-            LabelService.updateLabel(label)
+            LabelService.defaultHolder.updateLabel(label)
         }
     }
 }

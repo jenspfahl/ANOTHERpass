@@ -24,6 +24,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_LABELS_IN_LIST
 import de.jepfa.yapm.service.autofill.AutofillCredentialHolder
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
@@ -215,7 +216,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         key ?: return credentials
         return credentials
             .filter {
-                val labels = LabelService.decryptLabelsForCredential(key, it)
+                val labels = LabelService.defaultHolder.decryptLabelsForCredential(key, it)
                 LabelFilter.isFilterFor(labels)
             }
             .toList()
@@ -283,7 +284,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
 
                 val showLabels = PreferenceService.getAsBool(PREF_SHOW_LABELS_IN_LIST, itemView.context)
                 if (showLabels) {
-                    LabelService.decryptLabelsForCredential(key, credential).forEachIndexed { idx, label ->
+                    LabelService.defaultHolder.decryptLabelsForCredential(key, credential).forEachIndexed { idx, label ->
                         val chip = createAndAddLabelChip(
                             label,
                             credentialLabelContainerGroup,

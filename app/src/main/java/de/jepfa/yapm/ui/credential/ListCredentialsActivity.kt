@@ -34,6 +34,7 @@ import de.jepfa.yapm.service.PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_REL
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelFilter.WITH_NO_LABELS_ID
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.service.notification.ReminderService
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
 import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
@@ -94,8 +95,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         labelViewModel.allLabels.observe(this, { labels ->
             masterSecretKey?.let{ key ->
-                LabelService.initLabels(key, labels.toSet())
-                LabelFilter.initState(this, LabelService.getAllLabels())
+                LabelService.defaultHolder.initLabels(key, labels.toSet())
+                LabelFilter.initState(this, LabelService.defaultHolder.getAllLabels())
                 if (LabelFilter.hasFilters()) {
                     refreshCredentials()
                 }
@@ -259,7 +260,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 val allLabels = ArrayList<Label>()
                 val noLabel = Label(WITH_NO_LABELS_ID, getString(R.string.no_label), "", null)
                 allLabels.add(noLabel)
-                allLabels.addAll(LabelService.getAllLabels())
+                allLabels.addAll(LabelService.defaultHolder.getAllLabels())
                 val allChips = ArrayList<Chip>(allLabels.size)
 
                 allLabels.forEachIndexed { _, label ->
@@ -292,7 +293,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                             if (labelId != null) {
                                 val label =
                                     if (labelId == WITH_NO_LABELS_ID) noLabel
-                                    else LabelService.lookupByLabelId(labelId)
+                                    else LabelService.defaultHolder.lookupByLabelId(labelId)
                                 if (label != null) {
                                     if (checked) {
                                         LabelFilter.setFilterFor(label)
@@ -388,7 +389,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     }
 
     override fun lock() {
-        LabelService.clearAll()
+        LabelService.defaultHolder.clearAll()
         credentialsRecycleView?.let {
             it.post {
                 listCredentialAdapter?.notifyDataSetChanged()
@@ -508,7 +509,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 return true
             }
             R.id.show_vault_info -> {
-                val labelCount = LabelService.getAllLabels().size
+                val labelCount = LabelService.defaultHolder.getAllLabels().size
                 ShowVaultInfoUseCase.execute(ShowVaultInfoUseCase.Input(credentialCount, labelCount), this)
 
                 return true
@@ -575,7 +576,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
                 masterSecretKey?.let { key ->
 
-                    credentials.forEach { LabelService.updateLabelsForCredential(key, it) }
+                    credentials.forEach { LabelService.defaultHolder.updateLabelsForCredential(key, it) }
 
                     when (getPrefSortOrder()) {
                         CredentialSortOrder.CREDENTIAL_NAME_ASC -> {

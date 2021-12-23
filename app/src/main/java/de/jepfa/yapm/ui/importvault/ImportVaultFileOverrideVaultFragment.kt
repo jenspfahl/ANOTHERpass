@@ -19,6 +19,7 @@ import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseFragment
@@ -76,15 +77,15 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
                 val credentialsJson =
                     jsonContent.getAsJsonArray(VaultExportService.JSON_CREDENTIALS)
 
-                val credentialsToBeInserted = credentialsJson
+                val externalCredentials = credentialsJson
                     .map { json -> EncCredential.fromJson(json) }
                     .filterNotNull()
+
+                val credentialsToBeInserted = externalCredentials
                     .filterNot { existingCredentialIds.contains(it.id) }
                     .map { ChildType(it.id!!, null, it) }
 
-                val credentialsToBeUpdated = credentialsJson
-                    .map { json -> EncCredential.fromJson(json) }
-                    .filterNotNull()
+                val credentialsToBeUpdated =externalCredentials
                     .filter {
                         existingCredentialIds.contains(it.id)
                                 && !existingCredentials.contains(it) // Note:this compares the whole data of a credential
@@ -120,15 +121,20 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
                 val labelsJson =
                     jsonContent.getAsJsonArray(VaultExportService.JSON_LABELS)
 
-                val labelsToBeInserted = labelsJson
+                val externalLabels = labelsJson
                     .map { json -> EncLabel.fromJson(json) }
                     .filterNotNull()
+
+                importVaultActivity.masterSecretKey?.let {
+                    LabelService.externalHolder.clearAll()
+                    LabelService.externalHolder.initLabels(it, externalLabels.toSet())
+                }
+
+                val labelsToBeInserted = externalLabels
                     .filterNot { existingLabelIds.contains(it.id) }
                     .map { ChildType(it.id!!, null, it) }
 
-                val labelsToBeUpdated = labelsJson
-                    .map { json -> EncLabel.fromJson(json) }
-                    .filterNotNull()
+                val labelsToBeUpdated = externalLabels
                     .filter {
                         existingLabelIds.contains(it.id)
                                 && !existingLabels.contains(it) // Note:this compares the whole data of a label
@@ -214,6 +220,11 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        LabelService.externalHolder.clearAll()
+    }
+
     private fun isContentEqualTo(
         masterSecretKey: SecretKeyHolder?,
         externalCredential: EncCredential,
@@ -229,7 +240,7 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
         val externalAdditionalInfo =
             SecretService.decryptCommonString(masterSecretKey, externalCredential.additionalInfo)
         val externalLabelIds =
-            LabelService.decryptLabelsIdsForCredential(masterSecretKey, externalCredential)
+            LabelService.defaultHolder.decryptLabelsIdsForCredential(masterSecretKey, externalCredential)
 
         val existingCredential = existingCredentials.find { it.id == externalCredential.id }
         if (existingCredential == null) {
@@ -243,7 +254,7 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
         val existingAdditionalInfo =
             SecretService.decryptCommonString(masterSecretKey, existingCredential.additionalInfo)
         val existingLabelIds =
-            LabelService.decryptLabelsIdsForCredential(masterSecretKey, existingCredential)
+            LabelService.defaultHolder.decryptLabelsIdsForCredential(masterSecretKey, existingCredential)
 
         val contentEquals = externalName == existingName
                 && externalPasswd == existingPasswd
@@ -269,7 +280,7 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
         val externalDescription = SecretService.decryptCommonString(masterSecretKey, externalLabel.description)
 
 
-        val existingLabel = LabelService.lookupByLabelId(externalLabel.id!!)
+        val existingLabel = LabelService.defaultHolder.lookupByLabelId(externalLabel.id!!)
         if (existingLabel == null) {
             return false
         }

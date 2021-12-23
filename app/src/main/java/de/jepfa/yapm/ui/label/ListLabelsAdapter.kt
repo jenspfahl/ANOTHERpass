@@ -17,6 +17,7 @@ import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.observeOnce
 
@@ -114,7 +115,7 @@ class ListLabelsAdapter(private val listLabelsActivity: ListLabelsActivity) :
             labelChip.chipBackgroundColor = ColorStateList.valueOf(label.getColor(itemView.context))
             val labelId = label.labelId
             if (labelId != null) {
-                val usageCount = LabelService.getCredentialIdsForLabelId(labelId)?.size
+                val usageCount = LabelService.defaultHolder.getCredentialIdsForLabelId(labelId)?.size
                 if (usageCount == null || usageCount == 0) {
                     labelUsageTextView.text = itemView.context.getString(R.string.label_never_used)
                 }

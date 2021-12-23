@@ -3,6 +3,7 @@ package de.jepfa.yapm.usecase.vault
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.SecureActivity
@@ -28,7 +29,7 @@ object DropVaultUseCase: BasicUseCase<SecureActivity>() {
         PreferenceService.deleteAllData(activity)
         PreferenceService.delete(PreferenceService.STATE_LOGIN_ATTEMPTS, activity)
 
-        LabelService.clearAll()
+        LabelService.defaultHolder.clearAll()
         CoroutineScope(Dispatchers.IO).launch {
             activity.getApp().database?.clearAllTables()
         }

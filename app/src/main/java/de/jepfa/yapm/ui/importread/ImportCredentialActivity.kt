@@ -83,7 +83,7 @@ class ImportCredentialActivity : ReadActivityBase() {
     private fun startShowDetailActivity(credential: EncCredential) {
         val intent = Intent(this, ShowCredentialActivity::class.java)
         credential.applyExtras(intent)
-        intent.putExtra(ShowCredentialActivity.EXTRA_MODE, ShowCredentialActivity.EXTRA_MODE_SHOW_EXTERNAL)
+        intent.putExtra(ShowCredentialActivity.EXTRA_MODE, ShowCredentialActivity.EXTRA_MODE_SHOW_EXTERNAL_FROM_RECORD)
         startActivity(intent)
     }
 }

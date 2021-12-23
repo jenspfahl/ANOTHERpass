@@ -13,6 +13,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
@@ -39,8 +40,8 @@ class ListLabelsActivity : SecureActivity() {
 
         labelViewModel.allLabels.observe(this, { labels ->
             masterSecretKey?.let{ key ->
-                LabelService.initLabels(key, labels.toSet()) //TODO bad solution, better just looking for updates
-                listLabelsAdapter.submitList(LabelService.getAllLabels())
+                LabelService.defaultHolder.initLabels(key, labels.toSet()) //TODO bad solution, better just looking for updates
+                listLabelsAdapter.submitList(LabelService.defaultHolder.getAllLabels())
             }
         })
 

@@ -3,20 +3,20 @@ package de.jepfa.yapm.usecase.label
 import de.jepfa.yapm.R
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.OutputUseCase
-import de.jepfa.yapm.usecase.UseCase
 import de.jepfa.yapm.usecase.UseCaseOutput
 
 
 object DeleteUnusedLabelUseCase: OutputUseCase<String, SecureActivity>() {
 
     override fun execute(activity: SecureActivity): UseCaseOutput<String> {
-        val deleteCandidates = LabelService.getAllLabels()
+        val deleteCandidates = LabelService.defaultHolder.getAllLabels()
             .filter { label ->
                 val labelId = label.labelId
                 if (labelId != null) {
-                    LabelService.getCredentialIdsForLabelId(labelId)?.isEmpty() ?: true
+                    LabelService.defaultHolder.getCredentialIdsForLabelId(labelId)?.isEmpty() ?: true
                 }
                 else {
                     false
@@ -28,7 +28,7 @@ object DeleteUnusedLabelUseCase: OutputUseCase<String, SecureActivity>() {
         }
         // update model
         deleteCandidates.forEach { label ->
-                LabelService.removeLabel(label)
+                LabelService.defaultHolder.removeLabel(label)
                 LabelFilter.unsetFilterFor(label)
             }
 

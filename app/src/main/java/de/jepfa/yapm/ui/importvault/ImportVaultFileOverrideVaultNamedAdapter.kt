@@ -12,13 +12,13 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.model.encrypted.EncNamed
-import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.util.enrichId
 import kotlin.collections.HashMap
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
+import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.ui.HorizontalScrollableViewAdapter
 import de.jepfa.yapm.ui.credential.ShowCredentialActivity
 import de.jepfa.yapm.ui.label.Label
@@ -141,8 +141,8 @@ class ImportVaultFileOverrideVaultNamedAdapter(
                 if (origName == null) {
                     createAndAddCredentialNameTextView(newName, child.newNamed, views)
                 }
-                else {
-                    createAndAddCredentialNameTextView(origName, child.newNamed, views)
+                else if (child.origNamed is EncCredential) {
+                    createAndAddCredentialNameTextView(origName, child.origNamed, views)
                     createAndAddSeparator(views)
                     createAndAddCredentialNameTextView(newName, child.newNamed, views)
                 }
@@ -152,16 +152,16 @@ class ImportVaultFileOverrideVaultNamedAdapter(
                 val origEncLabel = child.origNamed as? EncLabel
                 if (origEncLabel == null) {
                     val encLabel = child.newNamed
-                    val label = LabelService.createLabel(key, encLabel)
+                    val label = LabelService.defaultHolder.createLabel(key, encLabel)
                     views += createLabel(label)
                 }
                 else {
-                    val origLabel = LabelService.createLabel(key, origEncLabel)
+                    val origLabel = LabelService.defaultHolder.createLabel(key, origEncLabel)
                     views += createLabel(origLabel)
 
                     createAndAddSeparator(views)
 
-                    val newLabel = LabelService.createLabel(key, newEncLabel)
+                    val newLabel = LabelService.defaultHolder.createLabel(key, newEncLabel)
                     views += createLabel(newLabel)
                 }
             }
@@ -205,8 +205,7 @@ class ImportVaultFileOverrideVaultNamedAdapter(
     private fun startShowCredentialActivity(credential: EncCredential) {
         val intent = Intent(activity, ShowCredentialActivity::class.java)
         credential.applyExtras(intent)
-        intent.putExtra(ShowCredentialActivity.EXTRA_MODE, ShowCredentialActivity.EXTRA_MODE_SHOW_EXTERNAL)
-        intent.putExtra(ShowCredentialActivity.EXTRA_SHOW_RAW_MENU, true)
+        intent.putExtra(ShowCredentialActivity.EXTRA_MODE, ShowCredentialActivity.EXTRA_MODE_SHOW_EXTERNAL_FROM_VAULT_FILE)
         activity.startActivity(intent)
     }
 
