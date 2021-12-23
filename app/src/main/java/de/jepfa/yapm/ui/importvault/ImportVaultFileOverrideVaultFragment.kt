@@ -60,8 +60,10 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
 
         loadedFileStatusTextView.text = getString(R.string.vault_export_info, createdAt, credentialsCount, labelsCount, vaultId)
 
-        var credentialsToOverride = HashSet<ChildType>()
-        var labelsToOverride = HashSet<ChildType>()
+        var credentialsToInsert: Set<ChildType>? = null
+        var credentialsToUpdate: Set<ChildType>? = null
+        var labelsToInsert: Set<ChildType>? = null
+        var labelsToUpdate: Set<ChildType>? = null
 
         if (credentialsCount?.toIntOrNull() ?:0 > 0) {
             importVaultActivity.credentialViewModel.allCredentials.observe(importVaultActivity) { existingCredentials ->
@@ -86,7 +88,7 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
                     }
                     .map { c -> ChildType(c.id!!, existingCredentials.find { it.id == c.id }, c) }
 
-                val insertOverrides = createExpandableView(
+                credentialsToInsert = createExpandableView(
                     credentialsToBeInserted,
                     GroupType.CREDENTIALS_TO_BE_INSERTED,
                     view,
@@ -94,9 +96,8 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
                     R.id.button_select_none_all_insert_credentials,
                     importVaultActivity
                 )
-                credentialsToOverride.addAll(insertOverrides)
 
-                val updateOverrides = createExpandableView(
+                credentialsToUpdate = createExpandableView(
                     credentialsToBeUpdated,
                     GroupType.CREDENTIALS_TO_BE_UPDATED,
                     view,
@@ -104,7 +105,6 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
                     R.id.button_select_none_all_update_credentials,
                     importVaultActivity
                 )
-                credentialsToOverride.addAll(updateOverrides)
             }
         }
 
@@ -131,7 +131,7 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
                     }
                     .map { l -> ChildType(l.id!!, existingLabels.find { it.id == l.id }, l) }
 
-                val insertOverrides = createExpandableView(
+                labelsToInsert = createExpandableView(
                     labelsToBeInserted,
                     GroupType.LABELS_TO_BE_INSERTED,
                     view,
@@ -139,9 +139,8 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
                     R.id.button_select_none_all_insert_labels,
                     importVaultActivity
                 )
-                labelsToOverride.addAll(insertOverrides)
 
-                val updateOverrides = createExpandableView(
+                labelsToUpdate = createExpandableView(
                     labelsToBeUpdated,
                     GroupType.LABELS_TO_BE_UPDATED,
                     view,
@@ -149,7 +148,6 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
                     R.id.button_select_none_all_update_labels,
                     importVaultActivity
                 )
-                labelsToOverride.addAll(updateOverrides)
             }
         }
 
@@ -159,6 +157,22 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
         importButton.setOnClickListener {
 
             val importVaultActivity: ImportVaultActivity? = getBaseActivityAs()
+
+            val credentialsToOverride = HashSet<ChildType>()
+            credentialsToInsert?.let {
+                credentialsToOverride.addAll(it)
+            }
+            credentialsToUpdate?.let {
+                credentialsToOverride.addAll(it)
+            }
+
+            val labelsToOverride = HashSet<ChildType>()
+            labelsToInsert?.let {
+                labelsToOverride.addAll(it)
+            }
+            labelsToUpdate?.let {
+                labelsToOverride.addAll(it)
+            }
 
             if (credentialsToOverride.isEmpty() && labelsToOverride.isEmpty()) {
                 toastText(importVaultActivity, R.string.nothing_to_import)

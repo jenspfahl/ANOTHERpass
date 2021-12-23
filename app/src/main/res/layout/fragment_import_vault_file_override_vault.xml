@@ -21,7 +21,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingHorizontal="15dp"
-            android:text="Here you see the content of the loaded vault file. You can check or uncheck each record to define which should be imported to your current app vault." />
+            android:text="@string/import_vault_override_explanation" />
 
 
         <TextView
