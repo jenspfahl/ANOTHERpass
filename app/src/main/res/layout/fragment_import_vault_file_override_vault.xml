@@ -44,7 +44,7 @@
 
             <ExpandableListView
                 android:id="@+id/expandable_list_insert_credentials"
-                android:layout_width="1000dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content">
             </ExpandableListView>
 
@@ -63,7 +63,7 @@
 
             <ExpandableListView
                 android:id="@+id/expandable_list_update_credentials"
-                android:layout_width="1000dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content">
             </ExpandableListView>
 
@@ -83,7 +83,7 @@
 
             <ExpandableListView
                 android:id="@+id/expandable_list_insert_labels"
-                android:layout_width="1000dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content">
             </ExpandableListView>
         </LinearLayout>
@@ -100,7 +100,7 @@
 
             <ExpandableListView
                 android:id="@+id/expandable_list_update_labels"
-                android:layout_width="1000dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content">
             </ExpandableListView>
 

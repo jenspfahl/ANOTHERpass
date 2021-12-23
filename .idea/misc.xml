@@ -81,7 +81,7 @@
         <entry key="app/src/main/res/layout/content_label_chip.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/content_list_credentials.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/expandable_group_item.xml" value="0.11354166666666667" />
-        <entry key="app/src/main/res/layout/expandable_list_item.xml" value="0.16799999999999998" />
+        <entry key="app/src/main/res/layout/expandable_list_item.xml" value="0.2" />
         <entry key="app/src/main/res/layout/fragment_create_vault_enter_passphrase.xml" value="0.11354166666666667" />
         <entry key="app/src/main/res/layout/fragment_create_vault_summarize.xml" value="0.264" />
         <entry key="app/src/main/res/layout/fragment_edit_credential_data.xml" value="0.264" />

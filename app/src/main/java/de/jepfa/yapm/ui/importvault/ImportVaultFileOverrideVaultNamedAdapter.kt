@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.recyclerview.widget.RecyclerView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncLabel
@@ -13,10 +14,12 @@ import de.jepfa.yapm.model.encrypted.EncNamed
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.util.createAndAddLabelChip
-import de.jepfa.yapm.util.cutText
 import de.jepfa.yapm.util.enrichId
 import kotlin.collections.HashMap
+import androidx.recyclerview.widget.LinearLayoutManager
+import de.jepfa.yapm.ui.HorizontalScrollableViewAdapter
+import de.jepfa.yapm.util.createLabelChip
+
 
 class ImportVaultFileOverrideVaultNamedAdapter(
     private val selectNoneAll: CheckBox,
@@ -119,21 +122,24 @@ class ImportVaultFileOverrideVaultNamedAdapter(
         }
         checkBoxes[checkBox] = group
 
-        val namedContainer = view.findViewById<ViewGroup>(R.id.expandable_container)
+        val namedContainer = view.findViewById<RecyclerView>(R.id.expandable_container)
+        val layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+        namedContainer.layoutManager = layoutManager
 
         activity.masterSecretKey?.let { key ->
 
             val origName = if (child.origNamed != null) SecretService.decryptCommonString(key, child.origNamed!!.name) else null
             val newName = SecretService.decryptCommonString(key, child.newNamed.name)
+            val views = ArrayList<View>()
 
             if (child.newNamed is EncCredential) {
                 if (origName == null) {
-                    createAndAddCredentialNameTextView(newName, child.newNamed, namedContainer)
+                    createAndAddCredentialNameTextView(newName, child.newNamed, views)
                 }
                 else {
-                    createAndAddCredentialNameTextView(origName, child.newNamed, namedContainer, cutText = true)
-                    createAndAddSeparator(namedContainer)
-                    createAndAddCredentialNameTextView(newName, child.newNamed, namedContainer, cutText = true)
+                    createAndAddCredentialNameTextView(origName, child.newNamed, views)
+                    createAndAddSeparator(views)
+                    createAndAddCredentialNameTextView(newName, child.newNamed, views)
                 }
             }
             else if (child.newNamed is EncLabel) {
@@ -142,19 +148,21 @@ class ImportVaultFileOverrideVaultNamedAdapter(
                 if (origEncLabel == null) {
                     val encLabel = child.newNamed
                     val label = LabelService.createLabel(key, encLabel)
-                    createAndAddLabelChip(label, namedContainer, true, activity)
+                    views += createLabelChip(label, thinner = true, activity)
                 }
                 else {
                     val origLabel = LabelService.createLabel(key, origEncLabel)
-                    createAndAddLabelChip(origLabel, namedContainer, true, activity, MAX_NAMED_LENGTH)
+                    views += createLabelChip(origLabel, thinner = true, activity)
 
-                    createAndAddSeparator(namedContainer)
+                    createAndAddSeparator(views)
 
                     val newLabel = LabelService.createLabel(key, newEncLabel)
-                    createAndAddLabelChip(newLabel, namedContainer, true, activity, MAX_NAMED_LENGTH)
+                    views += createLabelChip(newLabel, thinner = true, activity)
                 }
             }
-            
+
+            namedContainer.adapter = HorizontalScrollableViewAdapter(activity, views)
+
         }
 
         return view
@@ -184,23 +192,21 @@ class ImportVaultFileOverrideVaultNamedAdapter(
     private fun getInflater() = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
 
-    private fun createAndAddSeparator(container: ViewGroup) {
+    private fun createAndAddSeparator(views: ArrayList<View>) {
         val separatorView = ImageView(activity)
         separatorView.setImageDrawable(activity.getDrawable(R.drawable.ic_baseline_arrow_forward_12))
-        separatorView.setPadding(0, 10, 0, 0)
-        container.addView(separatorView)
+        views.add(separatorView)
     }
 
     private fun createAndAddCredentialNameTextView(
         name: String,
         credential: EncCredential,
-        container: ViewGroup,
-        cutText: Boolean = false
+        views: ArrayList<View>
     ) {
         val newTextView = TextView(activity)
-        newTextView.text = enrichId(activity, if (cutText) cutText(name, MAX_NAMED_LENGTH) else name, credential.id)
+        newTextView.text = enrichId(activity, name, credential.id)
         newTextView.setTypeface(null, Typeface.BOLD)
-        container.addView(newTextView)
+        views.add(newTextView)
     }
 
     private fun getCheckedChildrenCount(group: GroupType): Int {

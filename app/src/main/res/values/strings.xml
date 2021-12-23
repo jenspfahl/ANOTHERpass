@@ -446,9 +446,9 @@
     <string name="intro_5_bullet_4">ANOTHERpass uses a security chip if present for secure keys.</string>
     
     <string name="credentials_to_be_inserted">%1$d of %2$d credentials to be re-created</string>
-    <string name="credentials_to_be_updated">%1$d of %2$d credentials to be restored</string>
+    <string name="credentials_to_be_updated">%1$d of %2$d credentials to be replaced</string>
     <string name="labels_to_be_inserted">%1$d of %2$d labels to be re-created</string>
-    <string name="labels_to_be_updated">%1$d of %2$d labels to be restored</string>
+    <string name="labels_to_be_updated">%1$d of %2$d labels to be replaced</string>
     <string name="copy_of_name">%1$s (orig)</string>
     <string name="nothing_to_import">Nothing to import</string>
     <string name="copy_origin">Make a copy of the origin record before updating it. Its name will be followed by \'(orig)\'.</string>

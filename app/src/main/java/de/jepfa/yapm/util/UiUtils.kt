@@ -1,5 +1,6 @@
 package de.jepfa.yapm.util
 
+import android.R
 import android.app.Dialog
 import android.content.Context
 import android.content.res.ColorStateList
@@ -11,8 +12,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
-import com.google.android.material.resources.TextAppearance
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.ui.label.Label
 
@@ -33,24 +32,24 @@ fun enrichId(context: Context, name: String, id: Int?): String {
     return if (showIds) "$name [:${id?:"new"}]" else name
 }
 
-fun cutText(text: String, length: Int): String {
-    if (text.length < length) {
-        return text
-    }
-    else {
-        return text.substring(0, length) + "..."
-    }
-}
-
 fun createAndAddLabelChip(
     label: Label,
     container: ViewGroup,
     thinner: Boolean,
-    context: Context?,
-    maxLength: Int? = null
+    context: Context?
+): Chip {
+    val chip = createLabelChip(label, thinner, context)
+    container.addView(chip)
+    return chip
+}
+
+fun createLabelChip(
+    label: Label,
+    thinner: Boolean,
+    context: Context?
 ): Chip {
     val chip = Chip(context)
-    chip.text = if (maxLength != null) cutText(label.name, maxLength) else label.name
+    chip.text = label.name
     chip.textAlignment = View.TEXT_ALIGNMENT_CENTER
     if (thinner) {
         chip.textSize = 12.0f
@@ -62,10 +61,9 @@ fun createAndAddLabelChip(
     context?.let {
         if (label.labelId != -1) {
             chip.chipBackgroundColor = ColorStateList.valueOf(label.getColor(it))
-            chip.setTextColor(it.getColor(android.R.color.white))
+            chip.setTextColor(it.getColor(R.color.white))
         }
     }
-    container.addView(chip)
     return chip
 }
 
