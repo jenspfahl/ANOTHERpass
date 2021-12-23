@@ -1,12 +1,12 @@
 package de.jepfa.yapm.ui.credential
 
-import androidx.appcompat.app.AlertDialog
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DiffUtil
@@ -28,7 +28,7 @@ import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
-import de.jepfa.yapm.ui.label.LabelDialogOpener
+import de.jepfa.yapm.ui.label.LabelDialogs
 import de.jepfa.yapm.usecase.credential.ExportCredentialUseCase
 import de.jepfa.yapm.util.*
 import java.util.*
@@ -290,7 +290,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                             thinner = true,
                             itemView.context)
                         chip.setOnClickListener { _ ->
-                            LabelDialogOpener.openLabelDialog(activity, label)
+                            LabelDialogs.openLabelOverviewDialog(activity, label)
                         }
                     }
                 }

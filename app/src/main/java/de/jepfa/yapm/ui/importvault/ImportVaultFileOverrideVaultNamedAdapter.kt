@@ -1,6 +1,7 @@
 package de.jepfa.yapm.ui.importvault
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
@@ -17,7 +18,11 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.util.enrichId
 import kotlin.collections.HashMap
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.chip.Chip
 import de.jepfa.yapm.ui.HorizontalScrollableViewAdapter
+import de.jepfa.yapm.ui.credential.ShowCredentialActivity
+import de.jepfa.yapm.ui.label.Label
+import de.jepfa.yapm.ui.label.LabelDialogs
 import de.jepfa.yapm.util.createLabelChip
 
 
@@ -148,16 +153,16 @@ class ImportVaultFileOverrideVaultNamedAdapter(
                 if (origEncLabel == null) {
                     val encLabel = child.newNamed
                     val label = LabelService.createLabel(key, encLabel)
-                    views += createLabelChip(label, thinner = true, activity)
+                    views += createLabel(label)
                 }
                 else {
                     val origLabel = LabelService.createLabel(key, origEncLabel)
-                    views += createLabelChip(origLabel, thinner = true, activity)
+                    views += createLabel(origLabel)
 
                     createAndAddSeparator(views)
 
                     val newLabel = LabelService.createLabel(key, newEncLabel)
-                    views += createLabelChip(newLabel, thinner = true, activity)
+                    views += createLabel(newLabel)
                 }
             }
 
@@ -166,6 +171,14 @@ class ImportVaultFileOverrideVaultNamedAdapter(
         }
 
         return view
+    }
+
+    private fun createLabel(label: Label): Chip {
+        val chip = createLabelChip(label, thinner = true, activity)
+        chip.setOnClickListener {
+            LabelDialogs.openLabelOverviewDialog(activity, label, showChangeLabelButton = false)
+        }
+        return chip
     }
 
     override fun isChildSelectable(groupPosition: Int, childPosition: Int): Boolean {
@@ -189,6 +202,14 @@ class ImportVaultFileOverrideVaultNamedAdapter(
         notifyDataSetChanged()
     }
 
+    private fun startShowCredentialActivity(credential: EncCredential) {
+        val intent = Intent(activity, ShowCredentialActivity::class.java)
+        credential.applyExtras(intent)
+        intent.putExtra(ShowCredentialActivity.EXTRA_MODE, ShowCredentialActivity.EXTRA_MODE_SHOW_EXTERNAL)
+        intent.putExtra(ShowCredentialActivity.EXTRA_SHOW_RAW_MENU, true)
+        activity.startActivity(intent)
+    }
+
     private fun getInflater() = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
 
@@ -203,10 +224,14 @@ class ImportVaultFileOverrideVaultNamedAdapter(
         credential: EncCredential,
         views: ArrayList<View>
     ) {
-        val newTextView = TextView(activity)
-        newTextView.text = enrichId(activity, name, credential.id)
-        newTextView.setTypeface(null, Typeface.BOLD)
-        views.add(newTextView)
+        val textView = TextView(activity)
+        textView.text = enrichId(activity, name, credential.id)
+        textView.setTypeface(null, Typeface.BOLD)
+        textView.setOnClickListener {
+            startShowCredentialActivity(credential)
+        }
+
+        views.add(textView)
     }
 
     private fun getCheckedChildrenCount(group: GroupType): Int {

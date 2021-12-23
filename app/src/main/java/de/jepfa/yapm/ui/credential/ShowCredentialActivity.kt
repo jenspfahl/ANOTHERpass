@@ -1,25 +1,27 @@
 package de.jepfa.yapm.ui.credential
 
 import android.app.Activity
-import androidx.appcompat.app.AlertDialog
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.*
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.setPadding
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.chip.ChipGroup
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_COPY_PASSWORD
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_OVERLAY_FEATURE
@@ -33,7 +35,7 @@ import de.jepfa.yapm.service.secret.SecretService.decryptPassword
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
 import de.jepfa.yapm.ui.label.Label
-import de.jepfa.yapm.ui.label.LabelDialogOpener
+import de.jepfa.yapm.ui.label.LabelDialogs
 import de.jepfa.yapm.usecase.credential.ExportCredentialUseCase
 import de.jepfa.yapm.usecase.credential.ImportCredentialUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
@@ -146,7 +148,11 @@ class ShowCredentialActivity : SecureActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        if (externalMode) {
+        val showRawMenu = intent.hasExtra(EXTRA_SHOW_RAW_MENU)
+        if (showRawMenu) {
+            menuInflater.inflate(R.menu.menu_credential_detail_raw, menu)
+
+        } else if (externalMode) {
             menuInflater.inflate(R.menu.menu_credential_detail_import, menu)
         } else {
             menuInflater.inflate(R.menu.menu_credential_detail, menu)
@@ -353,7 +359,7 @@ class ShowCredentialActivity : SecureActivity() {
                 labelsForCredential.forEachIndexed { idx, label ->
                     val chip = createAndAddLabelChip(label, toolbarChipGroup, thinner, this)
                     chip.setOnClickListener { _ ->
-                        LabelDialogOpener.openLabelDialog(this, label)
+                        LabelDialogs.openLabelOverviewDialog(this, label)
                     }
                 }
             } else {
@@ -440,6 +446,8 @@ class ShowCredentialActivity : SecureActivity() {
             "de.jepfa.yapm.ui.ShowCredentialActivity.mode.show_existing"
         const val EXTRA_MODE_SHOW_EXTERNAL =
             "de.jepfa.yapm.ui.ShowCredentialActivity.mode.show_external"
+        const val EXTRA_SHOW_RAW_MENU =
+            "de.jepfa.yapm.ui.ShowCredentialActivity.show_raw_menu"
     }
 
 }
