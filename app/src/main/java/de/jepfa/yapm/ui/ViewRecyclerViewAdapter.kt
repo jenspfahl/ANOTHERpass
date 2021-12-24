@@ -6,8 +6,8 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.ViewGroup
 import android.widget.LinearLayout
 
-class HorizontalScrollableViewAdapter(private val context: Context, private val items: List<View>) :
-    RecyclerView.Adapter<HorizontalScrollableViewAdapter.ViewHolder>() {
+class ViewRecyclerViewAdapter(private val context: Context, private val items: List<View>) :
+    RecyclerView.Adapter<ViewRecyclerViewAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,

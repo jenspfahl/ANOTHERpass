@@ -4,10 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.ExpandableListView
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SwitchCompat
 import com.google.gson.JsonObject
@@ -19,7 +16,6 @@ import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.service.label.LabelService
-import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseFragment
@@ -36,6 +32,8 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
         enableBack = true
         backToPreviousFragment = true
     }
+
+    private val adapters = HashMap<GroupType, ImportVaultFileOverrideVaultNamedAdapter>()
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -99,7 +97,8 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
                     view,
                     R.id.expandable_list_insert_credentials,
                     R.id.button_select_none_all_insert_credentials,
-                    importVaultActivity
+                    importVaultActivity,
+                    savedInstanceState
                 )
 
                 credentialsToUpdate = createExpandableView(
@@ -108,7 +107,8 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
                     view,
                     R.id.expandable_list_update_credentials,
                     R.id.button_select_none_all_update_credentials,
-                    importVaultActivity
+                    importVaultActivity,
+                    savedInstanceState
                 )
             }
         }
@@ -148,7 +148,8 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
                     view,
                     R.id.expandable_list_insert_labels,
                     R.id.button_select_none_all_insert_labels,
-                    importVaultActivity
+                    importVaultActivity,
+                    savedInstanceState
                 )
 
                 labelsToUpdate = createExpandableView(
@@ -157,7 +158,8 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
                     view,
                     R.id.expandable_list_update_labels,
                     R.id.button_select_none_all_update_labels,
-                    importVaultActivity
+                    importVaultActivity,
+                    savedInstanceState
                 )
             }
         }
@@ -217,6 +219,13 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
 
             }
 
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        adapters.forEach { (k, v) ->
+            outState.putIntArray(k.toString(), v.checkedChildren.map { it.id }.toIntArray())
         }
     }
 
@@ -280,10 +289,7 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
         val externalDescription = SecretService.decryptCommonString(masterSecretKey, externalLabel.description)
 
 
-        val existingLabel = LabelService.defaultHolder.lookupByLabelId(externalLabel.id!!)
-        if (existingLabel == null) {
-            return false
-        }
+        val existingLabel = LabelService.defaultHolder.lookupByLabelId(externalLabel.id!!) ?: return false
 
         val existingName = existingLabel.name
         val existingDescription = existingLabel.description
@@ -294,33 +300,48 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
 
 
     private fun createExpandableView(
-        credentialsToBeInserted: List<ChildType>,
+        children: List<ChildType>,
         groupType: GroupType,
         view: View,
         expandableListViewId: Int,
         selectNoneAllCheckBoxId: Int,
-        importVaultActivity: ImportVaultActivity
+        importVaultActivity: ImportVaultActivity,
+        savedInstanceState: Bundle?
     ): Set<ChildType> {
-        val namedToBeImported = HashMap<GroupType, List<ChildType>>()
-        namedToBeImported[groupType] = credentialsToBeInserted
-
         val expandableListView =
             view.findViewById<ExpandableListView>(expandableListViewId)
         val selectNoneAll =
             view.findViewById<CheckBox>(selectNoneAllCheckBoxId)
 
+        val checkedChildren = fillChildrenFromState(groupType, children, savedInstanceState)
         val adapter = ImportVaultFileOverrideVaultNamedAdapter(
                 selectNoneAll,
                 importVaultActivity,
-                namedToBeImported
+                groupType,
+                children,
+                checkedChildren
             )
         expandableListView.setAdapter(adapter)
+        adapters[groupType] = adapter
 
         selectNoneAll.setOnClickListener {
             adapter.selectNoneAllClicked()
         }
 
-        return adapter.getCheckedChildren()
+        return adapter.checkedChildren
+    }
+
+    private fun fillChildrenFromState(
+        groupType: GroupType,
+        children: List<ChildType>,
+        savedInstanceState: Bundle?
+    ): MutableSet<ChildType> {
+        val ids = savedInstanceState?.getIntArray(groupType.toString())?.toList()
+            ?: return children.toMutableSet()
+
+        return ids.mapNotNull { id ->
+            children.find { it.id == id }
+        }.toMutableSet()
     }
 
     private fun getImportVaultActivity() : ImportVaultActivity {

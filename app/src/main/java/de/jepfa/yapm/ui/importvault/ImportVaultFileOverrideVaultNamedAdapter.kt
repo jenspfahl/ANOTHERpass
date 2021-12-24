@@ -19,7 +19,7 @@ import kotlin.collections.HashMap
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
 import de.jepfa.yapm.service.label.LabelService
-import de.jepfa.yapm.ui.HorizontalScrollableViewAdapter
+import de.jepfa.yapm.ui.ViewRecyclerViewAdapter
 import de.jepfa.yapm.ui.credential.ShowCredentialActivity
 import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.ui.label.LabelDialogs
@@ -29,7 +29,9 @@ import de.jepfa.yapm.util.createLabelChip
 class ImportVaultFileOverrideVaultNamedAdapter(
     private val selectNoneAll: CheckBox,
     private val activity: SecureActivity,
-    private val dataMap: HashMap<GroupType, List<ChildType>>
+    private val groupType: GroupType,
+    private val dataMap: List<ChildType>,
+    val checkedChildren: MutableSet<ChildType>
 ): BaseExpandableListAdapter() {
 
     enum class GroupType(val titleId: Int) {
@@ -41,36 +43,26 @@ class ImportVaultFileOverrideVaultNamedAdapter(
 
     data class ChildType(val id: Int, val origNamed: EncNamed?, val newNamed: EncNamed)
 
-    private var titleList: List<GroupType>
-    private val checkedChildren = HashMap<ChildType, GroupType>()
     private val checkBoxes = HashMap<CheckBox, GroupType>()
 
-    private val MAX_NAMED_LENGTH = 15
-
     init {
-        fillCheckedChildrenWithAllNamed()
-        selectNoneAll.isChecked = true
-
-        titleList = GroupType.values().filter { dataMap.keys.contains(it) }.toList()
-
+        updateSelectNoneAll()
     }
 
     override fun getGroupCount(): Int {
-        return titleList.size
+        return 1
     }
 
     override fun getChildrenCount(groupPosition: Int): Int {
-        val group = getGroup(groupPosition)
-        return dataMap[group]?.size ?: 0
+        return dataMap.size
     }
 
     override fun getGroup(groupPosition: Int): GroupType {
-        return titleList[groupPosition]
+        return groupType
     }
 
     override fun getChild(groupPosition: Int, childPosition: Int): ChildType {
-        val group = getGroup(groupPosition)
-        return dataMap[group]!![childPosition]
+        return dataMap[childPosition]
     }
 
     override fun getGroupId(groupPosition: Int): Long {
@@ -94,7 +86,7 @@ class ImportVaultFileOverrideVaultNamedAdapter(
         val view = getInflater().inflate(R.layout.expandable_group_item, null)
         val group = getGroup(groupPosition)
         val childrenCount = getChildrenCount(groupPosition)
-        val checkedChildrenCount = getCheckedChildrenCount(group)
+        val checkedChildrenCount = checkedChildren.count()
         val textView = view.findViewById<TextView>(R.id.expandable_text_view_1)
         textView.setTypeface(null, Typeface.BOLD)
         textView.text = activity.getString(group.titleId, checkedChildrenCount, childrenCount)
@@ -116,14 +108,14 @@ class ImportVaultFileOverrideVaultNamedAdapter(
         if (!checkBox.hasOnClickListeners()) {
             checkBox.setOnClickListener {
                 if (checkBox.isChecked) {
-                    checkedChildren[child] = group
+                    checkedChildren.add(child)
                 } else {
                     checkedChildren.remove(child)
                 }
-                selectNoneAll.isChecked = checkedChildren.isNotEmpty()
+                updateSelectNoneAll()
                 notifyDataSetChanged()
             }
-            checkBox.isChecked = checkedChildren.containsKey(child)
+            checkBox.isChecked = checkedChildren.contains(child)
         }
         checkBoxes[checkBox] = group
 
@@ -166,7 +158,7 @@ class ImportVaultFileOverrideVaultNamedAdapter(
                 }
             }
 
-            namedContainer.adapter = HorizontalScrollableViewAdapter(activity, views)
+            namedContainer.adapter = ViewRecyclerViewAdapter(activity, views)
 
         }
 
@@ -185,8 +177,6 @@ class ImportVaultFileOverrideVaultNamedAdapter(
         return true
     }
 
-    fun getCheckedChildren(): Set<ChildType> = checkedChildren.keys
-
     fun selectNoneAllClicked() {
         val nonSelected = checkedChildren.isEmpty()
         checkBoxes.forEach {
@@ -198,7 +188,7 @@ class ImportVaultFileOverrideVaultNamedAdapter(
         else {
             checkedChildren.clear()
         }
-        selectNoneAll.isChecked = checkedChildren.isNotEmpty()
+        updateSelectNoneAll()
         notifyDataSetChanged()
     }
 
@@ -222,10 +212,14 @@ class ImportVaultFileOverrideVaultNamedAdapter(
 
     private fun getInflater() = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
+    private fun updateSelectNoneAll() {
+        selectNoneAll.isChecked = checkedChildren.isNotEmpty()
+    }
 
     private fun createAndAddSeparator(views: ArrayList<View>) {
         val separatorView = ImageView(activity)
         separatorView.setImageDrawable(activity.getDrawable(R.drawable.ic_baseline_arrow_forward_12))
+        separatorView.setPadding(10, 0, 10, 0)
         views.add(separatorView)
     }
 
@@ -237,6 +231,7 @@ class ImportVaultFileOverrideVaultNamedAdapter(
     ) {
         val textView = TextView(activity)
         textView.text = enrichId(activity, name, credential.id)
+        textView.textSize = 16f
         textView.setTypeface(null, Typeface.BOLD)
         textView.setOnClickListener {
             startShowCredentialActivity(credential, isExternal)
@@ -245,15 +240,9 @@ class ImportVaultFileOverrideVaultNamedAdapter(
         views.add(textView)
     }
 
-    private fun getCheckedChildrenCount(group: GroupType): Int {
-        return checkedChildren.filter { it.value == group }.count()
-    }
-
     private fun fillCheckedChildrenWithAllNamed() {
-        dataMap.forEach { group, elems ->
-            elems.forEach { elem ->
-                checkedChildren[elem] = group
-            }
+        dataMap.forEach { elem ->
+                checkedChildren.add(elem)
         }
     }
 
