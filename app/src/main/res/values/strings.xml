@@ -452,6 +452,6 @@
     <string name="copy_of_name">%1$s (orig)</string>
     <string name="nothing_to_import">Nothing to import</string>
     <string name="copy_origin">Make a copy of the origin record before updating it. Its name will be followed by \'(orig)\'.</string>
-    <string name="import_vault_override_explanation">Here you see the content of the loaded vault file. Only records that differs to the current are shown (also records that were just saved without real changes). You can expand the lists and check or uncheck each record to select which should be imported. To see details, click on them.</string>
+    <string name="import_vault_override_explanation">Here you see the content of the loaded vault file. Only records that differs to the current are shown. You can expand the lists and check or uncheck each record to select which should be imported. To see details, click on them.</string>
 
 </resources>

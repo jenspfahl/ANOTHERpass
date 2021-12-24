@@ -363,7 +363,8 @@ class ShowCredentialActivity : SecureActivity() {
                 labelsForCredential.forEachIndexed { idx, label ->
                     val chip = createAndAddLabelChip(label, toolbarChipGroup, thinner, this)
                     chip.setOnClickListener { _ ->
-                        LabelDialogs.openLabelOverviewDialog(this, label)
+                        val showChangeLabelButton = mode == Mode.NORMAL
+                        LabelDialogs.openLabelOverviewDialog(this, label, showChangeLabelButton)
                     }
                 }
             } else {
