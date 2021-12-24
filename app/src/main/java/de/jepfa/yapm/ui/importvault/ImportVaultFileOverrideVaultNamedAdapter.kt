@@ -139,12 +139,12 @@ class ImportVaultFileOverrideVaultNamedAdapter(
 
             if (child.newNamed is EncCredential) {
                 if (origName == null) {
-                    createAndAddCredentialNameTextView(newName, child.newNamed, views)
+                    createAndAddCredentialNameTextView(newName, child.newNamed, views, isExternal = true)
                 }
                 else if (child.origNamed is EncCredential) {
-                    createAndAddCredentialNameTextView(origName, child.origNamed, views)
+                    createAndAddCredentialNameTextView(origName, child.origNamed, views, isExternal = false)
                     createAndAddSeparator(views)
-                    createAndAddCredentialNameTextView(newName, child.newNamed, views)
+                    createAndAddCredentialNameTextView(newName, child.newNamed, views, isExternal = true)
                 }
             }
             else if (child.newNamed is EncLabel) {
@@ -202,10 +202,21 @@ class ImportVaultFileOverrideVaultNamedAdapter(
         notifyDataSetChanged()
     }
 
-    private fun startShowCredentialActivity(credential: EncCredential) {
+    private fun startShowCredentialActivity(credential: EncCredential, isExternal: Boolean) {
         val intent = Intent(activity, ShowCredentialActivity::class.java)
         credential.applyExtras(intent)
-        intent.putExtra(ShowCredentialActivity.EXTRA_MODE, ShowCredentialActivity.EXTRA_MODE_SHOW_EXTERNAL_FROM_VAULT_FILE)
+        if (isExternal) {
+            intent.putExtra(
+                ShowCredentialActivity.EXTRA_MODE,
+                ShowCredentialActivity.EXTRA_MODE_SHOW_EXTERNAL_FROM_VAULT_FILE
+            )
+        }
+        else {
+            intent.putExtra(
+                ShowCredentialActivity.EXTRA_MODE,
+                ShowCredentialActivity.EXTRA_MODE_SHOW_NORMAL_READONLY
+            )
+        }
         activity.startActivity(intent)
     }
 
@@ -221,13 +232,14 @@ class ImportVaultFileOverrideVaultNamedAdapter(
     private fun createAndAddCredentialNameTextView(
         name: String,
         credential: EncCredential,
-        views: ArrayList<View>
+        views: ArrayList<View>,
+        isExternal: Boolean
     ) {
         val textView = TextView(activity)
         textView.text = enrichId(activity, name, credential.id)
         textView.setTypeface(null, Typeface.BOLD)
         textView.setOnClickListener {
-            startShowCredentialActivity(credential)
+            startShowCredentialActivity(credential, isExternal)
         }
 
         views.add(textView)

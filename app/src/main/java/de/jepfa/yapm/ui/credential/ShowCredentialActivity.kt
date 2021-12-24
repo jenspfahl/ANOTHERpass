@@ -45,7 +45,7 @@ import de.jepfa.yapm.util.PasswordColorizer.spannableObfusableAndMaskableString
 
 class ShowCredentialActivity : SecureActivity() {
 
-    private enum class Mode {NORMAL, EXTERNAL_FROM_RECORD, EXTERNAL_FROM_FILE}
+    private enum class Mode {NORMAL, NORMAL_READONLY, EXTERNAL_FROM_RECORD, EXTERNAL_FROM_FILE}
 
     val updateCredentialActivityRequestCode = 1
 
@@ -91,6 +91,7 @@ class ShowCredentialActivity : SecureActivity() {
         mode = when (intent.getStringExtra(EXTRA_MODE)) {
             EXTRA_MODE_SHOW_EXTERNAL_FROM_RECORD -> Mode.EXTERNAL_FROM_RECORD
             EXTRA_MODE_SHOW_EXTERNAL_FROM_VAULT_FILE -> Mode.EXTERNAL_FROM_FILE
+            EXTRA_MODE_SHOW_NORMAL_READONLY -> Mode.NORMAL_READONLY
             else -> Mode.NORMAL
         }
 
@@ -153,7 +154,7 @@ class ShowCredentialActivity : SecureActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        if (mode == Mode.EXTERNAL_FROM_FILE) {
+        if (mode == Mode.EXTERNAL_FROM_FILE || mode == Mode.NORMAL_READONLY) {
             menuInflater.inflate(R.menu.menu_credential_detail_raw, menu)
         } else if (mode == Mode.EXTERNAL_FROM_RECORD) {
             menuInflater.inflate(R.menu.menu_credential_detail_import, menu)
@@ -447,8 +448,10 @@ class ShowCredentialActivity : SecureActivity() {
 
     companion object {
         const val EXTRA_MODE = "de.jepfa.yapm.ui.ShowCredentialActivity.mode"
-        const val EXTRA_MODE_SHOW_EXISTING =
-            "de.jepfa.yapm.ui.ShowCredentialActivity.mode.show_existing"
+        const val EXTRA_MODE_SHOW_NORMAL =
+            "de.jepfa.yapm.ui.ShowCredentialActivity.mode.show_normal"
+        const val EXTRA_MODE_SHOW_NORMAL_READONLY =
+            "de.jepfa.yapm.ui.ShowCredentialActivity.mode.show_normal_readonly"
         const val EXTRA_MODE_SHOW_EXTERNAL_FROM_RECORD =
             "de.jepfa.yapm.ui.ShowCredentialActivity.mode.show_external_from_record"
         const val EXTRA_MODE_SHOW_EXTERNAL_FROM_VAULT_FILE =
