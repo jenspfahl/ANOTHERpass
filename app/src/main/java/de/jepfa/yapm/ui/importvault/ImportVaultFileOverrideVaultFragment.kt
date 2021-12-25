@@ -266,7 +266,7 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
             LabelService.defaultHolder.decryptLabelsIdsForCredential(masterSecretKey, existingCredential)
 
         val contentEquals = externalName == existingName
-                && externalPasswd == existingPasswd
+                && externalPasswd.isEqual(existingPasswd)
                 && externalUser == existingUser
                 && externalWebsite == existingWebsite
                 && externalAdditionalInfo == existingAdditionalInfo

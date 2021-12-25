@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.recyclerview.widget.RecyclerView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
@@ -232,7 +233,7 @@ class ImportVaultFileOverrideVaultNamedAdapter(
         val textView = TextView(activity)
         textView.text = enrichId(activity, name, credential.id)
         textView.textSize = 16f
-        textView.setTypeface(null, Typeface.BOLD)
+        textView.setTextAppearance(R.style.credential_title)
         textView.setOnClickListener {
             startShowCredentialActivity(credential, isExternal)
         }
