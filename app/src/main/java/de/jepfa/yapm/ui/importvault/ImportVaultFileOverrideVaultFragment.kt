@@ -1,6 +1,7 @@
 package de.jepfa.yapm.ui.importvault
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +20,7 @@ import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseFragment
+import de.jepfa.yapm.ui.NonScrollExpandableListView
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.importvault.ImportVaultFileOverrideVaultNamedAdapter.GroupType
@@ -34,6 +36,7 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
     }
 
     private val adapters = HashMap<GroupType, ImportVaultFileOverrideVaultNamedAdapter>()
+    private val expandableViews = HashMap<GroupType, ExpandableListView>()
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -49,10 +52,7 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
         val importVaultActivity = getImportVaultActivity()
         val loadedFileStatusTextView = view.findViewById<TextView>(R.id.loaded_file_status)
 
-        val jsonContent = getImportVaultActivity().jsonContent
-        if (jsonContent == null) {
-            return
-        }
+        val jsonContent = getImportVaultActivity().jsonContent ?: return
 
         val createdAt = jsonContent.get(VaultExportService.JSON_CREATION_DATE)?.asString
         val credentialsCount = jsonContent.get(VaultExportService.JSON_CREDENTIALS_COUNT)?.asString
@@ -66,6 +66,8 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
         var credentialsToUpdate: Set<ChildType>? = null
         var labelsToInsert: Set<ChildType>? = null
         var labelsToUpdate: Set<ChildType>? = null
+
+        LabelService.externalHolder.clearAll()
 
         if (credentialsCount?.toIntOrNull() ?:0 > 0) {
             importVaultActivity.credentialViewModel.allCredentials.observe(importVaultActivity) { existingCredentials ->
@@ -126,7 +128,6 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
                     .filterNotNull()
 
                 importVaultActivity.masterSecretKey?.let {
-                    LabelService.externalHolder.clearAll()
                     LabelService.externalHolder.initLabels(it, externalLabels.toSet())
                 }
 
@@ -227,6 +228,9 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
         adapters.forEach { (k, v) ->
             outState.putIntArray(k.toString(), v.checkedChildren.map { it.id }.toIntArray())
         }
+        expandableViews.forEach { (k, v) ->
+            outState.putBoolean(k.toString() + "_view", v.isGroupExpanded(0))
+        }
     }
 
     override fun onDestroyView() {
@@ -249,12 +253,10 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
         val externalAdditionalInfo =
             SecretService.decryptCommonString(masterSecretKey, externalCredential.additionalInfo)
         val externalLabelIds =
-            LabelService.defaultHolder.decryptLabelsIdsForCredential(masterSecretKey, externalCredential)
+            LabelService.externalHolder.decryptLabelsIdsForCredential(masterSecretKey, externalCredential)
 
         val existingCredential = existingCredentials.find { it.id == externalCredential.id }
-        if (existingCredential == null) {
-            return false
-        }
+            ?: return false
 
         val existingName = SecretService.decryptCommonString(masterSecretKey, existingCredential.name)
         val existingPasswd = SecretService.decryptPassword(masterSecretKey, existingCredential.password)
@@ -271,6 +273,7 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
                 && externalWebsite == existingWebsite
                 && externalAdditionalInfo == existingAdditionalInfo
                 && externalLabelIds == existingLabelIds
+                && externalCredential.isObfuscated == existingCredential.isObfuscated
 
         externalPasswd.clear()
         existingPasswd.clear()
@@ -296,6 +299,7 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
 
         return externalName == existingName
                 && externalDescription == existingDescription
+                && externalLabel.color == existingLabel.colorRGB
     }
 
 
@@ -308,8 +312,11 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
         importVaultActivity: ImportVaultActivity,
         savedInstanceState: Bundle?
     ): Set<ChildType> {
+
         val expandableListView =
             view.findViewById<ExpandableListView>(expandableListViewId)
+        expandableViews[groupType] = expandableListView
+
         val selectNoneAll =
             view.findViewById<CheckBox>(selectNoneAllCheckBoxId)
 
@@ -323,6 +330,12 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
             )
         expandableListView.setAdapter(adapter)
         adapters[groupType] = adapter
+
+        savedInstanceState?.getBoolean(groupType.toString() + "_view")?.let { expanded ->
+            if (expanded) {
+                expandableListView.expandGroup(0)
+            }
+        }
 
         selectNoneAll.setOnClickListener {
             adapter.selectNoneAllClicked()

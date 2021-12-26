@@ -5,6 +5,7 @@ import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.secret.SecretKeyHolder
+import de.jepfa.yapm.service.label.LabelService.createLabel
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.label.Label
 import java.util.*
@@ -164,12 +165,6 @@ class LabelsHolder {
 
     private fun idSetToString(ids: Set<Int>): String {
         return ids.joinToString(separator = ID_SEPARATOR)
-    }
-
-    fun createLabel(key: SecretKeyHolder, encLabel: EncLabel): Label {
-        val name = SecretService.decryptCommonString(key, encLabel.name)
-        val desc = SecretService.decryptCommonString(key, encLabel.description)
-        return Label(encLabel.id, name, desc, encLabel.color)
     }
 
 }
