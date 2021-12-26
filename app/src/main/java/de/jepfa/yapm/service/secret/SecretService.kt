@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import android.security.keystore.StrongBoxUnavailableException
 import android.util.Log
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.Validable.Companion.FAILED_BYTE_ARRAY
@@ -226,9 +227,21 @@ object SecretService {
             }
         }
 
-        keyGenerator.init(spec.build())
-
-        return keyGenerator.generateKey()
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+            keyGenerator.init(spec.build())
+            return keyGenerator.generateKey()
+        }
+        else {
+            try {
+                keyGenerator.init(spec.build())
+                return keyGenerator.generateKey()
+            } catch (e: StrongBoxUnavailableException) {
+                Log.w("SS", "Strong box not supported, falling back to without it", e)
+                spec.setIsStrongBoxBacked(false)
+                keyGenerator.init(spec.build())
+                return keyGenerator.generateKey()
+            }
+        }
     }
 
 

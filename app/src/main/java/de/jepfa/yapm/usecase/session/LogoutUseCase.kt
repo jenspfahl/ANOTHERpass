@@ -13,10 +13,9 @@ object LogoutUseCase: BasicUseCase<SecureActivity>() {
 
         TempFileService.clearSharesCache(activity)
         activity.closeOverlayDialogs()
-        activity.finishAffinity()
-        activity.finishAndRemoveTask()
-
         ClipboardUtil.clearClips(activity)
+
+        activity.finishAndRemoveTask()
 
         return true
     }
