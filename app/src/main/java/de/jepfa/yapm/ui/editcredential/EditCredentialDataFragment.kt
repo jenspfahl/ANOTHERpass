@@ -1,3 +1,5 @@
+@file:Suppress("KotlinDeprecation")
+
 package de.jepfa.yapm.ui.editcredential
 
 import android.os.Bundle
@@ -253,7 +255,7 @@ class EditCredentialDataFragment : SecureFragment() {
                         val encDesc = encryptCommonString(key, "")
                         val encLabel = EncLabel(null, encName, encDesc, null)
                         getBaseActivity()?.let{
-                            it.labelViewModel?.insert(encLabel, it)
+                            it.labelViewModel.insert(encLabel, it)
                         }
                     }
                 }

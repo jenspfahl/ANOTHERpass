@@ -1,6 +1,5 @@
 package de.jepfa.yapm.util
 
-import android.R
 import android.app.Dialog
 import android.content.Context
 import android.content.res.ColorStateList
@@ -61,7 +60,7 @@ fun createLabelChip(
     context?.let {
         if (label.labelId != -1) {
             chip.chipBackgroundColor = ColorStateList.valueOf(label.getColor(it))
-            chip.setTextColor(it.getColor(R.color.white))
+            chip.setTextColor(it.getColor(android.R.color.white))
         }
     }
     return chip

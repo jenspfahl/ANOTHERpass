@@ -24,7 +24,6 @@ import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_LABELS_IN_LIST
 import de.jepfa.yapm.service.autofill.AutofillCredentialHolder
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
-import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
@@ -290,7 +289,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                             credentialLabelContainerGroup,
                             thinner = true,
                             itemView.context)
-                        chip.setOnClickListener { _ ->
+                        chip.setOnClickListener {
                             LabelDialogs.openLabelOverviewDialog(activity, label)
                         }
                     }

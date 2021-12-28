@@ -79,7 +79,7 @@ class EditLabelActivity : SecureActivity() {
                 val chip = createAndAddLabelChip(label, labelsContainer, thinner = false, this)
                 chip.chipBackgroundColor = ColorStateList.valueOf(color)
 
-                chip.setOnClickListener {_ ->
+                chip.setOnClickListener {
                     labelColor = color
                     labelColorChip.chipBackgroundColor = ColorStateList.valueOf(color)
                     colorDialog.dismiss()

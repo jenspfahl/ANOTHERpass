@@ -30,7 +30,6 @@ import de.jepfa.yapm.service.PreferenceService.PREF_PASSWD_WORDS_ON_NL
 import de.jepfa.yapm.service.autofill.AutofillCredentialHolder
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.overlay.DetachHelper
-import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.decryptPassword
 import de.jepfa.yapm.ui.SecureActivity
@@ -42,7 +41,6 @@ import de.jepfa.yapm.usecase.credential.ImportCredentialUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.PasswordColorizer.spannableObfusableAndMaskableString
-import java.util.*
 
 
 class ShowCredentialActivity : SecureActivity() {
@@ -388,7 +386,7 @@ class ShowCredentialActivity : SecureActivity() {
                 val thinner = shouldMakeLabelThinner(labelsForCredential)
                 labelsForCredential.forEachIndexed { idx, label ->
                     val chip = createAndAddLabelChip(label, toolbarChipGroup, thinner, this)
-                    chip.setOnClickListener { _ ->
+                    chip.setOnClickListener {
                         val showChangeLabelButton = mode == Mode.NORMAL
                         LabelDialogs.openLabelOverviewDialog(this, label, showChangeLabelButton)
                     }

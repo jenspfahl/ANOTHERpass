@@ -2,7 +2,7 @@ package de.jepfa.yapm.model.secret
 
 import android.text.Editable
 import android.util.Base64
-import de.jepfa.obfusser.util.encrypt.Loop
+import de.jepfa.obfusser.util.Loop
 import de.jepfa.yapm.model.Clearable
 import java.nio.ByteBuffer
 import java.nio.CharBuffer

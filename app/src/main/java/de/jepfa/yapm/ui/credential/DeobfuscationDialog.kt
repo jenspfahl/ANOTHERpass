@@ -1,4 +1,4 @@
-package de.jepfa.yapm.util
+package de.jepfa.yapm.ui.credential
 
 import androidx.appcompat.app.AlertDialog
 import android.content.Context
@@ -12,6 +12,7 @@ import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.util.Constants
 
 object DeobfuscationDialog {
     fun openDeobfuscationDialog(context: Context, handlePassword: (obfuscationKey: Key) -> Unit) {

@@ -69,7 +69,7 @@ object ShareVaultUseCase: UseCase<ShareVaultUseCase.Input, Uri?, SecureActivity>
             val shareAction = "de.jepfa.yapm.share.SHARE_ACTION_" + UUID.randomUUID().toString()
             val receiverIntent = Intent(shareAction)
 
-            activity.registerReceiver(receiver, IntentFilter(shareAction));
+            activity.registerReceiver(receiver, IntentFilter(shareAction))
 
             val intentSender = PendingIntent
                 .getBroadcast(activity, 0, receiverIntent, PendingIntent.FLAG_IMMUTABLE)

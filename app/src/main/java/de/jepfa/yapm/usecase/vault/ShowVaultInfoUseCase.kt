@@ -5,6 +5,7 @@ import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_EXPORTED_AT
+import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_MODIFIED_AT
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
@@ -47,6 +48,10 @@ object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActi
         }
         if (vaultImportedAt != null) {
             sb.addFormattedLine(activity.getString(R.string.vault_imported_at), vaultImportedAt)
+        }
+        val vaultModifiedAt = PreferenceService.getAsDate(DATA_VAULT_MODIFIED_AT, activity)
+        vaultModifiedAt?.let {
+            sb.addFormattedLine(activity.getString(R.string.vault_modified_at), Constants.SDF_DT_MEDIUM.format(it))
         }
         val vaultExportedAt = PreferenceService.getAsDate(DATA_VAULT_EXPORTED_AT, activity)
         vaultExportedAt?.let {

@@ -22,7 +22,7 @@ enum class CipherAlgorithm(
     ;
     companion object {
         fun supportedValues(): List<CipherAlgorithm> {
-            return CipherAlgorithm.values()
+            return values()
                 .filter { Build.VERSION.SDK_INT >= it.supportedSdkVersion }
         }
     }

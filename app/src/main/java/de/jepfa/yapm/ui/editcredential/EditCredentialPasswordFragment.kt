@@ -27,6 +27,7 @@ import de.jepfa.yapm.service.secretgenerator.passphrase.PassphraseGeneratorSpec
 import de.jepfa.yapm.service.secretgenerator.password.PasswordGenerator
 import de.jepfa.yapm.service.secretgenerator.password.PasswordGeneratorSpec
 import de.jepfa.yapm.ui.SecureFragment
+import de.jepfa.yapm.ui.credential.DeobfuscationDialog
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.*
 import java.util.*
@@ -196,7 +197,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                         pwd1.inputType =
                             InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
                         val filters =
-                            arrayOf<InputFilter>(InputFilter.LengthFilter(Constants.MAX_CREDENTIAL_PASSWD_LENGTH))
+                            arrayOf<InputFilter>(LengthFilter(Constants.MAX_CREDENTIAL_PASSWD_LENGTH))
                         pwd1.filters = filters
                         pwd1.requestFocus()
                         inputView.addView(pwd1)

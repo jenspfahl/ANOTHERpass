@@ -193,7 +193,7 @@ data class EncCredential(var id: Int?,
                 )
             } catch (e: Exception) {
                 Log.e("ENCC", "cannot parse json container", e)
-                return null;
+                return null
             }
         }
     }

@@ -200,19 +200,17 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
 
-                        importVaultActivity?.let { activity ->
-                            PreferenceService
-                                .getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, activity)
-                                ?.let { encMasterKey ->
-                                    importVault(
-                                        jsonContent,
-                                        encMasterKey,
-                                        credentialsToOverride.map { it.id }.toSet(),
-                                        labelsToOverride.map { it.id }.toSet(),
-                                        copyOrigSwitch.isChecked,
-                                        activity)
-                                }
-                        }
+                        PreferenceService
+                            .getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, activity)
+                            ?.let { encMasterKey ->
+                                importVault(
+                                    jsonContent,
+                                    encMasterKey,
+                                    credentialsToOverride.map { it.id }.toSet(),
+                                    labelsToOverride.map { it.id }.toSet(),
+                                    copyOrigSwitch.isChecked,
+                                    activity)
+                            }
 
                     }
                     .setNegativeButton(android.R.string.no, null)

@@ -35,7 +35,7 @@ data class EncryptedType(val type: Types, val payload: String? = null) {
 
         fun of(typeAndPayload: String): EncryptedType? {
             if (typeAndPayload.isEmpty()) {
-                return null;
+                return null
             }
             val splitted = typeAndPayload.split(ADD_ON_SEPARATOR)
             val typeValue = splitted[0]

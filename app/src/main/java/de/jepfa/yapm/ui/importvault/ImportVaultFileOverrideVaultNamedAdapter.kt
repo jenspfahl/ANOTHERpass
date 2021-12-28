@@ -127,7 +127,7 @@ class ImportVaultFileOverrideVaultNamedAdapter(
 
         activity.masterSecretKey?.let { key ->
 
-            val origName = if (child.origNamed != null) SecretService.decryptCommonString(key, child.origNamed!!.name) else null
+            val origName = if (child.origNamed != null) SecretService.decryptCommonString(key, child.origNamed.name) else null
             val newName = SecretService.decryptCommonString(key, child.newNamed.name)
             val views = ArrayList<View>()
 
@@ -142,7 +142,7 @@ class ImportVaultFileOverrideVaultNamedAdapter(
                 }
             }
             else if (child.newNamed is EncLabel) {
-                val newEncLabel = child.newNamed as EncLabel
+                val newEncLabel = child.newNamed
                 val origEncLabel = child.origNamed as? EncLabel
                 if (origEncLabel == null) {
                     val encLabel = child.newNamed

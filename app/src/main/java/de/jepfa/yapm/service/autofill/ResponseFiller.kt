@@ -223,14 +223,14 @@ object ResponseFiller {
 
         if (!suggestEverywhere && node.autofillType != View.AUTOFILL_TYPE_TEXT) {
             Log.i("CFS", "No text autofill type")
-            return;
+            return
         }
 
         if (!suggestEverywhere && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             if (node.importantForAutofill == View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS) {
                 // don't traverse anything
                 Log.i("CFS", "No autofill for current node and children")
-                return;
+                return
             }
         }
 
@@ -256,7 +256,7 @@ object ResponseFiller {
             if (node.importantForAutofill == View.IMPORTANT_FOR_AUTOFILL_YES_EXCLUDE_DESCENDANTS) {
                 // don't traverse children
                 Log.i("CFS", "No autofill for current nodes children only")
-                return;
+                return
             }
         }
 

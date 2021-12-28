@@ -51,7 +51,7 @@
     <string name="message_delete_label">Are you sure deleting label \'%1$s\'? It will be removed from all credentials where it is assigned to.</string>
 
     <string name="lock_items">Lock vault</string>
-    <string name="logout">Logout and Exit</string>
+    <string name="logout">Logout and exit</string>
     <string name="login_help">Help</string>
     <string name="button_create_new_vault">Create vault</string>
     <string name="text_create_new_vault">Welcome! If you are new on ANOTHERpass it is worth to read the online help. Or just start by creating a new vault.</string>
@@ -235,7 +235,7 @@
     <string name="select_credential_for_autofill">Select a credential to autofill</string>
     <string name="paste_user_for_autofill">Paste user for \'%1$s\'</string>
     <string name="paste_passwd_for_autofill">Paste password for \'%1$s\'</string>
-    <string name="backup_file_saved">Backup file saved</string>
+    <string name="backup_file_saved">Vault file saved</string>
     <string name="backup_failed">Error while creating the backup file</string>
     <string name="backup_permission_missing">Permission to write to external storage is missing</string>
     <string name="qr_code_saved">QR code as image saved</string>
@@ -307,6 +307,7 @@
     <string name="label_count">Label count</string>
     <string name="vault_created_at">Vault created at</string>
     <string name="vault_imported_at">Vault imported at</string>
+    <string name="vault_modified_at">Vault modified at</string>
     <string name="vault_exported_at">Vault exported at</string>
     <string name="vault_already_created">Vault has already been created</string>
     <string name="obfuscate_while_saving">Obfuscate password while saving</string>
