@@ -72,7 +72,7 @@ object ShareVaultUseCase: UseCase<ShareVaultUseCase.Input, Uri?, SecureActivity>
             activity.registerReceiver(receiver, IntentFilter(shareAction));
 
             val intentSender = PendingIntent
-                .getBroadcast(activity, 0, receiverIntent, 0)
+                .getBroadcast(activity, 0, receiverIntent, PendingIntent.FLAG_IMMUTABLE)
                 .intentSender
 
             activity.startActivity(

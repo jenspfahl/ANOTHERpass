@@ -30,6 +30,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_PASSWD_WORDS_ON_NL
 import de.jepfa.yapm.service.autofill.AutofillCredentialHolder
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.overlay.DetachHelper
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.decryptPassword
 import de.jepfa.yapm.ui.SecureActivity
@@ -41,6 +42,7 @@ import de.jepfa.yapm.usecase.credential.ImportCredentialUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.PasswordColorizer.spannableObfusableAndMaskableString
+import java.util.*
 
 
 class ShowCredentialActivity : SecureActivity() {
@@ -302,6 +304,29 @@ class ShowCredentialActivity : SecureActivity() {
                         }
                     }
                 }
+                return true
+            }
+
+            if (id == R.id.menu_details) {
+                val sb = StringBuilder()
+
+                sb.addFormattedLine(getString(R.string.identifier), credential.id)
+
+                masterSecretKey?.let { key ->
+                    val name = decryptCommonString(key, credential.name)
+                    sb.addFormattedLine(getString(R.string.name), name)
+                }
+
+                credential.modifyTimestamp?.let{
+                    if (it > 1000) // modifyTimestamp is the credential Id after running db migration, assume ids are lower than 1000
+                        sb.addFormattedLine(getString(R.string.last_modified), Constants.SDF_DT_MEDIUM.format(it))
+                }
+
+                AlertDialog.Builder(this)
+                    .setTitle(R.string.title_credential_details)
+                    .setMessage(sb.toString())
+                    .show()
+
                 return true
             }
         }

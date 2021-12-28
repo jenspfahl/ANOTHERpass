@@ -3,7 +3,7 @@
 
     <style name="generated_password">
         <item name="android:textAlignment">center</item>
-        <item name="android:textSize">24dp</item>
+        <item name="android:textSize">24sp</item>
         <item name="android:fontFamily">monospace</item>
         <item name="android:paddingHorizontal">24dp</item>
         <item name="android:text">@string/nothing_placeholder</item>

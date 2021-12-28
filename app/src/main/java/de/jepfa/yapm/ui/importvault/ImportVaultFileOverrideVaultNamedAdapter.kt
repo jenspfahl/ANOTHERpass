@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
@@ -219,7 +220,7 @@ class ImportVaultFileOverrideVaultNamedAdapter(
 
     private fun createAndAddSeparator(views: ArrayList<View>) {
         val separatorView = ImageView(activity)
-        separatorView.setImageDrawable(activity.getDrawable(R.drawable.ic_baseline_arrow_forward_12))
+        separatorView.setImageDrawable(ContextCompat.getDrawable(activity, R.drawable.ic_baseline_arrow_forward_12))
         separatorView.setPadding(10, 0, 10, 0)
         views.add(separatorView)
     }

@@ -33,7 +33,7 @@
     <string name="CIPHER_AES_256">AES (256bit key)</string>
     <string name="CIPHER_BLOWFISH_128">Blowfish (128bit key)</string>
     <string name="CIPHER_BLOWFISH_256">Blowfish (256bit key)</string>
-    <string name="CIPHER_CHACHACHA20_256">Chachacha20 (256bit key)</string>
+    <string name="CIPHER_CHACHACHA20_256">Chacha20 (256bit key)</string>
 
     <string name="CIPHER_AES_128_desc">This is the standard encryption with a good balance of security and performance. Supported by all Android versions.</string>
     <string name="CIPHER_AES_256_desc">This is the standard encryption with better security but less performance. Supported by Android 8 and higher.</string>
@@ -307,6 +307,7 @@
     <string name="label_count">Label count</string>
     <string name="vault_created_at">Vault created at</string>
     <string name="vault_imported_at">Vault imported at</string>
+    <string name="vault_exported_at">Vault exported at</string>
     <string name="vault_already_created">Vault has already been created</string>
     <string name="obfuscate_while_saving">Obfuscate password while saving</string>
     <string name="obfuscate_while_saving_toast">Password will be obfuscated while saving</string>
@@ -453,5 +454,11 @@
     <string name="nothing_to_import">Nothing to import</string>
     <string name="copy_origin">Make a copy of the origin record before updating it. Its name will be followed by \'(orig)\'.</string>
     <string name="import_vault_override_explanation">Here you see the content of the loaded vault file. Only records that differs to the current are shown. You can expand the lists and check or uncheck each record to select which should be imported. To see details, click on them.</string>
+    <string name="dont_think_about_passwords">Don\'t think about passwords!</string>
+    <string name="details">Show details</string>
+    <string name="title_credential_details">Credential details</string>
+    <string name="last_modified">Last modified</string>
+    <string name="name">Name</string>
+    <string name="identifier">Id</string>
 
 </resources>

@@ -172,7 +172,7 @@ object ResponseFiller {
             context,
             1001,
             authIntent,
-            PendingIntent.FLAG_CANCEL_CURRENT
+            PendingIntent.FLAG_CANCEL_CURRENT// TODO or PendingIntent.FLAG_IMMUTABLE doesn't work, so must be mutable somehow
         ).intentSender
 
         val message =

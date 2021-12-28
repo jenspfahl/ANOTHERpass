@@ -34,7 +34,8 @@
             android:layout_height="match_parent"
             android:clickable="true"
             android:layout_gravity="start"
-            android:src="@drawable/ic_baseline_qr_code_scanner_48" />
+            android:src="@drawable/ic_baseline_qr_code_scanner_48"
+            android:focusable="true" />
 
         <ImageView
             android:id="@+id/imageview_scan_nfc"
@@ -43,7 +44,8 @@
             android:layout_marginStart="15dp"
             android:clickable="true"
             android:layout_gravity="start"
-            android:src="@drawable/ic_baseline_nfc_48" />
+            android:src="@drawable/ic_baseline_nfc_48"
+            android:focusable="true" />
 
     </LinearLayout>
 

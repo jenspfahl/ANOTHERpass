@@ -106,6 +106,7 @@
         <entry key="app/src/main/res/layout/view_bottom_sheet.xml" value="0.15572916666666667" />
         <entry key="app/src/main/res/menu/credential_detail_menu_import.xml" value="0.3015625" />
         <entry key="app/src/main/res/menu/list_labels_menu.xml" value="0.3015625" />
+        <entry key="app/src/main/res/menu/menu_credential_detail.xml" value="0.18072916666666666" />
         <entry key="app/src/main/res/menu/menu_credential_detail_import.xml" value="0.18072916666666666" />
         <entry key="app/src/main/res/menu/menu_credential_detail_raw.xml" value="0.18072916666666666" />
         <entry key="app/src/main/res/menu/menu_label_edit.xml" value="0.17864583333333334" />

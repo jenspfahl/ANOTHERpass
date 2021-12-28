@@ -1,7 +1,6 @@
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:paddingTop="4dp"
     android:orientation="horizontal">
     <TableRow
@@ -34,6 +33,7 @@
             android:layout_gravity="end"
             android:paddingStart="16dp"
             android:paddingEnd="1dp"
-            android:src="@drawable/ic_baseline_delete_24" />
+            android:src="@drawable/ic_baseline_delete_24"
+            android:focusable="true" />
     </TableRow>
 </TableLayout>
