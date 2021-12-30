@@ -89,17 +89,13 @@ class LabelsHolder {
     }
 
     fun decryptLabelsForCredential(key: SecretKeyHolder, credential: EncCredential): List<Label> {
-        if (!credential.isPersistent()) {
-            return Collections.emptyList()
-        }
         val labelsString = SecretService.decryptCommonString(key, credential.labels)
         val labels = stringIdsToLabels(labelsString)
 
         return labels
             .map { label ->
-                val credentialId = credential.id
                 val labelId = label.labelId
-                if (credentialId != null && labelId != null) {
+                if (labelId != null) {
                     lookupByLabelId(labelId)
                 }
                 else {
@@ -143,7 +139,7 @@ class LabelsHolder {
             .filterNotNull()
             .toSet()
 
-        val idsAsString =  idSetToString(ids)
+        val idsAsString = idSetToString(ids)
         return SecretService.encryptCommonString(key, idsAsString)
     }
 
