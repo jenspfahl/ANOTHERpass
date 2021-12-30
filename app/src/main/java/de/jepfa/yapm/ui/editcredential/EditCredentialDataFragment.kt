@@ -17,9 +17,9 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.label.LabelService
-import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.encryptCommonString
@@ -33,6 +33,8 @@ import kotlin.collections.ArrayList
 class EditCredentialDataFragment : SecureFragment() {
 
     private val LAST_CHARS = listOf(' ', '\t', System.lineSeparator())
+
+    private lateinit var editCredentialActivity: EditCredentialActivity
 
     private lateinit var editCredentialNameView: EditText
     private lateinit var editCredentialLabelsTextView: AutoCompleteTextView
@@ -59,7 +61,7 @@ class EditCredentialDataFragment : SecureFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, null)
 
-        val editCredentialActivity = getBaseActivity() as EditCredentialActivity
+        editCredentialActivity = getBaseActivity() as EditCredentialActivity
 
         editCredentialNameView = view.findViewById(R.id.edit_credential_name)
         editCredentialLabelsTextView = view.findViewById(R.id.edit_credential_labels_textview)
@@ -119,42 +121,23 @@ class EditCredentialDataFragment : SecureFragment() {
         val allLabels = LabelService.defaultHolder.getAllLabels()
 
         //fill UI
-        if (editCredentialActivity.isUpdate()) {
+        val current = editCredentialActivity.current
+
+        if (current != null) {
             editCredentialActivity.hideKeyboard(editCredentialNameView)
 
-            editCredentialActivity.load().observe(editCredentialActivity, {
-                editCredentialActivity.original = it
+            masterSecretKey?.let{ key ->
+                fillUi(key, current, allLabels, allLabelAdapter)
+            }
+        }
+        else if (editCredentialActivity.isUpdate()) {
+            editCredentialActivity.hideKeyboard(editCredentialNameView)
+
+            editCredentialActivity.load().observe(editCredentialActivity, { orig ->
+                editCredentialActivity.original = orig
                 masterSecretKey?.let{ key ->
-                    val name = decryptCommonString(key, it.name)
-                    val user = decryptCommonString(key, it.user)
-                    val website = decryptCommonString(key, it.website)
-                    val additionalInfo = decryptCommonString(
-                        key,
-                        it.additionalInfo
-                    )
-
-                    val enrichedName = enrichId(editCredentialActivity, name, it.id)
-                    editCredentialActivity.title = getString(R.string.title_change_credential_with_title, enrichedName)
-
-                    editCredentialNameView.setText(name)
-                    editCredentialUserView.setText(user)
-                    editCredentialWebsiteView.setText(website)
-                    editCredentialAdditionalInfoView.setText(additionalInfo)
-
-                    LabelService.defaultHolder.updateLabelsForCredential(key, it)
-                    val allLabelsForCredential = LabelService.defaultHolder.decryptLabelsForCredential(key, it)
-
-                    val labelSuggestions = allLabels
-                        .filterNot { allLabelsForCredential.contains(it) }
-                        .map { it.name }
-
-                    allLabelAdapter.addAll(labelSuggestions)
-
-                    allLabelsForCredential
-                        .forEachIndexed { _, label ->
-                            createAndAddChip(label, editCredentialLabelsChipGroup, allLabelAdapter)
-                        }
-
+                    editCredentialActivity.updateTitle(orig)
+                    fillUi(key, orig, allLabels, allLabelAdapter)
                 }
             })
         }
@@ -174,41 +157,97 @@ class EditCredentialDataFragment : SecureFragment() {
             } else {
 
                 masterSecretKey?.let{ key ->
-                    val name = editCredentialNameView.text.toString().trim()
-                    val additionalInfo = editCredentialAdditionalInfoView.text.toString()
-                    val user = editCredentialUserView.text.toString().trim()
-                    val website = editCredentialWebsiteView.text.toString().trim()
-
-                    val encName = encryptCommonString(key, name)
-                    val encAdditionalInfo = encryptCommonString(key, additionalInfo)
-                    val encUser = encryptCommonString(key, user)
-                    val encPassword = SecretService.encryptPassword(key, Password.empty())
-                    val encWebsite = encryptCommonString(key, website)
-                    val encLabels = LabelService.defaultHolder.encryptLabelIds(
-                        key,
-                        mapToLabelName(editCredentialLabelsChipGroup)
-                    )
-
-                    val credentialToSave = EncCredential(
-                        editCredentialActivity.currentId,
-                        encName,
-                        encAdditionalInfo,
-                        encUser,
-                        encPassword,
-                        editCredentialActivity.original?.lastPassword,
-                        encWebsite,
-                        encLabels,
-                        editCredentialActivity.original?.isObfuscated ?: false,
-                        editCredentialActivity.original?.isLastPasswordObfuscated ?: false,
-                        null
-                    )
-                    editCredentialActivity.current = credentialToSave
+                    saveCurrentUiData(key)
 
                     findNavController().navigate(R.id.action_EditCredential_DataFragment_to_PasswordFragment)
 
                 }
             }
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        if (isVisible) {
+            masterSecretKey?.let { key ->
+                saveCurrentUiData(key)
+            }
+        }
+    }
+
+    private fun fillUi(
+        key: SecretKeyHolder,
+        current: EncCredential,
+        allLabels: List<Label>,
+        allLabelAdapter: ArrayAdapter<String>
+    ) {
+        val name = decryptCommonString(key, current.name)
+        val user = decryptCommonString(key, current.user)
+        val website = decryptCommonString(key, current.website)
+        val additionalInfo = decryptCommonString(
+            key,
+            current.additionalInfo
+        )
+
+
+        editCredentialNameView.setText(name)
+        editCredentialUserView.setText(user)
+        editCredentialWebsiteView.setText(website)
+        editCredentialAdditionalInfoView.setText(additionalInfo)
+
+        val allLabelsForCredential = LabelService.defaultHolder.decryptLabelsForCredential(key, current)
+
+        val labelSuggestions = allLabels
+            .filterNot { allLabelsForCredential.contains(it) }
+            .map { it.name }
+
+        allLabelAdapter.addAll(labelSuggestions)
+
+        allLabelsForCredential
+            .forEachIndexed { _, label ->
+                createAndAddChip(label, editCredentialLabelsChipGroup, allLabelAdapter)
+            }
+    }
+
+    private fun saveCurrentUiData(
+        key: SecretKeyHolder
+    ) {
+        val name = editCredentialNameView.text.toString().trim()
+        val additionalInfo = editCredentialAdditionalInfoView.text.toString()
+        val user = editCredentialUserView.text.toString().trim()
+        val website = editCredentialWebsiteView.text.toString().trim()
+
+        val encName = encryptCommonString(key, name)
+        val encAdditionalInfo = encryptCommonString(key, additionalInfo)
+        val encUser = encryptCommonString(key, user)
+        val encPassword = editCredentialActivity.current?.password
+            ?: editCredentialActivity.original?.password
+            ?: SecretService.encryptPassword(key, Password.empty()
+        )
+        val encWebsite = encryptCommonString(key, website)
+        val encLabels = LabelService.defaultHolder.encryptLabelIds(
+            key,
+            mapToLabelName(editCredentialLabelsChipGroup)
+        )
+
+        // we create the new credential out of a former current if present or else out of the original if present
+        val credentialToSave = EncCredential(
+            editCredentialActivity.currentId,
+            encName,
+            encAdditionalInfo,
+            encUser,
+            encPassword,
+            editCredentialActivity.original?.lastPassword,
+            encWebsite,
+            encLabels,
+            editCredentialActivity.current?.isObfuscated
+                ?: editCredentialActivity.original?.isObfuscated
+                ?: false,
+            editCredentialActivity.original?.isLastPasswordObfuscated
+                ?: false,
+            null
+        )
+        editCredentialActivity.current = credentialToSave
     }
 
     private fun mapToLabelName(chipGroup: ChipGroup): List<String> {

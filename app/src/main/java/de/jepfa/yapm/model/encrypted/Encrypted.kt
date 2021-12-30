@@ -12,6 +12,8 @@ data class Encrypted(val type: EncryptedType?, val iv: ByteArray, val data: Byte
         return type.type == otherType
     }
 
+    fun isEmpty() = data.isEmpty() && iv.isEmpty()
+
     fun debugToString(): String {
         return "[type=${type}, iv=${iv.contentToString()}, data=${data.contentToString()}]"
     }

@@ -24,7 +24,9 @@ object DeleteLabelUseCase: InputUseCase<Label, SecureActivity>() {
                         val remainingLabelChips = labels
                             .filterNot { it.labelId == labelId}
                             .map { it.name }
-                        LabelService.defaultHolder.encryptLabelIds(key, remainingLabelChips)
+                        val encLabelIds = LabelService.defaultHolder.encryptLabelIds(key, remainingLabelChips)
+                        credential.labels = encLabelIds
+                        activity.credentialViewModel.update(credential, activity)
                         LabelService.defaultHolder.updateLabelsForCredential(key, credential)
                     }
                 }

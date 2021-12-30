@@ -15,10 +15,12 @@
         <entry key="app/src/main/res/drawable/ic_baseline_close_12.xml" value="0.20104166666666667" />
         <entry key="app/src/main/res/drawable/ic_baseline_delete_24.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_edit_16.xml" value="0.19895833333333332" />
+        <entry key="app/src/main/res/drawable/ic_baseline_edit_24.xml" value="0.31562819203268644" />
         <entry key="app/src/main/res/drawable/ic_baseline_filter_list_24.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_filter_list_24_white.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_filter_list_with_with_dot_24dp.xml" value="0.321875" />
         <entry key="app/src/main/res/drawable/ic_baseline_fitness_center_16.xml" value="0.19895833333333332" />
+        <entry key="app/src/main/res/drawable/ic_baseline_fitness_center_24.xml" value="0.31562819203268644" />
         <entry key="app/src/main/res/drawable/ic_baseline_help_outline_24.xml" value="0.12916666666666668" />
         <entry key="app/src/main/res/drawable/ic_baseline_help_outline_24_white.xml" value="0.12916666666666668" />
         <entry key="app/src/main/res/drawable/ic_baseline_import_export_24.xml" value="0.19895833333333332" />
@@ -109,6 +111,7 @@
         <entry key="app/src/main/res/menu/menu_credential_detail.xml" value="0.18072916666666666" />
         <entry key="app/src/main/res/menu/menu_credential_detail_import.xml" value="0.18072916666666666" />
         <entry key="app/src/main/res/menu/menu_credential_detail_raw.xml" value="0.18072916666666666" />
+        <entry key="app/src/main/res/menu/menu_credential_edit.xml" value="0.18072916666666666" />
         <entry key="app/src/main/res/menu/menu_label_edit.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/menu/menu_label_list.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/menu/menu_main.xml" value="0.264" />

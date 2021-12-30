@@ -7,22 +7,32 @@ import androidx.lifecycle.LiveData
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Key
+import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.autofill.AutofillCredentialHolder
 import de.jepfa.yapm.service.label.LabelService
-import de.jepfa.yapm.service.label.LabelsHolder
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.credential.AutofillPushBackActivityBase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
+import de.jepfa.yapm.util.enrichId
 
 
 class EditCredentialActivity : AutofillPushBackActivityBase() {
 
-    var currentId: Int? = null
-    lateinit var current: EncCredential
-    var original: EncCredential? = null
+    internal var currentId: Int? = null
+    internal var current: EncCredential? = null
+    internal var original: EncCredential? = null
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        savedInstanceState?.getParcelable<Intent>("current")?.let {
+            current = EncCredential.fromIntent(it)
+        }
+        savedInstanceState?.getParcelable<Intent>("original")?.let {
+            original = EncCredential.fromIntent(it)
+            original?.let {updateTitle(it) }
+        }
 
         if (Session.isDenied()) {
             LockVaultUseCase.execute(this)
@@ -42,7 +52,20 @@ class EditCredentialActivity : AutofillPushBackActivityBase() {
         }
         else {
             currentId = idExtra
-            setTitle(R.string.title_change_credential)
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        current?.let { current ->
+            val asIntent = Intent()
+            current.applyExtras(asIntent)
+            outState.putParcelable("current", asIntent)
+        }
+        original?.let { original ->
+            val asIntent = Intent()
+            original.applyExtras(asIntent)
+            outState.putParcelable("original", asIntent)
         }
     }
 
@@ -59,15 +82,25 @@ class EditCredentialActivity : AutofillPushBackActivityBase() {
     }
 
     fun reply(deobfuscationKey: Key?) {
-        val replyIntent = Intent()
-        current.applyExtras(replyIntent)
+        current?.let { current ->
+            val replyIntent = Intent()
+            current.applyExtras(replyIntent)
 
-        if (shouldPushBackAutoFill()) {
-            AutofillCredentialHolder.update(current, deobfuscationKey)
+            if (shouldPushBackAutoFill()) {
+                AutofillCredentialHolder.update(current, deobfuscationKey)
+            }
+
+            setResult(Activity.RESULT_OK, replyIntent)
         }
-
-        setResult(Activity.RESULT_OK, replyIntent)
         finish()
+    }
+
+    internal fun updateTitle(credential: EncCredential) {
+        masterSecretKey?.let { key ->
+            val origName = SecretService.decryptCommonString(key, credential.name)
+            val enrichedName = enrichId(this, origName, credential.id)
+            title = getString(R.string.title_change_credential_with_title, enrichedName)
+        }
     }
 
 }
