@@ -16,6 +16,7 @@ object LogoutUseCase: BasicUseCase<SecureActivity>() {
         ClipboardUtil.clearClips(activity)
 
         activity.finishAndRemoveTask()
+        activity.finishAffinity()
 
         return true
     }
