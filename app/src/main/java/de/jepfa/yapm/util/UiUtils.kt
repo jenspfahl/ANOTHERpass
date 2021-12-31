@@ -49,6 +49,7 @@ fun createLabelChip(
 ): Chip {
     val chip = Chip(context)
     chip.text = label.name
+    chip.tag = label.labelId
     chip.textAlignment = View.TEXT_ALIGNMENT_CENTER
     if (thinner) {
         chip.textSize = 12.0f

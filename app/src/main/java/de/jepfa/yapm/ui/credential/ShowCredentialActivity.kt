@@ -12,9 +12,11 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.children
 import androidx.core.view.setPadding
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
+import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
@@ -428,7 +430,12 @@ class ShowCredentialActivity : SecureActivity() {
                 passwordTextView.setOnLongClickListener {
                     val builder: AlertDialog.Builder = AlertDialog.Builder(this)
                     val icon: Drawable = applicationInfo.loadIcon(packageManager)
-                    val message = credential.toString()
+                    val labelIds = toolbarChipGroup.children
+                        .mapNotNull { it as? Chip }
+                        .mapNotNull { it.tag as? Int }
+                        .sorted()
+                        .toList()
+                    val message = credential.toString() + System.lineSeparator() + "LabelIds: " + labelIds
                     builder.setTitle(R.string.debug)
                         .setMessage(message)
                         .setIcon(icon)

@@ -115,7 +115,8 @@ class LoginActivity : NfcBaseActivity() {
                 .setMessage(getString(R.string.message_reset_all))
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(R.string.reset_vault) { dialog, whichButton ->
-                    doubleCheckDropVault()
+                    DropVaultUseCase.doubleCheckDropVault(this)
+                        {dropAndLogoutVault()}
                 }
                 .setNegativeButton(android.R.string.no, null)
                 .show()
@@ -263,25 +264,6 @@ class LoginActivity : NfcBaseActivity() {
         return PreferenceService.getAsInt(PREF_MAX_LOGIN_ATTEMPTS, this)
     }
 
-
-    private fun doubleCheckDropVault() {
-        credentialViewModel.allCredentials.observeOnce(this) { credentials ->
-            if (credentials.isEmpty()) {
-                dropAndLogoutVault()
-            }
-            else {
-                AlertDialog.Builder(this)
-                    .setTitle(getString(R.string.title_reset_all))
-                    .setMessage(getString(R.string.message_reset_all_double_check, credentials.size))
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setPositiveButton(R.string.reset_vault_and_delete) { dialog, whichButton ->
-                        dropAndLogoutVault()
-                    }
-                    .setNegativeButton(android.R.string.no, null)
-                    .show()
-            }
-        }
-    }
 
     private fun dropAndLogoutVault() {
         DropVaultUseCase.dropVaultData(this)

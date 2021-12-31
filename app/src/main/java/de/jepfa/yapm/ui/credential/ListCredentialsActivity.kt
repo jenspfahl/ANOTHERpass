@@ -520,7 +520,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     .setMessage(getString(R.string.message_drop_vault))
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
-                        DropVaultUseCase.execute(this)
+                        DropVaultUseCase.doubleCheckDropVault(this)
+                            {DropVaultUseCase.execute(this)}
                     }
                     .setNegativeButton(android.R.string.no, null)
                     .show()
