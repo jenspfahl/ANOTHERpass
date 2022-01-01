@@ -49,7 +49,7 @@ fun Intent.getIntExtra(key: String): Int? {
 fun StringBuilder.addFormattedLine(label: String, data: Any?) {
     append(label)
         .append(": ")
-        .append(data)
+        .append(data ?: "")
         .append(System.lineSeparator())
 }
 

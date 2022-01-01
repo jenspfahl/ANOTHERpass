@@ -461,5 +461,9 @@
     <string name="last_modified">Last modified</string>
     <string name="name">Name</string>
     <string name="identifier">Id</string>
+    <string name="source">Source</string>
+    <string name="source_from_vault_file">from external vault file</string>
+    <string name="source_from_record">from external QR code or NFC tag</string>
+    <string name="source_from_the_app">from the app</string>
 
 </resources>

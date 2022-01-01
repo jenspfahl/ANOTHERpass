@@ -317,6 +317,12 @@ class ShowCredentialActivity : SecureActivity() {
                     sb.addFormattedLine(getString(R.string.name), name)
                 }
 
+                when (mode) {
+                    Mode.EXTERNAL_FROM_FILE -> sb.addFormattedLine(getString(R.string.source), getString(R.string.source_from_vault_file))
+                    Mode.EXTERNAL_FROM_RECORD -> sb.addFormattedLine(getString(R.string.source), getString(R.string.source_from_record))
+                    Mode.NORMAL_READONLY -> sb.addFormattedLine(getString(R.string.source), getString(R.string.source_from_the_app))
+                }
+
                 credential.modifyTimestamp?.let{
                     if (it > 1000) // modifyTimestamp is the credential Id after running db migration, assume ids are lower than 1000
                         sb.addFormattedLine(getString(R.string.last_modified), Constants.SDF_DT_MEDIUM.format(it))
