@@ -446,7 +446,7 @@
     <string name="intro_5_bullet_2">No internet connection at any time, except you share data remotely.</string>
     <string name="intro_5_bullet_3">Strong encryption of ALL sensitive vault data with at least 128 bit keys.</string>
     <string name="intro_5_bullet_4">ANOTHERpass uses a security chip if present for secure keys.</string>
-    
+
     <string name="credentials_to_be_inserted">%1$d of %2$d credentials to be re-created</string>
     <string name="credentials_to_be_updated">%1$d of %2$d credentials to be replaced</string>
     <string name="labels_to_be_inserted">%1$d of %2$d labels to be re-created</string>

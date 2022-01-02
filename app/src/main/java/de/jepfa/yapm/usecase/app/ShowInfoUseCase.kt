@@ -4,9 +4,9 @@ import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.text.SpannableString
 import androidx.appcompat.app.AlertDialog
-import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import de.jepfa.yapm.R
 import de.jepfa.yapm.ui.BaseActivity
+import de.jepfa.yapm.ui.intro.LicencesActivity
 import de.jepfa.yapm.usecase.BasicUseCase
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.DebugInfo
@@ -41,8 +41,9 @@ object ShowInfoUseCase: BasicUseCase<BaseActivity>() {
             }
             .setNeutralButton(R.string.licences) { dialog, _ ->
                 dialog.dismiss()
-                OssLicensesMenuActivity.setActivityTitle(activity.getString(R.string.licences_title))
-                activity.startActivity(Intent(activity, OssLicensesMenuActivity::class.java))
+                val intent = Intent(activity, LicencesActivity::class.java)
+                activity.startActivity(intent)
+
             }
             .create()
 
