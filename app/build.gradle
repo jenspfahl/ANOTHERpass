@@ -7,6 +7,7 @@ plugins {
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.jaredsburrows.license'
 
+
 android {
     compileSdkVersion 29
 
@@ -32,11 +33,19 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField "java.util.Date", "BUILD_TIME", "new java.util.Date(" + System.currentTimeMillis() + "L)"
+
+            afterEvaluate {
+                preBuild.dependsOn "licenseDebugReport"
+            }
         }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField "java.util.Date", "BUILD_TIME", "new java.util.Date(" + System.currentTimeMillis() + "L)"
+
+            afterEvaluate {
+                preBuild.dependsOn "licenseReleaseReport"
+            }
         }
     }
     compileOptions {

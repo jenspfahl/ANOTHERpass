@@ -1,2 +1,2 @@
 include ':app'
-rootProject.name = "Yet AnotherPassword Manager"
+rootProject.name = "ANOTHERpass"
