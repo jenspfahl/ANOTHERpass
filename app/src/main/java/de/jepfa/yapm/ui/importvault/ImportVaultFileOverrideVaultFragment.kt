@@ -55,12 +55,10 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
         val jsonContent = getImportVaultActivity().jsonContent ?: return
 
         val createdAt = jsonContent.get(VaultExportService.JSON_CREATION_DATE)?.asString
-        val credentialsCount = jsonContent.get(VaultExportService.JSON_CREDENTIALS_COUNT)?.asString
-        val labelsCount = jsonContent.get(VaultExportService.JSON_LABELS_COUNT)?.asString
-        val salt = jsonContent.get(VaultExportService.JSON_VAULT_ID)
-        val vaultId = if (salt != null) SaltService.saltToVaultId(salt.asString) else R.string.unknown_placeholder
+        val credentialsCount = jsonContent.get(VaultExportService.JSON_CREDENTIALS_COUNT)?.asString ?: 0
+        val labelsCount = jsonContent.get(VaultExportService.JSON_LABELS_COUNT)?.asString ?: 0
 
-        loadedFileStatusTextView.text = getString(R.string.vault_export_info, createdAt, credentialsCount, labelsCount, vaultId)
+        loadedFileStatusTextView.text = getString(R.string.vault_export_info2, createdAt, credentialsCount, labelsCount)
 
         var credentialsToInsert: Set<ChildType>? = null
         var credentialsToUpdate: Set<ChildType>? = null
@@ -69,101 +67,99 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
 
         LabelService.externalHolder.clearAll()
 
-        if (credentialsCount?.toIntOrNull() ?:0 > 0) {
             importVaultActivity.credentialViewModel.allCredentials.observe(importVaultActivity) { existingCredentials ->
 
-                val existingCredentialIds =
-                    existingCredentials.filter { it.id != null }.map { it.id!! }
-                val credentialsJson =
-                    jsonContent.getAsJsonArray(VaultExportService.JSON_CREDENTIALS)
+            val existingCredentialIds =
+                existingCredentials.filter { it.id != null }.map { it.id!! }
+            val credentialsJson =
+                jsonContent.getAsJsonArray(VaultExportService.JSON_CREDENTIALS)
 
-                val externalCredentials = credentialsJson
-                    .map { json -> EncCredential.fromJson(json) }
-                    .filterNotNull()
+            val externalCredentials = credentialsJson
+                .map { json -> EncCredential.fromJson(json) }
+                .filterNotNull()
 
-                val credentialsToBeInserted = externalCredentials
-                    .filterNot { existingCredentialIds.contains(it.id) }
-                    .map { ChildType(it.id!!, null, it) }
+            val credentialsToBeInserted = externalCredentials
+                .filterNot { existingCredentialIds.contains(it.id) }
+                .map { ChildType(it.id!!, null, it) }
 
-                val credentialsToBeUpdated =externalCredentials
-                    .filter {
-                        existingCredentialIds.contains(it.id)
-                                && !existingCredentials.contains(it) // Note:this compares the whole data of a credential
-                    }
-                    .filterNot { isContentEqualTo(importVaultActivity.masterSecretKey, it, existingCredentials) }
-                    .map { c -> ChildType(c.id!!, existingCredentials.find { it.id == c.id }, c) }
-
-                credentialsToInsert = createExpandableView(
-                    credentialsToBeInserted,
-                    GroupType.CREDENTIALS_TO_BE_INSERTED,
-                    view,
-                    R.id.expandable_list_insert_credentials,
-                    R.id.button_select_none_all_insert_credentials,
-                    importVaultActivity,
-                    savedInstanceState
-                )
-
-                credentialsToUpdate = createExpandableView(
-                    credentialsToBeUpdated,
-                    GroupType.CREDENTIALS_TO_BE_UPDATED,
-                    view,
-                    R.id.expandable_list_update_credentials,
-                    R.id.button_select_none_all_update_credentials,
-                    importVaultActivity,
-                    savedInstanceState
-                )
-            }
-        }
-
-        if (labelsCount?.toIntOrNull() ?:0 > 0) {
-            importVaultActivity.labelViewModel.allLabels.observe(importVaultActivity) { existingLabels ->
-
-                val existingLabelIds =
-                    existingLabels.filter { it.id != null }.map { it.id!! }
-                val labelsJson =
-                    jsonContent.getAsJsonArray(VaultExportService.JSON_LABELS)
-
-                val externalLabels = labelsJson
-                    .map { json -> EncLabel.fromJson(json) }
-                    .filterNotNull()
-
-                importVaultActivity.masterSecretKey?.let {
-                    LabelService.externalHolder.initLabels(it, externalLabels.toSet())
+            val credentialsToBeUpdated =externalCredentials
+                .filter {
+                    existingCredentialIds.contains(it.id)
+                            && !existingCredentials.contains(it) // Note:this compares the whole data of a credential
                 }
+                .filterNot { isContentEqualTo(importVaultActivity.masterSecretKey, it, existingCredentials) }
+                .map { c -> ChildType(c.id!!, existingCredentials.find { it.id == c.id }, c) }
 
-                val labelsToBeInserted = externalLabels
-                    .filterNot { existingLabelIds.contains(it.id) }
-                    .map { ChildType(it.id!!, null, it) }
+            credentialsToInsert = createExpandableView(
+                credentialsToBeInserted,
+                GroupType.CREDENTIALS_TO_BE_INSERTED,
+                view,
+                R.id.expandable_list_insert_credentials,
+                R.id.button_select_none_all_insert_credentials,
+                importVaultActivity,
+                savedInstanceState
+            )
 
-                val labelsToBeUpdated = externalLabels
-                    .filter {
-                        existingLabelIds.contains(it.id)
-                                && !existingLabels.contains(it) // Note:this compares the whole data of a label
-                    }
-                    .filterNot { isContentEqualTo(importVaultActivity.masterSecretKey, it) }
-                    .map { l -> ChildType(l.id!!, existingLabels.find { it.id == l.id }, l) }
-
-                labelsToInsert = createExpandableView(
-                    labelsToBeInserted,
-                    GroupType.LABELS_TO_BE_INSERTED,
-                    view,
-                    R.id.expandable_list_insert_labels,
-                    R.id.button_select_none_all_insert_labels,
-                    importVaultActivity,
-                    savedInstanceState
-                )
-
-                labelsToUpdate = createExpandableView(
-                    labelsToBeUpdated,
-                    GroupType.LABELS_TO_BE_UPDATED,
-                    view,
-                    R.id.expandable_list_update_labels,
-                    R.id.button_select_none_all_update_labels,
-                    importVaultActivity,
-                    savedInstanceState
-                )
-            }
+            credentialsToUpdate = createExpandableView(
+                credentialsToBeUpdated,
+                GroupType.CREDENTIALS_TO_BE_UPDATED,
+                view,
+                R.id.expandable_list_update_credentials,
+                R.id.button_select_none_all_update_credentials,
+                importVaultActivity,
+                savedInstanceState
+            )
         }
+
+
+        importVaultActivity.labelViewModel.allLabels.observe(importVaultActivity) { existingLabels ->
+
+            val existingLabelIds =
+                existingLabels.filter { it.id != null }.map { it.id!! }
+            val labelsJson =
+                jsonContent.getAsJsonArray(VaultExportService.JSON_LABELS)
+
+            val externalLabels = labelsJson
+                .map { json -> EncLabel.fromJson(json) }
+                .filterNotNull()
+
+            importVaultActivity.masterSecretKey?.let {
+                LabelService.externalHolder.initLabels(it, externalLabels.toSet())
+            }
+
+            val labelsToBeInserted = externalLabels
+                .filterNot { existingLabelIds.contains(it.id) }
+                .map { ChildType(it.id!!, null, it) }
+
+            val labelsToBeUpdated = externalLabels
+                .filter {
+                    existingLabelIds.contains(it.id)
+                            && !existingLabels.contains(it) // Note:this compares the whole data of a label
+                }
+                .filterNot { isContentEqualTo(importVaultActivity.masterSecretKey, it) }
+                .map { l -> ChildType(l.id!!, existingLabels.find { it.id == l.id }, l) }
+
+            labelsToInsert = createExpandableView(
+                labelsToBeInserted,
+                GroupType.LABELS_TO_BE_INSERTED,
+                view,
+                R.id.expandable_list_insert_labels,
+                R.id.button_select_none_all_insert_labels,
+                importVaultActivity,
+                savedInstanceState
+            )
+
+            labelsToUpdate = createExpandableView(
+                labelsToBeUpdated,
+                GroupType.LABELS_TO_BE_UPDATED,
+                view,
+                R.id.expandable_list_update_labels,
+                R.id.button_select_none_all_update_labels,
+                importVaultActivity,
+                savedInstanceState
+            )
+        }
+
 
         val copyOrigSwitch = view.findViewById<SwitchCompat>(R.id.switch_copy_orig)
         val importButton = view.findViewById<Button>(R.id.button_import_loaded_vault)
