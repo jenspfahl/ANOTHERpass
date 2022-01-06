@@ -21,9 +21,6 @@ object Constants {
         SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM)
     var SDF_D_INTERNATIONAL: DateFormat = SimpleDateFormat("yyyy-MM-dd")
 
-    var NF: NumberFormat = NumberFormat.getNumberInstance()
-    var DF: DecimalFormat = NF as DecimalFormat
-
     var UNKNOWN_VAULT_VERSION = 1
     var FAST_KEYGEN_VAULT_VERSION = 2
 

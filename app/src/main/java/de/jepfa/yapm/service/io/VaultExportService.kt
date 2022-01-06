@@ -121,7 +121,7 @@ object VaultExportService {
             Log.e("BACKUPALL", "cannot get version code", e)
         }
 
-        root.addProperty(JSON_CREATION_DATE, Constants.SDF_DT_MEDIUM.format(Date()))
+        root.addProperty(JSON_CREATION_DATE, Date().time)
         val salt = SaltService.getSaltAsBase64String(context)
         salt.let {
             root.addProperty(JSON_VAULT_ID, it)

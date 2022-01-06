@@ -8,8 +8,11 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import de.jepfa.yapm.model.encrypted.Encrypted
+import java.lang.NumberFormatException
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.text.ParsePosition
+import java.util.*
 
 fun Bundle?.getEncrypted(key: String): Encrypted? {
 
@@ -54,13 +57,22 @@ fun StringBuilder.addFormattedLine(label: String, data: Any?) {
 }
 
 fun Double.toReadableFormat(scale: Int): String {
-  //  return Constants.DF.format(this)
     return BigDecimal(this).setScale(scale, RoundingMode.HALF_EVEN).toString()
 }
 
 
 fun Double.secondsToYear(): Double {
     return this / 60 / 60 / 24 / 365
+}
+
+fun String.asDateOrNull(): Date? {
+    val timestamp = this.toLongOrNull()
+    if (timestamp != null) {
+        return Date(timestamp)
+    }
+    else {
+        return Constants.SDF_DT_MEDIUM.parse(this, ParsePosition(0))
+    }
 }
 
 fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {

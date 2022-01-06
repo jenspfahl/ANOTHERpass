@@ -26,6 +26,8 @@ import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.importvault.ImportVaultFileOverrideVaultNamedAdapter.GroupType
 import de.jepfa.yapm.ui.importvault.ImportVaultFileOverrideVaultNamedAdapter.ChildType
 import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
+import de.jepfa.yapm.util.asDateOrNull
+import de.jepfa.yapm.util.dateToString
 import de.jepfa.yapm.util.toastText
 
 class ImportVaultFileOverrideVaultFragment : BaseFragment() {
@@ -54,11 +56,12 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
 
         val jsonContent = getImportVaultActivity().jsonContent ?: return
 
-        val createdAt = jsonContent.get(VaultExportService.JSON_CREATION_DATE)?.asString
+        val createdAt = jsonContent.get(VaultExportService.JSON_CREATION_DATE)?.asString?.asDateOrNull()
         val credentialsCount = jsonContent.get(VaultExportService.JSON_CREDENTIALS_COUNT)?.asString ?: 0
         val labelsCount = jsonContent.get(VaultExportService.JSON_LABELS_COUNT)?.asString ?: 0
 
-        loadedFileStatusTextView.text = getString(R.string.vault_export_info2, createdAt, credentialsCount, labelsCount)
+        loadedFileStatusTextView.text = getString(R.string.vault_export_info2,
+            dateToString(createdAt), credentialsCount, labelsCount)
 
         var credentialsToInsert: Set<ChildType>? = null
         var credentialsToUpdate: Set<ChildType>? = null
