@@ -11,6 +11,17 @@
         app:singleLineTitle="false"
         app:useSimpleSummaryProvider="true" />
 
+    <ListPreference
+        app:defaultValue="default"
+        app:entries="@array/language_entries"
+        app:entryValues="@array/language_values"
+        app:key="YAPM/pref:language"
+        app:title="@string/pref_language"
+        app:iconSpaceReserved="false"
+        app:allowDividerBelow="true"
+        app:singleLineTitle="false"
+        app:useSimpleSummaryProvider="true" />
+
     <SwitchPreferenceCompat
         app:key="YAPM/pref:show_labels_in_list"
         app:title="@string/pref_general_show_labels"

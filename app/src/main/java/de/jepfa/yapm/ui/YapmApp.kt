@@ -2,12 +2,14 @@ package de.jepfa.yapm.ui
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
+import com.yariksoffice.lingver.Lingver
 import de.jepfa.yapm.database.YapmDatabase
 import de.jepfa.yapm.database.repository.CredentialRepository
 import de.jepfa.yapm.database.repository.LabelRepository
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SecretService
+import java.util.*
 
 class YapmApp : Application() {
 
@@ -24,5 +26,15 @@ class YapmApp : Application() {
         // first thing after app start is to remove old transport key to get them exchanged / new generated
         SecretService.removeAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT)
 
+        val prefLang = PreferenceService.getAsString(PreferenceService.PREF_LANGUAGE, this)
+        val locale = getLocale(prefLang)
+        Lingver.init(this, locale)
+    }
+
+    fun getLocale(language: String?): Locale {
+        val locale =
+            if (language == null || language == "default") Locale.getDefault()
+            else Locale(language)
+        return locale
     }
 }

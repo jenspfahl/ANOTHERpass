@@ -21,7 +21,7 @@ object PreferenceService {
      * TODO If you add new preference xml files inside #initDefaults, they should be recognised as well.
      * To achieve this, count the version value up here.
      */
-    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_13"
+    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_14"
 
     const val STATE_DEFAULT_INIT_DONE = STATE_PREFIX + "default_init_done"
 
@@ -100,6 +100,7 @@ object PreferenceService {
     const val PREF_SHOW_CREDENTIAL_IDS = PREF_PREFIX + "show_credential_ids"
 
     const val PREF_DARK_MODE = PREF_PREFIX + "dark_mode"
+    const val PREF_LANGUAGE = PREF_PREFIX + "language"
 
     const val PREF_INCLUDE_MASTER_KEY_IN_BACKUP_FILE = PREF_PREFIX + "include_master_key_in_backup_file"
     const val PREF_INCLUDE_SETTINGS_IN_BACKUP_FILE = PREF_PREFIX + "include_settings_in_backup_file"
