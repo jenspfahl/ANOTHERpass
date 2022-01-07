@@ -12,6 +12,7 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.InputUseCase
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.addFormattedLine
+import de.jepfa.yapm.util.dateToString
 
 object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActivity>() {
 
@@ -27,11 +28,11 @@ object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActi
             PreferenceService.DATA_VAULT_VERSION,
             activity
         ) ?: Constants.UNKNOWN_VAULT_VERSION
-        val vaultCreatedAt = PreferenceService.getAsString(
+        val vaultCreatedAt = PreferenceService.getAsDate(
             PreferenceService.DATA_VAULT_CREATED_AT,
             activity
         )
-        val vaultImportedAt = PreferenceService.getAsString(
+        val vaultImportedAt = PreferenceService.getAsDate(
             PreferenceService.DATA_VAULT_IMPORTED_AT,
             activity
         )
@@ -44,18 +45,18 @@ object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActi
         sb.addFormattedLine(activity.getString(R.string.credential_count), input.credentialCount)
         sb.addFormattedLine(activity.getString(R.string.label_count), input.labelCount)
         if (vaultCreatedAt != null) {
-            sb.addFormattedLine(activity.getString(R.string.vault_created_at), vaultCreatedAt)
+            sb.addFormattedLine(activity.getString(R.string.vault_created_at), dateToString(vaultCreatedAt))
         }
         if (vaultImportedAt != null) {
-            sb.addFormattedLine(activity.getString(R.string.vault_imported_at), vaultImportedAt)
+            sb.addFormattedLine(activity.getString(R.string.vault_imported_at), dateToString(vaultImportedAt))
         }
         val vaultModifiedAt = PreferenceService.getAsDate(DATA_VAULT_MODIFIED_AT, activity)
         vaultModifiedAt?.let {
-            sb.addFormattedLine(activity.getString(R.string.vault_modified_at), Constants.SDF_DT_MEDIUM.format(it))
+            sb.addFormattedLine(activity.getString(R.string.vault_modified_at), dateToString(it))
         }
         val vaultExportedAt = PreferenceService.getAsDate(DATA_VAULT_EXPORTED_AT, activity)
         vaultExportedAt?.let {
-            sb.addFormattedLine(activity.getString(R.string.vault_exported_at), Constants.SDF_DT_MEDIUM.format(it))
+            sb.addFormattedLine(activity.getString(R.string.vault_exported_at), dateToString(it))
         }
 
         builder.setTitle(R.string.vault_info)

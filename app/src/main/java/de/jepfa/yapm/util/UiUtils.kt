@@ -13,6 +13,8 @@ import android.widget.Toast
 import com.google.android.material.chip.Chip
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.ui.label.Label
+import java.text.ParsePosition
+import java.util.*
 
 fun toastText(context: Context?, text: String) {
     if (context != null) {
@@ -84,6 +86,28 @@ fun linkifyDialogMessage(dialog: Dialog) {
     }
 }
 
+fun dateToString(date: Date?): String {
+    if (date != null) {
+        return Constants.SDF_DT_MEDIUM.format(date)
+    }
+    else {
+        return "??"
+    }
+}
+
+
+fun formatAsDate(s: String?): String {
+    if (s != null) {
+        val timestamp = s.toLongOrNull()
+        if (timestamp != null) {
+            return dateToString(Date(timestamp))
+        }
+        else {
+            return s
+        }
+    }
+    return "??"
+}
 
 private fun ensureHttp(s: String): String {
     if (s.startsWith(prefix = "http", ignoreCase = true)) {

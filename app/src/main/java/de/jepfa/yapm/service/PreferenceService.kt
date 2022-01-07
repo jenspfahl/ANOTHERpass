@@ -7,6 +7,7 @@ import androidx.preference.PreferenceManager
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.util.Constants
+import java.text.ParsePosition
 import java.util.*
 
 object PreferenceService {
@@ -140,7 +141,25 @@ object PreferenceService {
 
     fun getAsDate(prefKey: String, context: Context): Date? {
         val timestampAsString = get(prefKey, context) ?: return null
-        return Constants.SDF_DT_MEDIUM.parse(timestampAsString)
+        val timestamp = timestampAsString.toLongOrNull()
+        if (timestamp != null) {
+            return Date(timestamp)
+        }
+        else {
+            val date: Date? = Constants.SDF_DT_MEDIUM.parse(timestampAsString, ParsePosition(0))
+            if (date != null) {
+                // migrate to the new format
+                Log.i("PS", "migrate date $timestamp for key $prefKey to Long.")
+                putDate(prefKey, date, context)
+                return date
+            }
+            else {
+                // cannot parse it anymore, just delete it
+                Log.w("PS", "cannot parse date $timestamp for key $prefKey. Deleting it.")
+                delete(prefKey, context)
+                return null
+            }
+        }
     }
 
     fun getAsInt(prefKey: String, context: Context?): Int {
@@ -181,9 +200,13 @@ object PreferenceService {
     }
 
     fun putCurrentDate(prefKey: String, context: Context) {
+        putDate(prefKey, Date(), context)
+    }
+
+    fun putDate(prefKey: String, date: Date, context: Context) {
         putString(
             prefKey,
-            Constants.SDF_DT_MEDIUM.format(Date()),
+            date.time.toString(),
             context
         )
     }

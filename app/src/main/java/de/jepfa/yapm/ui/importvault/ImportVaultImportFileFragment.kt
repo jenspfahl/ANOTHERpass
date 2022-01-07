@@ -17,14 +17,12 @@ import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.MasterKeyService
 import de.jepfa.yapm.service.secret.SaltService
-import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
-import de.jepfa.yapm.util.QRCodeUtil
-import de.jepfa.yapm.util.toastText
+import de.jepfa.yapm.util.*
 
 class ImportVaultImportFileFragment : BaseFragment() {
 
@@ -83,7 +81,8 @@ class ImportVaultImportFileFragment : BaseFragment() {
         else {
             mkProvidedText = getString(R.string.emk_not_provided)
         }
-        loadedFileStatusTextView.text = getString(R.string.vault_export_info, createdAt, credentialsCount, labelsCount, vaultId)
+        loadedFileStatusTextView.text = getString(R.string.vault_export_info,
+            formatAsDate(createdAt), credentialsCount, labelsCount, vaultId)
             .plus(System.lineSeparator())
             .plus(System.lineSeparator())
             .plus(mkProvidedText)
