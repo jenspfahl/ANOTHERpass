@@ -65,16 +65,6 @@ fun Double.secondsToYear(): Double {
     return this / 60 / 60 / 24 / 365
 }
 
-fun String.asDateOrNull(): Date? {
-    val timestamp = this.toLongOrNull()
-    if (timestamp != null) {
-        return Date(timestamp)
-    }
-    else {
-        return Constants.SDF_DT_MEDIUM.parse(this, ParsePosition(0))
-    }
-}
-
 fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
     observe(lifecycleOwner, object : Observer<T> {
         override fun onChanged(t: T?) {

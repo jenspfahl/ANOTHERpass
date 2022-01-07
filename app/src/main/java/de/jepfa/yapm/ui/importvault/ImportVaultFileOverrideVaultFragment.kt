@@ -1,7 +1,6 @@
 package de.jepfa.yapm.ui.importvault
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,17 +16,14 @@ import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.service.label.LabelService
-import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseFragment
-import de.jepfa.yapm.ui.NonScrollExpandableListView
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
-import de.jepfa.yapm.ui.importvault.ImportVaultFileOverrideVaultNamedAdapter.GroupType
 import de.jepfa.yapm.ui.importvault.ImportVaultFileOverrideVaultNamedAdapter.ChildType
+import de.jepfa.yapm.ui.importvault.ImportVaultFileOverrideVaultNamedAdapter.GroupType
 import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
-import de.jepfa.yapm.util.asDateOrNull
-import de.jepfa.yapm.util.dateToString
+import de.jepfa.yapm.util.formatAsDate
 import de.jepfa.yapm.util.toastText
 
 class ImportVaultFileOverrideVaultFragment : BaseFragment() {
@@ -56,12 +52,12 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
 
         val jsonContent = getImportVaultActivity().jsonContent ?: return
 
-        val createdAt = jsonContent.get(VaultExportService.JSON_CREATION_DATE)?.asString?.asDateOrNull()
+        val createdAt = jsonContent.get(VaultExportService.JSON_CREATION_DATE)?.asString
         val credentialsCount = jsonContent.get(VaultExportService.JSON_CREDENTIALS_COUNT)?.asString ?: 0
         val labelsCount = jsonContent.get(VaultExportService.JSON_LABELS_COUNT)?.asString ?: 0
 
         loadedFileStatusTextView.text = getString(R.string.vault_export_info2,
-            dateToString(createdAt), credentialsCount, labelsCount)
+            formatAsDate(createdAt), credentialsCount, labelsCount)
 
         var credentialsToInsert: Set<ChildType>? = null
         var credentialsToUpdate: Set<ChildType>? = null
@@ -85,7 +81,7 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
                 .filterNot { existingCredentialIds.contains(it.id) }
                 .map { ChildType(it.id!!, null, it) }
 
-            val credentialsToBeUpdated =externalCredentials
+            val credentialsToBeUpdated = externalCredentials
                 .filter {
                     existingCredentialIds.contains(it.id)
                             && !existingCredentials.contains(it) // Note:this compares the whole data of a credential

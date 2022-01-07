@@ -149,11 +149,13 @@ object PreferenceService {
             val date: Date? = Constants.SDF_DT_MEDIUM.parse(timestampAsString, ParsePosition(0))
             if (date != null) {
                 // migrate to the new format
+                Log.i("PS", "migrate date $timestamp for key $prefKey to Long.")
                 putDate(prefKey, date, context)
                 return date
             }
             else {
                 // cannot parse it anymore, just delete it
+                Log.w("PS", "cannot parse date $timestamp for key $prefKey. Deleting it.")
                 delete(prefKey, context)
                 return null
             }

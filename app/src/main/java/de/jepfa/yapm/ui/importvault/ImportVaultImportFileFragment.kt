@@ -17,16 +17,12 @@ import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.MasterKeyService
 import de.jepfa.yapm.service.secret.SaltService
-import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
-import de.jepfa.yapm.util.QRCodeUtil
-import de.jepfa.yapm.util.asDateOrNull
-import de.jepfa.yapm.util.dateToString
-import de.jepfa.yapm.util.toastText
+import de.jepfa.yapm.util.*
 
 class ImportVaultImportFileFragment : BaseFragment() {
 
@@ -70,7 +66,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
             return
         }
 
-        val createdAt = jsonContent.get(VaultExportService.JSON_CREATION_DATE)?.asString?.asDateOrNull()
+        val createdAt = jsonContent.get(VaultExportService.JSON_CREATION_DATE)?.asString
         val credentialsCount = jsonContent.get(VaultExportService.JSON_CREDENTIALS_COUNT)?.asString
         val labelsCount = jsonContent.get(VaultExportService.JSON_LABELS_COUNT)?.asString
         val salt = jsonContent.get(VaultExportService.JSON_VAULT_ID)
@@ -86,7 +82,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
             mkProvidedText = getString(R.string.emk_not_provided)
         }
         loadedFileStatusTextView.text = getString(R.string.vault_export_info,
-            dateToString(createdAt), credentialsCount, labelsCount, vaultId)
+            formatAsDate(createdAt), credentialsCount, labelsCount, vaultId)
             .plus(System.lineSeparator())
             .plus(System.lineSeparator())
             .plus(mkProvidedText)
