@@ -7,7 +7,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
+import androidx.appcompat.widget.SwitchCompat
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.encrypted.Encrypted
@@ -46,6 +46,8 @@ class NfcActivity : NfcBaseActivity() {
         nfcStatusTextView = findViewById(R.id.read_nfc_status)
         val nfcExplanationTextView: TextView = findViewById(R.id.nfc_explanation)
         val nfcImageView: ImageView = findViewById(R.id.imageview_nfc_icon)
+        val nfcWriteProtectSwitch: SwitchCompat = findViewById(R.id.switch_make_nfc_tag_write_protected)
+
         val nfcWriteTagButton: Button = findViewById(R.id.button_write_nfc_tag)
 
         nfcImageView.setOnLongClickListener {
@@ -70,6 +72,7 @@ class NfcActivity : NfcBaseActivity() {
         if (mode == EXTRA_MODE_RO) {
             nfcExplanationTextView.text = getString(R.string.nfc_explanation_readonly)
             nfcWriteTagButton.visibility = View.GONE
+            nfcWriteProtectSwitch.visibility = View.GONE
             title = getString(R.string.title_read_nfc_tag)
         }
         else {
@@ -79,6 +82,11 @@ class NfcActivity : NfcBaseActivity() {
             nfcWriteTagButton.setOnClickListener {
                 if (ndefTag == null) {
                     toastText(this, R.string.nfc_tapping_needed)
+                    return@setOnClickListener
+                }
+                else if (ndefTag?.isWriteProtected() == true) {
+                    toastText(this, R.string.cannot_write_protected_nfc_tag)
+                    return@setOnClickListener
                 }
 
                 ndefTag?.let { t ->
@@ -89,13 +97,13 @@ class NfcActivity : NfcBaseActivity() {
                             .setMessage(R.string.message_write_nfc_tag)
                             .setIcon(android.R.drawable.ic_dialog_alert)
                             .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
-                                writeTag(t, withAppRecord)
+                                writeTag(t, withAppRecord, nfcWriteProtectSwitch.isChecked)
                             }
                             .setNegativeButton(android.R.string.no, null)
                             .show()
                     }
                     else {
-                        writeTag(t, withAppRecord)
+                        writeTag(t, withAppRecord, nfcWriteProtectSwitch.isChecked)
                     }
                 }
             }
@@ -127,9 +135,12 @@ class NfcActivity : NfcBaseActivity() {
     }
 
     private fun updateView() {
-        ndefTag?.let {
-            val size = it.getSize()
-            if (size == null) {
+        ndefTag?.let { tag ->
+            val size = tag.getSize()
+            if (tag.isWriteProtected()) {
+                nfcStatusTextView.text = getString(R.string.write_protected_nfc_detected)
+            }
+            else if (size == null) {
                 nfcStatusTextView.text = getString(R.string.nfc_tag_detected)
             }
             else if (size > 0) {
@@ -141,28 +152,55 @@ class NfcActivity : NfcBaseActivity() {
         }
     }
 
-    private fun writeTag(t: NdefTag, withAppRecord: Boolean) {
-        encData?.let { eD ->
-            val tempKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, this)
-            val data = SecretService.decryptPassword(tempKey, eD)
+    private fun writeTag(t: NdefTag, withAppRecord: Boolean, setWriteProtection: Boolean) {
 
-            try {
-                val message = NfcService.createNdefMessage(this, data.toByteArray(), withAppRecord)
-                val maxSize = t.getMaxSize()
-                if (maxSize != null && maxSize < message.byteArrayLength) {
-                    toastText(this, R.string.nfc_not_enough_space)
-                    return
+        encData?.let { data ->
+            if (setWriteProtection) {
+                if (t.canSetWriteProtection()) {
+                    AlertDialog.Builder(this)
+                        .setTitle(R.string.title_write_nfc_tag)
+                        .setMessage(R.string.message_make_nfc_tag_write_protected)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                            checkAndWriteTag(data, t, withAppRecord, true)
+                        }
+                        .setNegativeButton(android.R.string.no, null)
+                        .show()
                 }
-                t.writeData(message)
-                toastText(this, R.string.nfc_successfully_written)
-                nfcStatusTextView.text = getString(R.string.nfc_tap_again)
-            } catch (e: Exception) {
-                Log.e("NFC", "Cannot write tag", e)
-                toastText(this, R.string.nfc_cannot_write)
-            } finally {
-                data.clear()
+                else {
+                    toastText(this, R.string.cannot_write_protect_nfc_tag)
+                }
+            }
+            else {
+                checkAndWriteTag(data, t, withAppRecord, false)
             }
         }
+    }
+
+    private fun checkAndWriteTag(encrypted: Encrypted, t: NdefTag, withAppRecord: Boolean, setWriteProtection: Boolean) {
+
+
+        val tempKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, this)
+        val data = SecretService.decryptPassword(tempKey, encrypted)
+
+        try {
+            val message = NfcService.createNdefMessage(this, data.toByteArray(), withAppRecord)
+            val maxSize = t.getMaxSize()
+            if (maxSize != null && maxSize < message.byteArrayLength) {
+                toastText(this, R.string.nfc_not_enough_space)
+                return
+            }
+            t.writeData(message, setWriteProtection)
+
+            toastText(this, R.string.nfc_successfully_written)
+            nfcStatusTextView.text = getString(R.string.nfc_tap_again)
+        } catch (e: Exception) {
+            Log.e("NFC", "Cannot write tag", e)
+            toastText(this, R.string.nfc_cannot_write)
+        } finally {
+            data.clear()
+        }
+
     }
 
     companion object {

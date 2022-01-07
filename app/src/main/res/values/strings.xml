@@ -190,7 +190,7 @@
     <string name="nfc_not_enough_space">Not enough space on NFC tag</string>
     <string name="nfc_successfully_written">NFC tag successfully written</string>
     <string name="nfc_tap_again">Tap tag on your device to write again</string>
-    <string name="nfc_cannot_write">Cannot write NFC tag. Have you tapped it on your device?</string>
+    <string name="nfc_cannot_write">Cannot write NFC tag. Have you tapped it on your device? Write-protected?</string>
     <string name="nfc_tag_detected">NFC tag detected.</string>
     <string name="nfc_tag_not_empty_detected">Not empty NFC tag detected! All data will be overwritten!</string>
     <string name="nfc_tag_empty_detected">Empty NFC tag detected.</string>
@@ -465,5 +465,10 @@
     <string name="source_from_vault_file">from external vault file</string>
     <string name="source_from_record">from external QR code or NFC tag</string>
     <string name="source_from_the_app">from the app</string>
+    <string name="make_nfc_tag_write_protected">Write protect NFC tag (cannot be underdone!!)</string>
+    <string name="cannot_write_protect_nfc_tag">Cannot NFC tag make write protected</string>
+    <string name="message_make_nfc_tag_write_protected">Do you really want to make your NFC tag write-protected? This cannot be underdone, meaning the written data cannot be removed or overwritten again!</string>
+    <string name="write_protected_nfc_detected">Write-protected NFC tag detected</string>
+    <string name="cannot_write_protected_nfc_tag">Cannot write on protected NFC tag</string>
 
 </resources>

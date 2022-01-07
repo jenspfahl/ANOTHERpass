@@ -23,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@id/button_write_nfc_tag"
+        app:layout_constraintBottom_toTopOf="@id/button_write_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/nfc_explanation">
@@ -47,19 +47,36 @@
 
 
 
-    <Button
-        android:id="@+id/button_write_nfc_tag"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/button_write_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/button_write_nfc"
-        android:background="@color/colorAccent"
-        android:textColor="@color/buttonLabel"
-        android:paddingHorizontal="10dp"
-        android:textStyle="bold"
+        android:orientation="vertical"
+        android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/read_nfc_status_layout" />
+        app:layout_constraintTop_toBottomOf="@id/read_nfc_status_layout">
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switch_make_nfc_tag_write_protected"
+            android:checked="false"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12pt"
+            android:text="@string/make_nfc_tag_write_protected"/>
+
+        <Button
+            android:id="@+id/button_write_nfc_tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_write_nfc"
+            android:background="@color/colorAccent"
+            android:textColor="@color/buttonLabel"
+            android:paddingHorizontal="10dp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
