@@ -4,6 +4,10 @@ This Android app is another approach of a password manager. Instead of managing 
 
 The motivation for this app was curiosity of how encryption works, how to implement in Kotlin and the need of an easy, lightweight but secure password manager. It is a personal project without any warranty and pretension of absolute professionality. 
 
+[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
+     alt="Get it on F-Droid"
+     height="80">](https://f-droid.org/packages/de.jepfa.yapm/)
+
 **Core features of the app**
 
 >* easy two factor authentification
