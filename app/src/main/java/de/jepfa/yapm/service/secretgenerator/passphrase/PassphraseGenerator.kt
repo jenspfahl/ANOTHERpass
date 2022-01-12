@@ -3,8 +3,7 @@ package de.jepfa.yapm.service.secretgenerator.passphrase
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.secretgenerator.GeneratorBase
 import de.jepfa.yapm.service.secretgenerator.SecretStrength
-import java.lang.Math.ceil
-import java.lang.Math.pow
+import java.lang.Math.*
 
 val DEFAULT_VOCALS = "aeiouy"
 val DEFAULT_CONSONANTS = "bcdfghjklmnpqrstvwxz"
@@ -81,7 +80,7 @@ class PassphraseGenerator(
         val tupleCombinations = alphabetLength * ((vocalChance * alphabetLength) + (consonantChance * vocalLength)) // this is the material = when(isVocal) expression
         val tupleCombinationsWithVocalAtLast = vocalLength * alphabetLength // these tuples allow subsequent tuples with duplicate consonants
 
-        val wordCombinations = (tupleCombinations * tupleCombinations) + (tupleCombinationsWithVocalAtLast * consonantLength) // add tuples with duplicate consonants for each consonant
+        val wordCombinations = floor((tupleCombinations * tupleCombinations) + (tupleCombinationsWithVocalAtLast * consonantLength)) // add tuples with duplicate consonants for each consonant
         var totalCombinations = ceil(pow(wordCombinations, strengthToWordCount(spec.strength).toDouble()))
 
         if (spec.addDigit) {
