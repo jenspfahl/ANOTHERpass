@@ -10,7 +10,7 @@ Ebenso verwendet die App eine clevere Zwei-Faktor-Authentifizierung, um den Tres
 - Starke Verschlüsselung (AES 128/256, Blowfish, Chacha20)
 - Autofill Unterstützung
 - Biometrisches Merkmal (z.B. Fingerabdruck) für gespeichertes Masterpasswort
-- Unsichere Zwichenablage standardmäßig deaktiviert
+- Unsichere Zwischenablage standardmäßig deaktiviert
 - Passwörter können über anderen Apps angezeigt werden
 - Keine Internetverbindung notwendig, App funktioniert komplett offline
 - Exportieren und Importieren des kompletten Passwort-Tresors als Backup
