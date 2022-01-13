@@ -45,13 +45,13 @@ class PassphraseGeneratorTest {
             passphrase.clear()
         }
 
-        val combinationCount = passphraseGenerator.calcCombinationCount(spec).toInt()
+        val combinationCount = passphraseGenerator.calcCombinationCount(spec)
 
         println("hits=$hits")
         println("real combinations: ${hits.size}")
         println("calculated combinations: $combinationCount")
 
-        Assert.assertEquals(hits.size, combinationCount)
+        Assert.assertEquals(hits.size.toDouble(), combinationCount, 0.1)
 
     }
 
@@ -60,23 +60,24 @@ class PassphraseGeneratorTest {
         val spec = PassphraseGeneratorSpec(SecretStrength.ONE_WORD)
         val passphraseGenerator = PassphraseGenerator()
 
-        val combinationCount = passphraseGenerator.calcCombinationCount(spec).toInt()
+        val combinationCount = passphraseGenerator.calcCombinationCount(spec)
         println("calculated combinations: $combinationCount")
 
         val hits = HashSet<String>()
         val counter = AtomicInteger()
-        while (hits.size < combinationCount) {
+        while (hits.size < combinationCount.toLong()) {
             val passphrase = passphraseGenerator.generate(spec)
-            hits.add(passphrase.toString())
-            passphrase.clear()
-            if (counter.incrementAndGet() % 100000 == 0) {
-                println("current attempt: ${counter.get()} (${hits.size} < ${combinationCount})")
+            val new = hits.add(passphrase.toString())
+            if (new || counter.incrementAndGet() % 100000 == 0) {
+                println("current attempt: ${counter.get()} (${hits.size} < ${combinationCount.toLong()}): $passphrase isNew=$new")
             }
+            passphrase.clear()
+
         }
 
         println("real combinations: ${hits.size}")
 
-        Assert.assertEquals(hits.size, combinationCount)
+        Assert.assertEquals(hits.size.toDouble(), combinationCount, 0.1)
 
     }
 }

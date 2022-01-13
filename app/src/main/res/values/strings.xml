@@ -120,7 +120,7 @@
     <string name="toast_import_vault_failure_cipher_not_supported">The selected file is encrypted with an unsupported cipher.</string>
     <string name="toast_import_vault_failure_no_vault_match">The selected file doesn\'t belong to the current vault.</string>
     <string name="quick_access">Quick access</string>
-    <string name="generate_encrypted_masterpasswd">Create master export token</string>
+    <string name="generate_encrypted_masterpasswd">Create master password token</string>
     <string name="master_password_not_changed">Master password has not been changed.</string>
     <string name="use_pseudo_phrase">Use pseudo phrases to generate master password</string>
     <string name="help">Online help</string>
