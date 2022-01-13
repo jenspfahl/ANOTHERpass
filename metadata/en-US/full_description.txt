@@ -4,13 +4,14 @@ It also comes with a clever two factor authentication to login into the credenti
 
 <b>Core features of the app</b>
 
-- easy two factor authentification
+- easy two factor authentication
 - no complicated master password to memorize, it is just exported
 - easy to read generated passwords
 - strong modern encryption (AES 128/256, Blowfish, Chacha20)
 - Autofill support
 - biometrics (e.g. fingerprint) for stored master password
-- no unsecure clipboard function by default
+- no insecure clipboard function by default
+- show passwords over other apps
 - no internet connection needed, all is offline
 - export and import credential vault
 - share and outsource credentials
