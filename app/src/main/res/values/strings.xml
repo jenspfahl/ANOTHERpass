@@ -65,12 +65,12 @@
     <string name="repeat_pin">Repeat the pin</string>
     <string name="create_vault_enter_pin_fragment_label">Create Vault 2/3</string>
     <string name="pin_required">A pin is required</string>
-    <string name="pin_too_short">Pin is too short</string>
+    <string name="pin_too_short">Pin is too short (6 chars at least)</string>
     <string name="pin_not_equal">Pin repetition not equal</string>
     <string name="password_not_equal">Password repetition not equal</string>
     <string name="pin_wrong">Wrong pin</string>
     <string name="button_create_vault">Create vault</string>
-    <string name="create_vault_explanation_3">Here you see again your master password. Note it or better export as QR code or NFC tag by clicking on the corresponding icon. (If you decide to export as QR code you can either download it as image file of just photograph or copy the QR code directly.) Store it safely. You will need it together with your pin to login into the vault. For more convenience you may also additionally store it on this device for faster login.</string>
+    <string name="create_vault_explanation_3">Here you see again your master password. Export as QR code or NFC tag by clicking on the corresponding icon or note it on a safe piece of paper. (If you decide to export as QR code you can either download it as image file of just photograph or copy the QR code directly from your phone.) Store it safely. You will need it together with your pin to login into the vault. \nFor more convenience you may additionally store it on this device for faster login (biometric criteria may be needed).</string>
     <string name="store_master_password">Store master password on this device</string>
     <string name="create_vault_summarize_fragment_label">Create Vault 3/3</string>
     <string name="login_explanation_1">Enter your pin to login into your vault.</string>
@@ -92,23 +92,23 @@
     <string name="export_credential_desc">Export credential to either backup, outsource or share it.</string>
     <string name="export_masterkey">Export master key</string>
     <string name="export_masterpasswd">Export master password</string>
-    <string name="action_export_masterkey">Export\nmaster key</string>
+    <string name="action_export_masterkey">Export \nmaster key</string>
     <string name="action_export_masterpasswd">Export\nmaster password</string>
     <string name="export_vault">Export vault</string>
     <string name="export_vault_as_file">Export vault as file</string>
     <string name="import_vault_as_file">Import vault file</string>
     <string name="message_import_vault_records">You are going to import %1$d credentials and %2$d labels. Existing records may be overridden! Continue?</string>
     <string name="qrc_download_as_img">Save QR code as image</string>
-    <string name="download_as_nfc_tag">Push as NFC tag</string>
-    <string name="export_vault_explanation">Here you can share or export your complete vault into a file for backup purposes. Use this file to import your vault after a fresh new app installation without data. You have the choice to include or exclude the Encrypted Master Key. If you exclude it, export the master key by your own and store it on a safe place. You need it to import the vault file. The separation of Encrypted Master Key and vault file might be sense to make the vault file useless for hackers even if they guess your pin and master password.</string>
+    <string name="download_as_nfc_tag">Push on NFC tag</string>
+    <string name="export_vault_explanation">Here you can share or export your complete vault into a file for backup purposes. Use this file to import your vault after a fresh new app installation without data or to recorver changed data. \nYou may include or exclude the Encrypted Master Key. If you exclude it, export the master key by your own and store it on a safe place. You need it to import the vault file. \nThe separation of Encrypted Master Key and vault file makes the vault file useless for hackers even if they obtain your pin and master password.</string>
     <string name="button_share_vault">Share vault</string>
     <string name="button_export_vault">Export vault</string>
     <string name="include_enc_masterkey">Include Encrypted Master Key</string>
     <string name="include_preferences">Include current app settings</string>
-    <string name="too_may_wrong_logins">Too many login attempts, all tokens declined</string>
+    <string name="too_may_wrong_logins">Too many login attempts, master password is now needed</string>
     <string name="too_may_wrong_logins_self_destruction">Too many login attempts, vault completely deleted</string>
-    <string name="import_vault_explanation">Select a vault file to import. Note: You need the pin and the master password and, depending on the file, the Encrypted Master Key.</string>
-    <string name="import_vault_to_vault_explanation">Select a vault file to import. Note: The vault file must belong to the same vault as the current vault (Id = %1$s).</string>
+    <string name="import_vault_explanation">Select a vault file to import. Note: You need the pin and the (exported) master password and, depending on the file, the Encrypted Master Key.</string>
+    <string name="import_vault_to_vault_explanation">Select a vault file to import. Note: The vault file must belong to the same vault with the current vault (Id = %1$s).</string>
     <string name="import_vault_load_file_fragment_label" tools:ignore="TypographyFractions">Import Vault 1/2</string>
     <string name="import_vault_import_file_fragment_label">Import Vault 2/2</string>
     <string name="button_load_vault">Load vault file</string>
@@ -135,7 +135,7 @@
     <string name="change_master_password">Change master password</string>
     <string name="change_master_password_explanation">Change your master password by enter your current pin and generate a new master password. Note, that the Encrypted Master Key will be changed, so you need to export it again. This also effects old vault export files with the old key. You should also export your master password and tokens again.</string>
     <string name="vault">Vault</string>
-    <string name="delete_stored_masterpasswd_confirmation">Do you want to delete the stored master password from this device? For future logins you will need the master password then.</string>
+    <string name="delete_stored_masterpasswd_confirmation">Do you want to delete the stored master password from this device? For future logins you will need the (exported) master password then.</string>
     <string name="pref_header_general">General</string>
     <string name="pref_header_security">Security</string>
     <string name="title_activity_settings">Settings</string>
@@ -146,7 +146,7 @@
     <string name="pref_header_login">Login</string>
     <string name="pref_header_passwd">Password generator</string>
     <string name="max_login_attempts_title">Maximum login attempts</string>
-    <string name="notification_channel_paste_title">ANOTHERpass paste notifications</string>
+    <string name="notification_channel_paste_title" translatable="false">ANOTHERpass paste notifications</string>
     <string name="toast_copied_to_clipboard">Password copied to clipboard</string>
     <string name="toast_test_copypaste_password">Test data copied to clipboard</string>
     <string name="copy_to_clipboard">Copy password to clipboard</string>
@@ -160,7 +160,6 @@
     <string name="store_masterpasswd_confirmation">Do you want to store your master password encrypted on this device? This makes login easier. You can remove it at any time.</string>
     <string name="edit_credential_data_fragment_label">Edit credential data</string>
     <string name="edit_credential_password_fragment_label">Edit credential password</string>
-    <string name="hint_edit_credential_user">The credential user</string>
     <string name="hint_edit_credential_website">The website url</string>
     <string name="hint_edit_credential_labels">Add space separated labels</string>
     <string name="credential_data_params">Edit your credential here. The name is mandatory. Use labels to categorize them.</string>
@@ -363,8 +362,8 @@
     <string name="pref_general_summary_passwords_multiple_lines">Show password words on multiple lines to increase readability</string>
     <string name="pref_general_colorize_qrcodes">Use colors to show criticality of QR code content</string>
     <string name="pref_general_qrcodes_with_header">Print a short content info as header on top of the QR code</string>
-    <string name="pref_autofill_summary_off_suggest">Suggesting autofill only on identified user or password fields. With this option, the app could miss some fields, e.g. in web browsers.</string>
-    <string name="pref_autofill_summary_on_suggest">Suggesting autofill on every text field.</string>
+    <string name="pref_autofill_summary_off_suggest">Suggesting Autofill only on identified user or password fields. With this option, the app could miss some fields, e.g. in web browsers.</string>
+    <string name="pref_autofill_summary_on_suggest">Suggesting Autofill on every text field.</string>
     <string name="pref_autofill_exclude_apps">Exclude apps from Autofill</string>
     <string name="pref_clipboard_enable">Enable copying password to clipboard</string>
     <string name="pref_clipboard_summary_enable">Copying passwords to clipboard is dangerous and could leak your password to any other app that observe the system clipboard. Use this option with care!</string>
@@ -473,5 +472,6 @@
     <string name="pref_language">Language</string>
     <string name="title_change_language">Change language</string>
     <string name="message_change_language">The new selected language will be available after restarting the app.</string>
+    <string name="hint_edit_credential_user">The credential user</string>
 
 </resources>
