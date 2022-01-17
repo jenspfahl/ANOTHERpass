@@ -1,17 +1,15 @@
 package de.jepfa.yapm.util
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
+import android.util.Base64
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import de.jepfa.yapm.model.encrypted.Encrypted
-import java.lang.NumberFormatException
 import java.math.BigDecimal
 import java.math.RoundingMode
-import java.text.ParsePosition
+import java.nio.ByteBuffer
 import java.util.*
 
 fun Bundle?.getEncrypted(key: String): Encrypted? {
@@ -58,6 +56,28 @@ fun StringBuilder.addFormattedLine(label: String, data: Any?) {
 
 fun Double.toReadableFormat(scale: Int): String {
     return BigDecimal(this).setScale(scale, RoundingMode.HALF_EVEN).toString()
+}
+
+fun UUID.toBase64String(): String {
+    val byteArray = ByteBuffer.allocate(16)
+        .putLong(this.mostSignificantBits)
+        .putLong(this.leastSignificantBits)
+        .array()
+    return Base64.encodeToString(byteArray, 0)
+}
+
+fun String.toUUIDFromBase64String(): UUID {
+    try {
+        val dec = Base64.decode(this, 0)
+
+        if (dec.size != 16) {
+            throw IllegalArgumentException("UUIDs can only be created from 128bit")
+        }
+        val buf = ByteBuffer.allocate(16).put(dec)
+        return UUID(buf.getLong(0), buf.getLong(8))
+    } catch (e: IllegalArgumentException) {
+        throw IllegalArgumentException("Invalid Base64 sequence", e)
+    }
 }
 
 

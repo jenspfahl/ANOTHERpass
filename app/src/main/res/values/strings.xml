@@ -42,6 +42,7 @@
     <string name="CIPHER_CHACHACHA20_256_desc">This is another alternative encryption with around the same security like AES but supposed to be faster. Supported by Android 9 and higher.</string>
 
     <string name="change">Change</string>
+    <string name="duplicate">Duplicate</string>
     <string name="delete">Delete</string>
 
     <string name="title_delete_credential">Delete Credential</string>
@@ -178,8 +179,7 @@
     <string name="button_restart">Restart</string>
     <string name="bug_explanation">Sorry, a bug occurred :-(</string>
     <string name="toast_bug_report_copied">Bug report copied to clipboard</string>
-    <string name="debug">Debug info</string>
-    <string name="your_masterpassword">Your real master password</string>
+    <string name="debug" translatable="false">Debug info</string>
     <string name="test_copypaste_password_explanation">Click here to copy a dummy password to the clipboard and get notified if some other app reads it immediately.</string>
     <string name="pref_header_clipboard">Clipboard settings</string>
     <string name="button_write_nfc">Write NFC tag</string>
@@ -196,7 +196,7 @@
     <string name="title_write_nfc_tag">Write NFC tag</string>
     <string name="message_write_nfc_tag">There is data on the NFC tag. Overwrite it?</string>
     <string name="title_read_nfc_tag">Read NFC tag</string>
-    <string name="message_password_changed">The password has been changed. If you continue you will loose the origin password, but you can restore it if needed. Have you still updated the password out there?</string>
+    <string name="message_password_changed">The password has been changed, but you can restore it later if needed. Have you still updated the password out there?</string>
     <string name="button_continue">Continue</string>
     <string name="label_details">Label details</string>
     <string name="close">Close</string>
@@ -225,7 +225,7 @@
     <string name="scan_masterkey_first">Scan your master key first</string>
     <string name="not_an_emk">This is not an Encrypted Master Key</string>
 
-    <string name="label_never_used">Never used</string>
+    <string name="label_never_used">Not used</string>
     <string name="label_used_once">Used %1$d time</string>
     <string name="label_used_many">Used %1$d times</string>
     <string name="save_as">Save as</string>
@@ -347,6 +347,7 @@
     <string name="unused_credentials_deleted">%1$d unused credentials deleted</string>
     <string name="this_app_is_foss">This app is Open Source and published under the MIT licence.</string>
     <string name="visit_foss_site">Visit %1$s to inspect the licence, the code and to report issues or bugs.</string>
+    <string name="credential_duplicated">Credential duplicated</string>
     <string name="credential_deleted">Credential deleted</string>
 
     <string name="dark_mode_auto">System default</string>
@@ -450,7 +451,8 @@
     <string name="credentials_to_be_updated">%1$d of %2$d credentials to be replaced</string>
     <string name="labels_to_be_inserted">%1$d of %2$d labels to be re-created</string>
     <string name="labels_to_be_updated">%1$d of %2$d labels to be replaced</string>
-    <string name="copy_of_name">%1$s (orig)</string>
+    <string name="copy_of_name" translatable="false">%1$s (orig)</string>
+    <string name="duplicate_of_name" translatable="false">%1$s (copied)</string>
     <string name="nothing_to_import">Nothing to import</string>
     <string name="copy_origin">Make a copy of the origin record before updating it. Its name will be followed by \'(orig)\'.</string>
     <string name="import_vault_override_explanation">Here you see the content of the loaded vault file. Only records that differs to the current are shown. You can expand the lists and check or uncheck each record to select which should be imported. To see details, click on them.</string>

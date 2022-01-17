@@ -63,6 +63,7 @@ class ImportCredentialActivity : ReadActivityBase() {
 
             val credential = EncCredential(
                 null,
+                null,
                 encName,
                 encAdditionalInfo,
                 encUser,

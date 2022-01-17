@@ -64,6 +64,7 @@ class LabelRepository(private val encLabelDao: EncLabelDao) {
 
     private fun mapToLabel(entity: EncLabelEntity): EncLabel {
         return EncLabel(entity.id,
+                entity.uid,
                 entity.name,
                 entity.description,
                 entity.color)
@@ -71,6 +72,7 @@ class LabelRepository(private val encLabelDao: EncLabelDao) {
 
     private fun mapToEntity(encLabel: EncLabel): EncLabelEntity {
         return EncLabelEntity(encLabel.id,
+                encLabel.uid,
                 encLabel.name,
                 encLabel.description,
                 encLabel.color)

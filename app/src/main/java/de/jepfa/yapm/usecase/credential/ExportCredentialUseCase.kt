@@ -19,6 +19,7 @@ import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.usecase.InputUseCase
 import de.jepfa.yapm.util.putEncryptedExtra
+import de.jepfa.yapm.util.toBase64String
 
 object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, SecureActivity>() {
 
@@ -141,6 +142,7 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
                 val passwd = decryptPasswd(credential, key, obfuscationKey)
 
                 val shortPlainCredential = PlainShareableCredential(
+                    credential.uid?.toBase64String(),
                     SecretService.decryptCommonString(key, credential.name),
                     SecretService.decryptCommonString(key, credential.additionalInfo),
                     SecretService.decryptCommonString(key, credential.user),

@@ -7,13 +7,15 @@ import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Password
 
 
-data class PlainShareableCredential(val n: String,
+data class PlainShareableCredential(val ui: String?,
+                                    val n: String,
                                     val aI: String,
                                     val u: String,
                                     val p: Password,
                                     val w: String,
 ) {
     companion object {
+        const val ATTRIB_UID = "ui"
         const val ATTRIB_NAME = "n"
         const val ATTRIB_ADDITIONAL_INFO = "aI"
         const val ATTRIB_USER = "u"
@@ -24,6 +26,7 @@ data class PlainShareableCredential(val n: String,
             try {
                 val jsonObject = json.asJsonObject
                 return PlainShareableCredential(
+                    jsonObject.get(ATTRIB_UID)?.asString,
                     jsonObject.get(ATTRIB_NAME).asString,
                     jsonObject.get(ATTRIB_ADDITIONAL_INFO).asString,
                     jsonObject.get(ATTRIB_USER).asString,

@@ -170,7 +170,7 @@ class EditLabelActivity : SecureActivity() {
         masterSecretKey?.let { key ->
             val encName = SecretService.encryptCommonString(key, label.name)
             val encDesc = SecretService.encryptCommonString(key, label.description)
-            val encLabel = EncLabel(label.labelId, encName, encDesc, label.colorRGB)
+            val encLabel = EncLabel(label.labelId, null, encName, encDesc, label.colorRGB) //TODO retrieve uid from original
 
             if (encLabel.isPersistent()) {
                 labelViewModel.update(encLabel, this)

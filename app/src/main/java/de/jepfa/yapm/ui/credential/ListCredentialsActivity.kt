@@ -24,6 +24,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
@@ -654,6 +655,15 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             return CredentialSortOrder.valueOf(sortOrderAsString)
         }
         return CredentialSortOrder.DEFAULT
+    }
+
+    fun duplicateCredential(credential: EncCredential, key: SecretKeyHolder) {
+        val name = SecretService.decryptCommonString(key, credential.name)
+        val newName = getString(R.string.duplicate_of_name, name)
+        val encNewName = SecretService.encryptCommonString(key, newName)
+        val duplicated = credential.copy(id = null, name = encNewName)
+        credentialViewModel.insert(duplicated, this)
+        toastText(this, R.string.credential_duplicated)
     }
 
     fun deleteCredential(credential: EncCredential) {

@@ -5,8 +5,10 @@ import android.util.Log
 import com.google.gson.JsonElement
 import de.jepfa.yapm.util.getEncryptedExtra
 import de.jepfa.yapm.util.putEncryptedExtra
+import java.util.*
 
-data class EncCredential(var id: Int?,
+data class EncCredential(val id: Int?,
+                         val uid: UUID? = UUID.randomUUID(),
                          override var name: Encrypted,
                          var additionalInfo: Encrypted,
                          var user: Encrypted,
@@ -20,6 +22,7 @@ data class EncCredential(var id: Int?,
 ): EncNamed {
 
     constructor(id: Int?,
+                uid: String?,
                 nameBase64: String,
                 additionalInfoBase64: String,
                 userBase64: String,
@@ -31,6 +34,7 @@ data class EncCredential(var id: Int?,
                 isLastPasswordObfuscated: Boolean?,
                 modifyTimestamp: Long?) :
             this(id,
+                uid?.let { UUID.fromString(uid) },
                 Encrypted.fromBase64String(nameBase64),
                 Encrypted.fromBase64String(additionalInfoBase64),
                 Encrypted.fromBase64String(userBase64),
@@ -83,6 +87,7 @@ data class EncCredential(var id: Int?,
 
     fun applyExtras(intent: Intent) {
         intent.putExtra(EXTRA_CREDENTIAL_ID, id)
+        intent.putExtra(EXTRA_CREDENTIAL_UID, uid?.toString())
         intent.putEncryptedExtra(EXTRA_CREDENTIAL_NAME, name)
         intent.putEncryptedExtra(EXTRA_CREDENTIAL_ADDITIONAL_INFO, additionalInfo)
         intent.putEncryptedExtra(EXTRA_CREDENTIAL_USER, user)
@@ -104,6 +109,7 @@ data class EncCredential(var id: Int?,
         other as EncCredential
 
         if (id != other.id) return false
+        if (uid != other.uid) return false
         if (name != other.name) return false
         if (additionalInfo != other.additionalInfo) return false
         if (user != other.user) return false
@@ -117,6 +123,7 @@ data class EncCredential(var id: Int?,
 
     override fun hashCode(): Int {
         var result = id ?: 0
+        result = 31 * result + uid.hashCode()
         result = 31 * result + name.hashCode()
         result = 31 * result + additionalInfo.hashCode()
         result = 31 * result + user.hashCode()
@@ -129,6 +136,7 @@ data class EncCredential(var id: Int?,
 
     companion object {
         const val EXTRA_CREDENTIAL_ID = "de.jepfa.yapm.ui.credential.id"
+        const val EXTRA_CREDENTIAL_UID = "de.jepfa.yapm.ui.credential.uid"
         const val EXTRA_CREDENTIAL_NAME = "de.jepfa.yapm.ui.credential.name"
         const val EXTRA_CREDENTIAL_ADDITIONAL_INFO = "de.jepfa.yapm.ui.credential.additionalInfo"
         const val EXTRA_CREDENTIAL_USER = "de.jepfa.yapm.ui.credential.user"
@@ -141,6 +149,7 @@ data class EncCredential(var id: Int?,
         const val EXTRA_CREDENTIAL_MODIFY_TIMESTAMP = "de.jepfa.yapm.ui.credential.modifyTimestamp"
 
         const val ATTRIB_ID = "id"
+        const val ATTRIB_UID = "uid"
         const val ATTRIB_NAME = "name"
         const val ATTRIB_ADDITIONAL_INFO = "additionalInfo"
         const val ATTRIB_USER = "user"
@@ -158,6 +167,7 @@ data class EncCredential(var id: Int?,
             if (idExtra != -1) {
                 id = idExtra
             }
+            val uid = intent.getStringExtra(EXTRA_CREDENTIAL_UID)?.let { UUID.fromString(it) }
             val encName = intent.getEncryptedExtra(EXTRA_CREDENTIAL_NAME, Encrypted.empty())
             val encAdditionalInfo = intent.getEncryptedExtra(EXTRA_CREDENTIAL_ADDITIONAL_INFO, Encrypted.empty())
             val encUser = intent.getEncryptedExtra(EXTRA_CREDENTIAL_USER, Encrypted.empty())
@@ -171,7 +181,7 @@ data class EncCredential(var id: Int?,
             var modifyTimestamp = intent.getLongExtra(EXTRA_CREDENTIAL_MODIFY_TIMESTAMP, 0)
 
             return EncCredential(
-                id, encName, encAdditionalInfo, encUser, encPassword, encLastPassword, encWebsite, encLabels,
+                id, uid, encName, encAdditionalInfo, encUser, encPassword, encLastPassword, encWebsite, encLabels,
                 isObfuscated, isLastPasswordObfuscated, modifyTimestamp)
         }
 
@@ -180,6 +190,7 @@ data class EncCredential(var id: Int?,
                 val jsonObject = json.asJsonObject
                 return EncCredential(
                     jsonObject.get(ATTRIB_ID).asInt,
+                    jsonObject.get(ATTRIB_UID)?.asString,
                     jsonObject.get(ATTRIB_NAME).asString,
                     jsonObject.get(ATTRIB_ADDITIONAL_INFO).asString,
                     jsonObject.get(ATTRIB_USER).asString,

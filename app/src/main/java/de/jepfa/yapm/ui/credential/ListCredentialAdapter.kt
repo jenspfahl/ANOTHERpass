@@ -130,6 +130,12 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                             listCredentialsActivity.startActivityForResult(intent, listCredentialsActivity.newOrUpdateCredentialActivityRequestCode)
                             true
                         }
+                        R.id.menu_duplicate_credential -> {
+                            listCredentialsActivity.masterSecretKey?.let{ key ->
+                                listCredentialsActivity.duplicateCredential(current, key)
+                            }
+                            true
+                        }
                         R.id.menu_delete_credential -> {
                             listCredentialsActivity.masterSecretKey?.let{ key ->
                                 val decName = SecretService.decryptCommonString(key, current.name)

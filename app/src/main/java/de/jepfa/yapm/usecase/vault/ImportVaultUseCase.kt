@@ -160,9 +160,8 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
                     }
                     else {
                         if (copyOrigin) {
-                            val copyOfExistingC = existingC.copy()
-                            copyOfExistingC.id = null
-                            copyOfExistingC.name = copyName(existingC.name, activity)
+                            val copyOfExistingC = existingC.copy(
+                                id = null, name = copyName(existingC.name, activity))
                             copyOfExistingC.touchModify()
                             app.credentialRepository.insert(copyOfExistingC)
                         }
@@ -185,9 +184,8 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
                     }
                     else {
                         if (copyOrigin) {
-                            val copyOfExistingL = existingL.copy()
-                            copyOfExistingL.id = null
-                            copyOfExistingL.name = copyName(existingL.name, activity)
+                            val copyOfExistingL = existingL.copy(
+                                id = null, name = copyName(existingL.name, activity))
                             app.labelRepository.insert(copyOfExistingL)
                         }
                         app.labelRepository.update(l)
