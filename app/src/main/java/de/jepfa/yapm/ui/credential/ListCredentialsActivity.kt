@@ -661,7 +661,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         val name = SecretService.decryptCommonString(key, credential.name)
         val newName = getString(R.string.duplicate_of_name, name)
         val encNewName = SecretService.encryptCommonString(key, newName)
-        val duplicated = credential.copy(id = null, name = encNewName)
+        val duplicated = credential.copy(id = null, uid = UUID.randomUUID(), name = encNewName)
         credentialViewModel.insert(duplicated, this)
         toastText(this, R.string.credential_duplicated)
     }

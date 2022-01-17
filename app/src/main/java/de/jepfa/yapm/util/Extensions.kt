@@ -63,12 +63,12 @@ fun UUID.toBase64String(): String {
         .putLong(this.mostSignificantBits)
         .putLong(this.leastSignificantBits)
         .array()
-    return Base64.encodeToString(byteArray, 0)
+    return Base64.encodeToString(byteArray, Base64.NO_PADDING or Base64.NO_WRAP)
 }
 
 fun String.toUUIDFromBase64String(): UUID {
     try {
-        val dec = Base64.decode(this, 0)
+        val dec = Base64.decode(this, Base64.NO_PADDING or Base64.NO_WRAP)
 
         if (dec.size != 16) {
             throw IllegalArgumentException("UUIDs can only be created from 128bit")

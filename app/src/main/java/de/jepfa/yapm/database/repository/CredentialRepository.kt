@@ -5,6 +5,7 @@ import de.jepfa.yapm.database.dao.EncCredentialDao
 import de.jepfa.yapm.database.entity.EncCredentialEntity
 import de.jepfa.yapm.model.encrypted.EncCredential
 import kotlinx.coroutines.flow.*
+import java.util.*
 
 class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
 
@@ -42,6 +43,11 @@ class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
     fun findById(id: Int): Flow<EncCredential?> {
         val byId = encCredentialDao.getById(id)
         return byId.map { if (it != null) mapToCredential(it) else null }
+    }
+
+    fun findByUid(uid: UUID): Flow<EncCredential?> {
+        val byUid = encCredentialDao.getByUid(uid.toString())
+        return byUid.map { if (it != null) mapToCredential(it) else null }
     }
 
     fun getAll(): Flow<List<EncCredential>> {

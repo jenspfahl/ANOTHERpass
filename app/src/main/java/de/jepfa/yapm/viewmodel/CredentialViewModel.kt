@@ -7,6 +7,7 @@ import de.jepfa.yapm.database.repository.CredentialRepository
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.ui.YapmApp
 import kotlinx.coroutines.launch
+import java.util.*
 
 class CredentialViewModel(private val repository: CredentialRepository) : ViewModel() {
 
@@ -18,6 +19,10 @@ class CredentialViewModel(private val repository: CredentialRepository) : ViewMo
 
     fun findById(id: Int): LiveData<EncCredential?> {
         return repository.findById(id).asLiveData()
+    }
+
+    fun findByUid(uid: UUID): LiveData<EncCredential?> {
+        return repository.findByUid(uid).asLiveData()
     }
 
     fun insert(credential: EncCredential, context: Context) = viewModelScope.launch {

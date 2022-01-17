@@ -30,7 +30,7 @@ fun toastText(context: Context?, id: Int) {
 
 fun enrichId(context: Context, name: String, id: Int?): String {
     val showIds = PreferenceService.getAsBool(PreferenceService.PREF_SHOW_CREDENTIAL_IDS, context)
-    return if (showIds) "$name [:${id?:"new"}]" else name
+    return if (showIds) "$name [:${id?:"?"}]" else name
 }
 
 fun createAndAddLabelChip(

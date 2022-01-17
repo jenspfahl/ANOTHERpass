@@ -59,19 +59,47 @@ abstract class YapmDatabase : RoomDatabase() {
                                 database.execSQL("CREATE UNIQUE INDEX index_EncCredentialEntity_uid ON EncCredentialEntity(uid)")
                                 database.execSQL("CREATE UNIQUE INDEX index_EncLabelEntity_uid ON EncLabelEntity(uid)")
 
-                                val curCredential = database.query("SELECT id FROM EncCredentialEntity")
-                                while (!curCredential.isClosed && curCredential.isFirst && curCredential.moveToNext()) {
-                                    val id = curCredential.getInt(curCredential.getColumnIndexOrThrow("id"))
-                                    val uuid = UUID.randomUUID()
-                                    database.execSQL("UPDATE EncCredentialEntity SET uid =:2 WHERE id=:1",
-                                        arrayOf(id, uuid.toString()))
+                                val credentialsCursor =
+                                    database.query("SELECT id FROM EncCredentialEntity")
+                                database.beginTransaction()
+                                try {
+                                    if (credentialsCursor.count > 0) {
+                                        while (credentialsCursor.moveToNext()) {
+                                            val id = credentialsCursor.getInt(
+                                                credentialsCursor.getColumnIndexOrThrow("id")
+                                            )
+                                            val uuid = UUID.randomUUID()
+                                            database.execSQL(
+                                                "UPDATE EncCredentialEntity SET uid =:1 WHERE id=:2",
+                                                arrayOf(uuid.toString(), id.toLong())
+                                            )
+                                        }
+                                        database.setTransactionSuccessful()
+                                    }
+                                } finally {
+                                    database.endTransaction()
                                 }
-                                val curLabel = database.query("SELECT id FROM EncCredentialEntity")
-                                while (!curLabel.isClosed && curLabel.isFirst && curLabel.moveToNext()) {
-                                    val id = curLabel.getInt(curLabel.getColumnIndexOrThrow("id"))
-                                    val uuid = UUID.randomUUID()
-                                    database.execSQL("UPDATE EncCredentialEntity SET uid =:2 WHERE id=:1",
-                                        arrayOf(id, uuid.toString()))
+                                credentialsCursor.close()
+
+                                val labelsCursor = database.query("SELECT id FROM EncLabelEntity")
+                                database.beginTransaction()
+                                try {
+                                    if (labelsCursor.count > 0) {
+                                        while (labelsCursor.moveToNext()) {
+                                            val id = labelsCursor.getInt(
+                                                labelsCursor.getColumnIndexOrThrow("id")
+                                            )
+                                            val uuid = UUID.randomUUID()
+                                            database.execSQL(
+                                                "UPDATE EncLabelEntity SET uid =:1 WHERE id=:2",
+                                                arrayOf(uuid.toString(), id.toLong())
+                                            )
+                                        }
+                                        database.setTransactionSuccessful()
+                                    }
+                                } finally {
+                                    labelsCursor.close()
+                                    database.endTransaction()
                                 }
                             }
                         }

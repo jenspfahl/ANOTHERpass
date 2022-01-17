@@ -39,15 +39,16 @@
 
     <item android:title="@string/import_read" >
         <menu>
-            <item
-                android:id="@+id/import_credential"
-                android:orderInCategory="85"
-                android:title="@string/import_read_credential" />
 
             <item
                 android:id="@+id/test_verify_qr_code_or_nfc_tag"
-                android:orderInCategory="95"
+                android:orderInCategory="85"
                 android:title="@string/verify_test" />
+
+            <item
+                android:id="@+id/import_credential"
+                android:orderInCategory="95"
+                android:title="@string/import_read_credential" />
 
             <item
                 android:id="@+id/import_vault"

@@ -461,7 +461,8 @@
     <string name="title_credential_details">Credential details</string>
     <string name="last_modified">Last modified</string>
     <string name="name">Name</string>
-    <string name="identifier">Id</string>
+    <string name="identifier" translatable="false">Id</string>
+    <string name="universal_identifier" translatable="false">Uid</string>
     <string name="source">Source</string>
     <string name="source_from_vault_file">from external vault file</string>
     <string name="source_from_record">from external QR code or NFC tag</string>
