@@ -8,7 +8,7 @@ import de.jepfa.yapm.util.putEncryptedExtra
 import java.util.*
 
 data class EncCredential(val id: Int?,
-                         val uid: UUID? = UUID.randomUUID(),
+                         val uid: UUID?,
                          override var name: Encrypted,
                          var additionalInfo: Encrypted,
                          var user: Encrypted,

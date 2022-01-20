@@ -19,7 +19,9 @@ import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.util.DebugInfo
+import de.jepfa.yapm.util.addFormattedLine
 import de.jepfa.yapm.util.observeOnce
+import de.jepfa.yapm.util.toBase64String
 
 
 class ListLabelsAdapter(private val listLabelsActivity: ListLabelsActivity) :
@@ -50,22 +52,24 @@ class ListLabelsAdapter(private val listLabelsActivity: ListLabelsActivity) :
         }
 
         holder.listenForLongClick { pos, _ ->
-            if (DebugInfo.isDebug) {
-                val current = getItem(pos)
-                current.labelId?.let { id ->
-                    listLabelsActivity.labelViewModel.getById(id).observeOnce(listLabelsActivity) { encLabel ->
-                        val builder: AlertDialog.Builder = AlertDialog.Builder(listLabelsActivity)
-                        val icon: Drawable = listLabelsActivity.applicationInfo.loadIcon(listLabelsActivity.packageManager)
-                        val message = encLabel.toString()
-                        builder.setTitle(R.string.debug)
-                            .setMessage(message)
-                            .setIcon(icon)
-                            .show()
-                    }
+            val current = getItem(pos)
+            current.labelId?.let { id ->
+                listLabelsActivity.labelViewModel.getById(id).observeOnce(listLabelsActivity) { encLabel ->
+                    val sb = StringBuilder()
 
+                    encLabel.id?.let { sb.addFormattedLine(listLabelsActivity.getString(R.string.identifier), it)}
+                    encLabel.uid?.let { sb.addFormattedLine(listLabelsActivity.getString(R.string.universal_identifier), it.toBase64String())}
+                    sb.addFormattedLine(listLabelsActivity.getString(R.string.name), current.name)
+                    //TODO add modify timestamp
+                    AlertDialog.Builder(listLabelsActivity)
+                        .setTitle(R.string.title_label_details)
+                        .setMessage(sb.toString())
+                        .show()
                 }
-                true
+
             }
+            true
+
         }
 
         return holder

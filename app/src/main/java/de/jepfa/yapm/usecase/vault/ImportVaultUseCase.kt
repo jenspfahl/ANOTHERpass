@@ -16,6 +16,7 @@ import de.jepfa.yapm.usecase.InputUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
 
 object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity>() {
 
@@ -161,7 +162,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
                     else {
                         if (copyOrigin) {
                             val copyOfExistingC = existingC.copy(
-                                id = null, name = copyName(existingC.name, activity))
+                                id = null, uid = UUID.randomUUID(), name = copyName(existingC.name, activity))
                             copyOfExistingC.touchModify()
                             app.credentialRepository.insert(copyOfExistingC)
                         }
@@ -185,7 +186,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
                     else {
                         if (copyOrigin) {
                             val copyOfExistingL = existingL.copy(
-                                id = null, name = copyName(existingL.name, activity))
+                                id = null, uid = UUID.randomUUID(), name = copyName(existingL.name, activity))
                             app.labelRepository.insert(copyOfExistingL)
                         }
                         app.labelRepository.update(l)

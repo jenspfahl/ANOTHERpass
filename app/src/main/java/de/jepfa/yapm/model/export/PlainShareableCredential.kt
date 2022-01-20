@@ -29,7 +29,7 @@ data class PlainShareableCredential(val ui: String?,
         p.clear()
         return EncCredential(
             null,
-            ui?.toUUIDFromBase64String() ?: UUID.randomUUID(),
+            ui?.toUUIDFromBase64String(),
             encName,
             encAdditionalInfo,
             encUser,

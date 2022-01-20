@@ -1,6 +1,7 @@
 package de.jepfa.yapm.ui.label
 
 import android.content.res.ColorStateList
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -22,8 +23,10 @@ import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
+import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.createAndAddLabelChip
 import de.jepfa.yapm.util.getIntExtra
+import de.jepfa.yapm.util.observeOnce
 import java.util.*
 
 
@@ -57,11 +60,31 @@ class EditLabelActivity : SecureActivity() {
         else {
             setTitle(R.string.title_new_label)
         }
-        label?.let {
-            labelNameTextView.text = it.name
-            labelDescTextView.text = it.description
-            labelColor = it.colorRGB
-            labelColorChip.chipBackgroundColor = ColorStateList.valueOf(it.getColor(this))
+        label?.let { label ->
+            labelNameTextView.text = label.name
+            labelDescTextView.text = label.description
+            labelColor = label.colorRGB
+            labelColorChip.chipBackgroundColor = ColorStateList.valueOf(label.getColor(this))
+
+            findViewById<TextView>(R.id.edit_label_explanation).setOnLongClickListener {
+                if (DebugInfo.isDebug) {
+                    label.labelId?.let { id ->
+                        labelViewModel.getById(id)
+                            .observeOnce(this) { encLabel ->
+                                val builder: AlertDialog.Builder =
+                                    AlertDialog.Builder(this)
+                                val icon = applicationInfo.loadIcon(packageManager)
+                                val message = encLabel.toString()
+                                builder.setTitle(R.string.debug)
+                                    .setMessage(message)
+                                    .setIcon(icon)
+                                    .show()
+                            }
+
+                    }
+                }
+               true
+            }
 
         }
 

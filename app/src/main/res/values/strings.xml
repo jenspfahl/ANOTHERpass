@@ -459,6 +459,7 @@
     <string name="dont_think_about_passwords">Don\'t think about passwords!</string>
     <string name="details">Show details</string>
     <string name="title_credential_details">Credential details</string>
+    <string name="title_label_details">Label details</string>
     <string name="last_modified">Last modified</string>
     <string name="name">Name</string>
     <string name="identifier" translatable="false">Id</string>

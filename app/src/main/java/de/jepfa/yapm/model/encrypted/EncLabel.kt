@@ -5,7 +5,7 @@ import com.google.gson.JsonElement
 import java.util.*
 
 data class EncLabel(val id: Int?,
-                    val uid: UUID? = UUID.randomUUID(),
+                    val uid: UUID?,
                     override var name: Encrypted,
                     var description: Encrypted,
                     var color: Int?): EncNamed {

@@ -36,13 +36,35 @@ object ImportCredentialUseCase: InputUseCase<ImportCredentialUseCase.Input, Secu
                         .show()
                 }
                 else {
-                    saveAndNavigateBack(isNew = true, activity, input.credential, input.successHandler)
+                    // no uid found on vault app, search by id if present
+                    if (credentialId != null) {
+                        checkIdAskAndSave(activity, credentialId, input)
+                    }
+                    else {
+                        saveAndNavigateBack(isNew = true, activity, input.credential, input.successHandler)
+                    }
                 }
             }
         }
         else if (credentialId != null) {
             // is a ECR without a UID, PCR doesn't have an id
-            activity.credentialViewModel.findById(credentialId).observeOnce(activity) { existingCredential ->
+            checkIdAskAndSave(activity, credentialId, input)
+        }
+        else {
+            // is a PCR without a UID
+            saveAndNavigateBack(isNew = true, activity, input.credential, input.successHandler)
+        }
+
+        return true
+    }
+
+    private fun checkIdAskAndSave(
+        activity: SecureActivity,
+        credentialId: Int,
+        input: Input
+    ) {
+        activity.credentialViewModel.findById(credentialId)
+            .observeOnce(activity) { existingCredential ->
                 if (existingCredential != null) {
                     AlertDialog.Builder(activity)
                         .setTitle(R.string.import_credential)
@@ -53,22 +75,24 @@ object ImportCredentialUseCase: InputUseCase<ImportCredentialUseCase.Input, Secu
                             existingCredential.backupForRestore()
                             existingCredential.copyData(input.credential)
 
-                            saveAndNavigateBack(isNew = false, activity, existingCredential, input.successHandler)
+                            saveAndNavigateBack(
+                                isNew = false,
+                                activity,
+                                existingCredential,
+                                input.successHandler
+                            )
                         }
                         .setNegativeButton(android.R.string.no, null)
                         .show()
-                }
-                else {
-                    saveAndNavigateBack(isNew = true, activity, input.credential, input.successHandler)
+                } else {
+                    saveAndNavigateBack(
+                        isNew = true,
+                        activity,
+                        input.credential,
+                        input.successHandler
+                    )
                 }
             }
-        }
-        else {
-            // is a PCR without a UID
-            saveAndNavigateBack(isNew = true, activity, input.credential, input.successHandler)
-        }
-
-        return true
     }
 
     private fun saveAndNavigateBack(

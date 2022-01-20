@@ -59,48 +59,8 @@ abstract class YapmDatabase : RoomDatabase() {
                                 database.execSQL("CREATE UNIQUE INDEX index_EncCredentialEntity_uid ON EncCredentialEntity(uid)")
                                 database.execSQL("CREATE UNIQUE INDEX index_EncLabelEntity_uid ON EncLabelEntity(uid)")
 
-                                val credentialsCursor =
-                                    database.query("SELECT id FROM EncCredentialEntity")
-                                database.beginTransaction()
-                                try {
-                                    if (credentialsCursor.count > 0) {
-                                        while (credentialsCursor.moveToNext()) {
-                                            val id = credentialsCursor.getInt(
-                                                credentialsCursor.getColumnIndexOrThrow("id")
-                                            )
-                                            val uuid = UUID.randomUUID()
-                                            database.execSQL(
-                                                "UPDATE EncCredentialEntity SET uid =:1 WHERE id=:2",
-                                                arrayOf(uuid.toString(), id.toLong())
-                                            )
-                                        }
-                                        database.setTransactionSuccessful()
-                                    }
-                                } finally {
-                                    database.endTransaction()
-                                }
-                                credentialsCursor.close()
-
-                                val labelsCursor = database.query("SELECT id FROM EncLabelEntity")
-                                database.beginTransaction()
-                                try {
-                                    if (labelsCursor.count > 0) {
-                                        while (labelsCursor.moveToNext()) {
-                                            val id = labelsCursor.getInt(
-                                                labelsCursor.getColumnIndexOrThrow("id")
-                                            )
-                                            val uuid = UUID.randomUUID()
-                                            database.execSQL(
-                                                "UPDATE EncLabelEntity SET uid =:1 WHERE id=:2",
-                                                arrayOf(uuid.toString(), id.toLong())
-                                            )
-                                        }
-                                        database.setTransactionSuccessful()
-                                    }
-                                } finally {
-                                    labelsCursor.close()
-                                    database.endTransaction()
-                                }
+                                updateUuid(database, EncCredentialEntity::class.simpleName!!)
+                                updateUuid(database, EncLabelEntity::class.simpleName!!)
                             }
                         }
 
@@ -114,6 +74,29 @@ abstract class YapmDatabase : RoomDatabase() {
                 }
             }
             return INSTANCE
+        }
+
+        private fun updateUuid(database: SupportSQLiteDatabase, entityName: String) {
+            val cursor = database.query("SELECT id FROM $entityName")
+            database.beginTransaction()
+            try {
+                if (cursor.count > 0) {
+                    while (cursor.moveToNext()) {
+                        val id = cursor.getInt(
+                            cursor.getColumnIndexOrThrow("id")
+                        )
+                        val uuid = UUID.randomUUID()
+                        database.execSQL(
+                            "UPDATE $entityName SET uid =:1 WHERE id=:2",
+                            arrayOf(uuid.toString(), id.toLong())
+                        )
+                    }
+                    database.setTransactionSuccessful()
+                }
+            } finally {
+                cursor.close()
+                database.endTransaction()
+            }
         }
     }
 
