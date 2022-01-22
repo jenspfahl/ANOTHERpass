@@ -21,7 +21,7 @@ object PreferenceService {
      * TODO If you add new preference xml files inside #initDefaults, they should be recognised as well.
      * To achieve this, count the version value up here.
      */
-    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_14"
+    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_15"
 
     const val STATE_DEFAULT_INIT_DONE = STATE_PREFIX + "default_init_done"
 
@@ -84,6 +84,7 @@ object PreferenceService {
     const val PREF_PASSWD_SHOW_FORMATTED = PREF_PREFIX + "password_show_formatted"
     const val PREF_PASSWD_WORDS_ON_NL = PREF_PREFIX + "password_words_on_nl"
     const val PREF_SHOW_LABELS_IN_LIST = PREF_PREFIX + "show_labels_in_list"
+    const val PREF_SHOW_DIVIDERS_IN_LIST = PREF_PREFIX + "show_dividers_in_list"
     const val PREF_COLORIZE_MP_QRCODES = PREF_PREFIX + "colorize_mp_qrcodes"
     const val PREF_QRCODES_WITH_HEADER = PREF_PREFIX + "qrcodes_with_header"
 

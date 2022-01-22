@@ -60,7 +60,6 @@ class ListLabelsAdapter(private val listLabelsActivity: ListLabelsActivity) :
                     encLabel.id?.let { sb.addFormattedLine(listLabelsActivity.getString(R.string.identifier), it)}
                     encLabel.uid?.let { sb.addFormattedLine(listLabelsActivity.getString(R.string.universal_identifier), it.toBase64String())}
                     sb.addFormattedLine(listLabelsActivity.getString(R.string.name), current.name)
-                    //TODO add modify timestamp
                     AlertDialog.Builder(listLabelsActivity)
                         .setTitle(R.string.title_label_details)
                         .setMessage(sb.toString())

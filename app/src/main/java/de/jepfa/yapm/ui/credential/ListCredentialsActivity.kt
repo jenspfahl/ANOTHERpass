@@ -64,6 +64,10 @@ import de.jepfa.yapm.usecase.vault.ShowVaultInfoUseCase
 import de.jepfa.yapm.util.*
 import java.util.*
 import kotlin.collections.ArrayList
+import androidx.recyclerview.widget.DividerItemDecoration
+
+
+
 
 /**
  * This is the main activity
@@ -90,6 +94,16 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         listCredentialAdapter = ListCredentialAdapter(this)
         recyclerView.adapter = listCredentialAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
+
+        val showDividers = PreferenceService.getAsBool(PreferenceService.PREF_SHOW_DIVIDERS_IN_LIST, this)
+        if (showDividers) {
+            val dividerItemDecoration = DividerItemDecoration(
+                recyclerView.context,
+                DividerItemDecoration.VERTICAL
+            )
+            recyclerView.addItemDecoration(dividerItemDecoration)
+        }
+
         credentialsRecycleView = recyclerView
 
         refreshCredentials()
@@ -159,13 +173,16 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         val requestReload = PreferenceService.getAsBool(STATE_REQUEST_CREDENTIAL_LIST_RELOAD, applicationContext)
         val requestHardReload = PreferenceService.getAsBool(STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD, applicationContext)
-        if (requestReload) {
-            listCredentialAdapter?.notifyDataSetChanged()
-            PreferenceService.delete(STATE_REQUEST_CREDENTIAL_LIST_RELOAD, applicationContext)
-        }
-        else if (requestHardReload) {
-            recreate()
+        if (requestReload || requestHardReload) {
             PreferenceService.delete(STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD, applicationContext)
+            PreferenceService.delete(STATE_REQUEST_CREDENTIAL_LIST_RELOAD, applicationContext)
+
+            if (requestHardReload) {
+                recreate()
+            }
+            else {
+                listCredentialAdapter?.notifyDataSetChanged()
+            }
         }
 
         val view: View = findViewById(R.id.content_list_credentials)

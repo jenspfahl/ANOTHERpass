@@ -21,7 +21,6 @@ import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_COPY_PASSWORD
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_OVERLAY_FEATURE
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_LABELS_IN_LIST
-import de.jepfa.yapm.service.autofill.AutofillCredentialHolder
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.overlay.DetachHelper
@@ -78,25 +77,28 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             }
         }
 
-        holder.listenForSetToAutofill { pos,  _ ->
+        holder.listenForLongClick { pos, _ ->
 
             val current = getItem(pos)
 
-            if (current.isObfuscated) {
-                DeobfuscationDialog.openDeobfuscationDialog(listCredentialsActivity) { deobfuscationKey ->
-                    if (listCredentialsActivity.shouldPushBackAutoFill()) {
-                        listCredentialsActivity.pushBackAutofill(current, deobfuscationKey)
-                    }
+            val sb = StringBuilder()
 
-                    toastText(listCredentialsActivity, R.string.credential_used_for_autofill)
-                }
+            current.id?.let { sb.addFormattedLine(listCredentialsActivity.getString(R.string.identifier), it)}
+            current.uid?.let { sb.addFormattedLine(listCredentialsActivity.getString(R.string.universal_identifier), it.toBase64String())}
+
+            listCredentialsActivity.masterSecretKey?.let { key ->
+                val name = SecretService.decryptCommonString(key, current.name)
+                sb.addFormattedLine(listCredentialsActivity.getString(R.string.name), name)
             }
-            else {
-                AutofillCredentialHolder.update(current, null)
-                toastText(listCredentialsActivity, R.string.credential_used_for_autofill)
+            current.modifyTimestamp?.let{
+                if (it > 1000) // modifyTimestamp is the credential Id after running db migration, assume ids are lower than 1000
+                    sb.addFormattedLine(listCredentialsActivity.getString(R.string.last_modified), Constants.SDF_DT_MEDIUM.format(it))
             }
 
-
+            AlertDialog.Builder(listCredentialsActivity)
+                .setTitle(R.string.title_credential_details)
+                .setMessage(sb.toString())
+                .show()
 
             true
         }
@@ -272,7 +274,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             }
         }
 
-        fun listenForSetToAutofill(event: (position: Int, type: Int) -> Boolean) {
+        fun listenForLongClick(event: (position: Int, type: Int) -> Boolean) {
             credentialContainerView.setOnLongClickListener {
                 event.invoke(adapterPosition, itemViewType)
             }

@@ -25,10 +25,18 @@
     <SwitchPreferenceCompat
         app:key="YAPM/pref:show_labels_in_list"
         app:title="@string/pref_general_show_labels"
-        app:allowDividerBelow="true"
+        app:allowDividerAbove="true"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
         app:defaultValue="true"/>
+
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:show_dividers_in_list"
+        app:title="@string/pref_general_show_dividers"
+        app:allowDividerBelow="true"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:defaultValue="false"/>
 
     <SwitchPreferenceCompat
         app:key="YAPM/pref:password_show_formatted"

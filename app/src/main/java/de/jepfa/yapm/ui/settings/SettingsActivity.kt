@@ -150,6 +150,16 @@ class SettingsActivity : SecureActivity(),
                     true
                 }
             }
+
+            val showDividersInListPref = findPreference<SwitchPreferenceCompat>(
+                PreferenceService.PREF_SHOW_DIVIDERS_IN_LIST)
+
+            showDividersInListPref?.let {
+                it.setOnPreferenceChangeListener { preference, newValue ->
+                    PreferenceService.putBoolean(PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD, true, preference.context)
+                    true
+                }
+            }
         }
     }
 

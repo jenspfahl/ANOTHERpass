@@ -463,7 +463,7 @@ class ShowCredentialActivity : SecureActivity() {
         val password = decryptPassword(key, credential.password)
         if (allowDeobfuscate) {
             obfuscationKey?.let {
-                password.deobfuscate(it)
+                password.deobfuscate(it) //TODO this seems to cause a change of current item and a credential adapter list reload
             }
         }
         var spannedString = spannableObfusableAndMaskableString(
