@@ -17,11 +17,14 @@ object Constants {
 
     val MASTER_KEY_BYTE_SIZE = 128
 
-    var SDF_DT_MEDIUM =
+    val SDF_DT_MEDIUM =
         SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM)
-    var SDF_D_INTERNATIONAL: DateFormat = SimpleDateFormat("yyyy-MM-dd")
+    val SDF_D_INTERNATIONAL: DateFormat = SimpleDateFormat("yyyy-MM-dd")
 
-    var UNKNOWN_VAULT_VERSION = 1
-    var FAST_KEYGEN_VAULT_VERSION = 2
+    val DF = DecimalFormat.getInstance()
+    val EDF = DecimalFormat("0.#E0")
+
+    val UNKNOWN_VAULT_VERSION = 1
+    val FAST_KEYGEN_VAULT_VERSION = 2
 
 }

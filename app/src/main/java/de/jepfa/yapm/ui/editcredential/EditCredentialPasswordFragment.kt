@@ -354,23 +354,23 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 .setMessage(
                     getString(R.string.combinations) + ": " +
                             System.lineSeparator() +
-                            combinations.toReadableFormat(0) +
+                            combinations.toReadableFormat() +
                             System.lineSeparator() +
-                            "($combinations)" +
+                            "(${combinations.toExponentFormat()})" +
                             System.lineSeparator() +
                             System.lineSeparator() +
                             getString(R.string.bruteforce_years_pc) + ": " +
                             System.lineSeparator() +
-                            bruteForceWithPentium.secondsToYear().toReadableFormat(0) +
+                            bruteForceWithPentium.secondsToYear().toReadableFormat() +
                             System.lineSeparator() +
-                            "(${bruteForceWithPentium.secondsToYear()})" +
+                            "(${bruteForceWithPentium.secondsToYear().toExponentFormat()})" +
                             System.lineSeparator() +
                             System.lineSeparator() +
                             getString(R.string.bruteforce_year_supercomp) + ": " +
                             System.lineSeparator() +
-                            bruteForceWithSupercomp.secondsToYear().toReadableFormat(0) +
+                            bruteForceWithSupercomp.secondsToYear().toReadableFormat() +
                             System.lineSeparator() +
-                            "(${bruteForceWithSupercomp.secondsToYear()})"
+                            "(${bruteForceWithSupercomp.secondsToYear().toExponentFormat()})"
                 )
                 .show()
         }

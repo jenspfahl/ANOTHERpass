@@ -7,9 +7,14 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.util.Constants.DF
+import de.jepfa.yapm.util.Constants.EDF
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.nio.ByteBuffer
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.text.NumberFormat
 import java.util.*
 
 fun Bundle?.getEncrypted(key: String): Encrypted? {
@@ -54,8 +59,13 @@ fun StringBuilder.addFormattedLine(label: String, data: Any?) {
         .append(System.lineSeparator())
 }
 
-fun Double.toReadableFormat(scale: Int): String {
-    return BigDecimal(this).setScale(scale, RoundingMode.HALF_EVEN).toString()
+fun Double.toReadableFormat(): String {
+    return DF.format(this)
+}
+
+fun Double.toExponentFormat(): String {
+    return EDF.format(this)
+
 }
 
 fun UUID.toBase64String(): String {
