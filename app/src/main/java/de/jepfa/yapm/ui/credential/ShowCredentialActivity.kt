@@ -326,7 +326,7 @@ class ShowCredentialActivity : SecureActivity() {
 
                 credential.modifyTimestamp?.let{
                     if (it > 1000) // modifyTimestamp is the credential Id after running db migration, assume ids are lower than 1000
-                        sb.addFormattedLine(getString(R.string.last_modified), Constants.SDF_DT_MEDIUM.format(it))
+                        sb.addFormattedLine(getString(R.string.last_modified), it.toSimpleDateTimeFormat())
                 }
 
                 AlertDialog.Builder(this)

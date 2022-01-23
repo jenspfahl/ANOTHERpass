@@ -7,14 +7,11 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import de.jepfa.yapm.model.encrypted.Encrypted
-import de.jepfa.yapm.util.Constants.DF
-import de.jepfa.yapm.util.Constants.EDF
-import java.math.BigDecimal
-import java.math.RoundingMode
 import java.nio.ByteBuffer
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
 import java.util.*
 
 fun Bundle?.getEncrypted(key: String): Encrypted? {
@@ -59,13 +56,33 @@ fun StringBuilder.addFormattedLine(label: String, data: Any?) {
         .append(System.lineSeparator())
 }
 
+fun Long.toSimpleDateTimeFormat(): String {
+    val f =
+        SimpleDateFormat.getDateTimeInstance(
+            SimpleDateFormat.MEDIUM,
+            SimpleDateFormat.MEDIUM,
+            Locale.getDefault(Locale.Category.FORMAT))
+    return f.format(this)
+}
+
+fun Date.toSimpleDateTimeFormat(): String {
+    val f =
+        SimpleDateFormat.getDateTimeInstance(
+            SimpleDateFormat.MEDIUM,
+            SimpleDateFormat.MEDIUM,
+            Locale.getDefault(Locale.Category.FORMAT))
+    return f.format(this)
+}
+
 fun Double.toReadableFormat(): String {
-    return DF.format(this)
+    val f = NumberFormat.getInstance(Locale.getDefault(Locale.Category.FORMAT))
+    return f.format(this)
 }
 
 fun Double.toExponentFormat(): String {
-    return EDF.format(this)
-
+    val symbols = DecimalFormatSymbols.getInstance(Locale.getDefault(Locale.Category.FORMAT));
+    val f = DecimalFormat("0.0E0", symbols)
+    return f.format(this)
 }
 
 fun UUID.toBase64String(): String {

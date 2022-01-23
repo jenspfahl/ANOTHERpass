@@ -88,7 +88,7 @@ fun linkifyDialogMessage(dialog: Dialog) {
 
 fun dateToString(date: Date?): String {
     if (date != null) {
-        return Constants.SDF_DT_MEDIUM.format(date)
+        return date.toSimpleDateTimeFormat()
     }
     else {
         return "??"

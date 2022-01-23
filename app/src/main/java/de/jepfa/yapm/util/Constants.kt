@@ -5,6 +5,7 @@ import java.text.DateFormat
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
+import java.util.*
 
 object Constants {
     val HOMEPAGE = Uri.parse("https://anotherpass.jepfa.de")
@@ -20,9 +21,6 @@ object Constants {
     val SDF_DT_MEDIUM =
         SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM)
     val SDF_D_INTERNATIONAL: DateFormat = SimpleDateFormat("yyyy-MM-dd")
-
-    val DF = DecimalFormat.getInstance()
-    val EDF = DecimalFormat("0.#E0")
 
     val UNKNOWN_VAULT_VERSION = 1
     val FAST_KEYGEN_VAULT_VERSION = 2
