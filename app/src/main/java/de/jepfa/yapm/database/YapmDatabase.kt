@@ -77,8 +77,7 @@ abstract class YapmDatabase : RoomDatabase() {
         }
 
         private fun updateUuid(database: SupportSQLiteDatabase, entityName: String) {
-            val cursor = database.query("SELECT id FROM $entityName")
-            database.beginTransaction()
+            val cursor = database.query("SELECT id FROM $entityName where UID is null")
             try {
                 if (cursor.count > 0) {
                     while (cursor.moveToNext()) {
@@ -91,11 +90,9 @@ abstract class YapmDatabase : RoomDatabase() {
                             arrayOf(uuid.toString(), id.toLong())
                         )
                     }
-                    database.setTransactionSuccessful()
                 }
             } finally {
                 cursor.close()
-                database.endTransaction()
             }
         }
     }
