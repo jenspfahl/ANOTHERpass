@@ -22,8 +22,9 @@ import javax.crypto.spec.GCMParameterSpec
 
 object MasterPasswordService {
 
-    private const val MODE_WITH_AUTH = "wa"
+    const val KEY_PROTECTED_MP = "protected"
 
+    private const val MODE_WITH_AUTH = "wa"
     /*
     Fake key to fake encrypt exported master passwords (EMPs). In fact, master passwords cannot be encrypted while exported.
     To encrypt it with the PIN wouldn't bring more security effort since both together are still needed to encrypt the Encrypted Master Key (EMK).
@@ -122,9 +123,10 @@ object MasterPasswordService {
      * This is a pseudo encryption for exporting EMPs, to make them unreadable without the corresponding vault
      */
     fun generateEncMasterPasswdSKForExport(context: Context): SecretKeyHolder {
-        val saltAsPassword = Password(SaltService.getSalt(context))
-        val empSK = SecretService.generateNormalSecretKey(saltAsPassword, EMP_SALT, DEFAULT_CIPHER_ALGORITHM)
-        saltAsPassword.clear()
+        val saltAsPasswd = Password(SaltService.getSalt(context))
+        val empSK = SecretService.generateNormalSecretKey(saltAsPasswd, EMP_SALT, DEFAULT_CIPHER_ALGORITHM)
+
+        saltAsPasswd.clear()
         return empSK
     }
 
@@ -260,6 +262,10 @@ object MasterPasswordService {
             Log.e("EMPS", "unable to decrypt stored EMP")
             return null
         }
+    }
+
+    fun isProtectedEMP(emp: Encrypted): Boolean {
+        return emp.isType(EncryptedType.Types.ENC_MASTER_PASSWD) && emp.type?.payload == KEY_PROTECTED_MP
     }
 
 }

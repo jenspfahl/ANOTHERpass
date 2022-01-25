@@ -277,7 +277,11 @@ class ShowCredentialActivity : SecureActivity() {
                         toastText(this, R.string.deobfuscate_restored)
                     } else {
 
-                        DeobfuscationDialog.openDeobfuscationDialog(this) { deobfuscationKey ->
+                        DeobfuscationDialog.openDeobfuscationDialogForCredentials(this) { deobfuscationKey ->
+                            if (deobfuscationKey == null) {
+                                return@openDeobfuscationDialogForCredentials
+                            }
+
                             maskPassword = false
                             item.isChecked = true
 

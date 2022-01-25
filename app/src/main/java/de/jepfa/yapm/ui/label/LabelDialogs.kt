@@ -42,7 +42,7 @@ object LabelDialogs {
         }
 
         val dialog = builder
-            .setTitle(activity.getString(R.string.label_details))
+            .setTitle(activity.getString(R.string.title_label_details))
             .setIcon(R.drawable.ic_baseline_label_24)
             .setView(container)
             .setNegativeButton(R.string.close, null)

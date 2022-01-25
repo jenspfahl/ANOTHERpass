@@ -15,10 +15,9 @@ import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.encrypted.DEFAULT_CIPHER_ALGORITHM
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.LoginData
-import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.nfc.NfcService
-import de.jepfa.yapm.service.secret.MasterKeyService
 import de.jepfa.yapm.service.secret.AndroidKey.ALIAS_KEY_TRANSPORT
+import de.jepfa.yapm.service.secret.MasterKeyService
 import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.service.secret.SecretService.decryptPassword
 import de.jepfa.yapm.service.secret.SecretService.encryptPassword
@@ -88,8 +87,7 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
             val tempKey = getAndroidSecretKey(ALIAS_KEY_TRANSPORT, view.context)
             val encMasterPasswd = encryptPassword(tempKey, masterPasswd)
             getBaseActivity()?.let { baseActivity ->
-                ExportEncMasterPasswordUseCase.execute(
-                    ExportEncMasterPasswordUseCase.Input(encMasterPasswd, true), baseActivity)
+                ExportEncMasterPasswordUseCase.startUiFlow(baseActivity, encMasterPasswd, noSessionCheck = true)
             }
         }
         val exportAsNfcImageView: ImageView = view.findViewById(R.id.imageview_nfc_tag)
@@ -100,11 +98,8 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
             val tempKey = getAndroidSecretKey(ALIAS_KEY_TRANSPORT, view.context)
             val encMasterPasswd = encryptPassword(tempKey, masterPasswd)
             getBaseActivity()?.let { baseActivity ->
-                ExportEncMasterPasswordUseCase.execute(
-                    ExportEncMasterPasswordUseCase.Input(
-                        encMasterPasswd,
-                        noSessionCheck = true, directlyToNfcActivity = true
-                    ), baseActivity)
+                ExportEncMasterPasswordUseCase.startUiFlow(baseActivity, encMasterPasswd,
+                    noSessionCheck = true, directlyToNfcActivity = true)
             }
         }
 

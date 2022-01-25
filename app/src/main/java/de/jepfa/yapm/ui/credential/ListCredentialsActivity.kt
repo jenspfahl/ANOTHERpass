@@ -35,7 +35,6 @@ import de.jepfa.yapm.service.PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_REL
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelFilter.WITH_NO_LABELS_ID
 import de.jepfa.yapm.service.label.LabelService
-import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.service.notification.ReminderService
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
 import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
@@ -474,17 +473,15 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
                 return true
             }
-            R.id.generate_encrypted_masterpasswd -> {
+            R.id.generate_masterpasswd_token -> {
                 GenerateMasterPasswordTokenUseCase.openDialog(this)
                 return true
             }
             R.id.export_encrypted_masterpasswd -> {
                 val encMasterPasswd = Session.getEncMasterPasswd()
                 if (encMasterPasswd != null) {
-                    UseCaseBackgroundLauncher(ExportEncMasterPasswordUseCase)
-                        .launch(this,
-                            ExportEncMasterPasswordUseCase.Input(encMasterPasswd, false)
-                        )
+                    ExportEncMasterPasswordUseCase.startUiFlow(this, encMasterPasswd, noSessionCheck = false)
+
                     return true
                 } else {
                     return false

@@ -8,7 +8,6 @@ import android.text.InputType
 import android.view.*
 import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
-import androidx.core.view.setPadding
 import com.google.android.material.tabs.TabLayout
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.session.Session
@@ -19,7 +18,6 @@ import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.overlay.DetachHelper
-import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secretgenerator.*
 import de.jepfa.yapm.service.secretgenerator.passphrase.DEFAULT_SPECIAL_CHARS
@@ -188,75 +186,20 @@ class EditCredentialPasswordFragment : SecureFragment() {
             else {
                 masterSecretKey?.let{ key ->
                     if (obfuscatePasswordRequired) {
-                        val inputView = LinearLayout(context)
-                        inputView.orientation = LinearLayout.VERTICAL
-                        inputView.setPadding(32)
+                        DeobfuscationDialog.openObfuscationDialog(editCredentialActivity,
+                            editCredentialActivity.getString(R.string.obfuscate_while_saving),
+                            editCredentialActivity.getString(R.string.obfuscate_while_saving_message, DEFAULT_SPECIAL_CHARS),
+                            editCredentialActivity.getString(android.R.string.ok),
+                            editCredentialActivity.getString(android.R.string.cancel))
+                        { newObfuscationKey ->
+                            if (newObfuscationKey != null) {
+                                generatedPassword.obfuscate(newObfuscationKey)
+                                obfuscationKey = newObfuscationKey
 
-                        val pwd1 = EditText(context)
-                        pwd1.inputType =
-                            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-                        val filters =
-                            arrayOf<InputFilter>(LengthFilter(Constants.MAX_CREDENTIAL_PASSWD_LENGTH))
-                        pwd1.filters = filters
-                        pwd1.requestFocus()
-                        inputView.addView(pwd1)
-
-                        val pwd2 = EditText(context)
-                        pwd2.inputType =
-                            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-                        pwd2.setFilters(filters)
-                        inputView.addView(pwd2)
-
-                        val builder = AlertDialog.Builder(editCredentialActivity)
-                        val dialog: AlertDialog = builder
-                            .setTitle(R.string.obfuscate_while_saving)
-                            .setMessage(getString(R.string.obfuscate_while_saving_message, DEFAULT_SPECIAL_CHARS))
-                            .setView(inputView)
-                            .setPositiveButton(android.R.string.ok, null)
-                            .setNegativeButton(android.R.string.cancel, null)
-                            .create()
-
-                        dialog.setOnShowListener {
-                            val buttonPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                            buttonPositive.setOnClickListener {
-                                val obfusPasswd1 = Password(pwd1.text)
-                                val obfusPasswd2 = Password(pwd2.text)
-                                if (obfusPasswd1.isEmpty()) {
-                                    pwd1.setError(getString(R.string.error_field_required))
-                                    pwd1.requestFocus()
-                                    return@setOnClickListener
-                                }
-                                else if (obfusPasswd2.isEmpty()) {
-                                    pwd2.setError(getString(R.string.error_field_required))
-                                    pwd2.requestFocus()
-                                    return@setOnClickListener
-                                }
-                                else if (!obfusPasswd1.isEqual(obfusPasswd2)) {
-                                    pwd2.setError(getString(R.string.password_not_equal))
-                                    pwd2.requestFocus()
-                                    return@setOnClickListener
-                                }
-
-                                context?.let {
-                                    val salt = SaltService.getSalt(it)
-                                    val cipherAlgorithm = SecretService.getCipherAlgorithm(it)
-                                    val obfuscationSK =
-                                        SecretService.generateNormalSecretKey(obfusPasswd1, salt, cipherAlgorithm)
-                                    val newObfuscationKey = SecretService.secretKeyToKey(obfuscationSK, salt)
-                                    generatedPassword.obfuscate(newObfuscationKey)
-                                    obfuscationKey = newObfuscationKey
-
-                                    currentCredential.isObfuscated = true
-                                    saveCredential(key, currentCredential)
-                                }
-
-                                dialog.dismiss()
+                                currentCredential.isObfuscated = true
+                                saveCredential(key, currentCredential)
                             }
-                            val buttonNegative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-                            buttonNegative.setOnClickListener { dialog.dismiss() }
                         }
-                        dialog.show()
-
                     }
                     else {
                         saveCredential(key, currentCredential)
@@ -590,7 +533,11 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 }
                 else {
                     context?.let { ctx ->
-                        DeobfuscationDialog.openDeobfuscationDialog(ctx) { newObfuscationKey ->
+                        DeobfuscationDialog.openDeobfuscationDialogForCredentials(ctx) { newObfuscationKey ->
+                            if (newObfuscationKey == null) {
+                                return@openDeobfuscationDialogForCredentials
+                            }
+
                             item.isChecked = true
 
                             obfuscationKey = newObfuscationKey

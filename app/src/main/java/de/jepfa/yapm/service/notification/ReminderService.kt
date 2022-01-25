@@ -93,8 +93,7 @@ object ReminderService {
         override val action: (SecureActivity) -> Unit = { activity: SecureActivity ->
             val encMasterPasswd = Session.getEncMasterPasswd()
             encMasterPasswd?.let {
-                UseCaseBackgroundLauncher(ExportEncMasterPasswordUseCase)
-                    .launch(activity, ExportEncMasterPasswordUseCase.Input(it, false))
+                ExportEncMasterPasswordUseCase.startUiFlow(activity, encMasterPasswd, noSessionCheck = false)
             }
         }
     }

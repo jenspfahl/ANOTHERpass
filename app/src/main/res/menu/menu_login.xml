@@ -27,4 +27,12 @@
         android:title="@string/about">
     </item>
 
+    <item
+        android:id="@+id/menu_debug"
+        android:icon="@drawable/ic_baseline_memory_24"
+        android:orderInCategory="300"
+        android:title="@string/debug"
+        android:visible="false">
+    </item>
+
 </menu>

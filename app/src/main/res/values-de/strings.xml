@@ -5,7 +5,7 @@
 
     <string name="add_credential">Zugangsdaten hinzufügen</string>
 
-    <string name="hint_edit_label_name">Name der Markierung</string>
+    <string name="hint_edit_label_name">Name der Kategorie</string>
     <string name="hint_edit_label_desc">Zusatzinformationen</string>
     <string name="hint_edit_credential_name">Ein kurzer Name</string>
     <string name="hint_edit_credential_additional_info">Zusatzinformationen</string>
@@ -46,8 +46,8 @@
     <string name="title_delete_credential">Lösche Zugangsdaten</string>
     <string name="message_delete_credential">Zugangsdaten \'%1$s\' wirklich löschen?</string>
 
-    <string name="title_delete_label">Lösche Markierung</string>
-    <string name="message_delete_label">Markierung \'%1$s\' wirklich löschen? Sie wird auch von allen Zugangsdaten entfernt, die diese verwenden.</string>
+    <string name="title_delete_label">Lösche Kategorie</string>
+    <string name="message_delete_label">Kategorie \'%1$s\' wirklich löschen? Sie wird auch von allen Zugangsdaten entfernt, die diese verwenden.</string>
 
     <string name="lock_items">Tresor sperren</string>
     <string name="logout">Ausloggen und beenden</string>
@@ -73,7 +73,7 @@
     <string name="store_master_password">Speichere Masterpasswort auf dem Gerät</string>
     <string name="create_vault_summarize_fragment_label">Tresor erzeugen 3/3</string>
     <string name="login_explanation_1">Bitte PIN zum einloggen eingeben</string>
-    <string name="login_explanation_2">Scanne dein Encrypted Master Password oderMaster Password Token, indem du auf das QR-Code oder NFC Symbol klickst. Wenn du dir es notiert hast, gib es direkt ein.</string>
+    <string name="login_explanation_2">Scanne dein Exported Master Password (EMP) oder Master Password Token (MPT), indem du auf das QR-Code oder NFC Symbol klickst. Wenn du dir es notiert hast, gib es direkt ein.</string>
     <string name="enter_or_scan_masterpassword">Scanne oder gebe dein Masterpasswort ein</string>
     <string name="button_login">Login</string>
     <string name="password_required">Passwort erforderlich</string>
@@ -96,7 +96,7 @@
     <string name="export_vault">Exportiere Tresor</string>
     <string name="export_vault_as_file">Exportiere Tresor als Datei</string>
     <string name="import_vault_as_file">Importiere Tresor-Datei</string>
-    <string name="message_import_vault_records">Du bist dabei %1$d Zugangsdaten und %2$d Markierungen zu importieren. Schon existierende Daten werden überschrieben. Fortsetzen?</string>
+    <string name="message_import_vault_records">Du bist dabei %1$d Zugangsdaten und %2$d Kategorien zu importieren. Schon existierende Daten werden überschrieben. Fortsetzen?</string>
     <string name="qrc_download_as_img">Speichere QR-Code als Bilddatei</string>
     <string name="download_as_nfc_tag">Push as NFC tag</string>
     <string name="export_vault_explanation">Hier kannst du deinen kompletten Tresor als Datei teilen oder exportieren, z.B. als Backup auf Google Drive. Importiere diese Datei wenn du die App neu installiert hast oder um geänderte Daten wiederherzustellen.\nDer Encrypted Master Key kann Bestandteil dieser Datei sein. Wenn nicht, exportiere ihn separat als QR-Code oder NFC-Tag. Du brauchst ihn wenn du die Tresor-Datei neu importierst.\nDas Trennen des Encrypted Master Keys von der Tresor-Datei macht die Datei unnütz für Hacker, auch wenn sie deine Pin oder dein Masterpasswort hätten.</string>
@@ -159,16 +159,16 @@
     <string name="edit_credential_password_fragment_label">Zugangspasswort ändern</string>
     <string name="hint_edit_credential_user">Benutzer</string>
     <string name="hint_edit_credential_website">Webseite</string>
-    <string name="hint_edit_credential_labels">Füge Markierungen hinzu</string>
-    <string name="filter">Nach Markierungen filtern</string>
+    <string name="hint_edit_credential_labels">Füge Kategorien hinzu</string>
+    <string name="filter">Nach Kategorien filtern</string>
     <string name="pref_header_autofill">Autofill-Unterstützung</string>
-    <string name="title_activity_list_label">Markierungen verwalten</string>
-    <string name="action_labels">Verwalte Markierungen</string>
-    <string name="label_data_params">Gib der Markierung hier einen Namen, eine Beschreibung und eine Farbe</string>
+    <string name="title_activity_list_label">Kategorien verwalten</string>
+    <string name="action_labels">Verwalte Kategorien</string>
+    <string name="label_data_params">Gib der Kategorie hier einen Namen, eine Beschreibung und eine Farbe</string>
     <string name="choose_color">Wähle eine Farbe</string>
-    <string name="error_labelname_in_use">Dieser Name wird schon von einer anderen Markierung verwendet</string>
-    <string name="title_new_label">Neue Markierug</string>
-    <string name="title_change_label">Markierung ändern</string>
+    <string name="error_labelname_in_use">Dieser Name wird schon von einer anderen Kategorie verwendet</string>
+    <string name="title_new_label">Neue Kategorie</string>
+    <string name="title_change_label">Kategorie ändern</string>
     <string name="reset_vault">Alles zurücksetzen</string>
     <string name="reset_vault_and_delete">Alles löschen und zurücksetzen</string>
     <string name="button_report_bug">Fehler melden</string>
@@ -192,7 +192,6 @@
     <string name="title_read_nfc_tag">NFC-Tag lesen</string>
     <string name="message_password_changed">Das Passwort hat sich geändert, aber es kann später wiederhergestellt werden. Schon das Passwort \"draußen\" geändert?</string>
     <string name="button_continue">Fortsetzen</string>
-    <string name="label_details">Markierungsdetails</string>
     <string name="close">Schliessen</string>
     <string name="restore_last_password">Letztes Passwort wiederherstellen</string>
     <string name="edit_password">Passwort ändern</string>
@@ -213,8 +212,8 @@
     <string name="drop_to_close">APP SCHLIESSEN</string>
     <string name="drop_to_go_back">ZURÜCK ZUR APP</string>
 
-    <string name="vault_export_info">Tresor (Id = %4$s) exportiert am %1$s, enthält %2$s Zugangsdaten und %3$s Markierungen</string>
-    <string name="vault_export_info2">Tresor-Datei exportiert am %1$s, enthält %2$s Zugangsdaten und %3$s Markierungen</string>
+    <string name="vault_export_info">Tresor (Id = %4$s) exportiert am %1$s, enthält %2$s Zugangsdaten und %3$s Kategorien</string>
+    <string name="vault_export_info2">Tresor-Datei exportiert am %1$s, enthält %2$s Zugangsdaten und %3$s Kategorien</string>
     <string name="not_an_emk">Das ist kein Encrypted Master Key</string>
     <string name="scan_masterkey_first">Scan your master key first</string>
 
@@ -249,7 +248,7 @@
     <string name="sub_generate_mpt">Take this token in your wallet to scan for login. If you loose it, just create a new one.</string>
     <string name="title_generate_mpt">Generate master password token</string>
     <string name="message_generate_mpt" tools:ignore="PluralsCandidate">The last generated token with number \#%1$d will become invalid.</string>
-    <string name="head_export_emp">Your Encrypted Master Password</string>
+    <string name="head_export_emp">Your Exported Master Password</string>
     <string name="sub_export_emp">Store this on a safe place since this contains your master password.</string>
     <string name="head_export_emk">The Encrypted Master Key</string>
     <string name="sub_export_emk">Store this at a safe place. Future backups don\'t need to include that master key.</string>
@@ -270,8 +269,8 @@
     <string name="unknown_emp">Unknown master password</string>
     <string name="no_mpt_present">No master password token present.</string>
     <string name="invalid_mpt">Invalid master password token</string>
-    <string name="invalid_emp">Invalid encrypted master password</string>
-    <string name="invalid_emp_mpt">Not an encrypted master password or token</string>
+    <string name="invalid_emp">Invalid Exported Master Password</string>
+    <string name="invalid_emp_mpt">Not an Exported Master Password or token</string>
     <string name="scanning_emp">Scanning Master Password</string>
     <string name="title_reset_all">Reset all</string>
     <string name="message_reset_all">If you cannot login and got stuck you can reset all data here. If you continue all data is going to be deleted. Are you sure?</string>
@@ -320,8 +319,8 @@
     <string name="qr_code_or_nfc_tag_not_a_credential">QR code or NFC tag doesn\'t contain a readable credential</string>
     <string name="unknown_emk_scanned">\u274C Unknown Encrypted Master Key (EMK) scanned</string>
     <string name="well_known_emk_scanned">\u2705 Well known Encrypted Master Key (EMK) scanned</string>
-    <string name="unknown_emp_scanned">\u274C Unknown Encrypted Master Password (EMP) scanned</string>
-    <string name="well_known_emp_scanned">\u2705 Well known Encrypted Master Password (EMP) scanned</string>
+    <string name="unknown_emp_scanned">\u274C Unknown Exported Master Password (EMP) scanned</string>
+    <string name="well_known_emp_scanned">\u2705 Well known Exported Master Password (EMP) scanned</string>
     <string name="unknown_mpt_scanned">\u274C Unknown Master Password Token (MPT) scanned</string>
     <string name="well_known_mpt_scanned">\u2705 Well known Master Password Token (MPT #%1$s) scanned</string>
     <string name="well_known_ecr_scanned">\u2705 Well known Encrypted Credential Record (ECR) with name \'%1$s\' scanned</string>
@@ -345,7 +344,7 @@
     <string name="dark_mode_on">Dark</string>
     <string name="dark_mode_off">Light</string>
     <string name="pref_general_theme">Theme</string>
-    <string name="pref_general_show_labels">Zeige Markierungen in Übersichtsliste</string>
+    <string name="pref_general_show_labels">Zeige Kategorien in Übersichtsliste</string>
     <string name="pref_general_show_dividers">Zeige Trennungslinien in Übersichtsliste</string>
     <string name="pref_general_show_formatted_passwords">Show formatted passwords</string>
     <string name="pref_general_summary_show_formatted_passwords">Show passwords separated into words and accent highlighting colors for better readability</string>
@@ -388,9 +387,9 @@
     <string name="show_export_vault_reminder">Reminder to export vault</string>
     <string name="summary_show_export_vault_reminder">Show a reminder when the vault has changed and needs to be exported.</string>
     <string name="show_export_mk_reminder">Reminder to export Encrypted Master Key</string>
-    <string name="show_export_mp_reminder">Reminder to export Encrypted Master Password</string>
+    <string name="show_export_mp_reminder">Reminder to export Exported Master Password</string>
     <string name="summary_show_export_mk_reminder">Show a reminder when the Encrypted Master Key (EMK) has changed and needs to be exported.</string>
-    <string name="summary_show_export_mp_reminder">Show a reminder when the Encrypted Master Password (EMP) needs to be exported. Note: Without the master password you cannot login!</string>
+    <string name="summary_show_export_mp_reminder">Show a reminder when the Exported Master Password (EMP) needs to be exported. Note: Without the master password you cannot login!</string>
     <string name="show_biometric_smp_reminder">Reminder to setup biometrics for stored master password</string>
     <string name="summary_show_biometric_smp_reminder">Show a reminder when the stored master password is not protected by a biometric (e.g. a fingerprint) but the device would support it.</string>
     <string name="export_vault_reminder">Vault should be exported after recent modifications.</string>
@@ -400,7 +399,7 @@
     <string name="show_biometric_smp_howto">Wie?</string>
     <string name="dont_ask_again">Nicht mehr nerven</string>
     <string name="manage_reminder_settings_hint">You can manage reminder under Settings / Reminders</string>
-    <string name="no_label">OHNE MARKIERUNG</string>
+    <string name="no_label">OHNE KATEGORIE</string>
     <string name="biometric_failed">Cannot authorize biometric</string>
     <string name="auth_with_biometrics">Authorize with biometrics</string>
     <string name="auth_to_encrypt_emp">Authentication required to encrypt and store master password.</string>
@@ -464,10 +463,14 @@
     <string name="cannot_write_protected_nfc_tag">Cannot write on protected NFC tag</string>
     <string name="language_default">System Standard</string>
     <string name="test_copypaste_password"><![CDATA[Teste C&P Passwort]]></string>
-    <string name="credential_data_params">Ändere Zugangsdaten hier. Der Name ist ein Pflichtfeld. Mit Markierungen kannst du sie kategorisieren.</string>
+    <string name="credential_data_params">Ändere Zugangsdaten hier. Der Name ist ein Pflichtfeld. Mit Kategorien kannst du sie gruppieren.</string>
     <string name="message_write_nfc_tag">Der NFC-Tag ist schon beschrieben worden. Überschreiben?</string>
     <string name="drop_to_remove">FENSTER SCHLIESSEN</string>
     <string name="login_required_first">Tresor entsperren und Zugangsdaten auswählen</string>
     <string name="duplicate">Duplizieren</string>
+    <string name="message_change_language">Die gewählte Sprache wird erst nach einem App-Neustart richtig angezeigt.</string>
+    <string name="title_change_language">Sprache ändern</string>
+    <string name="pref_language">Sprache</string>
+    <string name="title_label_details">Kategorie-Details</string>
 
 </resources>

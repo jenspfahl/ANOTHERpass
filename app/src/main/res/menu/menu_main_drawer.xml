@@ -6,7 +6,7 @@
     <item android:title="@string/quick_access" >
         <menu >
             <item
-                android:id="@+id/generate_encrypted_masterpasswd"
+                android:id="@+id/generate_masterpasswd_token"
                 android:orderInCategory="50"
                 android:title="@string/generate_encrypted_masterpasswd" />
             <item
@@ -114,7 +114,8 @@
             android:id="@+id/menu_debug"
             android:icon="@drawable/ic_baseline_memory_24"
             android:orderInCategory="300"
-            android:title="@string/debug">
+            android:title="@string/debug"
+            android:visible="false">
         </item>
     </group>
 
