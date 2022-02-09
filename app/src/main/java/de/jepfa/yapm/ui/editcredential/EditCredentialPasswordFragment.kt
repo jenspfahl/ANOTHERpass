@@ -282,6 +282,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
     private fun showPasswordStrength() {
         val combinations = passwordCombinations
         if (combinations != null) {
+            val entropy = passphraseGenerator.calcEntropy(combinations)
             val bruteForceWithPentium = passphraseGenerator.calcBruteForceWaitingSeconds(
                 combinations, GeneratorBase.BRUTEFORCE_ATTEMPTS_PENTIUM
             )
@@ -300,6 +301,11 @@ class EditCredentialPasswordFragment : SecureFragment() {
                             combinations.toReadableFormat() +
                             System.lineSeparator() +
                             "(${combinations.toExponentFormat()})" +
+                            System.lineSeparator() +
+                            System.lineSeparator() +
+                            getString(R.string.entropy) + ": " +
+                            System.lineSeparator() +
+                            entropy.toInt() +
                             System.lineSeparator() +
                             System.lineSeparator() +
                             getString(R.string.bruteforce_years_pc) + ": " +

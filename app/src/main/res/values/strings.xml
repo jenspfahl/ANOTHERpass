@@ -71,7 +71,7 @@
     <string name="password_not_equal">Password repetition not equal</string>
     <string name="pin_wrong">Wrong pin</string>
     <string name="button_create_vault">Create vault</string>
-    <string name="create_vault_explanation_3">Here you see again your master password. Export as QR code or NFC tag by clicking on the corresponding icon or note it on a safe piece of paper. (If you decide to export as QR code you can either download it as image file of just photograph or copy the QR code directly from your phone.) Store it safely. You will need it together with your pin to login into the vault. \nFor more convenience you may additionally store it on this device for faster login (biometric criteria may be needed).</string>
+    <string name="create_vault_explanation_3">Here you see again your master password. Export it as QR code or NFC tag by clicking on the corresponding icon or note it on a safe piece of paper. (If you decide to export as QR code you can either download it as image file of just photograph or copy the QR code directly from your phone.) Store it safely. You will need it together with your pin to login into the vault. \nFor more convenience you may additionally store it on this device for faster login (biometric criteria may be needed).</string>
     <string name="store_master_password">Store master password on this device</string>
     <string name="create_vault_summarize_fragment_label">Create Vault 3/3</string>
     <string name="login_explanation_1">Enter your pin to login into your vault.</string>
@@ -295,6 +295,7 @@
     <string name="password_strength">Password strength</string>
     <string name="password_strength_guessed">Password strength (estimated)</string>
     <string name="combinations">Combinations</string>
+    <string name="entropy" translatable="false">Entropy</string>
     <string name="bruteforce_years_pc">Years to brute force with a usual PC</string>
     <string name="bruteforce_year_supercomp">Years to brute force with a super computer</string>
     <string name="show_vault_info">Show vault info</string>
