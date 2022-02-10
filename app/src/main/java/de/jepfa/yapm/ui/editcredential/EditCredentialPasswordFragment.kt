@@ -29,7 +29,6 @@ import de.jepfa.yapm.ui.SecureFragment
 import de.jepfa.yapm.ui.credential.DeobfuscationDialog
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.*
-import java.util.*
 
 
 class EditCredentialPasswordFragment : SecureFragment() {
@@ -259,16 +258,21 @@ class EditCredentialPasswordFragment : SecureFragment() {
     }
 
     private fun guessPasswordCombinations(password: Password) {
-        // rudimentary combination calculation by assuming a-Z, A-Z, 0-9 and 10 potential special chars
-        val containsLowerCase = if (password.contains(Regex("[a-z]"))) 26 else 0
-        val containsUpperCase = if (password.contains(Regex("[A-Z]"))) 26 else 0
-        val containsDigits = if (password.contains(Regex("[0-9]"))) 10 else 0
+        // rudimentary combination calculation by assuming a-Z, A-Z, 0-9 and some typical special chars
+        val containsLowerCase = containsChars(password, PasswordGenerator.DEFAULT_ALPHA_CHARS_LOWER_CASE)
+        val containsUpperCase = containsChars(password, PasswordGenerator.DEFAULT_ALPHA_CHARS_UPPER_CASE)
+        val containsDigits = containsChars(password, PasswordGenerator.DEFAULT_DIGITS)
+        val containsSpecialChars = containsChars(password, PasswordGenerator.DEFAULT_SPECIAL_CHARS)
         passwordCombinations = Math.pow(
-            (containsLowerCase + containsUpperCase + containsDigits + 10).toDouble(),
+            (containsLowerCase + containsUpperCase + containsDigits + containsSpecialChars).toDouble(),
             password.length.toDouble()
         )
         passwordCombinationsGuessed = true
     }
+
+    private fun containsChars(password: Password, chars: String) =
+        if (password.contains(Regex("[${Regex.escape(chars)}]"))) chars.length
+        else 0
 
     private fun calcPasswordStrength() {
         passwordCombinations = if (isPassphraseSelected()) {
@@ -433,9 +437,9 @@ class EditCredentialPasswordFragment : SecureFragment() {
         }
         val spec = PasswordGeneratorSpec(
             strength = passwordStrength,
-            onlyLowerCase = !switchUpperCaseChar.isChecked,
+            noUpperCase = !switchUpperCaseChar.isChecked,
             noDigits = !switchAddDigit.isChecked,
-            excludeSpecialChars = !switchAddSpecialChar.isChecked)
+            noSpecialChars = !switchAddSpecialChar.isChecked)
         return spec
     }
 

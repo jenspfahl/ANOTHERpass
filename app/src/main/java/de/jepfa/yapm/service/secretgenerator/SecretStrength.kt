@@ -4,6 +4,7 @@ import de.jepfa.yapm.R
 
 enum class SecretStrength(val pseudoPhraseLength: Int, val ordinaryPasswordLength: Int, val nameId: Int) {
     ONE_WORD(4, 4, -1),
+    TWO_WORDS(8, 8, -1),
     EASY(12, 10, R.string.EASY),
     NORMAL(16, 12, R.string.NORMAL),
     STRONG(20, 16, R.string.STRONG),
