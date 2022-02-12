@@ -1,25 +1,26 @@
 package de.jepfa.yapm.ui.editcredential
 
-import androidx.appcompat.app.AlertDialog
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputFilter.LengthFilter
 import android.text.InputType
 import android.view.*
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SwitchCompat
 import com.google.android.material.tabs.TabLayout
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SecretService
-import de.jepfa.yapm.service.secretgenerator.*
+import de.jepfa.yapm.service.secretgenerator.GeneratorBase
+import de.jepfa.yapm.service.secretgenerator.SecretStrength
 import de.jepfa.yapm.service.secretgenerator.passphrase.DEFAULT_SPECIAL_CHARS
 import de.jepfa.yapm.service.secretgenerator.passphrase.PassphraseGenerator
 import de.jepfa.yapm.service.secretgenerator.passphrase.PassphraseGeneratorSpec
@@ -296,6 +297,11 @@ class EditCredentialPasswordFragment : SecureFragment() {
             val titleId =
                 if (passwordCombinationsGuessed) R.string.password_strength_guessed
                 else R.string.password_strength
+            var strengthLevel = emoji(0x1f635)
+            if (entropy >= 128) strengthLevel = emoji(0x1f606)
+            else if (entropy >= 60) strengthLevel = emoji(0x1f642)
+            else if (entropy >= 36) strengthLevel = emoji(0x1f610)
+            else if (entropy >= 28) strengthLevel = emoji(0x1f641)
             AlertDialog.Builder(editCredentialActivity)
                 .setTitle(getString(titleId))
                 .setIcon(R.drawable.ic_baseline_fitness_center_24)
@@ -309,7 +315,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                             System.lineSeparator() +
                             getString(R.string.entropy) + ": " +
                             System.lineSeparator() +
-                            entropy.toInt() +
+                            entropy.toInt() + " " + strengthLevel +
                             System.lineSeparator() +
                             System.lineSeparator() +
                             getString(R.string.bruteforce_years_pc) + ": " +
@@ -461,6 +467,10 @@ class EditCredentialPasswordFragment : SecureFragment() {
     private fun getStrengthEnum(name: String?) : SecretStrength {
         name ?: return PASSPHRASE_STRENGTH_DEFAULT
         return SecretStrength.valueOf(name)
+    }
+
+    fun emoji(unicode: Int): String {
+        return String(Character.toChars(unicode))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
