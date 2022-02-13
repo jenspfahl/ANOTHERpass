@@ -484,6 +484,6 @@
     <string name="enter_codeword">Enter a code word</string>
     <string name="repeat_codeword">Repeat the code word</string>
     <string name="unlock_masterpassword">Unlock Exported Master Password</string>
-    <string name="message_unlock_masterpassword">The Exported Master Password (EMP) was protected with a codeword. Type it to unlock it.</string>
+    <string name="message_unlock_masterpassword">The Exported Master Password (EMP) is protected with a codeword. Type it to unlock it.</string>
 
 </resources>

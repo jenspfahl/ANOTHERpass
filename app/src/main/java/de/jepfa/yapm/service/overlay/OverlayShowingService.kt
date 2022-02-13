@@ -24,13 +24,8 @@ import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.getEncryptedExtra
-import android.app.ActivityManager.RunningTaskInfo
-
-import android.app.Activity
 
 import android.app.ActivityManager
-import androidx.core.view.marginStart
-import androidx.core.view.marginTop
 import androidx.core.view.setPadding
 import de.jepfa.yapm.service.PreferenceService.PREF_OVERLAY_CLOSE_ALL
 
@@ -66,6 +61,7 @@ class OverlayShowingService : Service(), OnTouchListener {
         multiLine = PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_WORDS_ON_NL, this)
         val encryptedPasswd = intent.getEncryptedExtra(DetachHelper.EXTRA_PASSWD)
         if (encryptedPasswd != null && !Session.isDenied()) {
+            Session.disableAutomaticLocking()
             val masterKeySK = Session.getMasterKeySK()
             if (masterKeySK != null) {
                 val transSK = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, applicationContext)
@@ -169,6 +165,8 @@ class OverlayShowingService : Service(), OnTouchListener {
             topView = null
         }
         password.clear()
+
+        Session.enableAutomaticLocking()
     }
 
     override fun onTouch(v: View, event: MotionEvent): Boolean {
@@ -257,6 +255,9 @@ class OverlayShowingService : Service(), OnTouchListener {
     }
 
     private fun updateContent() {
+        if (!Session.isDenied()) {
+            Session.touch()
+        }
         val showUser = PreferenceService.getAsBool(PREF_OVERLAY_SHOW_USER, applicationContext)
         if (showUser && user.isNotBlank()) {
             overlayedButton?.text = SpannableStringBuilder(user)

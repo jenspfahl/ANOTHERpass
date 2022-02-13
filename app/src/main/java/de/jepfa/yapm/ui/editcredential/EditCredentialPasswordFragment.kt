@@ -297,7 +297,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
             val titleId =
                 if (passwordCombinationsGuessed) R.string.password_strength_guessed
                 else R.string.password_strength
-            var strengthLevel = emoji(0x1f635)
+            var strengthLevel = emoji(0x1f625)
             if (entropy >= 128) strengthLevel = emoji(0x1f606)
             else if (entropy >= 60) strengthLevel = emoji(0x1f642)
             else if (entropy >= 36) strengthLevel = emoji(0x1f610)
