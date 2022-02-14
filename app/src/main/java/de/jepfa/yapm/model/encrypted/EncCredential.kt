@@ -161,13 +161,13 @@ data class EncCredential(val id: Int?,
         const val ATTRIB_IS_LAST_PASSWORD_OBFUSCATED = "isLastPasswordObfuscated"
         const val ATTRIB_MODIFY_TIMESTAMP = "modifyTimestamp"
 
-        fun fromIntent(intent: Intent): EncCredential {
+        fun fromIntent(intent: Intent, createUuid: Boolean = false): EncCredential {
             var id: Int? = null
             val idExtra = intent.getIntExtra(EXTRA_CREDENTIAL_ID, -1)
             if (idExtra != -1) {
                 id = idExtra
             }
-            val uid = intent.getStringExtra(EXTRA_CREDENTIAL_UID)?.let { UUID.fromString(it) }
+            var uid = intent.getStringExtra(EXTRA_CREDENTIAL_UID)?.let { UUID.fromString(it) }
             val encName = intent.getEncryptedExtra(EXTRA_CREDENTIAL_NAME, Encrypted.empty())
             val encAdditionalInfo = intent.getEncryptedExtra(EXTRA_CREDENTIAL_ADDITIONAL_INFO, Encrypted.empty())
             val encUser = intent.getEncryptedExtra(EXTRA_CREDENTIAL_USER, Encrypted.empty())
@@ -179,6 +179,10 @@ data class EncCredential(val id: Int?,
             val isLastPasswordObfuscated = intent.getBooleanExtra(
                 EXTRA_CREDENTIAL_IS_LAST_PASSWORD_OBFUSCATED, false)
             var modifyTimestamp = intent.getLongExtra(EXTRA_CREDENTIAL_MODIFY_TIMESTAMP, 0)
+
+            if (uid == null && createUuid) {
+                uid = UUID.randomUUID()
+            }
 
             return EncCredential(
                 id, uid, encName, encAdditionalInfo, encUser, encPassword, encLastPassword, encWebsite, encLabels,
