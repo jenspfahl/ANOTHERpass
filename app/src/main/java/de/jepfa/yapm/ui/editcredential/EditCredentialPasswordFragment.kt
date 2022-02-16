@@ -244,7 +244,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                     .setTitle(R.string.title_change_credential)
                     .setMessage(R.string.message_password_changed)
                     .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setPositiveButton(R.string.button_continue) { dialog, whichButton ->
+                    .setPositiveButton(R.string.yes_continue) { dialog, whichButton ->
                         updateCredential(key, credential, saveLastPassword = true)
                     }
                     .setNegativeButton(android.R.string.cancel, null)

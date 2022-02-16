@@ -70,7 +70,7 @@
             android:noHistory="true" />
         <activity
             android:name=".ui.qrcode.QrCodeActivity"
-            android:label="@string/export"
+            android:label="@string/action_export"
             android:noHistory="false" />
         <activity
             android:name=".ui.qrcode.CaptureActivity"

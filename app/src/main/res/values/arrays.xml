@@ -138,6 +138,6 @@
     </string-array>
 
     <string name="language_default">System default</string>
-    <string name="language_en" translatable="false">English</string>
-    <string name="language_de" translatable="false">Deutsch</string>
+    <string name="language_en">English</string>
+    <string name="language_de">German</string>
 </resources>

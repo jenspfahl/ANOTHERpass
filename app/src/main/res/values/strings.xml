@@ -86,8 +86,8 @@
     <string name="title_change_credential">Change credential</string>
     <string name="title_change_credential_with_title">Change \'%1$s\'</string>
     <string name="detach">Detach</string>
-    <string name="export">Export</string>
-    <string name="import_title">Import</string>
+    <string name="action_export">Export</string>
+    <string name="action_import">Import</string>
     <string name="import_read">Import / Read</string>
     <string name="export_credential">Export credential</string>
     <string name="export_credential_desc">Export credential to either backup, outsource or share it.</string>
@@ -196,7 +196,7 @@
     <string name="title_write_nfc_tag">Write NFC tag</string>
     <string name="message_write_nfc_tag">There is data on the NFC tag. Overwrite it?</string>
     <string name="title_read_nfc_tag">Read NFC tag</string>
-    <string name="message_password_changed">The password has been changed, but you can restore it later if needed. Have you still updated the password out there?</string>
+    <string name="message_password_changed">The password has been changed, but you can restore it later if needed. Have you already updated the password out there?</string>
     <string name="button_continue">Continue</string>
     <string name="close">Close</string>
     <string name="restore_last_password">Restore last password</string>
@@ -211,8 +211,8 @@
     <string name="credential_sort_by_recently_modified">Recently modified (recent first)</string>
     <string name="credential_sort_by_id">Credential identifier</string>
     <string name="show_ids">Show credential identifiers</string>
-    <string name="nothing_placeholder">…</string>
-    <string name="unknown_placeholder">\???</string>
+    <string name="nothing_placeholder" translatable="false">…</string>
+    <string name="unknown_placeholder" translatable="false">\???</string>
     <string name="tab_pseudo_phrase">Pseudo phrase</string>
     <string name="tab_ordinary">Ordinary password</string>
     <string name="drop_to_close">DROP TO CLOSE</string>
@@ -251,7 +251,7 @@
     <string name="message_drop_vault">You are going to delete ALL your credentials and login data.</string>
     <string name="select_none_all">None / All</string>
     <string name="title_copy_password">Copy password</string>
-    <string name="message_copy_password">Copying passwords to clipboard may leak your password since any other app can listen to clipboard changes and read from it. Further it can remain there when you use a clipboard with history function (e.g. Samsung). " Use 'Privacy/Test C&amp;P password' to figure out if someone reads the clipboard beside you. You can disable this warning in 'Settings/Security'.</string>
+    <string name="message_copy_password">Copying passwords to clipboard may leak your passwords since any other app can listen to clipboard changes and read from it. Further it can remain there when you use a clipboard with history function (e.g. Samsung).  Use \'Privacy/Test C&amp;P password\' to figure out if someone reads the clipboard beside you. You can disable this warning in \'Settings/Security\'.</string>
     <string name="head_generate_mpt">Your Master Password Token \#%1$d</string>
     <string name="sub_generate_mpt">Take this token in your wallet to scan for login. If you loose it, just create a new one.</string>
     <string name="title_generate_mpt">Generate master password token</string>
@@ -319,10 +319,10 @@
     <string name="deobfuscate_restored">Origin password restored</string>
     <string name="verify_test">Verify QR code / NFC tag</string>
     <string name="import_credential">Import credential</string>
-    <string name="import_read_credential">Import / read external credential</string>
+    <string name="import_read_credential">Import / read exported credential</string>
     <string name="button_close">Close</string>
     <string name="verify_exported_data_explanation">Scan a QR code or read a NFC tag to find out if it is well known for your current vault. This is useful when you have forgotten what data a QR code or NFC tag contains.</string>
-    <string name="import_exported_data_explanation">Here you can read or import an external credential from a QR code or a NFC tag. The credential will be immediately displayed after you have scanned it. There you have the chance to import it to your vault.</string>
+    <string name="import_exported_data_explanation">Here you can read or import an exported credential from a QR code or a NFC tag. The credential will be immediately displayed after you have scanned it. There you have the chance to import it to your vault.</string>
     <string name="scan_qr_or_nfc">Scan QR code or read NFC tag</string>
     <string name="scanning_qrcode">Scanning a QR code</string>
     <string name="unknown_qr_code_or_nfc_tag">Unknown QR code or NFC tag</string>
@@ -343,8 +343,8 @@
     <string name="credential_imported">Credential \'%1$s\' imported</string>
     <string name="delete_unused_labels">Delete all unused labels</string>
     <string name="message_delete_unused_labels">Do you really want to delete all unused labels?</string>
-    <string name="no_unused_credentials_to_delete">No unused credentials to delete</string>
-    <string name="unused_credentials_deleted">%1$d unused credentials deleted</string>
+    <string name="no_unused_labels_to_delete">No unused labels to delete</string>
+    <string name="unused_labels_deleted">%1$d unused labels deleted</string>
     <string name="this_app_is_foss">This app is Open Source and published under the MIT licence.</string>
     <string name="visit_foss_site">Visit %1$s to inspect the licence, the code and to report issues or bugs.</string>
     <string name="credential_duplicated">Credential duplicated</string>
@@ -479,7 +479,8 @@
     <string name="message_change_language">The selected language will be fully available after restarting the app.</string>
     <string name="hint_edit_credential_user">The credential user</string>
     <string name="message_protect_masterpasswd">"Do you want to protect the exported master password? You can protect it with a code word or any else which is needed to access that particular exported master password. So if you login using it you will need that code word as well (besides your common pin), but you don't need it if you store the master password on the device or use a Master Password Token. </string>
-    <string name="yes_do_it">Yes, protect it</string>
+    <string name="yes_continue">Yes, continue</string>
+    <string name="yes_protect_it">Yes, protect it</string>
     <string name="no_thanks">No, thanks</string>
     <string name="enter_codeword">Enter a code word</string>
     <string name="repeat_codeword">Repeat the code word</string>

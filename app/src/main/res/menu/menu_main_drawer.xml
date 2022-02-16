@@ -20,7 +20,7 @@
         </menu>
     </item>
 
-    <item android:title="@string/export" >
+    <item android:title="@string/action_export" >
         <menu >
             <item
                 android:id="@+id/export_encrypted_masterpasswd"

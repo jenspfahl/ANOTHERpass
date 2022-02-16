@@ -27,7 +27,7 @@ object ExportEncMasterPasswordUseCase:
         DeobfuscationDialog.openObfuscationDialog(activity,
             activity.getString(R.string.export_masterpasswd),
             activity.getString(R.string.message_protect_masterpasswd),
-            activity.getString(R.string.yes_do_it),
+            activity.getString(R.string.yes_protect_it),
             activity.getString(R.string.no_thanks))
         { obfuscationKey ->
             UseCaseBackgroundLauncher(ExportEncMasterPasswordUseCase)
