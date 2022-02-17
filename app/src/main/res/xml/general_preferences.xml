@@ -67,7 +67,7 @@
 
     <SwitchPreferenceCompat
         app:key="YAPM/pref:colorize_mp_qrcodes"
-        app:title="Colorize QR codes"
+        app:title="@string/colorize_qr_codes"
         app:summary="@string/pref_general_colorize_qrcodes"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
@@ -76,7 +76,7 @@
 
     <SwitchPreferenceCompat
         app:key="YAPM/pref:qrcodes_with_header"
-        app:title="Print QR code header"
+        app:title="@string/print_qr_code_header"
         app:summary="@string/pref_general_qrcodes_with_header"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"

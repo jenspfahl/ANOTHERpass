@@ -136,7 +136,7 @@
     <string name="change_master_password">Change master password</string>
     <string name="change_master_password_explanation">Change your master password by enter your current pin and generate a new master password. Note, that the Encrypted Master Key will be changed, so you need to export it again. This also effects old vault export files with the old key. You should also export your master password and tokens again.</string>
     <string name="vault">Vault</string>
-    <string name="delete_stored_masterpasswd_confirmation">Do you want to delete the stored master password from this device? For future logins you will need the (exported) master password then.</string>
+    <string name="delete_stored_masterpasswd_confirmation">Do you want to delete the stored master password from this device? For future logins you will need the (exported) master password or a Master Password Token then.</string>
     <string name="pref_header_general">General</string>
     <string name="pref_header_security">Security</string>
     <string name="title_activity_settings">Settings</string>
@@ -220,7 +220,7 @@
     <string name="drop_to_go_back">DROP TO GO BACK</string>
 
     <string name="vault_export_info">"Vault (Id = %4$s) exported at %1$s, contains %2$s credentials and %3$s labels"</string>
-    <string name="vault_export_info2">"Vault file exported at %1$s, contains %2$s credentials and %3$s labels"</string>
+    <string name="vault_export_info2">"Vault file exported at %1$s, contains totally %2$s credentials and %3$s labels"</string>
     <string name="scan_masterkey_first">Scan your master key first</string>
     <string name="not_an_emk">This is not an Encrypted Master Key</string>
 
@@ -371,8 +371,8 @@
     <string name="pref_clipboard_summary_enable">Copying passwords to clipboard is dangerous and could leak your password to any other app that observe the system clipboard. Use this option with care!</string>
     <string name="pref_clipboard_show_warning">Show warning when copying password to clipboard</string>
     <string name="pref_login_drop_vault">DROP VAULT(!!!) after max failed login attempts</string>
-    <string name="pref_login_summary_off_drop_vault">If somebody gathers your master password (or token) the pin is the only protection anymore. Self destruction may protect your data in a hard way. Ensure you have always a backup of your vault!</string>
-    <string name="pref_login_summary_on_drop_vault">If somebody gathers your master password (or token) the pin is the only protection anymore. Self destruction is activated after defined maximum login attempts. Ensure you have always a backup of your vault!</string>
+    <string name="pref_login_summary_off_drop_vault">If somebody gathers your unprotected master password or token the pin is the only protection anymore. Self destruction may protect your data in a hard way. Ensure you have always a backup of your vault!</string>
+    <string name="pref_login_summary_on_drop_vault">If somebody gathers your unprotected master password or token the pin is the only protection anymore. Self destruction is activated after defined maximum login attempts. Ensure you have always a backup of your vault!</string>
     <string name="pref_login_scan_qrcode">Scan master password QR code and login immediately</string>
     <string name="pref_login_summary_off_scan_qrcode">Master password can be typed manually or scanned from QR code</string>
     <string name="pref_login_summary_on_scan_qrcode">Opens the QR code scanner immediately if master password is not stored on device and logs in afterwards</string>
@@ -419,15 +419,13 @@
     <string name="biometric_not_supported">Biometric not available on this device</string>
     <string name="fingerprint_not_enrolled">Fingerprint not enrolled for this device</string>
     <string name="howto_biometrics_for_smp_title">How to use biometrics for stored master password</string>
-    <string name="howto_biometrics_for_smp_text">First, enrol fingerprints on your device. Next, remove stored master password and set it again authenticated with your fingerprint.</string>
+    <string name="howto_biometrics_for_smp_text">First, enrol biometrics (e.g. fingerprints) on your device. Next, remove stored master password and set it again authenticated with your biometric.</string>
     <string name="pref_header_reminder">Reminders</string>
     <string name="reminder_period_title">How often to show reminders</string>
     <string name="pref_auth_smp_with_biometric_title">Authorize stored master passwords with biometric</string>
     <string name="pref_auth_smp_with_biometric_summary">It is highly recommend to protect stored master passwords with e.g. a fingerprint to mitigate the risk of getting it stolen by compromised malware. (Only if your device supports it.) Note: An already stored master password is not touched by changeing this setting now. You have to remove it and set it again to take this setting in effect.</string>
     <string name="auth_to_decrypt_emp_omit">Scan Master Password</string>
     <string name="intro">Show intro</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="intro_1_head">Another way to manage passwords</string>
     <string name="intro_1_subtext">ANOTHERpass is another approach of a password manager. See what it means:</string>
     <string name="intro_2_head">ANOTHERpass generates easy but strong passwords for you. It uses so called \'Pseudo Phrases\' by default which looks like real words but are still very random and unpredictable. See this random example (click on it to re-generate):</string>
@@ -456,7 +454,7 @@
     <string name="duplicate_of_name" translatable="false">%1$s (copied)</string>
     <string name="nothing_to_import">Nothing to import</string>
     <string name="copy_origin">Make a copy of the origin record before updating it. Its name will be followed by \'(orig)\'.</string>
-    <string name="import_vault_override_explanation">Here you see the content of the loaded vault file. Only records that differs to the current are shown. You can expand the lists and check or uncheck each record to select which should be imported. To see details, click on them.</string>
+    <string name="import_vault_override_explanation">Here you see the content of the loaded vault file, but only records that differs to the current vault! You can expand the lists and check or uncheck each record to select which should be imported. To see details, click on them.</string>
     <string name="dont_think_about_passwords">Don\'t think about passwords!</string>
     <string name="details">Show details</string>
     <string name="title_credential_details">Credential details</string>
@@ -486,5 +484,37 @@
     <string name="repeat_codeword">Repeat the code word</string>
     <string name="unlock_masterpassword">Unlock Exported Master Password</string>
     <string name="message_unlock_masterpassword">The Exported Master Password (EMP) is protected with a codeword. Type it to unlock it.</string>
+
+    <string name="language_default">System default</string>
+    <string name="language_en">English</string>
+    <string name="language_de">German</string>
+    <string name="small">Small</string>
+    <string name="medium">Medium</string>
+    <string name="big">Big</string>
+
+    <string name="after_one_minute">After one minute</string>
+    <string name="after_two_minutes">After 2 minutes</string>
+    <string name="after_three_minutes">After 3 minutes</string>
+    <string name="after_five_minutes">After 5 minutes</string>
+    <string name="after_ten_minutes">After 10 minutes</string>
+    <string name="after_fifteen_minutes">After 15 minutes</string>
+    <string name="after_twenty_minutes">After 20 minutes</string>
+    <string name="after_thirty_minutes">After 30 minutes</string>
+    <string name="after_sixty_minutes">After one hour</string>
+
+    <string name="one_attempt">Only one attempt</string>
+    <string name="two_attempts">2 attempts</string>
+    <string name="three_attempts">3 attempts</string>
+    <string name="five_attempts">5 attempts</string>
+    <string name="ten_attempts">10 attempts</string>
+
+    <string name="reminder_period_10_min">Every 10 minutes</string>
+    <string name="reminder_period_30_min">Every 30 minutes</string>
+    <string name="reminder_period_1_hour">Every hour</string>
+    <string name="reminder_period_1_day">Once a day</string>
+    <string name="reminder_period_1_week">Once a week</string>
+    <string name="colorize_qr_codes">Colorize QR codes</string>
+    <string name="print_qr_code_header">Print QR code header</string>
+    <string name="autofill_suggest_everywhere">Autofill suggestion everywhere</string>
 
 </resources>
