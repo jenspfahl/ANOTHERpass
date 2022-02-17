@@ -51,7 +51,8 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         }
 
         val enableOverlayFeature = PreferenceService.getAsBool(PREF_ENABLE_OVERLAY_FEATURE, listCredentialsActivity)
-        if (!enableOverlayFeature) {
+        val inAutofillMode = listCredentialsActivity.shouldPushBackAutoFill()
+        if (inAutofillMode || !enableOverlayFeature) {
             holder.hideDetachPasswordIcon()
         }
 

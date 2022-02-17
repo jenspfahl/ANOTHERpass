@@ -34,8 +34,8 @@ import de.jepfa.yapm.util.*
 
 class EditCredentialPasswordFragment : SecureFragment() {
 
-    val PASSPHRASE_STRENGTH_DEFAULT = SecretStrength.STRONG
-    val PASSWORD_STRENGTH_DEFAULT = SecretStrength.STRONG
+    private val PASSPHRASE_STRENGTH_DEFAULT = SecretStrength.STRONG
+    private val PASSWORD_STRENGTH_DEFAULT = SecretStrength.STRONG
 
     private lateinit var currentCredential: EncCredential
     private lateinit var editCredentialActivity: EditCredentialActivity
@@ -606,7 +606,8 @@ class EditCredentialPasswordFragment : SecureFragment() {
         }
 
         val enableOverlayFeature = PreferenceService.getAsBool(PreferenceService.PREF_ENABLE_OVERLAY_FEATURE, getBaseActivity())
-        if (!enableOverlayFeature) {
+        val inAutofillMode = editCredentialActivity.shouldPushBackAutoFill()
+        if (inAutofillMode || !enableOverlayFeature) {
             menu.findItem(R.id.menu_detach_credential)?.isVisible = false
         }
 
