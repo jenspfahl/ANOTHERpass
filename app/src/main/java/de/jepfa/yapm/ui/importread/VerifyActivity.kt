@@ -19,6 +19,7 @@ import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromS
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.credential.DeobfuscationDialog
+import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
 
 
 class VerifyActivity : ReadActivityBase() {
@@ -132,7 +133,7 @@ class VerifyActivity : ReadActivityBase() {
     }
 
     private fun checkContainer(scanned: String) {
-        val content = VaultExportService.parseVaultFileContent(scanned)
+        val content = ImportVaultUseCase.parseVaultFileContent(scanned, this)
         if (content != null) {
             ExportContainer.fromJson(content)?.let { exportContainer ->
                 when (exportContainer.c) {

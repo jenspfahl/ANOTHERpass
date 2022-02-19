@@ -14,6 +14,7 @@ object PreferenceService {
 
     private const val PREF_PREFIX = "YAPM/pref:"
     private const val DATA_PREFIX = "YAPM/data:"
+    private const val TEMP_PREFIX = "YAPM/temp:"
     private const val STATE_PREFIX = "YAPM/state:"
     private const val ACTION_PREFIX = "YAPM/action:"
 
@@ -114,6 +115,10 @@ object PreferenceService {
 
     const val STATE_REQUEST_CREDENTIAL_LIST_RELOAD = STATE_PREFIX + "request_credential_list_reload"
     const val STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD = STATE_PREFIX + "request_credential_list_activity_reload"
+
+    const val TEMP_BLOB_CREDENTIALS = TEMP_PREFIX + "blob_credentials"
+    const val TEMP_BLOB_LABELS = TEMP_PREFIX + "blob_labels"
+    const val TEMP_BLOB_SETTINGS = TEMP_PREFIX + "blob_settings"
 
 
     fun initDefaults(context: Context?) {
@@ -245,6 +250,12 @@ object PreferenceService {
     fun deleteAllData(context: Context) {
         getDefault(context).all
             .filter { (k, _) -> k.startsWith(DATA_PREFIX) }
+            .forEach { (k, _) -> delete(k, context)}
+    }
+
+    fun deleteAllTempData(context: Context) {
+        getDefault(context).all
+            .filter { (k, _) -> k.startsWith(TEMP_PREFIX) }
             .forEach { (k, _) -> delete(k, context)}
     }
 

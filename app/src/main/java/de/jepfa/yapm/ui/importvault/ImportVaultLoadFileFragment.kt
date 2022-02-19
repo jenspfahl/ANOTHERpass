@@ -75,7 +75,8 @@ class ImportVaultLoadFileFragment : BaseFragment() {
                         val baseActivity = getBaseActivity() ?: return
                         val content = FileUtil.readFile(baseActivity, selectedFile)
                         if (content != null) {
-                            getImportVaultActivity().jsonContent = VaultExportService.parseVaultFileContent(content)
+                            getImportVaultActivity().jsonContent = ImportVaultUseCase.parseVaultFileContent(
+                                content, importVaultActivity, handleBlob = true)
                         }
                     } catch (e: Exception) {
                         Log.e("RESTORE", "cannot import file $selectedFile", e)

@@ -10,6 +10,7 @@ import de.jepfa.yapm.model.export.PlainShareableCredential
 import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.credential.ShowCredentialActivity
+import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
 import de.jepfa.yapm.util.toUUIDFromBase64String
 import de.jepfa.yapm.util.toastText
 
@@ -29,7 +30,7 @@ class ImportCredentialActivity : ReadActivityBase() {
     }
 
     private fun extractCredential(scanned: String): EncCredential? {
-        val content = VaultExportService.parseVaultFileContent(scanned)
+        val content = ImportVaultUseCase.parseVaultFileContent(scanned, this)
         if (content != null) {
             ExportContainer.fromJson(content)?.let { exportContainer ->
                 when (exportContainer.c) {

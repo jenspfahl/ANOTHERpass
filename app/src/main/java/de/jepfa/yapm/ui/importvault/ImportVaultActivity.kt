@@ -3,8 +3,8 @@ package de.jepfa.yapm.ui.importvault
 import android.os.Bundle
 import com.google.gson.JsonObject
 import de.jepfa.yapm.R
-import de.jepfa.yapm.service.io.VaultExportService.parseVaultFileContent
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.usecase.vault.ImportVaultUseCase.parseVaultFileContent
 
 class ImportVaultActivity : SecureActivity() {
 
@@ -17,7 +17,7 @@ class ImportVaultActivity : SecureActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         savedInstanceState?.getString("JSON")?.let {
-            jsonContent = parseVaultFileContent(it)
+            jsonContent = parseVaultFileContent(it, this)
         }
 
         super.onCreate(savedInstanceState)

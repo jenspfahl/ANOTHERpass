@@ -75,7 +75,7 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
                 existingCredentials.mapNotNull { it.uid }.toSet()
 
             val credentialsJson =
-                jsonContent.getAsJsonArray(VaultExportService.JSON_CREDENTIALS)
+                jsonContent.get(VaultExportService.JSON_CREDENTIALS)?.asJsonArray ?: emptyList()
 
             val externalCredentials = credentialsJson
                 .map { json -> EncCredential.fromJson(json) }
@@ -125,7 +125,7 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
                 existingLabels.mapNotNull { it.uid }.toSet()
 
             val labelsJson =
-                jsonContent.getAsJsonArray(VaultExportService.JSON_LABELS)
+                jsonContent.get(VaultExportService.JSON_LABELS)?.asJsonArray ?: emptyList()
 
             val externalLabels = labelsJson
                 .map { json -> EncLabel.fromJson(json) }

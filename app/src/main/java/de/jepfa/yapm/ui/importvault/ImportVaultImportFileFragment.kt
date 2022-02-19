@@ -61,10 +61,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
 
         mkTextView = view.findViewById(R.id.text_scan_mk)
 
-        val jsonContent = getImportVaultActivity().jsonContent
-        if (jsonContent == null) {
-            return
-        }
+        val jsonContent = getImportVaultActivity().jsonContent ?: return
 
         val createdAt = jsonContent.get(VaultExportService.JSON_CREATION_DATE)?.asString
         val credentialsCount = jsonContent.get(VaultExportService.JSON_CREDENTIALS_COUNT)?.asString
