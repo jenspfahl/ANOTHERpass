@@ -27,7 +27,7 @@ object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActi
         val vaultVersion = PreferenceService.getAsString(
             PreferenceService.DATA_VAULT_VERSION,
             activity
-        ) ?: Constants.UNKNOWN_VAULT_VERSION
+        ) ?: Constants.INITIAL_VAULT_VERSION
         val vaultCreatedAt = PreferenceService.getAsDate(
             PreferenceService.DATA_VAULT_CREATED_AT,
             activity

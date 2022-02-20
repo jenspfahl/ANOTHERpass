@@ -22,7 +22,9 @@ object Constants {
         SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM)
     val SDF_D_INTERNATIONAL: DateFormat = SimpleDateFormat("yyyy-MM-dd")
 
-    val UNKNOWN_VAULT_VERSION = 1
-    val FAST_KEYGEN_VAULT_VERSION = 2
+    // Note: This is actually not a vault version rather than a Masterkey interpretation. So new vault versions should be handled differently !
+    const val INITIAL_VAULT_VERSION = 1
+    const val FAST_KEYGEN_VAULT_VERSION = 2
+    const val CURRENT_VERSION = FAST_KEYGEN_VAULT_VERSION
 
 }

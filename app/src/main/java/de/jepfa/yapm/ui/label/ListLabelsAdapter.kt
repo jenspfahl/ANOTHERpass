@@ -18,10 +18,7 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.label.LabelsHolder
-import de.jepfa.yapm.util.DebugInfo
-import de.jepfa.yapm.util.addFormattedLine
-import de.jepfa.yapm.util.observeOnce
-import de.jepfa.yapm.util.toBase64String
+import de.jepfa.yapm.util.*
 
 
 class ListLabelsAdapter(private val listLabelsActivity: ListLabelsActivity) :
@@ -58,7 +55,11 @@ class ListLabelsAdapter(private val listLabelsActivity: ListLabelsActivity) :
                     val sb = StringBuilder()
 
                     encLabel.id?.let { sb.addFormattedLine(listLabelsActivity.getString(R.string.identifier), it)}
-                    encLabel.uid?.let { sb.addFormattedLine(listLabelsActivity.getString(R.string.universal_identifier), it.toBase64String())}
+                    encLabel.uid?.let {
+                        sb.addFormattedLine(
+                            listLabelsActivity.getString(R.string.universal_identifier),
+                            shortenBase64String(it.toBase64String()))
+                    }
                     sb.addFormattedLine(listLabelsActivity.getString(R.string.name), current.name)
                     AlertDialog.Builder(listLabelsActivity)
                         .setTitle(R.string.title_label_details)

@@ -32,7 +32,7 @@ object CreateVaultUseCase: InputUseCase<CreateVaultUseCase.Input, BaseActivity>(
 
         PreferenceService.putString(
             PreferenceService.DATA_VAULT_VERSION,
-            Constants.FAST_KEYGEN_VAULT_VERSION.toString(),
+            Constants.CURRENT_VERSION.toString(),
             activity
         )
         PreferenceService.putString(

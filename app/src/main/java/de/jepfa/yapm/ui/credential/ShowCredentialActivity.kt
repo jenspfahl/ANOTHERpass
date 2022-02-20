@@ -315,7 +315,11 @@ class ShowCredentialActivity : SecureActivity() {
                 val sb = StringBuilder()
 
                 credential.id?.let { sb.addFormattedLine(getString(R.string.identifier), it)}
-                credential.uid?.let { sb.addFormattedLine(getString(R.string.universal_identifier), it.toBase64String())}
+                credential.uid?.let {
+                    sb.addFormattedLine(
+                        getString(R.string.universal_identifier),
+                        shortenBase64String(it.toBase64String()))
+                }
 
                 masterSecretKey?.let { key ->
                     val name = decryptCommonString(key, credential.name)

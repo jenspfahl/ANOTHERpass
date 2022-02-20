@@ -129,7 +129,7 @@ object VaultExportService {
 
         val vaultVersion =
             PreferenceService.getAsString(PreferenceService.DATA_VAULT_VERSION, context)
-            ?: Constants.UNKNOWN_VAULT_VERSION.toString()
+            ?: Constants.INITIAL_VAULT_VERSION.toString()
         root.addProperty(JSON_VAULT_VERSION, vaultVersion)
 
         val cipherAlgorithm = SecretService.getCipherAlgorithm(context)

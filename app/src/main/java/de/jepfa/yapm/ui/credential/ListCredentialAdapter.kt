@@ -85,7 +85,11 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             val sb = StringBuilder()
 
             current.id?.let { sb.addFormattedLine(listCredentialsActivity.getString(R.string.identifier), it)}
-            current.uid?.let { sb.addFormattedLine(listCredentialsActivity.getString(R.string.universal_identifier), it.toBase64String())}
+            current.uid?.let {
+                sb.addFormattedLine(
+                    listCredentialsActivity.getString(R.string.universal_identifier),
+                    shortenBase64String(it.toBase64String()))
+            }
 
             listCredentialsActivity.masterSecretKey?.let { key ->
                 val name = SecretService.decryptCommonString(key, current.name)

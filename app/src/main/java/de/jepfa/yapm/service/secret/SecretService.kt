@@ -164,8 +164,12 @@ object SecretService {
     }
 
     private fun decryptData(secretKeyHolder: SecretKeyHolder, encrypted: Encrypted): ByteArray {
+        if (encrypted.isEmpty()) {
+            Log.e("SS", "empty encrypted")
+            return FAILED_BYTE_ARRAY
+        }
         if (secretKeyHolder.cipherAlgorithm != encrypted.cipherAlgorithm) {
-            Log.e("SS", "cipher algorithm missmatch")
+            Log.e("SS", "cipher algorithm mismatch")
             return FAILED_BYTE_ARRAY
         }
 

@@ -7,6 +7,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import de.jepfa.yapm.R
+import de.jepfa.yapm.model.Validable
 import de.jepfa.yapm.model.encrypted.*
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
@@ -17,6 +18,7 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.InputUseCase
+import de.jepfa.yapm.util.Constants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -74,6 +76,10 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
                             val jsonCredentialsAsString =
                                 SecretService.decryptCommonString(masterKeySK, encJsonCredentials)
 
+                            if (jsonCredentialsAsString == Validable.FAILED_STRING) {
+                                return null
+                            }
+
                             val jsonCredentials = JsonParser.parseString(jsonCredentialsAsString).asJsonArray
                             rawJson.add(VaultExportService.JSON_CREDENTIALS, jsonCredentials)
                         }
@@ -99,6 +105,10 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
                                 Encrypted.fromBase64String(encJsonLabelsAsString)
                             val jsonLabelsAsString =
                                 SecretService.decryptCommonString(masterKeySK, encJsonLabels)
+
+                            if (jsonLabelsAsString == Validable.FAILED_STRING) {
+                                return null
+                            }
 
                             val jsonLabels = JsonParser.parseString(jsonLabelsAsString).asJsonArray
                             rawJson.add(VaultExportService.JSON_LABELS, jsonLabels)
@@ -126,6 +136,10 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
                                 Encrypted.fromBase64String(encJsonAppSettingsAsString)
                             val jsonAppSettingsAsString =
                                 SecretService.decryptCommonString(masterKeySK, encJsonAppSettings)
+
+                            if (jsonAppSettingsAsString == Validable.FAILED_STRING) {
+                                return null
+                            }
 
                             val jsonAppSettings = JsonParser.parseString(jsonAppSettingsAsString).asJsonObject
                             rawJson.add(VaultExportService.JSON_APP_SETTINGS, jsonAppSettings)
@@ -158,27 +172,30 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
         if (stagedEncCredentials != null) {
             val encCredentials = Encrypted.fromBase64String(stagedEncCredentials)
             val jsonCredentialsAsString = SecretService.decryptCommonString(masterSecretKey, encCredentials)
-            val jsonCredentials = JsonParser.parseString(jsonCredentialsAsString).asJsonArray
-            
-            persistCredentials(jsonCredentials, activity)
+            if (jsonCredentialsAsString != Validable.FAILED_STRING) {
+                val jsonCredentials = JsonParser.parseString(jsonCredentialsAsString).asJsonArray
+                persistCredentials(jsonCredentials, activity)
+            }
             PreferenceService.delete(PreferenceService.TEMP_BLOB_CREDENTIALS, activity)
         }
 
         if (stagedEncLabels != null) {
             val encLabels = Encrypted.fromBase64String(stagedEncLabels)
             val jsonLabelsAsString = SecretService.decryptCommonString(masterSecretKey, encLabels)
-            val jsonLabels = JsonParser.parseString(jsonLabelsAsString).asJsonArray
-            
-            persistLabels(jsonLabels, activity)
+            if (jsonLabelsAsString != Validable.FAILED_STRING) {
+                val jsonLabels = JsonParser.parseString(jsonLabelsAsString).asJsonArray
+                persistLabels(jsonLabels, activity)
+            }
             PreferenceService.delete(PreferenceService.TEMP_BLOB_LABELS, activity)
         }
         
         if (stagedEncAppSettings != null) {
             val encAppSettings = Encrypted.fromBase64String(stagedEncAppSettings)
             val jsonAppSettingsAsString = SecretService.decryptCommonString(masterSecretKey, encAppSettings)
-            val jsonAppSettings = JsonParser.parseString(jsonAppSettingsAsString).asJsonObject
-            
-            persistAppSettings(jsonAppSettings, activity)
+            if (jsonAppSettingsAsString != Validable.FAILED_STRING) {
+                val jsonAppSettings = JsonParser.parseString(jsonAppSettingsAsString).asJsonObject
+                persistAppSettings(jsonAppSettings, activity)
+            }
             PreferenceService.delete(PreferenceService.TEMP_BLOB_SETTINGS, activity)
         }
 
@@ -201,11 +218,17 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
         val cipherAlgorithm = extractCipherAlgorithm(jsonContent)
 
         if (Build.VERSION.SDK_INT < cipherAlgorithm.supportedSdkVersion) {
+            Log.e("IMPV", "Unsupported cipher algorithm $cipherAlgorithm")
             return false
         }
 
-        val vaultVersion = jsonContent.get(VaultExportService.JSON_VAULT_VERSION)?.asString ?: "1"
-        PreferenceService.putString(PreferenceService.DATA_VAULT_VERSION, vaultVersion, activity)
+        val vaultVersion = jsonContent.get(VaultExportService.JSON_VAULT_VERSION)?.asInt
+            ?: Constants.INITIAL_VAULT_VERSION
+        if (vaultVersion > Constants.CURRENT_VERSION) {
+            Log.e("IMPV", "Unsupported vault version $vaultVersion")
+            return false
+        }
+        PreferenceService.putString(PreferenceService.DATA_VAULT_VERSION, vaultVersion.toString(), activity)
 
         PreferenceService.putString(
             PreferenceService.DATA_CIPHER_ALGORITHM,

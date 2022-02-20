@@ -33,6 +33,13 @@ fun enrichId(context: Context, name: String, id: Int?): String {
     return if (showIds) "$name [:${id?:"?"}]" else name
 }
 
+fun shortenBase64String(base64String: String): String {
+    return base64String
+        .toLowerCase(Locale.ROOT)
+        .replace(Regex("[^0-9a-z]"),"")
+        .take(8)
+}
+
 fun createAndAddLabelChip(
     label: Label,
     container: ViewGroup,
