@@ -17,6 +17,7 @@ Ebenso verwendet die App eine clevere Zwei-Faktor-Authentifizierung, um den Tres
 - Option um einzelne Zugangsdaten zu exportieren bzw. auszulagern
 - Verschleierung von einzelnen Passwörtern als zusätzlicher Schutz möglich
 - Wahlweise Selbstzerstörungsmodus bei zu vielen gescheiterten Loginversuchen
+- Dark-Theme Support ;-)
 
 
 Für mehr Informationen siehe https://anotherpass.jepfa.de

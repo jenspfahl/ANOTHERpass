@@ -23,6 +23,7 @@ The motivation for this app was curiosity of how encryption works, how to implem
 >* share and outsource credentials
 >* obfuscate passwords
 >* self destruction mode
+>* Dark Theme support ;-)
 
 For more information see [https://anotherpass.jepfa.de](https://anotherpass.jepfa.de)
 

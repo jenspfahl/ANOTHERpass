@@ -429,7 +429,7 @@
     <string name="intro_4_bullet_1">Exportiere es als QR-Code. Drucke es auf Papier, z.B. mit einem Kopierer.</string>
     <string name="intro_4_bullet_2">Falls dein Gerät NFC unterstützt, kaufe ein NFC-Tag (ca. 3€) und exportiere es darauf.</string>
     <string name="intro_4_bullet_3">Als Alternative kannst du das Masterpasswort auch aufschreiben.</string>
-    <string name="intro_4_bullet_4">Zusätzlich kannst du das es auch auf dem Gerät in der App mit einem biometrischen Merkmal (z.B. Fingerabdruck) speichern. Dann kannst du dich bequemer einloggen.</string>
+    <string name="intro_4_bullet_4">Zusätzlich kannst du es auch auf dem Gerät in der App mit einem biometrischen Merkmal (z.B. Fingerabdruck) speichern. Dann kannst du dich bequemer einloggen.</string>
     <string name="intro_5_head">ANOTHERpass ist sicher</string>
     <string name="intro_5_subtext">ANOTHERpass verhindert typische sicherheitsrelevante Fallstricke.</string>
     <string name="intro_5_bullet_1">Passwörter in die Zwischenablage zu kopieren ist standardmäßig deaktiviert. Dies ist nämlich ein Sicherheitsrisiko, da alle anderen Apps auf die Zwischenablage zugreifen können.</string>
