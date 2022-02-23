@@ -72,7 +72,7 @@
     <string name="pin_wrong">Wrong PIN</string>
     <string name="button_create_vault">Create vault</string>
     <string name="create_vault_explanation_3">Here you see again your master password. Export it as QR code or NFC tag by clicking on the corresponding icon or note it on a safe piece of paper. (If you decide to export as QR code you can either download it as image file of just photograph or copy the QR code directly from your phone.) Store it safely. You will need it together with your PIN to login into the vault. \nFor more convenience you may additionally store it on this device for faster login (biometric criteria may be needed).</string>
-    <string name="store_master_password">Store master password on this device</string>
+    <string name="store_master_password">Store master password on device</string>
     <string name="create_vault_summarize_fragment_label">Create Vault 3/3</string>
     <string name="login_explanation_1">Enter your PIN to login into your vault.</string>
     <string name="login_explanation_2">Scan your Exported Master Password (EMP) or your Master Password Token (MPT) by clicking on the QR-code or NFC icon. If you have noted it, enter it here manually.</string>
@@ -184,7 +184,7 @@
     <string name="pref_header_clipboard">Clipboard settings</string>
     <string name="button_write_nfc">Write NFC tag</string>
     <string name="nfc_explanation_readonly">Tap the tag on your device to read from it.</string>
-    <string name="nfc_explanation_readwrite">Tap the tag on your device to read from it and click the button to write data on it.</string>
+    <string name="nfc_explanation_readwrite">Tap the tag on your device and click the button to write data on it.</string>
     <string name="nfc_tapping_needed">Tap a NFC tag on your device first</string>
     <string name="nfc_not_enough_space">Not enough space on NFC tag</string>
     <string name="nfc_successfully_written">NFC tag successfully written</string>
@@ -516,5 +516,6 @@
     <string name="colorize_qr_codes">Colorize QR codes</string>
     <string name="print_qr_code_header">Print QR code header</string>
     <string name="autofill_suggest_everywhere">Autofill suggestion everywhere</string>
+    <string name="report_a_bug">The bug report will be sent to a bug report tracker website (Github). You need a Github account for doing this. Additionally the report is copied to the clipboard. Thanks for helping.</string>
 
 </resources>

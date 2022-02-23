@@ -27,18 +27,18 @@ class ErrorActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_error)
         var error = findViewById<TextView>(R.id.bug_report)
-        val errorText = intent.getStringExtra("error")
+        val errorText = intent.getCharSequenceExtra("error") ?: ""
         error.text = errorText
 
         val buttonReportBug = findViewById<Button>(R.id.button_report_bug)
         buttonReportBug.setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle(R.string.button_report_bug)
-                .setMessage("The bug will be sent to a bug report tracker website (Github). Wou need a Github account for doing this. Additionally the bug is copied to the clipboard. Thanks for helping.")
+                .setMessage(R.string.report_a_bug)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.ok) { dialog, whichButton ->
                     ClipboardUtil.copy("bug report", errorText, this)
-                    val errorTextUrlSafe = URLEncoder.encode(errorText, "UTF-8")
+                    val errorTextUrlSafe = URLEncoder.encode(errorText.toString(), "UTF-8")
                     val bugReportUrl = Constants.BUG_REPORT_SITE.format("Something went wrong :-(", errorTextUrlSafe)
                     val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(bugReportUrl))
                     startActivity(browserIntent)

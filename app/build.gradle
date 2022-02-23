@@ -9,12 +9,12 @@ apply plugin: 'com.jaredsburrows.license'
 
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     defaultConfig {
         applicationId "de.jepfa.yapm"
         minSdkVersion 24
-        targetSdkVersion 29
+        targetSdkVersion 30
         // format: <XXYYZZZ>
         // XX=major (breaks compatibility to old apps)
         // YY=minor (new features)

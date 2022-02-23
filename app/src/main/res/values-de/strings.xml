@@ -508,5 +508,7 @@
     <string name="colorize_qr_codes">Coloriere QR-Codes</string>
     <string name="print_qr_code_header">Drucke QR-Code Kopfzeile</string>
     <string name="autofill_suggest_everywhere">Autofill-Vorschläge überall anzeigen</string>
+    <string name="report_a_bug">Der Fehlerbericht wird nun zu einer Bug-Tracking-Website (Github) gesendet. Dafür brauchst du ein Github-Konto. Außerdem wurde der Bericht in die Zwischenablage kopiert. Danke für deine Hilfe.</string>
+
 
 </resources>
