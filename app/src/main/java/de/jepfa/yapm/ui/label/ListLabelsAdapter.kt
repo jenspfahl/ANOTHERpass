@@ -89,15 +89,24 @@ class ListLabelsAdapter(private val listLabelsActivity: ListLabelsActivity) :
 
         fun listenForEditLabel(event: (position: Int, type: Int) -> Unit) {
             labelChip.setOnClickListener {
+                if (adapterPosition == RecyclerView.NO_POSITION) {
+                    return@setOnClickListener
+                }
                 event.invoke(adapterPosition, itemViewType)
             }
             labelUsageTextView.setOnClickListener {
+                if (adapterPosition == RecyclerView.NO_POSITION) {
+                    return@setOnClickListener
+                }
                 event.invoke(adapterPosition, itemViewType)
             }
         }
 
         fun listenForLongClick(event: (position: Int, type: Int) -> Unit) {
             labelChip.setOnLongClickListener {
+                if (adapterPosition == RecyclerView.NO_POSITION) {
+                    return@setOnLongClickListener false
+                }
                 event.invoke(adapterPosition, itemViewType)
                 true
             }
@@ -105,6 +114,9 @@ class ListLabelsAdapter(private val listLabelsActivity: ListLabelsActivity) :
 
         fun listenForDeleteLabel(event: (position: Int, type: Int) -> Unit) {
             labelDeleteImageView.setOnClickListener {
+                if (adapterPosition == RecyclerView.NO_POSITION) {
+                    return@setOnClickListener
+                }
                 event.invoke(adapterPosition, itemViewType)
             }
         }

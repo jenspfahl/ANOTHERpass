@@ -257,30 +257,45 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
 
         fun listenForShowCredential(event: (position: Int, type: Int) -> Unit) {
             credentialContainerView.setOnClickListener {
+                if (adapterPosition == RecyclerView.NO_POSITION) {
+                    return@setOnClickListener
+                }
                 event.invoke(adapterPosition, itemViewType)
             }
         }
 
         fun listenForDetachPasswd(event: (position: Int, type: Int) -> Boolean) {
             credentialDetachImageView.setOnClickListener {
+                if (adapterPosition == RecyclerView.NO_POSITION) {
+                    return@setOnClickListener
+                }
                 event.invoke(adapterPosition, itemViewType)
             }
         }
 
         fun listenForCopyPasswd(event: (position: Int, type: Int) -> Unit) {
             credentialCopyImageView.setOnClickListener {
+                if (adapterPosition == RecyclerView.NO_POSITION) {
+                    return@setOnClickListener
+                }
                 event.invoke(adapterPosition, itemViewType)
             }
         }
 
         fun listenForOpenMenu(event: (position: Int, type: Int, view: View) -> Unit) {
             credentialMenuImageView.setOnClickListener {
+                if (adapterPosition == RecyclerView.NO_POSITION) {
+                    return@setOnClickListener
+                }
                 event.invoke(adapterPosition, itemViewType, credentialMenuImageView)
             }
         }
 
         fun listenForLongClick(event: (position: Int, type: Int) -> Boolean) {
             credentialContainerView.setOnLongClickListener {
+                if (adapterPosition == RecyclerView.NO_POSITION) {
+                    return@setOnLongClickListener false
+                }
                 event.invoke(adapterPosition, itemViewType)
             }
         }
