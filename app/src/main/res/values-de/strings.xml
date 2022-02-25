@@ -441,7 +441,6 @@
     <string name="credentials_to_be_updated">%1$d von %2$d Zugangsdaten zum Ersetzen</string>
     <string name="labels_to_be_inserted">%1$d von %2$d Kategorien zum Wiederherstellen</string>
     <string name="labels_to_be_updated">%1$d von %2$d Kategorien zum Ersetzen</string>
-    <string name="copy_of_name">%1$s (orig)</string>
     <string name="nothing_to_import">Nichts zum Importieren</string>
     <string name="copy_origin">Erstelle eine Kopie des Originals bevor das Original überschrieben wird. Der Name der Kopie trägt \'(orig)\' am Ende.</string>
     <string name="import_vault_override_explanation">Hier siehst du den Inhalt der geladenen Tresor-Datei, allerdings nur Datensätze die sich zum aktuellen Tresor unterscheiden! Du kannst die Listen ausklappen und prüfen und jene Datensätze anhaken, die importiert werden sollen. Mit einem Klick auf den Datensatz siehst du mehr Details.</string>
@@ -450,7 +449,6 @@
     <string name="title_credential_details">Details der Zugangsdaten</string>
     <string name="last_modified">Zuletzt geändert</string>
     <string name="name">Name</string>
-    <string name="identifier">Id</string>
     <string name="source">Quelle</string>
     <string name="source_from_vault_file">von Tresor-Datei</string>
     <string name="source_from_record">von QR-Code oder NFC-Tag</string>
