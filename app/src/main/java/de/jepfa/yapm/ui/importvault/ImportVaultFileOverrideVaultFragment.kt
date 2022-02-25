@@ -69,9 +69,13 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
             importVaultActivity.credentialViewModel.allCredentials.observe(importVaultActivity) { existingCredentials ->
 
             val existingCredentialIds =
-                existingCredentials.filter { it.id != null }.map { it.id!! }
+                existingCredentials.mapNotNull { it.id }.toSet()
+
+            val existingCredentialUids =
+                existingCredentials.mapNotNull { it.uid }.toSet()
+
             val credentialsJson =
-                jsonContent.getAsJsonArray(VaultExportService.JSON_CREDENTIALS)
+                jsonContent.get(VaultExportService.JSON_CREDENTIALS)?.asJsonArray ?: emptyList()
 
             val externalCredentials = credentialsJson
                 .map { json -> EncCredential.fromJson(json) }
@@ -79,12 +83,14 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
 
             val credentialsToBeInserted = externalCredentials
                 .filterNot { existingCredentialIds.contains(it.id) }
+                .filterNot { existingCredentialUids.contains(it.uid) }
                 .map { ChildType(it.id!!, null, it) }
 
             val credentialsToBeUpdated = externalCredentials
                 .filter {
-                    existingCredentialIds.contains(it.id)
-                            && !existingCredentials.contains(it) // Note:this compares the whole data of a credential
+                    (existingCredentialIds.contains(it.id)
+                            || existingCredentialUids.contains(it.uid))
+                        && !existingCredentials.contains(it) // Note:this compares the whole data of a credential
                 }
                 .filterNot { isContentEqualTo(importVaultActivity.masterSecretKey, it, existingCredentials) }
                 .map { c -> ChildType(c.id!!, existingCredentials.find { it.id == c.id }, c) }
@@ -114,9 +120,12 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
         importVaultActivity.labelViewModel.allLabels.observe(importVaultActivity) { existingLabels ->
 
             val existingLabelIds =
-                existingLabels.filter { it.id != null }.map { it.id!! }
+                existingLabels.mapNotNull { it.id }.toSet()
+            val existingLabelUids =
+                existingLabels.mapNotNull { it.uid }.toSet()
+
             val labelsJson =
-                jsonContent.getAsJsonArray(VaultExportService.JSON_LABELS)
+                jsonContent.get(VaultExportService.JSON_LABELS)?.asJsonArray ?: emptyList()
 
             val externalLabels = labelsJson
                 .map { json -> EncLabel.fromJson(json) }
@@ -128,12 +137,14 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
 
             val labelsToBeInserted = externalLabels
                 .filterNot { existingLabelIds.contains(it.id) }
+                .filterNot { existingLabelUids.contains(it.uid) }
                 .map { ChildType(it.id!!, null, it) }
 
             val labelsToBeUpdated = externalLabels
                 .filter {
-                    existingLabelIds.contains(it.id)
-                            && !existingLabels.contains(it) // Note:this compares the whole data of a label
+                    (existingLabelIds.contains(it.id)
+                            || existingLabelUids.contains(it.uid))
+                        && !existingLabels.contains(it) // Note:this compares the whole data of a label
                 }
                 .filterNot { isContentEqualTo(importVaultActivity.masterSecretKey, it) }
                 .map { l -> ChildType(l.id!!, existingLabels.find { it.id == l.id }, l) }

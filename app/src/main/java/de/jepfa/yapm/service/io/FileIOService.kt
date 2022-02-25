@@ -65,7 +65,9 @@ class FileIOService: IntentService("FileIOService") {
             val includeMasterKey = intent.getBooleanExtra(PARAM_INCLUDE_MK, false)
             val includePreferences = intent.getBooleanExtra(PARAM_INCLUDE_PREFS, false)
             val uri = intent.getParcelableExtra<Uri>(PARAM_FILE_URI)
-            val success = createVaultFile(applicationContext, getApp(), includeMasterKey, includePreferences, uri)
+            val success =
+                if (uri != null) createVaultFile(applicationContext, getApp(), includeMasterKey, includePreferences, uri)
+                else false
 
             if (success) {
                 message = getString(R.string.backup_file_saved)
@@ -102,7 +104,9 @@ class FileIOService: IntentService("FileIOService") {
             val header = SecretService.decryptCommonString(tempKey, encHeader)
 
             val bitmap = QRCodeUtil.generateQRCode(header, qrc.toRawFormattedPassword(), qrcColor, this)
-            val success = bitmapToJpegFile(contentResolver, bitmap, uri)
+            val success =
+                if (uri != null) bitmapToJpegFile(contentResolver, bitmap, uri)
+                else false
             if (success) {
                 message = getString(R.string.qr_code_saved)
             }

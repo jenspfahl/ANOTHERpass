@@ -236,7 +236,8 @@ object ResponseFiller {
 
         if (suggestEverywhere && node.className != null) {
             val viewId = node.idEntry?.toLowerCase(Locale.ROOT)
-            if (viewId != null && node.className.contains(VIEW_TO_IDENTIFY)) {
+            val className = node.className
+            if (viewId != null && className != null && className.contains(VIEW_TO_IDENTIFY)) {
                 if (!suggestEverywhere && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                     if (node.importantForAutofill != View.IMPORTANT_FOR_AUTOFILL_NO) {
                         // only consider current node if AUTO and YES*

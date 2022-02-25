@@ -24,6 +24,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
@@ -34,7 +35,6 @@ import de.jepfa.yapm.service.PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_REL
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelFilter.WITH_NO_LABELS_ID
 import de.jepfa.yapm.service.label.LabelService
-import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.service.notification.ReminderService
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
 import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
@@ -50,7 +50,6 @@ import de.jepfa.yapm.ui.importvault.ImportVaultActivity
 import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.ui.label.ListLabelsActivity
 import de.jepfa.yapm.ui.settings.SettingsActivity
-import de.jepfa.yapm.usecase.*
 import de.jepfa.yapm.usecase.app.ShowInfoUseCase
 import de.jepfa.yapm.usecase.secret.ExportEncMasterKeyUseCase
 import de.jepfa.yapm.usecase.secret.ExportEncMasterPasswordUseCase
@@ -63,6 +62,10 @@ import de.jepfa.yapm.usecase.vault.ShowVaultInfoUseCase
 import de.jepfa.yapm.util.*
 import java.util.*
 import kotlin.collections.ArrayList
+import androidx.recyclerview.widget.DividerItemDecoration
+
+
+
 
 /**
  * This is the main activity
@@ -79,6 +82,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private var listCredentialAdapter: ListCredentialAdapter? = null
     private var credentialCount = 0
 
+    private var jumpToUuid: UUID? = null
+    private var jumpToItemPosition: Int? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list_credentials)
@@ -89,19 +95,44 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         listCredentialAdapter = ListCredentialAdapter(this)
         recyclerView.adapter = listCredentialAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
-        credentialsRecycleView = recyclerView
+        val showDividers = PreferenceService.getAsBool(PreferenceService.PREF_SHOW_DIVIDERS_IN_LIST, this)
+        if (showDividers) {
+            val dividerItemDecoration = DividerItemDecoration(
+                recyclerView.context,
+                DividerItemDecoration.VERTICAL
+            )
+            recyclerView.addItemDecoration(dividerItemDecoration)
+        }
 
-        refreshCredentials()
+        listCredentialAdapter?.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                val linearLayoutManager = credentialsRecycleView?.layoutManager as LinearLayoutManager
 
-        labelViewModel.allLabels.observe(this, { labels ->
-            masterSecretKey?.let{ key ->
-                LabelService.defaultHolder.initLabels(key, labels.toSet())
-                LabelFilter.initState(this, LabelService.defaultHolder.getAllLabels())
-                if (LabelFilter.hasFilters()) {
-                    refreshCredentials()
+                if (jumpToUuid != null) {
+                    val index = listCredentialAdapter?.currentList?.indexOfFirst { it.uid == jumpToUuid }
+                    index?.let {
+                        linearLayoutManager.scrollToPositionWithOffset(it, 10)
+                    }
+                } else {
+                    jumpToItemPosition?.let {
+                        linearLayoutManager.scrollToPositionWithOffset(it, 10)
+                    }
                 }
+                jumpToItemPosition = null
+                jumpToUuid = null
+
             }
         })
+
+        credentialsRecycleView = recyclerView
+
+        labelViewModel.allLabels.observe(this) { labels ->
+            masterSecretKey?.let { key ->
+                LabelService.defaultHolder.initLabels(key, labels.toSet())
+                LabelFilter.initState(this, LabelService.defaultHolder.getAllLabels())
+                refreshCredentials()
+            }
+        }
 
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
@@ -158,13 +189,16 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         val requestReload = PreferenceService.getAsBool(STATE_REQUEST_CREDENTIAL_LIST_RELOAD, applicationContext)
         val requestHardReload = PreferenceService.getAsBool(STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD, applicationContext)
-        if (requestReload) {
-            listCredentialAdapter?.notifyDataSetChanged()
-            PreferenceService.delete(STATE_REQUEST_CREDENTIAL_LIST_RELOAD, applicationContext)
-        }
-        else if (requestHardReload) {
-            recreate()
+        if (requestReload || requestHardReload) {
             PreferenceService.delete(STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD, applicationContext)
+            PreferenceService.delete(STATE_REQUEST_CREDENTIAL_LIST_RELOAD, applicationContext)
+
+            if (requestHardReload) {
+                recreate()
+            }
+            else {
+                listCredentialAdapter?.notifyDataSetChanged()
+            }
         }
 
         val view: View = findViewById(R.id.content_list_credentials)
@@ -364,7 +398,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         if (requestCode == newOrUpdateCredentialActivityRequestCode && resultCode == Activity.RESULT_OK) {
             data?.let {
 
-                val credential = EncCredential.fromIntent(it)
+                val credential = EncCredential.fromIntent(it, createUuid = true)
+                jumpToUuid = credential.uid
+
                 if (credential.isPersistent()) {
                     credentialViewModel.update(credential, this)
                 }
@@ -456,17 +492,15 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
                 return true
             }
-            R.id.generate_encrypted_masterpasswd -> {
+            R.id.generate_masterpasswd_token -> {
                 GenerateMasterPasswordTokenUseCase.openDialog(this)
                 return true
             }
             R.id.export_encrypted_masterpasswd -> {
                 val encMasterPasswd = Session.getEncMasterPasswd()
                 if (encMasterPasswd != null) {
-                    UseCaseBackgroundLauncher(ExportEncMasterPasswordUseCase)
-                        .launch(this,
-                            ExportEncMasterPasswordUseCase.Input(encMasterPasswd, false)
-                        )
+                    ExportEncMasterPasswordUseCase.startUiFlow(this, encMasterPasswd, noSessionCheck = false)
+
                     return true
                 } else {
                     return false
@@ -570,26 +604,33 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     private fun refreshCredentials() {
         credentialViewModel.allCredentials.removeObservers(this)
-        credentialViewModel.allCredentials.observe(this, { credentials ->
+        credentialViewModel.allCredentials.observe(this) { credentials ->
             credentials?.let { credentials ->
                 credentialCount = credentials.size
                 var sortedCredentials = credentials
 
                 masterSecretKey?.let { key ->
 
-                    credentials.forEach { LabelService.defaultHolder.updateLabelsForCredential(key, it) }
+                    credentials.forEach {
+                        LabelService.defaultHolder.updateLabelsForCredential(
+                            key,
+                            it
+                        )
+                    }
 
                     when (getPrefSortOrder()) {
                         CredentialSortOrder.CREDENTIAL_NAME_ASC -> {
                             sortedCredentials = credentials
                                 .sortedBy {
-                                    SecretService.decryptCommonString(key, it.name).toLowerCase(Locale.ROOT)
+                                    SecretService.decryptCommonString(key, it.name)
+                                        .toLowerCase(Locale.ROOT)
                                 }
                         }
                         CredentialSortOrder.CREDENTIAL_NAME_DESC -> {
                             sortedCredentials = credentials
                                 .sortedBy {
-                                    SecretService.decryptCommonString(key, it.name).toLowerCase(Locale.ROOT)
+                                    SecretService.decryptCommonString(key, it.name)
+                                        .toLowerCase(Locale.ROOT)
                                 }
                                 .reversed()
                         }
@@ -610,7 +651,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 listCredentialAdapter?.filter?.filter("")
 
             }
-        })
+        }
     }
 
     private fun refreshMenuMasterPasswordItem(menu: Menu) {
@@ -656,7 +697,19 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         return CredentialSortOrder.DEFAULT
     }
 
+    fun duplicateCredential(credential: EncCredential, key: SecretKeyHolder) {
+        val name = SecretService.decryptCommonString(key, credential.name)
+        val newName = getString(R.string.duplicate_of_name, name)
+        val encNewName = SecretService.encryptCommonString(key, newName)
+        val duplicated = credential.copy(id = null, uid = UUID.randomUUID(), name = encNewName)
+        jumpToUuid = duplicated.uid
+        credentialViewModel.insert(duplicated, this)
+        toastText(this, R.string.credential_duplicated)
+    }
+
     fun deleteCredential(credential: EncCredential) {
+        jumpToItemPosition = (credentialsRecycleView?.layoutManager as LinearLayoutManager)
+            .findFirstVisibleItemPosition()
         credentialViewModel.delete(credential)
         toastText(this, R.string.credential_deleted)
     }

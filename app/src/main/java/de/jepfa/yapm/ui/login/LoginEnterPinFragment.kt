@@ -98,9 +98,11 @@ class LoginEnterPinFragment : BaseFragment() {
                 login(pinTextView, userPin, masterPasswd, loginActivity)
             }
             else if (scannedNdefTag != null) {
-                val masterPasswd = loginActivity.readMasterPassword(scannedNdefTag)
-                if (masterPasswd != null) {
-                    login(pinTextView, userPin, masterPasswd, loginActivity)
+                loginActivity.readMasterPassword(scannedNdefTag)
+                { masterPasswd ->
+                    masterPasswd?.let {
+                        login(pinTextView, userPin, masterPasswd, loginActivity)
+                    }
                 }
             }
             else {

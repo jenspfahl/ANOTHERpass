@@ -277,7 +277,11 @@ class ShowCredentialActivity : SecureActivity() {
                         toastText(this, R.string.deobfuscate_restored)
                     } else {
 
-                        DeobfuscationDialog.openDeobfuscationDialog(this) { deobfuscationKey ->
+                        DeobfuscationDialog.openDeobfuscationDialogForCredentials(this) { deobfuscationKey ->
+                            if (deobfuscationKey == null) {
+                                return@openDeobfuscationDialogForCredentials
+                            }
+
                             maskPassword = false
                             item.isChecked = true
 
@@ -310,7 +314,12 @@ class ShowCredentialActivity : SecureActivity() {
             if (id == R.id.menu_details) {
                 val sb = StringBuilder()
 
-                sb.addFormattedLine(getString(R.string.identifier), credential.id)
+                credential.id?.let { sb.addFormattedLine(getString(R.string.identifier), it)}
+                credential.uid?.let {
+                    sb.addFormattedLine(
+                        getString(R.string.universal_identifier),
+                        shortenBase64String(it.toBase64String()))
+                }
 
                 masterSecretKey?.let { key ->
                     val name = decryptCommonString(key, credential.name)
@@ -325,7 +334,7 @@ class ShowCredentialActivity : SecureActivity() {
 
                 credential.modifyTimestamp?.let{
                     if (it > 1000) // modifyTimestamp is the credential Id after running db migration, assume ids are lower than 1000
-                        sb.addFormattedLine(getString(R.string.last_modified), Constants.SDF_DT_MEDIUM.format(it))
+                        sb.addFormattedLine(getString(R.string.last_modified), it.toSimpleDateTimeFormat())
                 }
 
                 AlertDialog.Builder(this)
@@ -462,7 +471,7 @@ class ShowCredentialActivity : SecureActivity() {
         val password = decryptPassword(key, credential.password)
         if (allowDeobfuscate) {
             obfuscationKey?.let {
-                password.deobfuscate(it)
+                password.deobfuscate(it) //TODO this seems to cause a change of current item and a credential adapter list reload
             }
         }
         var spannedString = spannableObfusableAndMaskableString(

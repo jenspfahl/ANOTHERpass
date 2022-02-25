@@ -1,13 +1,14 @@
 package de.jepfa.yapm.ui.login
 
 import android.app.Activity
-import androidx.appcompat.app.AlertDialog
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
+import androidx.appcompat.app.AlertDialog
 import androidx.navigation.fragment.NavHostFragment
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
@@ -15,21 +16,22 @@ import de.jepfa.yapm.model.encrypted.EncryptedType
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.service.PreferenceService.STATE_INTRO_SHOWED
 import de.jepfa.yapm.service.PreferenceService.PREF_MAX_LOGIN_ATTEMPTS
 import de.jepfa.yapm.service.PreferenceService.PREF_SELF_DESTRUCTION
+import de.jepfa.yapm.service.PreferenceService.STATE_INTRO_SHOWED
 import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_ATTEMPTS
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.*
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
+import de.jepfa.yapm.ui.credential.DeobfuscationDialog
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.ui.importvault.ImportVaultActivity
-import de.jepfa.yapm.ui.nfc.NfcBaseActivity
 import de.jepfa.yapm.ui.intro.IntroActivity
-import de.jepfa.yapm.usecase.vault.DropVaultUseCase
+import de.jepfa.yapm.ui.nfc.NfcBaseActivity
 import de.jepfa.yapm.usecase.app.ShowInfoUseCase
+import de.jepfa.yapm.usecase.vault.DropVaultUseCase
 import de.jepfa.yapm.util.Constants
-import de.jepfa.yapm.util.observeOnce
+import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.toastText
 
 
@@ -92,6 +94,8 @@ class LoginActivity : NfcBaseActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_login, menu)
+        val debugItem: MenuItem = menu.findItem(R.id.menu_debug)
+        debugItem.isVisible = DebugInfo.isDebug
         return true
     }
 
@@ -124,6 +128,16 @@ class LoginActivity : NfcBaseActivity() {
 
         if (id == R.id.menu_about) {
             ShowInfoUseCase.execute(this)
+            return true
+        }
+        if (id == R.id.menu_debug) {
+            val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+            val icon: Drawable = applicationInfo.loadIcon(packageManager)
+            val message = DebugInfo.getDebugInfo(this)
+            builder.setTitle(R.string.debug)
+                .setMessage(message)
+                .setIcon(icon)
+                .show()
             return true
         }
 
@@ -200,38 +214,56 @@ class LoginActivity : NfcBaseActivity() {
         finish()
     }
 
-    internal fun readMasterPassword(scanned: String): Password? {
+    internal fun readMasterPassword(scanned: String, handlePassword: (passwd: Password?) -> Unit) {
         val encrypted = Encrypted.fromEncryptedBase64StringWithCheck(scanned)
-        return when (encrypted?.type?.type) {
-            EncryptedType.Types.ENC_MASTER_PASSWD -> readEMP(encrypted)
-            EncryptedType.Types.MASTER_PASSWD_TOKEN -> readMPT(encrypted)
+        when (encrypted?.type?.type) {
+            EncryptedType.Types.ENC_MASTER_PASSWD -> readEMP(encrypted, handlePassword)
+            EncryptedType.Types.MASTER_PASSWD_TOKEN -> readMPT(encrypted, handlePassword)
             else -> {
                 toastText(this, R.string.invalid_emp_mpt)
-                return null
             }
         }
     }
 
-    private fun readEMP(emp: Encrypted): Password? {
-        val empSK = MasterPasswordService.generateEncMasterPasswdSKForExport(this)
-        val masterPassword =
-            SecretService.decryptPassword(empSK, emp)
-        if (!masterPassword.isValid()) {
-            toastText(this, R.string.invalid_emp)
-            return null
-        }
-
-        return masterPassword
+    internal fun isFastLoginWithQrCode(): Boolean {
+        return  PreferenceService.getAsBool(PreferenceService.PREF_FAST_MASTERPASSWD_LOGIN_WITH_QRC, this)
     }
 
-    private fun readMPT(mpt: Encrypted): Password? {
+    internal fun isFastLoginWithNfcTag(): Boolean {
+        return  PreferenceService.getAsBool(PreferenceService.PREF_FAST_MASTERPASSWD_LOGIN_WITH_NFC, this)
+    }
+
+    private fun readEMP(emp: Encrypted, handlePassword: (passwd: Password?) -> Unit) {
+        val empSK = MasterPasswordService.generateEncMasterPasswdSKForExport(this)
+        val masterPassword = SecretService.decryptPassword(empSK, emp)
+        if (!masterPassword.isValid()) {
+            toastText(this, R.string.invalid_emp)
+        }
+        else if (MasterPasswordService.isProtectedEMP(emp)) {
+            DeobfuscationDialog.openDeobfuscationDialogForMasterPassword(this) { deobfuscationKey ->
+                if (deobfuscationKey != null) {
+                    masterPassword.deobfuscate(deobfuscationKey)
+                    handlePassword(masterPassword)
+                }
+                else {
+                    handlePassword(null)
+                }
+            }
+        }
+        else {
+            handlePassword(masterPassword)
+        }
+
+    }
+
+    private fun readMPT(mpt: Encrypted, handlePassword: (passwd: Password) -> Unit) {
         if (!PreferenceService.isPresent(
                 PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY,
                 this
             )
         ) {
             toastText(this, R.string.no_mpt_present)
-            return null
+            return
         }
         // decrypt obliviously encrypted master password token
         val encMasterPasswordTokenKey = PreferenceService.getEncrypted(
@@ -252,12 +284,12 @@ class LoginActivity : NfcBaseActivity() {
             val masterPassword =
                 SecretService.decryptPassword(mptSK, mpt)
             if (masterPassword.isValid()) {
-                return masterPassword
+                handlePassword(masterPassword)
+                return
             }
 
         }
         toastText(this, R.string.invalid_mpt)
-        return null
     }
 
     private fun getMaxLoginAttempts(): Int {

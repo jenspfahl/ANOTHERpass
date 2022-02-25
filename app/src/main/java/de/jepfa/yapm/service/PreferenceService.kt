@@ -14,6 +14,7 @@ object PreferenceService {
 
     private const val PREF_PREFIX = "YAPM/pref:"
     private const val DATA_PREFIX = "YAPM/data:"
+    private const val TEMP_PREFIX = "YAPM/temp:"
     private const val STATE_PREFIX = "YAPM/state:"
     private const val ACTION_PREFIX = "YAPM/action:"
 
@@ -21,7 +22,7 @@ object PreferenceService {
      * TODO If you add new preference xml files inside #initDefaults, they should be recognised as well.
      * To achieve this, count the version value up here.
      */
-    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_13"
+    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_15"
 
     const val STATE_DEFAULT_INIT_DONE = STATE_PREFIX + "default_init_done"
 
@@ -84,6 +85,7 @@ object PreferenceService {
     const val PREF_PASSWD_SHOW_FORMATTED = PREF_PREFIX + "password_show_formatted"
     const val PREF_PASSWD_WORDS_ON_NL = PREF_PREFIX + "password_words_on_nl"
     const val PREF_SHOW_LABELS_IN_LIST = PREF_PREFIX + "show_labels_in_list"
+    const val PREF_SHOW_DIVIDERS_IN_LIST = PREF_PREFIX + "show_dividers_in_list"
     const val PREF_COLORIZE_MP_QRCODES = PREF_PREFIX + "colorize_mp_qrcodes"
     const val PREF_QRCODES_WITH_HEADER = PREF_PREFIX + "qrcodes_with_header"
 
@@ -100,6 +102,7 @@ object PreferenceService {
     const val PREF_SHOW_CREDENTIAL_IDS = PREF_PREFIX + "show_credential_ids"
 
     const val PREF_DARK_MODE = PREF_PREFIX + "dark_mode"
+    const val PREF_LANGUAGE = PREF_PREFIX + "language"
 
     const val PREF_INCLUDE_MASTER_KEY_IN_BACKUP_FILE = PREF_PREFIX + "include_master_key_in_backup_file"
     const val PREF_INCLUDE_SETTINGS_IN_BACKUP_FILE = PREF_PREFIX + "include_settings_in_backup_file"
@@ -112,6 +115,10 @@ object PreferenceService {
 
     const val STATE_REQUEST_CREDENTIAL_LIST_RELOAD = STATE_PREFIX + "request_credential_list_reload"
     const val STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD = STATE_PREFIX + "request_credential_list_activity_reload"
+
+    const val TEMP_BLOB_CREDENTIALS = TEMP_PREFIX + "blob_credentials"
+    const val TEMP_BLOB_LABELS = TEMP_PREFIX + "blob_labels"
+    const val TEMP_BLOB_SETTINGS = TEMP_PREFIX + "blob_settings"
 
 
     fun initDefaults(context: Context?) {
@@ -243,6 +250,12 @@ object PreferenceService {
     fun deleteAllData(context: Context) {
         getDefault(context).all
             .filter { (k, _) -> k.startsWith(DATA_PREFIX) }
+            .forEach { (k, _) -> delete(k, context)}
+    }
+
+    fun deleteAllTempData(context: Context) {
+        getDefault(context).all
+            .filter { (k, _) -> k.startsWith(TEMP_PREFIX) }
             .forEach { (k, _) -> delete(k, context)}
     }
 

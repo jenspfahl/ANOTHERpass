@@ -8,13 +8,18 @@ import de.jepfa.yapm.model.encrypted.EncryptedType.Types.*
 import de.jepfa.yapm.model.export.EncExportableCredential
 import de.jepfa.yapm.model.export.ExportContainer
 import de.jepfa.yapm.model.export.PlainShareableCredential
+import de.jepfa.yapm.model.secret.Key
+import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.service.secret.AndroidKey
+import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.service.secret.MasterPasswordService.generateEncMasterPasswdSKForExport
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.ui.credential.DeobfuscationDialog
+import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
 
 
 class VerifyActivity : ReadActivityBase() {
@@ -70,16 +75,28 @@ class VerifyActivity : ReadActivityBase() {
         verifyResultText.text = getString(R.string.unknown_emp_scanned)
 
         val empSK = generateEncMasterPasswdSKForExport(this)
-        val scannedMasterPassword =
-            SecretService.decryptPassword(empSK, emp)
+        val scannedMasterPassword = SecretService.decryptPassword(empSK, emp)
+
+        if (scannedMasterPassword.isValid()) {
+            if (MasterPasswordService.isProtectedEMP(emp)) {
+                DeobfuscationDialog.openDeobfuscationDialogForMasterPassword(this) { deobfuscationKey ->
+                    deobfuscationKey?.let { scannedMasterPassword.deobfuscate(it) }
+                    verifyScannedEMP(scannedMasterPassword)
+                }
+            } else {
+                verifyScannedEMP(scannedMasterPassword)
+            }
+        }
+    }
+
+    private fun verifyScannedEMP(scannedMasterPassword: Password) {
         val masterPassword = getMasterPasswordFromSession(this)
-        if (masterPassword != null && scannedMasterPassword.isValid() && scannedMasterPassword.isEqual(
-                masterPassword
-            )
-        ) {
+        if (masterPassword != null
+            && scannedMasterPassword.isEqual(masterPassword)) {
             verifyResultText.text = getString(R.string.well_known_emp_scanned)
         }
         masterPassword?.clear()
+        scannedMasterPassword.clear()
     }
 
     private fun checkMPT(mpt: Encrypted) {
@@ -116,7 +133,7 @@ class VerifyActivity : ReadActivityBase() {
     }
 
     private fun checkContainer(scanned: String) {
-        val content = VaultExportService.parseVaultFileContent(scanned)
+        val content = ImportVaultUseCase.parseVaultFileContent(scanned, this)
         if (content != null) {
             ExportContainer.fromJson(content)?.let { exportContainer ->
                 when (exportContainer.c) {

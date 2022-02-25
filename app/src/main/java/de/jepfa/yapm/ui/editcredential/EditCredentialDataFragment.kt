@@ -233,6 +233,7 @@ class EditCredentialDataFragment : SecureFragment() {
         // we create the new credential out of a former current if present or else out of the original if present
         val credentialToSave = EncCredential(
             editCredentialActivity.currentId,
+            editCredentialActivity.original?.uid,
             encName,
             encAdditionalInfo,
             encUser,
@@ -292,7 +293,7 @@ class EditCredentialDataFragment : SecureFragment() {
                     if (existing == null) {
                         val encName = encryptCommonString(key, label.name)
                         val encDesc = encryptCommonString(key, "")
-                        val encLabel = EncLabel(null, encName, encDesc, null)
+                        val encLabel = EncLabel(null, null, encName, encDesc, null)
                         getBaseActivity()?.let{
                             it.labelViewModel.insert(encLabel, it)
                         }

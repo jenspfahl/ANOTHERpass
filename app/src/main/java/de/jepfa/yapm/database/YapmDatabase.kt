@@ -4,23 +4,21 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import de.jepfa.yapm.database.converter.StringSetConverter
 import de.jepfa.yapm.database.dao.EncCredentialDao
 import de.jepfa.yapm.database.dao.EncLabelDao
 import de.jepfa.yapm.database.entity.EncCredentialEntity
 import de.jepfa.yapm.database.entity.EncLabelEntity
+import java.util.*
 
-const val DB_VERSION = 4
+const val DB_VERSION = 5
 
 @Database(
     entities = [EncCredentialEntity::class, EncLabelEntity::class],
     version = DB_VERSION,
     exportSchema = false
 )
-@TypeConverters(StringSetConverter::class)
 abstract class YapmDatabase : RoomDatabase() {
     abstract fun credentialDao(): EncCredentialDao
     abstract fun labelDao(): EncLabelDao
@@ -54,17 +52,48 @@ abstract class YapmDatabase : RoomDatabase() {
                                 database.execSQL("UPDATE EncCredentialEntity SET modifyTimestamp=id")
                             }
                         }
+                        val migration4to5 = object : Migration(4, 5) {
+                            override fun migrate(database: SupportSQLiteDatabase) {
+                                database.execSQL("ALTER TABLE EncCredentialEntity ADD COLUMN uid TEXT")
+                                database.execSQL("ALTER TABLE EncLabelEntity ADD COLUMN uid TEXT")
+                                database.execSQL("CREATE UNIQUE INDEX index_EncCredentialEntity_uid ON EncCredentialEntity(uid)")
+                                database.execSQL("CREATE UNIQUE INDEX index_EncLabelEntity_uid ON EncLabelEntity(uid)")
+
+                                updateUuid(database, EncCredentialEntity::class.simpleName!!)
+                                updateUuid(database, EncLabelEntity::class.simpleName!!)
+                            }
+                        }
 
                         INSTANCE = Room.databaseBuilder(
                             context.applicationContext,
                             YapmDatabase::class.java, "yapm_database"
                         )
-                        .addMigrations(migration1to2, migration2to3, migration3to4)
+                        .addMigrations(migration1to2, migration2to3, migration3to4, migration4to5)
                         .build()
                     }
                 }
             }
             return INSTANCE
+        }
+
+        private fun updateUuid(database: SupportSQLiteDatabase, entityName: String) {
+            val cursor = database.query("SELECT id FROM $entityName where UID is null")
+            try {
+                if (cursor.count > 0) {
+                    while (cursor.moveToNext()) {
+                        val id = cursor.getInt(
+                            cursor.getColumnIndexOrThrow("id")
+                        )
+                        val uuid = UUID.randomUUID()
+                        database.execSQL(
+                            "UPDATE $entityName SET uid =:1 WHERE id=:2",
+                            arrayOf(uuid.toString(), id.toLong())
+                        )
+                    }
+                }
+            } finally {
+                cursor.close()
+            }
         }
     }
 

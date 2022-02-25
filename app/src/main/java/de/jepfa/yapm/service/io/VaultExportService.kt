@@ -12,6 +12,7 @@ import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.export.*
 import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SaltService
@@ -20,6 +21,7 @@ import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.FileUtil
+import java.lang.IllegalStateException
 import java.lang.reflect.Type
 import java.util.*
 
@@ -57,14 +59,13 @@ object VaultExportService {
             src?.let {
                 return JsonPrimitive(it.toBase64String())
             }
-
             return JsonPrimitive("")
         }
     }
 
     val GSON: Gson = GsonBuilder()
             .registerTypeAdapter(Encrypted::class.java, EncryptedSerializer())
-            .registerTypeAdapter(Password::class.java,PasswordSerializer())
+            .registerTypeAdapter(Password::class.java, PasswordSerializer())
             .create()
 
     fun credentialToJson(credential: EncExportableCredential): String {
@@ -82,20 +83,16 @@ object VaultExportService {
         includePreferences: Boolean,
         uri: Uri
     ): Boolean {
-        val jsonData = exportToJson(context, app, includeMasterkey, includePreferences)
-        val success = writeExportFile(context, uri, jsonData)
-        return success
-    }
-
-
-    fun parseVaultFileContent(content: String): JsonObject? {
-        return try {
-            JsonParser.parseString(content).asJsonObject
+        try {
+            val jsonData = exportToJson(context, app, includeMasterkey, includePreferences)
+            val success = writeExportFile(context, uri, jsonData)
+            return success
         } catch (e: Exception) {
-            Log.e("JSON", "cannot parse JSON", e)
-            null
+            Log.e("JSON", "cannot create JSON", e)
+            return false
         }
     }
+
 
     private fun writeExportFile(context: Context, uri: Uri, jsonData: JsonObject): Boolean {
         var success = false
@@ -113,6 +110,9 @@ object VaultExportService {
     }
 
     private fun exportToJson(context: Context, app: YapmApp, includeMasterkey: Boolean, includePreferences: Boolean): JsonObject {
+        val masterKeySK = Session.getMasterKeySK()
+            ?: throw IllegalStateException("No secret to encrypt vault file")
+
         val root = JsonObject()
         try {
             root.addProperty(JSON_APP_VERSION_CODE, DebugInfo.getVersionCode(context))
@@ -129,7 +129,7 @@ object VaultExportService {
 
         val vaultVersion =
             PreferenceService.getAsString(PreferenceService.DATA_VAULT_VERSION, context)
-            ?: Constants.UNKNOWN_VAULT_VERSION.toString()
+            ?: Constants.INITIAL_VAULT_VERSION.toString()
         root.addProperty(JSON_VAULT_VERSION, vaultVersion)
 
         val cipherAlgorithm = SecretService.getCipherAlgorithm(context)
@@ -148,18 +148,33 @@ object VaultExportService {
 
         val credentials = app.credentialRepository.getAllSync()
 
-        root.add(JSON_CREDENTIALS, GSON.toJsonTree(credentials, CREDENTIALS_TYPE))
+        val credentialsAsJson = GSON.toJsonTree(credentials, CREDENTIALS_TYPE)
+        val encCredentials = SecretService.encryptCommonString(
+            masterKeySK,
+            credentialsAsJson.toString())
+
+        root.addProperty(JSON_CREDENTIALS, encCredentials.toBase64String())
         root.addProperty(JSON_CREDENTIALS_COUNT, credentials.size)
 
 
         val labels = app.labelRepository.getAllSync()
 
-        root.add(JSON_LABELS, GSON.toJsonTree(labels, LABELS_TYPE))
+        val labelsAsJson = GSON.toJsonTree(labels, LABELS_TYPE)
+        val encLabels = SecretService.encryptCommonString(
+            masterKeySK,
+            labelsAsJson.toString())
+
+        root.addProperty(JSON_LABELS, encLabels.toBase64String())
         root.addProperty(JSON_LABELS_COUNT, labels.size)
 
         if (includePreferences) {
             val allPrefs = PreferenceService.getAllPrefs(context)
-            root.add(JSON_APP_SETTINGS, GSON.toJsonTree(allPrefs))
+            val allPrefsAsJson = GSON.toJsonTree(allPrefs)
+            val encPrefs = SecretService.encryptCommonString(
+                masterKeySK,
+                allPrefsAsJson.toString())
+
+            root.addProperty(JSON_APP_SETTINGS, encPrefs.toBase64String())
         }
 
         return root

@@ -30,7 +30,14 @@ fun toastText(context: Context?, id: Int) {
 
 fun enrichId(context: Context, name: String, id: Int?): String {
     val showIds = PreferenceService.getAsBool(PreferenceService.PREF_SHOW_CREDENTIAL_IDS, context)
-    return if (showIds) "$name [:${id?:"new"}]" else name
+    return if (showIds) "$name [:${id?:"?"}]" else name
+}
+
+fun shortenBase64String(base64String: String): String {
+    return base64String
+        .toLowerCase(Locale.ROOT)
+        .replace(Regex("[^0-9a-z]"),"")
+        .take(8)
 }
 
 fun createAndAddLabelChip(
@@ -88,7 +95,7 @@ fun linkifyDialogMessage(dialog: Dialog) {
 
 fun dateToString(date: Date?): String {
     if (date != null) {
-        return Constants.SDF_DT_MEDIUM.format(date)
+        return date.toSimpleDateTimeFormat()
     }
     else {
         return "??"

@@ -6,7 +6,7 @@
     <item android:title="@string/quick_access" >
         <menu >
             <item
-                android:id="@+id/generate_encrypted_masterpasswd"
+                android:id="@+id/generate_masterpasswd_token"
                 android:orderInCategory="50"
                 android:title="@string/generate_encrypted_masterpasswd" />
             <item
@@ -20,7 +20,7 @@
         </menu>
     </item>
 
-    <item android:title="@string/export" >
+    <item android:title="@string/action_export" >
         <menu >
             <item
                 android:id="@+id/export_encrypted_masterpasswd"
@@ -39,15 +39,16 @@
 
     <item android:title="@string/import_read" >
         <menu>
-            <item
-                android:id="@+id/import_credential"
-                android:orderInCategory="85"
-                android:title="@string/import_read_credential" />
 
             <item
                 android:id="@+id/test_verify_qr_code_or_nfc_tag"
-                android:orderInCategory="95"
+                android:orderInCategory="85"
                 android:title="@string/verify_test" />
+
+            <item
+                android:id="@+id/import_credential"
+                android:orderInCategory="95"
+                android:title="@string/import_read_credential" />
 
             <item
                 android:id="@+id/import_vault"
@@ -113,7 +114,8 @@
             android:id="@+id/menu_debug"
             android:icon="@drawable/ic_baseline_memory_24"
             android:orderInCategory="300"
-            android:title="@string/debug">
+            android:title="@string/debug"
+            android:visible="false">
         </item>
     </group>
 

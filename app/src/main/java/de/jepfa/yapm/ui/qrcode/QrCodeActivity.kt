@@ -119,7 +119,7 @@ class QrCodeActivity : SecureActivity() {
                     .setTitle(R.string.qrc_download_as_img)
                     .setMessage(R.string.hint_store_qr_as_file)
                     .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setPositiveButton(R.string.title_continue) { dialog, _ ->
+                    .setPositiveButton(R.string.button_continue) { dialog, _ ->
                         dialog.dismiss()
                         val downloadIntent = Intent(Intent.ACTION_CREATE_DOCUMENT)
                         downloadIntent.addCategory(Intent.CATEGORY_OPENABLE)

@@ -11,6 +11,7 @@ import de.jepfa.yapm.service.secret.SecretService.encryptKey
 import de.jepfa.yapm.service.secret.SecretService.generateRandomKey
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.util.Constants
+import de.jepfa.yapm.util.shortenBase64String
 import java.util.*
 
 object SaltService {
@@ -46,14 +47,7 @@ object SaltService {
 
     fun getVaultId(context: Context): String {
         val saltBase64 = getSaltAsBase64String(context)
-        return saltToVaultId(saltBase64)
-    }
-
-    fun saltToVaultId(saltAsBase64String: String): String {
-        return saltAsBase64String
-            .toLowerCase(Locale.ROOT)
-            .replace(Regex("[^0-9a-z]"),"")
-            .take(8)
+        return shortenBase64String(saltBase64)
     }
 
     private fun createAndStoreSalt(context: Context): Key {

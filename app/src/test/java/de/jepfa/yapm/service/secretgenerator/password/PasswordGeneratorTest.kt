@@ -15,7 +15,7 @@ class PasswordGeneratorTest {
     fun generatePassword() {
         val spec = PasswordGeneratorSpec(
             SecretStrength.NORMAL,
-            noDigits = false, excludeSpecialChars = false, onlyLowerCase = false)
+            noDigits = false, noSpecialChars = false, noUpperCase = false)
         for (i in 1..10) {
             val password = passwordGenerator.generate(spec)
             println("password = ${password.toFormattedPassword()}")
@@ -38,57 +38,106 @@ class PasswordGeneratorTest {
     }
 
     @Test
-    fun testCalcCombinationsPlainWord() {
-        val spec = PasswordGeneratorSpec(onlyLowerCase = true, excludeSpecialChars = true,
+    fun testCalcCombinationsLowerCaseWord() {
+        val spec = PasswordGeneratorSpec(noUpperCase = true, noSpecialChars = true,
             noDigits = true, strength = SecretStrength.ONE_WORD)
-        val passwordGenerator = PasswordGenerator()
 
-        val combinationCount = passwordGenerator.calcCombinationCount(spec)
-        println("calculated combinations: $combinationCount")
-
-        val hits = HashSet<String>()
-        val counter = AtomicInteger()
-        while (hits.size < combinationCount.toLong()) {
-            val password = passwordGenerator.generate(spec)
-            val new = hits.add(password.toString())
-            if (new || counter.incrementAndGet() % 100000 == 0) {
-                println("current attempt: ${counter.get()} (${hits.size} < ${combinationCount.toLong()}): $password isNew=$new")
-            }
-            password.clear()
-
-        }
-
-        println("real combinations: ${hits.size}")
-
-        Assert.assertEquals(hits.size.toDouble(), combinationCount, 0.1)
-
+        calcAndGenAllCombinations(spec, 50)
     }
 
+    @Test
+    fun testCalcCombinationsAllCaseWord() {
+        val spec = PasswordGeneratorSpec(noSpecialChars = true,
+            noDigits = true, strength = SecretStrength.ONE_WORD)
+
+        calcAndGenAllCombinations(spec, 50)
+    }
+
+    @Test
+    fun testCalcCombinationsLowerCaseDigitsWord() {
+        val spec = PasswordGeneratorSpec(noSpecialChars = true,
+            noUpperCase = true, strength = SecretStrength.ONE_WORD)
+
+        calcAndGenAllCombinations(spec, 50)
+    }
+
+    @Test
+    fun testCalcCombinationsLowerCaseSpecialCharWord() {
+        val spec = PasswordGeneratorSpec(noDigits = true,
+            noUpperCase = true, strength = SecretStrength.ONE_WORD)
+
+        calcAndGenAllCombinations(spec, 50)
+    }
+
+    @Test
+    fun testCalcCombinationsNoUpperCaseWord() {
+        val spec = PasswordGeneratorSpec(noUpperCase = true, strength = SecretStrength.ONE_WORD)
+
+        calcAndGenAllCombinations(spec, 50)
+    }
+
+    @Test
+    fun testCalcCombinationsNoDigitsWord() {
+        val spec = PasswordGeneratorSpec(noDigits = true, strength = SecretStrength.ONE_WORD)
+
+        calcAndGenAllCombinations(spec, 50)
+    }
+
+    @Test
+    fun testCalcCombinationsNoSpecialCharsWord() {
+        val spec = PasswordGeneratorSpec(noSpecialChars = true, strength = SecretStrength.ONE_WORD)
+
+        calcAndGenAllCombinations(spec, 50)
+    }
 
     @Test
     fun testCalcCombinationsAllWord() {
-        val spec = PasswordGeneratorSpec(onlyLowerCase = false, excludeSpecialChars = false,
-            noDigits = false, strength = SecretStrength.ONE_WORD)
-        val passwordGenerator = PasswordGenerator()
+        val spec = PasswordGeneratorSpec(strength = SecretStrength.ONE_WORD)
+
+        calcAndGenAllCombinations(spec, 10)
+
+    }
+
+    private fun calcAndGenAllCombinations(spec: PasswordGeneratorSpec, keepGoingTimes: Int) {
+        val passwordGenerator = PasswordGenerator(
+            upperCase = "ABCDEFG",
+            lowerCase = "abcdef",
+            digits = "01234",
+            specialChars = "!.#%"
+        )
 
         val combinationCount = passwordGenerator.calcCombinationCount(spec)
         println("calculated combinations: $combinationCount")
 
+        val iteration = 1000// 100000
         val hits = HashSet<String>()
         val counter = AtomicInteger()
-        while (hits.size < combinationCount.toLong()) {
+        var mark = 0;
+        var keepGoing = false;
+        while (hits.size.toLong() < combinationCount.toLong() || keepGoing) {
             val password = passwordGenerator.generate(spec)
             val new = hits.add(password.toString())
-            if (counter.incrementAndGet() % 100000 == 0) {
-                println("current attempt: ${counter.get()} (${hits.size} < ${combinationCount.toLong()}): $password isNew=$new")
+            if (counter.incrementAndGet() % iteration == 0) {
+                val percentage = (hits.size / combinationCount) * 100
+                var keepGoingString = ""
+                if (keepGoing) {
+                    val keepGoingPercentage = (mark.toDouble() / (iteration * keepGoingTimes).toDouble()) * 100
+                    keepGoingString="keepGoing - ${keepGoingPercentage.toInt()}%"
+                }
+                println("current attempt: ${counter.get()} (${hits.size} / ${combinationCount.toLong()} = ${percentage.toInt()}%): $password isNew=$new $keepGoingString")
             }
             password.clear()
-
+            if (hits.size.toLong() == combinationCount.toLong()) {
+                keepGoing = true
+            }
+            if (keepGoing) {
+                mark++
+                keepGoing = mark <= iteration * keepGoingTimes
+            }
         }
 
         println("real combinations: ${hits.size}")
 
-        Assert.assertEquals(hits.size.toDouble(), combinationCount, 0.1)
-
+        Assert.assertEquals(combinationCount, hits.size.toDouble(), 0.1)
     }
 }

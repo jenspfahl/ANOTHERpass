@@ -5,6 +5,7 @@ import java.text.DateFormat
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
+import java.util.*
 
 object Constants {
     val HOMEPAGE = Uri.parse("https://anotherpass.jepfa.de")
@@ -17,11 +18,13 @@ object Constants {
 
     val MASTER_KEY_BYTE_SIZE = 128
 
-    var SDF_DT_MEDIUM =
+    val SDF_DT_MEDIUM =
         SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM)
-    var SDF_D_INTERNATIONAL: DateFormat = SimpleDateFormat("yyyy-MM-dd")
+    val SDF_D_INTERNATIONAL: DateFormat = SimpleDateFormat("yyyy-MM-dd")
 
-    var UNKNOWN_VAULT_VERSION = 1
-    var FAST_KEYGEN_VAULT_VERSION = 2
+    // Note: This is actually not a vault version rather than a Masterkey interpretation. So new vault versions should be handled differently !
+    const val INITIAL_VAULT_VERSION = 1
+    const val FAST_KEYGEN_VAULT_VERSION = 2
+    const val CURRENT_VERSION = FAST_KEYGEN_VAULT_VERSION
 
 }

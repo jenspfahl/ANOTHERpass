@@ -1,14 +1,17 @@
 package de.jepfa.yapm.database.entity
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import de.jepfa.yapm.model.encrypted.Encrypted
+import java.util.*
 
 /**
  * Encrypted entity for Credential
  */
-@Entity
+@Entity(indices = arrayOf(Index("uid", unique = true)))
 data class EncCredentialEntity (@PrimaryKey(autoGenerate = true) val id: Int?,
+                                val uid: String?,
                                 var name: String,
                                 var additionalInfo: String,
                                 var user: String,
@@ -21,6 +24,7 @@ data class EncCredentialEntity (@PrimaryKey(autoGenerate = true) val id: Int?,
                                 var modifyTimestamp: Long) {
 
     constructor(id: Int?,
+                uid: UUID?,
                 name: Encrypted,
                 additionalInfo: Encrypted,
                 user: Encrypted,
@@ -33,6 +37,7 @@ data class EncCredentialEntity (@PrimaryKey(autoGenerate = true) val id: Int?,
                 modifyTimestamp: Long
     ) : this(
         id,
+        uid?.let { it.toString() },
         name.toBase64String(),
         additionalInfo.toBase64String(),
         user.toBase64String(),

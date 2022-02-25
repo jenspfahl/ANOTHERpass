@@ -69,18 +69,25 @@ class NdefTag @Throws(FormatException::class) constructor(val tag: Tag, val data
         }
     }
 
+    fun canSetWriteProtection() =  ndef?.canMakeReadOnly() ?: false
+    fun isWriteProtected() = !(ndef?.isWritable ?: false)
+
     @Throws(IOException::class, FormatException::class)
-    fun writeData(message: NdefMessage): Boolean {
+    fun writeData(message: NdefMessage, setWriteProtection: Boolean = false): Boolean {
         if (ndef != null) {
             ndef.connect()
             if (ndef.isConnected) {
                 ndef.writeNdefMessage(message)
+                if (setWriteProtection && ndef.canMakeReadOnly()) {
+                    ndef.makeReadOnly()
+                }
                 return true
             }
         } else if (ndefFormatable != null) {
             ndefFormatable.connect()
             if (ndefFormatable.isConnected) {
                 ndefFormatable.format(message)
+
                 return true
             }
         }

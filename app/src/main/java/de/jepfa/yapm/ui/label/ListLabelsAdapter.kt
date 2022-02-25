@@ -18,8 +18,7 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.label.LabelsHolder
-import de.jepfa.yapm.util.DebugInfo
-import de.jepfa.yapm.util.observeOnce
+import de.jepfa.yapm.util.*
 
 
 class ListLabelsAdapter(private val listLabelsActivity: ListLabelsActivity) :
@@ -50,22 +49,27 @@ class ListLabelsAdapter(private val listLabelsActivity: ListLabelsActivity) :
         }
 
         holder.listenForLongClick { pos, _ ->
-            if (DebugInfo.isDebug) {
-                val current = getItem(pos)
-                current.labelId?.let { id ->
-                    listLabelsActivity.labelViewModel.getById(id).observeOnce(listLabelsActivity) { encLabel ->
-                        val builder: AlertDialog.Builder = AlertDialog.Builder(listLabelsActivity)
-                        val icon: Drawable = listLabelsActivity.applicationInfo.loadIcon(listLabelsActivity.packageManager)
-                        val message = encLabel.toString()
-                        builder.setTitle(R.string.debug)
-                            .setMessage(message)
-                            .setIcon(icon)
-                            .show()
-                    }
+            val current = getItem(pos)
+            current.labelId?.let { id ->
+                listLabelsActivity.labelViewModel.getById(id).observeOnce(listLabelsActivity) { encLabel ->
+                    val sb = StringBuilder()
 
+                    encLabel.id?.let { sb.addFormattedLine(listLabelsActivity.getString(R.string.identifier), it)}
+                    encLabel.uid?.let {
+                        sb.addFormattedLine(
+                            listLabelsActivity.getString(R.string.universal_identifier),
+                            shortenBase64String(it.toBase64String()))
+                    }
+                    sb.addFormattedLine(listLabelsActivity.getString(R.string.name), current.name)
+                    AlertDialog.Builder(listLabelsActivity)
+                        .setTitle(R.string.title_label_details)
+                        .setMessage(sb.toString())
+                        .show()
                 }
-                true
+
             }
+            true
+
         }
 
         return holder
@@ -85,15 +89,24 @@ class ListLabelsAdapter(private val listLabelsActivity: ListLabelsActivity) :
 
         fun listenForEditLabel(event: (position: Int, type: Int) -> Unit) {
             labelChip.setOnClickListener {
+                if (adapterPosition == RecyclerView.NO_POSITION) {
+                    return@setOnClickListener
+                }
                 event.invoke(adapterPosition, itemViewType)
             }
             labelUsageTextView.setOnClickListener {
+                if (adapterPosition == RecyclerView.NO_POSITION) {
+                    return@setOnClickListener
+                }
                 event.invoke(adapterPosition, itemViewType)
             }
         }
 
         fun listenForLongClick(event: (position: Int, type: Int) -> Unit) {
             labelChip.setOnLongClickListener {
+                if (adapterPosition == RecyclerView.NO_POSITION) {
+                    return@setOnLongClickListener false
+                }
                 event.invoke(adapterPosition, itemViewType)
                 true
             }
@@ -101,6 +114,9 @@ class ListLabelsAdapter(private val listLabelsActivity: ListLabelsActivity) :
 
         fun listenForDeleteLabel(event: (position: Int, type: Int) -> Unit) {
             labelDeleteImageView.setOnClickListener {
+                if (adapterPosition == RecyclerView.NO_POSITION) {
+                    return@setOnClickListener
+                }
                 event.invoke(adapterPosition, itemViewType)
             }
         }

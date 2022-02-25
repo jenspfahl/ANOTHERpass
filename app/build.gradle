@@ -9,21 +9,21 @@ apply plugin: 'com.jaredsburrows.license'
 
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     defaultConfig {
         applicationId "de.jepfa.yapm"
         minSdkVersion 24
-        targetSdkVersion 29
+        targetSdkVersion 30
         // format: <XXYYZZZ>
         // XX=major (breaks compatibility to old apps)
         // YY=minor (new features)
         // ZZZ=micro (just bugfixes)
     //  versionCode XXYYZZZ
-        versionCode  105004
+        versionCode  106000
         // remove _rc when release
         // e.g. versionName "1.3.0_rc"
-        versionName "1.5.4"
+        versionName "1.6.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -99,6 +99,9 @@ dependencies {
 
     //AppIntro
     implementation 'com.github.AppIntro:AppIntro:6.1.0'
+
+    // Switch language inside the app
+    implementation "com.github.YarikSOffice:lingver:1.3.0"
 
     // Testing
     testImplementation "junit:junit:$rootProject.junitVersion"

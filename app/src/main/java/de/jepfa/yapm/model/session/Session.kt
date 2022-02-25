@@ -18,6 +18,7 @@ object Session {
     private var masterSecretKey: SecretKeyHolder? = null
     private var encMasterPassword: Encrypted? = null
     private var lastUpdated: Long = 0
+    private var lockDisabled = false;
 
     fun getMasterKeySK() : SecretKeyHolder? {
         return masterSecretKey
@@ -46,16 +47,24 @@ object Session {
         touch()
     }
 
-    fun touch() {
+    internal fun touch() {
         lastUpdated = System.currentTimeMillis()
     }
 
     fun isOutdated(): Boolean {
-        return age() > lock_timeout || shouldBeLoggedOut()
+        return (!lockDisabled && age() > lock_timeout) || shouldBeLoggedOut()
     }
 
     fun shouldBeLoggedOut(): Boolean {
         return age() > logout_timeout
+    }
+
+    fun disableAutomaticLocking() {
+        lockDisabled = true
+    }
+
+    fun enableAutomaticLocking() {
+        lockDisabled = false
     }
 
     fun isLocked() : Boolean {
@@ -71,6 +80,7 @@ object Session {
     }
 
     fun lock() {
+        lockDisabled = false;
         masterSecretKey?.destroy()
         masterSecretKey = null
         AutofillCredentialHolder.clear()

@@ -3,7 +3,6 @@ package de.jepfa.yapm.usecase.label
 import de.jepfa.yapm.R
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
-import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.OutputUseCase
 import de.jepfa.yapm.usecase.UseCaseOutput
@@ -24,7 +23,7 @@ object DeleteUnusedLabelUseCase: OutputUseCase<String, SecureActivity>() {
             }.toList()
 
         if (deleteCandidates.isEmpty()) {
-            return UseCaseOutput(false, activity.getString(R.string.no_unused_credentials_to_delete))
+            return UseCaseOutput(false, activity.getString(R.string.no_unused_labels_to_delete))
         }
         // update model
         deleteCandidates.forEach { label ->
@@ -39,7 +38,7 @@ object DeleteUnusedLabelUseCase: OutputUseCase<String, SecureActivity>() {
 
         activity.labelViewModel.deleteByIds(deleteCandidateIds)
 
-        return UseCaseOutput(true, activity.getString(R.string.unused_credentials_deleted, deleteCandidateIds.size))
+        return UseCaseOutput(true, activity.getString(R.string.unused_labels_deleted, deleteCandidateIds.size))
     }
 
 }

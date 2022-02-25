@@ -129,18 +129,15 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         if (scannedNdefTag != null) {
             Log.i("LOGIN", "Tag available")
 
-            val loginIntented = readAndUpdateMasterPassword(scannedNdefTag, loginActivity)
-            if (loginIntented) {
-                Log.i("LOGIN", "NDEF tag scanned and fast login granted")
-                return
-            }
-        }
+            readAndUpdateMasterPassword(scannedNdefTag, loginActivity, loginActivity.isFastLoginWithNfcTag())
 
-        if (isFastLoginWithQrCode()) {
-            scanQrCodeImageView.performClick()
         }
-        else if (isFastLoginWithNfcTag()) {
-            scanNfcImageView.performClick()
+        else {
+            if (loginActivity.isFastLoginWithQrCode()) {
+                scanQrCodeImageView.performClick()
+            } else if (loginActivity.isFastLoginWithNfcTag()) {
+                scanNfcImageView.performClick()
+            }
         }
 
         getBaseActivity()?.hideKeyboard(masterPasswdTextView)
@@ -150,7 +147,9 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         val scanned = getScannedFromIntent(requestCode, resultCode, data)
         if (scanned != null) {
             val loginActivity = getBaseActivity() as LoginActivity
-            readAndUpdateMasterPassword(scanned, loginActivity)
+            readAndUpdateMasterPassword(scanned, loginActivity,
+                (requestCode == NfcActivity.ACTION_READ_NFC_TAG && loginActivity.isFastLoginWithNfcTag()
+                        || (requestCode != NfcActivity.ACTION_READ_NFC_TAG && loginActivity.isFastLoginWithQrCode())))
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }
@@ -163,23 +162,25 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         val scannedNdefTag = loginActivity.ndefTag?.data
         if (scannedNdefTag != null) {
             Log.i("LOGIN", "Tag available")
-            readAndUpdateMasterPassword(scannedNdefTag, loginActivity)
+            readAndUpdateMasterPassword(scannedNdefTag, loginActivity, loginActivity.isFastLoginWithNfcTag())
         }
     }
 
 
-    private fun readAndUpdateMasterPassword(scanned: String, loginActivity: LoginActivity): Boolean {
-        val masterPassword = loginActivity.readMasterPassword(scanned) ?: return false
+    private fun readAndUpdateMasterPassword(scanned: String, loginActivity: LoginActivity, isFastLogin: Boolean) {
+        loginActivity.readMasterPassword(scanned)
+        { masterPassword ->
+            masterPassword?.let {
+                masterPasswdTextView.setText(masterPassword.toRawFormattedPassword())
+                masterPassword.clear()
 
-        masterPasswdTextView.setText(masterPassword.toRawFormattedPassword())
-        masterPassword.clear()
-
-        if (isFastLoginWithQrCode() || isFastLoginWithNfcTag()) {
-            loginButton.performClick()
-            return true
+                if (isFastLogin) {
+                    loginButton.performClick()
+                }
+            }
         }
 
-        return false
+
     }
 
 
@@ -231,14 +232,6 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         arguments?.remove(CreateVaultActivity.ARG_ENC_PIN)
 
         loginActivity.loginSuccessful()
-    }
-
-    private fun isFastLoginWithQrCode(): Boolean {
-        return  PreferenceService.getAsBool(PREF_FAST_MASTERPASSWD_LOGIN_WITH_QRC, getBaseActivity())
-    }
-
-    private fun isFastLoginWithNfcTag(): Boolean {
-        return  PreferenceService.getAsBool(PREF_FAST_MASTERPASSWD_LOGIN_WITH_NFC, getBaseActivity())
     }
 
 }

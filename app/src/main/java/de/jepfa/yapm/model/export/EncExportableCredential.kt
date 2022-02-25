@@ -1,14 +1,14 @@
 package de.jepfa.yapm.model.export
 
-import android.content.Intent
 import android.util.Log
 import com.google.gson.JsonElement
-import com.google.gson.JsonObject
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.Encrypted
-import de.jepfa.yapm.util.getEncryptedExtra
+import de.jepfa.yapm.util.toBase64String
+import de.jepfa.yapm.util.toUUIDFromBase64String
 
 data class EncExportableCredential(val i: Int?,
+                                   val ui: String?,
                                    val n: Encrypted,
                                    val aI: Encrypted,
                                    val u: Encrypted,
@@ -21,6 +21,7 @@ data class EncExportableCredential(val i: Int?,
     constructor(credential: EncCredential) :
             this(
                 credential.id,
+                credential.uid?.toBase64String(),
                 credential.name,
                 credential.additionalInfo,
                 credential.user,
@@ -31,6 +32,7 @@ data class EncExportableCredential(val i: Int?,
             )
 
     constructor(id: Int?,
+                uidBase64: String?,
                 nameBase64: String,
                 additionalInfoBase64: String,
                 userBase64: String,
@@ -39,6 +41,7 @@ data class EncExportableCredential(val i: Int?,
                 labelsBase64: String,
                 isObfuscated: Boolean) :
             this(id,
+                uidBase64,
                 Encrypted.fromBase64String(nameBase64),
                 Encrypted.fromBase64String(additionalInfoBase64),
                 Encrypted.fromBase64String(userBase64),
@@ -51,6 +54,7 @@ data class EncExportableCredential(val i: Int?,
     fun toEncCredential(): EncCredential {
         return EncCredential(
             i,
+            ui?.toUUIDFromBase64String(),
             n,
             aI,
             u,
@@ -66,6 +70,7 @@ data class EncExportableCredential(val i: Int?,
 
     companion object {
         const val ATTRIB_ID = "i"
+        const val ATTRIB_UID = "ui"
         const val ATTRIB_NAME = "n"
         const val ATTRIB_ADDITIONAL_INFO = "aI"
         const val ATTRIB_USER = "u"
@@ -77,7 +82,9 @@ data class EncExportableCredential(val i: Int?,
         fun fromJson(json: JsonElement): EncExportableCredential? {
             return try {
                 val jsonObject = json.asJsonObject
-                EncExportableCredential(jsonObject.get(ATTRIB_ID).asInt,
+                EncExportableCredential(
+                    jsonObject.get(ATTRIB_ID).asInt,
+                    jsonObject.get(ATTRIB_UID)?.asString,
                     jsonObject.get(ATTRIB_NAME).asString,
                     jsonObject.get(ATTRIB_ADDITIONAL_INFO).asString,
                     jsonObject.get(ATTRIB_USER).asString,

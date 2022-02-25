@@ -7,7 +7,7 @@
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
         app:defaultValue="false"
-        app:title="Autofill suggestion everywhere" />
+        app:title="@string/autofill_suggest_everywhere" />
 
     <MultiSelectListPreference
         app:key="YAPM/pref:autofill_exclusion_list"

@@ -6,6 +6,7 @@ import de.jepfa.yapm.database.entity.EncLabelEntity
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncLabel
 import kotlinx.coroutines.flow.*
+import java.util.*
 
 class LabelRepository(private val encLabelDao: EncLabelDao) {
 
@@ -64,6 +65,7 @@ class LabelRepository(private val encLabelDao: EncLabelDao) {
 
     private fun mapToLabel(entity: EncLabelEntity): EncLabel {
         return EncLabel(entity.id,
+                entity.uid,
                 entity.name,
                 entity.description,
                 entity.color)
@@ -71,6 +73,7 @@ class LabelRepository(private val encLabelDao: EncLabelDao) {
 
     private fun mapToEntity(encLabel: EncLabel): EncLabelEntity {
         return EncLabelEntity(encLabel.id,
+                encLabel.uid ?: UUID.randomUUID(),
                 encLabel.name,
                 encLabel.description,
                 encLabel.color)

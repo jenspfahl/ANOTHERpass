@@ -10,6 +10,8 @@ import de.jepfa.yapm.model.export.PlainShareableCredential
 import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.credential.ShowCredentialActivity
+import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
+import de.jepfa.yapm.util.toUUIDFromBase64String
 import de.jepfa.yapm.util.toastText
 
 
@@ -28,7 +30,7 @@ class ImportCredentialActivity : ReadActivityBase() {
     }
 
     private fun extractCredential(scanned: String): EncCredential? {
-        val content = VaultExportService.parseVaultFileContent(scanned)
+        val content = ImportVaultUseCase.parseVaultFileContent(scanned, this)
         if (content != null) {
             ExportContainer.fromJson(content)?.let { exportContainer ->
                 when (exportContainer.c) {
@@ -51,30 +53,7 @@ class ImportCredentialActivity : ReadActivityBase() {
 
     private fun createEncCredentialFromPcr(pcr: PlainShareableCredential): EncCredential? {
         masterSecretKey?.let {  key ->
-
-            val encName = SecretService.encryptCommonString(key, pcr.n)
-            val encAdditionalInfo = SecretService.encryptCommonString(key, pcr.aI)
-            val encUser = SecretService.encryptCommonString(key, pcr.u)
-            val encPasswd = SecretService.encryptPassword(key, pcr.p)
-            val encWebsite = SecretService.encryptCommonString(key, pcr.w)
-            val encLabels = SecretService.encryptCommonString(key, "")
-
-            pcr.p.clear()
-
-            val credential = EncCredential(
-                null,
-                encName,
-                encAdditionalInfo,
-                encUser,
-                encPasswd,
-                null,
-                encWebsite,
-                encLabels,
-                false,
-                null,
-                null
-            )
-            return credential
+            return pcr.toEncCredential(key)
         }
         return null
     }

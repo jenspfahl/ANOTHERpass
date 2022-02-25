@@ -20,6 +20,7 @@ import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
 import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.FileUtil
+import de.jepfa.yapm.util.shortenBase64String
 import de.jepfa.yapm.util.toastText
 
 class ImportVaultLoadFileFragment : BaseFragment() {
@@ -75,7 +76,8 @@ class ImportVaultLoadFileFragment : BaseFragment() {
                         val baseActivity = getBaseActivity() ?: return
                         val content = FileUtil.readFile(baseActivity, selectedFile)
                         if (content != null) {
-                            getImportVaultActivity().jsonContent = VaultExportService.parseVaultFileContent(content)
+                            getImportVaultActivity().jsonContent = ImportVaultUseCase.parseVaultFileContent(
+                                content, importVaultActivity, handleBlob = true)
                         }
                     } catch (e: Exception) {
                         Log.e("RESTORE", "cannot import file $selectedFile", e)
@@ -104,9 +106,9 @@ class ImportVaultLoadFileFragment : BaseFragment() {
     }
 
     private fun sameVaultId(jsonContent: JsonObject, context: Context): Boolean {
-        val fileVaultId = jsonContent.get(VaultExportService.JSON_VAULT_ID)?.asString
-        val currentVaultId = SaltService.getVaultId(context)
-        return fileVaultId != null && SaltService.saltToVaultId(fileVaultId) == currentVaultId
+        val fileSalt = jsonContent.get(VaultExportService.JSON_VAULT_ID)?.asString
+        val currentSalt = SaltService.getSaltAsBase64String(context)
+        return fileSalt != null && fileSalt == currentSalt
     }
 
     private fun cipherVersionSupported(jsonContent: JsonObject): Boolean {

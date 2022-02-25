@@ -5,12 +5,11 @@ import android.os.Build
 import de.jepfa.yapm.BuildConfig
 import de.jepfa.yapm.database.YapmDatabase
 import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.service.PreferenceService.DATA_CIPHER_ALGORITHM
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_VERSION
 import de.jepfa.yapm.service.biometrix.BiometricUtils
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.SecretService
-import de.jepfa.yapm.util.Constants.UNKNOWN_VAULT_VERSION
+import de.jepfa.yapm.util.Constants.INITIAL_VAULT_VERSION
 
 object DebugInfo {
 
@@ -40,9 +39,9 @@ object DebugInfo {
         sb.addFormattedLine("Version", getVersionName(context))
         sb.addFormattedLine("Version Code", getVersionCode(context))
         sb.addFormattedLine("Database Version", YapmDatabase.getVersion())
-        sb.addFormattedLine("Vault Version", PreferenceService.getAsString(DATA_VAULT_VERSION, context) ?: UNKNOWN_VAULT_VERSION)
+        sb.addFormattedLine("Vault Version", PreferenceService.getAsString(DATA_VAULT_VERSION, context) ?: INITIAL_VAULT_VERSION)
         sb.addFormattedLine("Vault Cipher", SecretService.getCipherAlgorithm(context))
-        sb.addFormattedLine("Build Timestamp", Constants.SDF_DT_MEDIUM.format(BuildConfig.BUILD_TIME))
+        sb.addFormattedLine("Build Timestamp", BuildConfig.BUILD_TIME.toSimpleDateTimeFormat())
         sb.addFormattedLine("Build Type", BuildConfig.BUILD_TYPE)
 
         sb.append("\n************ DEVICE INFORMATION ***********\n")

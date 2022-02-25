@@ -1,27 +1,26 @@
 package de.jepfa.yapm.ui.editcredential
 
-import androidx.appcompat.app.AlertDialog
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputFilter.LengthFilter
 import android.text.InputType
 import android.view.*
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SwitchCompat
-import androidx.core.view.setPadding
 import com.google.android.material.tabs.TabLayout
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.overlay.DetachHelper
-import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
-import de.jepfa.yapm.service.secretgenerator.*
+import de.jepfa.yapm.service.secretgenerator.GeneratorBase
+import de.jepfa.yapm.service.secretgenerator.SecretStrength
 import de.jepfa.yapm.service.secretgenerator.passphrase.DEFAULT_SPECIAL_CHARS
 import de.jepfa.yapm.service.secretgenerator.passphrase.PassphraseGenerator
 import de.jepfa.yapm.service.secretgenerator.passphrase.PassphraseGeneratorSpec
@@ -31,13 +30,12 @@ import de.jepfa.yapm.ui.SecureFragment
 import de.jepfa.yapm.ui.credential.DeobfuscationDialog
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.*
-import java.util.*
 
 
 class EditCredentialPasswordFragment : SecureFragment() {
 
-    val PASSPHRASE_STRENGTH_DEFAULT = SecretStrength.STRONG
-    val PASSWORD_STRENGTH_DEFAULT = SecretStrength.STRONG
+    private val PASSPHRASE_STRENGTH_DEFAULT = SecretStrength.STRONG
+    private val PASSWORD_STRENGTH_DEFAULT = SecretStrength.STRONG
 
     private lateinit var currentCredential: EncCredential
     private lateinit var editCredentialActivity: EditCredentialActivity
@@ -188,75 +186,20 @@ class EditCredentialPasswordFragment : SecureFragment() {
             else {
                 masterSecretKey?.let{ key ->
                     if (obfuscatePasswordRequired) {
-                        val inputView = LinearLayout(context)
-                        inputView.orientation = LinearLayout.VERTICAL
-                        inputView.setPadding(32)
+                        DeobfuscationDialog.openObfuscationDialog(editCredentialActivity,
+                            editCredentialActivity.getString(R.string.obfuscate_while_saving),
+                            editCredentialActivity.getString(R.string.obfuscate_while_saving_message, DEFAULT_SPECIAL_CHARS),
+                            editCredentialActivity.getString(android.R.string.ok),
+                            editCredentialActivity.getString(android.R.string.cancel))
+                        { newObfuscationKey ->
+                            if (newObfuscationKey != null) {
+                                generatedPassword.obfuscate(newObfuscationKey)
+                                obfuscationKey = newObfuscationKey
 
-                        val pwd1 = EditText(context)
-                        pwd1.inputType =
-                            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-                        val filters =
-                            arrayOf<InputFilter>(LengthFilter(Constants.MAX_CREDENTIAL_PASSWD_LENGTH))
-                        pwd1.filters = filters
-                        pwd1.requestFocus()
-                        inputView.addView(pwd1)
-
-                        val pwd2 = EditText(context)
-                        pwd2.inputType =
-                            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-                        pwd2.setFilters(filters)
-                        inputView.addView(pwd2)
-
-                        val builder = AlertDialog.Builder(editCredentialActivity)
-                        val dialog: AlertDialog = builder
-                            .setTitle(R.string.obfuscate_while_saving)
-                            .setMessage(getString(R.string.obfuscate_while_saving_message, DEFAULT_SPECIAL_CHARS))
-                            .setView(inputView)
-                            .setPositiveButton(android.R.string.ok, null)
-                            .setNegativeButton(android.R.string.cancel, null)
-                            .create()
-
-                        dialog.setOnShowListener {
-                            val buttonPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                            buttonPositive.setOnClickListener {
-                                val obfusPasswd1 = Password(pwd1.text)
-                                val obfusPasswd2 = Password(pwd2.text)
-                                if (obfusPasswd1.isEmpty()) {
-                                    pwd1.setError(getString(R.string.error_field_required))
-                                    pwd1.requestFocus()
-                                    return@setOnClickListener
-                                }
-                                else if (obfusPasswd2.isEmpty()) {
-                                    pwd2.setError(getString(R.string.error_field_required))
-                                    pwd2.requestFocus()
-                                    return@setOnClickListener
-                                }
-                                else if (!obfusPasswd1.isEqual(obfusPasswd2)) {
-                                    pwd2.setError(getString(R.string.password_not_equal))
-                                    pwd2.requestFocus()
-                                    return@setOnClickListener
-                                }
-
-                                context?.let {
-                                    val salt = SaltService.getSalt(it)
-                                    val cipherAlgorithm = SecretService.getCipherAlgorithm(it)
-                                    val obfuscationSK =
-                                        SecretService.generateNormalSecretKey(obfusPasswd1, salt, cipherAlgorithm)
-                                    val newObfuscationKey = SecretService.secretKeyToKey(obfuscationSK, salt)
-                                    generatedPassword.obfuscate(newObfuscationKey)
-                                    obfuscationKey = newObfuscationKey
-
-                                    currentCredential.isObfuscated = true
-                                    saveCredential(key, currentCredential)
-                                }
-
-                                dialog.dismiss()
+                                currentCredential.isObfuscated = true
+                                saveCredential(key, currentCredential)
                             }
-                            val buttonNegative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-                            buttonNegative.setOnClickListener { dialog.dismiss() }
                         }
-                        dialog.show()
-
                     }
                     else {
                         saveCredential(key, currentCredential)
@@ -301,7 +244,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                     .setTitle(R.string.title_change_credential)
                     .setMessage(R.string.message_password_changed)
                     .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setPositiveButton(R.string.title_continue) { dialog, whichButton ->
+                    .setPositiveButton(R.string.yes_continue) { dialog, whichButton ->
                         updateCredential(key, credential, saveLastPassword = true)
                     }
                     .setNegativeButton(android.R.string.cancel, null)
@@ -316,16 +259,21 @@ class EditCredentialPasswordFragment : SecureFragment() {
     }
 
     private fun guessPasswordCombinations(password: Password) {
-        // rudimentary combination calculation by assuming a-Z, A-Z, 0-9 and 10 potential special chars
-        val containsLowerCase = if (password.contains(Regex("[a-z]"))) 26 else 0
-        val containsUpperCase = if (password.contains(Regex("[A-Z]"))) 26 else 0
-        val containsDigits = if (password.contains(Regex("[0-9]"))) 10 else 0
+        // rudimentary combination calculation by assuming a-Z, A-Z, 0-9 and some typical special chars
+        val containsLowerCase = containsChars(password, PasswordGenerator.DEFAULT_ALPHA_CHARS_LOWER_CASE)
+        val containsUpperCase = containsChars(password, PasswordGenerator.DEFAULT_ALPHA_CHARS_UPPER_CASE)
+        val containsDigits = containsChars(password, PasswordGenerator.DEFAULT_DIGITS)
+        val containsSpecialChars = containsChars(password, PasswordGenerator.DEFAULT_SPECIAL_CHARS)
         passwordCombinations = Math.pow(
-            (containsLowerCase + containsUpperCase + containsDigits + 10).toDouble(),
+            (containsLowerCase + containsUpperCase + containsDigits + containsSpecialChars).toDouble(),
             password.length.toDouble()
         )
         passwordCombinationsGuessed = true
     }
+
+    private fun containsChars(password: Password, chars: String) =
+        if (password.contains(Regex("[${Regex.escape(chars)}]"))) chars.length
+        else 0
 
     private fun calcPasswordStrength() {
         passwordCombinations = if (isPassphraseSelected()) {
@@ -339,6 +287,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
     private fun showPasswordStrength() {
         val combinations = passwordCombinations
         if (combinations != null) {
+            val entropy = passphraseGenerator.calcEntropy(combinations)
             val bruteForceWithPentium = passphraseGenerator.calcBruteForceWaitingSeconds(
                 combinations, GeneratorBase.BRUTEFORCE_ATTEMPTS_PENTIUM
             )
@@ -348,29 +297,39 @@ class EditCredentialPasswordFragment : SecureFragment() {
             val titleId =
                 if (passwordCombinationsGuessed) R.string.password_strength_guessed
                 else R.string.password_strength
+            var strengthLevel = emoji(0x1f625)
+            if (entropy >= 128) strengthLevel = emoji(0x1f606)
+            else if (entropy >= 60) strengthLevel = emoji(0x1f642)
+            else if (entropy >= 36) strengthLevel = emoji(0x1f610)
+            else if (entropy >= 28) strengthLevel = emoji(0x1f641)
             AlertDialog.Builder(editCredentialActivity)
                 .setTitle(getString(titleId))
                 .setIcon(R.drawable.ic_baseline_fitness_center_24)
                 .setMessage(
                     getString(R.string.combinations) + ": " +
                             System.lineSeparator() +
-                            combinations.toReadableFormat(0) +
+                            combinations.toReadableFormat() +
                             System.lineSeparator() +
-                            "($combinations)" +
+                            "(${combinations.toExponentFormat()})" +
+                            System.lineSeparator() +
+                            System.lineSeparator() +
+                            getString(R.string.entropy) + ": " +
+                            System.lineSeparator() +
+                            entropy.toInt() + " " + strengthLevel +
                             System.lineSeparator() +
                             System.lineSeparator() +
                             getString(R.string.bruteforce_years_pc) + ": " +
                             System.lineSeparator() +
-                            bruteForceWithPentium.secondsToYear().toReadableFormat(0) +
+                            bruteForceWithPentium.secondsToYear().toReadableFormat() +
                             System.lineSeparator() +
-                            "(${bruteForceWithPentium.secondsToYear()})" +
+                            "(${bruteForceWithPentium.secondsToYear().toExponentFormat()})" +
                             System.lineSeparator() +
                             System.lineSeparator() +
                             getString(R.string.bruteforce_year_supercomp) + ": " +
                             System.lineSeparator() +
-                            bruteForceWithSupercomp.secondsToYear().toReadableFormat(0) +
+                            bruteForceWithSupercomp.secondsToYear().toReadableFormat() +
                             System.lineSeparator() +
-                            "(${bruteForceWithSupercomp.secondsToYear()})"
+                            "(${bruteForceWithSupercomp.secondsToYear().toExponentFormat()})"
                 )
                 .show()
         }
@@ -484,9 +443,9 @@ class EditCredentialPasswordFragment : SecureFragment() {
         }
         val spec = PasswordGeneratorSpec(
             strength = passwordStrength,
-            onlyLowerCase = !switchUpperCaseChar.isChecked,
+            noUpperCase = !switchUpperCaseChar.isChecked,
             noDigits = !switchAddDigit.isChecked,
-            excludeSpecialChars = !switchAddSpecialChar.isChecked)
+            noSpecialChars = !switchAddSpecialChar.isChecked)
         return spec
     }
 
@@ -508,6 +467,10 @@ class EditCredentialPasswordFragment : SecureFragment() {
     private fun getStrengthEnum(name: String?) : SecretStrength {
         name ?: return PASSPHRASE_STRENGTH_DEFAULT
         return SecretStrength.valueOf(name)
+    }
+
+    fun emoji(unicode: Int): String {
+        return String(Character.toChars(unicode))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -590,7 +553,11 @@ class EditCredentialPasswordFragment : SecureFragment() {
                 }
                 else {
                     context?.let { ctx ->
-                        DeobfuscationDialog.openDeobfuscationDialog(ctx) { newObfuscationKey ->
+                        DeobfuscationDialog.openDeobfuscationDialogForCredentials(ctx) { newObfuscationKey ->
+                            if (newObfuscationKey == null) {
+                                return@openDeobfuscationDialogForCredentials
+                            }
+
                             item.isChecked = true
 
                             obfuscationKey = newObfuscationKey
@@ -639,7 +606,8 @@ class EditCredentialPasswordFragment : SecureFragment() {
         }
 
         val enableOverlayFeature = PreferenceService.getAsBool(PreferenceService.PREF_ENABLE_OVERLAY_FEATURE, getBaseActivity())
-        if (!enableOverlayFeature) {
+        val inAutofillMode = editCredentialActivity.shouldPushBackAutoFill()
+        if (inAutofillMode || !enableOverlayFeature) {
             menu.findItem(R.id.menu_detach_credential)?.isVisible = false
         }
 

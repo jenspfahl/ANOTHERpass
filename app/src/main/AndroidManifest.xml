@@ -70,7 +70,7 @@
             android:noHistory="true" />
         <activity
             android:name=".ui.qrcode.QrCodeActivity"
-            android:label="@string/export"
+            android:label="@string/action_export"
             android:noHistory="false" />
         <activity
             android:name=".ui.qrcode.CaptureActivity"
@@ -119,12 +119,6 @@
             android:label="@string/app_name"
             android:noHistory="false"
             android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
-            android:theme="@style/Theme.YetAnotherPasswordManager" />
-        <activity
-            android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
-            android:theme="@style/Theme.YetAnotherPasswordManager" />
 
         <service
             android:name=".service.overlay.OverlayShowingService"

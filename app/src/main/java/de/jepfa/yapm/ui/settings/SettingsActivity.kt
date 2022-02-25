@@ -1,18 +1,24 @@
 package de.jepfa.yapm.ui.settings
 
+import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.*
+import com.yariksoffice.lingver.Lingver
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.biometrix.BiometricUtils
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.ui.login.LoginActivity
+import de.jepfa.yapm.usecase.session.LogoutUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.ClipboardUtil
+import java.util.*
 
 private const val TITLE_TAG = "settingsActivityTitle"
 
@@ -108,12 +114,49 @@ class SettingsActivity : SecureActivity(),
                 }
             }
 
+            val languagePref = findPreference<ListPreference>(
+                PreferenceService.PREF_LANGUAGE)
+
+            languagePref?.let {
+                it.setOnPreferenceChangeListener { preference, newValue ->
+
+                    val oldValue = languagePref.value
+
+                    if (oldValue != newValue) {
+                        (activity as? SettingsActivity)?.let { activity ->
+                            Lingver.getInstance().setLocale(activity, Locale(newValue.toString()))
+
+                            AlertDialog.Builder(activity)
+                                .setTitle(R.string.title_change_language)
+                                .setMessage(R.string.message_change_language)
+                                .setNeutralButton(R.string.button_restart) { dialog, _ ->
+                                    LogoutUseCase.execute(activity)
+                                    val intent = Intent(activity, LoginActivity::class.java)
+                                    activity.startActivity(intent)
+                                }
+                                .show()
+                        }
+                    }
+                    true
+                }
+            }
+
             val showLabelsInListPref = findPreference<SwitchPreferenceCompat>(
                 PreferenceService.PREF_SHOW_LABELS_IN_LIST)
 
             showLabelsInListPref?.let {
                 it.setOnPreferenceChangeListener { preference, newValue ->
                     PreferenceService.putBoolean(PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_RELOAD, true, preference.context)
+                    true
+                }
+            }
+
+            val showDividersInListPref = findPreference<SwitchPreferenceCompat>(
+                PreferenceService.PREF_SHOW_DIVIDERS_IN_LIST)
+
+            showDividersInListPref?.let {
+                it.setOnPreferenceChangeListener { preference, newValue ->
+                    PreferenceService.putBoolean(PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD, true, preference.context)
                     true
                 }
             }

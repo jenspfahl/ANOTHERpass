@@ -1,5 +1,7 @@
 package de.jepfa.yapm.usecase.session
 
+import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
@@ -10,6 +12,7 @@ import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.usecase.InputUseCase
+import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
 import de.jepfa.yapm.util.Constants
 
 
@@ -43,7 +46,10 @@ object LoginUseCase: InputUseCase<LoginData, BaseActivity>() {
 
         TempFileService.clearSharesCache(baseActivity)
         loginData.clear()
+        ImportVaultUseCase.importStagedData(baseActivity)
+
         return true
 
     }
+
 }

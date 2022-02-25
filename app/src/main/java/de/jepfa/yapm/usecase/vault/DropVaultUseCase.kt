@@ -49,6 +49,7 @@ object DropVaultUseCase: BasicUseCase<SecureActivity>() {
 
         MasterPasswordService.deleteStoredMasterPassword(activity)
         PreferenceService.deleteAllData(activity)
+        PreferenceService.deleteAllTempData(activity)
         PreferenceService.delete(PreferenceService.STATE_LOGIN_ATTEMPTS, activity)
 
         LabelService.defaultHolder.clearAll()
