@@ -1,0 +1,7 @@
+* possibility to protect Exported Master Password with a certain codeword
+* possibility to write-protect NFC tags after writing
+* add UUID attribute to all credentials and labels to simplify sharing 
+* encrypt app settings in exported vault file
+* fix password combination calculation and add entropy indicator
+* german translations and typo fixing
+* bug fixes and small improvements

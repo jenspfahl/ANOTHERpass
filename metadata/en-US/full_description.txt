@@ -1,6 +1,6 @@
-This offline password manager manages generated strong passwords which are easy to type (but almost impossible to crack).
+This offline password manager manages strong generated passwords which are easy to type (but almost impossible to crack).
 
-It also comes with a clever two factor authentication to login into the credential vault. These factors are knowledge (a pin) and ownership (the master password). So instead of remembering a long and complicated master password you just remember the pin and have your master password with you (as QR code or NFC tag), and use biometrics (e.g. fingerprint) to get it from your device.
+It also comes with a clever two factor authentication to login into the credential vault. These factors are knowledge (a PIN) and ownership (the master password). So instead of remembering a long and complicated master password you just remember the PIN and have your master password with you (as QR code or NFC tag), and use biometrics (e.g. fingerprint) to get it from your device.
 
 <b>Core features of the app</b>
 
