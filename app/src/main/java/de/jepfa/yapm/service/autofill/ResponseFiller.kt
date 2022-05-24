@@ -172,7 +172,7 @@ object ResponseFiller {
             context,
             1001,
             authIntent,
-            PendingIntent.FLAG_CANCEL_CURRENT// TODO or PendingIntent.FLAG_IMMUTABLE doesn't work, so must be mutable somehow
+            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_MUTABLE// TODO or PendingIntent.FLAG_IMMUTABLE doesn't work, so must be mutable somehow
         ).intentSender
 
         val message =
@@ -195,7 +195,7 @@ object ResponseFiller {
         val headerView =
             createRemoteView(R.mipmap.ic_launcher_round, context.getString(R.string.app_name), context)
         headerView.setTextViewTextSize(R.id.autofill_item, TypedValue.COMPLEX_UNIT_SP, 24f)
-        headerView.setTextColor(R.id.autofill_item, Color.BLACK)
+        headerView.setTextColor(R.id.autofill_item, Color.GRAY)
         headerView.setViewPadding(R.id.autofill_item, 0, 32, 0, 0)
         return headerView
     }
@@ -293,7 +293,7 @@ object ResponseFiller {
 
     private fun createUserDataSets(fields : Set<ViewNode>, name: String, user: String, context: Context): List<Dataset> {
         return createDataSets(fields,
-            R.drawable.ic_baseline_person_24,
+            R.drawable.ic_baseline_person_24_gray,
             context.getString(R.string.paste_user_for_autofill, name),
             user,
             context)
@@ -301,7 +301,7 @@ object ResponseFiller {
 
     private fun createPasswordDataSets(fields : Set<ViewNode>, name: String, password: Password, context: Context): List<Dataset> {
         return createDataSets(fields,
-            R.drawable.ic_baseline_vpn_key_24,
+            R.drawable.ic_baseline_vpn_key_24_gray,
             context.getString(R.string.paste_passwd_for_autofill, name),
             password.toRawFormattedPassword(),
             context)

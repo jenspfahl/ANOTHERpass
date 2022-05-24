@@ -209,10 +209,15 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             }
 
             override fun publishResults(charSequence: CharSequence, filterResults: FilterResults) {
-                val pubCredentials = filterResults.values as List<EncCredential?>
-                submitList(pubCredentials)
+                val list = filterResults.values
+                if (list is List<*>) {
+                    submitList(list as List<EncCredential>?)
+                }
+                else {
+                    // in some cases the filter result is null in Android 13, recreate it
+                    listCredentialsActivity.recreate()
+                }
             }
-
         }
     }
 

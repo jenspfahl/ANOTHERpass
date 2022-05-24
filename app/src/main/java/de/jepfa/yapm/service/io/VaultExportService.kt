@@ -100,6 +100,7 @@ object VaultExportService {
             success = FileUtil.writeFile(context, uri, jsonData.toString())
             val content: String? = FileUtil.readFile(context, uri)
             if (TextUtils.isEmpty(content)) {
+                //TODO this check seems not to work from time to time
                 Log.e("BACKUP", "Empty file created: $uri")
                 success = false
             }

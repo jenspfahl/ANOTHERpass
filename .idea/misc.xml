@@ -32,6 +32,7 @@
         <entry key="app/src/main/res/drawable/ic_baseline_nfc_64.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_north_east_24.xml" value="0.12916666666666668" />
         <entry key="app/src/main/res/drawable/ic_baseline_person_24.xml" value="0.12916666666666668" />
+        <entry key="app/src/main/res/drawable/ic_baseline_person_24_gray.xml" value="0.1775" />
         <entry key="app/src/main/res/drawable/ic_baseline_qr_code_24.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_qr_code_24_white.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_qr_code_36.xml" value="0.20416666666666666" />
@@ -46,6 +47,7 @@
         <entry key="app/src/main/res/drawable/ic_baseline_sort_24_white.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_vpn_key_12.xml" value="0.17604166666666668" />
         <entry key="app/src/main/res/drawable/ic_baseline_vpn_key_24.xml" value="0.17604166666666668" />
+        <entry key="app/src/main/res/drawable/ic_baseline_vpn_key_24_gray.xml" value="0.1775" />
         <entry key="app/src/main/res/drawable/ic_baseline_vpn_key_24_white.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_keywithqrcode_normal.xml" value="0.321875" />
         <entry key="app/src/main/res/drawable/ic_security_black_24dp.xml" value="0.19895833333333332" />

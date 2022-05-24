@@ -134,7 +134,7 @@
     <string name="change_master_password">Ändere Masterpasswort</string>
     <string name="change_master_password_explanation">Ändere dein Masterpasswort, indem du die aktuelle PIN eingibst und ein neues Masterpasswort generierst. Beachte, dass sich der verschlüsselte Masterkey ändert, so dass du ihn erneut exportieren solltest. Das betrifft auch Tresor-Dateien mit verschlüsselten Masterkey.</string>
     <string name="vault">Tresor</string>
-    <string name="delete_stored_masterpasswd_confirmation">Willst du das gespeicherte Masterpasswort vom Gerät entfernen? Für zukünftige Logins brauchst dann das (exportierte) Masterpasswort order ein Masterpasswort-Token.</string>
+    <string name="delete_stored_masterpasswd_confirmation">Willst du das gespeicherte Masterpasswort vom Gerät entfernen? Für zukünftige Logins brauchst dann das (exportierte) Masterpasswort oder ein Masterpasswort-Token.</string>
     <string name="pref_header_general">Allgemein</string>
     <string name="pref_header_security">Sicherheit</string>
     <string name="title_activity_settings">Einstellungen</string>
