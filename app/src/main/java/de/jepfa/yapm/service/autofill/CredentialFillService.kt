@@ -17,7 +17,6 @@ class CredentialFillService: AutofillService() {
         cancellationSignal: CancellationSignal,
         fillCallback: FillCallback
     ) {
-
         if (cancellationSignal.isCanceled) {
             fillCallback.onSuccess(null)
             return

@@ -7,7 +7,9 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.view.*
+import android.view.autofill.AutofillManager
 import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
@@ -394,6 +396,13 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
+        if (data?.hasExtra(AutofillManager.EXTRA_AUTHENTICATION_RESULT) == true) {
+            setResult(Activity.RESULT_OK, data)
+            Log.i("CFS", "disable forwarded")
+            finish()
+            return
+        }
 
         if (requestCode == newOrUpdateCredentialActivityRequestCode && resultCode == Activity.RESULT_OK) {
             data?.let {

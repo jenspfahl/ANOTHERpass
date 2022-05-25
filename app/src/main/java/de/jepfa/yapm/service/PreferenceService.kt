@@ -22,7 +22,7 @@ object PreferenceService {
      * TODO If you add new preference xml files inside #initDefaults, they should be recognised as well.
      * To achieve this, count the version value up here.
      */
-    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_15"
+    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_16"
 
     const val STATE_DEFAULT_INIT_DONE = STATE_PREFIX + "default_init_done"
 
@@ -91,6 +91,7 @@ object PreferenceService {
 
     const val PREF_AUTOFILL_EVERYWHERE = PREF_PREFIX + "autofill_suggest_everywhere"
     const val PREF_AUTOFILL_EXCLUSION_LIST = PREF_PREFIX + "autofill_exclusion_list"
+    const val PREF_AUTOFILL_DEACTIVATION_DURATION = PREF_PREFIX + "autofill_deactivation_duration"
 
     const val PREF_MASK_PASSWORD = PREF_PREFIX + "mask_password"
     const val PREF_ENABLE_COPY_PASSWORD = PREF_PREFIX + "enable_copy_password"

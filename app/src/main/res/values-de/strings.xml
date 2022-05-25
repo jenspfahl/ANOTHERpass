@@ -507,6 +507,15 @@
     <string name="print_qr_code_header">Drucke QR-Code Kopfzeile</string>
     <string name="autofill_suggest_everywhere">Autofill-Vorschläge überall anzeigen</string>
     <string name="report_a_bug">Der Fehlerbericht wird nun zu einer Bug-Tracking-Website (Github) gesendet. Dafür brauchst du ein Github-Konto. Außerdem wurde der Bericht in die Zwischenablage kopiert. Danke für deine Hilfe.</string>
+    <string name="autofill_deactivation_duration_title">Auf Aufforderung Autofill temporär pausieren</string>
+    <string name="temp_deact_autofill">Autofill pausieren</string>
+    <string name="temp_deact_autofill_never">Nie</string>
+    <string name="temp_deact_autofill_15_sec">Für 15 Sekunden</string>
+    <string name="temp_deact_autofill_30_sec">Für 30 Sekunden</string>
+    <string name="temp_deact_autofill_1_minute">Für eine Minute</string>
+    <string name="temp_deact_autofill_5_minutes">Für 5 Minuten</string>
+    <string name="temp_deact_autofill_10_minutes">Für 10 Minuten</string>
+    <string name="temp_deact_autofill_on">Autofill pausiert (%1$s)</string>
 
 
 </resources>

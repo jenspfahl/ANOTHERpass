@@ -39,6 +39,7 @@ class LoginActivity : NfcBaseActivity() {
 
     var loginAttempts = 0
     var showTagDetectedMessage = false
+    var isFromAutofill = false
 
     val createVaultActivityRequestCode = 1
     val importVaultActivityRequestCode = 2
@@ -52,7 +53,7 @@ class LoginActivity : NfcBaseActivity() {
         super.onCreate(null)
 
         val introShowed = PreferenceService.getAsBool(STATE_INTRO_SHOWED, this)
-        val isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofill, false)
+        isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofill, false)
         if (!introShowed && !isFromAutofill && Session.isLoggedOut()) {
             val intent = Intent(this, IntroActivity::class.java)
             startActivity(intent)

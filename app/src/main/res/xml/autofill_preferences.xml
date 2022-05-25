@@ -15,4 +15,16 @@
         app:singleLineTitle="false"
         app:title="@string/pref_autofill_exclude_apps" />
 
+    <ListPreference
+        app:defaultValue="15"
+        app:entries="@array/autofill_deactivation_duration_entries"
+        app:entryValues="@array/autofill_deactivation_duration_values"
+        app:key="YAPM/pref:autofill_deactivation_duration"
+        app:title="@string/autofill_deactivation_duration_title"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:useSimpleSummaryProvider="true"/>
+
+
+
 </PreferenceScreen>

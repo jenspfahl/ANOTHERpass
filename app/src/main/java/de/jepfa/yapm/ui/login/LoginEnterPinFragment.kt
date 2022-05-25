@@ -1,9 +1,14 @@
 package de.jepfa.yapm.ui.login
 
+import android.app.Activity
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.autofill.AutofillManager
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
@@ -11,12 +16,11 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.encrypted.Encrypted
-import de.jepfa.yapm.model.encrypted.EncryptedType
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.service.secret.SecretService
@@ -27,7 +31,6 @@ import de.jepfa.yapm.usecase.secret.RemoveStoredMasterPasswordUseCase
 import de.jepfa.yapm.usecase.session.LoginUseCase
 import de.jepfa.yapm.util.putEncrypted
 import de.jepfa.yapm.util.toastText
-import java.util.*
 
 
 class LoginEnterPinFragment : BaseFragment() {
@@ -47,15 +50,41 @@ class LoginEnterPinFragment : BaseFragment() {
 
         val pinTextView: EditText = view.findViewById(R.id.edittext_enter_pin)
         val nextButton = view.findViewById<Button>(R.id.button_login_next)
+        val noAutofillButton = view.findViewById<Button>(R.id.button_no_autofill)
 
         // this is to perform next step out of the keyboard
         pinTextView.imeOptions = EditorInfo.IME_ACTION_DONE
-        pinTextView.setOnEditorActionListener{ textView, id, keyEvent ->
+        pinTextView.setOnEditorActionListener{ _, _, _ ->
             nextButton.performClick()
             true
         }
 
         pinTextView.requestFocus()
+
+
+        val pauseDurationInSec = PreferenceService.getAsString(PreferenceService.PREF_AUTOFILL_DEACTIVATION_DURATION, context)
+
+        if (pauseDurationInSec != "0" && loginActivity.isFromAutofill && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            noAutofillButton.setOnClickListener {
+                val replyIntent = Intent().apply {
+                    val pauseResponse = ResponseFiller.createAutofillPauseResponse(loginActivity)
+                    putExtra(AutofillManager.EXTRA_AUTHENTICATION_RESULT, pauseResponse)
+                }
+                loginActivity.setResult(Activity.RESULT_OK, replyIntent)
+                Log.i("CFS", "disable clicked")
+                val entries = resources.getStringArray(R.array.autofill_deactivation_duration_entries)
+                val values = resources.getStringArray(R.array.autofill_deactivation_duration_values)
+                values.indexOf(pauseDurationInSec).let {
+                    entries[it]?.let { entry ->
+                        toastText(context, getString(R.string.temp_deact_autofill_on, entry))
+                    }
+                }
+                loginActivity.finish()
+            }
+        }
+        else {
+            noAutofillButton.visibility = View.GONE
+        }
 
         nextButton.setOnLongClickListener{
             AlertDialog.Builder(loginActivity)

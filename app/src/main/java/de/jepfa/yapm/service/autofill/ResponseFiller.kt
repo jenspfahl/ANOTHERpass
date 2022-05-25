@@ -13,6 +13,7 @@ import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.view.autofill.AutofillId
+import android.view.autofill.AutofillManager
 import android.view.autofill.AutofillValue
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
@@ -23,8 +24,10 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_DEACTIVATION_DURATION
 import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_EVERYWHERE
 import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_EXCLUSION_LIST
+import java.time.LocalDateTime
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
@@ -35,6 +38,8 @@ object ResponseFiller {
     private val VIEW_TO_IDENTIFY = "text"
     private val PASSWORD_INDICATORS = listOf("password", "passwd", "passphrase", "pin", "pass phrase", "keyword")
     private val USER_INDICATORS = listOf("user", "account", "email")
+
+    private var isDeactivatedSinceWhen: LocalDateTime? = null
 
     private class Fields {
 
@@ -93,6 +98,20 @@ object ResponseFiller {
         if (structure.isHomeActivity) {
             Log.i("CFS", "home activity")
             return null
+        }
+        Log.i("CFS", isDeactivatedSinceWhen.toString())
+
+        val pauseDurationInSec = PreferenceService.getAsString(PreferenceService.PREF_AUTOFILL_DEACTIVATION_DURATION, context)
+
+        if (pauseDurationInSec != null && pauseDurationInSec.toInt() != 0) {
+            isDeactivatedSinceWhen?.let {
+                if (it.isAfter(LocalDateTime.now().minusSeconds(pauseDurationInSec.toLong()))) {
+                    Log.i("CFS", "temporary deactivated")
+                    return null
+                } else {
+                    isDeactivatedSinceWhen = null
+                }
+            }
         }
 
         if (structure.activityComponent?.packageName.equals(context.packageName)) {
@@ -159,7 +178,18 @@ object ResponseFiller {
 
         return responseBuilder.build()
 
+    }
 
+    @RequiresApi(Build.VERSION_CODES.P)
+    fun createAutofillPauseResponse(context: Context): FillResponse? {
+        val pauseDurationInSec = PreferenceService.getAsString(PREF_AUTOFILL_DEACTIVATION_DURATION, context)
+        if (pauseDurationInSec == null || pauseDurationInSec.toInt() == 0) {
+            return null;
+        }
+        isDeactivatedSinceWhen = LocalDateTime.now()
+        return FillResponse.Builder()
+                .disableAutofill(pauseDurationInSec.toLong() * 1000)
+                .build()
     }
 
     private fun createAuthenticationFillResponse(fields: Fields, context: Context): FillResponse {

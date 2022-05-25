@@ -386,7 +386,7 @@
     <string name="pref_overlay_close_all">Close entire app and logout when overlay is dropped</string>
     <string name="pref_overlay_size_title">Overlay dialog size</string>
     <string name="pref_password_generator_use_pseudophrase">Use pseudo phrase to generate new passwords</string>
-    <string name="pref_password_generator_password_strength">Default password stength</string>
+    <string name="pref_password_generator_password_strength">Default password strength</string>
     <string name="pref_security_mask_password">Mask password when showing a credential (can be unmasked by clicking on it)</string>
     <string name="licences">Licences</string>
     <string name="licences_title">Used open source licences</string>
@@ -517,5 +517,14 @@
     <string name="print_qr_code_header">Print QR code header</string>
     <string name="autofill_suggest_everywhere">Autofill suggestion everywhere</string>
     <string name="report_a_bug">The bug report will be sent to a bug report tracker website (Github). You need a Github account for doing this. Additionally the report is copied to the clipboard. Thanks for helping.</string>
+    <string name="autofill_deactivation_duration_title">On demand temporary pause Autofill</string>
+    <string name="temp_deact_autofill">Pause autofill</string>
+    <string name="temp_deact_autofill_never">Never</string>
+    <string name="temp_deact_autofill_15_sec">For 15 seconds</string>
+    <string name="temp_deact_autofill_30_sec">For 30 seconds</string>
+    <string name="temp_deact_autofill_1_minute">For one minute</string>
+    <string name="temp_deact_autofill_5_minutes">For 5 minutes</string>
+    <string name="temp_deact_autofill_10_minutes">For 10 minutes</string>
+    <string name="temp_deact_autofill_on">Autofill paused (%1$s)</string>
 
 </resources>
