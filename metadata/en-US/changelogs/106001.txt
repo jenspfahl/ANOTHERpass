@@ -1,0 +1,2 @@
+* fix crash when open from Autofill (Android 10+)
+* add temporary pause Autofill feature
