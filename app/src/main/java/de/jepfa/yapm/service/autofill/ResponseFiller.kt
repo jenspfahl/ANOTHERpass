@@ -13,6 +13,7 @@ import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.view.autofill.AutofillId
+import android.view.autofill.AutofillManager
 import android.view.autofill.AutofillValue
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
@@ -23,8 +24,11 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_DEACTIVATION_DURATION
 import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_EVERYWHERE
 import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_EXCLUSION_LIST
+import de.jepfa.yapm.service.PreferenceService.STATE_PAUSE_AUTOFILL
+import java.time.LocalDateTime
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
@@ -35,6 +39,8 @@ object ResponseFiller {
     private val VIEW_TO_IDENTIFY = "text"
     private val PASSWORD_INDICATORS = listOf("password", "passwd", "passphrase", "pin", "pass phrase", "keyword")
     private val USER_INDICATORS = listOf("user", "account", "email")
+
+    private var isDeactivatedSinceWhen: Long? = null
 
     private class Fields {
 
@@ -93,6 +99,28 @@ object ResponseFiller {
         if (structure.isHomeActivity) {
             Log.i("CFS", "home activity")
             return null
+        }
+        Log.i("CFS", isDeactivatedSinceWhen.toString())
+
+        val pauseDurationInSec = PreferenceService.getAsString(PreferenceService.PREF_AUTOFILL_DEACTIVATION_DURATION, context)
+
+        if (pauseDurationInSec != null && pauseDurationInSec.toInt() != 0) {
+
+            if (isDeactivatedSinceWhen == null) {
+                PreferenceService.getAsString(STATE_PAUSE_AUTOFILL, context)?.let { whenAsString ->
+                    isDeactivatedSinceWhen = whenAsString.toLong()
+                }
+            }
+
+            isDeactivatedSinceWhen?.let {
+                val border = System.currentTimeMillis() - (pauseDurationInSec.toLong() * 1000)
+                if (it > border) {
+                    Log.i("CFS", "temporary deactivated")
+                    return null
+                } else {
+                    resumeAutofill(context)
+                }
+            }
         }
 
         if (structure.activityComponent?.packageName.equals(context.packageName)) {
@@ -159,7 +187,29 @@ object ResponseFiller {
 
         return responseBuilder.build()
 
+    }
 
+    fun resumeAutofill(context: Context) {
+        PreferenceService.delete(STATE_PAUSE_AUTOFILL, context)
+        isDeactivatedSinceWhen = null
+    }
+
+    fun isAutofillPaused(context: Context): Boolean {
+        return isDeactivatedSinceWhen != null || PreferenceService.isPresent(STATE_PAUSE_AUTOFILL, context)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.P)
+    fun createAutofillPauseResponse(context: Context, pauseDurationInSec: Long): FillResponse? {
+        if (pauseDurationInSec == 0L) {
+            resumeAutofill(context)
+            return null;
+        }
+        isDeactivatedSinceWhen = System.currentTimeMillis()
+        PreferenceService.putString(STATE_PAUSE_AUTOFILL, isDeactivatedSinceWhen.toString(), context)
+
+        return FillResponse.Builder()
+                .disableAutofill( 1) // disabling autofill is managed by the app to be able to resume it earlier
+                .build()
     }
 
     private fun createAuthenticationFillResponse(fields: Fields, context: Context): FillResponse {
@@ -172,7 +222,7 @@ object ResponseFiller {
             context,
             1001,
             authIntent,
-            PendingIntent.FLAG_CANCEL_CURRENT// TODO or PendingIntent.FLAG_IMMUTABLE doesn't work, so must be mutable somehow
+            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_MUTABLE// TODO or PendingIntent.FLAG_IMMUTABLE doesn't work, so must be mutable somehow
         ).intentSender
 
         val message =
@@ -195,7 +245,7 @@ object ResponseFiller {
         val headerView =
             createRemoteView(R.mipmap.ic_launcher_round, context.getString(R.string.app_name), context)
         headerView.setTextViewTextSize(R.id.autofill_item, TypedValue.COMPLEX_UNIT_SP, 24f)
-        headerView.setTextColor(R.id.autofill_item, Color.BLACK)
+        headerView.setTextColor(R.id.autofill_item, Color.GRAY)
         headerView.setViewPadding(R.id.autofill_item, 0, 32, 0, 0)
         return headerView
     }
@@ -293,7 +343,7 @@ object ResponseFiller {
 
     private fun createUserDataSets(fields : Set<ViewNode>, name: String, user: String, context: Context): List<Dataset> {
         return createDataSets(fields,
-            R.drawable.ic_baseline_person_24,
+            R.drawable.ic_baseline_person_24_gray,
             context.getString(R.string.paste_user_for_autofill, name),
             user,
             context)
@@ -301,7 +351,7 @@ object ResponseFiller {
 
     private fun createPasswordDataSets(fields : Set<ViewNode>, name: String, password: Password, context: Context): List<Dataset> {
         return createDataSets(fields,
-            R.drawable.ic_baseline_vpn_key_24,
+            R.drawable.ic_baseline_vpn_key_24_gray,
             context.getString(R.string.paste_passwd_for_autofill, name),
             password.toRawFormattedPassword(),
             context)

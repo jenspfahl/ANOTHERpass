@@ -3,6 +3,7 @@ package de.jepfa.yapm.ui.login
 import android.app.Activity
 import android.content.Intent
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -20,6 +21,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_MAX_LOGIN_ATTEMPTS
 import de.jepfa.yapm.service.PreferenceService.PREF_SELF_DESTRUCTION
 import de.jepfa.yapm.service.PreferenceService.STATE_INTRO_SHOWED
 import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_ATTEMPTS
+import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.*
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
@@ -39,6 +41,7 @@ class LoginActivity : NfcBaseActivity() {
 
     var loginAttempts = 0
     var showTagDetectedMessage = false
+    var isFromAutofill = false
 
     val createVaultActivityRequestCode = 1
     val importVaultActivityRequestCode = 2
@@ -52,7 +55,7 @@ class LoginActivity : NfcBaseActivity() {
         super.onCreate(null)
 
         val introShowed = PreferenceService.getAsBool(STATE_INTRO_SHOWED, this)
-        val isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofill, false)
+        isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofill, false)
         if (!introShowed && !isFromAutofill && Session.isLoggedOut()) {
             val intent = Intent(this, IntroActivity::class.java)
             startActivity(intent)
@@ -96,6 +99,10 @@ class LoginActivity : NfcBaseActivity() {
         menuInflater.inflate(R.menu.menu_login, menu)
         val debugItem: MenuItem = menu.findItem(R.id.menu_debug)
         debugItem.isVisible = DebugInfo.isDebug
+
+        val resumeAutofillItem: MenuItem = menu.findItem(R.id.menu_resume_autofill)
+        resumeAutofillItem.isVisible = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && ResponseFiller.isAutofillPaused(this)
+
         return true
     }
 
@@ -124,6 +131,16 @@ class LoginActivity : NfcBaseActivity() {
                 }
                 .setNegativeButton(android.R.string.no, null)
                 .show()
+            return true
+        }
+
+        if (id == R.id.menu_resume_autofill) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && ResponseFiller.isAutofillPaused(this)) {
+                ResponseFiller.resumeAutofill(this)
+                toastText(this, R.string.resume_paused_autofill_done)
+                item.isVisible = false
+            }
+            return true
         }
 
         if (id == R.id.menu_about) {

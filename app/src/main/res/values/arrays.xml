@@ -51,6 +51,28 @@
         <item>10</item>
     </string-array>
 
+    <string-array name="autofill_deactivation_duration_entries">
+        <item>@string/temp_deact_autofill_never</item>
+        <item>@string/temp_deact_autofill_15_sec</item>
+        <item>@string/temp_deact_autofill_30_sec</item>
+        <item>@string/temp_deact_autofill_1_minute</item>
+        <item>@string/temp_deact_autofill_5_minutes</item>
+        <item>@string/temp_deact_autofill_10_minutes</item>
+        <item>@string/temp_deact_autofill_1_hour</item>
+        <item>@string/temp_deact_autofill_12_hours</item>
+    </string-array>
+
+    <string-array name="autofill_deactivation_duration_values">
+        <item>0</item>
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>300</item>
+        <item>600</item>
+        <item>3600</item>
+        <item>43200</item>
+    </string-array>
+
 
     <string-array name="default_passwd_strength_entries">
         <item>@string/NORMAL</item>

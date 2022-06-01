@@ -9,21 +9,21 @@ apply plugin: 'com.jaredsburrows.license'
 
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
 
     defaultConfig {
         applicationId "de.jepfa.yapm"
         minSdkVersion 24
-        targetSdkVersion 30
+        targetSdkVersion 31
         // format: <XXYYZZZ>
         // XX=major (breaks compatibility to old apps)
         // YY=minor (new features)
         // ZZZ=micro (just bugfixes)
     //  versionCode XXYYZZZ
-        versionCode  106000
+        versionCode  106001
         // remove _rc when release
         // e.g. versionName "1.3.0_rc"
-        versionName "1.6.0"
+        versionName "1.6.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

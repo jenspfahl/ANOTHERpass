@@ -26,7 +26,7 @@
             android:inputType="textPassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@id/button_login_next"
+            app:layout_constraintBottom_toTopOf="@id/button_container"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/textview_login_vault"
@@ -35,19 +35,57 @@
             tools:ignore="TextFields" />
 
 
-        <Button
-            android:id="@+id/button_login_next"
+        <LinearLayout
+            android:orientation="vertical"
+            android:id="@+id/button_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/button_next"
-            android:background="@color/colorAccent"
-            android:textColor="@color/buttonLabel"
-            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/edittext_enter_pin" />
+            app:layout_constraintTop_toTopOf="@id/edittext_enter_pin">
 
+
+            <Button
+                android:id="@+id/button_login_next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/button_next"
+                android:background="@color/colorAccent"
+                android:textColor="@color/buttonLabel"
+                android:textStyle="bold"
+               />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp">
+                <Button
+                    android:id="@+id/button_no_autofill"
+                    style="?android:textAppearanceSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@color/white"
+                    android:paddingHorizontal="8dp"
+                    android:text="@string/temp_deact_autofill"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorAccent"
+                    android:textStyle="normal" />
+                <Button
+                    android:id="@+id/button_no_autofill_dropdown"
+                    style="?android:textAppearanceSmall"
+                    android:layout_width="32dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:drawableEnd="@android:drawable/arrow_down_float"
+                    android:background="@color/white"
+                    android:paddingHorizontal="8dp"
+                    android:drawableTint="@color/colorAccent" />
+                </LinearLayout>
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
