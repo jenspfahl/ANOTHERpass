@@ -117,6 +117,8 @@ object PreferenceService {
     const val STATE_REQUEST_CREDENTIAL_LIST_RELOAD = STATE_PREFIX + "request_credential_list_reload"
     const val STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD = STATE_PREFIX + "request_credential_list_activity_reload"
 
+    const val STATE_PAUSE_AUTOFILL = STATE_PREFIX + "pause_autofill"
+
     const val TEMP_BLOB_CREDENTIALS = TEMP_PREFIX + "blob_credentials"
     const val TEMP_BLOB_LABELS = TEMP_PREFIX + "blob_labels"
     const val TEMP_BLOB_SETTINGS = TEMP_PREFIX + "blob_settings"

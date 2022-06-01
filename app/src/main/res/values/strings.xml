@@ -525,6 +525,10 @@
     <string name="temp_deact_autofill_1_minute">For one minute</string>
     <string name="temp_deact_autofill_5_minutes">For 5 minutes</string>
     <string name="temp_deact_autofill_10_minutes">For 10 minutes</string>
+    <string name="temp_deact_autofill_1_hour">For one hour</string>
+    <string name="temp_deact_autofill_12_hours">For 12 hours</string>
     <string name="temp_deact_autofill_on">Autofill paused (%1$s)</string>
+    <string name="resume_paused_autofill">Resume paused Autofill</string>
+    <string name="resume_paused_autofill_done">Autofill now active again</string>
 
 </resources>

@@ -27,6 +27,7 @@ import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_DEACTIVATION_DURATION
 import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_EVERYWHERE
 import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_EXCLUSION_LIST
+import de.jepfa.yapm.service.PreferenceService.STATE_PAUSE_AUTOFILL
 import java.time.LocalDateTime
 import java.util.*
 import kotlin.collections.ArrayList
@@ -39,7 +40,7 @@ object ResponseFiller {
     private val PASSWORD_INDICATORS = listOf("password", "passwd", "passphrase", "pin", "pass phrase", "keyword")
     private val USER_INDICATORS = listOf("user", "account", "email")
 
-    private var isDeactivatedSinceWhen: LocalDateTime? = null
+    private var isDeactivatedSinceWhen: Long? = null
 
     private class Fields {
 
@@ -104,12 +105,20 @@ object ResponseFiller {
         val pauseDurationInSec = PreferenceService.getAsString(PreferenceService.PREF_AUTOFILL_DEACTIVATION_DURATION, context)
 
         if (pauseDurationInSec != null && pauseDurationInSec.toInt() != 0) {
+
+            if (isDeactivatedSinceWhen == null) {
+                PreferenceService.getAsString(STATE_PAUSE_AUTOFILL, context)?.let { whenAsString ->
+                    isDeactivatedSinceWhen = whenAsString.toLong()
+                }
+            }
+
             isDeactivatedSinceWhen?.let {
-                if (it.isAfter(LocalDateTime.now().minusSeconds(pauseDurationInSec.toLong()))) {
+                val border = System.currentTimeMillis() - (pauseDurationInSec.toLong() * 1000)
+                if (it > border) {
                     Log.i("CFS", "temporary deactivated")
                     return null
                 } else {
-                    isDeactivatedSinceWhen = null
+                    resumeAutofill(context)
                 }
             }
         }
@@ -180,15 +189,26 @@ object ResponseFiller {
 
     }
 
+    fun resumeAutofill(context: Context) {
+        PreferenceService.delete(STATE_PAUSE_AUTOFILL, context)
+        isDeactivatedSinceWhen = null
+    }
+
+    fun isAutofillPaused(context: Context): Boolean {
+        return isDeactivatedSinceWhen != null || PreferenceService.isPresent(STATE_PAUSE_AUTOFILL, context)
+    }
+
     @RequiresApi(Build.VERSION_CODES.P)
-    fun createAutofillPauseResponse(context: Context): FillResponse? {
-        val pauseDurationInSec = PreferenceService.getAsString(PREF_AUTOFILL_DEACTIVATION_DURATION, context)
-        if (pauseDurationInSec == null || pauseDurationInSec.toInt() == 0) {
+    fun createAutofillPauseResponse(context: Context, pauseDurationInSec: Long): FillResponse? {
+        if (pauseDurationInSec == 0L) {
+            resumeAutofill(context)
             return null;
         }
-        isDeactivatedSinceWhen = LocalDateTime.now()
+        isDeactivatedSinceWhen = System.currentTimeMillis()
+        PreferenceService.putString(STATE_PAUSE_AUTOFILL, isDeactivatedSinceWhen.toString(), context)
+
         return FillResponse.Builder()
-                .disableAutofill(pauseDurationInSec.toLong() * 1000)
+                .disableAutofill( 1) // disabling autofill is managed by the app to be able to resume it earlier
                 .build()
     }
 
