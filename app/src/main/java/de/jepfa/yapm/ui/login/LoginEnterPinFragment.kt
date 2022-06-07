@@ -4,6 +4,9 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -17,11 +20,17 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_LAST_LOGIN_STATE
+import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_DENIED_AT
+import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_SUCCEEDED_AT
+import de.jepfa.yapm.service.PreferenceService.STATE_PREVIOUS_LOGIN_ATTEMPTS
+import de.jepfa.yapm.service.PreferenceService.STATE_PREVIOUS_LOGIN_SUCCEEDED_AT
 import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.MasterPasswordService
@@ -31,6 +40,8 @@ import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.usecase.secret.RemoveStoredMasterPasswordUseCase
 import de.jepfa.yapm.usecase.session.LoginUseCase
+import de.jepfa.yapm.util.dateToNiceString
+import de.jepfa.yapm.util.dateToString
 import de.jepfa.yapm.util.putEncrypted
 import de.jepfa.yapm.util.toastText
 
@@ -54,6 +65,8 @@ class LoginEnterPinFragment : BaseFragment() {
         val nextButton = view.findViewById<Button>(R.id.button_login_next)
         val noAutofillButton = view.findViewById<Button>(R.id.button_no_autofill)
         val noAutofillDrowdownButton = view.findViewById<Button>(R.id.button_no_autofill_dropdown)
+
+        updateInfoText()
 
         // this is to perform next step out of the keyboard
         pinTextView.imeOptions = EditorInfo.IME_ACTION_DONE
@@ -163,6 +176,45 @@ class LoginEnterPinFragment : BaseFragment() {
         }
     }
 
+    private fun updateInfoText() {
+        view?.let { view ->
+            val context = view.context
+            val showPreviousLogins = PreferenceService.getAsInt(PREF_SHOW_LAST_LOGIN_STATE, context)
+
+            val lastLoginDeniedAt = PreferenceService.getAsDate(STATE_LOGIN_DENIED_AT, context)
+            val lastLoginSucceededAt =
+                PreferenceService.getAsDate(STATE_LOGIN_SUCCEEDED_AT, context)
+            val previousLoginSucceededAt =
+                PreferenceService.getAsDate(STATE_PREVIOUS_LOGIN_SUCCEEDED_AT, context)
+            if (showPreviousLogins > 0
+                && lastLoginDeniedAt != null && lastLoginSucceededAt != null
+                && lastLoginDeniedAt.after(lastLoginSucceededAt)) {
+                val lastLoginDeniedAttempts =
+                    PreferenceService.getAsInt(STATE_PREVIOUS_LOGIN_ATTEMPTS, context)
+
+                val span = SpannableString(getString(R.string.last_succeeded_login,
+                    dateToNiceString(lastLoginDeniedAt, context), lastLoginDeniedAttempts))
+
+                span.setSpan(ForegroundColorSpan(context.getColor(R.color.colorAltAccent)),
+                    0, span.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                Snackbar.make(
+                    view,
+                    span,
+                    1_200_000
+                ).show()
+
+            }
+            else if (showPreviousLogins == 2 && previousLoginSucceededAt != null) {
+                Snackbar.make(
+                    view,
+
+                    getString(R.string.last_denied_login_attempt, dateToNiceString(previousLoginSucceededAt, context)),
+                    7_000
+                ).show()
+            }
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.P)
     private fun pauseAutofill(
         loginActivity: LoginActivity,
@@ -182,6 +234,11 @@ class LoginEnterPinFragment : BaseFragment() {
             }
         }
         loginActivity.finish()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateInfoText()
     }
 
     private fun login(

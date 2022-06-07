@@ -530,5 +530,19 @@
     <string name="temp_deact_autofill_on">Autofill paused (%1$s)</string>
     <string name="resume_paused_autofill">Resume paused Autofill</string>
     <string name="resume_paused_autofill_done">Autofill now active again</string>
+    <string name="previous_login_at">Previous login at</string>
+    <string name="last_denied_login_at">Last denied login at</string>
+    <string name="last_denied_login_attempts">Last denied login attempts</string>
+    <string name="last_succeeded_login">"%2$d login attempt(s) was/were denied %1$s!!</string>
+    <string name="last_denied_login_attempt">Last succeeded login was %1$s</string>
+
+    <string name="date_at">at %1$s</string>
+    <string name="date_yesterday_at">yesterday at %1$s</string>
+    <string name="date_on_date_at">on %1$s at %2$s</string>
+
+    <string name="pref_show_last_login_state">Show previous login state</string>
+    <string name="show_last_login_state_denies_and_succeeds">Login denies and succeeds</string>
+    <string name="show_last_login_state_denies_only">Only login denies</string>
+    <string name="show_last_login_state_nothing">None</string>
 
 </resources>

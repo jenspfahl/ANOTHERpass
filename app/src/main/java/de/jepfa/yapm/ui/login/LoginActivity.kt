@@ -20,7 +20,11 @@ import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_MAX_LOGIN_ATTEMPTS
 import de.jepfa.yapm.service.PreferenceService.PREF_SELF_DESTRUCTION
 import de.jepfa.yapm.service.PreferenceService.STATE_INTRO_SHOWED
+import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_DENIED_AT
 import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_ATTEMPTS
+import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_SUCCEEDED_AT
+import de.jepfa.yapm.service.PreferenceService.STATE_PREVIOUS_LOGIN_ATTEMPTS
+import de.jepfa.yapm.service.PreferenceService.STATE_PREVIOUS_LOGIN_SUCCEEDED_AT
 import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.*
@@ -174,7 +178,12 @@ class LoginActivity : NfcBaseActivity() {
 
     fun handleFailedLoginAttempt() {
         loginAttempts++
-        PreferenceService.putString(STATE_LOGIN_ATTEMPTS, loginAttempts.toString(), this)
+
+        PreferenceService.putInt(STATE_LOGIN_ATTEMPTS, loginAttempts, this)
+        PreferenceService.putInt(STATE_PREVIOUS_LOGIN_ATTEMPTS, loginAttempts, this)
+
+        PreferenceService.putCurrentDate(STATE_LOGIN_DENIED_AT, this)
+
         if (loginAttempts >= getMaxLoginAttempts()) {
             val selfDestruction = PreferenceService.getAsBool(PREF_SELF_DESTRUCTION, this)
 
@@ -218,6 +227,17 @@ class LoginActivity : NfcBaseActivity() {
 
     fun loginSuccessful() {
         loginAttempts = 0
+
+        // backup last login attempt
+        PreferenceService.putInt(STATE_PREVIOUS_LOGIN_ATTEMPTS,
+            PreferenceService.getAsInt(STATE_LOGIN_ATTEMPTS, this), this)
+
+        // backup last succeeded login
+        PreferenceService.getAsDate(STATE_LOGIN_SUCCEEDED_AT, this)?.let {
+            PreferenceService.putDate(STATE_PREVIOUS_LOGIN_SUCCEEDED_AT, it, this)
+        }
+
+        PreferenceService.putCurrentDate(STATE_LOGIN_SUCCEEDED_AT, this)
         PreferenceService.delete(STATE_LOGIN_ATTEMPTS, this)
 
         val isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofill, false)

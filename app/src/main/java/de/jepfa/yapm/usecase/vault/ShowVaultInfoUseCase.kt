@@ -6,12 +6,16 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_EXPORTED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_MODIFIED_AT
+import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_DENIED_AT
+import de.jepfa.yapm.service.PreferenceService.STATE_PREVIOUS_LOGIN_ATTEMPTS
+import de.jepfa.yapm.service.PreferenceService.STATE_PREVIOUS_LOGIN_SUCCEEDED_AT
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.InputUseCase
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.addFormattedLine
+import de.jepfa.yapm.util.addNewLine
 import de.jepfa.yapm.util.dateToString
 
 object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActivity>() {
@@ -42,8 +46,10 @@ object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActi
         sb.addFormattedLine(activity.getString(R.string.vault_id), vaultId)
         sb.addFormattedLine(activity.getString(R.string.vault_version), vaultVersion)
         sb.addFormattedLine(activity.getString(R.string.cipher_name), activity.getString(cipherAlgorithm.uiLabel))
+        sb.addNewLine()
         sb.addFormattedLine(activity.getString(R.string.credential_count), input.credentialCount)
         sb.addFormattedLine(activity.getString(R.string.label_count), input.labelCount)
+        sb.addNewLine()
         if (vaultCreatedAt != null) {
             sb.addFormattedLine(activity.getString(R.string.vault_created_at), dateToString(vaultCreatedAt))
         }
@@ -57,6 +63,19 @@ object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActi
         val vaultExportedAt = PreferenceService.getAsDate(DATA_VAULT_EXPORTED_AT, activity)
         vaultExportedAt?.let {
             sb.addFormattedLine(activity.getString(R.string.vault_exported_at), dateToString(it))
+        }
+        sb.addNewLine()
+        val previousLoginSucceededAt = PreferenceService.getAsDate(STATE_PREVIOUS_LOGIN_SUCCEEDED_AT, activity)
+        previousLoginSucceededAt?.let {
+            sb.addFormattedLine(activity.getString(R.string.previous_login_at), dateToString(it))
+        }
+        val lastDeniedLoginAt = PreferenceService.getAsDate(STATE_LOGIN_DENIED_AT, activity)
+        lastDeniedLoginAt?.let {
+            sb.addFormattedLine(activity.getString(R.string.last_denied_login_at), dateToString(it))
+        }
+        val lastDeniedLoginAttempts = PreferenceService.getAsInt(STATE_PREVIOUS_LOGIN_ATTEMPTS, activity)
+        lastDeniedLoginAttempts?.let {
+            sb.addFormattedLine(activity.getString(R.string.last_denied_login_attempts), it)
         }
 
         builder.setTitle(R.string.vault_info)
