@@ -126,6 +126,10 @@ fun formatAsDate(s: String?, context: Context): String {
     return "??"
 }
 
+fun emoji(unicode: Int): String {
+    return String(Character.toChars(unicode))
+}
+
 private fun ensureHttp(s: String): String {
     if (s.startsWith(prefix = "http", ignoreCase = true)) {
         return s

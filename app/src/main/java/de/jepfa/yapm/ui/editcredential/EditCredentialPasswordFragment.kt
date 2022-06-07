@@ -19,7 +19,6 @@ import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SecretService
-import de.jepfa.yapm.service.secretgenerator.GeneratorBase
 import de.jepfa.yapm.service.secretgenerator.SecretStrength
 import de.jepfa.yapm.service.secretgenerator.passphrase.DEFAULT_SPECIAL_CHARS
 import de.jepfa.yapm.service.secretgenerator.passphrase.PassphraseGenerator
@@ -28,8 +27,12 @@ import de.jepfa.yapm.service.secretgenerator.password.PasswordGenerator
 import de.jepfa.yapm.service.secretgenerator.password.PasswordGeneratorSpec
 import de.jepfa.yapm.ui.SecureFragment
 import de.jepfa.yapm.ui.credential.DeobfuscationDialog
+import de.jepfa.yapm.usecase.credential.ShowPasswordStrengthUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
-import de.jepfa.yapm.util.*
+import de.jepfa.yapm.util.ClipboardUtil
+import de.jepfa.yapm.util.Constants
+import de.jepfa.yapm.util.PasswordColorizer
+import de.jepfa.yapm.util.toastText
 
 
 class EditCredentialPasswordFragment : SecureFragment() {
@@ -259,15 +262,8 @@ class EditCredentialPasswordFragment : SecureFragment() {
     }
 
     private fun guessPasswordCombinations(password: Password) {
-        // rudimentary combination calculation by assuming a-Z, A-Z, 0-9 and some typical special chars
-        val containsLowerCase = containsChars(password, PasswordGenerator.DEFAULT_ALPHA_CHARS_LOWER_CASE)
-        val containsUpperCase = containsChars(password, PasswordGenerator.DEFAULT_ALPHA_CHARS_UPPER_CASE)
-        val containsDigits = containsChars(password, PasswordGenerator.DEFAULT_DIGITS)
-        val containsSpecialChars = containsChars(password, PasswordGenerator.DEFAULT_SPECIAL_CHARS)
-        passwordCombinations = Math.pow(
-            (containsLowerCase + containsUpperCase + containsDigits + containsSpecialChars).toDouble(),
-            password.length.toDouble()
-        )
+
+        passwordCombinations = ShowPasswordStrengthUseCase.guessPasswordCombinations(password)
         passwordCombinationsGuessed = true
     }
 
@@ -287,51 +283,8 @@ class EditCredentialPasswordFragment : SecureFragment() {
     private fun showPasswordStrength() {
         val combinations = passwordCombinations
         if (combinations != null) {
-            val entropy = passphraseGenerator.calcEntropy(combinations)
-            val bruteForceWithPentium = passphraseGenerator.calcBruteForceWaitingSeconds(
-                combinations, GeneratorBase.BRUTEFORCE_ATTEMPTS_PENTIUM
-            )
-            val bruteForceWithSupercomp = passphraseGenerator.calcBruteForceWaitingSeconds(
-                combinations, GeneratorBase.BRUTEFORCE_ATTEMPTS_SUPERCOMP
-            )
-            val titleId =
-                if (passwordCombinationsGuessed) R.string.password_strength_guessed
-                else R.string.password_strength
-            var strengthLevel = emoji(0x1f625)
-            if (entropy >= 128) strengthLevel = emoji(0x1f606)
-            else if (entropy >= 60) strengthLevel = emoji(0x1f642)
-            else if (entropy >= 36) strengthLevel = emoji(0x1f610)
-            else if (entropy >= 28) strengthLevel = emoji(0x1f641)
-            AlertDialog.Builder(editCredentialActivity)
-                .setTitle(getString(titleId))
-                .setIcon(R.drawable.ic_baseline_fitness_center_24)
-                .setMessage(
-                    getString(R.string.combinations) + ": " +
-                            System.lineSeparator() +
-                            combinations.toReadableFormat() +
-                            System.lineSeparator() +
-                            "(${combinations.toExponentFormat()})" +
-                            System.lineSeparator() +
-                            System.lineSeparator() +
-                            getString(R.string.entropy) + ": " +
-                            System.lineSeparator() +
-                            entropy.toInt() + " " + strengthLevel +
-                            System.lineSeparator() +
-                            System.lineSeparator() +
-                            getString(R.string.bruteforce_years_pc) + ": " +
-                            System.lineSeparator() +
-                            bruteForceWithPentium.secondsToYear().toReadableFormat() +
-                            System.lineSeparator() +
-                            "(${bruteForceWithPentium.secondsToYear().toExponentFormat()})" +
-                            System.lineSeparator() +
-                            System.lineSeparator() +
-                            getString(R.string.bruteforce_year_supercomp) + ": " +
-                            System.lineSeparator() +
-                            bruteForceWithSupercomp.secondsToYear().toReadableFormat() +
-                            System.lineSeparator() +
-                            "(${bruteForceWithSupercomp.secondsToYear().toExponentFormat()})"
-                )
-                .show()
+
+            ShowPasswordStrengthUseCase.showPasswordStrength(combinations, editCredentialActivity)
         }
         else {
             toastText(activity,R.string.generate_password_first)
@@ -467,10 +420,6 @@ class EditCredentialPasswordFragment : SecureFragment() {
     private fun getStrengthEnum(name: String?) : SecretStrength {
         name ?: return PASSPHRASE_STRENGTH_DEFAULT
         return SecretStrength.valueOf(name)
-    }
-
-    fun emoji(unicode: Int): String {
-        return String(Character.toChars(unicode))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

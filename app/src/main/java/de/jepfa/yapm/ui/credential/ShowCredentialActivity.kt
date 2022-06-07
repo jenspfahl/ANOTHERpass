@@ -40,6 +40,7 @@ import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.ui.label.LabelDialogs
 import de.jepfa.yapm.usecase.credential.ExportCredentialUseCase
 import de.jepfa.yapm.usecase.credential.ImportCredentialUseCase
+import de.jepfa.yapm.usecase.credential.ShowPasswordStrengthUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.PasswordColorizer.spannableObfusableAndMaskableString
@@ -111,6 +112,19 @@ class ShowCredentialActivity : SecureActivity() {
         additionalInfoTextView = findViewById(R.id.additional_info)
         passwordTextView = findViewById(R.id.passwd)
 
+        passwordTextView.setOnLongClickListener {
+            if (credential != null) {
+                masterSecretKey?.let { key ->
+                    val password = decryptPassword(key, credential!!.password)
+                    obfuscationKey?.let {
+                        password.deobfuscate(it)
+                    }
+                    ShowPasswordStrengthUseCase.execute(password, this)
+                    password.clear()
+                }
+            }
+            return@setOnLongClickListener true
+        }
         passwordTextView.setOnClickListener {
             if (maskPassword) {
                 maskPassword = false
@@ -442,7 +456,7 @@ class ShowCredentialActivity : SecureActivity() {
                 credential.isObfuscated
 
             if (DebugInfo.isDebug) {
-                passwordTextView.setOnLongClickListener {
+                titleLayout.setOnLongClickListener {
                     val builder: AlertDialog.Builder = AlertDialog.Builder(this)
                     val icon: Drawable = applicationInfo.loadIcon(packageManager)
                     val labelIds = toolbarChipGroup.children
