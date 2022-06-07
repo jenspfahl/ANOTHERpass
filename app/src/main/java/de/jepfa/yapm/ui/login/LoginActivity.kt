@@ -50,6 +50,7 @@ class LoginActivity : NfcBaseActivity() {
     val createVaultActivityRequestCode = 1
     val importVaultActivityRequestCode = 2
 
+    private var resumeAutofillItem: MenuItem? = null
 
     init {
         checkSession = false
@@ -104,10 +105,15 @@ class LoginActivity : NfcBaseActivity() {
         val debugItem: MenuItem = menu.findItem(R.id.menu_debug)
         debugItem.isVisible = DebugInfo.isDebug
 
-        val resumeAutofillItem: MenuItem = menu.findItem(R.id.menu_resume_autofill)
-        resumeAutofillItem.isVisible = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && ResponseFiller.isAutofillPaused(this)
+        resumeAutofillItem = menu.findItem(R.id.menu_resume_autofill)
+        updateResumeAutfillMenuItem()
 
         return true
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateResumeAutfillMenuItem()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -268,6 +274,11 @@ class LoginActivity : NfcBaseActivity() {
 
     internal fun isFastLoginWithNfcTag(): Boolean {
         return  PreferenceService.getAsBool(PreferenceService.PREF_FAST_MASTERPASSWD_LOGIN_WITH_NFC, this)
+    }
+
+    private fun updateResumeAutfillMenuItem() {
+        resumeAutofillItem?.isVisible =
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && ResponseFiller.isAutofillPaused(this)
     }
 
     private fun readEMP(emp: Encrypted, handlePassword: (passwd: Password?) -> Unit) {
