@@ -60,13 +60,8 @@ fun StringBuilder.addNewLine() {
     append(System.lineSeparator())
 }
 
-fun Long.toSimpleDateTimeFormat(): String {
-    val f =
-        SimpleDateFormat.getDateTimeInstance(
-            SimpleDateFormat.MEDIUM,
-            SimpleDateFormat.MEDIUM,
-            Locale.getDefault(Locale.Category.FORMAT))
-    return f.format(this)
+fun Long.toDate(): Date {
+    return Date(this)
 }
 
 fun Date.toSimpleDateTimeFormat(): String {

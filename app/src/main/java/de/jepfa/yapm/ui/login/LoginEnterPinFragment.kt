@@ -41,7 +41,6 @@ import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.usecase.secret.RemoveStoredMasterPasswordUseCase
 import de.jepfa.yapm.usecase.session.LoginUseCase
 import de.jepfa.yapm.util.dateToNiceString
-import de.jepfa.yapm.util.dateToString
 import de.jepfa.yapm.util.putEncrypted
 import de.jepfa.yapm.util.toastText
 

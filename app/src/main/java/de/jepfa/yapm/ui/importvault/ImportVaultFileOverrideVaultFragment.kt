@@ -57,7 +57,7 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
         val labelsCount = jsonContent.get(VaultExportService.JSON_LABELS_COUNT)?.asString ?: 0
 
         loadedFileStatusTextView.text = getString(R.string.vault_export_info2,
-            formatAsDate(createdAt), credentialsCount, labelsCount)
+            formatAsDate(createdAt, importVaultActivity), credentialsCount, labelsCount)
 
         var credentialsToInsert: Set<ChildType>? = null
         var credentialsToUpdate: Set<ChildType>? = null

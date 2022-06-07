@@ -97,7 +97,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             }
             current.modifyTimestamp?.let{
                 if (it > 1000) // modifyTimestamp is the credential Id after running db migration, assume ids are lower than 1000
-                    sb.addFormattedLine(listCredentialsActivity.getString(R.string.last_modified), it.toSimpleDateTimeFormat())
+                    sb.addFormattedLine(listCredentialsActivity.getString(R.string.last_modified), dateToNiceString(it.toDate(), listCredentialsActivity))
             }
 
             AlertDialog.Builder(listCredentialsActivity)

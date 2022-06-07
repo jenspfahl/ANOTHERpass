@@ -93,22 +93,13 @@ fun linkifyDialogMessage(dialog: Dialog) {
     }
 }
 
-fun dateToString(date: Date?): String {
-    if (date != null) {
-        return date.toSimpleDateTimeFormat()
-    }
-    else {
-        return "??"
-    }
-}
-
 fun dateToNiceString(dateTime: Date?, context: Context): String {
     if (dateTime != null) {
         val date = dateTime.removeTime()
         val today = Date().removeTime()
         val yesterday = Date().yesterday().removeTime()
         if (date == today) {
-            return context.getString(R.string.date_at, dateTime.toSimpleTimeFormat())
+            return context.getString(R.string.date_today_at, dateTime.toSimpleTimeFormat())
         }
         if (date == yesterday) {
             return context.getString(R.string.date_yesterday_at, dateTime.toSimpleTimeFormat())
@@ -122,11 +113,11 @@ fun dateToNiceString(dateTime: Date?, context: Context): String {
 }
 
 
-fun formatAsDate(s: String?): String {
+fun formatAsDate(s: String?, context: Context): String {
     if (s != null) {
         val timestamp = s.toLongOrNull()
         if (timestamp != null) {
-            return dateToString(Date(timestamp))
+            return dateToNiceString(Date(timestamp), context)
         }
         else {
             return s

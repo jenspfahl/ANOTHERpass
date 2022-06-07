@@ -526,7 +526,7 @@
     <string name="last_succeeded_login">"%2$d Loginversuch(e) wurde(n) %1$s abgelehnt!!</string>
     <string name="last_denied_login_attempt">Letzter Login war %1$s</string>
 
-    <string name="date_at">%1$s</string>
+    <string name="date_today_at">heute %1$s</string>
     <string name="date_yesterday_at">gestern %1$s</string>
     <string name="date_on_date_at">am %1$s %2$s</string>
 

@@ -79,7 +79,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
             mkProvidedText = getString(R.string.emk_not_provided)
         }
         loadedFileStatusTextView.text = getString(R.string.vault_export_info,
-            formatAsDate(createdAt), credentialsCount, labelsCount, vaultId)
+            formatAsDate(createdAt, requireContext()), credentialsCount, labelsCount, vaultId)
             .plus(System.lineSeparator())
             .plus(System.lineSeparator())
             .plus(mkProvidedText)
