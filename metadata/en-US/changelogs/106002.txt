@@ -1,0 +1,2 @@
+* fix "Resume Autofill" - option
+* add last succeeded / denied login feature
