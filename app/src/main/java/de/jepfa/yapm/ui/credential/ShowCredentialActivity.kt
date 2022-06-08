@@ -119,7 +119,8 @@ class ShowCredentialActivity : SecureActivity() {
                     obfuscationKey?.let {
                         password.deobfuscate(it)
                     }
-                    ShowPasswordStrengthUseCase.execute(password, this)
+                    val input = ShowPasswordStrengthUseCase.Input(password, R.string.password_strength)
+                    ShowPasswordStrengthUseCase.execute(input, this)
                     password.clear()
                 }
             }

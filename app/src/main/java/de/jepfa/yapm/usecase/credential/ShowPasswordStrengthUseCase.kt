@@ -2,6 +2,7 @@ package de.jepfa.yapm.usecase.credential
 
 import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
+import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.secretgenerator.GeneratorBase
 import de.jepfa.yapm.service.secretgenerator.password.PasswordGenerator
@@ -12,19 +13,20 @@ import de.jepfa.yapm.util.secondsToYear
 import de.jepfa.yapm.util.toExponentFormat
 import de.jepfa.yapm.util.toReadableFormat
 
-object ShowPasswordStrengthUseCase: InputUseCase<Password, SecureActivity>() {
+object ShowPasswordStrengthUseCase: InputUseCase<ShowPasswordStrengthUseCase.Input, SecureActivity>() {
 
     private val passwordGenerator = PasswordGenerator()
 
+    data class Input(val password: Password, val titleId: Int)
 
-    override fun doExecute(password: Password, activity: SecureActivity): Boolean {
-        val combinations = guessPasswordCombinations(password)
-        showPasswordStrength(combinations, activity)
+    override fun doExecute(input: Input, activity: SecureActivity): Boolean {
+        val combinations = guessPasswordCombinations(input.password)
+        showPasswordStrength(combinations, input.titleId, activity)
 
         return true
     }
 
-    fun showPasswordStrength(combinations: Double, activity: SecureActivity) {
+    fun showPasswordStrength(combinations: Double, titleId: Int, activity: SecureActivity) {
         val entropy = passwordGenerator.calcEntropy(combinations)
         val bruteForceWithPentium = passwordGenerator.calcBruteForceWaitingSeconds(
             combinations, GeneratorBase.BRUTEFORCE_ATTEMPTS_PENTIUM
@@ -39,7 +41,7 @@ object ShowPasswordStrengthUseCase: InputUseCase<Password, SecureActivity>() {
         else if (entropy >= 36) strengthLevel = emoji(0x1f610)
         else if (entropy >= 28) strengthLevel = emoji(0x1f641)
         AlertDialog.Builder(activity)
-            .setTitle(R.string.password_strength_guessed)
+            .setTitle(titleId)
             .setIcon(R.drawable.ic_baseline_fitness_center_24)
             .setMessage(
                 activity.getString(R.string.combinations) + ": " +

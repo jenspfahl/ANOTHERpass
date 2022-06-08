@@ -284,7 +284,10 @@ class EditCredentialPasswordFragment : SecureFragment() {
         val combinations = passwordCombinations
         if (combinations != null) {
 
-            ShowPasswordStrengthUseCase.showPasswordStrength(combinations, editCredentialActivity)
+            val titleId =
+                if (passwordCombinationsGuessed) R.string.password_strength_guessed
+                else R.string.password_strength_from_generator
+            ShowPasswordStrengthUseCase.showPasswordStrength(combinations, titleId, editCredentialActivity)
         }
         else {
             toastText(activity,R.string.generate_password_first)

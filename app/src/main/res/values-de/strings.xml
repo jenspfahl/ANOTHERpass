@@ -280,7 +280,8 @@
     <string name="label_too_long">Kategorie zu lang (maximal %1$d Zeichen)</string>
     <string name="max_labels_reached">Maximale Kategorieanzahl erreicht (%1$d)</string>
     <string name="label_already_in_ist">Diese Kategorie wurde schon hinzugefügt</string>
-    <string name="password_strength">Passwortstärke (vom Passwortgenerator)</string>
+    <string name="password_strength">Passwortstärke</string>
+    <string name="password_strength_from_generator">Passwortstärke (vom Passwortgenerator)</string>
     <string name="password_strength_guessed">Passwortstärke (vom aktuellen Passwort)</string>
     <string name="combinations">Kombinationen</string>
     <string name="bruteforce_years_pc">Jahre um das Passwort mit einem gewöhnlichem PC zu erraten</string>

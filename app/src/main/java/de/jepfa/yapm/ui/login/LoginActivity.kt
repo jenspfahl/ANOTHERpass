@@ -234,10 +234,6 @@ class LoginActivity : NfcBaseActivity() {
     fun loginSuccessful() {
         loginAttempts = 0
 
-        // backup last login attempt
-        PreferenceService.putInt(STATE_PREVIOUS_LOGIN_ATTEMPTS,
-            PreferenceService.getAsInt(STATE_LOGIN_ATTEMPTS, this), this)
-
         // backup last succeeded login
         PreferenceService.getAsDate(STATE_LOGIN_SUCCEEDED_AT, this)?.let {
             PreferenceService.putDate(STATE_PREVIOUS_LOGIN_SUCCEEDED_AT, it, this)
