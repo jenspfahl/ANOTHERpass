@@ -1,6 +1,8 @@
-Dieser Offline-Passwortmanager verwaltet starke generierte Passwörter welche leicht zu tippen, aber nahezu unmöglich zu cracken sind.
+<b>Ein etwas anderer Passwortmanager</b>
 
-Ebenso verwendet die App eine clevere Zwei-Faktor-Authentifizierung, um den Tresor mit den Zugangsdaten zu entsperren. Diese Faktoren sind Wissen (eine PIN) und Besitz (das Masterpasswort). Anstatt ein langes und kompliziertes Masterpasswort zu merken, merkt man sich nur eine PIN und hat das Masterpasswort als QR-Code oder NFC-Tag bei sich. Zusätzlich kann man das Masterpasswort geschützt mit einem biometrischem Merkmal (z.B. Fingerabdruck) auf dem Gerät speichern.
+ANOTHERpass generiert leicht zu tippende aber starke Passwörter für dich. Sogenannte <i>Pseudophrasen</i> schauen aus wie echte Wörter, sind aber dennoch zufällig und unvorhersehbar.
+
+Ebenso verwendet die App eine clevere Zwei-Faktor-Authentifizierung, um den Tresor mit den Zugangsdaten zu entsperren. Diese Faktoren sind Wissen (eine PIN) und Besitz (das Masterpasswort). Anstatt sich ein langes und kompliziertes Masterpasswort zu merken, merkt man sich nur eine PIN und hat das Masterpasswort als QR-Code oder NFC-Tag bei sich. Zusätzlich kann man das Masterpasswort geschützt mit einem biometrischem Merkmal (z.B. Fingerabdruck) auf dem Gerät speichern.
 
 <b>Kernfunktionen</b>
 
@@ -8,10 +10,11 @@ Ebenso verwendet die App eine clevere Zwei-Faktor-Authentifizierung, um den Tres
 - Kein kompliziertes Masterpasswort nötig zu merken, es wird einfach exportiert
 - Leicht zu lesende generierte Passwörter
 - Starke Verschlüsselung (AES 128/256, Blowfish, Chacha20)
+- verwendet einen integrierten Sicherheitschip oder eine TEE (Trusted Execution Environment), falls vorhanden
 - Autofill Unterstützung
 - Biometrisches Merkmal (z.B. Fingerabdruck) für gespeichertes Masterpasswort
 - Unsichere Zwischenablage standardmäßig deaktiviert
-- Passwörter können über anderen Apps angezeigt werden
+- Passwörter können über anderen Apps angezeigt werden um Abtippen zu erleichtern
 - Keine Internetverbindung notwendig, App funktioniert komplett offline
 - Exportieren und Importieren des kompletten Passwort-Tresors als Backup
 - Option um einzelne Zugangsdaten zu exportieren bzw. auszulagern
@@ -20,4 +23,6 @@ Ebenso verwendet die App eine clevere Zwei-Faktor-Authentifizierung, um den Tres
 - Dark-Theme Support ;-)
 
 
-Für mehr Informationen siehe https://anotherpass.jepfa.de
+Für mehr Informationen siehe <a href="https://anotherpass.jepfa.de">anotherpass.jepfa.de</a>
+
+Wenn du die App magst, gib ihr einen Stern auf <a href="https://github.com/jenspfahl/ANOTHERpass">Github</a>!
