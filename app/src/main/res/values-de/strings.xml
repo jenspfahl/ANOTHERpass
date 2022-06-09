@@ -210,8 +210,8 @@
     <string name="drop_to_close">APP SCHLIESSEN</string>
     <string name="drop_to_go_back">ZURÜCK ZUR APP</string>
 
-    <string name="vault_export_info">Tresor (Id = %4$s), exportiert am %1$s, enthält %2$s Zugangsdaten und %3$s Kategorien</string>
-    <string name="vault_export_info2">Tresor-Datei, exportiert am %1$s, enthält insgesamt %2$s Zugangsdaten und %3$s Kategorien</string>
+    <string name="vault_export_info">Tresor (Id = %4$s), exportiert %1$s, enthält %2$s Zugangsdaten und %3$s Kategorien</string>
+    <string name="vault_export_info2">Tresor-Datei, exportiert %1$s, enthält insgesamt %2$s Zugangsdaten und %3$s Kategorien</string>
     <string name="not_an_emk">Das ist keinen verschlüsselter Masterkey</string>
     <string name="scan_masterkey_first">Scanne erst deinen verschlüsselten Masterkey</string>
 
@@ -292,10 +292,10 @@
     <string name="vault_version">Tresor Version</string>
     <string name="credential_count">Anzahl der Zugangsdaten</string>
     <string name="label_count">Anzahl der Kategorien</string>
-    <string name="vault_created_at">Tresor erstellt am</string>
-    <string name="vault_imported_at">Tresor importiert am</string>
-    <string name="vault_modified_at">Tresor geändert am</string>
-    <string name="vault_exported_at">Tresor exportiert am</string>
+    <string name="vault_created_at">Tresor erstellt</string>
+    <string name="vault_imported_at">Tresor importiert</string>
+    <string name="vault_modified_at">Tresor geändert</string>
+    <string name="vault_exported_at">Tresor exportiert</string>
     <string name="vault_already_created">Tresor wurde schon erzeugt</string>
     <string name="obfuscate_while_saving">Verschleiere Passwort beim Speichern</string>
     <string name="obfuscate_while_saving_toast">Passwort wird beim Speichern verschleiert</string>
@@ -521,8 +521,8 @@
     <string name="temp_deact_autofill_on">Autofill pausiert (%1$s)</string>
     <string name="resume_paused_autofill">Pausiertes Autofill fortsetzen</string>
     <string name="resume_paused_autofill_done">Autofill wieder aktiv</string>
-    <string name="previous_login_at">Vorheriger Login am</string>
-    <string name="last_denied_login_at">Letzter erfolgloser Login am</string>
+    <string name="previous_login_at">Vorheriger Login</string>
+    <string name="last_denied_login_at">Letzter erfolgloser Login</string>
     <string name="last_denied_login_attempts">Letzte erfolglose Loginversuche</string>
     <string name="last_succeeded_login">"%2$d Loginversuch(e) wurde(n) %1$s abgelehnt!!</string>
     <string name="last_denied_login_attempt">Letzter Login war %1$s</string>

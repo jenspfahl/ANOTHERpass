@@ -16,6 +16,8 @@ class ImportVaultActivity : SecureActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        mode = intent.getStringExtra(EXTRA_MODE) ?: EXTRA_MODE_INITIAL_IMPORT
+
         savedInstanceState?.getString("JSON")?.let {
             jsonContent = parseVaultFileContent(it, this)
         }
@@ -23,7 +25,6 @@ class ImportVaultActivity : SecureActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_import_vault)
 
-        mode = intent.getStringExtra(EXTRA_MODE) ?: EXTRA_MODE_INITIAL_IMPORT
         if (isOverrideMode()) {
             checkSession = true
         }

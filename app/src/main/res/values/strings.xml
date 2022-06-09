@@ -305,10 +305,10 @@
     <string name="vault_version">Vault version</string>
     <string name="credential_count">Credential count</string>
     <string name="label_count">Label count</string>
-    <string name="vault_created_at">Vault created at</string>
-    <string name="vault_imported_at">Vault imported at</string>
-    <string name="vault_modified_at">Vault modified at</string>
-    <string name="vault_exported_at">Vault exported at</string>
+    <string name="vault_created_at">Vault created</string>
+    <string name="vault_imported_at">Vault imported</string>
+    <string name="vault_modified_at">Vault modified</string>
+    <string name="vault_exported_at">Vault exported</string>
     <string name="vault_already_created">Vault has already been created</string>
     <string name="obfuscate_while_saving">Obfuscate password while saving</string>
     <string name="obfuscate_while_saving_toast">Password will be obfuscated while saving</string>
@@ -531,8 +531,8 @@
     <string name="temp_deact_autofill_on">Autofill paused (%1$s)</string>
     <string name="resume_paused_autofill">Resume paused Autofill</string>
     <string name="resume_paused_autofill_done">Autofill now active again</string>
-    <string name="previous_login_at">Previous login at</string>
-    <string name="last_denied_login_at">Last denied login at</string>
+    <string name="previous_login_at">Previous login</string>
+    <string name="last_denied_login_at">Last denied login</string>
     <string name="last_denied_login_attempts">Last denied login attempts</string>
     <string name="last_succeeded_login">"%2$d login attempt(s) was/were denied %1$s!!</string>
     <string name="last_denied_login_attempt">Last succeeded login was %1$s</string>
