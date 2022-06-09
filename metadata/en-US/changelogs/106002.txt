@@ -1,2 +1,3 @@
 * fix "Resume Autofill" - option
 * add last succeeded / denied login feature
+* fix show all installed apps to exclude from Autofill (Android 11+)

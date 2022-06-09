@@ -1,17 +1,15 @@
 package de.jepfa.yapm.ui.importread
 
 import android.os.Bundle
-import android.widget.*
+import android.widget.TextView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.encrypted.EncryptedType.Types.*
 import de.jepfa.yapm.model.export.EncExportableCredential
 import de.jepfa.yapm.model.export.ExportContainer
 import de.jepfa.yapm.model.export.PlainShareableCredential
-import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.service.secret.MasterPasswordService.generateEncMasterPasswdSKForExport
@@ -53,6 +51,7 @@ class VerifyActivity : ReadActivityBase() {
             ENC_MASTER_KEY -> checkEMK(encrypted)
             ENC_MASTER_PASSWD -> checkEMP(encrypted)
             MASTER_PASSWD_TOKEN -> checkMPT(encrypted)
+            else -> {}
         }
     }
 

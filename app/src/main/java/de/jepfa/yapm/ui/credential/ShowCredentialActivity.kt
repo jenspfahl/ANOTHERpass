@@ -345,6 +345,7 @@ class ShowCredentialActivity : SecureActivity() {
                     Mode.EXTERNAL_FROM_FILE -> sb.addFormattedLine(getString(R.string.source), getString(R.string.source_from_vault_file))
                     Mode.EXTERNAL_FROM_RECORD -> sb.addFormattedLine(getString(R.string.source), getString(R.string.source_from_record))
                     Mode.NORMAL_READONLY -> sb.addFormattedLine(getString(R.string.source), getString(R.string.source_from_the_app))
+                    else -> {}
                 }
 
                 credential.modifyTimestamp?.let{

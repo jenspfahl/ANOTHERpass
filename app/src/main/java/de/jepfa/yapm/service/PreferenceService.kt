@@ -278,7 +278,7 @@ object PreferenceService {
         return getDefault(context).all.filter { (k, _) -> k.startsWith(PREF_PREFIX) }
     }
 
-    private fun getDefault(context: Context?): SharedPreferences {
+    private fun getDefault(context: Context): SharedPreferences {
         return PreferenceManager.getDefaultSharedPreferences(context)
     }
 }
