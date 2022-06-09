@@ -57,16 +57,17 @@ class LoginActivity : NfcBaseActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofill, false)
+        loginAttempts = PreferenceService.getAsInt(STATE_LOGIN_ATTEMPTS,  this)
+
         super.onCreate(null)
 
         val introShowed = PreferenceService.getAsBool(STATE_INTRO_SHOWED, this)
-        isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofill, false)
         if (!introShowed && !isFromAutofill && Session.isLoggedOut()) {
             val intent = Intent(this, IntroActivity::class.java)
             startActivity(intent)
         }
-
-        loginAttempts = PreferenceService.getAsInt(STATE_LOGIN_ATTEMPTS,  this)
 
         if (MasterKeyService.isMasterKeyStored(this)) {
             setContentView(R.layout.activity_login)
