@@ -41,7 +41,7 @@
     <string name="CIPHER_BLOWFISH_256_desc">This is an alternative encryption with better security but less performance. It is supposed to be harder to crack than AES but therefore slower. Supported by Android 2.3 and higher.</string>
     <string name="CIPHER_CHACHACHA20_256_desc">This is another alternative encryption with around the same security like AES but supposed to be faster. Supported by Android 9 and higher.</string>
 
-    <string name="change">Change</string>
+    <string name="change">Edit</string>
     <string name="duplicate">Duplicate</string>
     <string name="delete">Delete</string>
 
@@ -83,8 +83,8 @@
     <string name="password_wrong">Master password or PIN wrong</string>
     <string name="something_went_wrong">Something went wrong :-(</string>
     <string name="title_new_credential">Create Credential</string>
-    <string name="title_change_credential">Change credential</string>
-    <string name="title_change_credential_with_title">Change \'%1$s\'</string>
+    <string name="title_change_credential">Edit credential</string>
+    <string name="title_change_credential_with_title">Edit \'%1$s\'</string>
     <string name="detach">Detach</string>
     <string name="action_export">Export</string>
     <string name="action_import">Import</string>
@@ -172,7 +172,7 @@
     <string name="choose_color">Choose a color</string>
     <string name="error_labelname_in_use">This label name is already in use by another label</string>
     <string name="title_new_label">New label</string>
-    <string name="title_change_label">Change label</string>
+    <string name="title_change_label">Edit label</string>
     <string name="reset_vault">Reset all</string>
     <string name="reset_vault_and_delete">Reset and delete all</string>
     <string name="button_report_bug">Report bug</string>

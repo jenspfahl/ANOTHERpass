@@ -40,7 +40,7 @@
     <string name="CIPHER_BLOWFISH_256_desc">Dies ist ein alternativer Verschlüsselungsalgorithmus mit etwas besserer Sicherheit aber weniger Performance. Er soll schwerer zu brechen aber dafür langsamer als AES sein. Unterstützt ab Android 2.3.</string>
     <string name="CIPHER_CHACHACHA20_256_desc">Dies ist ein relativ neuer Verschlüsselungsalgorithmus mit etwa der gleichen Sicherheit wie AES aber einer angeblich höheren Performance. Unterstützt ab Android 9.</string>
 
-    <string name="change">Ändern</string>
+    <string name="change">Bearbeiten</string>
     <string name="delete">Löschen</string>
 
     <string name="title_delete_credential">Lösche Zugangsdaten</string>
@@ -155,8 +155,8 @@
 
     <string name="store_masterpasswd">Speichere Masterpasswort</string>
     <string name="store_masterpasswd_confirmation">Soll das Masterpasswort verschlüsselt auf dem Gerät gespeichert werden? Das macht zukünftige Logins einfacher. Du kannst es jederzeit wieder entfernen.</string>
-    <string name="edit_credential_data_fragment_label">Zugangsdaten ändern</string>
-    <string name="edit_credential_password_fragment_label">Zugangspasswort ändern</string>
+    <string name="edit_credential_data_fragment_label">Zugangsdaten bearbeiten</string>
+    <string name="edit_credential_password_fragment_label">Zugangspasswort bearbeiten</string>
     <string name="hint_edit_credential_user">Benutzer</string>
     <string name="hint_edit_credential_website">Webseite</string>
     <string name="hint_edit_credential_labels">Füge Kategorien hinzu</string>
@@ -168,7 +168,7 @@
     <string name="choose_color">Wähle eine Farbe</string>
     <string name="error_labelname_in_use">Dieser Name wird schon von einer anderen Kategorie verwendet</string>
     <string name="title_new_label">Neue Kategorie</string>
-    <string name="title_change_label">Kategorie ändern</string>
+    <string name="title_change_label">Kategorie bearbeiten</string>
     <string name="reset_vault">Alles zurücksetzen</string>
     <string name="reset_vault_and_delete">Alles löschen und zurücksetzen</string>
     <string name="button_report_bug">Fehler melden</string>
@@ -461,7 +461,7 @@
     <string name="cannot_write_protected_nfc_tag">Schreibgeschützter NFC-Tag kann nicht beschrieben werden</string>
     <string name="language_default">System Standard</string>
     <string name="test_copypaste_password"><![CDATA[Teste C&P Passwort]]></string>
-    <string name="credential_data_params">Ändere Zugangsdaten hier. Der Name ist ein Pflichtfeld. Mit Kategorien kannst du verschiedene Zugangsdaten gruppieren.</string>
+    <string name="credential_data_params">Bearbeite Zugangsdaten hier. Der Name ist ein Pflichtfeld. Mit Kategorien kannst du verschiedene Zugangsdaten gruppieren.</string>
     <string name="message_write_nfc_tag">Der NFC-Tag ist schon beschrieben worden. Überschreiben?</string>
     <string name="drop_to_remove">FENSTER SCHLIESSEN</string>
     <string name="login_required_first">Tresor entsperren und Zugangsdaten auswählen</string>
