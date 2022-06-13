@@ -76,7 +76,7 @@ class SettingsActivity : SecureActivity(),
         val args = pref.extras
         val fragment = supportFragmentManager.fragmentFactory.instantiate(
             classLoader,
-            pref.fragment
+            pref.fragment!!
         ).apply {
             arguments = args
             setTargetFragment(caller, 0)
@@ -273,12 +273,13 @@ class SettingsActivity : SecureActivity(),
                 val pm = requireContext().packageManager
                 val packages = pm.getInstalledApplications(PackageManager.GET_META_DATA)
 
-                packages?.let {
+                packages.let {
                     val filteredPackages = it.toList()
                         .filterNotNull()
+                        .filterNot { it.packageName == requireContext().packageName}
                         .filter { it.enabled }
                         .filter { isUserApp(it) }
-                        .sortedBy { it.loadLabel(pm).toString() }
+                        .sortedBy { it.loadLabel(pm).toString().uppercase(Locale.ROOT) }
 
                     pref.entries = filteredPackages.map { it.loadLabel(pm) }.toTypedArray()
                     pref.entryValues = filteredPackages.map { it.packageName }.toTypedArray()

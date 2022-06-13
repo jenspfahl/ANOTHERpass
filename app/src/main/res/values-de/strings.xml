@@ -40,7 +40,7 @@
     <string name="CIPHER_BLOWFISH_256_desc">Dies ist ein alternativer Verschlüsselungsalgorithmus mit etwas besserer Sicherheit aber weniger Performance. Er soll schwerer zu brechen aber dafür langsamer als AES sein. Unterstützt ab Android 2.3.</string>
     <string name="CIPHER_CHACHACHA20_256_desc">Dies ist ein relativ neuer Verschlüsselungsalgorithmus mit etwa der gleichen Sicherheit wie AES aber einer angeblich höheren Performance. Unterstützt ab Android 9.</string>
 
-    <string name="change">Ändern</string>
+    <string name="change">Bearbeiten</string>
     <string name="delete">Löschen</string>
 
     <string name="title_delete_credential">Lösche Zugangsdaten</string>
@@ -155,8 +155,8 @@
 
     <string name="store_masterpasswd">Speichere Masterpasswort</string>
     <string name="store_masterpasswd_confirmation">Soll das Masterpasswort verschlüsselt auf dem Gerät gespeichert werden? Das macht zukünftige Logins einfacher. Du kannst es jederzeit wieder entfernen.</string>
-    <string name="edit_credential_data_fragment_label">Zugangsdaten ändern</string>
-    <string name="edit_credential_password_fragment_label">Zugangspasswort ändern</string>
+    <string name="edit_credential_data_fragment_label">Zugangsdaten bearbeiten</string>
+    <string name="edit_credential_password_fragment_label">Zugangspasswort bearbeiten</string>
     <string name="hint_edit_credential_user">Benutzer</string>
     <string name="hint_edit_credential_website">Webseite</string>
     <string name="hint_edit_credential_labels">Füge Kategorien hinzu</string>
@@ -168,7 +168,7 @@
     <string name="choose_color">Wähle eine Farbe</string>
     <string name="error_labelname_in_use">Dieser Name wird schon von einer anderen Kategorie verwendet</string>
     <string name="title_new_label">Neue Kategorie</string>
-    <string name="title_change_label">Kategorie ändern</string>
+    <string name="title_change_label">Kategorie bearbeiten</string>
     <string name="reset_vault">Alles zurücksetzen</string>
     <string name="reset_vault_and_delete">Alles löschen und zurücksetzen</string>
     <string name="button_report_bug">Fehler melden</string>
@@ -210,8 +210,8 @@
     <string name="drop_to_close">APP SCHLIESSEN</string>
     <string name="drop_to_go_back">ZURÜCK ZUR APP</string>
 
-    <string name="vault_export_info">Tresor (Id = %4$s), exportiert am %1$s, enthält %2$s Zugangsdaten und %3$s Kategorien</string>
-    <string name="vault_export_info2">Tresor-Datei, exportiert am %1$s, enthält insgesamt %2$s Zugangsdaten und %3$s Kategorien</string>
+    <string name="vault_export_info">Tresor (Id = %4$s), exportiert %1$s, enthält %2$s Zugangsdaten und %3$s Kategorien</string>
+    <string name="vault_export_info2">Tresor-Datei, exportiert %1$s, enthält insgesamt %2$s Zugangsdaten und %3$s Kategorien</string>
     <string name="not_an_emk">Das ist keinen verschlüsselter Masterkey</string>
     <string name="scan_masterkey_first">Scanne erst deinen verschlüsselten Masterkey</string>
 
@@ -280,7 +280,8 @@
     <string name="label_too_long">Kategorie zu lang (maximal %1$d Zeichen)</string>
     <string name="max_labels_reached">Maximale Kategorieanzahl erreicht (%1$d)</string>
     <string name="label_already_in_ist">Diese Kategorie wurde schon hinzugefügt</string>
-    <string name="password_strength">Passwortstärke (vom Passwortgenerator)</string>
+    <string name="password_strength">Passwortstärke</string>
+    <string name="password_strength_from_generator">Passwortstärke (vom Passwortgenerator)</string>
     <string name="password_strength_guessed">Passwortstärke (vom aktuellen Passwort)</string>
     <string name="combinations">Kombinationen</string>
     <string name="bruteforce_years_pc">Jahre um das Passwort mit einem gewöhnlichem PC zu erraten</string>
@@ -291,10 +292,10 @@
     <string name="vault_version">Tresor Version</string>
     <string name="credential_count">Anzahl der Zugangsdaten</string>
     <string name="label_count">Anzahl der Kategorien</string>
-    <string name="vault_created_at">Tresor erstellt am</string>
-    <string name="vault_imported_at">Tresor importiert am</string>
-    <string name="vault_modified_at">Tresor geändert am</string>
-    <string name="vault_exported_at">Tresor exportiert am</string>
+    <string name="vault_created_at">Tresor erstellt</string>
+    <string name="vault_imported_at">Tresor importiert</string>
+    <string name="vault_modified_at">Tresor geändert</string>
+    <string name="vault_exported_at">Tresor exportiert</string>
     <string name="vault_already_created">Tresor wurde schon erzeugt</string>
     <string name="obfuscate_while_saving">Verschleiere Passwort beim Speichern</string>
     <string name="obfuscate_while_saving_toast">Passwort wird beim Speichern verschleiert</string>
@@ -460,7 +461,7 @@
     <string name="cannot_write_protected_nfc_tag">Schreibgeschützter NFC-Tag kann nicht beschrieben werden</string>
     <string name="language_default">System Standard</string>
     <string name="test_copypaste_password"><![CDATA[Teste C&P Passwort]]></string>
-    <string name="credential_data_params">Ändere Zugangsdaten hier. Der Name ist ein Pflichtfeld. Mit Kategorien kannst du verschiedene Zugangsdaten gruppieren.</string>
+    <string name="credential_data_params">Bearbeite Zugangsdaten hier. Der Name ist ein Pflichtfeld. Mit Kategorien kannst du verschiedene Zugangsdaten gruppieren.</string>
     <string name="message_write_nfc_tag">Der NFC-Tag ist schon beschrieben worden. Überschreiben?</string>
     <string name="drop_to_remove">FENSTER SCHLIESSEN</string>
     <string name="login_required_first">Tresor entsperren und Zugangsdaten auswählen</string>
@@ -520,6 +521,19 @@
     <string name="temp_deact_autofill_on">Autofill pausiert (%1$s)</string>
     <string name="resume_paused_autofill">Pausiertes Autofill fortsetzen</string>
     <string name="resume_paused_autofill_done">Autofill wieder aktiv</string>
+    <string name="previous_login_at">Vorheriger Login</string>
+    <string name="last_denied_login_at">Letzter erfolgloser Login</string>
+    <string name="last_denied_login_attempts">Letzte erfolglose Loginversuche</string>
+    <string name="last_succeeded_login">"%2$d Loginversuch(e) wurde(n) %1$s abgelehnt!!</string>
+    <string name="last_denied_login_attempt">Letzter Login war %1$s</string>
 
+    <string name="date_today_at">heute %1$s</string>
+    <string name="date_yesterday_at">gestern %1$s</string>
+    <string name="date_on_date_at">am %1$s %2$s</string>
+
+    <string name="pref_show_last_login_state">Zeige letzte Loginereignisse</string>
+    <string name="show_last_login_state_denies_and_succeeds">Abgelehnte und erfolgreiche Logins</string>
+    <string name="show_last_login_state_denies_only">Nur abgelehnte Loginversuche</string>
+    <string name="show_last_login_state_nothing">Keine</string>
 
 </resources>

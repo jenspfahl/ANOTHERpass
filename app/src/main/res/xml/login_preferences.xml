@@ -11,6 +11,16 @@
         app:useSimpleSummaryProvider="true"/>
 
 
+    <ListPreference
+        app:defaultValue="1"
+        app:entries="@array/show_last_login_state_entries"
+        app:entryValues="@array/show_last_login_state_values"
+        app:key="YAPM/pref:show_last_login_state"
+        app:title="@string/pref_show_last_login_state"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:useSimpleSummaryProvider="true" />
+
     <SwitchPreferenceCompat
         app:key="YAPM/pref:drop_vault_if_login_declined"
         app:summaryOff="@string/pref_login_summary_off_drop_vault"

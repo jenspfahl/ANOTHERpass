@@ -40,6 +40,7 @@ import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.ui.label.LabelDialogs
 import de.jepfa.yapm.usecase.credential.ExportCredentialUseCase
 import de.jepfa.yapm.usecase.credential.ImportCredentialUseCase
+import de.jepfa.yapm.usecase.credential.ShowPasswordStrengthUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.PasswordColorizer.spannableObfusableAndMaskableString
@@ -111,6 +112,20 @@ class ShowCredentialActivity : SecureActivity() {
         additionalInfoTextView = findViewById(R.id.additional_info)
         passwordTextView = findViewById(R.id.passwd)
 
+        passwordTextView.setOnLongClickListener {
+            if (credential != null) {
+                masterSecretKey?.let { key ->
+                    val password = decryptPassword(key, credential!!.password)
+                    obfuscationKey?.let {
+                        password.deobfuscate(it)
+                    }
+                    val input = ShowPasswordStrengthUseCase.Input(password, R.string.password_strength)
+                    ShowPasswordStrengthUseCase.execute(input, this)
+                    password.clear()
+                }
+            }
+            return@setOnLongClickListener true
+        }
         passwordTextView.setOnClickListener {
             if (maskPassword) {
                 maskPassword = false
@@ -330,11 +345,12 @@ class ShowCredentialActivity : SecureActivity() {
                     Mode.EXTERNAL_FROM_FILE -> sb.addFormattedLine(getString(R.string.source), getString(R.string.source_from_vault_file))
                     Mode.EXTERNAL_FROM_RECORD -> sb.addFormattedLine(getString(R.string.source), getString(R.string.source_from_record))
                     Mode.NORMAL_READONLY -> sb.addFormattedLine(getString(R.string.source), getString(R.string.source_from_the_app))
+                    else -> {}
                 }
 
                 credential.modifyTimestamp?.let{
                     if (it > 1000) // modifyTimestamp is the credential Id after running db migration, assume ids are lower than 1000
-                        sb.addFormattedLine(getString(R.string.last_modified), it.toSimpleDateTimeFormat())
+                        sb.addFormattedLine(getString(R.string.last_modified), dateToNiceString(it.toDate(), this))
                 }
 
                 AlertDialog.Builder(this)
@@ -442,7 +458,7 @@ class ShowCredentialActivity : SecureActivity() {
                 credential.isObfuscated
 
             if (DebugInfo.isDebug) {
-                passwordTextView.setOnLongClickListener {
+                titleLayout.setOnLongClickListener {
                     val builder: AlertDialog.Builder = AlertDialog.Builder(this)
                     val icon: Drawable = applicationInfo.loadIcon(packageManager)
                     val labelIds = toolbarChipGroup.children

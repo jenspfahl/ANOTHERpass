@@ -22,7 +22,7 @@ object PreferenceService {
      * TODO If you add new preference xml files inside #initDefaults, they should be recognised as well.
      * To achieve this, count the version value up here.
      */
-    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_16"
+    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_17"
 
     const val STATE_DEFAULT_INIT_DONE = STATE_PREFIX + "default_init_done"
 
@@ -59,6 +59,7 @@ object PreferenceService {
     const val DATA_BIOMETRIC_SMP_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "biometric_smp_notification_showed_as"
     const val PREF_SHOW_BIOMETRIC_SMP_REMINDER = PREF_PREFIX + "show_biometric_smp_reminder"
 
+    const val PREF_SHOW_LAST_LOGIN_STATE = PREF_PREFIX + "show_last_login_state"
     const val PREF_MAX_LOGIN_ATTEMPTS = PREF_PREFIX + "max_login_attempts"
     const val PREF_SELF_DESTRUCTION = PREF_PREFIX + "drop_vault_if_login_declined"
 
@@ -98,6 +99,11 @@ object PreferenceService {
     const val ACTION_TEST_COPY_PASSWORD = ACTION_PREFIX + "test_copy_password"
 
     const val STATE_LOGIN_ATTEMPTS = STATE_PREFIX + "login_attempts"
+    const val STATE_LOGIN_DENIED_AT = STATE_PREFIX + "login_denied_at"
+    const val STATE_LOGIN_SUCCEEDED_AT = STATE_PREFIX + "login_succeeded_at"
+
+    const val STATE_PREVIOUS_LOGIN_ATTEMPTS = STATE_PREFIX + "previous_login_attempts"
+    const val STATE_PREVIOUS_LOGIN_SUCCEEDED_AT = STATE_PREFIX + "previous_login_succeeded_at"
 
     const val PREF_CREDENTIAL_SORT_ORDER = PREF_PREFIX + "credential_sort_order"
     const val PREF_SHOW_CREDENTIAL_IDS = PREF_PREFIX + "show_credential_ids"
@@ -221,6 +227,12 @@ object PreferenceService {
         )
     }
 
+    fun putInt(prefKey: String, value: Int, context: Context) {
+        val editor = getDefault(context).edit()
+        editor.putString(prefKey, value.toString())
+        editor.apply()
+    }
+
     fun putString(prefKey: String, value: String, context: Context) {
         val editor = getDefault(context).edit()
         editor.putString(prefKey, value)
@@ -266,7 +278,7 @@ object PreferenceService {
         return getDefault(context).all.filter { (k, _) -> k.startsWith(PREF_PREFIX) }
     }
 
-    private fun getDefault(context: Context?): SharedPreferences {
+    private fun getDefault(context: Context): SharedPreferences {
         return PreferenceManager.getDefaultSharedPreferences(context)
     }
 }

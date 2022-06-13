@@ -133,13 +133,13 @@ class EditCredentialDataFragment : SecureFragment() {
         else if (editCredentialActivity.isUpdate()) {
             editCredentialActivity.hideKeyboard(editCredentialNameView)
 
-            editCredentialActivity.load().observe(editCredentialActivity, { orig ->
+            editCredentialActivity.load().observe(editCredentialActivity) { orig ->
                 editCredentialActivity.original = orig
-                masterSecretKey?.let{ key ->
+                masterSecretKey?.let { key ->
                     editCredentialActivity.updateTitle(orig)
                     fillUi(key, orig, allLabels, allLabelAdapter)
                 }
-            })
+            }
         }
         else {
             val labelSuggestions = allLabels

@@ -23,27 +23,6 @@ class EditCredentialActivity : AutofillPushBackActivityBase() {
     internal var original: EncCredential? = null
 
     public override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        savedInstanceState?.getParcelable<Intent>("current")?.let {
-            current = EncCredential.fromIntent(it)
-        }
-        savedInstanceState?.getParcelable<Intent>("original")?.let {
-            original = EncCredential.fromIntent(it)
-            original?.let {updateTitle(it) }
-        }
-
-        if (Session.isDenied()) {
-            LockVaultUseCase.execute(this)
-            return
-        }
-        setContentView(R.layout.activity_edit_credential)
-
-        labelViewModel.allLabels.observe(this, { labels ->
-            masterSecretKey?.let{ key ->
-                LabelService.defaultHolder.initLabels(key, labels.toSet())
-            }
-        })
 
         val idExtra = intent.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
         if (idExtra == -1) {
@@ -52,6 +31,29 @@ class EditCredentialActivity : AutofillPushBackActivityBase() {
         else {
             currentId = idExtra
         }
+        savedInstanceState?.getParcelable<Intent>("current")?.let {
+            current = EncCredential.fromIntent(it)
+        }
+        savedInstanceState?.getParcelable<Intent>("original")?.let {
+            original = EncCredential.fromIntent(it)
+            original?.let {updateTitle(it) }
+        }
+
+
+        super.onCreate(savedInstanceState)
+        
+        if (Session.isDenied()) {
+            LockVaultUseCase.execute(this)
+            return
+        }
+        setContentView(R.layout.activity_edit_credential)
+
+        labelViewModel.allLabels.observe(this) { labels ->
+            masterSecretKey?.let { key ->
+                LabelService.defaultHolder.initLabels(key, labels.toSet())
+            }
+        }
+
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

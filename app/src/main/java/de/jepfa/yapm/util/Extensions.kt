@@ -56,13 +56,12 @@ fun StringBuilder.addFormattedLine(label: String, data: Any?) {
         .append(System.lineSeparator())
 }
 
-fun Long.toSimpleDateTimeFormat(): String {
-    val f =
-        SimpleDateFormat.getDateTimeInstance(
-            SimpleDateFormat.MEDIUM,
-            SimpleDateFormat.MEDIUM,
-            Locale.getDefault(Locale.Category.FORMAT))
-    return f.format(this)
+fun StringBuilder.addNewLine() {
+    append(System.lineSeparator())
+}
+
+fun Long.toDate(): Date {
+    return Date(this)
 }
 
 fun Date.toSimpleDateTimeFormat(): String {
@@ -72,6 +71,39 @@ fun Date.toSimpleDateTimeFormat(): String {
             SimpleDateFormat.MEDIUM,
             Locale.getDefault(Locale.Category.FORMAT))
     return f.format(this)
+}
+
+fun Date.toSimpleDateFormat(): String {
+    val f =
+        SimpleDateFormat.getDateInstance(
+            SimpleDateFormat.MEDIUM,
+            Locale.getDefault(Locale.Category.FORMAT))
+    return f.format(this)
+}
+
+fun Date.toSimpleTimeFormat(): String {
+    val f =
+        SimpleDateFormat.getTimeInstance(
+            SimpleDateFormat.SHORT,
+            Locale.getDefault(Locale.Category.FORMAT))
+    return f.format(this)
+}
+
+fun Date.removeTime(): Date {
+    val cal = Calendar.getInstance()
+    cal.time = this
+    cal[Calendar.HOUR_OF_DAY] = 0
+    cal[Calendar.MINUTE] = 0
+    cal[Calendar.SECOND] = 0
+    cal[Calendar.MILLISECOND] = 0
+    return cal.time
+}
+
+fun Date.yesterday(): Date {
+    val cal = Calendar.getInstance()
+    cal.time = this
+    cal.add(Calendar.DATE, -1)
+    return cal.time
 }
 
 fun Double.toReadableFormat(): String {

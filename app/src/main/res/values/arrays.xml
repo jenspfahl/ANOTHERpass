@@ -51,6 +51,18 @@
         <item>10</item>
     </string-array>
 
+    <string-array name="show_last_login_state_entries">
+        <item>@string/show_last_login_state_denies_and_succeeds</item>
+        <item>@string/show_last_login_state_denies_only</item>
+        <item>@string/show_last_login_state_nothing</item>
+    </string-array>
+
+    <string-array name="show_last_login_state_values">
+        <item>2</item>
+        <item>1</item>
+        <item>0</item>
+    </string-array>
+
     <string-array name="autofill_deactivation_duration_entries">
         <item>@string/temp_deact_autofill_never</item>
         <item>@string/temp_deact_autofill_15_sec</item>

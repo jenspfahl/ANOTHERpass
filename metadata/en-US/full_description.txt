@@ -1,6 +1,8 @@
-This offline password manager manages strong generated passwords which are easy to type (but almost impossible to crack).
+<b>This is ANOTHER way to manage passwords!</b>
 
-It also comes with a clever two factor authentication to login into the credential vault. These factors are knowledge (a PIN) and ownership (the master password). So instead of remembering a long and complicated master password you just remember the PIN and have your master password with you (as QR code or NFC tag), and use biometrics (e.g. fingerprint) to get it from your device.
+ANOTHERpass generates easy but strong passwords for you. It uses so called <i>Pseudo Phrases</i> by default which looks like real words but are still very random and unpredictable.
+
+It also comes with a clever two factor authentication to login into the credential vault. These factors are knowledge (a PIN) and ownership (the master password). So instead of remembering a long and complicated master password you just remember the PIN and have your master password with you (as QR code or NFC tag). Additionally you can safely store it on your device using biometrics (e.g. fingerprint).
 
 <b>Core features of the app</b>
 
@@ -8,10 +10,11 @@ It also comes with a clever two factor authentication to login into the credenti
 - no complicated master password to memorize, it is just exported
 - easy to read generated passwords
 - strong modern encryption (AES 128/256, Blowfish, Chacha20)
+- uses an integrated security chip or TEE (Trusted Execution Environment) if present
 - Autofill support
 - biometrics (e.g. fingerprint) for stored master password
 - no insecure clipboard function by default
-- show passwords over other apps
+- show passwords over other apps to type it easily
 - no internet connection needed, all is offline
 - export and import credential vault
 - share and outsource credentials
@@ -20,4 +23,6 @@ It also comes with a clever two factor authentication to login into the credenti
 - Dark theme support ;-)
 
 
-For detailed information see https://anotherpass.jepfa.de
+For detailed information see <a href="https://anotherpass.jepfa.de">anotherpass.jepfa.de</a>
+
+If you like the app please star it on <a href="https://github.com/jenspfahl/ANOTHERpass">Github</a>!

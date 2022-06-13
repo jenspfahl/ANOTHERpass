@@ -20,7 +20,11 @@ import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_MAX_LOGIN_ATTEMPTS
 import de.jepfa.yapm.service.PreferenceService.PREF_SELF_DESTRUCTION
 import de.jepfa.yapm.service.PreferenceService.STATE_INTRO_SHOWED
+import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_DENIED_AT
 import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_ATTEMPTS
+import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_SUCCEEDED_AT
+import de.jepfa.yapm.service.PreferenceService.STATE_PREVIOUS_LOGIN_ATTEMPTS
+import de.jepfa.yapm.service.PreferenceService.STATE_PREVIOUS_LOGIN_SUCCEEDED_AT
 import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.*
@@ -46,22 +50,24 @@ class LoginActivity : NfcBaseActivity() {
     val createVaultActivityRequestCode = 1
     val importVaultActivityRequestCode = 2
 
+    private var resumeAutofillItem: MenuItem? = null
 
     init {
         checkSession = false
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofill, false)
+        loginAttempts = PreferenceService.getAsInt(STATE_LOGIN_ATTEMPTS,  this)
+
         super.onCreate(null)
 
         val introShowed = PreferenceService.getAsBool(STATE_INTRO_SHOWED, this)
-        isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofill, false)
         if (!introShowed && !isFromAutofill && Session.isLoggedOut()) {
             val intent = Intent(this, IntroActivity::class.java)
             startActivity(intent)
         }
-
-        loginAttempts = PreferenceService.getAsInt(STATE_LOGIN_ATTEMPTS,  this)
 
         if (MasterKeyService.isMasterKeyStored(this)) {
             setContentView(R.layout.activity_login)
@@ -100,10 +106,15 @@ class LoginActivity : NfcBaseActivity() {
         val debugItem: MenuItem = menu.findItem(R.id.menu_debug)
         debugItem.isVisible = DebugInfo.isDebug
 
-        val resumeAutofillItem: MenuItem = menu.findItem(R.id.menu_resume_autofill)
-        resumeAutofillItem.isVisible = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && ResponseFiller.isAutofillPaused(this)
+        resumeAutofillItem = menu.findItem(R.id.menu_resume_autofill)
+        updateResumeAutfillMenuItem()
 
         return true
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateResumeAutfillMenuItem()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -174,7 +185,12 @@ class LoginActivity : NfcBaseActivity() {
 
     fun handleFailedLoginAttempt() {
         loginAttempts++
-        PreferenceService.putString(STATE_LOGIN_ATTEMPTS, loginAttempts.toString(), this)
+
+        PreferenceService.putInt(STATE_LOGIN_ATTEMPTS, loginAttempts, this)
+        PreferenceService.putInt(STATE_PREVIOUS_LOGIN_ATTEMPTS, loginAttempts, this)
+
+        PreferenceService.putCurrentDate(STATE_LOGIN_DENIED_AT, this)
+
         if (loginAttempts >= getMaxLoginAttempts()) {
             val selfDestruction = PreferenceService.getAsBool(PREF_SELF_DESTRUCTION, this)
 
@@ -218,6 +234,13 @@ class LoginActivity : NfcBaseActivity() {
 
     fun loginSuccessful() {
         loginAttempts = 0
+
+        // backup last succeeded login
+        PreferenceService.getAsDate(STATE_LOGIN_SUCCEEDED_AT, this)?.let {
+            PreferenceService.putDate(STATE_PREVIOUS_LOGIN_SUCCEEDED_AT, it, this)
+        }
+
+        PreferenceService.putCurrentDate(STATE_LOGIN_SUCCEEDED_AT, this)
         PreferenceService.delete(STATE_LOGIN_ATTEMPTS, this)
 
         val isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofill, false)
@@ -248,6 +271,11 @@ class LoginActivity : NfcBaseActivity() {
 
     internal fun isFastLoginWithNfcTag(): Boolean {
         return  PreferenceService.getAsBool(PreferenceService.PREF_FAST_MASTERPASSWD_LOGIN_WITH_NFC, this)
+    }
+
+    private fun updateResumeAutfillMenuItem() {
+        resumeAutofillItem?.isVisible =
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && ResponseFiller.isAutofillPaused(this)
     }
 
     private fun readEMP(emp: Encrypted, handlePassword: (passwd: Password?) -> Unit) {

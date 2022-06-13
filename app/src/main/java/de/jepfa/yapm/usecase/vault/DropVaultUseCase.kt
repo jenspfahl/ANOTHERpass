@@ -51,6 +51,10 @@ object DropVaultUseCase: BasicUseCase<SecureActivity>() {
         PreferenceService.deleteAllData(activity)
         PreferenceService.deleteAllTempData(activity)
         PreferenceService.delete(PreferenceService.STATE_LOGIN_ATTEMPTS, activity)
+        PreferenceService.delete(PreferenceService.STATE_LOGIN_DENIED_AT, activity)
+        PreferenceService.delete(PreferenceService.STATE_LOGIN_SUCCEEDED_AT, activity)
+        PreferenceService.delete(PreferenceService.STATE_PREVIOUS_LOGIN_ATTEMPTS, activity)
+        PreferenceService.delete(PreferenceService.STATE_PREVIOUS_LOGIN_SUCCEEDED_AT, activity)
 
         LabelService.defaultHolder.clearAll()
         CoroutineScope(Dispatchers.IO).launch {
