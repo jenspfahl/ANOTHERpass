@@ -11,6 +11,8 @@ import androidx.appcompat.widget.SwitchCompat
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.DATA_MASTER_PASSWORD_TOKEN_NFC_TAG_ID
 import de.jepfa.yapm.service.nfc.NdefTag
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.nfc.NfcService
@@ -46,7 +48,14 @@ class NfcActivity : NfcBaseActivity() {
         nfcStatusTextView = findViewById(R.id.read_nfc_status)
         val nfcExplanationTextView: TextView = findViewById(R.id.nfc_explanation)
         val nfcImageView: ImageView = findViewById(R.id.imageview_nfc_icon)
+        val nfcProtectCopyingSwitch: SwitchCompat = findViewById(R.id.switch_protect_mpt_against_copying)
         val nfcWriteProtectSwitch: SwitchCompat = findViewById(R.id.switch_make_nfc_tag_write_protected)
+
+        val protectCopyingMpt = intent.getBooleanExtra(EXTRA_PROTECT_COPYING_MPT, false)
+        if (protectCopyingMpt) {
+            nfcProtectCopyingSwitch.visibility = View.VISIBLE
+            nfcProtectCopyingSwitch.isChecked = PreferenceService.isPresent(DATA_MASTER_PASSWORD_TOKEN_NFC_TAG_ID,this)
+        }
 
         val nfcWriteTagButton: Button = findViewById(R.id.button_write_nfc_tag)
 
@@ -97,13 +106,13 @@ class NfcActivity : NfcBaseActivity() {
                             .setMessage(R.string.message_write_nfc_tag)
                             .setIcon(android.R.drawable.ic_dialog_alert)
                             .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
-                                writeTag(t, withAppRecord, nfcWriteProtectSwitch.isChecked)
+                                writeTag(t, withAppRecord, nfcWriteProtectSwitch.isChecked, nfcProtectCopyingSwitch.isChecked)
                             }
                             .setNegativeButton(android.R.string.no, null)
                             .show()
                     }
                     else {
-                        writeTag(t, withAppRecord, nfcWriteProtectSwitch.isChecked)
+                        writeTag(t, withAppRecord, nfcWriteProtectSwitch.isChecked, nfcProtectCopyingSwitch.isChecked)
                     }
                 }
             }
@@ -152,7 +161,19 @@ class NfcActivity : NfcBaseActivity() {
         }
     }
 
-    private fun writeTag(t: NdefTag, withAppRecord: Boolean, setWriteProtection: Boolean) {
+    private fun writeTag(t: NdefTag, withAppRecord: Boolean, setWriteProtection: Boolean, setCopyProtection: Boolean) {
+
+        PreferenceService.delete(DATA_MASTER_PASSWORD_TOKEN_NFC_TAG_ID, this)
+        if (setCopyProtection) {
+            val tagId = ndefTag?.tagId
+            if (tagId != null) {
+                PreferenceService.putString(DATA_MASTER_PASSWORD_TOKEN_NFC_TAG_ID, tagId, this)
+            } else {
+                toastText(this, R.string.cannot_copy_protect_nfc_tag)
+                return
+            }
+        }
+
 
         encData?.let { data ->
             if (setWriteProtection) {
@@ -211,6 +232,7 @@ class NfcActivity : NfcBaseActivity() {
         const val EXTRA_DATA= "data"
         const val EXTRA_NO_SESSION_CHECK = "noSessionCheck"
         const val EXTRA_SCANNED_NDC_TAG_DATA = "scannedData"
+        const val EXTRA_PROTECT_COPYING_MPT = "protectCopyingMPT"
 
         const val ACTION_READ_NFC_TAG = 1
     }

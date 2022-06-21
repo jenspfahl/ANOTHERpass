@@ -129,7 +129,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         if (scannedNdefTag != null) {
             Log.i("LOGIN", "Tag available")
 
-            readAndUpdateMasterPassword(scannedNdefTag, loginActivity, loginActivity.isFastLoginWithNfcTag())
+            readAndUpdateMasterPassword(scannedNdefTag, false, loginActivity, loginActivity.isFastLoginWithNfcTag())
 
         }
         else {
@@ -147,7 +147,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         val scanned = getScannedFromIntent(requestCode, resultCode, data)
         if (scanned != null) {
             val loginActivity = getBaseActivity() as LoginActivity
-            readAndUpdateMasterPassword(scanned, loginActivity,
+            readAndUpdateMasterPassword(scanned, true, loginActivity,
                 (requestCode == NfcActivity.ACTION_READ_NFC_TAG && loginActivity.isFastLoginWithNfcTag()
                         || (requestCode != NfcActivity.ACTION_READ_NFC_TAG && loginActivity.isFastLoginWithQrCode())))
         } else {
@@ -162,13 +162,13 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         val scannedNdefTag = loginActivity.ndefTag?.data
         if (scannedNdefTag != null) {
             Log.i("LOGIN", "Tag available")
-            readAndUpdateMasterPassword(scannedNdefTag, loginActivity, loginActivity.isFastLoginWithNfcTag())
+            readAndUpdateMasterPassword(scannedNdefTag, false, loginActivity, loginActivity.isFastLoginWithNfcTag())
         }
     }
 
 
-    private fun readAndUpdateMasterPassword(scanned: String, loginActivity: LoginActivity, isFastLogin: Boolean) {
-        loginActivity.readMasterPassword(scanned)
+    private fun readAndUpdateMasterPassword(scanned: String, isFromQRScan: Boolean, loginActivity: LoginActivity, isFastLogin: Boolean) {
+        loginActivity.readMasterPassword(scanned, isFromQRScan)
         { masterPassword ->
             masterPassword?.let {
                 masterPasswdTextView.setText(masterPassword.toRawFormattedPassword())

@@ -151,7 +151,7 @@ class LoginEnterPinFragment : BaseFragment() {
                 login(pinTextView, userPin, masterPasswd, loginActivity)
             }
             else if (scannedNdefTag != null) {
-                loginActivity.readMasterPassword(scannedNdefTag)
+                loginActivity.readMasterPassword(scannedNdefTag, false)
                 { masterPasswd ->
                     masterPasswd?.let {
                         login(pinTextView, userPin, masterPasswd, loginActivity)

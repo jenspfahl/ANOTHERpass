@@ -53,10 +53,6 @@ import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.ui.label.ListLabelsActivity
 import de.jepfa.yapm.ui.settings.SettingsActivity
 import de.jepfa.yapm.usecase.app.ShowInfoUseCase
-import de.jepfa.yapm.usecase.secret.ExportEncMasterKeyUseCase
-import de.jepfa.yapm.usecase.secret.ExportEncMasterPasswordUseCase
-import de.jepfa.yapm.usecase.secret.GenerateMasterPasswordTokenUseCase
-import de.jepfa.yapm.usecase.secret.RemoveStoredMasterPasswordUseCase
 import de.jepfa.yapm.usecase.session.LogoutUseCase
 import de.jepfa.yapm.usecase.vault.DropVaultUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
@@ -65,8 +61,7 @@ import de.jepfa.yapm.util.*
 import java.util.*
 import kotlin.collections.ArrayList
 import androidx.recyclerview.widget.DividerItemDecoration
-
-
+import de.jepfa.yapm.usecase.secret.*
 
 
 /**
@@ -164,6 +159,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         navigationView.setNavigationItemSelectedListener(this)
         refreshMenuMasterPasswordItem(navigationView.menu)
+        refreshRevokeMptItem(navigationView.menu)
         refreshMenuDebugItem(navigationView.menu)
 
         toggle = ActionBarDrawerToggle(
@@ -188,6 +184,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     override fun onResume() {
         super.onResume()
         refreshMenuMasterPasswordItem(navigationView.menu)
+        refreshRevokeMptItem(navigationView.menu)
 
         val requestReload = PreferenceService.getAsBool(STATE_REQUEST_CREDENTIAL_LIST_RELOAD, applicationContext)
         val requestHardReload = PreferenceService.getAsBool(STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD, applicationContext)
@@ -262,7 +259,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         refreshMenuLockItem(menu.findItem(R.id.menu_lock_items))
         refreshMenuFiltersItem(menu.findItem(R.id.menu_filter))
         refreshMenuShowIdsItem(menu.findItem(R.id.menu_show_ids))
-
 
         labelViewModel.allLabels.observe(this, { labels ->
             masterSecretKey?.let{ key ->
@@ -451,6 +447,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
     }
 
+    private fun refreshRevokeMptItem(menu: Menu) {
+        val hasMpt = PreferenceService.isPresent(PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY, this)
+        menu.findItem(R.id.revoke_masterpasswd_token).isVisible = hasMpt
+    }
+
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
 
         drawerLayout.closeDrawer(GravityCompat.START)
@@ -502,7 +503,16 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 return true
             }
             R.id.generate_masterpasswd_token -> {
-                GenerateMasterPasswordTokenUseCase.openDialog(this)
+                GenerateMasterPasswordTokenUseCase.openDialog(this) {
+                    refreshRevokeMptItem(navigationView.menu)
+                }
+                return true
+            }
+            R.id.revoke_masterpasswd_token -> {
+                RevokeMasterPasswordTokenUseCase.openDialog(this) {
+                    refreshRevokeMptItem(navigationView.menu)
+                }
+
                 return true
             }
             R.id.export_encrypted_masterpasswd -> {

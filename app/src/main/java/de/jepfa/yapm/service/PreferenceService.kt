@@ -31,6 +31,7 @@ object PreferenceService {
     const val DATA_ENCRYPTED_MASTER_PASSWORD = DATA_PREFIX + "mpwd"
     const val DATA_ENCRYPTED_MASTER_KEY = DATA_PREFIX + "enmk"
     const val DATA_MASTER_PASSWORD_TOKEN_KEY = DATA_PREFIX + "mpt"
+    const val DATA_MASTER_PASSWORD_TOKEN_NFC_TAG_ID = DATA_PREFIX + "mpt_nfc_tag_id"
     const val STATE_MASTER_PASSWD_TOKEN_COUNTER = STATE_PREFIX + "mpt_counter"
 
     const val DATA_VAULT_VERSION = DATA_PREFIX + "vault_version"

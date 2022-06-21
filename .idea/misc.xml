@@ -74,7 +74,7 @@
         <entry key="app/src/main/res/layout/activity_list_credentials.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/activity_list_labels.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.10885416666666667" />
-        <entry key="app/src/main/res/layout/activity_nfc.xml" value="0.17864583333333334" />
+        <entry key="app/src/main/res/layout/activity_nfc.xml" value="0.4" />
         <entry key="app/src/main/res/layout/activity_onboarding.xml" value="0.15572916666666667" />
         <entry key="app/src/main/res/layout/activity_qr_code.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/activity_show_credential.xml" value="0.1" />

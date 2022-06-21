@@ -119,7 +119,8 @@
     <string name="toast_import_vault_failure_cipher_not_supported">Die ausgewählte Datei ist mit einem nicht unterstützten Algorithmus verschlüsselt.</string>
     <string name="toast_import_vault_failure_no_vault_match">Die ausgewählte Datei gehört nicht zum aktuellen Tresor.</string>
     <string name="quick_access">Schnellzugang</string>
-    <string name="generate_encrypted_masterpasswd">Erzeuge Masterpasswort-Token</string>
+    <string name="generate_new_mpt">Erzeuge Masterpasswort-Token</string>
+    <string name="revoke_last_mpt">Lösche Masterpasswort-Token</string>
     <string name="master_password_not_changed">Das Masterpasswort wurde nicht geändert.</string>
     <string name="use_pseudo_phrase">Verwende Pseudophrasen zum Generieren des Masterpasswortes</string>
     <string name="help">Onlinehilfe</string>
@@ -321,6 +322,7 @@
     <string name="unknown_emp_scanned">\u274C Unbekanntes exportiertes Masterpasswort (EMP) gescannt</string>
     <string name="well_known_emp_scanned">\u2705 Gültiges exportiertes Masterpasswort (EMP) gescannt</string>
     <string name="unknown_mpt_scanned">\u274C Unbekanntes Masterpasswort-Token (MPT) gescannt</string>
+    <string name="mpt_qr_scan_forbidden">\u274C Masterpasswort-Token (MPT) als QR-Code nicht erlaubt, da es als kopiergeschützes NFC-Tag vorliegt</string>
     <string name="well_known_mpt_scanned">\u2705 Gültiges Masterpasswort-Token (MPT #%1$s) gescannt</string>
     <string name="well_known_ecr_scanned">\u2705 Gültige verschlüsselte Zugangsdaten mit Name \'%1$s\' gescannt</string>
     <string name="unknown_ecr_scanned">\u274C Unbekannte verschlüsselte Zugangsdaten gescannt</string>
@@ -535,5 +537,9 @@
     <string name="show_last_login_state_denies_and_succeeds">Abgelehnte und erfolgreiche Logins</string>
     <string name="show_last_login_state_denies_only">Nur abgelehnte Loginversuche</string>
     <string name="show_last_login_state_nothing">Keine</string>
+    <string name="protect_mpt_against_copying">Schützt das Token vorm Kopieren. Nur das aktuelle NFC Token wird erkannt. Weiterhin kann dieses Token nicht als QR-Code verwendet werden!</string>
+    <string name="cannot_copy_protect_nfc_tag">Token kann nicht kopier-geschützt werden</string>
+    <string name="mpt_qrcode_scan_not_allowed">Masterpassword-Token als QR-Code nicht erlaubt</string>
+    <string name="not_a_original_mpt_nfc_token">Kein original Masterpassword-Token NFC-Tag</string>
 
 </resources>

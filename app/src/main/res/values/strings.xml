@@ -121,7 +121,8 @@
     <string name="toast_import_vault_failure_cipher_not_supported">The selected file is encrypted with an unsupported cipher.</string>
     <string name="toast_import_vault_failure_no_vault_match">The selected file doesn\'t belong to the current vault.</string>
     <string name="quick_access">Quick access</string>
-    <string name="generate_encrypted_masterpasswd">Create Master Password Token</string>
+    <string name="generate_new_mpt">Create Master Password Token</string>
+    <string name="revoke_last_mpt">Invalidate Master Password Token</string>
     <string name="master_password_not_changed">Master password has not been changed.</string>
     <string name="use_pseudo_phrase">Use pseudo phrases to generate master password</string>
     <string name="help">Online help</string>
@@ -333,6 +334,7 @@
     <string name="unknown_emp_scanned">\u274C Unknown Exported Master Password (EMP) scanned</string>
     <string name="well_known_emp_scanned">\u2705 Well known Exported Master Password (EMP) scanned</string>
     <string name="unknown_mpt_scanned">\u274C Unknown Master Password Token (MPT) scanned</string>
+    <string name="mpt_qr_scan_forbidden">\u274C Master Password Token (MPT) as QR code not allowed due to copy-protected NFC tag priority</string>
     <string name="well_known_mpt_scanned">\u2705 Well known Master Password Token (MPT #%1$s) scanned</string>
     <string name="well_known_ecr_scanned">\u2705 Well known Encrypted Credential Record (ECR) with name \'%1$s\' scanned</string>
     <string name="unknown_ecr_scanned">\u274C Unknown Encrypted Credential Record (ECR) scanned</string>
@@ -545,5 +547,9 @@
     <string name="show_last_login_state_denies_and_succeeds">Denied and succeeded logins</string>
     <string name="show_last_login_state_denies_only">Only denied logins</string>
     <string name="show_last_login_state_nothing">None</string>
+    <string name="protect_mpt_against_copying">Protect token against copying. The token will only work with the current NFC tag. It also disables the usage of QR code for this token!</string>
+    <string name="cannot_copy_protect_nfc_tag">Cannot copy-protect this token</string>
+    <string name="mpt_qrcode_scan_not_allowed">Scanning Master Password Token not allowed</string>
+    <string name="not_a_original_mpt_nfc_token">Not an origin Master Password Token tag</string>
 
 </resources>

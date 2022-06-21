@@ -1,6 +1,7 @@
 package de.jepfa.yapm.ui.importread
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.TextView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
@@ -100,7 +101,18 @@ class VerifyActivity : ReadActivityBase() {
 
     private fun checkMPT(mpt: Encrypted) {
         verifyResultText.text = getString(R.string.unknown_mpt_scanned)
+        val tagId = ndefTag?.tagId
+        val storedTagId = PreferenceService.getAsString(PreferenceService.DATA_MASTER_PASSWORD_TOKEN_NFC_TAG_ID, this)
+        if (isFromQRScan && storedTagId != null) {
+            Log.i("nfc", "mpt qr code scan not allowed for copy-protected nfc tokens")
+            verifyResultText.text = getString(R.string.mpt_qr_scan_forbidden)
 
+            return
+        }
+        if (tagId != null && storedTagId != null && tagId != storedTagId) {
+            Log.i("nfc", "mpt tag id missmatch: tagId = $tagId <> storedTagId=$storedTagId")
+            return
+        }
         val encMasterPasswordTokenKey = PreferenceService.getEncrypted(
             PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY,
             this

@@ -254,11 +254,11 @@ class LoginActivity : NfcBaseActivity() {
         finish()
     }
 
-    internal fun readMasterPassword(scanned: String, handlePassword: (passwd: Password?) -> Unit) {
+    internal fun readMasterPassword(scanned: String, isFromQRScan: Boolean, handlePassword: (passwd: Password?) -> Unit) {
         val encrypted = Encrypted.fromEncryptedBase64StringWithCheck(scanned)
         when (encrypted?.type?.type) {
             EncryptedType.Types.ENC_MASTER_PASSWD -> readEMP(encrypted, handlePassword)
-            EncryptedType.Types.MASTER_PASSWD_TOKEN -> readMPT(encrypted, handlePassword)
+            EncryptedType.Types.MASTER_PASSWD_TOKEN -> readMPT(encrypted, isFromQRScan, handlePassword)
             else -> {
                 toastText(this, R.string.invalid_emp_mpt)
             }
@@ -301,7 +301,7 @@ class LoginActivity : NfcBaseActivity() {
 
     }
 
-    private fun readMPT(mpt: Encrypted, handlePassword: (passwd: Password) -> Unit) {
+    private fun readMPT(mpt: Encrypted, isFromQRScan: Boolean, handlePassword: (passwd: Password) -> Unit) {
         if (!PreferenceService.isPresent(
                 PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY,
                 this
@@ -310,6 +310,20 @@ class LoginActivity : NfcBaseActivity() {
             toastText(this, R.string.no_mpt_present)
             return
         }
+        val tagId = ndefTag?.tagId
+        val storedTagId = PreferenceService.getAsString(PreferenceService.DATA_MASTER_PASSWORD_TOKEN_NFC_TAG_ID, this)
+        if (isFromQRScan && storedTagId != null) {
+            Log.i("nfc", "mpt qr code scan not allowed for copy-protected nfc tokens")
+            toastText(this, R.string.mpt_qrcode_scan_not_allowed)
+            return
+        }
+        if (tagId != null && storedTagId != null && tagId != storedTagId) {
+            Log.i("nfc", "mpt tag id missmatch: tagId = $tagId <> storedTagId=$storedTagId")
+            toastText(this, R.string.not_a_original_mpt_nfc_token)
+
+            return
+        }
+
         // decrypt obliviously encrypted master password token
         val encMasterPasswordTokenKey = PreferenceService.getEncrypted(
             PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY,

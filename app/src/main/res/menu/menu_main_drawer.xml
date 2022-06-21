@@ -8,7 +8,12 @@
             <item
                 android:id="@+id/generate_masterpasswd_token"
                 android:orderInCategory="50"
-                android:title="@string/generate_encrypted_masterpasswd" />
+                android:title="@string/generate_new_mpt" />
+            <item
+                android:id="@+id/revoke_masterpasswd_token"
+                android:orderInCategory="60"
+                android:title="@string/revoke_last_mpt"
+                android:visible="false"/>
             <item
                 android:id="@+id/delete_stored_masterpasswd"
                 android:orderInCategory="70"
