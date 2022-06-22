@@ -69,7 +69,6 @@ abstract class ReadActivityBase : NfcBaseActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val scanned = getScannedFromIntent(requestCode, resultCode, data)
         if (scanned != null) {
-            isFromQRScan = true
             handleScannedData(scanned)
         } else {
             super.onActivityResult(requestCode, resultCode, data)
@@ -78,12 +77,13 @@ abstract class ReadActivityBase : NfcBaseActivity() {
 
     private fun getScannedFromIntent(requestCode: Int, resultCode: Int, data: Intent?): String? {
         if (requestCode == NfcActivity.ACTION_READ_NFC_TAG) {
+            isFromQRScan = false
             return data?.getStringExtra(NfcActivity.EXTRA_SCANNED_NDC_TAG_DATA)
         }
         else {
+            isFromQRScan = true
             return QRCodeUtil.extractContentFromIntent(requestCode, resultCode, data)
         }
-        return null
     }
 
     abstract fun getLayoutId(): Int

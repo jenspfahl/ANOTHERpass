@@ -312,16 +312,22 @@ class LoginActivity : NfcBaseActivity() {
         }
         val tagId = ndefTag?.tagId
         val storedTagId = PreferenceService.getAsString(PreferenceService.DATA_MASTER_PASSWORD_TOKEN_NFC_TAG_ID, this)
-        if (isFromQRScan && storedTagId != null) {
-            Log.i("nfc", "mpt qr code scan not allowed for copy-protected nfc tokens")
-            toastText(this, R.string.mpt_qrcode_scan_not_allowed)
-            return
-        }
-        if (tagId != null && storedTagId != null && tagId != storedTagId) {
-            Log.i("nfc", "mpt tag id missmatch: tagId = $tagId <> storedTagId=$storedTagId")
-            toastText(this, R.string.not_a_original_mpt_nfc_token)
+        if (storedTagId != null) {
+            if (isFromQRScan) {
+                Log.i("nfc", "mpt qr code scan not allowed for copy-protected nfc tokens")
+                toastText(this, R.string.mpt_qrcode_scan_not_allowed)
+                return
+            }
+            else if (tagId == null) {
+                toastText(this, "This NFC tag doesn't have an Id but is needed to verify it.")
+                return
+            }
+            else if (tagId != storedTagId) {
+                Log.i("nfc", "mpt tag id missmatch: tagId = $tagId <> storedTagId=$storedTagId")
+                toastText(this, R.string.not_a_original_mpt_nfc_token)
 
-            return
+                return
+            }
         }
 
         // decrypt obliviously encrypted master password token

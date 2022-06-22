@@ -1,5 +1,6 @@
 package de.jepfa.yapm.ui.nfc
 
+import android.nfc.NfcAdapter
 import androidx.appcompat.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
@@ -134,7 +135,11 @@ class NfcActivity : NfcBaseActivity() {
         val tData = ndefTag?.data
         if (mode == EXTRA_MODE_RO && tData != null) {
             nfcStatusTextView.text = getString(R.string.nfc_tag_detected)
+            // we put the origin tag data and the content data separated
+            intent.putExtra(NfcAdapter.EXTRA_TAG, ndefTag?.tag)
+            intent.putExtra(NfcAdapter.EXTRA_NDEF_MESSAGES, tData)
             intent.putExtra(EXTRA_SCANNED_NDC_TAG_DATA, tData)
+
             setResult(ACTION_READ_NFC_TAG, intent)
             finish()
         }

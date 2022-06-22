@@ -111,6 +111,8 @@ class VerifyActivity : ReadActivityBase() {
         }
         if (tagId != null && storedTagId != null && tagId != storedTagId) {
             Log.i("nfc", "mpt tag id missmatch: tagId = $tagId <> storedTagId=$storedTagId")
+            verifyResultText.text = "\u274C " + getString(R.string.not_a_original_mpt_nfc_token)
+
             return
         }
         val encMasterPasswordTokenKey = PreferenceService.getEncrypted(
