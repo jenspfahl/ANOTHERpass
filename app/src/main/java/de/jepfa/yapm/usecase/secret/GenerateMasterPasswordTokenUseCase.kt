@@ -60,7 +60,7 @@ object GenerateMasterPasswordTokenUseCase: BasicUseCase<SecureActivity>() {
             ) + 1
             val cipherAlgorithm = SecretService.getCipherAlgorithm(activity)
 
-            val masterPasswordTokenKey = SecretService.generateRandomKey(32)
+            val masterPasswordTokenKey = SecretService.generateRandomKey(32, null)
             val encMasterPasswordTokenKey = SecretService.encryptKey(mptKey, masterPasswordTokenKey)
             val masterPasswordTokenSK = SecretService.generateStrongSecretKey(
                 masterPasswordTokenKey,

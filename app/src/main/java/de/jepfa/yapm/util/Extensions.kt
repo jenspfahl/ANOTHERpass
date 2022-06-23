@@ -153,3 +153,7 @@ fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observ
     })
 }
 
+fun ByteArray.toHex(): String = joinToString(separator = "") { eachByte ->
+    "%02x".format(eachByte)
+}
+

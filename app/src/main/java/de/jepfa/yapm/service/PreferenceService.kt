@@ -28,6 +28,7 @@ object PreferenceService {
 
     const val DATA_CIPHER_ALGORITHM = DATA_PREFIX + "cipher_algorithm"
     const val DATA_SALT = DATA_PREFIX + "aslt"
+    const val DATA_ENCRYPTED_SEED = DATA_PREFIX + "seed"
     const val DATA_ENCRYPTED_MASTER_PASSWORD = DATA_PREFIX + "mpwd"
     const val DATA_ENCRYPTED_MASTER_KEY = DATA_PREFIX + "enmk"
     const val DATA_MASTER_PASSWORD_TOKEN_KEY = DATA_PREFIX + "mpt"

@@ -1,6 +1,8 @@
 package de.jepfa.yapm.service.secretgenerator.password
 
+import android.content.Context
 import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secretgenerator.GeneratorBase
 import java.util.*
 
@@ -8,8 +10,9 @@ class PasswordGenerator(
     val upperCase: String = DEFAULT_ALPHA_CHARS_UPPER_CASE,
     val lowerCase: String = DEFAULT_ALPHA_CHARS_LOWER_CASE,
     val digits: String = DEFAULT_DIGITS,
-    val specialChars: String = DEFAULT_SPECIAL_CHARS
-) : GeneratorBase<PasswordGeneratorSpec>() {
+    val specialChars: String = DEFAULT_SPECIAL_CHARS,
+    context: Context?
+) : GeneratorBase<PasswordGeneratorSpec>(context) {
 
     companion object {
         val DEFAULT_ALPHA_CHARS_LOWER_CASE = "abcdefghijklmnopqrstuvwxyz"
@@ -20,9 +23,8 @@ class PasswordGenerator(
 
     override fun generate(spec: PasswordGeneratorSpec): Password {
         while(true){
-            val buffer = generatePassword(spec)
+            val buffer = generatePassword(spec, context)
             if (matchSpec(spec, buffer)) {
-                maybeResetPRNG()
                 return Password(buffer)
             }
         }
@@ -140,12 +142,12 @@ class PasswordGenerator(
         return buffer.filter { c -> material.contains(c) }.isNotEmpty()
     }
 
-    private fun generatePassword(spec: PasswordGeneratorSpec): CharArray {
+    private fun generatePassword(spec: PasswordGeneratorSpec, context: Context?): CharArray {
         val buffer = CharArray(spec.strength.ordinaryPasswordLength)
         val material = extractMaterial(spec)
 
-        for (i in 0 until buffer.size) {
-            buffer[i] = random(material)
+        for (i in buffer.indices) {
+            buffer[i] = random(material, context)
         }
         return buffer
     }
@@ -164,8 +166,8 @@ class PasswordGenerator(
         return material
     }
 
-    private fun random(material: String): Char {
-        val index = random.nextInt(material.length)
+    private fun random(material: String, context: Context?): Char {
+        val index = SecretService.getSecureRandom(context).nextInt(material.length)
 
         return material[index]
     }

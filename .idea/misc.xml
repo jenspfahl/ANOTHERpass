@@ -8,6 +8,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../.gradle/caches/transforms-3/b5fc9fe81f432b473c9d18cad7139f18/transformed/jetified-AppIntro-6.1.0/res/drawable/ic_appintro_arrow.xml" value="0.15" />
         <entry key="../../../.gradle/caches/transforms-3/ff81f502ffce195f4a804dfbc80ef12b/transformed/jetified-AppIntro-6.1.0/res/drawable/ic_appintro_arrow.xml" value="0.20104166666666667" />
         <entry key="../../../Android/Sdk/platforms/android-29/data/res/layout/simple_dropdown_item_1line.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/drawable/ic_baseline_arrow_back_24.xml" value="0.20104166666666667" />
@@ -64,6 +65,7 @@
         <entry key="app/src/main/res/layout/activity_change_master_password.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/activity_change_pin.xml" value="0.20244565217391305" />
         <entry key="app/src/main/res/layout/activity_create_or_import_vault.xml" value="0.17864583333333334" />
+        <entry key="app/src/main/res/layout/activity_create_vault.xml" value="0.1359375" />
         <entry key="app/src/main/res/layout/activity_edit_label.xml" value="0.33747178329571104" />
         <entry key="app/src/main/res/layout/activity_error.xml" value="0.18072916666666666" />
         <entry key="app/src/main/res/layout/activity_export_vault.xml" value="0.176" />
@@ -86,9 +88,11 @@
         <entry key="app/src/main/res/layout/content_import_vault_file_to_vault.xml" value="0.3015625" />
         <entry key="app/src/main/res/layout/content_label_chip.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/content_list_credentials.xml" value="0.17864583333333334" />
+        <entry key="app/src/main/res/layout/content_login.xml" value="0.1359375" />
         <entry key="app/src/main/res/layout/expandable_group_item.xml" value="0.11354166666666667" />
         <entry key="app/src/main/res/layout/expandable_list_item.xml" value="0.2" />
-        <entry key="app/src/main/res/layout/fragment_create_vault_enter_passphrase.xml" value="0.11354166666666667" />
+        <entry key="app/src/main/res/layout/fragment_create_vault_enter_passphrase.xml" value="0.4" />
+        <entry key="app/src/main/res/layout/fragment_create_vault_enter_pin.xml" value="0.1359375" />
         <entry key="app/src/main/res/layout/fragment_create_vault_summarize.xml" value="0.264" />
         <entry key="app/src/main/res/layout/fragment_edit_credential_data.xml" value="0.264" />
         <entry key="app/src/main/res/layout/fragment_edit_credential_password.xml" value="0.2" />

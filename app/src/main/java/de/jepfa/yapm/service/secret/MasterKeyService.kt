@@ -49,8 +49,8 @@ object MasterKeyService {
         return masterSK
     }
 
-    fun generateMasterKey(): Key {
-        return generateRandomKey(MASTER_KEY_BYTE_SIZE)
+    fun generateMasterKey(context: Context?): Key {
+        return generateRandomKey(MASTER_KEY_BYTE_SIZE, context)
     }
 
     fun getMasterKey(masterPassPhraseSK: SecretKeyHolder, storedEncMasterKey: Encrypted, context: Context): Key? {

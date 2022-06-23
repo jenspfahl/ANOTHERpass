@@ -251,6 +251,15 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
             )
         }
 
+        val encSeedBase64String = jsonContent.get(VaultExportService.JSON_ENC_SEED)?.asString
+        if (encSeedBase64String != null) {
+            PreferenceService.putEncrypted(
+                PreferenceService.DATA_ENCRYPTED_SEED,
+                Encrypted.fromBase64String(encSeedBase64String),
+                activity
+            )
+        }
+
         val credentialsJson = jsonContent.get(VaultExportService.JSON_CREDENTIALS)?.asJsonArray
         if (credentialsJson != null) {
             persistCredentials(credentialsJson, activity)

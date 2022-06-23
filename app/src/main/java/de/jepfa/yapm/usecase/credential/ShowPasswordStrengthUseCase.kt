@@ -15,7 +15,7 @@ import de.jepfa.yapm.util.toReadableFormat
 
 object ShowPasswordStrengthUseCase: InputUseCase<ShowPasswordStrengthUseCase.Input, SecureActivity>() {
 
-    private val passwordGenerator = PasswordGenerator()
+    private val passwordGenerator = PasswordGenerator(context = null)
 
     data class Input(val password: Password, val titleId: Int)
 

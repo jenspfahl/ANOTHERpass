@@ -15,7 +15,9 @@ import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.encrypted.EncryptedType
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_SEED
 import de.jepfa.yapm.service.biometrix.BiometricUtils
 import java.security.*
 import javax.crypto.Cipher
@@ -34,8 +36,36 @@ object SecretService {
 
     private val ANDROID_KEY_STORE = "AndroidKeyStore"
 
-    private val random = SecureRandom()
+    private var userSeed: Key? = null
+    private var random: SecureRandom? = null
     private val androidKeyStore = KeyStore.getInstance(ANDROID_KEY_STORE)
+
+    @Synchronized
+    fun getSecureRandom(context: Context?): SecureRandom {
+        if (random == null || random!!.nextInt(100) <= 0) {
+            Log.d("SEED", "init PRNG")
+            random = SecureRandom()
+            loadUserSeed(context)
+            userSeed?.let { seed ->
+                Log.d("SEED", "add user seed to PRNG")
+                random?.setSeed(seed.data)
+            }
+        }
+        else {
+            Log.d("SEED", "return current PRNG")
+        }
+        return random!!
+    }
+
+    private fun loadUserSeed(context: Context?) {
+        if (context != null) {
+            Session.getMasterKeySK()?.let { key ->
+                PreferenceService.getEncrypted(DATA_ENCRYPTED_SEED, context)?.let { encSeed ->
+                    userSeed = decryptKey(key, encSeed)
+                }
+            }
+        }
+    }
 
     fun getCipherAlgorithm(context: Context): CipherAlgorithm {
         val cipherAlgorithmName =
@@ -44,9 +74,9 @@ object SecretService {
         return CipherAlgorithm.valueOf(cipherAlgorithmName)
     }
 
-    fun generateRandomKey(length: Int): Key {
+    fun generateRandomKey(length: Int, context: Context?): Key {
         val bytes = ByteArray(length)
-        random.nextBytes(bytes)
+        getSecureRandom(context).nextBytes(bytes)
         return Key(bytes)
     }
 
@@ -155,7 +185,7 @@ object SecretService {
         }
         else {
             val iv = ByteArray(cipher.blockSize)
-            random.nextBytes(iv)
+            getSecureRandom(null).nextBytes(iv)
             val ivParams = IvParameterSpec(iv)
             cipher.init(Cipher.ENCRYPT_MODE, secretKeyHolder.secretKey, ivParams)
         }
@@ -244,6 +274,21 @@ object SecretService {
                 spec.setIsStrongBoxBacked(false)
                 keyGenerator.init(spec.build())
                 return keyGenerator.generateKey()
+            }
+        }
+    }
+
+    fun setUserSeed(seed: Key?) {
+        userSeed = seed
+        Log.d("SEED", "update user seed")
+    }
+
+    fun persistUserSeed(context: Context) {
+        userSeed?.let { seed ->
+            Session.getMasterKeySK()?.let { key ->
+                val encSeed = encryptKey(key, seed)
+                PreferenceService.putEncrypted(DATA_ENCRYPTED_SEED, encSeed, context)
+                Log.d("SEED", "persist user seed")
             }
         }
     }

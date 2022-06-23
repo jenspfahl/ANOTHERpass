@@ -1,5 +1,6 @@
 package de.jepfa.yapm.usecase.secret
 
+import android.content.Context
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.secretgenerator.SecretStrength
 import de.jepfa.yapm.service.secretgenerator.passphrase.PassphraseGenerator
@@ -12,25 +13,22 @@ import de.jepfa.yapm.usecase.UseCaseOutput
 
 object GenerateMasterPasswordUseCase: UseCase<Boolean, Password, BaseActivity> {
 
-    private var passphraseGenerator = PassphraseGenerator()
-    private var passwordGenerator = PasswordGenerator()
-
     override fun execute(usePseudoPhrase: Boolean, activity: BaseActivity): UseCaseOutput<Password> {
 
-        val generated = generate(usePseudoPhrase)
+        val generated = generate(usePseudoPhrase, activity)
 
         return UseCaseOutput(generated)
     }
 
-    private fun generate(usePseudoPhrase: Boolean): Password {
+    private fun generate(usePseudoPhrase: Boolean, context : Context): Password {
         if (usePseudoPhrase) {
-            return passphraseGenerator.generate(
+            return PassphraseGenerator(context = context).generate(
                 PassphraseGeneratorSpec(
                     strength = SecretStrength.HYPER
                 )
             )
         } else {
-            return passwordGenerator.generate(
+            return PasswordGenerator(context = context).generate(
                 PasswordGeneratorSpec(
                     strength = SecretStrength.HYPER
                 )
