@@ -57,8 +57,14 @@ object SecretService {
         return random!!
     }
 
+    fun clear() {
+        userSeed?.clear()
+        userSeed = null
+        random = null
+    }
+
     private fun loadUserSeed(context: Context?) {
-        if (context != null) {
+        if (context != null && userSeed == null) {
             Session.getMasterKeySK()?.let { key ->
                 PreferenceService.getEncrypted(DATA_ENCRYPTED_SEED, context)?.let { encSeed ->
                     userSeed = decryptKey(key, encSeed)

@@ -3,6 +3,7 @@ package de.jepfa.yapm.model.session
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.autofill.AutofillCredentialHolder
+import de.jepfa.yapm.service.secret.SecretService
 import java.util.concurrent.TimeUnit
 
 object Session {
@@ -83,6 +84,7 @@ object Session {
         lockDisabled = false;
         masterSecretKey?.destroy()
         masterSecretKey = null
+        SecretService.clear()
         AutofillCredentialHolder.clear()
         touch()
     }
