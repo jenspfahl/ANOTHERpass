@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".ui.createvault.CreateVaultSummarizeFragment">
+    tools:context=".ui.changelogin.ChangeEncryptionActivity">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -20,65 +20,38 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/change_master_password_explanation"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="@string/create_vault_explanation_3"
+                android:text="@string/change_encryption_explanation"
                 android:layout_marginBottom="24dp"/>
 
-
-            <LinearLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical">
+                android:layout_height="wrap_content">
 
-                <LinearLayout
+                <EditText
+                    android:id="@+id/current_pin"
+                    android:inputType="textPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="horizontal">
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    android:layout_marginBottom="24dp"
+                    android:maxLength="@integer/max_pin_length"
+                    android:hint="@string/current_pin"
+                    tools:ignore="TextFields" />
 
-                    <ImageView
-                        android:id="@+id/imageview_qrcode"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:paddingHorizontal="4dp"
-                        android:clickable="true"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_baseline_qr_code_36"
-                        android:focusable="true" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-                    <ImageView
-                        android:id="@+id/imageview_nfc_tag"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:paddingHorizontal="4dp"
-                        android:clickable="true"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_baseline_nfc_36"
-                        android:focusable="true" />
-
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/generated_passwd"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    style="@style/generated_password"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"/>
-
-            </LinearLayout>
 
             <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/switch_store_master_password"
+                android:id="@+id/switch_generate_new_masterkey"
+                android:checked="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginBottom="4dp"
-                android:text="@string/store_master_password" />
+                android:paddingHorizontal="8pt"
+                android:text="@string/generate_new_masterkey"/>
 
 
             <LinearLayout
@@ -90,9 +63,10 @@
                 android:layout_marginBottom="16dp">
 
                 <TextView
+                    android:id="@+id/current_encryption_text"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="@string/create_vault_cipher_explanation"
+                    android:text="@string/nothing_placeholder"
                     android:layout_marginHorizontal="8dp"/>
 
                 <LinearLayout
@@ -121,14 +95,13 @@
                 </LinearLayout>
             </LinearLayout>
 
-
             <Button
-                android:id="@+id/button_create_vault"
+                android:id="@+id/button_change"
                 style="?android:textAppearanceSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/button_create_vault"
+                android:text="@string/button_change"
                 android:background="@color/colorAccent"
                 android:textColor="@color/buttonLabel"
                 android:textStyle="bold" />

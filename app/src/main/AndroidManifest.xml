@@ -71,6 +71,10 @@
             android:label="@string/change_master_password"
             android:noHistory="true" />
         <activity
+            android:name=".ui.changelogin.ChangeEncryptionActivity"
+            android:label="@string/change_encryption"
+            android:noHistory="true" />
+        <activity
             android:name=".ui.nfc.NfcActivity"
             android:noHistory="true" />
         <activity

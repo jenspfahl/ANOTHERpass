@@ -62,6 +62,7 @@ import de.jepfa.yapm.util.*
 import java.util.*
 import kotlin.collections.ArrayList
 import androidx.recyclerview.widget.DividerItemDecoration
+import de.jepfa.yapm.ui.changelogin.ChangeEncryptionActivity
 import de.jepfa.yapm.usecase.secret.*
 
 
@@ -572,6 +573,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             }
             R.id.change_master_password -> {
                 val intent = Intent(this, ChangeMasterPasswordActivity::class.java)
+                startActivity(intent)
+                return true
+            }
+            R.id.change_master_key_and_encryption -> {
+                val intent = Intent(this, ChangeEncryptionActivity::class.java)
                 startActivity(intent)
                 return true
             }

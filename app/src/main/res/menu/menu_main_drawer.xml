@@ -81,6 +81,11 @@
                 android:title="@string/change_master_password" />
 
             <item
+                android:id="@+id/change_master_key_and_encryption"
+                android:orderInCategory="92"
+                android:title="@string/change_encryption" />
+
+            <item
                 android:id="@+id/seed_random_generator"
                 android:orderInCategory="95"
                 android:title="@string/seed_random_generator" />

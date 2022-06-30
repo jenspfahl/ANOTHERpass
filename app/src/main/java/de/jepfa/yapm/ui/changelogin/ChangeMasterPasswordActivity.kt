@@ -85,6 +85,8 @@ class ChangeMasterPasswordActivity : SecureActivity() {
 
                 true
             }
+
+            hideKeyboard(currentPinTextView)
         }
 
         buttonGeneratePasswd.setOnClickListener {

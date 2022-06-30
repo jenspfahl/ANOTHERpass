@@ -27,7 +27,8 @@
 
 
     <string name="cipher_name">Encryption algorithm</string>
-    <string name="create_vault_cipher_explanation">Choose an encryption algorithm. You cannot change that later. If in doubt, use the current default.</string>
+    <string name="create_vault_cipher_explanation">Choose an encryption algorithm. You change that later. If in doubt, use the current default.</string>
+    <string name="update_vault_cipher_explanation">Choose an encryption algorithm. Current used algorithm is %1$s</string>
 
     <string name="CIPHER_AES_128">AES (128bit key)</string>
     <string name="CIPHER_AES_256">AES (256bit key)</string>
@@ -125,6 +126,7 @@
     <string name="revoke_last_mpt">Invalidate Master Password Token</string>
     <string name="master_password_not_changed">Master password has not been changed.</string>
     <string name="use_pseudo_phrase">Use pseudo phrases to generate master password</string>
+    <string name="generate_new_masterkey">Generate new master key (the internal key to en-/decrypt all vault data will be renewed)</string>
     <string name="help">Online help</string>
     <string name="about">About</string>
     <string name="title_about_the_app">About the app</string>
@@ -135,7 +137,9 @@
     <string name="repeat_new_pin">Repeat new PIN</string>
     <string name="current_pin">Enter current PIN</string>
     <string name="change_master_password">Change master password</string>
+    <string name="change_encryption">Change encryption</string>
     <string name="change_master_password_explanation">Change your master password by enter your current PIN and generate a new master password. Note, that the Encrypted Master Key will be changed, so you need to export it again. This also effects old vault export files with the old key. You should also export your master password and tokens again.</string>
+    <string name="change_encryption_explanation">Change the vault\'s encryption algorithm if you have migrated your vault to a newer device with support for additional encryption algorithms. Note, that the Encrypted Master Key will be changed, so you need to export it again. This also effects old vault export files and exported credentials (ECRs) which might become unreadable.</string>
     <string name="vault">Vault</string>
     <string name="delete_stored_masterpasswd_confirmation">Do you want to delete the stored master password from this device? For future logins you will need the (exported) master password or a Master Password Token then.</string>
     <string name="pref_header_general">General</string>

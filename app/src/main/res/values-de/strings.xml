@@ -26,7 +26,8 @@
 
 
     <string name="cipher_name">Verschlüsselungsalgorithmus</string>
-    <string name="create_vault_cipher_explanation">Wähle einen Verschlüsselungsalgorithmus. Er kann später nicht mehr geändert werden. Im Zweifel belasse die Voreinstellung.</string>
+    <string name="create_vault_cipher_explanation">Wähle einen Verschlüsselungsalgorithmus. Er kann später auch geändert werden. Im Zweifel belasse die Voreinstellung.</string>
+    <string name="update_vault_cipher_explanation">Wähle einen Verschlüsselungsalgorithmus. Der aktuelle Algorithmus ist %1$s</string>
 
     <string name="CIPHER_AES_128">AES (128bit-Schlüssel)</string>
     <string name="CIPHER_AES_256">AES (256bit-Schlüssel)</string>
@@ -123,6 +124,7 @@
     <string name="revoke_last_mpt">Lösche Masterpasswort-Token</string>
     <string name="master_password_not_changed">Das Masterpasswort wurde nicht geändert.</string>
     <string name="use_pseudo_phrase">Verwende Pseudophrasen zum Generieren des Masterpasswortes</string>
+    <string name="generate_new_masterkey">Generiere neuen Masterkey (der interne Schlüssel zum Ver- und Entschlüsseln aller Tresordaten wird erneuert)</string>
     <string name="help">Onlinehilfe</string>
     <string name="about">Über</string>
     <string name="title_about_the_app">Über die App</string>
@@ -133,7 +135,9 @@
     <string name="repeat_new_pin">Neue PIN wiederholen</string>
     <string name="current_pin">Aktuelle PIN</string>
     <string name="change_master_password">Ändere Masterpasswort</string>
+    <string name="change_encryption">Ändere Verschlüsselung</string>
     <string name="change_master_password_explanation">Ändere dein Masterpasswort, indem du die aktuelle PIN eingibst und ein neues Masterpasswort generierst. Beachte, dass sich der verschlüsselte Masterkey ändert, so dass du ihn erneut exportieren solltest. Das betrifft auch Tresor-Dateien mit verschlüsselten Masterkey.</string>
+    <string name="change_encryption_explanation">Ändere den Verschlüsselungsalgorithmus des Tresors, wenn du den Tresor von einem alten Gerät migriert hast und dein neues Gerät zusätzliche Algorithmen unterstützt. Beachte, dass sich der verschlüsselte Masterkey ändert, so dass du ihn erneut exportieren solltest. Das betrifft auch Tresor-Dateien und exportierte Zugangsdaten (ECRs), welche dann nicht mehr gelesen werden könnten.</string>
     <string name="vault">Tresor</string>
     <string name="delete_stored_masterpasswd_confirmation">Willst du das gespeicherte Masterpasswort vom Gerät entfernen? Für zukünftige Logins brauchst dann das (exportierte) Masterpasswort oder ein Masterpasswort-Token.</string>
     <string name="pref_header_general">Allgemein</string>

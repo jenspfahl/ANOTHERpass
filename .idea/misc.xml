@@ -62,6 +62,7 @@
         <entry key="app/src/main/res/drawable/ic_twotone_nfc_24.xml" value="0.321875" />
         <entry key="app/src/main/res/drawable/ic_twotone_psychology_24.xml" value="0.321875" />
         <entry key="app/src/main/res/drawable/ic_twotone_qr_code_24.xml" value="0.321875" />
+        <entry key="app/src/main/res/layout/activity_change_encryption.xml" value="0.264" />
         <entry key="app/src/main/res/layout/activity_change_master_password.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/activity_change_pin.xml" value="0.20244565217391305" />
         <entry key="app/src/main/res/layout/activity_create_or_import_vault.xml" value="0.17864583333333334" />
@@ -93,7 +94,7 @@
         <entry key="app/src/main/res/layout/expandable_list_item.xml" value="0.2" />
         <entry key="app/src/main/res/layout/fragment_create_vault_enter_passphrase.xml" value="0.4" />
         <entry key="app/src/main/res/layout/fragment_create_vault_enter_pin.xml" value="0.1359375" />
-        <entry key="app/src/main/res/layout/fragment_create_vault_summarize.xml" value="0.264" />
+        <entry key="app/src/main/res/layout/fragment_create_vault_summarize.xml" value="0.4" />
         <entry key="app/src/main/res/layout/fragment_edit_credential_data.xml" value="0.264" />
         <entry key="app/src/main/res/layout/fragment_edit_credential_password.xml" value="0.2" />
         <entry key="app/src/main/res/layout/fragment_import_vault_file.xml" value="0.2" />
