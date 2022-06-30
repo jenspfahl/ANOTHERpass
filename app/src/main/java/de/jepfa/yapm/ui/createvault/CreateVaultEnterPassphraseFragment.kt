@@ -29,13 +29,12 @@ import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER_PASSWD
 import de.jepfa.yapm.usecase.secret.GenerateMasterPasswordUseCase
+import de.jepfa.yapm.usecase.secret.SeedRandomGeneratorUseCase
 import de.jepfa.yapm.util.*
 import java.nio.ByteBuffer
 
 
 class CreateVaultEnterPassphraseFragment : BaseFragment() {
-
-    private val REQUEST_IMAGE_CAPTURE = 18353
 
     private var manuallySeedView: TextView? = null
     private var generatedPassword: Password = Password.empty()
@@ -67,22 +66,9 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
         else {
             manuallySeedView?.setOnClickListener {
 
-                AlertDialog.Builder(requireContext())
-                    .setTitle(R.string.title_add_user_seed)
-                    .setMessage(R.string.message_add_user_seed)
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-
-                        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                        try {
-                            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
-                        } catch (e: ActivityNotFoundException) {
-                            toastText(requireContext(), R.string.error_add_user_seed)
-                        }
-                    }
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .show()
-
-
+                getBaseActivity()?.let {
+                    SeedRandomGeneratorUseCase.openDialog(it, this)
+                }
             }
         }
 
@@ -143,36 +129,19 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            val seedFromThumbnailImage = extractSeedFromImage(data)
-            SecretService.setUserSeed(seedFromThumbnailImage)
-            manuallySeedView?.text = getString(
-                R.string.used_seed,
-                seedFromThumbnailImage!!.data.copyOf(8).toHex())
+        if (requestCode == SeedRandomGeneratorUseCase.REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            val imageBitmap = data?.extras?.get("data") as Bitmap?
+            val baseActivity = getBaseActivity()
+            if (baseActivity != null && imageBitmap != null) {
+                val output = SeedRandomGeneratorUseCase.execute(imageBitmap, baseActivity)
+                if (output.success) {
+                    manuallySeedView?.text = getString(
+                        R.string.used_seed,
+                        output.data
+                    )
+                }
+            }
         }
     }
-
-    private fun extractSeedFromImage(data: Intent?): Key? {
-        val imageBitmap = data?.extras?.get("data") as Bitmap
-        Log.i("SEED byte count", imageBitmap.byteCount.toString())
-        Log.i("SEED x", imageBitmap.width.toString())
-        Log.i("SEED y", imageBitmap.height.toString())
-
-        if (imageBitmap.width < 32 || imageBitmap.height < 32) {
-            Log.i("SEED", "thumbnail image too small to extract a random seed")
-            toastText(requireContext(), R.string.error_picture_too_small_for_user_seed)
-            return null
-        }
-
-
-        val size: Int = imageBitmap.rowBytes * imageBitmap.height
-        val byteBuffer = ByteBuffer.allocate(size)
-        imageBitmap.copyPixelsToBuffer(byteBuffer)
-        val byteArray = byteBuffer.array()
-        imageBitmap.recycle()
-
-        return SecretService.fastHash(byteArray, SaltService.getSalt(requireContext()))
-    }
-
 
 }

@@ -5,6 +5,7 @@ import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
@@ -400,7 +401,20 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             return
         }
 
-        if (requestCode == newOrUpdateCredentialActivityRequestCode && resultCode == Activity.RESULT_OK) {
+        if (requestCode == SeedRandomGeneratorUseCase.REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            val imageBitmap = data?.extras?.get("data") as Bitmap?
+            if (imageBitmap != null) {
+                val output = SeedRandomGeneratorUseCase.execute(imageBitmap, this)
+                if (output.success) {
+                    val text = getString(
+                        R.string.used_seed,
+                        output.data
+                    )
+                    toastText(this, text)
+                }
+            }
+        }
+        else if (requestCode == newOrUpdateCredentialActivityRequestCode && resultCode == Activity.RESULT_OK) {
             data?.let {
 
                 val credential = EncCredential.fromIntent(it, createUuid = true)
@@ -559,6 +573,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             R.id.change_master_password -> {
                 val intent = Intent(this, ChangeMasterPasswordActivity::class.java)
                 startActivity(intent)
+                return true
+            }
+            R.id.seed_random_generator -> {
+                SeedRandomGeneratorUseCase.openDialog(this)
+
                 return true
             }
             R.id.show_vault_info -> {

@@ -284,9 +284,10 @@ object SecretService {
         }
     }
 
-    fun setUserSeed(seed: Key?) {
+    fun setUserSeed(seed: Key?, context: Context) {
         userSeed = seed
         Log.d("SEED", "update user seed")
+        persistUserSeed(context)
     }
 
     fun persistUserSeed(context: Context) {
