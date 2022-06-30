@@ -551,10 +551,11 @@
     <string name="cannot_copy_protect_nfc_tag">Cannot copy-protect this token</string>
     <string name="mpt_qrcode_scan_not_allowed">Scanning Master Password Token not allowed</string>
     <string name="not_a_original_mpt_nfc_token">Not an origin Master Password Token tag</string>
-    <string name="used_seed">Using seed: %1$s</string>
+    <string name="used_seed">Additional seed: %1$s</string>
     <string name="add_additional_source_of_entropy">Add additional source of entropy</string>
     <string name="title_add_user_seed">Add more entropy to generate random keys</string>
     <string name="message_add_user_seed">If you don\'t trust the seed generator from the operating system, which normally uses a lot of entropy to get a real unpredicable seed, you can add an additional source of entropy by taking a random detailed picture with the camera. \nThe taken picture is hashed and added to the entropy from the operation system to enlarge the randomness even more. So, take a picture of a random scene with lot of details. The photo is not stored on the device!</string>
+    <string name="message_confirm_add_user_seed">You have aleady added an additional entropy. Do wou want to do it again?</string>
     <string name="error_add_user_seed">Could not open a camera app</string>
     <string name="error_picture_too_small_for_user_seed">Taken picture is too small to extract a random seed</string>
     <string name="seed_random_generator">Optimize random generator</string>

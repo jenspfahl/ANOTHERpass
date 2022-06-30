@@ -541,10 +541,11 @@
     <string name="cannot_copy_protect_nfc_tag">Token kann nicht kopier-geschützt werden</string>
     <string name="mpt_qrcode_scan_not_allowed">Masterpassword-Token als QR-Code nicht erlaubt</string>
     <string name="not_a_original_mpt_nfc_token">Kein original Masterpassword-Token NFC-Tag</string>
-    <string name="used_seed">Verwendetes Seed: %1$s</string>
+    <string name="used_seed">Zusätzliches Seed: %1$s</string>
     <string name="add_additional_source_of_entropy">Zusätzliche Entropie hinzufügen</string>
     <string name="title_add_user_seed">Füge zusätzliche Entropie für den Zufallsgenerator hinzu</string>
-    <string name="message_add_user_seed">Falls du dem Zufallsgenerator des Betriebssystems nicht traust, welcher normalerweise verschiedene Entropie des Gerätes verwendet, um unvorhersagbare Zufallszahlen zu generieren, kannst du hier eine weitere Entropie hinzufügen: ein Foto von deiner Kamera.\n  Das fotografierte Bild wird gehasht und als zusätliche Entropy verwendet, um die Zufäigkeit weiter zu erhöhen. Das heißt, mache ein zufälliges Foto mit vielen unterschiedlichen Details. Das Foto wird nicht auf dem Gerät gespeichert!</string>
+    <string name="message_add_user_seed">Falls du dem Zufallsgenerator des Betriebssystems nicht traust, welcher normalerweise verschiedene Entropie des Gerätes verwendet, um unvorhersagbare Zufallszahlen zu generieren, kannst du hier eine weitere Entropie hinzufügen: ein Foto von deiner Kamera.\n  Das fotografierte Bild wird gehasht und als zusätzliche Entropy verwendet, um die Zufälligkeit weiter zu erhöhen. Das heißt, mache ein zufälliges Foto mit vielen unterschiedlichen Details. Das Foto wird nicht auf dem Gerät gespeichert!</string>
+    <string name="message_confirm_add_user_seed">Du hast schon eine eigene Entropie hinzugefügt. Willst du den Vorgang wiederholen?</string>
     <string name="error_add_user_seed">Die Kamera-App konnte nicht geöffnet werden</string>
     <string name="error_picture_too_small_for_user_seed">Das geschossene Foto ist zu klein um es als Entropie zu verwenden</string>
     <string name="seed_random_generator">Optimiere Zufallsgenerator</string>

@@ -9,6 +9,7 @@ import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Key
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
@@ -36,6 +37,24 @@ object SeedRandomGeneratorUseCase: UseCase<Bitmap, String, BaseActivity> {
     }
 
     fun openDialog(baseActivity: BaseActivity, fragmentForResult: BaseFragment? = null) {
+
+        if (PreferenceService.isPresent(PreferenceService.DATA_ENCRYPTED_SEED, baseActivity)) {
+
+            AlertDialog.Builder(baseActivity)
+                .setTitle(R.string.title_add_user_seed)
+                .setMessage(R.string.message_confirm_add_user_seed)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    openDialogAndTakePicture(baseActivity, fragmentForResult)
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+        }
+        else {
+            openDialogAndTakePicture(baseActivity, fragmentForResult)
+        }
+    }
+
+    private fun openDialogAndTakePicture(baseActivity: BaseActivity, fragmentForResult: BaseFragment? = null) {
         AlertDialog.Builder(baseActivity)
             .setTitle(R.string.title_add_user_seed)
             .setMessage(R.string.message_add_user_seed)
