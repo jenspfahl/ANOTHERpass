@@ -37,6 +37,7 @@ object SecretService {
     private val ANDROID_KEY_STORE = "AndroidKeyStore"
 
     private var userSeed: Key? = null
+    private var userSeedUsed: Boolean = false
     private var random: SecureRandom? = null
     private val androidKeyStore = KeyStore.getInstance(ANDROID_KEY_STORE)
 
@@ -45,14 +46,17 @@ object SecretService {
         if (random == null || random!!.nextInt(100) <= 0) {
             Log.d("SEED", "init PRNG")
             random = SecureRandom()
-            loadUserSeed(context)
-            userSeed?.let { seed ->
-                Log.d("SEED", "add user seed to PRNG")
-                random?.setSeed(seed.data)
-            }
         }
         else {
             Log.d("SEED", "return current PRNG")
+        }
+        loadUserSeed(context)
+        if (!userSeedUsed) {
+            userSeed?.let { seed ->
+                Log.d("SEED", "add user seed to PRNG")
+                random?.setSeed(seed.data)
+                userSeedUsed = true
+            }
         }
         return random!!
     }
@@ -60,6 +64,7 @@ object SecretService {
     fun clear() {
         userSeed?.clear()
         userSeed = null
+        userSeedUsed = false
         random = null
     }
 
@@ -68,6 +73,7 @@ object SecretService {
             Session.getMasterKeySK()?.let { key ->
                 PreferenceService.getEncrypted(DATA_ENCRYPTED_SEED, context)?.let { encSeed ->
                     userSeed = decryptKey(key, encSeed)
+                    userSeedUsed = false
                 }
             }
         }
@@ -286,6 +292,7 @@ object SecretService {
 
     fun setUserSeed(seed: Key?, context: Context) {
         userSeed = seed
+        userSeedUsed = false
         Log.d("SEED", "update user seed")
         persistUserSeed(context)
     }
