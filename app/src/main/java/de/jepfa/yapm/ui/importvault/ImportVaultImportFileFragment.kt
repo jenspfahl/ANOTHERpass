@@ -16,7 +16,6 @@ import de.jepfa.yapm.model.encrypted.EncryptedType.Types.ENC_MASTER_KEY
 import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.MasterKeyService
-import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
@@ -61,7 +60,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
 
         mkTextView = view.findViewById(R.id.text_scan_mk)
 
-        val jsonContent = getImportVaultActivity().jsonContent ?: return
+        val jsonContent = getImportVaultActivity().parsedVault?.content ?: return
 
         val createdAt = jsonContent.get(VaultExportService.JSON_CREATION_DATE)?.asString
         val credentialsCount = jsonContent.get(VaultExportService.JSON_CREDENTIALS_COUNT)?.asString

@@ -77,7 +77,7 @@ class ImportVaultLoadFileFragment : BaseFragment() {
                         val baseActivity = getBaseActivity() ?: return
                         val content = FileUtil.readFile(baseActivity, selectedFile)
                         if (content != null) {
-                            getImportVaultActivity().jsonContent = ImportVaultUseCase.parseVaultFileContent(
+                            getImportVaultActivity().parsedVault = ImportVaultUseCase.parseVaultFileContent(
                                 content, importVaultActivity, handleBlob = true)
                         }
                     } catch (e: Exception) {
@@ -86,17 +86,21 @@ class ImportVaultLoadFileFragment : BaseFragment() {
                 }
             }
 
-            if (importVaultActivity.jsonContent == null) {
+            val parsedVault = importVaultActivity.parsedVault
+            if (parsedVault == null) {
                 toastText(activity, R.string.toast_import_vault_failure)
             }
-            else if (importVaultActivity.isOverrideMode() && !sameVaultId(importVaultActivity.jsonContent!!, importVaultActivity)) {
+            else if (importVaultActivity.isOverrideMode() && parsedVault.vaultId != null && !sameVaultId(parsedVault.vaultId, importVaultActivity)) {
                 toastText(activity, R.string.toast_import_vault_failure_no_vault_match)
             }
-            else if (importVaultActivity.isOverrideMode() && !sameCipherAlgorithm(importVaultActivity.jsonContent!!, importVaultActivity)) {
+            else if(parsedVault.cipherAlgorithm != null && !cipherVersionSupported(parsedVault.cipherAlgorithm)) {
+                toastText(activity, R.string.toast_import_vault_failure_cipher_not_supported)
+            }
+            else if (importVaultActivity.isOverrideMode() && parsedVault.cipherAlgorithm != null && !sameCipherAlgorithm(parsedVault.cipherAlgorithm, importVaultActivity)) {
                 toastText(activity, R.string.toast_import_vault_failure_not_same_algo)
             }
-            else if(!cipherVersionSupported(importVaultActivity.jsonContent!!)) {
-                toastText(activity, R.string.toast_import_vault_failure_cipher_not_supported)
+            else if (parsedVault.content == null || parsedVault.vaultId == null || parsedVault.cipherAlgorithm == null) {
+                toastText(activity, R.string.toast_import_vault_failure)
             }
             else {
                 if (importVaultActivity.isOverrideMode()) {
@@ -109,20 +113,17 @@ class ImportVaultLoadFileFragment : BaseFragment() {
         }
     }
 
-    private fun sameVaultId(jsonContent: JsonObject, context: Context): Boolean {
-        val fileSalt = jsonContent.get(VaultExportService.JSON_VAULT_ID)?.asString
-        val currentSalt = SaltService.getSaltAsBase64String(context)
-        return fileSalt != null && fileSalt == currentSalt
+    private fun sameVaultId(vaultId: String, context: Context): Boolean {
+        val currentSaltAsVaultId = SaltService.getSaltAsBase64String(context)
+        return vaultId == currentSaltAsVaultId
     }
 
-    private fun sameCipherAlgorithm(jsonContent: JsonObject, context: Context): Boolean {
-        val fileAlgo = jsonContent.get(VaultExportService.JSON_CIPHER_ALGORITHM)?.asString ?: return false
+    private fun sameCipherAlgorithm(cipherAlgorithm: CipherAlgorithm, context: Context): Boolean {
         val currentAlgo = SecretService.getCipherAlgorithm(context)
-        return CipherAlgorithm.valueOf(fileAlgo) == currentAlgo
+        return cipherAlgorithm == currentAlgo
     }
 
-    private fun cipherVersionSupported(jsonContent: JsonObject): Boolean {
-        val cipherAlgorithm = ImportVaultUseCase.extractCipherAlgorithm(jsonContent)
+    private fun cipherVersionSupported(cipherAlgorithm: CipherAlgorithm): Boolean {
         return Build.VERSION.SDK_INT >= cipherAlgorithm.supportedSdkVersion
     }
 

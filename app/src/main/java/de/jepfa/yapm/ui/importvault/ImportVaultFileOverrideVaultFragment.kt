@@ -50,7 +50,7 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
         val importVaultActivity = getImportVaultActivity()
         val loadedFileStatusTextView = view.findViewById<TextView>(R.id.loaded_file_status)
 
-        val jsonContent = getImportVaultActivity().jsonContent ?: return
+        val jsonContent = getImportVaultActivity().parsedVault?.content ?: return
 
         val createdAt = jsonContent.get(VaultExportService.JSON_CREATION_DATE)?.asString
         val credentialsCount = jsonContent.get(VaultExportService.JSON_CREDENTIALS_COUNT)?.asString ?: 0

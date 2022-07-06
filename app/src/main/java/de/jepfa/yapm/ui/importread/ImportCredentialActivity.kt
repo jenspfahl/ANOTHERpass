@@ -30,9 +30,9 @@ class ImportCredentialActivity : ReadActivityBase() {
     }
 
     private fun extractCredential(scanned: String): EncCredential? {
-        val content = ImportVaultUseCase.parseVaultFileContent(scanned, this)
-        if (content != null) {
-            ExportContainer.fromJson(content)?.let { exportContainer ->
+        val parsedVault = ImportVaultUseCase.parseVaultFileContent(scanned, this)
+        if (parsedVault.content != null) {
+            ExportContainer.fromJson(parsedVault.content)?.let { exportContainer ->
                 when (exportContainer.c) {
                     is EncExportableCredential -> {
                         val ecr = exportContainer.c
