@@ -15,7 +15,7 @@ object CreateVaultUseCase: InputUseCase<CreateVaultUseCase.Input, BaseActivity>(
     data class Input(val loginData: LoginData,
                      val cipherAlgorithm: CipherAlgorithm)
 
-    override fun doExecute(input: Input, activity: BaseActivity): Boolean {
+    override suspend fun doExecute(input: Input, activity: BaseActivity): Boolean {
         val salt = SaltService.getSalt(activity)
         val masterKey = MasterKeyService.generateMasterKey(activity)
         MasterKeyService.encryptAndStoreMasterKey(

@@ -11,7 +11,7 @@ import de.jepfa.yapm.util.observeOnce
 
 object DeleteLabelUseCase: InputUseCase<Label, SecureActivity>() {
 
-    override fun doExecute(label: Label, activity: SecureActivity): Boolean {
+    override suspend fun doExecute(label: Label, activity: SecureActivity): Boolean {
         val key = activity.masterSecretKey
         val labelId = label.labelId
         if (key != null && labelId != null) {

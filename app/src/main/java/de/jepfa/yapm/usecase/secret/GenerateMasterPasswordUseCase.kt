@@ -13,7 +13,7 @@ import de.jepfa.yapm.usecase.UseCaseOutput
 
 object GenerateMasterPasswordUseCase: UseCase<Boolean, Password, BaseActivity> {
 
-    override fun execute(usePseudoPhrase: Boolean, activity: BaseActivity): UseCaseOutput<Password> {
+    override suspend fun execute(usePseudoPhrase: Boolean, activity: BaseActivity): UseCaseOutput<Password> {
 
         val generated = generate(usePseudoPhrase, activity)
 

@@ -36,7 +36,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
         val copyOrigin: Boolean = false,
     )
 
-    override fun doExecute(input: Input, activity: SecureActivity): Boolean {
+    override suspend fun doExecute(input: Input, activity: SecureActivity): Boolean {
         try {
             val success =
                 if (input.override)

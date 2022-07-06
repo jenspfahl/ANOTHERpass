@@ -20,6 +20,7 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.usecase.secret.ChangeMasterPasswordUseCase
+import de.jepfa.yapm.usecase.secret.ChangeVaultEncryptionUseCase
 import de.jepfa.yapm.usecase.secret.GenerateMasterPasswordUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.Constants
@@ -84,8 +85,35 @@ class ChangeEncryptionActivity : SecureActivity(), AdapterView.OnItemSelectedLis
                 currentPinTextView.error = getString(R.string.pin_required)
                 currentPinTextView.requestFocus()
             }
+            else if (selectedCipherAlgorithm == originCipherAlgorithm && !newMasterKeySwitch.isChecked) {
+                toastText(this, R.string.nothing_has_been_changed)
+                currentPin.clear()
+            }
             else {
+                val masterPassword = MasterPasswordService.getMasterPasswordFromSession(this)
+                    ?: return@setOnClickListener
+                ChangeVaultEncryptionUseCase.openDialog(
+                    ChangeVaultEncryptionUseCase.Input(
+                        LoginData(currentPin, masterPassword),
+                        selectedCipherAlgorithm,
+                        newMasterKeySwitch.isChecked
+                ), this)
+                { output ->
+                    currentPin.clear()
+                    masterPassword.clear()
 
+                    if (output.success) {
+                        val upIntent = Intent(intent)
+                        navigateUpTo(upIntent)
+
+                        masterPassword.clear()
+                        toastText(baseContext, R.string.encryption_changed)
+                    }
+                    else {
+                        currentPinTextView.error = getString(R.string.pin_wrong)
+                        currentPinTextView.requestFocus()
+                    }
+                }
 
             }
         }

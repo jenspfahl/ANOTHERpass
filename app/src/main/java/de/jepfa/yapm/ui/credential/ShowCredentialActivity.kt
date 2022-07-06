@@ -44,6 +44,9 @@ import de.jepfa.yapm.usecase.credential.ShowPasswordStrengthUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.PasswordColorizer.spannableObfusableAndMaskableString
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class ShowCredentialActivity : SecureActivity() {
@@ -120,8 +123,10 @@ class ShowCredentialActivity : SecureActivity() {
                         password.deobfuscate(it)
                     }
                     val input = ShowPasswordStrengthUseCase.Input(password, R.string.password_strength)
-                    ShowPasswordStrengthUseCase.execute(input, this)
-                    password.clear()
+                    CoroutineScope(Dispatchers.Main).launch {
+                        ShowPasswordStrengthUseCase.execute(input, this@ShowCredentialActivity)
+                        password.clear()
+                    }
                 }
             }
             return@setOnLongClickListener true
@@ -218,7 +223,9 @@ class ShowCredentialActivity : SecureActivity() {
                     val upIntent = Intent(this, ListCredentialsActivity::class.java)
                     navigateUpTo(upIntent)
                 }
-                ImportCredentialUseCase.execute(input, this)
+                CoroutineScope(Dispatchers.Main).launch {
+                    ImportCredentialUseCase.execute(input, this@ShowCredentialActivity)
+                }
                 return true
             }
 

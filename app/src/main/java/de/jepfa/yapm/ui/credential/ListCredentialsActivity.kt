@@ -64,6 +64,9 @@ import kotlin.collections.ArrayList
 import androidx.recyclerview.widget.DividerItemDecoration
 import de.jepfa.yapm.ui.changelogin.ChangeEncryptionActivity
 import de.jepfa.yapm.usecase.secret.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 /**
@@ -405,14 +408,17 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         if (requestCode == SeedRandomGeneratorUseCase.REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             val imageBitmap = data?.extras?.get("data") as Bitmap?
             if (imageBitmap != null) {
-                val output = SeedRandomGeneratorUseCase.execute(imageBitmap, this)
-                if (output.success) {
-                    val text = getString(
-                        R.string.used_seed,
-                        output.data
-                    )
-                    toastText(this, text)
-                }
+                UseCaseBackgroundLauncher(SeedRandomGeneratorUseCase)
+                    .launch(this, imageBitmap)
+                    { output ->
+                        if (output.success) {
+                            val text = getString(
+                                R.string.used_seed,
+                                output.data
+                            )
+                            toastText(this, text)
+                        }
+                    }
             }
         }
         else if (requestCode == newOrUpdateCredentialActivityRequestCode && resultCode == Activity.RESULT_OK) {
@@ -588,7 +594,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             }
             R.id.show_vault_info -> {
                 val labelCount = LabelService.defaultHolder.getAllLabels().size
-                ShowVaultInfoUseCase.execute(ShowVaultInfoUseCase.Input(credentialCount, labelCount), this)
+                CoroutineScope(Dispatchers.Main).launch {
+                    ShowVaultInfoUseCase.execute(ShowVaultInfoUseCase.Input(credentialCount, labelCount), this@ListCredentialsActivity)
+                }
 
                 return true
             }

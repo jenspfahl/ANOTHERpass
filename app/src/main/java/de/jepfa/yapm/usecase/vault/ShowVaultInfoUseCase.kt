@@ -19,7 +19,7 @@ object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActi
 
     data class Input(val credentialCount: Int, val labelCount: Int)
 
-    override fun doExecute(input: Input, activity: SecureActivity): Boolean {
+    override suspend fun doExecute(input: Input, activity: SecureActivity): Boolean {
 
         val builder: AlertDialog.Builder = AlertDialog.Builder(activity)
         val icon: Drawable = activity.applicationInfo.loadIcon(activity.packageManager)

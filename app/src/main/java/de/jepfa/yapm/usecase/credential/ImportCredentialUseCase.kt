@@ -14,7 +14,7 @@ object ImportCredentialUseCase: InputUseCase<ImportCredentialUseCase.Input, Secu
 
     data class Input(val credential: EncCredential, val successHandler: () -> Unit)
 
-    override fun doExecute(input: Input, activity: SecureActivity): Boolean {
+    override suspend fun doExecute(input: Input, activity: SecureActivity): Boolean {
         val credentialId = input.credential.id
         val credentialUid = input.credential.uid
         if (credentialUid != null) {

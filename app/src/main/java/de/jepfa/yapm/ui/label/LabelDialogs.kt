@@ -11,6 +11,7 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.usecase.label.DeleteLabelUseCase
 import de.jepfa.yapm.util.createAndAddLabelChip
 
@@ -73,11 +74,14 @@ object LabelDialogs {
             .setMessage(activity.getString(R.string.message_delete_label, label.name))
             .setIcon(android.R.drawable.ic_dialog_alert)
             .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
-                DeleteLabelUseCase.execute(label, activity)
-                if (finishActivityAfterDelete) {
-                    PreferenceService.putBoolean(PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_RELOAD, true, activity)
-                    activity.finish()
-                }
+                UseCaseBackgroundLauncher(DeleteLabelUseCase)
+                    .launch(activity, label)
+                    {
+                        if (finishActivityAfterDelete) {
+                            PreferenceService.putBoolean(PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_RELOAD, true, activity)
+                            activity.finish()
+                        }
+                    }
 
             }
             .setNegativeButton(android.R.string.no, null)

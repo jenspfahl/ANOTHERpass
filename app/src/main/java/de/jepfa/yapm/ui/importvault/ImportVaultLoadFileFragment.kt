@@ -14,13 +14,14 @@ import android.widget.TextView
 import androidx.navigation.fragment.findNavController
 import com.google.gson.JsonObject
 import de.jepfa.yapm.R
+import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.service.secret.SaltService
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
 import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.FileUtil
-import de.jepfa.yapm.util.shortenBase64String
 import de.jepfa.yapm.util.toastText
 
 class ImportVaultLoadFileFragment : BaseFragment() {
@@ -91,6 +92,9 @@ class ImportVaultLoadFileFragment : BaseFragment() {
             else if (importVaultActivity.isOverrideMode() && !sameVaultId(importVaultActivity.jsonContent!!, importVaultActivity)) {
                 toastText(activity, R.string.toast_import_vault_failure_no_vault_match)
             }
+            else if (importVaultActivity.isOverrideMode() && !sameCipherAlgorithm(importVaultActivity.jsonContent!!, importVaultActivity)) {
+                toastText(activity, R.string.toast_import_vault_failure_not_same_algo)
+            }
             else if(!cipherVersionSupported(importVaultActivity.jsonContent!!)) {
                 toastText(activity, R.string.toast_import_vault_failure_cipher_not_supported)
             }
@@ -109,6 +113,12 @@ class ImportVaultLoadFileFragment : BaseFragment() {
         val fileSalt = jsonContent.get(VaultExportService.JSON_VAULT_ID)?.asString
         val currentSalt = SaltService.getSaltAsBase64String(context)
         return fileSalt != null && fileSalt == currentSalt
+    }
+
+    private fun sameCipherAlgorithm(jsonContent: JsonObject, context: Context): Boolean {
+        val fileAlgo = jsonContent.get(VaultExportService.JSON_CIPHER_ALGORITHM)?.asString ?: return false
+        val currentAlgo = SecretService.getCipherAlgorithm(context)
+        return CipherAlgorithm.valueOf(fileAlgo) == currentAlgo
     }
 
     private fun cipherVersionSupported(jsonContent: JsonObject): Boolean {

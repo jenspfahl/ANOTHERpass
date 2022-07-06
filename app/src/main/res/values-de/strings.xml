@@ -119,9 +119,10 @@
     <string name="toast_import_vault_failure">Die ausgewählte Datei kann nicht importiert werden.</string>
     <string name="toast_import_vault_failure_cipher_not_supported">Die ausgewählte Datei ist mit einem nicht unterstützten Algorithmus verschlüsselt.</string>
     <string name="toast_import_vault_failure_no_vault_match">Die ausgewählte Datei gehört nicht zum aktuellen Tresor.</string>
+    <string name="toast_import_vault_failure_not_same_algo">Die ausgewählte Datei verwendet eine andere Verschlüsselung.</string>
     <string name="quick_access">Schnellzugang</string>
     <string name="generate_new_mpt">Erzeuge Masterpasswort-Token</string>
-    <string name="revoke_last_mpt">Lösche Masterpasswort-Token</string>
+    <string name="revoke_last_mpt">Invalidiere Masterpasswort-Token</string>
     <string name="master_password_not_changed">Das Masterpasswort wurde nicht geändert.</string>
     <string name="use_pseudo_phrase">Verwende Pseudophrasen zum Generieren des Masterpasswortes</string>
     <string name="generate_new_masterkey">Generiere neuen Masterkey (der interne Schlüssel zum Ver- und Entschlüsseln aller Tresordaten wird erneuert)</string>
@@ -136,8 +137,10 @@
     <string name="current_pin">Aktuelle PIN</string>
     <string name="change_master_password">Ändere Masterpasswort</string>
     <string name="change_encryption">Ändere Verschlüsselung</string>
+    <string name="title_change_encryption">Ändere Tresorverschlüsselung</string>
+    <string name="message_change_encryption">Nach der Änderung der Verschlüsselung und/oder des Masterkeys können alle bisher exportierten Tresor-Dateien nicht mehr gelesen werden. Es wird außerdem empfohlen, ein aktuelles Backup des Tresors und des verschlüsselten Masterkeys für den Notfall zu haben.</string>
     <string name="change_master_password_explanation">Ändere dein Masterpasswort, indem du die aktuelle PIN eingibst und ein neues Masterpasswort generierst. Beachte, dass sich der verschlüsselte Masterkey ändert, so dass du ihn erneut exportieren solltest. Das betrifft auch Tresor-Dateien mit verschlüsselten Masterkey.</string>
-    <string name="change_encryption_explanation">Ändere den Verschlüsselungsalgorithmus des Tresors, wenn du den Tresor von einem alten Gerät migriert hast und dein neues Gerät zusätzliche Algorithmen unterstützt. Beachte, dass sich der verschlüsselte Masterkey ändert, so dass du ihn erneut exportieren solltest. Das betrifft auch Tresor-Dateien und exportierte Zugangsdaten (ECRs), welche dann nicht mehr gelesen werden könnten.</string>
+    <string name="change_encryption_explanation">Ändere den Verschlüsselungsalgorithmus des Tresors, wenn du den Tresor von einem alten Gerät migriert hast und dein neues Gerät zusätzliche Algorithmen unterstützt. Beachte, dass sich der verschlüsselte Masterkey ändert, so dass du ihn erneut exportieren solltest. Das betrifft auch Tresor-Dateien und exportierte Zugangsdaten (ECRs), welche dann nicht mehr gelesen werden können.</string>
     <string name="vault">Tresor</string>
     <string name="delete_stored_masterpasswd_confirmation">Willst du das gespeicherte Masterpasswort vom Gerät entfernen? Für zukünftige Logins brauchst dann das (exportierte) Masterpasswort oder ein Masterpasswort-Token.</string>
     <string name="pref_header_general">Allgemein</string>
@@ -237,6 +240,7 @@
     <string name="message_missing_overlay_permission">Passwörter können nicht über anderen Apps eingeblendet werden. Aktiviere die entsprechende Berechtigung und probiere es danach erneut.</string>
     <string name="open_overlay_permission">Öffne Berechtigungen</string>
     <string name="masterpassword_changed">Masterpasswort erfolgreich geändert</string>
+    <string name="encryption_changed">Verschlüsselung erfolgreich geändert</string>
     <string name="pin_changed">PIN erfolgreich geändert</string>
     <string name="masterpassword_stored">Masterpasswort auf dem Gerät gespeichert</string>
     <string name="masterpassword_not_stored">Masterpasswort konnte nicht gespeichert werden</string>
@@ -449,6 +453,7 @@
     <string name="labels_to_be_inserted">%1$d von %2$d Kategorien zum Wiederherstellen</string>
     <string name="labels_to_be_updated">%1$d von %2$d Kategorien zum Ersetzen</string>
     <string name="nothing_to_import">Nichts zum Importieren</string>
+    <string name="nothing_has_been_changed">Nichts hat sich geändert</string>
     <string name="copy_origin">Erstelle eine Kopie des Originals bevor das Original überschrieben wird. Der Name der Kopie trägt \'(orig)\' am Ende.</string>
     <string name="import_vault_override_explanation">Hier siehst du den Inhalt der geladenen Tresor-Datei, allerdings nur Datensätze die sich zum aktuellen Tresor unterscheiden! Du kannst die Listen ausklappen und prüfen und jene Datensätze anhaken, die importiert werden sollen. Mit einem Klick auf den Datensatz siehst du mehr Details.</string>
     <string name="dont_think_about_passwords">Denke nicht über Passwörter nach!</string>

@@ -121,6 +121,7 @@
     <string name="toast_import_vault_failure">The selected file cannot be imported.</string>
     <string name="toast_import_vault_failure_cipher_not_supported">The selected file is encrypted with an unsupported cipher.</string>
     <string name="toast_import_vault_failure_no_vault_match">The selected file doesn\'t belong to the current vault.</string>
+    <string name="toast_import_vault_failure_not_same_algo">The selected file uses another encryption algorithm.</string>
     <string name="quick_access">Quick access</string>
     <string name="generate_new_mpt">Create Master Password Token</string>
     <string name="revoke_last_mpt">Invalidate Master Password Token</string>
@@ -138,6 +139,8 @@
     <string name="current_pin">Enter current PIN</string>
     <string name="change_master_password">Change master password</string>
     <string name="change_encryption">Change encryption</string>
+    <string name="title_change_encryption">Change vault\'s encryption</string>
+    <string name="message_change_encryption">With changing the vault\'s encryption and/or master key all exported vault files cannot be read anymore. It is also recommended to have a fresh backup of your vault and Exported Master Key in case of something goes wrong.</string>
     <string name="change_master_password_explanation">Change your master password by enter your current PIN and generate a new master password. Note, that the Encrypted Master Key will be changed, so you need to export it again. This also effects old vault export files with the old key. You should also export your master password and tokens again.</string>
     <string name="change_encryption_explanation">Change the vault\'s encryption algorithm if you have migrated your vault to a newer device with support for additional encryption algorithms. Note, that the Encrypted Master Key will be changed, so you need to export it again. This also effects old vault export files and exported credentials (ECRs) which might become unreadable.</string>
     <string name="vault">Vault</string>
@@ -248,6 +251,7 @@
     <string name="message_missing_overlay_permission">App cannot draw over other apps. Enable permission and try again.</string>
     <string name="open_overlay_permission">Open permission</string>
     <string name="masterpassword_changed">Master password successfully changed</string>
+    <string name="encryption_changed">Encryption successfully changed</string>
     <string name="pin_changed">PIN successfully changed</string>
     <string name="masterpassword_stored">Master password stored on device</string>
     <string name="masterpassword_not_stored">Master password couldn\'t be stored</string>
@@ -460,6 +464,7 @@
     <string name="copy_of_name" translatable="false">%1$s (orig)</string>
     <string name="duplicate_of_name" translatable="false">%1$s (copied)</string>
     <string name="nothing_to_import">Nothing to import</string>
+    <string name="nothing_has_been_changed">Nothing has been changed</string>
     <string name="copy_origin">Make a copy of the origin record before updating it. Its name will be followed by \'(orig)\'.</string>
     <string name="import_vault_override_explanation">Here you see the content of the loaded vault file, but only records that differs to the current vault! You can expand the lists and check or uncheck each record to select which should be imported. To see details, click on them.</string>
     <string name="dont_think_about_passwords">Don\'t think about passwords!</string>

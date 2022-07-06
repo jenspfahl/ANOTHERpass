@@ -19,7 +19,7 @@ object ShowPasswordStrengthUseCase: InputUseCase<ShowPasswordStrengthUseCase.Inp
 
     data class Input(val password: Password, val titleId: Int)
 
-    override fun doExecute(input: Input, activity: SecureActivity): Boolean {
+    override suspend fun doExecute(input: Input, activity: SecureActivity): Boolean {
         val combinations = guessPasswordCombinations(input.password)
         showPasswordStrength(combinations, input.titleId, activity)
 

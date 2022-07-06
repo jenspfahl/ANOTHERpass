@@ -19,6 +19,8 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_SEED
 import de.jepfa.yapm.service.biometrix.BiometricUtils
+import de.jepfa.yapm.util.DebugInfo
+import de.jepfa.yapm.util.toastText
 import java.security.*
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -55,6 +57,9 @@ object SecretService {
             userSeed?.let { seed ->
                 Log.d("SEED", "add user seed to PRNG")
                 random?.setSeed(seed.data)
+                if (DebugInfo.isDebug && context != null) {
+                    toastText(context, "PRNG seeded with user seed")
+                }
                 userSeedUsed = true
             }
         }

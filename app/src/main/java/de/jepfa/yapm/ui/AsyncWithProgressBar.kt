@@ -1,17 +1,19 @@
 package de.jepfa.yapm.ui
 
-import android.os.AsyncTask
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.ProgressBar
-import de.jepfa.yapm.usecase.UseCaseOutput
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class AsyncWithProgressBar(
     val activity: BaseActivity?,
-    val backgroundHandler: () -> Boolean,
+    val backgroundHandler: suspend () -> Boolean,
     private val postHandler: (backgroundResult: Boolean) -> Unit
-) : AsyncTask<Void, Void, Boolean>()
+)
 {
     constructor(activity: BaseActivity?,
                 backgroundHandler: () -> Boolean): this(activity, backgroundHandler, {})
@@ -21,32 +23,35 @@ class AsyncWithProgressBar(
         val activityProgressBar = activity?.getProgressBar()
         if (activityProgressBar != null) {
             progressBar = activityProgressBar
-            execute()
+            showProgressBar()
+            CoroutineScope(Dispatchers.IO).launch {
+                val result = backgroundHandler()
+                CoroutineScope(Dispatchers.Main).launch {
+                    postHandler(result)
+                    hideProgressBar()
+                }
+            }
         }
         else {
             Log.w("ASYNC", "no progressbar, invoke in UI thread")
-            val result = backgroundHandler.invoke()
+            val result = runBlocking {
+                return@runBlocking backgroundHandler()
+            }
             postHandler.invoke(result)
         }
     }
 
-    override fun onPreExecute() {
-        super.onPreExecute()
+    private fun showProgressBar() {
         progressBar.visibility = View.VISIBLE
         activity?.window?.setFlags(
             WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
             WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
     }
 
-    override fun doInBackground(vararg params: Void?): Boolean {
-        return backgroundHandler()
-    }
 
-    override fun onPostExecute(result: Boolean) {
-        super.onPostExecute(result)
+    private fun hideProgressBar() {
         progressBar.visibility = View.INVISIBLE
         activity?.window?.clearFlags(
             WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-        postHandler.invoke(result)
     }
 }

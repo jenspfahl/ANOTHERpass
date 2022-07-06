@@ -24,7 +24,7 @@ object SeedRandomGeneratorUseCase: UseCase<Bitmap, String, BaseActivity> {
 
     val REQUEST_IMAGE_CAPTURE = 18353
 
-    override fun execute(img: Bitmap, activity: BaseActivity): UseCaseOutput<String> {
+    override suspend fun execute(img: Bitmap, activity: BaseActivity): UseCaseOutput<String> {
         val seedFromThumbnailImage = extractSeedFromImage(img, activity)
         if (seedFromThumbnailImage != null) {
             SecretService.setUserSeed(seedFromThumbnailImage, activity)

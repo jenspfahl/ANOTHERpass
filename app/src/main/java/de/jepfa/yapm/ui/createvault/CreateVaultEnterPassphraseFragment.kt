@@ -27,6 +27,7 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.ui.BaseFragment
+import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER_PASSWD
 import de.jepfa.yapm.usecase.secret.GenerateMasterPasswordUseCase
 import de.jepfa.yapm.usecase.secret.SeedRandomGeneratorUseCase
@@ -103,9 +104,13 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
 
         buttonGeneratePasswd.setOnClickListener {
            getBaseActivity()?.let { baseActivity ->
-               generatedPassword = GenerateMasterPasswordUseCase.execute(pseudoPhraseSwitch.isChecked, baseActivity).data
-               var spannedString = PasswordColorizer.spannableString(generatedPassword, getBaseActivity())
-               generatedPasswdView.text = spannedString
+               UseCaseBackgroundLauncher(GenerateMasterPasswordUseCase)
+                   .launch(baseActivity, pseudoPhraseSwitch.isChecked)
+                   { output ->
+                       generatedPassword = output.data
+                       var spannedString = PasswordColorizer.spannableString(generatedPassword, getBaseActivity())
+                       generatedPasswdView.text = spannedString
+                   }
            }
         }
 
@@ -133,13 +138,16 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
             val imageBitmap = data?.extras?.get("data") as Bitmap?
             val baseActivity = getBaseActivity()
             if (baseActivity != null && imageBitmap != null) {
-                val output = SeedRandomGeneratorUseCase.execute(imageBitmap, baseActivity)
-                if (output.success) {
-                    manuallySeedView?.text = getString(
-                        R.string.used_seed,
-                        output.data
-                    )
-                }
+                UseCaseBackgroundLauncher(SeedRandomGeneratorUseCase)
+                    .launch(baseActivity, imageBitmap)
+                    { output ->
+                        if (output.success) {
+                            manuallySeedView?.text = getString(
+                                R.string.used_seed,
+                                output.data
+                            )
+                        }
+                    }
             }
         }
     }

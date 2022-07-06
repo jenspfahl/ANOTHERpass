@@ -48,7 +48,7 @@ object ExportEncMasterPasswordUseCase:
         val obfuscationKey: Key? = null
     )
 
-    override fun doExecute(input: Input, activity: BaseActivity): Boolean {
+    override suspend fun doExecute(input: Input, activity: BaseActivity): Boolean {
         val tempKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, activity)
 
         val encHead =
