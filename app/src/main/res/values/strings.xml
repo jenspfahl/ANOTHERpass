@@ -409,8 +409,10 @@
     <string name="summary_show_export_vault_reminder">Show a reminder when the vault has changed and needs to be exported.</string>
     <string name="show_export_mk_reminder">Reminder to export Encrypted Master Key</string>
     <string name="show_export_mp_reminder">Reminder to export Master Password</string>
+    <string name="show_refresh_mpt_reminder">Reminder to renew Master Password Token</string>
     <string name="summary_show_export_mk_reminder">Show a reminder when the Encrypted Master Key has changed and needs to be exported.</string>
     <string name="summary_show_export_mp_reminder">Show a reminder when the Master Password needs to be exported. Note: Without the master password you cannot login!</string>
+    <string name="summary_show_refresh_mpt_reminder">Show a reminder when the Master Password Token should be renewed (if created). This can help to reduce the risk of abusing stolen token.</string>
     <string name="show_biometric_smp_reminder">Reminder to setup biometrics for stored master password</string>
     <string name="summary_show_biometric_smp_reminder">Show a reminder when the stored master password is not protected by a biometric (e.g. a fingerprint) but the device would support it.</string>
     <string name="export_vault_reminder">Vault should be exported after recent modifications.</string>
@@ -418,6 +420,8 @@
     <string name="export_mp_reminder">Master password should be strongly exported!</string>
     <string name="biometric_smp_reminder">Biometrics should be used for stored master password.</string>
     <string name="show_biometric_smp_howto">How?</string>
+    <string name="refresh_mpt_reminder">Master Password Token should be renewed.</string>
+    <string name="show_refresh_mpt">Renew now</string>
     <string name="dont_ask_again">Don\'t nag again</string>
     <string name="manage_reminder_settings_hint">You can manage reminder under Settings / Reminders</string>
     <string name="no_label">WITH NO LABELS</string>
@@ -569,4 +573,11 @@
     <string name="error_picture_too_small_for_user_seed">Taken picture is too small to extract a random seed</string>
     <string name="seed_random_generator">Optimize random generator</string>
 
+    <string name="reminder_refresh_mpt_none">Never</string>
+    <string name="reminder_refresh_mpt_one_week">After a week</string>
+    <string name="reminder_refresh_mpt_two_weeks">After two weeks</string>
+    <string name="reminder_refresh_mpt_one_month">After one month</string>
+    <string name="reminder_refresh_mpt_two_months">After two months</string>
+    <string name="reminder_refresh_mpt_half_a_year">After half a year</string>
+    <string name="reminder_refresh_mpt_year">After a year</string>
 </resources>

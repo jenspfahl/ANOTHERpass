@@ -96,7 +96,7 @@ object GenerateMasterPasswordTokenUseCase: BasicUseCase<SecureActivity>() {
                 activity
             )
             PreferenceService.delete(PreferenceService.DATA_MASTER_PASSWORD_TOKEN_NFC_TAG_ID, activity)
-
+            PreferenceService.putCurrentDate(PreferenceService.DATA_MPT_CREATED_AT, activity)
 
             val intent = Intent(activity, QrCodeActivity::class.java)
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_HEADLINE, encHead)

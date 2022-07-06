@@ -30,7 +30,6 @@
         app:singleLineTitle="false"
         app:defaultValue="true"/>
 
-
     <SwitchPreferenceCompat
         app:key="YAPM/pref:show_export_mk_reminder"
         app:title="@string/show_export_mk_reminder"
@@ -39,6 +38,18 @@
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
         app:defaultValue="true"/>
+
+
+    <ListPreference
+        app:defaultValue="0"
+        app:key="YAPM/pref:show_refresh_mpt_reminder"
+        app:title="@string/show_refresh_mpt_reminder"
+        app:entries="@array/reminder_refresh_mpt_entries"
+        app:entryValues="@array/reminder_refresh_mpt_values"
+        app:allowDividerAbove="false"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:useSimpleSummaryProvider="true"/>
 
     <SwitchPreferenceCompat
         app:key="YAPM/pref:show_biometric_smp_reminder"

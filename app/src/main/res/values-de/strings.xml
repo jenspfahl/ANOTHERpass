@@ -398,8 +398,10 @@
     <string name="summary_show_export_vault_reminder">Zeige eine Erinnerung wenn sich der Tresorinhalt geändert hat und deshalb exportiert werden sollte.</string>
     <string name="show_export_mk_reminder">Erinnerung den verschlüsselten Masterkey zu exportieren</string>
     <string name="show_export_mp_reminder">Erinnerung das Masterpasswort zu exportieren</string>
+    <string name="show_refresh_mpt_reminder">Erinnerung das Masterpasswort-Token zu erneuern</string>
     <string name="summary_show_export_mk_reminder">Zeige eine Erinnerung wenn sich der verschlüsselte Masterkey (EMK) geändert hat und exportiert werden sollte.</string>
     <string name="summary_show_export_mp_reminder">Zeige eine Erinnerung wenn sich das Masterpasswort (EMP) geändert hat und exportiert werden sollte. Beachte: Ohne aktuelles Masterpasswort kannst du dich ggf. nicht mehr einloggen!</string>
+    <string name="summary_show_refresh_mpt_reminder">Erinnerung das Masterpasswort-Token zu erneuern (wenn vorhanden). Dies kann helfen das Risiko zu minimieren, dass ein gestohlenes Token missbräuchlich verwendet wird.</string>
     <string name="show_biometric_smp_reminder">Erinnerung ein biometrisches Merkmal einzurichten (für das gespeicherte Masterpasswort)</string>
     <string name="summary_show_biometric_smp_reminder">Zeige eine Erinnerung wenn das gespeicherte Masterpasswort nicht mit einem biometrischem Merkmal (z.B. Fingerabdruck) geschützt wurde aber dies vom Gerät unterstützt werden würde.</string>
 
@@ -408,6 +410,8 @@
     <string name="export_mp_reminder">Masterpasswort sollte exportiert werden!</string>
     <string name="biometric_smp_reminder">Biometrie sollte für Masterpasswort eingerichtet werden.</string>
     <string name="show_biometric_smp_howto">Wie?</string>
+    <string name="refresh_mpt_reminder">Masterpassword-Token sollte erneuert werden.</string>
+    <string name="show_refresh_mpt">Jetzt erneuern</string>
     <string name="dont_ask_again">Nicht mehr nerven</string>
     <string name="manage_reminder_settings_hint">Erinnerungen können geändert werden unter \'Einstellungen / Erinnerungen\'</string>
     <string name="no_label">OHNE KATEGORIE</string>
@@ -559,4 +563,11 @@
     <string name="error_picture_too_small_for_user_seed">Das geschossene Foto ist zu klein um es als Entropie zu verwenden</string>
     <string name="seed_random_generator">Optimiere Zufallsgenerator</string>
 
+    <string name="reminder_refresh_mpt_none">Nie</string>
+    <string name="reminder_refresh_mpt_one_week">Nach einer Woche</string>
+    <string name="reminder_refresh_mpt_two_weeks">Nach zwei Wochen</string>
+    <string name="reminder_refresh_mpt_one_month">Nach einem Monat</string>
+    <string name="reminder_refresh_mpt_two_months">Nach zwei Monaten</string>
+    <string name="reminder_refresh_mpt_half_a_year">Nach einem halben Jahr</string>
+    <string name="reminder_refresh_mpt_year">Nach einem Jahr</string>
 </resources>

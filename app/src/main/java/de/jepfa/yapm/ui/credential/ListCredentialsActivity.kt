@@ -217,6 +217,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         if (!showed) {
             showed = ReminderService.showReminders(ReminderService.StoredMasterPassword, view, this)
         }
+        if (!showed) {
+            showed = ReminderService.showReminders(ReminderService.RefreshMasterPasswordToken, view, this)
+        }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

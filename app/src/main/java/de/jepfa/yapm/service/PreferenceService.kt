@@ -22,7 +22,7 @@ object PreferenceService {
      * TODO If you add new preference xml files inside #initDefaults, they should be recognised as well.
      * To achieve this, count the version value up here.
      */
-    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_17"
+    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_19"
 
     const val STATE_DEFAULT_INIT_DONE = STATE_PREFIX + "default_init_done"
 
@@ -51,6 +51,8 @@ object PreferenceService {
     const val DATA_MK_EXPORT_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "mk_export_notification_showed_as"
     const val PREF_SHOW_EXPORT_MK_REMINDER = PREF_PREFIX + "show_export_mk_reminder"
 
+    const val DATA_MPT_CREATED_AT = DATA_PREFIX + "mpt_created_at"
+
     const val DATA_MP_EXPORTED_AT = DATA_PREFIX + "mp_exported_at"
     const val DATA_MP_MODIFIED_AT = DATA_PREFIX + "mp_modified_at"
     const val DATA_MP_EXPORT_NOTIFICATION_SHOWED_AT = DATA_PREFIX + "mp_export_notification_showed_at"
@@ -60,6 +62,10 @@ object PreferenceService {
     const val DATA_BIOMETRIC_SMP_NOTIFICATION_SHOWED_AT = DATA_PREFIX + "biometric_smp_notification_showed_at"
     const val DATA_BIOMETRIC_SMP_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "biometric_smp_notification_showed_as"
     const val PREF_SHOW_BIOMETRIC_SMP_REMINDER = PREF_PREFIX + "show_biometric_smp_reminder"
+
+    const val DATA_REFRESH_MPT_NOTIFICATION_SHOWED_AT = DATA_PREFIX + "refresh_mpt_notification_showed_at"
+    const val DATA_REFRESH_MPT_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "refresh_mpt_notification_showed_as"
+    const val PREF_SHOW_REFRESH_MPT_REMINDER = PREF_PREFIX + "show_refresh_mpt_reminder"
 
     const val PREF_SHOW_LAST_LOGIN_STATE = PREF_PREFIX + "show_last_login_state"
     const val PREF_MAX_LOGIN_ATTEMPTS = PREF_PREFIX + "max_login_attempts"

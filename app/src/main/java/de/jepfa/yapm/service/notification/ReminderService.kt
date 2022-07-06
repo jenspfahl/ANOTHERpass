@@ -15,10 +15,13 @@ import de.jepfa.yapm.service.PreferenceService.DATA_MK_EXPORT_NOTIFICATION_SHOWE
 import de.jepfa.yapm.service.PreferenceService.DATA_MK_MODIFIED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_BIOMETRIC_SMP_NOTIFICATION_SHOWED_AS
 import de.jepfa.yapm.service.PreferenceService.DATA_BIOMETRIC_SMP_NOTIFICATION_SHOWED_AT
+import de.jepfa.yapm.service.PreferenceService.DATA_MPT_CREATED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_MP_EXPORTED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_MP_EXPORT_NOTIFICATION_SHOWED_AS
 import de.jepfa.yapm.service.PreferenceService.DATA_MP_EXPORT_NOTIFICATION_SHOWED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_MP_MODIFIED_AT
+import de.jepfa.yapm.service.PreferenceService.DATA_REFRESH_MPT_NOTIFICATION_SHOWED_AS
+import de.jepfa.yapm.service.PreferenceService.DATA_REFRESH_MPT_NOTIFICATION_SHOWED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_EXPORTED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_EXPORT_NOTIFICATION_SHOWED_AS
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_EXPORT_NOTIFICATION_SHOWED_AT
@@ -28,6 +31,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_EXPORT_MK_REMINDER
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_BIOMETRIC_SMP_REMINDER
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_EXPORT_MP_REMINDER
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_EXPORT_VAULT_REMINDER
+import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_REFRESH_MPT_REMINDER
 import de.jepfa.yapm.service.biometrix.BiometricUtils
 import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.ui.SecureActivity
@@ -35,6 +39,8 @@ import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.exportvault.ExportVaultActivity
 import de.jepfa.yapm.usecase.secret.ExportEncMasterKeyUseCase
 import de.jepfa.yapm.usecase.secret.ExportEncMasterPasswordUseCase
+import de.jepfa.yapm.usecase.secret.GenerateMasterPasswordTokenUseCase
+import de.jepfa.yapm.util.addDays
 import de.jepfa.yapm.util.toastText
 import java.util.*
 
@@ -42,7 +48,8 @@ object ReminderService {
 
 
     interface ReminderConfig {
-        val prefShowReminder: String
+        val showIt: (SecureActivity) -> Boolean
+        val doDeactivate: (SecureActivity) -> Unit
         val dataNotificationShowedAt: String
         val dataNotificationShowedAs: String
         val notificationText: Int
@@ -52,7 +59,12 @@ object ReminderService {
     }
 
     object Vault: ReminderConfig {
-        override val prefShowReminder = PREF_SHOW_EXPORT_VAULT_REMINDER
+        override val showIt = { activity: SecureActivity ->
+            PreferenceService.getAsBool(PREF_SHOW_EXPORT_VAULT_REMINDER, activity)
+        }
+        override val doDeactivate: (SecureActivity) -> Unit = { activity: SecureActivity ->
+            PreferenceService.putBoolean(PREF_SHOW_EXPORT_VAULT_REMINDER, false, activity)
+        }
         override val dataNotificationShowedAt = DATA_VAULT_EXPORT_NOTIFICATION_SHOWED_AT
         override val dataNotificationShowedAs = DATA_VAULT_EXPORT_NOTIFICATION_SHOWED_AS
         override val notificationText = R.string.export_vault_reminder
@@ -67,7 +79,12 @@ object ReminderService {
     }
 
     object MasterKey: ReminderConfig {
-        override val prefShowReminder = PREF_SHOW_EXPORT_MK_REMINDER
+        override val showIt = { activity: SecureActivity ->
+            PreferenceService.getAsBool(PREF_SHOW_EXPORT_MK_REMINDER, activity)
+        }
+        override val doDeactivate: (SecureActivity) -> Unit = { activity: SecureActivity ->
+            PreferenceService.putBoolean(PREF_SHOW_EXPORT_MK_REMINDER, false, activity)
+        }
         override val dataNotificationShowedAt = DATA_MK_EXPORT_NOTIFICATION_SHOWED_AT
         override val dataNotificationShowedAs = DATA_MK_EXPORT_NOTIFICATION_SHOWED_AS
         override val notificationText = R.string.export_mk_reminder
@@ -82,7 +99,12 @@ object ReminderService {
     }
 
     object MasterPassword: ReminderConfig {
-        override val prefShowReminder = PREF_SHOW_EXPORT_MP_REMINDER
+        override val showIt = { activity: SecureActivity ->
+            PreferenceService.getAsBool(PREF_SHOW_EXPORT_MP_REMINDER, activity)
+        }
+        override val doDeactivate: (SecureActivity) -> Unit = { activity: SecureActivity ->
+            PreferenceService.putBoolean(PREF_SHOW_EXPORT_MP_REMINDER, false, activity)
+        }
         override val dataNotificationShowedAt = DATA_MP_EXPORT_NOTIFICATION_SHOWED_AT
         override val dataNotificationShowedAs = DATA_MP_EXPORT_NOTIFICATION_SHOWED_AS
         override val notificationText = R.string.export_mp_reminder
@@ -99,7 +121,12 @@ object ReminderService {
     }
 
     object StoredMasterPassword: ReminderConfig {
-        override val prefShowReminder = PREF_SHOW_BIOMETRIC_SMP_REMINDER
+        override val showIt = { activity: SecureActivity ->
+            PreferenceService.getAsBool(PREF_SHOW_BIOMETRIC_SMP_REMINDER, activity)
+        }
+        override val doDeactivate: (SecureActivity) -> Unit = { activity: SecureActivity ->
+            PreferenceService.putBoolean(PREF_SHOW_BIOMETRIC_SMP_REMINDER, false, activity)
+        }
         override val dataNotificationShowedAt = DATA_BIOMETRIC_SMP_NOTIFICATION_SHOWED_AT
         override val dataNotificationShowedAs = DATA_BIOMETRIC_SMP_NOTIFICATION_SHOWED_AS
         override val notificationText = R.string.biometric_smp_reminder
@@ -117,9 +144,38 @@ object ReminderService {
         }
     }
 
+    object RefreshMasterPasswordToken: ReminderConfig {
+        override val showIt = { activity: SecureActivity ->
+            PreferenceService.getAsInt(PREF_SHOW_REFRESH_MPT_REMINDER, activity) != 0
+        }
+        override val doDeactivate: (SecureActivity) -> Unit = { activity: SecureActivity ->
+            PreferenceService.putInt(PREF_SHOW_REFRESH_MPT_REMINDER, 0, activity)
+        }
+        override val dataNotificationShowedAt = DATA_REFRESH_MPT_NOTIFICATION_SHOWED_AT
+        override val dataNotificationShowedAs = DATA_REFRESH_MPT_NOTIFICATION_SHOWED_AS
+        override val notificationText = R.string.refresh_mpt_reminder
+        override val notificationAction = R.string.show_refresh_mpt
+        override val condition = { activity: SecureActivity ->
+            val hasMpt = PreferenceService.isPresent(PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY, activity)
+            val createdDate = PreferenceService.getAsDate(DATA_MPT_CREATED_AT, activity)
+            val duration = PreferenceService.getAsInt(PREF_SHOW_REFRESH_MPT_REMINDER, activity)
+            if (hasMpt && createdDate != null && duration != 0) {
+                val shouldRenewedDate = createdDate.addDays(duration)
+                val now = Date()
+                dateOlderThan(shouldRenewedDate, now)
+            }
+            else {
+                false
+            }
+        }
+        override val action: (SecureActivity) -> Unit = { activity: SecureActivity ->
+            GenerateMasterPasswordTokenUseCase.openDialog(activity) {}
+        }
+    }
+
 
     fun showReminders(config: ReminderConfig, view: View, activity: SecureActivity): Boolean {
-        val remindEnabled = PreferenceService.getAsBool(config.prefShowReminder, activity)
+        val remindEnabled = config.showIt(activity)
         if (!remindEnabled) {
             return false
         }
@@ -140,7 +196,7 @@ object ReminderService {
             val notificationShowedAs = PreferenceService.getAsBool(config.dataNotificationShowedAs, activity)
             if (notificationShowedAs) {
                 snackBar.setAction(R.string.dont_ask_again) {
-                    PreferenceService.putBoolean(config.prefShowReminder, false, activity)
+                    config.doDeactivate(activity)
                     toastText(activity, R.string.manage_reminder_settings_hint)
                 }
             }
@@ -170,15 +226,15 @@ object ReminderService {
         return dateOlderThan(vaultExportedAt, vaultModifiedAt)
     }
 
-    private fun dateOlderThan(exportedAt: Date?, modifiedAt: Date?): Boolean {
-        if (exportedAt == null && modifiedAt != null) {
+    private fun dateOlderThan(dateA: Date?, dateB: Date?): Boolean {
+        if (dateA == null && dateB != null) {
             return true
         }
-        if (exportedAt == null || modifiedAt == null) {
+        if (dateA == null || dateB == null) {
             return false
         }
 
-        return exportedAt.before(modifiedAt)
+        return dateA.before(dateB)
 
     }
 
