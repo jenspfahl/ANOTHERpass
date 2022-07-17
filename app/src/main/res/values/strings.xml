@@ -549,6 +549,7 @@
     <string name="previous_login_at">Previous login</string>
     <string name="last_denied_login_at">Last denied login</string>
     <string name="last_denied_login_attempts">Last denied login attempts</string>
+    <string name="recent_created_mpt">Master Password Token created at</string>
     <string name="last_succeeded_login">"%2$d login attempt(s) was/were denied %1$s!!</string>
     <string name="last_denied_login_attempt">Last succeeded login was %1$s</string>
 

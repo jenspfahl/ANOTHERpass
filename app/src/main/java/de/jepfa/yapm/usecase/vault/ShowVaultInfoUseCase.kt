@@ -4,6 +4,8 @@ import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY
+import de.jepfa.yapm.service.PreferenceService.DATA_MPT_CREATED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_EXPORTED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_MODIFIED_AT
 import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_DENIED_AT
@@ -60,6 +62,17 @@ object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActi
         val vaultExportedAt = PreferenceService.getAsDate(DATA_VAULT_EXPORTED_AT, activity)
         vaultExportedAt?.let {
             sb.addFormattedLine(activity.getString(R.string.vault_exported_at), dateToNiceString(it, activity))
+        }
+        val hasMPT = PreferenceService.isPresent(DATA_MASTER_PASSWORD_TOKEN_KEY, activity)
+        if (hasMPT) {
+            val recentCreatedMPT = PreferenceService.getAsDate(DATA_MPT_CREATED_AT, activity)
+            recentCreatedMPT?.let {
+                sb.addNewLine()
+                sb.addFormattedLine(
+                    activity.getString(R.string.recent_created_mpt),
+                    dateToNiceString(it, activity)
+                )
+            }
         }
         sb.addNewLine()
         val previousLoginSucceededAt = PreferenceService.getAsDate(STATE_PREVIOUS_LOGIN_SUCCEEDED_AT, activity)

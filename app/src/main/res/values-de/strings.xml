@@ -539,6 +539,7 @@
     <string name="previous_login_at">Vorheriger Login</string>
     <string name="last_denied_login_at">Letzter erfolgloser Login</string>
     <string name="last_denied_login_attempts">Letzte erfolglose Loginversuche</string>
+    <string name="recent_created_mpt">Masterpasswort-Token erzeugt am</string>
     <string name="last_succeeded_login">"%2$d Loginversuch(e) wurde(n) %1$s abgelehnt!!</string>
     <string name="last_denied_login_attempt">Letzter Login war %1$s</string>
 
