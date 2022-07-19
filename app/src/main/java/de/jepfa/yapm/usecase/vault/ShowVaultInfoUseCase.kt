@@ -9,6 +9,7 @@ import de.jepfa.yapm.service.PreferenceService.DATA_MPT_CREATED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_EXPORTED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_MODIFIED_AT
 import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_DENIED_AT
+import de.jepfa.yapm.service.PreferenceService.STATE_MASTER_PASSWD_TOKEN_COUNTER
 import de.jepfa.yapm.service.PreferenceService.STATE_PREVIOUS_LOGIN_ATTEMPTS
 import de.jepfa.yapm.service.PreferenceService.STATE_PREVIOUS_LOGIN_SUCCEEDED_AT
 import de.jepfa.yapm.service.secret.SaltService
@@ -66,10 +67,11 @@ object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActi
         val hasMPT = PreferenceService.isPresent(DATA_MASTER_PASSWORD_TOKEN_KEY, activity)
         if (hasMPT) {
             val recentCreatedMPT = PreferenceService.getAsDate(DATA_MPT_CREATED_AT, activity)
+            val mptCounter = PreferenceService.getAsInt(STATE_MASTER_PASSWD_TOKEN_COUNTER, activity)
             recentCreatedMPT?.let {
                 sb.addNewLine()
                 sb.addFormattedLine(
-                    activity.getString(R.string.recent_created_mpt),
+                    activity.getString(R.string.recent_created_mpt, mptCounter),
                     dateToNiceString(it, activity)
                 )
             }
