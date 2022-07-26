@@ -60,8 +60,7 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
 
         manuallySeedView = view.findViewById(R.id.button_seed_manually)
         val hasCamera = requireContext().packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
-        val hasCameraPermission = PermissionChecker.hasCameraPermission(requireContext())
-        if (!hasCamera || !hasCameraPermission) {
+        if (!hasCamera) {
             manuallySeedView?.visibility = View.GONE
         }
         else {

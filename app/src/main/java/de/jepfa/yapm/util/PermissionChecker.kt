@@ -6,10 +6,11 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.provider.Settings
 import androidx.core.app.ActivityCompat
+import de.jepfa.yapm.ui.BaseActivity
 
 object PermissionChecker {
 
-    private val REQUEST_EXTERNAL_STORAGE = 1
+    const val PERMISSION_REQUEST_CODE = 163434
     private val PERMISSIONS_RW_STORAGE = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
     private val PERMISSIONS_READ_STORAGE = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -23,7 +24,7 @@ object PermissionChecker {
             ActivityCompat.requestPermissions(
                     activity,
                     PERMISSIONS_RW_STORAGE,
-                    REQUEST_EXTERNAL_STORAGE
+                    PERMISSION_REQUEST_CODE
             )
         }
     }
@@ -37,9 +38,21 @@ object PermissionChecker {
             ActivityCompat.requestPermissions(
                     activity,
                     PERMISSIONS_READ_STORAGE,
-                    REQUEST_EXTERNAL_STORAGE
+                    PERMISSION_REQUEST_CODE
             )
         }
+    }
+
+    fun verifyCameraPermissions(activity: BaseActivity): Boolean {
+        if (! hasCameraPermission(activity)) {
+            ActivityCompat.requestPermissions(
+                    activity,
+                    arrayOf(Manifest.permission.CAMERA),
+                    PERMISSION_REQUEST_CODE
+            )
+            return false
+        }
+        return true
     }
 
     fun hasOverlayPermission(context: Context): Boolean {

@@ -16,6 +16,7 @@ import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.usecase.UseCase
 import de.jepfa.yapm.usecase.UseCaseOutput
+import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.toHex
 import de.jepfa.yapm.util.toastText
 import java.nio.ByteBuffer
@@ -37,6 +38,10 @@ object SeedRandomGeneratorUseCase: UseCase<Bitmap, String, BaseActivity> {
     }
 
     fun openDialog(baseActivity: BaseActivity, fragmentForResult: BaseFragment? = null) {
+        val hasCameraPermission = PermissionChecker.verifyCameraPermissions(baseActivity)
+        if (!hasCameraPermission) {
+            return
+        }
 
         if (PreferenceService.isPresent(PreferenceService.DATA_ENCRYPTED_SEED, baseActivity)) {
 

@@ -571,4 +571,7 @@
     <string name="reminder_refresh_mpt_two_months">Nach zwei Monaten</string>
     <string name="reminder_refresh_mpt_half_a_year">Nach einem halben Jahr</string>
     <string name="reminder_refresh_mpt_year">Nach einem Jahr</string>
+
+    <string name="permission_granted_please_repeat">Berechtigung erteilt, bitte wiederholen sie ihre Aktion.</string>
+
 </resources>
