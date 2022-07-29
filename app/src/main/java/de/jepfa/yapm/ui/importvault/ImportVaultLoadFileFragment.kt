@@ -12,10 +12,8 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.navigation.fragment.findNavController
-import com.google.gson.JsonObject
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm
-import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseFragment
@@ -58,7 +56,7 @@ class ImportVaultLoadFileFragment : BaseFragment() {
                     .setType("*/*")
                     .setAction(Intent.ACTION_GET_CONTENT)
                 val chooserIntent =
-                    Intent.createChooser(intent, getString(R.string.chooser_select_vault_file))
+                    Intent.createChooser(intent, getString(R.string.chooser_select_file_to_import))
                 startActivityForResult(chooserIntent, importVaultFile)
             }
         }

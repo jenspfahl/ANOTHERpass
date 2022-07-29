@@ -56,9 +56,15 @@
                 android:title="@string/import_read_credential" />
 
             <item
+                android:id="@+id/import_credentials_from_file"
+                android:orderInCategory="97"
+                android:title="@string/import_credentials_file" />
+
+            <item
                 android:id="@+id/import_vault"
                 android:orderInCategory="99"
                 android:title="@string/import_vault_as_file" />
+
         </menu>
     </item>
 

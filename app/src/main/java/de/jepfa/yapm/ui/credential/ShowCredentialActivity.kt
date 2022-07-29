@@ -96,7 +96,7 @@ class ShowCredentialActivity : SecureActivity() {
         val idExtra = intent.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
         mode = when (intent.getStringExtra(EXTRA_MODE)) {
             EXTRA_MODE_SHOW_EXTERNAL_FROM_RECORD -> Mode.EXTERNAL_FROM_RECORD
-            EXTRA_MODE_SHOW_EXTERNAL_FROM_VAULT_FILE -> Mode.EXTERNAL_FROM_FILE
+            EXTRA_MODE_SHOW_EXTERNAL_FROM_FILE -> Mode.EXTERNAL_FROM_FILE
             EXTRA_MODE_SHOW_NORMAL_READONLY -> Mode.NORMAL_READONLY
             else -> Mode.NORMAL
         }
@@ -349,7 +349,7 @@ class ShowCredentialActivity : SecureActivity() {
                 }
 
                 when (mode) {
-                    Mode.EXTERNAL_FROM_FILE -> sb.addFormattedLine(getString(R.string.source), getString(R.string.source_from_vault_file))
+                    Mode.EXTERNAL_FROM_FILE -> sb.addFormattedLine(getString(R.string.source), getString(R.string.source_from_file))
                     Mode.EXTERNAL_FROM_RECORD -> sb.addFormattedLine(getString(R.string.source), getString(R.string.source_from_record))
                     Mode.NORMAL_READONLY -> sb.addFormattedLine(getString(R.string.source), getString(R.string.source_from_the_app))
                     else -> {}
@@ -522,7 +522,7 @@ class ShowCredentialActivity : SecureActivity() {
             "de.jepfa.yapm.ui.ShowCredentialActivity.mode.show_normal_readonly"
         const val EXTRA_MODE_SHOW_EXTERNAL_FROM_RECORD =
             "de.jepfa.yapm.ui.ShowCredentialActivity.mode.show_external_from_record"
-        const val EXTRA_MODE_SHOW_EXTERNAL_FROM_VAULT_FILE =
+        const val EXTRA_MODE_SHOW_EXTERNAL_FROM_FILE =
             "de.jepfa.yapm.ui.ShowCredentialActivity.mde.show_external_from_vault_file"
     }
 

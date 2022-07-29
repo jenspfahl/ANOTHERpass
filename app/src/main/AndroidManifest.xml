@@ -52,6 +52,7 @@
         <activity
             android:name=".ui.settings.SettingsActivity"
             android:label="@string/title_activity_settings" />
+        <activity android:name=".ui.importcredentials.ImportCredentialsActivity" />
         <activity android:name=".ui.importvault.ImportVaultActivity" />
         <activity android:name=".ui.exportvault.ExportVaultActivity" />
         <activity

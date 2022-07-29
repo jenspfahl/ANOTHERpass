@@ -1,4 +1,4 @@
-package de.jepfa.yapm.ui.importvault
+package de.jepfa.yapm.ui.importcredentials
 
 import android.content.Context
 import android.content.Intent
@@ -11,40 +11,23 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
-import de.jepfa.yapm.model.encrypted.EncLabel
-import de.jepfa.yapm.model.encrypted.EncNamed
-import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.util.enrichId
-import kotlin.collections.HashMap
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.chip.Chip
-import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.ui.ViewRecyclerViewAdapter
 import de.jepfa.yapm.ui.credential.ShowCredentialActivity
-import de.jepfa.yapm.ui.label.Label
-import de.jepfa.yapm.ui.label.LabelDialogs
-import de.jepfa.yapm.util.createLabelChip
 
 
-class ImportVaultFileOverrideVaultNamedAdapter(
+class ImportCredentialsImportFileAdapter(
     private val selectNoneAll: CheckBox,
     private val activity: SecureActivity,
-    private val groupType: GroupType,
-    private val dataMap: List<ChildType>,
-    val checkedChildren: MutableSet<ChildType>
+    private val dataMap: List<FileRecord>,
+    val checkedChildren: MutableSet<FileRecord>
 ): BaseExpandableListAdapter() {
 
-    enum class GroupType(val titleId: Int) {
-        CREDENTIALS_TO_BE_INSERTED(R.string.credentials_to_be_inserted),
-        CREDENTIALS_TO_BE_UPDATED(R.string.credentials_to_be_updated),
-        LABELS_TO_BE_INSERTED(R.string.labels_to_be_inserted),
-        LABELS_TO_BE_UPDATED(R.string.labels_to_be_updated),
-    }
 
-    data class ChildType(val id: Int, val origNamed: EncNamed?, val newNamed: EncNamed)
+    data class FileRecord(val id: Int, val name: String, val url: String?, val userName: String?, val plainPassword: String)
 
-    private val checkBoxes = HashMap<CheckBox, GroupType>()
+    private val checkBoxes = ArrayList<CheckBox>()
 
     init {
         updateSelectNoneAll()
@@ -58,11 +41,11 @@ class ImportVaultFileOverrideVaultNamedAdapter(
         return dataMap.size
     }
 
-    override fun getGroup(groupPosition: Int): GroupType {
-        return groupType
+    override fun getGroup(groupPosition: Int): String {
+        return "group"
     }
 
-    override fun getChild(groupPosition: Int, childPosition: Int): ChildType {
+    override fun getChild(groupPosition: Int, childPosition: Int): FileRecord {
         return dataMap[childPosition]
     }
 
@@ -90,7 +73,7 @@ class ImportVaultFileOverrideVaultNamedAdapter(
         val checkedChildrenCount = checkedChildren.count()
         val textView = view.findViewById<TextView>(R.id.expandable_text_view_1)
         textView.setTypeface(null, Typeface.BOLD)
-        textView.text = activity.getString(group.titleId, checkedChildrenCount, childrenCount)
+        textView.text = "TODO"//activity.getString(group.titleId, checkedChildrenCount, childrenCount)
         return view
     }
 
@@ -101,14 +84,13 @@ class ImportVaultFileOverrideVaultNamedAdapter(
         convertView: View?,
         parent: ViewGroup?
     ): View {
-        val group = getGroup(groupPosition)
         val child = getChild(groupPosition, childPosition)
 
         val view = getInflater().inflate(R.layout.expandable_list_item, null)
-        val checkBox = view.findViewById<CheckBox>(R.id.expandable_check_box)
+        var checkBox = view.findViewById<CheckBox>(R.id.expandable_check_box)
         if (!checkBox.hasOnClickListeners()) {
             checkBox.setOnClickListener {
-                if (checkBox.isChecked) {
+                if (checkBox?.isChecked?:false) {
                     checkedChildren.add(child)
                 } else {
                     checkedChildren.remove(child)
@@ -118,7 +100,6 @@ class ImportVaultFileOverrideVaultNamedAdapter(
             }
             checkBox.isChecked = checkedChildren.contains(child)
         }
-        checkBoxes[checkBox] = group
 
         val namedContainer = view.findViewById<RecyclerView>(R.id.expandable_container)
         val layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
@@ -126,52 +107,15 @@ class ImportVaultFileOverrideVaultNamedAdapter(
 
         activity.masterSecretKey?.let { key ->
 
-            val origName = if (child.origNamed != null) SecretService.decryptCommonString(key, child.origNamed.name) else null
-            val newName = SecretService.decryptCommonString(key, child.newNamed.name)
             val views = ArrayList<View>()
 
-            if (child.newNamed is EncCredential) {
-                if (origName == null) {
-                    createAndAddCredentialNameTextView(newName, child.newNamed, views, isExternal = true)
-                }
-                else if (child.origNamed is EncCredential) {
-                    createAndAddCredentialNameTextView(origName, child.origNamed, views, isExternal = false)
-                    createAndAddSeparator(views)
-                    createAndAddCredentialNameTextView(newName, child.newNamed, views, isExternal = true)
-                }
-            }
-            else if (child.newNamed is EncLabel) {
-                val newEncLabel = child.newNamed
-                val origEncLabel = child.origNamed as? EncLabel
-                if (origEncLabel == null) {
-                    val encLabel = child.newNamed
-                    val label = LabelService.createLabel(key, encLabel)
-                    views += createLabel(label)
-                }
-                else {
-                    val origLabel = LabelService.createLabel(key, origEncLabel)
-                    views += createLabel(origLabel)
-
-                    createAndAddSeparator(views)
-
-                    val newLabel = LabelService.createLabel(key, newEncLabel)
-                    views += createLabel(newLabel)
-                }
-            }
+            createAndAddCredentialNameTextView(activity as ImportCredentialsActivity, child, views, isExternal = true)
 
             namedContainer.adapter = ViewRecyclerViewAdapter(activity, views)
 
         }
 
         return view
-    }
-
-    private fun createLabel(label: Label): Chip {
-        val chip = createLabelChip(label, thinner = true, activity)
-        chip.setOnClickListener {
-            LabelDialogs.openLabelOverviewDialog(activity, label, showChangeLabelButton = false)
-        }
-        return chip
     }
 
     override fun isChildSelectable(groupPosition: Int, childPosition: Int): Boolean {
@@ -181,7 +125,7 @@ class ImportVaultFileOverrideVaultNamedAdapter(
     fun selectNoneAllClicked() {
         val nonSelected = checkedChildren.isEmpty()
         checkBoxes.forEach {
-            it.key.isChecked = nonSelected
+            it.isChecked = nonSelected
         }
         if (nonSelected) {
             fillCheckedChildrenWithAllNamed()
@@ -225,21 +169,25 @@ class ImportVaultFileOverrideVaultNamedAdapter(
     }
 
     private fun createAndAddCredentialNameTextView(
-        name: String,
-        credential: EncCredential,
+        activity: ImportCredentialsActivity,
+        record: FileRecord,
         views: ArrayList<View>,
         isExternal: Boolean
     ) {
-        val textView = TextView(activity)
-        textView.text = enrichId(activity, name, credential.id)
+        val textView = TextView(this.activity)
+        textView.text = record.name
         textView.textSize = 16f
         textView.setTextAppearance(R.style.credential_title)
         textView.setOnClickListener {
-            startShowCredentialActivity(credential, isExternal)
+            this.activity.masterSecretKey?.let { key ->
+                val credential = activity.createCredentialFromRecord(key, record, emptyList())
+                startShowCredentialActivity(credential, isExternal)
+            }
         }
 
         views.add(textView)
     }
+
 
     private fun fillCheckedChildrenWithAllNamed() {
         dataMap.forEach { elem ->

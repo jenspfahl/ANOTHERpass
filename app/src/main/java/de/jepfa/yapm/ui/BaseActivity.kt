@@ -74,8 +74,12 @@ open class BaseActivity : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if (requestCode == PermissionChecker.PERMISSION_REQUEST_CODE && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            toastText(applicationContext, R.string.permission_granted_please_repeat)
+        if (requestCode == PermissionChecker.PERMISSION_REQUEST_CODE && grantResults.isNotEmpty()) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                toastText(applicationContext, R.string.permission_granted_please_repeat)
+            } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                toastText(applicationContext, R.string.permission_denied)
+            }
         }
     }
 

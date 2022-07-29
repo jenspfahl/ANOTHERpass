@@ -98,6 +98,7 @@
     <string name="export_vault_as_file">Exportiere Tresor als Datei</string>
     <string name="import_vault_as_file">Importiere Tresor-Datei</string>
     <string name="message_import_vault_records">Du bist dabei %1$d Zugangsdaten und %2$d Kategorien zu importieren. Schon existierende Daten werden überschrieben. Fortsetzen?</string>
+    <string name="message_import_credential_records">Du bist dabei %1$d Zugangsdaten zu importieren. Es werden keine existierende Zugangsdaten überschrieben. Fortfahren?</string>
     <string name="qrc_download_as_img">Speichere QR-Code als Bilddatei</string>
     <string name="download_as_nfc_tag">Schreibe auf NFC-Tag</string>
     <string name="export_vault_explanation">Hier kannst du deinen kompletten Tresor als Datei teilen oder exportieren, z.B. als Backup auf Google Drive. Importiere diese Datei, wenn du die App neu installiert hast oder um geänderte Daten wiederherzustellen.\nDer verschlüsselte Masterkey kann Bestandteil dieser Datei sein. Wenn nicht, exportiere ihn separat als QR-Code oder NFC-Tag. Du brauchst ihn, wenn du die Tresor-Datei neu importierst.\nDas Trennen des verschlüsselten Masterkeys von der Tresor-Datei macht die Datei unnütz für Hacker, auch wenn sie deine PIN oder dein Masterpasswort hätten.</string>
@@ -107,15 +108,23 @@
     <string name="include_preferences">Inklusive App-Einstellungen</string>
     <string name="too_may_wrong_logins">Zu viele Loginversuche, Masterpasswort wird nun benötigt</string>
     <string name="too_may_wrong_logins_self_destruction">Zu viele Loginversuche, Tresordaten werden nun gelöscht!</string>
+
     <string name="import_vault_explanation">Wähle eine Tresor-Datei zum Importieren aus. Beachte: Du benötigst die zugehörige PIN und das (exportierte) Masterpasswort, und abhängig von der Datei, den exportierten Masterkey.</string>
     <string name="import_vault_to_vault_explanation">Wähle eine Tresor-Datei zum Importieren aus. Beachte: Die Datei muss zum aktuellen Tresor gehören (aktuelle Id = %1$s).</string>
-    <string name="import_vault_load_file_fragment_label" tools:ignore="TypographyFractions">Importiere Tresor 1/2</string>
-    <string name="import_vault_import_file_fragment_label">Importiere Tresor 2/2</string>
-    <string name="button_load_vault">Lade Tresor-Datei</string>
+    <string name="import_vault_load_file_fragment_label" tools:ignore="TypographyFractions">Tresor importieren 1/2</string>
+    <string name="import_vault_import_file_fragment_label">Tresor importieren 2/2</string>
+    <string name="button_load_vault">Tresor-Datei laden</string>
     <string name="button_import_vault">Tresor importieren</string>
+
+    <string name="import_credentials_load_file_explanation">Wähle eine Datei mit unverschlüsselten Zugangsdaten aus. Zur Zeit werden nur CSV-Dateien unterstützt. Importiere z.B. Zugangsdaten von Browsern wie Firefox oder Chrome.</string>
+    <string name="import_credentials_load_file_fragment_label" tools:ignore="TypographyFractions">Zugangsdaten importieren 1/2</string>
+    <string name="import_credentials_import_file_fragment_label">Zugangsdaten importieren 2/2</string>
+    <string name="button_load_credentials_file">Zugangsdatendatei laden</string>
+    <string name="button_import_credentials">Zugangsdaten importieren</string>
+
     <string name="scan_mk">Scanne deinen Masterkey</string>
     <string name="drop_vault">Tresor vernichten (alles löschen)</string>
-    <string name="chooser_select_vault_file">Wähle eine Tresor-Datei zum Importieren aus</string>
+    <string name="chooser_select_file_to_import">Wähle eine Datei zum Importieren aus</string>
     <string name="toast_import_vault_failure">Die ausgewählte Datei kann nicht importiert werden.</string>
     <string name="toast_import_vault_failure_cipher_not_supported">Die ausgewählte Datei ist mit einem nicht unterstützten Algorithmus verschlüsselt.</string>
     <string name="toast_import_vault_failure_no_vault_match">Die ausgewählte Datei gehört nicht zum aktuellen Tresor.</string>
@@ -452,6 +461,7 @@
     <string name="intro_5_bullet_3">Starke Verschlüsselung ALLER sensitiven Daten mit mindestens 128 bit Schlüsseln.</string>
     <string name="intro_5_bullet_4">ANOTHERpass kann einen integrierten Sicherheitschip verwenden, falls vorhanden.</string>
 
+    <string name="credentials_to_be_imported">%1$d von %2$d Zugangsdaten zum Importieren</string>
     <string name="credentials_to_be_inserted">%1$d von %2$d Zugangsdaten zum Wiederherstellen</string>
     <string name="credentials_to_be_updated">%1$d von %2$d Zugangsdaten zum Ersetzen</string>
     <string name="labels_to_be_inserted">%1$d von %2$d Kategorien zum Wiederherstellen</string>
@@ -460,13 +470,15 @@
     <string name="nothing_has_been_changed">Nichts hat sich geändert</string>
     <string name="copy_origin">Erstelle eine Kopie des Originals bevor das Original überschrieben wird. Der Name der Kopie trägt \'(orig)\' am Ende.</string>
     <string name="import_vault_override_explanation">Hier siehst du den Inhalt der geladenen Tresor-Datei, allerdings nur Datensätze die sich zum aktuellen Tresor unterscheiden! Du kannst die Listen ausklappen und prüfen und jene Datensätze anhaken, die importiert werden sollen. Mit einem Klick auf den Datensatz siehst du mehr Details.</string>
+    <string name="import_credentials_explanation">Hier siehst du den Inhalt der geladenen Zugangsdaten-Datei. Du kannst die Zugangsdaten anhaken, die importiert werden sollen. Mit einem Klick auf den Datensatz siehst du mehr Details.</string>
+
     <string name="dont_think_about_passwords">Denke nicht über Passwörter nach!</string>
     <string name="details">Zeige Details</string>
     <string name="title_credential_details">Details der Zugangsdaten</string>
     <string name="last_modified">Zuletzt geändert</string>
     <string name="name">Name</string>
     <string name="source">Quelle</string>
-    <string name="source_from_vault_file">von Tresor-Datei</string>
+    <string name="source_from_file">aus Datei</string>
     <string name="source_from_record">von QR-Code oder NFC-Tag</string>
     <string name="source_from_the_app">von der App</string>
     <string name="make_nfc_tag_write_protected">Mache NFC-Tag schreibgeschützt (kann nicht rückgängig gemacht werden!!)</string>
@@ -573,5 +585,9 @@
     <string name="reminder_refresh_mpt_year">Nach einem Jahr</string>
 
     <string name="permission_granted_please_repeat">Berechtigung erteilt, bitte wiederholen sie ihre Aktion.</string>
+    <string name="permission_denied">Berechtigung nicht erteilt!</string>
+
+    <string name="import_credentials_file">Importiere Zugangsdaten aus Datei</string>
+    <string name="import_credentials_explanation_labels">Du kannst deine importierten Zugangsdaten kategorisieren um sie leichter wiederzufinden,</string>
 
 </resources>

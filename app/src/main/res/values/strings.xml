@@ -100,6 +100,7 @@
     <string name="export_vault_as_file">Export vault as file</string>
     <string name="import_vault_as_file">Import vault file</string>
     <string name="message_import_vault_records">You are going to import %1$d credentials and %2$d labels. Existing records may be overridden! Continue?</string>
+    <string name="message_import_credential_records">You are going to import %1$d external credentials. They will be created as new records. Continue?</string>
     <string name="qrc_download_as_img">Save QR code as image</string>
     <string name="download_as_nfc_tag">Push on NFC tag</string>
     <string name="export_vault_explanation">Here you can share or export your complete vault into a file for backup purposes. Use this file to import your vault after a fresh new app installation without data or to recorver changed data. \nYou may include or exclude the Encrypted Master Key. If you exclude it, export the master key by your own and store it on a safe place. You need it to import the vault file. \nThe separation of Encrypted Master Key and vault file makes the vault file useless for hackers even if they obtain your PIN and master password.</string>
@@ -109,15 +110,23 @@
     <string name="include_preferences">Include current app settings</string>
     <string name="too_may_wrong_logins">Too many login attempts, master password is now needed</string>
     <string name="too_may_wrong_logins_self_destruction">Too many login attempts, vault completely deleted</string>
+
     <string name="import_vault_explanation">Select a vault file to import. Note: You need the PIN and the (exported) master password and, depending on the file, the Encrypted Master Key.</string>
     <string name="import_vault_to_vault_explanation">Select a vault file to import. Note: The vault file must belong to the same vault with the current vault (Id = %1$s).</string>
     <string name="import_vault_load_file_fragment_label" tools:ignore="TypographyFractions">Import Vault 1/2</string>
     <string name="import_vault_import_file_fragment_label">Import Vault 2/2</string>
     <string name="button_load_vault">Load vault file</string>
     <string name="button_import_vault">Import vault</string>
+
+    <string name="import_credentials_load_file_explanation">Select a file which contains the unencrypted credentials to import. Currently only CSV-files are supported. Use this to import your credentials e.g. from browsers like Firefox or Chrome.</string>
+    <string name="import_credentials_load_file_fragment_label" tools:ignore="TypographyFractions">Import Credentials 1/2</string>
+    <string name="import_credentials_import_file_fragment_label">Import Credentials 2/2</string>
+    <string name="button_load_credentials_file">Load credentials file</string>
+    <string name="button_import_credentials">Import credentials</string>
+
     <string name="scan_mk">Scan your master key</string>
     <string name="drop_vault">Drop vault (delete all)</string>
-    <string name="chooser_select_vault_file">Select vault file to import</string>
+    <string name="chooser_select_file_to_import">Select file to import</string>
     <string name="toast_import_vault_failure">The selected file cannot be imported.</string>
     <string name="toast_import_vault_failure_cipher_not_supported">The selected file is encrypted with an unsupported cipher.</string>
     <string name="toast_import_vault_failure_no_vault_match">The selected file doesn\'t belong to the current vault.</string>
@@ -461,6 +470,7 @@
     <string name="intro_5_bullet_3">Strong encryption of ALL sensitive vault data with at least 128 bit keys.</string>
     <string name="intro_5_bullet_4">ANOTHERpass uses a security chip if present for secure keys.</string>
 
+    <string name="credentials_to_be_imported">%1$d of %2$d credentials to be imported</string>
     <string name="credentials_to_be_inserted">%1$d of %2$d credentials to be re-created</string>
     <string name="credentials_to_be_updated">%1$d of %2$d credentials to be replaced</string>
     <string name="labels_to_be_inserted">%1$d of %2$d labels to be re-created</string>
@@ -471,6 +481,7 @@
     <string name="nothing_has_been_changed">Nothing has been changed</string>
     <string name="copy_origin">Make a copy of the origin record before updating it. Its name will be followed by \'(orig)\'.</string>
     <string name="import_vault_override_explanation">Here you see the content of the loaded vault file, but only records that differs to the current vault! You can expand the lists and check or uncheck each record to select which should be imported. To see details, click on them.</string>
+    <string name="import_credentials_explanation">Here you see the content of the loaded credentials file. You can check or uncheck each record to select which should be imported. To see details, click on them.</string>
     <string name="dont_think_about_passwords">Don\'t think about passwords!</string>
     <string name="details">Show details</string>
     <string name="title_credential_details">Credential details</string>
@@ -480,7 +491,7 @@
     <string name="identifier" translatable="false">Id</string>
     <string name="universal_identifier" translatable="false">Uid</string>
     <string name="source">Source</string>
-    <string name="source_from_vault_file">from external vault file</string>
+    <string name="source_from_file">from external file</string>
     <string name="source_from_record">from external QR code or NFC tag</string>
     <string name="source_from_the_app">from the app</string>
     <string name="make_nfc_tag_write_protected">Write protect NFC tag (cannot be underdone!!)</string>
@@ -583,4 +594,8 @@
     <string name="reminder_refresh_mpt_year">After a year</string>
 
     <string name="permission_granted_please_repeat">Permission granted, please repeat your action.</string>
+    <string name="permission_denied">Permission denied!</string>
+
+    <string name="import_credentials_file">Import credentials from file</string>
+    <string name="import_credentials_explanation_labels">You can use labels to find your imported credentials easier.</string>
 </resources>

@@ -63,6 +63,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import androidx.recyclerview.widget.DividerItemDecoration
 import de.jepfa.yapm.ui.changelogin.ChangeEncryptionActivity
+import de.jepfa.yapm.ui.importcredentials.ImportCredentialsActivity
 import de.jepfa.yapm.usecase.secret.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -566,6 +567,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             }
             R.id.test_verify_qr_code_or_nfc_tag -> {
                 val intent = Intent(this, VerifyActivity::class.java)
+                startActivity(intent)
+                return true
+            }
+            R.id.import_credentials_from_file -> {
+                val intent = Intent(this, ImportCredentialsActivity::class.java)
                 startActivity(intent)
                 return true
             }
