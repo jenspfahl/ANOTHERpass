@@ -2,6 +2,7 @@
 package de.jepfa.yapm.ui.label
 
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.*
 import androidx.core.view.iterator
 import androidx.core.view.size
@@ -20,8 +21,7 @@ import de.jepfa.yapm.util.toastText
 
 
 class LabelEditViewExtender(private val activity: SecureActivity,
-                            view: View,
-                            initLabels: MutableList<Label>) {
+                            view: View) {
 
     private val LAST_CHARS = listOf(' ', '\t', System.lineSeparator())
 
@@ -45,13 +45,18 @@ class LabelEditViewExtender(private val activity: SecureActivity,
             toastText(activity, R.string.start_typing_to_filter_labels)
         }
 
-        editCredentialLabelsTextView.setOnFocusChangeListener { v, hasFocus ->
-            if (!hasFocus) {
+        editCredentialLabelsTextView.setOnEditorActionListener { v, actionId, event ->
+            if(actionId == EditorInfo.IME_ACTION_DONE){
                 val unfinishedText = editCredentialLabelsTextView.text.toString()
                 addChipToLabelGroup(unfinishedText)
                 editCredentialLabelsTextView.text = null
+                true
+            }
+            else {
+                false
             }
         }
+
         editCredentialLabelsTextView.doAfterTextChanged {
             val committedText = it.toString()
             if (isCommittedLabelName(committedText)) {
@@ -61,14 +66,9 @@ class LabelEditViewExtender(private val activity: SecureActivity,
             }
         }
 
-
-        initLabels.forEach { label ->
-            addLabelToLabelGroup(label)
-        }
-
     }
 
-    fun addLabels(labels: List<Label>, ) {
+    fun addLabels(labels: List<Label>) {
         labels
             .forEachIndexed { _, label ->
                 createAndAddChip(label, editCredentialLabelsChipGroup)

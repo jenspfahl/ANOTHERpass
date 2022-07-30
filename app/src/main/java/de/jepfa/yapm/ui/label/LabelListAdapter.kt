@@ -34,6 +34,14 @@ class LabelListAdapter(context: Context,
         return LabelFilter(this, labels)
     }
 
+    override fun getItem(position: Int): Label? {
+        return filteredLabels[position]
+    }
+
+    override fun getItemId(position: Int): Long {
+        return filteredLabels[position].labelId?.toLong()?:0
+    }
+
     override fun getView(position: Int, view: View?, parent: ViewGroup): View {
         val label = filteredLabels[position]
 
@@ -79,7 +87,9 @@ class LabelListAdapter(context: Context,
 
         override fun publishResults(constraint: CharSequence, results: FilterResults) {
             labelListAdapter.filteredLabels.clear()
-            labelListAdapter.filteredLabels.addAll(results.values as MutableList<Label>)
+            if (results.values != null && results.values is MutableList<*>) {
+                labelListAdapter.filteredLabels.addAll((results.values as MutableList<Label>).sortedBy { it.name })
+            }
             labelListAdapter.notifyDataSetChanged()
         }
 
