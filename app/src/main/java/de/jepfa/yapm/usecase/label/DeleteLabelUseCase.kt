@@ -17,18 +17,19 @@ object DeleteLabelUseCase: InputUseCase<Label, SecureActivity>() {
         if (key != null && labelId != null) {
             val credentialsToUpdate = LabelService.defaultHolder.getCredentialIdsForLabelId(labelId)
             credentialsToUpdate?.forEach { credentialId ->
-                activity.credentialViewModel.getById(credentialId).observeOnce(activity) { credential ->
-                    credential?.let {
-                        val labels = LabelService.defaultHolder.decryptLabelsForCredential(key, credential)
+                val credential = activity.getApp().credentialRepository.findByIdSync(credentialId)
 
-                        val remainingLabelChips = labels
-                            .filterNot { it.labelId == labelId}
-                            .map { it.name }
-                        val encLabelIds = LabelService.defaultHolder.encryptLabelIds(key, remainingLabelChips)
-                        credential.labels = encLabelIds
-                        activity.credentialViewModel.update(credential, activity)
-                        LabelService.defaultHolder.updateLabelsForCredential(key, credential)
-                    }
+                credential?.let {
+                    val labels = LabelService.defaultHolder.decryptLabelsForCredential(key, credential)
+
+                    val remainingLabelChips = labels
+                        .filterNot { it.labelId == labelId}
+                        .map { it.name }
+                    val encLabelIds = LabelService.defaultHolder.encryptLabelIds(key, remainingLabelChips)
+                    credential.labels = encLabelIds
+                    activity.credentialViewModel.update(credential, activity)
+                    LabelService.defaultHolder.updateLabelsForCredential(key, credential)
+
                 }
 
             }
