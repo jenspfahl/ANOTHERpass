@@ -12,6 +12,7 @@
         <entry key="../../../.gradle/caches/transforms-3/b5fc9fe81f432b473c9d18cad7139f18/transformed/jetified-AppIntro-6.1.0/res/drawable/ic_appintro_arrow.xml" value="0.15" />
         <entry key="../../../.gradle/caches/transforms-3/ff81f502ffce195f4a804dfbc80ef12b/transformed/jetified-AppIntro-6.1.0/res/drawable/ic_appintro_arrow.xml" value="0.20104166666666667" />
         <entry key="../../../Android/Sdk/platforms/android-29/data/res/layout/simple_dropdown_item_1line.xml" value="0.17864583333333334" />
+        <entry key="../../../Android/Sdk/platforms/android-31/data/res/layout/simple_dropdown_item_1line.xml" value="0.17604166666666668" />
         <entry key="app/src/main/res/drawable/ic_baseline_arrow_back_24.xml" value="0.20104166666666667" />
         <entry key="app/src/main/res/drawable/ic_baseline_arrow_forward_24.xml" value="0.20104166666666667" />
         <entry key="app/src/main/res/drawable/ic_baseline_close_12.xml" value="0.20104166666666667" />

@@ -223,6 +223,5 @@ class EditLabelActivity : SecureActivity() {
         } else {
             labelViewModel.insert(encLabel, this)
         }
-        LabelService.defaultHolder.updateLabel(label)
     }
 }

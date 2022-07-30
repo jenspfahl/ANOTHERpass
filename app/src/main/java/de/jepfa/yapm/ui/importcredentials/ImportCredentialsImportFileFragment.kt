@@ -6,15 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
-import androidx.core.widget.doAfterTextChanged
-import com.google.android.material.chip.ChipGroup
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
-import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.ui.BaseFragment
-import de.jepfa.yapm.ui.LabelEditViewExtender
+import de.jepfa.yapm.ui.label.LabelEditViewExtender
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
+import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.usecase.credential.ImportCredentialsUseCase
 import de.jepfa.yapm.util.toastText
 
@@ -43,7 +41,9 @@ class ImportCredentialsImportFileFragment : BaseFragment() {
 
         val importCredentialsActivity = getImportCredentialsActivity()
         val loadedFileStatusTextView = view.findViewById<TextView>(R.id.loaded_file_status)
-        val labelEditViewExtender = LabelEditViewExtender(importCredentialsActivity, view)
+        val labelEditViewExtender = LabelEditViewExtender(importCredentialsActivity, view, mutableListOf(
+            Label("csv", "from csv file")),
+        )
     //    labelEditViewExtender.updateWithLabels(LabelService.defaultHolder.getAllLabels().subList(0, 3))
 
     //    val jsonContent = getImportCredentialsActivity().parsedVault?.content ?: return
@@ -134,7 +134,9 @@ class ImportCredentialsImportFileFragment : BaseFragment() {
                 checkedChildren
             )
         expandableListView.setAdapter(adapter)
-        expandableListView.expandGroup(0)
+        if (children.size < 5) {
+            expandableListView.expandGroup(0)
+        }
 
         savedInstanceState?.getBoolean("records_list_view")?.let { expanded ->
             if (expanded) {

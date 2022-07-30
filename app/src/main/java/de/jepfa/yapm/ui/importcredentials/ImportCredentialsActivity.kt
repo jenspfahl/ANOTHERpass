@@ -24,6 +24,13 @@ class ImportCredentialsActivity : SecureActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_import_credentials)
 
+        //TODO all calls of initLabels() is to refresh the holder when new Labels are inserted to ths model to obtain the id for future lookups
+        labelViewModel.allLabels.observe(this) { labels ->
+            masterSecretKey?.let { key ->
+                LabelService.defaultHolder.initLabels(key, labels.toSet())
+            }
+        }
+
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
