@@ -34,10 +34,10 @@ class LabelEditViewExtender(private val activity: SecureActivity,
     init {
 
         editCredentialLabelsTextView.setAdapter(allLabelAdapter)
+
         editCredentialLabelsTextView.setOnItemClickListener { parent, _, position, _ ->
             editCredentialLabelsTextView.text = null
             val selectedLabel = parent.getItemAtPosition(position) as Label
-
             addLabelToLabelGroup(selectedLabel)
         }
 
@@ -50,6 +50,8 @@ class LabelEditViewExtender(private val activity: SecureActivity,
                 val unfinishedText = editCredentialLabelsTextView.text.toString()
                 addChipToLabelGroup(unfinishedText)
                 editCredentialLabelsTextView.text = null
+                editCredentialLabelsTextView.dismissDropDown()
+
                 true
             }
             else {
@@ -63,16 +65,19 @@ class LabelEditViewExtender(private val activity: SecureActivity,
                 val labelName = clearCommittedLabelName(committedText)
                 addChipToLabelGroup(labelName)
                 editCredentialLabelsTextView.text = null
+                editCredentialLabelsTextView.dismissDropDown()
+
             }
         }
 
     }
 
-    fun addLabels(labels: List<Label>) {
+    fun addPersistedLabels(labels: List<Label>) {
         labels
             .forEachIndexed { _, label ->
                 createAndAddChip(label, editCredentialLabelsChipGroup)
             }
+
     }
 
     fun getLabelNames(): List<String> {
@@ -176,7 +181,7 @@ class LabelEditViewExtender(private val activity: SecureActivity,
     }
 
     private fun isCommittedLabelName(text: String): Boolean {
-        if (text.isEmpty()) {
+        if (text.isBlank()) {
             return false
         }
 

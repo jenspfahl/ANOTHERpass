@@ -8,6 +8,8 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.label.LabelEditViewExtender
 import de.jepfa.yapm.ui.SecureActivity
@@ -23,6 +25,7 @@ class ImportCredentialsImportFileFragment : BaseFragment() {
         backToPreviousFragment = true
     }
 
+    private lateinit var labelEditViewExtender: LabelEditViewExtender
     private lateinit var expandableListView: ExpandableListView
     private lateinit var adapter: ImportCredentialsImportFileAdapter
     private var credentialsToBeImported: MutableSet<ImportCredentialsImportFileAdapter.FileRecord> = HashSet()
@@ -41,10 +44,11 @@ class ImportCredentialsImportFileFragment : BaseFragment() {
 
         val importCredentialsActivity = getImportCredentialsActivity()
         val loadedFileStatusTextView = view.findViewById<TextView>(R.id.loaded_file_status)
-        val labelEditViewExtender = LabelEditViewExtender(importCredentialsActivity, view, mutableListOf(
-            Label("csv", "from csv file")),
-        )
-    //    labelEditViewExtender.updateWithLabels(LabelService.defaultHolder.getAllLabels().subList(0, 3))
+        labelEditViewExtender = LabelEditViewExtender(importCredentialsActivity, view)
+        savedInstanceState?.getStringArray("added_labels")?.let { labelNames ->
+            val labels = labelNames.mapNotNull { LabelService.defaultHolder.lookupByLabelName(it) }.toList()
+            labelEditViewExtender.addPersistedLabels(labels)
+        }
 
     //    val jsonContent = getImportCredentialsActivity().parsedVault?.content ?: return
 
@@ -110,6 +114,7 @@ class ImportCredentialsImportFileFragment : BaseFragment() {
         super.onSaveInstanceState(outState)
         outState.putIntArray("records_list", adapter.checkedChildren.map { it.id }.toIntArray())
         outState.putBoolean("records_list_view", expandableListView.isGroupExpanded(0))
+        outState.putStringArray("added_labels", labelEditViewExtender.getLabelNames().toTypedArray())
 
     }
 

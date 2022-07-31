@@ -21,6 +21,7 @@ class LabelListAdapter(context: Context,
 ) {
     private var labels: List<Label>
     private val filteredLabels: MutableList<Label> = ArrayList()
+    private var labelFilter: LabelFilter? = null
 
     init {
         this.labels = labels
@@ -30,8 +31,12 @@ class LabelListAdapter(context: Context,
         return filteredLabels.size
     }
 
+    @Synchronized
     override fun getFilter(): Filter {
-        return LabelFilter(this, labels)
+        if (labelFilter == null) {
+            labelFilter = LabelFilter(this, labels)
+        }
+        return labelFilter!!
     }
 
     override fun getItem(position: Int): Label? {
@@ -85,7 +90,7 @@ class LabelListAdapter(context: Context,
             return results
         }
 
-        override fun publishResults(constraint: CharSequence, results: FilterResults) {
+        override fun publishResults(constraint: CharSequence?, results: FilterResults) {
             labelListAdapter.filteredLabels.clear()
             if (results.values != null && results.values is MutableList<*>) {
                 labelListAdapter.filteredLabels.addAll((results.values as MutableList<Label>).sortedBy { it.name })

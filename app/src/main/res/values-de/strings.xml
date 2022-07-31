@@ -589,6 +589,6 @@
 
     <string name="import_credentials_file">Importiere Zugangsdaten aus Datei</string>
     <string name="import_credentials_explanation_labels">Du kannst deine importierten Zugangsdaten kategorisieren um sie leichter wiederzufinden,</string>
-    <string name="start_typing_to_filter_labels">Beginne zu tippen um nach Kategorien zu suchen</string>
+    <string name="start_typing_to_filter_labels">Beginne zu tippen oder drücke die Leertaste um nach Kategorien zu suchen</string>
 
 </resources>
