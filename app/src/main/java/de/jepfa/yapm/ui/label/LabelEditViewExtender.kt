@@ -16,7 +16,6 @@ import de.jepfa.yapm.service.secret.SecretService.encryptCommonString
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.createAndAddLabelChip
-import de.jepfa.yapm.util.createLabelChip
 import de.jepfa.yapm.util.toastText
 
 
@@ -28,8 +27,8 @@ class LabelEditViewExtender(private val activity: SecureActivity,
 
     private var allLabelAdapter = LabelListAdapter(activity, LabelService.defaultHolder.getAllLabels())
 
-    private var editCredentialLabelsTextView: AutoCompleteTextView = view.findViewById(R.id.edit_credential_labels_textview)
-    private var editCredentialLabelsChipGroup: ChipGroup = view.findViewById(R.id.edit_credential_labels_chipgroup)
+    private var editCredentialLabelsTextView: AutoCompleteTextView = view.findViewById(R.id.autocomplete_labels_textview)
+    private var editCredentialLabelsChipGroup: ChipGroup = view.findViewById(R.id.autocomplete_labels_chipgroup)
 
     init {
 
@@ -41,7 +40,7 @@ class LabelEditViewExtender(private val activity: SecureActivity,
             addLabelToLabelGroup(selectedLabel)
         }
 
-        view.findViewById<ImageView>(R.id.img_label)?.setOnClickListener {
+        view.findViewById<ImageView>(R.id.autocomplete_label_icon)?.setOnClickListener {
             toastText(activity, R.string.start_typing_to_filter_labels)
         }
 
@@ -80,7 +79,7 @@ class LabelEditViewExtender(private val activity: SecureActivity,
 
     }
 
-    fun getLabelNames(): List<String> {
+    fun getCommitedLabelNames(): List<String> {
         return mapToLabelName(editCredentialLabelsChipGroup)
     }
 

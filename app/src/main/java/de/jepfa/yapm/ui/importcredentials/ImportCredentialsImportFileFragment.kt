@@ -9,12 +9,10 @@ import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.service.label.LabelService
-import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.label.LabelEditViewExtender
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
-import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.usecase.credential.ImportCredentialsUseCase
 import de.jepfa.yapm.util.toastText
 
@@ -95,7 +93,7 @@ class ImportCredentialsImportFileFragment : BaseFragment() {
                                     importCredentialsActivity.createCredentialFromRecord(
                                         key,
                                         it,
-                                        labelEditViewExtender.getLabelNames()
+                                        labelEditViewExtender.getCommitedLabelNames()
                                     )
                                 }
                                 .toList(), importCredentialsActivity)
@@ -114,7 +112,7 @@ class ImportCredentialsImportFileFragment : BaseFragment() {
         super.onSaveInstanceState(outState)
         outState.putIntArray("records_list", adapter.checkedChildren.map { it.id }.toIntArray())
         outState.putBoolean("records_list_view", expandableListView.isGroupExpanded(0))
-        outState.putStringArray("added_labels", labelEditViewExtender.getLabelNames().toTypedArray())
+        outState.putStringArray("added_labels", labelEditViewExtender.getCommitedLabelNames().toTypedArray())
 
     }
 
