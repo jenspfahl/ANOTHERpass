@@ -3,16 +3,17 @@ package de.jepfa.yapm.ui.importcredentials
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
+import de.jepfa.yapm.service.io.CsvService
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.FileUtil
+import de.jepfa.yapm.util.toastText
 
 class ImportCredentialsLoadFileFragment : BaseFragment() {
 
@@ -58,39 +59,31 @@ class ImportCredentialsLoadFileFragment : BaseFragment() {
                 val selectedFile = data.data
 
                 if (selectedFile != null && FileUtil.isExternalStorageReadable()) {
-                    try {
-                        val baseActivity = getBaseActivity() ?: return
-                     /*   val content = FileUtil.readFile(baseActivity, selectedFile)
-                        if (content != null) {
-                            getImportCredentialsActivity().parsedVault = ImportVaultUseCase.parseVaultFileContent(
-                                content, importCredentialsActivity, handleBlob = true)
-                        }*/
-                    } catch (e: Exception) {
-                        Log.e("RESTORE", "cannot import file $selectedFile", e)
+                    val content = FileUtil.readFile(importCredentialsActivity, selectedFile)
+                    if (content == null) {
+                        toastText(importCredentialsActivity, R.string.cannot_parse_csv_credentials)
+                        return
+                    }
+                    val csv = CsvService.parseCsv(content)
+                    if (csv == null || csv.isEmpty()) {
+                        toastText(importCredentialsActivity, R.string.cannot_parse_csv_credentials)
+                        return
+                    }
+                    else {
+                        val records = importCredentialsActivity.readContent(csv)
+                        if (records == null || records.isEmpty()) {
+                            toastText(importCredentialsActivity, R.string.cannot_parse_csv_credentials)
+                            return
+                        }
+                        importCredentialsActivity.content = content
+                        importCredentialsActivity.records = records
+                        findNavController().navigate(R.id.action_importCredentials_LoadFileFragment_to_ImportFileFragment)
                     }
                 }
             }
-
-          /*  val parsedVault = importCredentialsActivity.parsedVault
-            if (parsedVault == null) {
-                toastText(activity, R.string.toast_import_vault_failure)
-            }
-            else if(parsedVault.cipherAlgorithm != null && !cipherVersionSupported(parsedVault.cipherAlgorithm)) {
-                toastText(activity, R.string.toast_import_vault_failure_cipher_not_supported)
-            }
-            else if (parsedVault.content == null || parsedVault.vaultId == null || parsedVault.cipherAlgorithm == null) {
-                toastText(activity, R.string.toast_import_vault_failure)
-            }
-            else {
-                if (importCredentialsActivity.isOverrideMode()) {
-                    findNavController().navigate(R.id.action_importVault_LoadFileFragment_to_ImportFileOVerrideVaultFragment)
-                }
-                else {
-                    findNavController().navigate(R.id.action_importVault_LoadFileFragment_to_ImportFileFragment)
-                }
-            }*/ findNavController().navigate(R.id.action_importCredentials_LoadFileFragment_to_ImportFileFragment)
         }
     }
+
 
     private fun getImportCredentialsActivity() : ImportCredentialsActivity {
         return getBaseActivity() as ImportCredentialsActivity

@@ -73,7 +73,7 @@ class ImportCredentialsImportFileAdapter(
         val checkedChildrenCount = checkedChildren.count()
         val textView = view.findViewById<TextView>(R.id.expandable_text_view_1)
         textView.setTypeface(null, Typeface.BOLD)
-        textView.text = "TODO"//activity.getString(group.titleId, checkedChildrenCount, childrenCount)
+        textView.text = activity.getString(R.string.credentials_to_be_imported, checkedChildrenCount, childrenCount)
         return view
     }
 

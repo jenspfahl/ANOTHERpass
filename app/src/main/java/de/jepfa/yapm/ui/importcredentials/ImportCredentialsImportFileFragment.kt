@@ -26,7 +26,6 @@ class ImportCredentialsImportFileFragment : BaseFragment() {
     private lateinit var labelEditViewExtender: LabelEditViewExtender
     private lateinit var expandableListView: ExpandableListView
     private lateinit var adapter: ImportCredentialsImportFileAdapter
-    private var credentialsToBeImported: MutableSet<ImportCredentialsImportFileAdapter.FileRecord> = HashSet()
 
 
     override fun onCreateView(
@@ -54,15 +53,13 @@ class ImportCredentialsImportFileFragment : BaseFragment() {
         val credentialsCount = jsonContent.get(VaultExportService.JSON_CREDENTIALS_COUNT)?.asString ?: 0
         val labelsCount = jsonContent.get(VaultExportService.JSON_LABELS_COUNT)?.asString ?: 0
 */
-        loadedFileStatusTextView.text = "2 credentials mockup"//getString(R.string.vault_export_info2,
-         //   formatAsDate(createdAt, importCredentialsActivity), credentialsCount, labelsCount)
 
-        credentialsToBeImported.clear()
-        credentialsToBeImported.add(ImportCredentialsImportFileAdapter.FileRecord(1, "test1", "http://test1.de", "jens1", "xcvsdf1"))
-        credentialsToBeImported.add(ImportCredentialsImportFileAdapter.FileRecord(2, "test2", "http://test2.de", "jens2", "3egsdg"))
+        val credentialsToBeImported = importCredentialsActivity.records
+
+        loadedFileStatusTextView.text = getString(R.string.credentials_in_file, credentialsToBeImported?.size?:0)
 
         createExpandableView(
-            credentialsToBeImported.toList().sortedBy { it.name },
+            credentialsToBeImported?.sortedBy { it.name }?: emptyList(),
             view,
             importCredentialsActivity,
             savedInstanceState

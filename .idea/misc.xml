@@ -101,7 +101,7 @@
         <entry key="app/src/main/res/layout/fragment_create_vault_summarize.xml" value="0.4" />
         <entry key="app/src/main/res/layout/fragment_edit_credential_data.xml" value="0.264" />
         <entry key="app/src/main/res/layout/fragment_edit_credential_password.xml" value="0.2" />
-        <entry key="app/src/main/res/layout/fragment_import_credentials.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/fragment_import_credentials.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_import_vault_file.xml" value="0.2" />
         <entry key="app/src/main/res/layout/fragment_import_vault_file_override_vault.xml" value="0.176" />
         <entry key="app/src/main/res/layout/fragment_intor_1.xml" value="0.10885416666666667" />
@@ -116,11 +116,13 @@
         <entry key="app/src/main/res/layout/fragment_login_enter_masterpassword.xml" value="0.264" />
         <entry key="app/src/main/res/layout/fragment_login_enter_pin.xml" value="0.30709426627793973" />
         <entry key="app/src/main/res/layout/fragment_override_vault_file.xml" value="0.11354166666666667" />
+        <entry key="app/src/main/res/layout/label_edit_view.xml" value="0.17604166666666668" />
         <entry key="app/src/main/res/layout/nav_header_main.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/recyclerview_credential.xml" value="0.536" />
         <entry key="app/src/main/res/layout/recyclerview_label.xml" value="0.15572916666666667" />
         <entry key="app/src/main/res/layout/view_biometrix_bottom_sheet.xml" value="0.4" />
         <entry key="app/src/main/res/layout/view_bottom_sheet.xml" value="0.15572916666666667" />
+        <entry key="app/src/main/res/layout/view_label_edit.xml" value="0.33" />
         <entry key="app/src/main/res/menu/credential_detail_menu_import.xml" value="0.3015625" />
         <entry key="app/src/main/res/menu/list_labels_menu.xml" value="0.3015625" />
         <entry key="app/src/main/res/menu/menu_credential_detail.xml" value="0.18072916666666666" />
@@ -149,7 +151,7 @@
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

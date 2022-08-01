@@ -1,24 +1,28 @@
 package de.jepfa.yapm.ui.importcredentials
 
+import android.net.Uri
 import android.os.Bundle
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
+import de.jepfa.yapm.service.io.CsvService
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
-import de.jepfa.yapm.usecase.vault.ImportVaultUseCase.parseVaultFileContent
 
 class ImportCredentialsActivity : SecureActivity() {
 
-//    var parsedVault: ImportVaultUseCase.ParsedVault? = null
+    var content: String? = null
+    var records: List<ImportCredentialsImportFileAdapter.FileRecord>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        savedInstanceState?.getString("JSON")?.let {
-  //          parsedVault = parseVaultFileContent(it, this)
+        savedInstanceState?.getString("CSV")?.let { csv ->
+            content = csv
+            CsvService.parseCsv(csv)?.let {
+                records = readContent(it)
+            }
         }
 
         super.onCreate(savedInstanceState)
@@ -35,12 +39,43 @@ class ImportCredentialsActivity : SecureActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-     //   outState.putString("JSON", parsedVault.toString())
+        outState.putString("CSV", content)
     }
 
     override fun lock() {
         recreate()
     }
+
+    fun readContent(csvRecords: List<Map<String, String>>): List<ImportCredentialsImportFileAdapter.FileRecord>? {
+        return csvRecords.withIndex().map { record ->
+            val nameKey = extractKey(record, "name")
+            val urlKey = extractKey(record, "url")
+            val userKey = extractKey(record, "username")
+            val passwordKey = extractKey(record, "password") ?: return null
+
+            val id = record.index
+            val url = record.value[urlKey]
+            val name = record.value[nameKey]
+            val user = record.value[userKey]
+            val password = record.value[passwordKey] ?: return null
+            ImportCredentialsImportFileAdapter.FileRecord(id,
+                name ?: url?.let { getDomain(it)} ?: "unknown $id",
+                url, user, password)
+
+        }
+
+    }
+
+    private fun getDomain(url: String): String {
+        val uri = Uri.parse(url)
+
+        return uri.host ?: url
+
+    }
+
+    private fun extractKey(record: IndexedValue<Map<String, String>>, key: String) =
+        record.value.keys.map { it.lowercase().trim() }.filter { it == key }
+            .firstOrNull()
 
     fun createCredentialFromRecord(
         key: SecretKeyHolder,
