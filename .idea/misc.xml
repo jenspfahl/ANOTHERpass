@@ -14,7 +14,11 @@
         <entry key="../../../Android/Sdk/platforms/android-29/data/res/layout/simple_dropdown_item_1line.xml" value="0.17864583333333334" />
         <entry key="../../../Android/Sdk/platforms/android-31/data/res/layout/simple_dropdown_item_1line.xml" value="0.17604166666666668" />
         <entry key="app/src/main/res/drawable/ic_baseline_arrow_back_24.xml" value="0.20104166666666667" />
+        <entry key="app/src/main/res/drawable/ic_baseline_arrow_back_24_accent.xml" value="0.139" />
+        <entry key="app/src/main/res/drawable/ic_baseline_arrow_back_24_gray.xml" value="0.139" />
+        <entry key="app/src/main/res/drawable/ic_baseline_arrow_forward_12.xml" value="0.139" />
         <entry key="app/src/main/res/drawable/ic_baseline_arrow_forward_24.xml" value="0.20104166666666667" />
+        <entry key="app/src/main/res/drawable/ic_baseline_auto_awesome_24.xml" value="0.139" />
         <entry key="app/src/main/res/drawable/ic_baseline_close_12.xml" value="0.20104166666666667" />
         <entry key="app/src/main/res/drawable/ic_baseline_delete_24.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_edit_16.xml" value="0.19895833333333332" />
@@ -28,12 +32,15 @@
         <entry key="app/src/main/res/drawable/ic_baseline_help_outline_24_white.xml" value="0.12916666666666668" />
         <entry key="app/src/main/res/drawable/ic_baseline_import_export_24.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_label_24.xml" value="0.12916666666666668" />
+        <entry key="app/src/main/res/drawable/ic_baseline_list_24.xml" value="0.139" />
+        <entry key="app/src/main/res/drawable/ic_baseline_login_24.xml" value="0.139" />
         <entry key="app/src/main/res/drawable/ic_baseline_memory_24.xml" value="0.321875" />
         <entry key="app/src/main/res/drawable/ic_baseline_nfc_24.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_nfc_36.xml" value="0.321875" />
         <entry key="app/src/main/res/drawable/ic_baseline_nfc_48.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_nfc_64.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_north_east_24.xml" value="0.12916666666666668" />
+        <entry key="app/src/main/res/drawable/ic_baseline_not_interested_gray_24.xml" value="0.139" />
         <entry key="app/src/main/res/drawable/ic_baseline_person_24.xml" value="0.12916666666666668" />
         <entry key="app/src/main/res/drawable/ic_baseline_person_24_gray.xml" value="0.1775" />
         <entry key="app/src/main/res/drawable/ic_baseline_qr_code_24.xml" value="0.19895833333333332" />
@@ -53,6 +60,10 @@
         <entry key="app/src/main/res/drawable/ic_baseline_vpn_key_24_gray.xml" value="0.1775" />
         <entry key="app/src/main/res/drawable/ic_baseline_vpn_key_24_white.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_keywithqrcode_normal.xml" value="0.321875" />
+        <entry key="app/src/main/res/drawable/ic_lock_open_gray_24dp.xml" value="0.139" />
+        <entry key="app/src/main/res/drawable/ic_lock_open_white_24dp.xml" value="0.139" />
+        <entry key="app/src/main/res/drawable/ic_lock_outline_gray_24dp.xml" value="0.139" />
+        <entry key="app/src/main/res/drawable/ic_lock_outline_white_24dp.xml" value="0.139" />
         <entry key="app/src/main/res/drawable/ic_security_black_24dp.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_settings_black_24dp.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_twotone_cloud_off_24.xml" value="0.246875" />
@@ -120,6 +131,7 @@
         <entry key="app/src/main/res/layout/nav_header_main.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/recyclerview_credential.xml" value="0.536" />
         <entry key="app/src/main/res/layout/recyclerview_label.xml" value="0.15572916666666667" />
+        <entry key="app/src/main/res/layout/settings_activity.xml" value="0.17604166666666668" />
         <entry key="app/src/main/res/layout/view_biometrix_bottom_sheet.xml" value="0.4" />
         <entry key="app/src/main/res/layout/view_bottom_sheet.xml" value="0.15572916666666667" />
         <entry key="app/src/main/res/layout/view_label_edit.xml" value="0.33" />

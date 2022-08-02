@@ -291,7 +291,7 @@ class OverlayShowingService : Service(), OnTouchListener {
 
     private fun updateBack() {
         overlayedButton?.text = getString(R.string.drop_to_go_back)
-        overlayedButton?.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_arrow_back_24, 0, 0)
+        overlayedButton?.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_baseline_arrow_back_24_accent, 0, 0)
         overlayedButton?.typeface = null
         calcOriginalPos()
     }

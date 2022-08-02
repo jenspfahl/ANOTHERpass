@@ -62,6 +62,7 @@ import de.jepfa.yapm.util.*
 import java.util.*
 import kotlin.collections.ArrayList
 import androidx.recyclerview.widget.DividerItemDecoration
+import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.ui.changelogin.ChangeEncryptionActivity
 import de.jepfa.yapm.ui.importcredentials.ImportCredentialsActivity
 import de.jepfa.yapm.usecase.secret.*
@@ -89,11 +90,28 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private var jumpToItemPosition: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // session check would bring LoginActivity to front when action is invoked
+        checkSession = false
         super.onCreate(savedInstanceState)
+        intent?.action?.let { action ->
+            Log.i("LST", "action=$action")
+            if (action == ResponseFiller.ACTION_CLOSE_VAULT)  {
+                Session.lock()
+                pushBackAutofill(allowCreateAuthentication = true)
+                return
+            }
+            if (action == ResponseFiller.ACTION_EXCLUDE_FROM_AUTOFILL)  {
+                pushBackAutofill(ignoreCurrentField = true)
+                return
+            }
+        }
+        // now lets check session
+        checkSession = true
+        SecretChecker.getOrAskForSecret(this)
+
         setContentView(R.layout.activity_list_credentials)
         val toolbar: Toolbar = findViewById(R.id.list_credentials_toolbar)
         setSupportActionBar(toolbar)
-
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
         listCredentialAdapter = ListCredentialAdapter(this)
         recyclerView.adapter = listCredentialAdapter
@@ -181,6 +199,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         supportActionBar?.setHomeButtonEnabled(true)
 
     }
+
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)

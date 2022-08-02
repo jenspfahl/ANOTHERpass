@@ -601,4 +601,6 @@
     <string name="start_typing_to_filter_labels">Start typing or press space to see existing labels</string>
     <string name="credentials_in_file">%1$d credentials found in file</string>
     <string name="cannot_parse_csv_credentials">Cannot read credentials from CSV file</string>
+    <string name="go_back_to_app">Back to the app</string>
+    <string name="no_autofill_here">No Autofill here</string>
 </resources>

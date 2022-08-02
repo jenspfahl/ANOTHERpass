@@ -593,5 +593,7 @@
     <string name="credentials_in_file">%1$d Zugangsdaten in Datei gefunden</string>
 
     <string name="cannot_parse_csv_credentials">Zugangsdaten konnten nicht gelesen werden</string>
+    <string name="go_back_to_app">Zurück zur App</string>
+    <string name="no_autofill_here">Hier kein Autofill</string>
 
 </resources>
