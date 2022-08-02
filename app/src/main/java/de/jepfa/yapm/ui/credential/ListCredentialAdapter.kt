@@ -62,6 +62,9 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             if (listCredentialsActivity.shouldPushBackAutoFill()) {
                     if (current.isObfuscated) {
                     DeobfuscationDialog.openDeobfuscationDialogForCredentials(listCredentialsActivity) { deobfuscationKey ->
+                        if (deobfuscationKey == null) {
+                            return@openDeobfuscationDialogForCredentials
+                        }
                         listCredentialsActivity.pushBackAutofill(current, deobfuscationKey)
                     }
                 }
