@@ -595,5 +595,7 @@
     <string name="cannot_parse_csv_credentials">Zugangsdaten konnten nicht gelesen werden</string>
     <string name="go_back_to_app">Zurück zur App</string>
     <string name="no_autofill_here">Hier kein Autofill</string>
+    <string name="excluded_from_autofill">Autofill für dieses Feld ist nun temporär deaktiviert</string>
+    <string name="vault_locked">Der Tresor ist nun gesperrt</string>
 
 </resources>

@@ -7,11 +7,13 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.view.autofill.AutofillManager
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
@@ -65,6 +67,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.ui.changelogin.ChangeEncryptionActivity
 import de.jepfa.yapm.ui.importcredentials.ImportCredentialsActivity
+import de.jepfa.yapm.ui.login.LoginActivity
 import de.jepfa.yapm.usecase.secret.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -98,11 +101,20 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             if (action == ResponseFiller.ACTION_CLOSE_VAULT)  {
                 Session.lock()
                 pushBackAutofill(allowCreateAuthentication = true)
+                toastText(this, R.string.vault_locked)
                 return
             }
             if (action == ResponseFiller.ACTION_EXCLUDE_FROM_AUTOFILL)  {
                 pushBackAutofill(ignoreCurrentField = true)
+                toastText(this, R.string.excluded_from_autofill)
                 return
+            }
+            if (action == ResponseFiller.ACTION_PAUSE_AUTOFILL) {
+                val pauseDurationInSec = PreferenceService.getAsString(PreferenceService.PREF_AUTOFILL_DEACTIVATION_DURATION, this)
+                if (pauseDurationInSec != null) {
+                    pauseAutofill(pauseDurationInSec)
+                    return
+                }
             }
         }
         // now lets check session
@@ -793,6 +805,27 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         credentialViewModel.delete(credential)
         toastText(this, R.string.credential_deleted)
     }
+
+    @RequiresApi(Build.VERSION_CODES.P)
+    private fun pauseAutofill(
+        pauseDurationInSec: String
+    ) {
+        val replyIntent = Intent().apply {
+            val pauseResponse = ResponseFiller.createAutofillPauseResponse(this@ListCredentialsActivity, pauseDurationInSec.toLong())
+            putExtra(AutofillManager.EXTRA_AUTHENTICATION_RESULT, pauseResponse)
+        }
+        setResult(Activity.RESULT_OK, replyIntent)
+        Log.i("CFS", "disable clicked")
+        val entries = resources.getStringArray(R.array.autofill_deactivation_duration_entries)
+        val values = resources.getStringArray(R.array.autofill_deactivation_duration_values)
+        values.indexOf(pauseDurationInSec).let {
+            entries[it]?.let { entry ->
+                toastText(this, getString(R.string.temp_deact_autofill_on, entry))
+            }
+        }
+        finish()
+    }
+
 
 }
 

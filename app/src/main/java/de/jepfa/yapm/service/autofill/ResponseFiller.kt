@@ -36,6 +36,7 @@ object ResponseFiller {
     const val ACTION_OPEN_VAULT = "openVault"
     const val ACTION_CLOSE_VAULT = "closeVault"
     const val ACTION_EXCLUDE_FROM_AUTOFILL = "excludeFromAutofill"
+    const val ACTION_PAUSE_AUTOFILL = "pauseAutofill"
 
     private val VIEW_TO_IDENTIFY = "text"
     private val PASSWORD_INDICATORS = listOf("password", "passwd", "passphrase", "pin", "pass phrase", "keyword")
@@ -197,6 +198,12 @@ object ResponseFiller {
             context)
             .forEach { dataSets.add(it) }
 
+        createAuthDataSets(fields.getPotentialFields(),
+            R.drawable.ic_baseline_not_interested_gray_24,
+            context.getString(R.string.no_autofill_here),
+            ACTION_EXCLUDE_FROM_AUTOFILL, context)
+            .forEach { dataSets.add(it) }
+
 
 
         password.clear()
@@ -263,6 +270,14 @@ object ResponseFiller {
             context.getString(R.string.no_autofill_here), ACTION_EXCLUDE_FROM_AUTOFILL, context)
             .forEach { responseBuilder.addDataset(it) }
 
+        val pauseDurationInSec = PreferenceService.getAsString(PreferenceService.PREF_AUTOFILL_DEACTIVATION_DURATION, context)
+
+        if (pauseDurationInSec != null && pauseDurationInSec != "0" && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            createAuthDataSets(
+                fields.getPotentialFields(), R.drawable.ic_baseline_pause_gray_24,
+                context.getString(R.string.temp_deact_autofill), ACTION_PAUSE_AUTOFILL, context
+            ).forEach { responseBuilder.addDataset(it) }
+        }
 
         return responseBuilder.build()
     }
