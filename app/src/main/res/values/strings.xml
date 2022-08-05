@@ -249,7 +249,9 @@
     <string name="login_required_first">Login into your vault and select a credential</string>
     <string name="select_credential_for_autofill">Select a credential to autofill</string>
     <string name="paste_user_for_autofill">Paste user for \'%1$s\'</string>
+    <string name="no_user_for_autofill">No user for \'%1$s\' available</string>
     <string name="paste_passwd_for_autofill">Paste password for \'%1$s\'</string>
+    <string name="paste_credential_for_autofill">Paste user and password for \'%1$s\'</string>
     <string name="backup_file_saved">Vault file saved</string>
     <string name="backup_failed">Error while creating the backup file</string>
     <string name="backup_permission_missing">Permission to write to external storage is missing</string>

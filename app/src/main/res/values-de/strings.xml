@@ -239,7 +239,9 @@
     <string name="password_pasted_by_another">Passwort gelesen von einer anderen App</string>
     <string name="select_credential_for_autofill">Wähle Zugangsdaten für Autofill</string>
     <string name="paste_user_for_autofill">Füge Nutzer für \'%1$s\' ein</string>
+    <string name="no_user_for_autofill">Kein Nutzer für \'%1$s\' vorhanden</string>
     <string name="paste_passwd_for_autofill">Füge Passwort für \'%1$s\' ein</string>
+    <string name="paste_credential_for_autofill">Füge Nutzer und Passwort für \'%1$s\' ein</string>
     <string name="backup_file_saved">Tresor-Datei gespeichert</string>
     <string name="backup_failed">Fehler beim Erzeugen der Tresor-Datei</string>
     <string name="backup_permission_missing">Berechtigung zum Schreiben des Externen Speichers fehlt</string>

@@ -26,6 +26,7 @@ import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_EVERYWHERE
 import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_EXCLUSION_LIST
 import de.jepfa.yapm.service.PreferenceService.STATE_PAUSE_AUTOFILL
+import de.jepfa.yapm.util.DebugInfo
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
@@ -88,8 +89,8 @@ object ResponseFiller {
             return allFields
         }
 
-        fun hasCredentialFields() : Boolean
-                = !userFields.isNullOrEmpty() || !passwordFields.isNullOrEmpty()
+        fun hasFields() : Boolean
+                = allFields.isNotEmpty()
 
         fun getAutofillIds(): Array<AutofillId> {
             return potentialFields.map { it.autofillId }
@@ -151,12 +152,16 @@ object ResponseFiller {
 
         val suggestEverywhere = PreferenceService.getAsBool(PREF_AUTOFILL_EVERYWHERE, context)
         val fields = identifyFields(structure, suggestEverywhere) ?: return null
+        if (fields.getAllFields().isEmpty()) {
+            Log.i("CFS", "No fields to autofill found")
+            return null
+        }
 
         val key = Session.getMasterKeySK()
         val credential = AutofillCredentialHolder.currentCredential
         if (key == null || Session.isDenied() || credential == null) {
             if (allowCreateAuthentication) {
-                if (suggestEverywhere || fields.hasCredentialFields()) {
+                if (suggestEverywhere || fields.hasFields()) {
                     return createAuthenticationFillResponse(fields, context)
                 }
             }
@@ -172,38 +177,62 @@ object ResponseFiller {
         }
 
         val dataSets = ArrayList<Dataset>()
-        if (user.isNotBlank()) {
+
+        var firstUserField = fields.getUserFields().firstOrNull()
+        var firstPasswordField = fields.getPasswordFields().firstOrNull()
+
+        if (user.isNotBlank() && firstUserField != null && firstPasswordField != null) {
+            var dataset = createUserAndPasswordDataSet(
+                firstUserField,
+                firstPasswordField,
+                name,
+                user,
+                password,
+                context
+            )
+
+            dataset?.let { dataSets.add(it) }
+
+        }
+        else {
             createUserDataSets(fields.getUserFields(), name, user, context)
                 .forEach { dataSets.add(it) }
-
-            createUserDataSets(fields.getPotentialFields(), name, user, context)
+            createPasswordDataSets(fields.getPasswordFields(), name, password, context)
                 .forEach { dataSets.add(it) }
+
+            if (suggestEverywhere) {
+                createUserDataSets(fields.getPotentialFields(), name, user, context)
+                    .forEach { dataSets.add(it) }
+                createPasswordDataSets(fields.getPotentialFields(), name, password, context)
+                    .forEach { dataSets.add(it) }
+            }
         }
 
-        createPasswordDataSets(fields.getPasswordFields(), name, password, context)
-            .forEach { dataSets.add(it) }
-        createPasswordDataSets(fields.getPotentialFields(), name, password, context)
-            .forEach { dataSets.add(it) }
-        createAuthDataSets(fields.getPotentialFields(),
+        createAuthDataSets(fields.getAllFields(),
             R.drawable.ic_baseline_arrow_back_24_gray,
             context.getString(R.string.go_back_to_app),
             ACTION_OPEN_VAULT,
             context)
             .forEach { dataSets.add(it) }
 
-        createAuthDataSets(fields.getPotentialFields(),
+        createAuthDataSets(fields.getAllFields(),
             R.drawable.ic_lock_outline_gray_24dp,
             context.getString(R.string.lock_items),
             ACTION_CLOSE_VAULT,
             context)
             .forEach { dataSets.add(it) }
 
-        createAuthDataSets(fields.getPotentialFields(),
+        createAuthDataSets(fields.getAllFields(),
             R.drawable.ic_baseline_not_interested_gray_24,
             context.getString(R.string.no_autofill_here),
             ACTION_EXCLUDE_FROM_AUTOFILL, context)
             .forEach { dataSets.add(it) }
 
+        if (DebugInfo.isDebug) {
+            fields.getAllFields().mapNotNull {
+                createDebugDataSet(it, context)
+            }.forEach { dataSets.add(it) }
+        }
 
 
         password.clear()
@@ -253,20 +282,25 @@ object ResponseFiller {
         addHeaderView(responseBuilder, context)
 
         if (Session.isDenied()) {
-            createAuthDataSets(fields.getPotentialFields(),
+            createAuthDataSets(fields.getAllFields(),
                 R.drawable.ic_lock_open_gray_24dp,
                 context.getString(R.string.login_required_first), ACTION_OPEN_VAULT, context)
                 .forEach { responseBuilder.addDataset(it) }
         }
         else {
-            createAuthDataSets(fields.getPotentialFields(),
+            createAuthDataSets(fields.getAllFields(),
                 R.drawable.ic_baseline_list_gray_24,
                 context.getString(R.string.select_credential_for_autofill), ACTION_OPEN_VAULT, context)
                 .forEach { responseBuilder.addDataset(it) }
         }
 
+        if (DebugInfo.isDebug) {
+            fields.getAllFields().mapNotNull {
+                createDebugDataSet(it, context)
+            }.forEach { responseBuilder.addDataset(it) }
+        }
 
-        createAuthDataSets(fields.getPotentialFields(), R.drawable.ic_baseline_not_interested_gray_24,
+        createAuthDataSets(fields.getAllFields(), R.drawable.ic_baseline_not_interested_gray_24,
             context.getString(R.string.no_autofill_here), ACTION_EXCLUDE_FROM_AUTOFILL, context)
             .forEach { responseBuilder.addDataset(it) }
 
@@ -274,13 +308,27 @@ object ResponseFiller {
 
         if (pauseDurationInSec != null && pauseDurationInSec != "0" && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             createAuthDataSets(
-                fields.getPotentialFields(), R.drawable.ic_baseline_pause_gray_24,
+                fields.getAllFields(), R.drawable.ic_baseline_pause_gray_24,
                 context.getString(R.string.temp_deact_autofill), ACTION_PAUSE_AUTOFILL, context
             ).forEach { responseBuilder.addDataset(it) }
         }
 
         return responseBuilder.build()
     }
+
+    private fun createDebugDataSet(
+        it: ViewNode,
+        context: Context
+    ) = createDataSet(
+        it,
+        R.drawable.ic_baseline_bug_report_gray_24,
+        "aId: ${it.autofillId}, webDomain: ${it.webDomain}, " +
+                "aHints: ${Arrays.toString(it.autofillHints)}, hint: ${it.hint}, " +
+                "text: ${it.text}, idEntry: ${it.idEntry}, htmlInfoTag: ${it.htmlInfo?.tag}, " +
+                "htmlInfoAttr: ${it.htmlInfo?.attributes}, type: ${it.autofillType}, important: ${it.importantForAutofill}, " +
+                "class: ${it.className}",
+        "debug", context
+    )
 
     private fun createAppIntentSender(context: Context, action: String): IntentSender {
         val authIntent = Intent(context, ListCredentialsActivity::class.java)
@@ -325,16 +373,6 @@ object ResponseFiller {
 
 
     private fun identifyFields(node: ViewNode, fields: Fields, suggestEverywhere: Boolean) {
-        node.idEntry?.let { identifyField(it, node, fields) }
-        node.text?.let { identifyField(it.toString(), node, fields) }
-        node.hint?.let { identifyField(it, node, fields) }
-        node.htmlInfo?.let { identifyField(it.tag, node, fields) }
-        node.autofillHints?.map { identifyField(it, node, fields) }
-
-        if (!suggestEverywhere && node.autofillType != View.AUTOFILL_TYPE_TEXT) {
-            Log.i("CFS", "No text autofill type")
-            return
-        }
 
         if (!suggestEverywhere && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             if (node.importantForAutofill == View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS) {
@@ -344,23 +382,14 @@ object ResponseFiller {
             }
         }
 
-        if (suggestEverywhere && node.className != null) {
-            val viewId = node.idEntry?.toLowerCase(Locale.ROOT)
-            val className = node.className
-            if (viewId != null && className != null && className.contains(VIEW_TO_IDENTIFY)) {
-                if (!suggestEverywhere && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    if (node.importantForAutofill != View.IMPORTANT_FOR_AUTOFILL_NO) {
-                        // only consider current node if AUTO and YES*
-                        fields.addPotentialField(node)
-                    }
-                    else {
-                        Log.i("CFS", "No autofill for current node but its children")
-                    }
-                }
-                else {
-                    fields.addPotentialField(node)
-                }
+        if (suggestEverywhere || ((node.autofillType == View.AUTOFILL_TYPE_NONE || node.autofillType == View.AUTOFILL_TYPE_TEXT)
+            && node.importantForAutofill != View.IMPORTANT_FOR_AUTOFILL_NO)) {
+
+            inspectNodeAttributes(node, fields)
+            if (suggestEverywhere) {
+                fields.addPotentialField(node)
             }
+
         }
 
         if (!suggestEverywhere && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -380,31 +409,47 @@ object ResponseFiller {
         }
     }
 
+    private fun inspectNodeAttributes(
+        node: ViewNode,
+        fields: Fields
+    ) {
+        node.text?.let { identifyField(it.toString(), node, fields) }
+        node.hint?.let { identifyField(it, node, fields) }
+        node.htmlInfo?.let { identifyField(it.tag, node, fields) }
+        node.autofillHints?.map { identifyField(it, node, fields) }
+        node.htmlInfo?.attributes?.mapNotNull {
+            if (it.second != null) {
+                identifyField(it.second, node, fields) // this is the value
+            }
+        }
+    }
+
     private fun identifyField(
         attribute: String,
         node: ViewNode,
         fields: Fields
     ) {
 
-        val attrib = attribute.toLowerCase(Locale.ROOT)
+        val attrib = attribute.lowercase()
         if (contains(attrib, USER_INDICATORS)) {
             fields.addUserField(node)
         } else if (contains(attrib, PASSWORD_INDICATORS)) {
             fields.addPasswordField(node)
         }
-        else {
-            fields.addPotentialField(node)
-        }
     }
 
     private fun contains(s: String, contents: Collection<String>) : Boolean {
-        return contents.filter { s.contains(it) }.any()
+        return contents.any { s.contains(it) }
     }
 
     private fun createUserDataSets(fields : Set<ViewNode>, name: String, user: String, context: Context): List<Dataset> {
+        var message = context.getString(R.string.paste_user_for_autofill, name)
+        if (user.isBlank()) {
+            message = context.getString(R.string.no_user_for_autofill, name)
+        }
         return createDataSets(fields,
             R.drawable.ic_baseline_person_24_gray,
-            context.getString(R.string.paste_user_for_autofill, name),
+            message,
             user,
             context)
     }
@@ -444,6 +489,31 @@ object ResponseFiller {
             ).build()
     }
 
+    private fun createUserAndPasswordDataSet(
+        userField: ViewNode,
+        passwordField: ViewNode,
+        credentialName: String,
+        user: CharSequence,
+        password: CharSequence,
+        context: Context
+    ): Dataset? {
+
+        val userAutofillId = userField.autofillId ?: return null
+        val passwordAutofillId = passwordField.autofillId ?: return null
+        val remoteView = createUserPasswordRemoteView(
+            context.getString(R.string.paste_credential_for_autofill, credentialName),
+            context)
+
+        return Dataset.Builder(remoteView)
+            .setValue(
+                userAutofillId,
+                AutofillValue.forText(user)
+            ).setValue(
+                passwordAutofillId,
+                AutofillValue.forText(password)
+            ).build()
+    }
+
     private fun createAuthDataSet(
         field: ViewNode,
         iconId : Int,
@@ -469,6 +539,16 @@ object ResponseFiller {
         )
 
         remoteView.setImageViewResource(R.id.autofill_image, iconId)
+        remoteView.setTextViewText(R.id.autofill_item, text)
+        return remoteView
+    }
+
+    private fun createUserPasswordRemoteView(text: String, context: Context): RemoteViews {
+        val remoteView = RemoteViews(
+            context.packageName,
+            R.layout.content_autofill_user_password_view
+        )
+
         remoteView.setTextViewText(R.id.autofill_item, text)
         return remoteView
     }

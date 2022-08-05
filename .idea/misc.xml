@@ -19,6 +19,7 @@
         <entry key="app/src/main/res/drawable/ic_baseline_arrow_forward_12.xml" value="0.139" />
         <entry key="app/src/main/res/drawable/ic_baseline_arrow_forward_24.xml" value="0.20104166666666667" />
         <entry key="app/src/main/res/drawable/ic_baseline_auto_awesome_24.xml" value="0.139" />
+        <entry key="app/src/main/res/drawable/ic_baseline_bug_report_gray_24.xml" value="0.139" />
         <entry key="app/src/main/res/drawable/ic_baseline_close_12.xml" value="0.20104166666666667" />
         <entry key="app/src/main/res/drawable/ic_baseline_delete_24.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_edit_16.xml" value="0.19895833333333332" />
@@ -33,6 +34,7 @@
         <entry key="app/src/main/res/drawable/ic_baseline_import_export_24.xml" value="0.19895833333333332" />
         <entry key="app/src/main/res/drawable/ic_baseline_label_24.xml" value="0.12916666666666668" />
         <entry key="app/src/main/res/drawable/ic_baseline_list_24.xml" value="0.139" />
+        <entry key="app/src/main/res/drawable/ic_baseline_list_gray_24.xml" value="0.139" />
         <entry key="app/src/main/res/drawable/ic_baseline_login_24.xml" value="0.139" />
         <entry key="app/src/main/res/drawable/ic_baseline_memory_24.xml" value="0.321875" />
         <entry key="app/src/main/res/drawable/ic_baseline_nfc_24.xml" value="0.19895833333333332" />
@@ -97,6 +99,7 @@
         <entry key="app/src/main/res/layout/activity_qr_code.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/activity_show_credential.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_verify.xml" value="0.264" />
+        <entry key="app/src/main/res/layout/content_autofill_user_password_view.xml" value="0.17604166666666668" />
         <entry key="app/src/main/res/layout/content_autofill_view.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/content_create_vault.xml" value="0.1296875" />
         <entry key="app/src/main/res/layout/content_dynamic_labels_list.xml" value="0.17864583333333334" />
