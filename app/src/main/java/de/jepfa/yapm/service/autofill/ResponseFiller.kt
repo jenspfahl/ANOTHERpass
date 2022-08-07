@@ -27,6 +27,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_EVERYWHERE
 import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_EXCLUSION_LIST
 import de.jepfa.yapm.service.PreferenceService.STATE_PAUSE_AUTOFILL
 import de.jepfa.yapm.util.DebugInfo
+import de.jepfa.yapm.util.getAppNameFromPackage
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
@@ -103,14 +104,14 @@ object ResponseFiller {
     fun createFillResponse(
         structure: AssistStructure,
         allowCreateAuthentication : Boolean,
-        ignoreCurrentField: Boolean = false,
+        ignoreCurrentApp: Boolean = false,
         context: Context
     ) : FillResponse? {
         if (structure.isHomeActivity) {
             Log.i("CFS", "home activity")
             return null
         }
-        Log.i("CFS", isDeactivatedSinceWhen.toString())
+        Log.i("CFS", "isDecativatedSince $isDeactivatedSinceWhen")
 
         val pauseDurationInSec = PreferenceService.getAsString(PreferenceService.PREF_AUTOFILL_DEACTIVATION_DURATION, context)
 
@@ -157,12 +158,25 @@ object ResponseFiller {
             return null
         }
 
+        if (ignoreCurrentApp) {
+            val currentApp = structure.activityComponent.packageName
+            Log.i("CFS", "Ignore $currentApp")
+            val excludedApps = PreferenceService.getAsStringSet(
+                PREF_AUTOFILL_EXCLUSION_LIST, context) ?: emptySet()
+            val newExcludedApps = HashSet(excludedApps)
+            newExcludedApps.add(currentApp)
+            PreferenceService.putStringSet(
+                PREF_AUTOFILL_EXCLUSION_LIST, newExcludedApps, context)
+
+            return null
+        }
+
         val key = Session.getMasterKeySK()
         val credential = AutofillCredentialHolder.currentCredential
         if (key == null || Session.isDenied() || credential == null) {
             if (allowCreateAuthentication) {
                 if (suggestEverywhere || fields.hasFields()) {
-                    return createAuthenticationFillResponse(fields, context)
+                    return createAuthenticationFillResponse(fields, structure, context)
                 }
             }
             Log.i("CFS", "Not logged in or no credential selected")
@@ -222,12 +236,6 @@ object ResponseFiller {
             context)
             .forEach { dataSets.add(it) }
 
-        createAuthDataSets(fields.getAllFields(),
-            R.drawable.ic_baseline_not_interested_gray_24,
-            context.getString(R.string.no_autofill_here),
-            ACTION_EXCLUDE_FROM_AUTOFILL, context)
-            .forEach { dataSets.add(it) }
-
         if (DebugInfo.isDebug) {
             fields.getAllFields().mapNotNull {
                 createDebugDataSet(it, context)
@@ -243,11 +251,6 @@ object ResponseFiller {
         addHeaderView(responseBuilder, context)
 
         dataSets.forEach { responseBuilder.addDataset(it) }
-
-        if (ignoreCurrentField) {
-            val ignoreIds = fields.getAllFields().filter { it.isFocused }.mapNotNull { it.autofillId }.toTypedArray()
-            responseBuilder.setIgnoredIds(*ignoreIds)
-        }
 
         return responseBuilder.build()
 
@@ -276,7 +279,11 @@ object ResponseFiller {
                 .build()
     }
 
-    private fun createAuthenticationFillResponse(fields: Fields, context: Context): FillResponse {
+    private fun createAuthenticationFillResponse(
+        fields: Fields,
+        structure: AssistStructure,
+        context: Context
+    ): FillResponse {
         val responseBuilder = FillResponse.Builder()
 
         addHeaderView(responseBuilder, context)
@@ -301,7 +308,10 @@ object ResponseFiller {
         }
 
         createAuthDataSets(fields.getAllFields(), R.drawable.ic_baseline_not_interested_gray_24,
-            context.getString(R.string.no_autofill_here), ACTION_EXCLUDE_FROM_AUTOFILL, context)
+            context.getString(R.string.no_autofill_here,
+                getAppNameFromPackage(structure.activityComponent.packageName, context)),
+            ACTION_EXCLUDE_FROM_AUTOFILL,
+            context)
             .forEach { responseBuilder.addDataset(it) }
 
         val pauseDurationInSec = PreferenceService.getAsString(PreferenceService.PREF_AUTOFILL_DEACTIVATION_DURATION, context)
@@ -362,13 +372,18 @@ object ResponseFiller {
 
         val fields = Fields()
 
-        val windowNode = structure.getWindowNodeAt(0) ?: return null
-        val viewNode = windowNode.rootViewNode ?: return null
-
-        identifyFields(viewNode, fields, suggestEverywhere)
+        if (structure.windowNodeCount == 0) {
+            return null
+        }
+        for (i in 0..structure.windowNodeCount) {
+            val windowNode = structure.getWindowNodeAt(0)
+            val viewNode = windowNode?.rootViewNode
+            if (viewNode != null) {
+                identifyFields(viewNode, fields, suggestEverywhere)
+            }
+        }
 
         return fields
-
     }
 
 
@@ -382,7 +397,7 @@ object ResponseFiller {
             }
         }
 
-        if (suggestEverywhere || ((node.autofillType == View.AUTOFILL_TYPE_NONE || node.autofillType == View.AUTOFILL_TYPE_TEXT)
+        if (suggestEverywhere || (node.autofillType == View.AUTOFILL_TYPE_TEXT
             && node.importantForAutofill != View.IMPORTANT_FOR_AUTOFILL_NO)) {
 
             inspectNodeAttributes(node, fields)

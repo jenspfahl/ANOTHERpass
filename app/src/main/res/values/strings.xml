@@ -604,7 +604,7 @@
     <string name="credentials_in_file">%1$d credentials found in file</string>
     <string name="cannot_parse_csv_credentials">Cannot read credentials from CSV file</string>
     <string name="go_back_to_app">Back to the app</string>
-    <string name="no_autofill_here">No Autofill here</string>
-    <string name="excluded_from_autofill">This field is excluded from Autofill for now</string>
+    <string name="no_autofill_here">No Autofill for \'%1%s\'</string>
+    <string name="excluded_from_autofill">This app is now excluded from Autofill</string>
     <string name="vault_locked">Vault is now locked</string>
 </resources>

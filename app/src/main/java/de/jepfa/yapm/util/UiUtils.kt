@@ -2,6 +2,8 @@ package de.jepfa.yapm.util
 
 import android.app.Dialog
 import android.content.Context
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
@@ -15,6 +17,7 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.ui.label.Label
 import java.util.*
+
 
 fun toastText(context: Context?, text: String) {
     if (context != null) {
@@ -137,5 +140,15 @@ private fun ensureHttp(s: String): String {
     else {
         return "http://" + s
     }
+}
+
+fun getAppNameFromPackage(packageName: String, context: Context): CharSequence {
+    val pm: PackageManager = context.packageManager
+    val ai: ApplicationInfo? = try {
+        pm.getApplicationInfo(packageName, 0)
+    } catch (e: PackageManager.NameNotFoundException) {
+        null
+    }
+    return if (ai != null) pm.getApplicationLabel(ai) else packageName
 }
 

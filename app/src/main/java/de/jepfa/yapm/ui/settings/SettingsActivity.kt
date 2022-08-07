@@ -267,6 +267,9 @@ class SettingsActivity : SecureActivity(),
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.autofill_preferences, rootKey)
 
+            val excludedApps = PreferenceService.getAsStringSet(
+                PreferenceService.PREF_AUTOFILL_EXCLUSION_LIST, context)?: emptySet()
+
             val exclusionAppPref = findPreference<MultiSelectListPreference>(
                 PreferenceService.PREF_AUTOFILL_EXCLUSION_LIST)
             exclusionAppPref?.let { pref ->
@@ -278,7 +281,7 @@ class SettingsActivity : SecureActivity(),
                         .filterNotNull()
                         .filterNot { it.packageName == requireContext().packageName}
                         .filter { it.enabled }
-                        .filter { isUserApp(it) }
+                        .filter { isUserOrExcludedApp(it, excludedApps) }
                         .sortedBy { it.loadLabel(pm).toString().uppercase(Locale.ROOT) }
 
                     pref.entries = filteredPackages.map { it.loadLabel(pm) }.toTypedArray()
@@ -288,7 +291,10 @@ class SettingsActivity : SecureActivity(),
             }
         }
 
-        fun isUserApp(ai: ApplicationInfo): Boolean {
+        fun isUserOrExcludedApp(ai: ApplicationInfo, excludedApps: Set<String>): Boolean {
+            if (excludedApps.contains(ai.packageName)) {
+                return true // always show excluded apps, so filter them
+            }
             val mask = ApplicationInfo.FLAG_SYSTEM or ApplicationInfo.FLAG_UPDATED_SYSTEM_APP
             return ai.flags and mask == 0
         }

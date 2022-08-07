@@ -67,7 +67,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.ui.changelogin.ChangeEncryptionActivity
 import de.jepfa.yapm.ui.importcredentials.ImportCredentialsActivity
-import de.jepfa.yapm.ui.login.LoginActivity
 import de.jepfa.yapm.usecase.secret.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -105,7 +104,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 return
             }
             if (action == ResponseFiller.ACTION_EXCLUDE_FROM_AUTOFILL)  {
-                pushBackAutofill(ignoreCurrentField = true)
+                pushBackAutofill(ignoreCurrentApp = true)
                 toastText(this, R.string.excluded_from_autofill)
                 return
             }

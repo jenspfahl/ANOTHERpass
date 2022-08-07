@@ -9,11 +9,9 @@ import android.view.autofill.AutofillManager
 import android.view.autofill.AutofillManager.EXTRA_AUTHENTICATION_RESULT
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Key
-import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.autofill.AutofillCredentialHolder
 import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.util.getIntExtra
 
 abstract class AutofillPushBackActivityBase : SecureActivity() {
 
@@ -37,14 +35,14 @@ abstract class AutofillPushBackActivityBase : SecureActivity() {
         pushBackAutofill()
     }
 
-    fun pushBackAutofill(ignoreCurrentField: Boolean = false, allowCreateAuthentication: Boolean = false) {
+    fun pushBackAutofill(ignoreCurrentApp: Boolean = false, allowCreateAuthentication: Boolean = false) {
         val structure = assistStructure
         if (structure != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val replyIntent = Intent().apply {
                 val fillResponse = ResponseFiller.createFillResponse(
                     structure,
                     allowCreateAuthentication,
-                    ignoreCurrentField,
+                    ignoreCurrentApp,
                     applicationContext
                 )
                 putExtra(EXTRA_AUTHENTICATION_RESULT, fillResponse)
