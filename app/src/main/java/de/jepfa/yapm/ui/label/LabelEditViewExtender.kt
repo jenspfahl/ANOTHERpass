@@ -25,7 +25,7 @@ class LabelEditViewExtender(private val activity: SecureActivity,
     private val LAST_CHARS = listOf(' ', '\t', System.lineSeparator())
 
 
-    private var allLabelAdapter = LabelListAdapter(activity, LabelService.defaultHolder.getAllLabels())
+    private var allLabelAdapter = LabelListAdapter(activity, ArrayList(LabelService.defaultHolder.getAllLabels()))
 
     private var editCredentialLabelsTextView: AutoCompleteTextView = view.findViewById(R.id.autocomplete_labels_textview)
     private var editCredentialLabelsChipGroup: ChipGroup = view.findViewById(R.id.autocomplete_labels_chipgroup)

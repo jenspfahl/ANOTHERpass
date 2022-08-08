@@ -22,10 +22,7 @@ import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
-import de.jepfa.yapm.util.DebugInfo
-import de.jepfa.yapm.util.createAndAddLabelChip
-import de.jepfa.yapm.util.getIntExtra
-import de.jepfa.yapm.util.observeOnce
+import de.jepfa.yapm.util.*
 import java.util.*
 
 
@@ -98,7 +95,7 @@ class EditLabelActivity : SecureActivity() {
                 val labelName = labelNameTextView.text.toString()
                 val labelDesc = labelDescTextView.text.toString()
                 val label = Label(labelName, labelDesc)
-                val chip = createAndAddLabelChip(label, labelsContainer, thinner = false, this)
+                val chip = createLabelChip(label, thinner = false, this)
                 chip.chipBackgroundColor = ColorStateList.valueOf(color)
 
                 chip.setOnClickListener {
@@ -106,6 +103,29 @@ class EditLabelActivity : SecureActivity() {
                     labelColorChip.chipBackgroundColor = ColorStateList.valueOf(color)
                     colorDialog.dismiss()
                 }
+
+                val usageCount = LabelService.defaultHolder.getAllLabels().filter { it.colorRGB == color }.size
+                var usageString = if (usageCount == 1) {
+                    getString(R.string.label_used_once, usageCount)
+                }
+                else if (usageCount > 1) {
+                    getString(R.string.label_used_many, usageCount)
+                } else {
+                    null
+                }
+
+
+                val row = LinearLayout(this)
+                row.orientation = LinearLayout.VERTICAL
+                row.addView(chip)
+
+                if (usageString != null) {
+                    val usageText = TextView(this)
+                    usageText.text = usageString
+                    row.addView(usageText)
+                }
+
+                labelsContainer.addView(row)
             }
 
             val builder = AlertDialog.Builder(this)

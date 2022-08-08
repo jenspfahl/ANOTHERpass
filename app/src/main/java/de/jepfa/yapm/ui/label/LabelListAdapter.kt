@@ -15,7 +15,7 @@ import de.jepfa.yapm.R
 import java.util.*
 
 class LabelListAdapter(context: Context,
-                       labels: List<Label>
+                       labels: MutableList<Label>
 ) : ArrayAdapter<Label>(
     context, R.layout.content_dynamic_labels_list, labels
 ) {
