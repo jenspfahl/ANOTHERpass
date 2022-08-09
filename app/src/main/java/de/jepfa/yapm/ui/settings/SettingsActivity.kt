@@ -11,6 +11,7 @@ import com.yariksoffice.lingver.Lingver
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.service.biometrix.BiometricUtils
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.ui.SecureActivity
@@ -266,6 +267,10 @@ class SettingsActivity : SecureActivity(),
     class AutofillSettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.autofill_preferences, rootKey)
+
+            findPreference<SwitchPreferenceCompat>(PreferenceService.PREF_AUTOFILL_INLINE_PRESENTATIONS)?.let { pref ->
+                activity?.let { pref.isEnabled = ResponseFiller.isInlinePresentationSupported() }
+            }
 
             val excludedApps = PreferenceService.getAsStringSet(
                 PreferenceService.PREF_AUTOFILL_EXCLUSION_LIST, context)?: emptySet()

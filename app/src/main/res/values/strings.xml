@@ -606,6 +606,8 @@
     <string name="cannot_parse_csv_credentials">Cannot read credentials from CSV file</string>
     <string name="go_back_to_app">Back to the app</string>
     <string name="no_autofill_here">No Autofill for \'%1%s\'</string>
-    <string name="excluded_from_autofill">This app is now excluded from Autofill</string>
+    <string name="excluded_from_autofill">This app is now excluded from Autofill.</string>
     <string name="vault_locked">Vault is now locked</string>
+    <string name="autofill_inline_presentations_title">Show Autofill options inlined of the keyboard</string>
+    <string name="autofill_inline_presentations_summary">Since Android 11 Autofill options can be shown integrated in the virtual keyboard, if the keyboard supports it. If not, the common popup dialog will be shown.</string>
 </resources>

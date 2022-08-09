@@ -26,6 +26,7 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_EVERYWHERE
 import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_EXCLUSION_LIST
+import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_INLINE_PRESENTATIONS
 import de.jepfa.yapm.service.PreferenceService.STATE_PAUSE_AUTOFILL
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
@@ -193,7 +194,7 @@ object ResponseFiller {
         val credential = AutofillCredentialHolder.currentCredential
         if (key == null || Session.isDenied() || credential == null) {
             if (allowCreateAuthentication && fields.hasFields()) {
-                return createAuthenticationFillResponse(fields, structure, context)
+                return createAuthenticationFillResponse(fields, structure, suggestEverywhere, context)
             }
 
             Log.i("CFS", "Not logged in or no credential selected")
@@ -212,7 +213,7 @@ object ResponseFiller {
         var firstUserField = fields.getUserFields().firstOrNull()
         var firstPasswordField = fields.getPasswordFields().firstOrNull()
 
-        if (user.isNotBlank() && firstUserField != null && firstPasswordField != null) {
+        if (firstUserField != null && firstPasswordField != null) {
             var dataset = createUserAndPasswordDataSet(
                 firstUserField,
                 firstPasswordField,
@@ -302,6 +303,7 @@ object ResponseFiller {
     private fun createAuthenticationFillResponse(
         fields: Fields,
         structure: AssistStructure,
+        suggestEverywhere: Boolean,
         context: Context
     ): FillResponse {
         val responseBuilder = FillResponse.Builder()
@@ -331,7 +333,7 @@ object ResponseFiller {
             context.getString(R.string.no_autofill_here,
                 getAppNameFromPackage(structure.activityComponent.packageName, context)),
             ACTION_EXCLUDE_FROM_AUTOFILL,
-            false,
+            suggestEverywhere,
             context)
             .forEach { responseBuilder.addDataset(it) }
 
@@ -550,7 +552,9 @@ object ResponseFiller {
         context: Context,
         builder: Dataset.Builder
     ) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        val showInlinePresentation = PreferenceService.getAsBool(PREF_AUTOFILL_INLINE_PRESENTATIONS, context)
+
+        if (showInlinePresentation && isInlinePresentationSupported()) {
             val inlinePresentation = createInlinePresentation(autofillId, iconId, text, content, action, context)
             if (inlinePresentation != null) {
                 builder
@@ -559,6 +563,8 @@ object ResponseFiller {
             }
         }
     }
+
+    fun isInlinePresentationSupported() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
 
     private fun createInlinePresentation(
         autofillId: AutofillId,

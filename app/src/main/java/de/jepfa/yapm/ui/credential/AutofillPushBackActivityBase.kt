@@ -24,7 +24,7 @@ abstract class AutofillPushBackActivityBase : SecureActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             assistStructure = intent.getParcelableExtra(AutofillManager.EXTRA_ASSIST_STRUCTURE)
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if (ResponseFiller.isInlinePresentationSupported()) {
             inlineSuggestionsRequest = intent.getParcelableExtra(AutofillManager.EXTRA_INLINE_SUGGESTIONS_REQUEST)
         }
         super.onCreate(savedInstanceState)

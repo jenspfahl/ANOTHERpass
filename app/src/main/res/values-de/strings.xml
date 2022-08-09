@@ -598,7 +598,10 @@
     <string name="cannot_parse_csv_credentials">Zugangsdaten konnten nicht gelesen werden</string>
     <string name="go_back_to_app">Zurück zur App</string>
     <string name="no_autofill_here">Kein Autofill für \'%1$s\'</string>
-    <string name="excluded_from_autofill">Autofill für diese App ist nun dauerhaft deaktiviert</string>
+    <string name="excluded_from_autofill">Autofill für diese App ist nun dauerhaft deaktiviert.</string>
     <string name="vault_locked">Der Tresor ist nun gesperrt</string>
+
+    <string name="autofill_inline_presentations_title">Integriere Autofill-Optionen in die Tastatur</string>
+    <string name="autofill_inline_presentations_summary">Ab Android 11 können Autofill-Optionen in die virtuellen Tastatur integriert werden. Die virtuelle Tastatur muss dies aber unterstützen. Wenn nicht, wird stattdessen der normale Popup-Dialog angezeigt.</string>
 
 </resources>

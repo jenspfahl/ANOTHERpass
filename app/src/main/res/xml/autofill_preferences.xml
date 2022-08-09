@@ -9,6 +9,14 @@
         app:defaultValue="false"
         app:title="@string/autofill_suggest_everywhere" />
 
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:autofill_inline_presentations"
+        app:summary="@string/autofill_inline_presentations_summary"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:defaultValue="true"
+        app:title="@string/autofill_inline_presentations_title" />
+
     <MultiSelectListPreference
         app:key="YAPM/pref:autofill_exclusion_list"
         app:iconSpaceReserved="false"
