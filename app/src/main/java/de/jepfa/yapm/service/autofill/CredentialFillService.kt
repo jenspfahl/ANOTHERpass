@@ -4,7 +4,6 @@ import android.os.Build
 import android.os.CancellationSignal
 import android.service.autofill.*
 import androidx.annotation.RequiresApi
-import de.jepfa.yapm.service.autofill.ResponseFiller.createFillResponse
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -22,10 +21,12 @@ class CredentialFillService: AutofillService() {
             return
         }
 
+        ResponseFiller.updateInlinePresentationRequest(fillRequest.inlineSuggestionsRequest)
+
         val contexts = fillRequest.fillContexts
         val structure = contexts.get(contexts.size - 1).structure
-
-        val fillResponse = createFillResponse(structure,
+        val fillResponse = ResponseFiller.createFillResponse(
+            structure,
             allowCreateAuthentication = true, context = applicationContext)
 
         fillCallback.onSuccess(fillResponse)

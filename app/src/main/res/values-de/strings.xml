@@ -237,11 +237,13 @@
     <string name="label_used_many">%1$d mal verwendet</string>
     <string name="save_as">Speichern als</string>
     <string name="password_pasted_by_another">Passwort gelesen von einer anderen App</string>
-    <string name="select_credential_for_autofill">Wähle Zugangsdaten für Autofill</string>
-    <string name="paste_user_for_autofill">Füge Nutzer für \'%1$s\' ein</string>
+
+    <string name="login_required_first">Tresor entsperren</string>
+    <string name="select_credential_for_autofill">Zugangsdaten auswählen</string>
+    <string name="paste_user_for_autofill">Nutzer für \'%1$s\'</string>
     <string name="no_user_for_autofill">Kein Nutzer für \'%1$s\' vorhanden</string>
-    <string name="paste_passwd_for_autofill">Füge Passwort für \'%1$s\' ein</string>
-    <string name="paste_credential_for_autofill">Füge Nutzer und Passwort für \'%1$s\' ein</string>
+    <string name="paste_passwd_for_autofill">Passwort für \'%1$s\'</string>
+    <string name="paste_credential_for_autofill">Zugangsdaten für \'%1$s\'</string>
     <string name="backup_file_saved">Tresor-Datei gespeichert</string>
     <string name="backup_failed">Fehler beim Erzeugen der Tresor-Datei</string>
     <string name="backup_permission_missing">Berechtigung zum Schreiben des Externen Speichers fehlt</string>
@@ -493,7 +495,6 @@
     <string name="credential_data_params">Bearbeite Zugangsdaten hier. Der Name ist ein Pflichtfeld. Mit Kategorien kannst du verschiedene Zugangsdaten gruppieren.</string>
     <string name="message_write_nfc_tag">Der NFC-Tag ist schon beschrieben worden. Überschreiben?</string>
     <string name="drop_to_remove">FENSTER SCHLIESSEN</string>
-    <string name="login_required_first">Tresor entsperren und Zugangsdaten auswählen</string>
     <string name="duplicate">Duplizieren</string>
     <string name="message_change_language">Die gewählte Sprache wird erst nach einem App-Neustart richtig angezeigt.</string>
     <string name="title_change_language">Sprache ändern</string>

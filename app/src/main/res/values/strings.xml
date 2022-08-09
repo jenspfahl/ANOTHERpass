@@ -246,12 +246,13 @@
     <string name="label_used_many">Used %1$d times</string>
     <string name="save_as">Save as</string>
     <string name="password_pasted_by_another">Password pasted by another app</string>
-    <string name="login_required_first">Login into your vault and select a credential</string>
-    <string name="select_credential_for_autofill">Select a credential to autofill</string>
-    <string name="paste_user_for_autofill">Paste user for \'%1$s\'</string>
+
+    <string name="login_required_first">Unlock your vault</string>
+    <string name="select_credential_for_autofill">Select a credential</string>
+    <string name="paste_user_for_autofill">User for \'%1$s\'</string>
     <string name="no_user_for_autofill">No user for \'%1$s\' available</string>
-    <string name="paste_passwd_for_autofill">Paste password for \'%1$s\'</string>
-    <string name="paste_credential_for_autofill">Paste user and password for \'%1$s\'</string>
+    <string name="paste_passwd_for_autofill">Password for \'%1$s\'</string>
+    <string name="paste_credential_for_autofill">Credential for \'%1$s\'</string>
     <string name="backup_file_saved">Vault file saved</string>
     <string name="backup_failed">Error while creating the backup file</string>
     <string name="backup_permission_missing">Permission to write to external storage is missing</string>

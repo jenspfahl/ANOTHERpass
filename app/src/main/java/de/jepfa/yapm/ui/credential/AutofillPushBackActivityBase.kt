@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.autofill.AutofillManager
 import android.view.autofill.AutofillManager.EXTRA_AUTHENTICATION_RESULT
+import android.view.inputmethod.InlineSuggestionsRequest
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.service.autofill.AutofillCredentialHolder
@@ -16,11 +17,15 @@ import de.jepfa.yapm.ui.SecureActivity
 abstract class AutofillPushBackActivityBase : SecureActivity() {
 
     private var assistStructure: AssistStructure? = null
+    private var inlineSuggestionsRequest: InlineSuggestionsRequest? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AutofillCredentialHolder.clear()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             assistStructure = intent.getParcelableExtra(AutofillManager.EXTRA_ASSIST_STRUCTURE)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            inlineSuggestionsRequest = intent.getParcelableExtra(AutofillManager.EXTRA_INLINE_SUGGESTIONS_REQUEST)
         }
         super.onCreate(savedInstanceState)
 
@@ -39,6 +44,7 @@ abstract class AutofillPushBackActivityBase : SecureActivity() {
         val structure = assistStructure
         if (structure != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val replyIntent = Intent().apply {
+                ResponseFiller.updateInlinePresentationRequest(inlineSuggestionsRequest)
                 val fillResponse = ResponseFiller.createFillResponse(
                     structure,
                     allowCreateAuthentication,
