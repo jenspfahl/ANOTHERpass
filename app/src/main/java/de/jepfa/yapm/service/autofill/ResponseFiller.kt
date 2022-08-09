@@ -34,6 +34,7 @@ import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.getAppNameFromPackage
 import java.util.*
+import java.util.regex.Pattern
 
 @RequiresApi(Build.VERSION_CODES.O)
 object ResponseFiller {
@@ -44,8 +45,9 @@ object ResponseFiller {
     const val ACTION_PAUSE_AUTOFILL = "pauseAutofill"
 
     private const val VIEW_TO_IDENTIFY = "text"
-    private val PASSWORD_INDICATORS = listOf("password", "passwd", "passphrase", "pin", "pass phrase", "keyword")
-    private val USER_INDICATORS = listOf("user", "account", "email")
+    private val PASSWORD_INDICATORS = listOf("password", "passwd", "passphrase",
+        "pin", "passphrase", "keyword", "codeword", "passwort", "secret")
+    private val USER_INDICATORS = listOf("user", "account", "email", "login")
 
     private var inlinePresentationRequest: InlineSuggestionsRequest? = null
     private var inlinePresentationUsageCounter = HashMap<AutofillId, Int>()
@@ -474,7 +476,8 @@ object ResponseFiller {
         fields: Fields
     ) {
 
-        val attrib = attribute.lowercase()
+        val attrib = attribute.lowercase().replace(Regex("[^a-z]*"),"")
+
         if (contains(attrib, USER_INDICATORS)) {
             fields.addUserField(node)
         } else if (contains(attrib, PASSWORD_INDICATORS)) {
