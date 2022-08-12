@@ -188,25 +188,45 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                 val key = listCredentialsActivity.masterSecretKey
 
                 val filterResults = FilterResults()
-                val charString = charSequence.toString()
+                val filterAll = charSequence.startsWith("!")
+                val charString =
+                    if (filterAll) charSequence.substring(1).lowercase().trimStart()
+                    else charSequence.toString().lowercase()
 
                 if (charString.isEmpty()) {
                     filterResults.values = filterByLabels(key, originList)
                 } else {
                     val filteredList: MutableList<EncCredential> = ArrayList<EncCredential>()
                     for (credential in originList) {
-                        var name: String
                         if (key != null) {
-                            name = SecretService.decryptCommonString(key, credential.name)
+                            var name = SecretService.decryptCommonString(key, credential.name)
                             name = enrichId(listCredentialsActivity, name, credential.id)
+                            val website = SecretService.decryptCommonString(key, credential.website)
+                            val user = SecretService.decryptCommonString(key, credential.user)
+                            val addInfo = SecretService.decryptCommonString(key, credential.additionalInfo)
 
-                            if (name.toLowerCase(Locale.ROOT).contains(charString.toLowerCase(Locale.ROOT))) {
+                            if (name.lowercase().contains(charString)) {
+                                filteredList.add(credential)
+                            }
+                            else if (filterAll && website.lowercase().contains(charString)) {
+                                filteredList.add(credential)
+                            }
+                            else if (filterAll && user.lowercase().contains(charString)) {
+                                filteredList.add(credential)
+                            }
+                            else if (filterAll && addInfo.lowercase().contains(charString)) {
                                 filteredList.add(credential)
                             }
                         }
 
                     }
-                    filterResults.values = filterByLabels(key, filteredList)
+                    if (filterAll) {
+                        filterResults.values = filteredList
+
+                    }
+                    else {
+                        filterResults.values = filterByLabels(key, filteredList)
+                    }
                 }
                 return filterResults
             }

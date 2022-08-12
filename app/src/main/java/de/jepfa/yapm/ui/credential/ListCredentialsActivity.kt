@@ -9,6 +9,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
+import android.text.SpannableStringBuilder
 import android.util.Log
 import android.view.*
 import android.view.autofill.AutofillManager
@@ -97,18 +98,18 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         super.onCreate(savedInstanceState)
         intent?.action?.let { action ->
             Log.i("LST", "action=$action")
-            if (action == ResponseFiller.ACTION_CLOSE_VAULT)  {
+            if (action.startsWith(ResponseFiller.ACTION_CLOSE_VAULT)) {
                 Session.lock()
                 pushBackAutofill(allowCreateAuthentication = true)
                 toastText(this, R.string.vault_locked)
                 return
             }
-            if (action == ResponseFiller.ACTION_EXCLUDE_FROM_AUTOFILL)  {
+            if (action.startsWith(ResponseFiller.ACTION_EXCLUDE_FROM_AUTOFILL)) {
                 pushBackAutofill(ignoreCurrentApp = true)
                 toastText(this, R.string.excluded_from_autofill)
                 return
             }
-            if (action == ResponseFiller.ACTION_PAUSE_AUTOFILL) {
+            if (action.startsWith(ResponseFiller.ACTION_PAUSE_AUTOFILL)) {
                 val pauseDurationInSec = PreferenceService.getAsString(PreferenceService.PREF_AUTOFILL_DEACTIVATION_DURATION, this)
                 if (pauseDurationInSec != null) {
                     pauseAutofill(pauseDurationInSec)
@@ -294,16 +295,30 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 getSystemService(Context.SEARCH_SERVICE) as SearchManager
         searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
 
-
         refreshMenuLockItem(menu.findItem(R.id.menu_lock_items))
         refreshMenuFiltersItem(menu.findItem(R.id.menu_filter))
         refreshMenuShowIdsItem(menu.findItem(R.id.menu_show_ids))
 
-        labelViewModel.allLabels.observe(this, { labels ->
-            masterSecretKey?.let{ key ->
+        labelViewModel.allLabels.observe(this) { labels ->
+            masterSecretKey?.let { key ->
                 refreshMenuFiltersItem(menu.findItem(R.id.menu_filter))
             }
-        })
+        }
+
+        if (!Session.isDenied()) {
+            intent?.action?.let { action ->
+                Log.i("LST", "action2=$action")
+                if (action.startsWith(ResponseFiller.ACTION_OPEN_VAULT)) {
+                    val searchString = action.substringAfter(":").lowercase()
+                    if (searchString != null && searchString.isNotBlank()) {
+                        searchView.setQuery("!$searchString", true)
+                        searchItem.expandActionView()
+                        searchPlate.text = SpannableStringBuilder("!$searchString")
+                        searchPlate.selectAll()
+                    }
+                }
+            }
+        }
 
         return super.onCreateOptionsMenu(menu)
     }

@@ -142,13 +142,13 @@ private fun ensureHttp(s: String): String {
     }
 }
 
-fun getAppNameFromPackage(packageName: String, context: Context): CharSequence {
+fun getAppNameFromPackage(packageName: String, context: Context): String? {
     val pm: PackageManager = context.packageManager
     val ai: ApplicationInfo? = try {
         pm.getApplicationInfo(packageName, 0)
     } catch (e: PackageManager.NameNotFoundException) {
         null
     }
-    return if (ai != null) pm.getApplicationLabel(ai) else packageName
+    return if (ai != null) pm.getApplicationLabel(ai).toString() else null
 }
 

@@ -5,7 +5,6 @@ import android.app.assist.AssistStructure
 import android.app.assist.AssistStructure.ViewNode
 import android.content.Context
 import android.content.Intent
-import android.content.IntentSender
 import android.graphics.Color
 import android.graphics.drawable.Icon
 import android.os.Build
@@ -34,7 +33,6 @@ import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.getAppNameFromPackage
 import java.util.*
-import java.util.regex.Pattern
 
 @RequiresApi(Build.VERSION_CODES.O)
 object ResponseFiller {
@@ -230,20 +228,20 @@ object ResponseFiller {
 
         }
         else {
-            createUserDataSets(fields.getUserFields(), name, user, context)
+            createUserDataSets(structure, fields.getUserFields(), name, user, context)
                 .forEach { dataSets.add(it) }
-            createPasswordDataSets(fields.getPasswordFields(), name, password, context)
+            createPasswordDataSets(structure, fields.getPasswordFields(), name, password, context)
                 .forEach { dataSets.add(it) }
 
             if (suggestEverywhere) {
-                createUserDataSets(fields.getPotentialFields(), name, user, context)
+                createUserDataSets(structure, fields.getPotentialFields(), name, user, context)
                     .forEach { dataSets.add(it) }
-                createPasswordDataSets(fields.getPotentialFields(), name, password, context)
+                createPasswordDataSets(structure, fields.getPotentialFields(), name, password, context)
                     .forEach { dataSets.add(it) }
             }
         }
 
-        createAuthDataSets(fields.getAllFields(),
+        createAuthDataSets(structure, fields.getAllFields(),
             R.drawable.ic_baseline_arrow_back_24_gray,
             context.getString(R.string.go_back_to_app),
             ACTION_OPEN_VAULT,
@@ -251,7 +249,7 @@ object ResponseFiller {
             context)
             .forEach { dataSets.add(it) }
 
-        createAuthDataSets(fields.getAllFields(),
+        createAuthDataSets(structure, fields.getAllFields(),
             R.drawable.ic_lock_outline_gray_24dp,
             context.getString(R.string.lock_items),
             ACTION_CLOSE_VAULT,
@@ -313,13 +311,15 @@ object ResponseFiller {
         addHeaderView(responseBuilder, context)
 
         if (Session.isDenied()) {
-            createAuthDataSets(fields.getAllFields(),
+            createAuthDataSets(structure,
+                fields.getAllFields(),
                 R.drawable.ic_lock_open_gray_24dp,
                 context.getString(R.string.login_required_first), ACTION_OPEN_VAULT, true, context)
                 .forEach { responseBuilder.addDataset(it) }
         }
         else {
-            createAuthDataSets(fields.getAllFields(),
+            createAuthDataSets(structure,
+                fields.getAllFields(),
                 R.drawable.ic_baseline_list_gray_24,
                 context.getString(R.string.select_credential_for_autofill), ACTION_OPEN_VAULT, true, context)
                 .forEach { responseBuilder.addDataset(it) }
@@ -331,9 +331,13 @@ object ResponseFiller {
             }.forEach { responseBuilder.addDataset(it) }
         }
 
-        createAuthDataSets(fields.getAllFields(), R.drawable.ic_baseline_not_interested_gray_24,
-            context.getString(R.string.no_autofill_here,
-                getAppNameFromPackage(structure.activityComponent.packageName, context)),
+        val appName = getAppNameFromPackage(structure.activityComponent.packageName, context)
+        val message =
+            if (appName != null) context.getString(R.string.no_autofill_for_app, appName)
+            else context.getString(R.string.no_autofill_for_current_app)
+        createAuthDataSets(structure,
+            fields.getAllFields(), R.drawable.ic_baseline_not_interested_gray_24,
+            message,
             ACTION_EXCLUDE_FROM_AUTOFILL,
             suggestEverywhere,
             context)
@@ -343,6 +347,7 @@ object ResponseFiller {
 
         if (pauseDurationInSec != null && pauseDurationInSec != "0" && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             createAuthDataSets(
+                structure,
                 fields.getAllFields(), R.drawable.ic_baseline_pause_gray_24,
                 context.getString(R.string.temp_deact_autofill), ACTION_PAUSE_AUTOFILL, false, context
             ).forEach { responseBuilder.addDataset(it) }
@@ -367,10 +372,15 @@ object ResponseFiller {
         "debug", context, false
     )
 
-    private fun createPendingIntent(context: Context, action: String): PendingIntent {
+    private fun createPendingIntent(context: Context, action: String, actionData: String?): PendingIntent {
         val authIntent = Intent(context, ListCredentialsActivity::class.java)
         authIntent.putExtra(SecureActivity.SecretChecker.fromAutofill, true)
-        authIntent.action = action
+        if (actionData != null) {
+            authIntent.action = "$action:$actionData" // do it as extra doesn't work (extra gets lost)
+        }
+        else {
+            authIntent.action = action
+        }
 
         return PendingIntent.getActivity(
             context,
@@ -378,10 +388,6 @@ object ResponseFiller {
             authIntent,
             PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_ONE_SHOT
         )
-    }
-
-    private fun createAppIntentSender(context: Context, action: String): IntentSender {
-        return createPendingIntent(context, action).intentSender
     }
 
     private fun addHeaderView(responseBuilder: FillResponse.Builder, context: Context) {
@@ -420,7 +426,7 @@ object ResponseFiller {
 
     private fun identifyFields(node: ViewNode, fields: Fields, suggestEverywhere: Boolean) {
 
-        if (!suggestEverywhere && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        if (/*!suggestEverywhere && */Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             if (node.importantForAutofill == View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS) {
                 // don't traverse anything
                 Log.i("CFS", "No autofill for current node and children")
@@ -428,7 +434,7 @@ object ResponseFiller {
             }
         }
 
-        if (suggestEverywhere || (node.autofillType == View.AUTOFILL_TYPE_TEXT
+        if (/*suggestEverywhere || */(node.autofillType == View.AUTOFILL_TYPE_TEXT
             && node.importantForAutofill != View.IMPORTANT_FOR_AUTOFILL_NO)) {
 
             inspectNodeAttributes(node, fields)
@@ -438,7 +444,7 @@ object ResponseFiller {
 
         }
 
-        if (!suggestEverywhere && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        if (/*!suggestEverywhere &&*/ Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             if (node.importantForAutofill == View.IMPORTANT_FOR_AUTOFILL_YES_EXCLUDE_DESCENDANTS) {
                 // don't traverse children
                 Log.i("CFS", "No autofill for current nodes children only")
@@ -489,14 +495,15 @@ object ResponseFiller {
         return contents.any { s.contains(it) }
     }
 
-    private fun createUserDataSets(fields : Set<ViewNode>, name: String, user: String, context: Context): List<Dataset> {
+    private fun createUserDataSets(structure: AssistStructure, fields : Set<ViewNode>, name: String, user: String, context: Context): List<Dataset> {
         var message = context.getString(R.string.paste_user_for_autofill, name)
         var withInlinePresentation = true
         if (user.isBlank()) {
             message = context.getString(R.string.no_user_for_autofill, name)
             withInlinePresentation = false
         }
-        return createDataSets(fields,
+        return createDataSets(
+            fields,
             R.drawable.ic_baseline_person_24_gray,
             message,
             user,
@@ -504,8 +511,9 @@ object ResponseFiller {
             context)
     }
 
-    private fun createPasswordDataSets(fields : Set<ViewNode>, name: String, password: Password, context: Context): List<Dataset> {
-        return createDataSets(fields,
+    private fun createPasswordDataSets(structure: AssistStructure, fields : Set<ViewNode>, name: String, password: Password, context: Context): List<Dataset> {
+        return createDataSets(
+            fields,
             R.drawable.ic_baseline_vpn_key_24_gray,
             context.getString(R.string.paste_passwd_for_autofill, name),
             password.toRawFormattedPassword(),
@@ -515,11 +523,11 @@ object ResponseFiller {
 
 
     private fun createDataSets(fields : Set<ViewNode>, iconId: Int, text: String, content: CharSequence, withInlinePresentation: Boolean, context: Context): List<Dataset> {
-        return fields.mapNotNull { createDataSet(it, iconId, text, content, context, withInlinePresentation) }
+        return fields.mapNotNull { createDataSet( it, iconId, text, content, context, withInlinePresentation) }
     }
 
-    private fun createAuthDataSets(fields : Set<ViewNode>, iconId: Int, text: String, action: String, withInlinePresentation: Boolean, context: Context): List<Dataset> {
-        return fields.mapNotNull { createAuthDataSet(it, iconId, text, action, context, withInlinePresentation) }
+    private fun createAuthDataSets(structure: AssistStructure, fields : Set<ViewNode>, iconId: Int, text: String, action: String, withInlinePresentation: Boolean, context: Context): List<Dataset> {
+        return fields.mapNotNull { createAuthDataSet(structure, it, iconId, text, action, context, withInlinePresentation) }
     }
 
     private fun createDataSet(
@@ -536,7 +544,14 @@ object ResponseFiller {
         val builder = Dataset.Builder(remoteView)
 
         if (withInlinePresentation) {
-            buildInlinePresentation(autofillId, iconId, text, content, "", context, builder)
+            buildInlinePresentation(
+                autofillId,
+                iconId,
+                text,
+                context,
+                builder,
+                null
+            )
         }
 
         return builder
@@ -546,19 +561,24 @@ object ResponseFiller {
             .build()
     }
 
+    private fun createSearchString(structure: AssistStructure, field: ViewNode, context: Context): String? {
+        val appName = structure.activityComponent.packageName.let { getAppNameFromPackage(it, context) }
+        val webDomain = field.webDomain?.substringBeforeLast(".")?.substringAfterLast(".")
+        return webDomain ?: appName
+    }
+
     private fun buildInlinePresentation(
         autofillId: AutofillId,
         iconId: Int,
         text: String,
-        content: CharSequence,
-        action: String,
         context: Context,
-        builder: Dataset.Builder
+        builder: Dataset.Builder,
+        pendingIntent: PendingIntent?
     ) {
         val showInlinePresentation = PreferenceService.getAsBool(PREF_AUTOFILL_INLINE_PRESENTATIONS, context)
 
         if (showInlinePresentation && isInlinePresentationSupported()) {
-            val inlinePresentation = createInlinePresentation(autofillId, iconId, text, content, action, context)
+            val inlinePresentation = createInlinePresentation(autofillId, iconId, text, pendingIntent, context)
             if (inlinePresentation != null) {
                 builder
                     .setInlinePresentation(inlinePresentation)
@@ -573,8 +593,7 @@ object ResponseFiller {
         autofillId: AutofillId,
         iconId: Int,
         text: String,
-        content: CharSequence,
-        action: String,
+        pendingIntent: PendingIntent?,
         context: Context
     ): InlinePresentation? {
 
@@ -589,7 +608,7 @@ object ResponseFiller {
             Icon.createWithResource(context, iconId),
             Icon.createWithResource(context, R.mipmap.ic_launcher_round),
             "ANOTHERpass",
-            createPendingIntent(context, action)
+            pendingIntent ?: createPendingIntent(context, "dummy", "")
 
         ) ?: return null
         inlinePresentationUsageCounter.put(autofillId, lastValue + 1)
@@ -619,8 +638,22 @@ object ResponseFiller {
             context)
         val builder = Dataset.Builder(remoteView)
         if (withInlinePresentation) {
-            buildInlinePresentation(userAutofillId, R.drawable.ic_baseline_person_24_gray, text, user, "", context, builder)
-            buildInlinePresentation(passwordAutofillId, R.drawable.ic_baseline_vpn_key_24_gray, text, password, "", context, builder)
+            buildInlinePresentation(
+                userAutofillId,
+                R.drawable.ic_baseline_person_24_gray,
+                text,
+                context,
+                builder,
+                null
+            )
+            buildInlinePresentation(
+                passwordAutofillId,
+                R.drawable.ic_baseline_vpn_key_24_gray,
+                text,
+                context,
+                builder,
+                null
+            )
         }
 
         return builder
@@ -634,6 +667,7 @@ object ResponseFiller {
     }
 
     private fun createAuthDataSet(
+        structure: AssistStructure,
         field: ViewNode,
         iconId : Int,
         text: String,
@@ -644,16 +678,17 @@ object ResponseFiller {
         val autofillId = field.autofillId ?: return null
 
         val remoteView = createRemoteView(iconId, text, context)
-        val intentSender = createAppIntentSender(context, action)
+        val searchString = createSearchString(structure, field, context)
+        val pendingIntent = createPendingIntent(context, action, searchString)
         val builder = Dataset.Builder(remoteView)
 
         if (withInlinePresentation) {
-            buildInlinePresentation(autofillId, iconId, text, "", action, context, builder)
+            buildInlinePresentation(autofillId, iconId, text, context, builder, pendingIntent)
         }
 
         return builder
             .setValue(autofillId, null)
-            .setAuthentication(intentSender)
+            .setAuthentication(pendingIntent.intentSender)
             .build()
     }
 

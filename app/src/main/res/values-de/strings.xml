@@ -17,7 +17,7 @@
     <string name="credential_passwd_params">Hier kannst du das Passwort generieren. Es wird empfohlen es zu generieren anstatt es manuell einzugeben. \'Pseudophrase\'-Passwörter sind leicht zu lesen und zu tippen aber dennoch zufällig und stark.</string>
     <string name="button_gen_passwd">Generiere</string>
 
-    <string name="search">Suche</string>
+    <string name="search">Suche (!-erweitert)</string>
     <string name="EASY">Leicht</string>
     <string name="NORMAL">Normal</string>
     <string name="STRONG">Stark</string>
@@ -597,7 +597,8 @@
 
     <string name="cannot_parse_csv_credentials">Zugangsdaten konnten nicht gelesen werden</string>
     <string name="go_back_to_app">Zurück zur App</string>
-    <string name="no_autofill_here">Kein Autofill für \'%1$s\'</string>
+    <string name="no_autofill_for_app">Kein Autofill für \'%1$s\'</string>
+    <string name="no_autofill_for_current_app">Kein Autofill für diese App</string>
     <string name="excluded_from_autofill">Autofill für diese App ist nun dauerhaft deaktiviert.</string>
     <string name="vault_locked">Der Tresor ist nun gesperrt</string>
 
