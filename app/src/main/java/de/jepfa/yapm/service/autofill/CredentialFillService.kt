@@ -21,7 +21,9 @@ class CredentialFillService: AutofillService() {
             return
         }
 
-        ResponseFiller.updateInlinePresentationRequest(fillRequest.inlineSuggestionsRequest)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            ResponseFiller.updateInlinePresentationRequest(fillRequest.inlineSuggestionsRequest)
+        }
 
         val contexts = fillRequest.fillContexts
         val structure = contexts.get(contexts.size - 1).structure

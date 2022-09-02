@@ -611,4 +611,6 @@
     <string name="vault_locked">Vault is now locked</string>
     <string name="autofill_inline_presentations_title">Show Autofill options inlined of the keyboard</string>
     <string name="autofill_inline_presentations_summary">Since Android 11 Autofill options can be shown integrated in the virtual keyboard, if the keyboard supports it. If not, the common popup dialog will be shown.</string>
+    <string name="autofill_suggest_credentials_title">Suggest credentials</string>
+    <string name="autofill_suggest_credentials_summary">If possible, suggest credentials which could fit for the current dialog to Autofill</string>
 </resources>

@@ -65,6 +65,7 @@ import de.jepfa.yapm.util.*
 import java.util.*
 import kotlin.collections.ArrayList
 import androidx.recyclerview.widget.DividerItemDecoration
+import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_SUGGEST_CREDENTIALS
 import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.ui.changelogin.ChangeEncryptionActivity
 import de.jepfa.yapm.ui.importcredentials.ImportCredentialsActivity
@@ -309,12 +310,15 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             intent?.action?.let { action ->
                 Log.i("LST", "action2=$action")
                 if (action.startsWith(ResponseFiller.ACTION_OPEN_VAULT)) {
-                    val searchString = action.substringAfter(":").lowercase()
-                    if (searchString != null && searchString.isNotBlank()) {
-                        searchView.setQuery("!$searchString", true)
-                        searchItem.expandActionView()
-                        searchPlate.text = SpannableStringBuilder("!$searchString")
-                        searchPlate.selectAll()
+                    val suggestCredentials = PreferenceService.getAsBool(PREF_AUTOFILL_SUGGEST_CREDENTIALS, true, this)
+                    if (suggestCredentials) {
+                        val searchString = action.substringAfter(":").lowercase()
+                        if (searchString != null && searchString.isNotBlank()) {
+                            searchView.setQuery("!$searchString", true)
+                            searchItem.expandActionView()
+                            searchPlate.text = SpannableStringBuilder("!$searchString")
+                            searchPlate.selectAll()
+                        }
                     }
                 }
             }

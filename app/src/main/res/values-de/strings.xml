@@ -604,5 +604,6 @@
 
     <string name="autofill_inline_presentations_title">Integriere Autofill-Optionen in die Tastatur</string>
     <string name="autofill_inline_presentations_summary">Ab Android 11 können Autofill-Optionen in die virtuellen Tastatur integriert werden. Die virtuelle Tastatur muss dies aber unterstützen. Wenn nicht, wird stattdessen der normale Popup-Dialog angezeigt.</string>
-
+    <string name="autofill_suggest_credentials_title">Schlage Zugangsdaten vor</string>
+    <string name="autofill_suggest_credentials_summary">Wenn möglich, schlage Zugangsdaten vor, die zur aktuellen Autofill-Aktion passen könnten.</string>
 </resources>
