@@ -45,7 +45,7 @@ object ResponseFiller {
     private const val VIEW_TO_IDENTIFY = "text"
     private val PASSWORD_INDICATORS = listOf("password", "passwd", "passphrase",
         "pin", "passphrase", "keyword", "codeword", "passwort", "secret")
-    private val USER_INDICATORS = listOf("user", "account", "email", "login")
+    private val USER_INDICATORS = listOf("user", "account", "email", "login", "name")
 
     private var inlinePresentationRequest: InlineSuggestionsRequest? = null
     private var inlinePresentationUsageCounter = HashMap<AutofillId, Int>()
@@ -107,11 +107,6 @@ object ResponseFiller {
         fun hasFields() : Boolean
                 = allFields.isNotEmpty()
 
-        fun getAutofillIds(): Array<AutofillId> {
-            return potentialFields.map { it.autofillId }
-                .filterNotNull()
-                .toTypedArray()
-        }
     }
 
     fun updateInlinePresentationRequest(req: InlineSuggestionsRequest?) {
@@ -177,6 +172,12 @@ object ResponseFiller {
             return null
         }
 
+        Log.d("CFS", "found fields: ${fields.getAllFields().size}")
+        fields.getAllFields().forEach {
+            Log.d("CFS", "field: ${it}")
+        }
+
+
         if (ignoreCurrentApp) {
             val currentApp = structure.activityComponent.packageName
             Log.i("CFS", "Ignore $currentApp")
@@ -210,13 +211,15 @@ object ResponseFiller {
 
         val dataSets = ArrayList<Dataset>()
 
-        var firstUserField = fields.getUserFields().firstOrNull()
-        var firstPasswordField = fields.getPasswordFields().firstOrNull()
+        Log.d("CFS", "userfields size: ${fields.getUserFields().size}")
+        Log.d("CFS", "passwordfields size: ${fields.getPasswordFields().size}")
+        Log.d("CFS", "potentialfields size: ${fields.getPotentialFields().size}")
+        Log.d("CFS", "allfields size: ${fields.getAllFields().size}")
 
-        if (firstUserField != null && firstPasswordField != null) {
-            var dataset = createUserAndPasswordDataSet(
-                firstUserField,
-                firstPasswordField,
+        if (fields.getUserFields().isNotEmpty() && fields.getPasswordFields().isNotEmpty()) {
+            val dataset = createUserAndPasswordDataSet(
+                fields.getUserFields(),
+                fields.getPasswordFields(),
                 name,
                 user,
                 password,
@@ -228,8 +231,13 @@ object ResponseFiller {
 
         }
         else {
+            Log.d("CFS", "create data sets for user fields: ${fields.getUserFields().size}")
+
             createUserDataSets(structure, fields.getUserFields(), name, user, context)
                 .forEach { dataSets.add(it) }
+
+            Log.d("CFS", "create data sets for password fields: ${fields.getPasswordFields().size}")
+
             createPasswordDataSets(structure, fields.getPasswordFields(), name, password, context)
                 .forEach { dataSets.add(it) }
 
@@ -266,12 +274,16 @@ object ResponseFiller {
 
         password.clear()
 
+        Log.d("CFS", "datasets empty?: ${dataSets.size}")
         if (dataSets.isEmpty()) return null
 
         val responseBuilder = FillResponse.Builder()
+
         addHeaderView(responseBuilder, context)
 
         dataSets.forEach { responseBuilder.addDataset(it) }
+
+        Log.d("CFS", "datasets to add to response: ${dataSets.size}")
 
         return responseBuilder.build()
 
@@ -295,9 +307,9 @@ object ResponseFiller {
         isDeactivatedSinceWhen = System.currentTimeMillis()
         PreferenceService.putString(STATE_PAUSE_AUTOFILL, isDeactivatedSinceWhen.toString(), context)
 
-        return FillResponse.Builder()
+        val responseBuilder = FillResponse.Builder()
                 .disableAutofill( 1) // disabling autofill is managed by the app to be able to resume it earlier
-                .build()
+        return responseBuilder.build()
     }
 
     private fun createAuthenticationFillResponse(
@@ -352,6 +364,9 @@ object ResponseFiller {
                 context.getString(R.string.temp_deact_autofill), ACTION_PAUSE_AUTOFILL, false, context
             ).forEach { responseBuilder.addDataset(it) }
         }
+
+        Log.d("CFS", "auth response finished")
+
 
         return responseBuilder.build()
     }
@@ -412,8 +427,8 @@ object ResponseFiller {
         if (structure.windowNodeCount == 0) {
             return null
         }
-        for (i in 0..structure.windowNodeCount) {
-            val windowNode = structure.getWindowNodeAt(0)
+        for (i in 0 until structure.windowNodeCount) {
+            val windowNode = structure.getWindowNodeAt(i)
             val viewNode = windowNode?.rootViewNode
             if (viewNode != null) {
                 identifyFields(viewNode, fields, suggestEverywhere)
@@ -426,7 +441,7 @@ object ResponseFiller {
 
     private fun identifyFields(node: ViewNode, fields: Fields, suggestEverywhere: Boolean) {
 
-        if (/*!suggestEverywhere && */Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        if (!suggestEverywhere && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             if (node.importantForAutofill == View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS) {
                 // don't traverse anything
                 Log.i("CFS", "No autofill for current node and children")
@@ -434,8 +449,8 @@ object ResponseFiller {
             }
         }
 
-        if (/*suggestEverywhere || */(node.autofillType == View.AUTOFILL_TYPE_TEXT
-            && node.importantForAutofill != View.IMPORTANT_FOR_AUTOFILL_NO)) {
+        if (suggestEverywhere || (node.autofillType == View.AUTOFILL_TYPE_TEXT
+            && node.importantForAutofill != View.IMPORTANT_FOR_AUTOFILL_NO)){
 
             inspectNodeAttributes(node, fields)
             if (suggestEverywhere) {
@@ -444,7 +459,7 @@ object ResponseFiller {
 
         }
 
-        if (/*!suggestEverywhere &&*/ Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        if (!suggestEverywhere && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             if (node.importantForAutofill == View.IMPORTANT_FOR_AUTOFILL_YES_EXCLUDE_DESCENDANTS) {
                 // don't traverse children
                 Log.i("CFS", "No autofill for current nodes children only")
@@ -539,6 +554,8 @@ object ResponseFiller {
         withInlinePresentation: Boolean
     ): Dataset? {
 
+        Log.d("CFS", "fields ${field.hint} autofillId: ${field.autofillId}")
+
         val autofillId = field.autofillId ?: return null
         val remoteView = createRemoteView(iconId, text, context)
         val builder = Dataset.Builder(remoteView)
@@ -621,49 +638,65 @@ object ResponseFiller {
 
 
     private fun createUserAndPasswordDataSet(
-        userField: ViewNode,
-        passwordField: ViewNode,
+        userFields: Set<ViewNode>,
+        passwordFields: Set<ViewNode>,
         credentialName: String,
         user: CharSequence,
-        password: CharSequence,
+        password: Password,
         withInlinePresentation: Boolean,
         context: Context
     ): Dataset? {
 
-        val userAutofillId = userField.autofillId ?: return null
-        val passwordAutofillId = passwordField.autofillId ?: return null
+
         val text = context.getString(R.string.paste_credential_for_autofill, credentialName)
         val remoteView = createUserPasswordRemoteView(
             text,
             context)
         val builder = Dataset.Builder(remoteView)
+
         if (withInlinePresentation) {
-            buildInlinePresentation(
-                userAutofillId,
-                R.drawable.ic_baseline_person_24_gray,
-                text,
-                context,
-                builder,
-                null
-            )
-            buildInlinePresentation(
-                passwordAutofillId,
-                R.drawable.ic_baseline_vpn_key_24_gray,
-                text,
-                context,
-                builder,
-                null
-            )
+            userFields.mapNotNull { it.autofillId }
+                .forEach {
+                    buildInlinePresentation(
+                        it,
+                        R.drawable.ic_baseline_person_24_gray,
+                        text,
+                        context,
+                        builder,
+                        null
+                )
+            }
+
+            passwordFields.mapNotNull { it.autofillId }
+                .forEach {
+                    buildInlinePresentation(
+                        it,
+                        R.drawable.ic_baseline_vpn_key_24_gray,
+                        text,
+                        context,
+                        builder,
+                        null
+                    )
+                }
         }
 
-        return builder
-            .setValue(
-                userAutofillId,
-                AutofillValue.forText(user)
-            ).setValue(
-                passwordAutofillId,
-                AutofillValue.forText(password)
-            ).build()
+        userFields.mapNotNull { it.autofillId }
+            .forEach {
+                builder.setValue(
+                        it,
+                        AutofillValue.forText(user)
+                    )
+            }
+
+        passwordFields.mapNotNull { it.autofillId }
+            .forEach {
+                builder.setValue(
+                        it,
+                        AutofillValue.forText(password.toRawFormattedPassword())
+                    )
+            }
+
+        return builder.build()
     }
 
     private fun createAuthDataSet(
