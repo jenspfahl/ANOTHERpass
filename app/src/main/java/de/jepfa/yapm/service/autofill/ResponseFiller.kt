@@ -441,6 +441,9 @@ object ResponseFiller {
 
     private fun identifyFields(node: ViewNode, fields: Fields, suggestEverywhere: Boolean) {
 
+        /*
+        // gonna ignore that since a lot of apps exclude itself from Autofill for unknown reasons
+
         if (!suggestEverywhere && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             if (node.importantForAutofill == View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS) {
                 // don't traverse anything
@@ -448,17 +451,19 @@ object ResponseFiller {
                 return
             }
         }
+        */
 
-        if (suggestEverywhere || (node.autofillType == View.AUTOFILL_TYPE_TEXT
-            && node.importantForAutofill != View.IMPORTANT_FOR_AUTOFILL_NO)){
+       // if (suggestEverywhere || (node.autofillType == View.AUTOFILL_TYPE_TEXT
+         //   && node.importantForAutofill != View.IMPORTANT_FOR_AUTOFILL_NO)){
 
             inspectNodeAttributes(node, fields)
             if (suggestEverywhere) {
                 fields.addPotentialField(node)
             }
 
-        }
+        //}
 
+        /*
         if (!suggestEverywhere && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             if (node.importantForAutofill == View.IMPORTANT_FOR_AUTOFILL_YES_EXCLUDE_DESCENDANTS) {
                 // don't traverse children
@@ -466,6 +471,7 @@ object ResponseFiller {
                 return
             }
         }
+        */
 
         // go deeper in the tree
         for (i in 0 until node.childCount) {
