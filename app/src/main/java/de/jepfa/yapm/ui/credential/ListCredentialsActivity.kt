@@ -80,6 +80,7 @@ import kotlinx.coroutines.launch
  */
 class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.OnNavigationItemSelectedListener  {
 
+    private var searchItem: MenuItem? = null
     private var credentialsRecycleView: RecyclerView? = null
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
@@ -221,6 +222,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     override fun onResume() {
         super.onResume()
+
         refreshMenuMasterPasswordItem(navigationView.menu)
         refreshRevokeMptItem(navigationView.menu)
 
@@ -253,6 +255,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         if (!showed) {
             showed = ReminderService.showReminders(ReminderService.RefreshMasterPasswordToken, view, this)
         }
+
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -264,8 +267,10 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
 
         menuInflater.inflate(R.menu.menu_main, menu)
+        Log.d("LST", "inflate menues")
 
         val searchItem: MenuItem = menu.findItem(R.id.action_search)
+        this.searchItem = searchItem
         val searchView = MenuItemCompat.getActionView(searchItem) as SearchView
 
         val searchPlate = searchView.findViewById(R.id.search_src_text) as EditText
@@ -306,26 +311,48 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             }
         }
 
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onPostResume() {
+        super.onPostResume()
+        updateSearchFieldWithAutofillSuggestion()
+    }
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        updateSearchFieldWithAutofillSuggestion()
+        return super.onPrepareOptionsMenu(menu)
+    }
+
+    private fun updateSearchFieldWithAutofillSuggestion() {
         if (!Session.isDenied()) {
             intent?.action?.let { action ->
                 Log.i("LST", "action2=$action")
                 if (action.startsWith(ResponseFiller.ACTION_OPEN_VAULT)) {
-                    val suggestCredentials = PreferenceService.getAsBool(PREF_AUTOFILL_SUGGEST_CREDENTIALS, true, this)
+                    val suggestCredentials =
+                        PreferenceService.getAsBool(PREF_AUTOFILL_SUGGEST_CREDENTIALS, true, this)
                     if (suggestCredentials) {
                         val searchString = action.substringAfter(":").lowercase()
-                        if (searchString != null && searchString.isNotBlank()) {
-                            searchView.setQuery("!$searchString", true)
-                            searchItem.expandActionView()
-                            searchPlate.text = SpannableStringBuilder("!$searchString")
-                            searchPlate.selectAll()
+                        if (searchString.isNotBlank()) {
+                            searchItem?.let { searchItem ->
+                                Log.i("LST", "update search text")
+
+                                val searchView =
+                                    MenuItemCompat.getActionView(searchItem) as SearchView
+                                val searchPlate =
+                                    searchView.findViewById(R.id.search_src_text) as EditText
+
+                                searchView.setQuery("!$searchString", true)
+                                searchItem.expandActionView()
+                                searchPlate.text = SpannableStringBuilder("!$searchString")
+                                searchPlate.selectAll()
+                            }
                         }
                     }
                 }
             }
         }
-
-        return super.onCreateOptionsMenu(menu)
     }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
@@ -335,6 +362,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         return when (item.itemId) {
             R.id.menu_lock_items -> {
+                if (shouldPushBackAutoFill()) {
+                    Session.lock()
+                    pushBackAutofill(allowCreateAuthentication = true)
+                    return true
+                }
                 LockVaultUseCase.execute(this)
                 refreshMenuLockItem(item)
                 return true

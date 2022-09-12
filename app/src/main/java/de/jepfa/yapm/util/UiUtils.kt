@@ -2,14 +2,18 @@ package de.jepfa.yapm.util
 
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import android.content.res.ColorStateList
+import android.content.res.Resources
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.Toast
 import com.google.android.material.chip.Chip
@@ -138,7 +142,7 @@ private fun ensureHttp(s: String): String {
         return s
     }
     else {
-        return "http://" + s
+        return "https://" + s
     }
 }
 
@@ -149,6 +153,7 @@ fun getAppNameFromPackage(packageName: String, context: Context): String? {
     } catch (e: PackageManager.NameNotFoundException) {
         null
     }
-    return if (ai != null) pm.getApplicationLabel(ai).toString() else null
+
+    return ai?.loadLabel(pm)?.toString()
 }
 
