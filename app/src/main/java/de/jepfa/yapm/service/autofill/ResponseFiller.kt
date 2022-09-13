@@ -13,7 +13,6 @@ import android.service.autofill.FillResponse
 import android.service.autofill.InlinePresentation
 import android.util.Log
 import android.util.TypedValue
-import android.view.View
 import android.view.autofill.AutofillId
 import android.view.autofill.AutofillValue
 import android.view.inputmethod.InlineSuggestionsRequest
@@ -367,7 +366,6 @@ object ResponseFiller {
 
         Log.d("CFS", "auth response finished")
 
-
         return responseBuilder.build()
     }
 
@@ -590,6 +588,10 @@ object ResponseFiller {
         return webDomain ?: appName
     }
 
+    private fun createDomainString(structure: AssistStructure, field: ViewNode, context: Context): String? {
+        return field.webDomain
+    }
+
     private fun buildInlinePresentation(
         autofillId: AutofillId,
         iconId: Int,
@@ -718,7 +720,8 @@ object ResponseFiller {
 
         val remoteView = createRemoteView(iconId, text, context)
         val searchString = createSearchString(structure, field, context)
-        val pendingIntent = createPendingIntent(context, action, searchString)
+        val domainString = createDomainString(structure, field, context)
+        val pendingIntent = createPendingIntent(context, action, searchString + ":" + (domainString?:""))
         val builder = Dataset.Builder(remoteView)
 
         if (withInlinePresentation) {

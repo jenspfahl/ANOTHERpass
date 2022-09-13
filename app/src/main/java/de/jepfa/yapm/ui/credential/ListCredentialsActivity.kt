@@ -172,6 +172,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
             val intent = Intent(this@ListCredentialsActivity, EditCredentialActivity::class.java)
+            intent.action = this.intent.action
             intent.putExtras(this.intent) // forward all extras, especially needed for Autofill
             startActivityForResult(intent, newOrUpdateCredentialActivityRequestCode)
         }
@@ -331,7 +332,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     val suggestCredentials =
                         PreferenceService.getAsBool(PREF_AUTOFILL_SUGGEST_CREDENTIALS, true, this)
                     if (suggestCredentials) {
-                        val searchString = action.substringAfter(":").lowercase()
+                        val searchString = action.substringAfter(":").substringBeforeLast(":").lowercase()
                         if (searchString.isNotBlank()) {
                             searchItem?.let { searchItem ->
                                 Log.i("LST", "update search text")

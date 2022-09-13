@@ -97,6 +97,12 @@ class EditCredentialDataFragment : SecureFragment() {
         }
         else {
             editCredentialNameView.requestFocus()
+            editCredentialActivity.suggestedCredentialName?.let {
+                editCredentialNameView.setText(it.capitalize())
+            }
+            editCredentialActivity.suggestedWebSite?.let {
+                editCredentialWebsiteView.setText(it)
+            }
         }
 
         val buttonNext: Button = view.findViewById(R.id.button_next)
