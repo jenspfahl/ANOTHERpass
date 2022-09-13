@@ -428,7 +428,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         }
 
                         LabelFilter.persistState(this)
-                        listCredentialAdapter?.filter?.filter("")
+                        resetFilter()
                         refreshMenuFiltersItem(item)
                         dialog.dismiss()
                     }
@@ -791,10 +791,15 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 }
 
                 listCredentialAdapter?.submitOriginList(sortedCredentials)
-                listCredentialAdapter?.filter?.filter("")
+                resetFilter()
 
             }
         }
+    }
+
+    private fun resetFilter() {
+        listCredentialAdapter?.filter?.filter("")
+        updateSearchFieldWithAutofillSuggestion()
     }
 
     private fun refreshMenuMasterPasswordItem(menu: Menu) {
