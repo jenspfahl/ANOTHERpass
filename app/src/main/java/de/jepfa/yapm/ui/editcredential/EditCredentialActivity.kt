@@ -12,6 +12,7 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.autofill.AutofillCredentialHolder
 import de.jepfa.yapm.service.autofill.ResponseFiller
+import de.jepfa.yapm.service.autofill.ResponseFiller.ACTION_DELIMITER
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.credential.AutofillPushBackActivityBase
@@ -46,8 +47,8 @@ class EditCredentialActivity : AutofillPushBackActivityBase() {
 
         intent?.action?.let { action ->
             if (action.startsWith(ResponseFiller.ACTION_OPEN_VAULT)) {
-                suggestedCredentialName = action.substringAfter(":").substringBeforeLast(":")
-                suggestedWebSite = action.substringAfterLast(":")
+                suggestedCredentialName = action.substringAfter(ACTION_DELIMITER).substringBeforeLast(ACTION_DELIMITER)
+                suggestedWebSite = action.substringAfterLast(ACTION_DELIMITER)
             }
         }
 

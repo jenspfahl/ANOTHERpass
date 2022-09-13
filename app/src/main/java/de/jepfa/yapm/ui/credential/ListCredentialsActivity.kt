@@ -67,6 +67,7 @@ import kotlin.collections.ArrayList
 import androidx.recyclerview.widget.DividerItemDecoration
 import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_SUGGEST_CREDENTIALS
 import de.jepfa.yapm.service.autofill.ResponseFiller
+import de.jepfa.yapm.service.autofill.ResponseFiller.ACTION_DELIMITER
 import de.jepfa.yapm.ui.changelogin.ChangeEncryptionActivity
 import de.jepfa.yapm.ui.importcredentials.ImportCredentialsActivity
 import de.jepfa.yapm.usecase.secret.*
@@ -332,7 +333,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     val suggestCredentials =
                         PreferenceService.getAsBool(PREF_AUTOFILL_SUGGEST_CREDENTIALS, true, this)
                     if (suggestCredentials) {
-                        val searchString = action.substringAfter(":").substringBeforeLast(":").lowercase()
+                        val searchString = action.substringAfter(ACTION_DELIMITER).substringBeforeLast(ACTION_DELIMITER).lowercase()
                         if (searchString.isNotBlank()) {
                             searchItem?.let { searchItem ->
                                 Log.i("LST", "update search text")
@@ -428,7 +429,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         }
 
                         LabelFilter.persistState(this)
-                        resetFilter()
+                        filterAgain()
                         refreshMenuFiltersItem(item)
                         dialog.dismiss()
                     }
@@ -518,9 +519,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 }
                 else {
                     credentialViewModel.insert(credential, this)
-                }
-                if (shouldPushBackAutoFill()) {
-                    pushBackAutofill()
+                    if (shouldPushBackAutoFill()) {
+                        pushBackAutofill()
+                    } else {
+                        // nothing
+                    }
                 }
             }
         }
@@ -791,15 +794,23 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 }
 
                 listCredentialAdapter?.submitOriginList(sortedCredentials)
-                resetFilter()
+                filterAgain()
 
             }
         }
     }
 
-    private fun resetFilter() {
-        listCredentialAdapter?.filter?.filter("")
-        updateSearchFieldWithAutofillSuggestion()
+    private fun filterAgain() {
+        searchItem?.let { searchItem ->
+
+            val searchView =
+                MenuItemCompat.getActionView(searchItem) as SearchView
+
+            if (searchView.query != null && searchView.query.isNotEmpty()) {
+                // refresh filtering
+                listCredentialAdapter?.filter?.filter(searchView.query)
+            }
+        }
     }
 
     private fun refreshMenuMasterPasswordItem(menu: Menu) {

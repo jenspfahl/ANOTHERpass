@@ -36,6 +36,7 @@ import java.util.*
 @RequiresApi(Build.VERSION_CODES.O)
 object ResponseFiller {
 
+    const val ACTION_DELIMITER = "$"
     const val ACTION_OPEN_VAULT = "openVault"
     const val ACTION_CLOSE_VAULT = "closeVault"
     const val ACTION_EXCLUDE_FROM_AUTOFILL = "excludeFromAutofill"
@@ -376,7 +377,7 @@ object ResponseFiller {
     ) = createDataSet(
         it,
         R.drawable.ic_baseline_bug_report_gray_24,
-        "aId: ${it.autofillId}, webDomain: ${it.webDomain}, " +
+        "aId: ${it.autofillId}, webScheme: ${it.webScheme}, webDomain: ${it.webDomain}, " +
                 "aHints: ${Arrays.toString(it.autofillHints)}, hint: ${it.hint}, " +
                 "text: ${it.text}, idEntry: ${it.idEntry}, htmlInfoTag: ${it.htmlInfo?.tag}, " +
                 "htmlInfoAttr: ${it.htmlInfo?.attributes}, type: ${it.autofillType}, important: ${it.importantForAutofill}, " +
@@ -389,7 +390,7 @@ object ResponseFiller {
         val authIntent = Intent(context, ListCredentialsActivity::class.java)
         authIntent.putExtra(SecureActivity.SecretChecker.fromAutofill, true)
         if (actionData != null) {
-            authIntent.action = "$action:$actionData" // do it as extra doesn't work (extra gets lost)
+            authIntent.action = "$action$ACTION_DELIMITER$actionData" // do it as extra doesn't work (extra gets lost)
         }
         else {
             authIntent.action = action
@@ -589,7 +590,7 @@ object ResponseFiller {
     }
 
     private fun createDomainString(structure: AssistStructure, field: ViewNode, context: Context): String? {
-        return field.webDomain
+        return field.webScheme + "://" + field.webDomain
     }
 
     private fun buildInlinePresentation(
@@ -721,7 +722,7 @@ object ResponseFiller {
         val remoteView = createRemoteView(iconId, text, context)
         val searchString = createSearchString(structure, field, context)
         val domainString = createDomainString(structure, field, context)
-        val pendingIntent = createPendingIntent(context, action, searchString + ":" + (domainString?:""))
+        val pendingIntent = createPendingIntent(context, action, searchString + ACTION_DELIMITER + (domainString?:""))
         val builder = Dataset.Builder(remoteView)
 
         if (withInlinePresentation) {
