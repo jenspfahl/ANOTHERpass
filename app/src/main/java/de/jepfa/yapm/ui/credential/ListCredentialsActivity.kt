@@ -86,6 +86,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var toggle: ActionBarDrawerToggle
+    private var resumeAutofillItem: MenuItem? = null
 
     val newOrUpdateCredentialActivityRequestCode = 1
 
@@ -227,6 +228,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         refreshMenuMasterPasswordItem(navigationView.menu)
         refreshRevokeMptItem(navigationView.menu)
+        updateResumeAutfillMenuItem()
 
         val requestReload = PreferenceService.getAsBool(STATE_REQUEST_CREDENTIAL_LIST_RELOAD, applicationContext)
         val requestHardReload = PreferenceService.getAsBool(STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD, applicationContext)
@@ -312,6 +314,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 refreshMenuFiltersItem(menu.findItem(R.id.menu_filter))
             }
         }
+
+        resumeAutofillItem = menu.findItem(R.id.menu_resume_autofill)
+        updateResumeAutfillMenuItem()
 
         return super.onCreateOptionsMenu(menu)
     }
@@ -475,6 +480,14 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 PreferenceService.toggleBoolean(PREF_SHOW_CREDENTIAL_IDS, this)
                 refreshMenuShowIdsItem(item)
                 listCredentialAdapter?.notifyDataSetChanged()
+                return true
+            }
+            R.id.menu_resume_autofill -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && ResponseFiller.isAutofillPaused(this)) {
+                    ResponseFiller.resumeAutofill(this)
+                    toastText(this, R.string.resume_paused_autofill_done)
+                    item.isVisible = false
+                }
                 return true
             }
             else -> super.onOptionsItemSelected(item)
@@ -893,6 +906,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         finish()
     }
 
-
+    private fun updateResumeAutfillMenuItem() {
+        resumeAutofillItem?.isVisible =
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && ResponseFiller.isAutofillPaused(this)
+    }
 }
 

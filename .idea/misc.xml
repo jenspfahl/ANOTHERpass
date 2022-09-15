@@ -131,6 +131,8 @@
         <entry key="app/src/main/res/layout/fragment_login_enter_masterpassword.xml" value="0.264" />
         <entry key="app/src/main/res/layout/fragment_login_enter_pin.xml" value="0.30709426627793973" />
         <entry key="app/src/main/res/layout/fragment_override_vault_file.xml" value="0.11354166666666667" />
+        <entry key="app/src/main/res/layout/fragment_whats_new_1.xml" value="0.17604166666666668" />
+        <entry key="app/src/main/res/layout/fragment_whats_new_in_1_7.xml" value="0.25" />
         <entry key="app/src/main/res/layout/label_edit_view.xml" value="0.17604166666666668" />
         <entry key="app/src/main/res/layout/nav_header_main.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/layout/recyclerview_credential.xml" value="0.536" />
@@ -148,7 +150,7 @@
         <entry key="app/src/main/res/menu/menu_credential_list.xml" value="0.3015625" />
         <entry key="app/src/main/res/menu/menu_label_edit.xml" value="0.17864583333333334" />
         <entry key="app/src/main/res/menu/menu_label_list.xml" value="0.17864583333333334" />
-        <entry key="app/src/main/res/menu/menu_login.xml" value="0.264" />
+        <entry key="app/src/main/res/menu/menu_login.xml" value="0.1" />
         <entry key="app/src/main/res/menu/menu_main.xml" value="0.264" />
         <entry key="app/src/main/res/menu/menu_main_drawer.xml" value="0.4" />
         <entry key="app/src/main/res/menu/menu_no_autofill_list.xml" value="0.176" />

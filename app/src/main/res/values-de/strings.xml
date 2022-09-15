@@ -443,7 +443,9 @@
     <string name="pref_auth_smp_with_biometric_title">Autorisiere gespeichertes Masterpasswort mit biometrischem Merkmal</string>
     <string name="pref_auth_smp_with_biometric_summary">Es wird dringend empfohlen das in der App gespeicherte Massterpasswort mit einem biometrischem Merkmal zu schützen (falls vom Gerät unterstützt). Beachte: Ein bereits gespeichertes Masterpasswort wird nicht geschützt nur weil diese Option aktiviert wurde. Du musst es erst aus der App entfernen und neu speichern.</string>
     <string name="auth_to_decrypt_emp_omit">Scanne Masterpasswort</string>
-
+    <string name="whats_new">Was ist neu</string>
+    <string name="whats_new_in_1_7">Was ist neu in Version 1.7</string>
+    <string name="whats_new_in_1_7_subtext">Neben einigen Fehlerkorrekturen und Verbesserungen kommen diese neuen Features hinzu:</string>
     <string name="intro">Starte Intro</string>
     <string name="intro_1_head">Ein etwas anderer Passwortmanager</string>
     <string name="intro_1_subtext">ANOTHERpass bietet eine etwas andere Herangehensweise. Lies hier was das heißt:</string>

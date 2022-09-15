@@ -452,6 +452,9 @@
     <string name="pref_auth_smp_with_biometric_title">Authorize stored master passwords with biometric</string>
     <string name="pref_auth_smp_with_biometric_summary">It is highly recommend to protect stored master passwords with e.g. a fingerprint to mitigate the risk of getting it stolen by compromised malware. (Only if your device supports it.) Note: An already stored master password is not touched by changeing this setting now. You have to remove it and set it again to take this setting in effect.</string>
     <string name="auth_to_decrypt_emp_omit">Scan Master Password</string>
+    <string name="whats_new">What\'s new</string>
+    <string name="whats_new_in_1_7">What\'s new in version 1.7</string>
+    <string name="whats_new_in_1_7_subtext">Besides several bugfixes and improvements these new main features shipped in:</string>
     <string name="intro">Show intro</string>
     <string name="intro_1_head">Another way to manage passwords</string>
     <string name="intro_1_subtext">ANOTHERpass is another approach of a password manager. See what it means:</string>

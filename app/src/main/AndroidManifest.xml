@@ -50,6 +50,9 @@
             android:name=".ui.intro.IntroActivity"
             android:theme="@style/Theme.YetAnotherPasswordManager.NoActionBar" />
         <activity
+            android:name=".ui.intro.WhatsNewActivity"
+            android:theme="@style/Theme.YetAnotherPasswordManager.NoActionBar" />
+        <activity
             android:name=".ui.settings.SettingsActivity"
             android:label="@string/title_activity_settings" />
         <activity android:name=".ui.importcredentials.ImportCredentialsActivity" />

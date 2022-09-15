@@ -33,6 +33,7 @@ import de.jepfa.yapm.ui.credential.DeobfuscationDialog
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.ui.importvault.ImportVaultActivity
 import de.jepfa.yapm.ui.intro.IntroActivity
+import de.jepfa.yapm.ui.intro.WhatsNewActivity
 import de.jepfa.yapm.ui.nfc.NfcBaseActivity
 import de.jepfa.yapm.usecase.app.ShowInfoUseCase
 import de.jepfa.yapm.usecase.vault.DropVaultUseCase
@@ -127,6 +128,12 @@ class LoginActivity : NfcBaseActivity() {
 
         if (id == R.id.menu_intro) {
             val intent = Intent(this, IntroActivity::class.java)
+            startActivity(intent)
+            return true
+        }
+
+        if (id == R.id.menu_whats_new) {
+            val intent = Intent(this, WhatsNewActivity::class.java)
             startActivity(intent)
             return true
         }
