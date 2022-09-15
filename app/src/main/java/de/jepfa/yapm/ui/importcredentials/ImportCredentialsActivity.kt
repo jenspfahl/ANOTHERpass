@@ -59,23 +59,27 @@ class ImportCredentialsActivity : SecureActivity() {
             val user = record.value[userKey]
             val password = record.value[passwordKey] ?: return null
             ImportCredentialsImportFileAdapter.FileRecord(id,
-                name ?: url?.let { getDomain(it)} ?: "unknown $id",
+                name ?: url?.let { getDomainAsName(it)} ?: "unknown $id",
                 url, user, password)
 
         }
 
     }
 
-    private fun getDomain(url: String): String {
+    private fun getDomainAsName(url: String): String {
         val uri = Uri.parse(url)
-
-        return uri.host ?: url
+        val host = uri.host
+        if (host != null) {
+            return host.substringBeforeLast(".").substringAfterLast(".").capitalize()
+        }
+        else {
+            return url
+        }
 
     }
 
     private fun extractKey(record: IndexedValue<Map<String, String>>, key: String) =
-        record.value.keys.map { it.lowercase().trim() }.filter { it == key }
-            .firstOrNull()
+        record.value.keys.map { it.lowercase().trim() }.firstOrNull { it == key }
 
     fun createCredentialFromRecord(
         key: SecretKeyHolder,

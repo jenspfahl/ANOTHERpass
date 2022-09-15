@@ -590,7 +590,11 @@ object ResponseFiller {
     }
 
     private fun createDomainString(structure: AssistStructure, field: ViewNode, context: Context): String? {
-        return field.webScheme + "://" + field.webDomain
+        return if (field.webDomain != null) {
+            (field.webScheme?:"https") + "://" + field.webDomain
+        } else {
+            null
+        }
     }
 
     private fun buildInlinePresentation(
