@@ -7,6 +7,7 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.STATE_WHATS_NEW_SHOWED_FOR_VERSION
 import de.jepfa.yapm.util.DebugInfo.getVersionCode
+import de.jepfa.yapm.util.DebugInfo.getVersionCodeForWhatsNew
 
 // Taken from https://github.com/AppIntro/AppIntro
 class WhatsNewActivity : IntroBaseActivity() {
@@ -23,13 +24,13 @@ class WhatsNewActivity : IntroBaseActivity() {
 
     override fun onSkipPressed(currentFragment: Fragment?) {
         super.onSkipPressed(currentFragment)
-        PreferenceService.putInt(STATE_WHATS_NEW_SHOWED_FOR_VERSION, getVersionCode(this), this)
+        PreferenceService.putInt(STATE_WHATS_NEW_SHOWED_FOR_VERSION, getVersionCodeForWhatsNew(this), this)
         finish()
     }
 
     override fun onDonePressed(currentFragment: Fragment?) {
         super.onDonePressed(currentFragment)
-        PreferenceService.putInt(STATE_WHATS_NEW_SHOWED_FOR_VERSION, getVersionCode(this), this)
+        PreferenceService.putInt(STATE_WHATS_NEW_SHOWED_FOR_VERSION, getVersionCodeForWhatsNew(this), this)
         finish()
     }
 }

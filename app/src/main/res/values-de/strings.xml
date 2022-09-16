@@ -178,7 +178,7 @@
     <string name="hint_edit_credential_website">Webseite</string>
     <string name="hint_edit_credential_labels">Füge Kategorien hinzu</string>
     <string name="filter">Nach Kategorien filtern</string>
-    <string name="pref_header_autofill">Autofill-Unterstützung</string>
+    <string name="pref_header_autofill">Unterstützung für Automatisches Ausfüllen</string>
     <string name="title_activity_list_label">Kategorien verwalten</string>
     <string name="action_labels">Verwalte Kategorien</string>
     <string name="label_data_params">Gib der Kategorie einen Namen, eine Beschreibung und eine Farbe.</string>
@@ -377,9 +377,9 @@
     <string name="pref_general_colorize_qrcodes">Verwende Farben um die Kritikalität von QR-Code Inhalten zu verdeutlichen</string>
     <string name="pref_general_qrcodes_with_header">Drucke eine kurze inhaltsbezogene Kopfzeile am oberen Rand eines QR-Codes</string>
 
-    <string name="pref_autofill_summary_off_suggest">Biete Autofill nur für eindeutig erkannte Nutzer- oder Passwortfelder an. Dadurch könnten allerdings einige Felder ignoriert werden, die nicht eindeutig erkannt werden können, z.B. in Webbrowsern. </string>
-    <string name="pref_autofill_summary_on_suggest">Biete Autofill für jedes Textfeld an.</string>
-    <string name="pref_autofill_exclude_apps">Ignoriere Autofill für Apps</string>
+    <string name="pref_autofill_summary_off_suggest">Biete Automatisches Ausfüllen nur für eindeutig erkannte Nutzer- oder Passwortfelder an. Dadurch könnten allerdings einige Felder ignoriert werden, die nicht eindeutig erkannt werden können, z.B. in Webbrowsern. </string>
+    <string name="pref_autofill_summary_on_suggest">Biete Automatisches Ausfüllen für jedes Textfeld an.</string>
+    <string name="pref_autofill_exclude_apps">Ignoriere Automatisches Ausfüllen für diese Apps</string>
     <string name="pref_clipboard_enable">Aktiviere Passwort in die Zwischenablage zu kopieren</string>
     <string name="pref_clipboard_summary_enable">Passwörter in die Zwischenablage zu kopieren ist riskant und könnte dein Passwort an andere Apps preisgeben. Verwende diese Option mit Vorsicht!</string>
     <string name="pref_clipboard_show_warning">Zeige Warnung wenn Passwörter in die Zwischenablage kopiert werden</string>
@@ -446,6 +446,17 @@
     <string name="whats_new">Was ist neu</string>
     <string name="whats_new_in_1_7">Was ist neu in Version 1.7</string>
     <string name="whats_new_in_1_7_subtext">Neben einigen Fehlerkorrekturen und Verbesserungen kommen diese neuen Features hinzu:</string>
+    <string name="whats_new_in_1_7_bullet_1_head">Importiere Browser-Zugangsdaten</string>
+    <string name="whats_new_in_1_7_bullet_1_text">Du kannst deine Zugangsdaten von Browsern wie Firefox oder Chrome oder von anderen Quellen als CSV importieren.</string>
+    <string name="whats_new_in_1_7_bullet_2_head">Verbessertes Automtisches Ausfüllen</string>
+    <string name="whats_new_in_1_7_bullet_2_text">Automatisches Ausfüllen wurde signifikant verbessert und unterstützt jetzt automatische Vorschläge zum Ausfüllen.</string>
+    <string name="whats_new_in_1_7_bullet_3_head">Kopierschutz für Masterpasswort-Token auf NFC Tag</string>
+    <string name="whats_new_in_1_7_bullet_3_text">Wenn aktiviert, können NFC-Tags mit MPTs zwar noch kopiert werden, die Kopien sind aber wirkungslos zum Einloggen.</string>
+    <string name="whats_new_in_1_7_bullet_4_head">Änderung der aktuellen Tresorverschlüsselung</string>
+    <string name="whats_new_in_1_7_bullet_4_text">Jetzt kannst du den Verschlüsselungs-Algorithmus deines Tresors nachträglich ändern, um z.B. einen neueren Algorithmus zu verwenden.</string>
+    <string name="whats_new_in_1_7_bullet_5_head">Optimiere Zufallsgenerator</string>
+    <string name="whats_new_in_1_7_bullet_5_text">Füge zusätzliche Entropie für den Zufallsgenerator hinzu um eine höhere Zufälligkeit zu erhalten.</string>
+
     <string name="intro">Starte Intro</string>
     <string name="intro_1_head">Ein etwas anderer Passwortmanager</string>
     <string name="intro_1_subtext">ANOTHERpass bietet eine etwas andere Herangehensweise. Lies hier was das heißt:</string>
@@ -538,10 +549,10 @@
     <string name="reminder_period_1_week">Einmal pro Woche</string>
     <string name="colorize_qr_codes">Coloriere QR-Codes</string>
     <string name="print_qr_code_header">Drucke QR-Code Kopfzeile</string>
-    <string name="autofill_suggest_everywhere">Autofill-Vorschläge überall anzeigen</string>
+    <string name="autofill_suggest_everywhere">Vorschläge für Automatisches Ausfüllen überall anzeigen</string>
     <string name="report_a_bug">Der Fehlerbericht wird nun zu einer Bug-Tracking-Website (Github) gesendet. Dafür brauchst du ein Github-Konto. Außerdem wurde der Bericht in die Zwischenablage kopiert. Danke für deine Hilfe.</string>
-    <string name="autofill_deactivation_duration_title">Auf Aufforderung Autofill temporär pausieren</string>
-    <string name="temp_deact_autofill">Autofill pausieren</string>
+    <string name="autofill_deactivation_duration_title">Auf Aufforderung Automatisches Ausfüllen temporär pausieren</string>
+    <string name="temp_deact_autofill">Ausfüllen pausieren</string>
     <string name="temp_deact_autofill_never">Nie</string>
     <string name="temp_deact_autofill_15_sec">Für 15 Sekunden</string>
     <string name="temp_deact_autofill_30_sec">Für 30 Sekunden</string>
@@ -550,9 +561,9 @@
     <string name="temp_deact_autofill_10_minutes">Für 10 Minuten</string>
     <string name="temp_deact_autofill_1_hour">Für eine Stunde</string>
     <string name="temp_deact_autofill_12_hours">Für 12 Stunden</string>
-    <string name="temp_deact_autofill_on">Autofill pausiert (%1$s)</string>
-    <string name="resume_paused_autofill">Pausiertes Autofill fortsetzen</string>
-    <string name="resume_paused_autofill_done">Autofill wieder aktiv</string>
+    <string name="temp_deact_autofill_on">Automatisches Ausfüllen pausiert (%1$s)</string>
+    <string name="resume_paused_autofill">Pausiertes Automatisches Ausfüllen fortsetzen</string>
+    <string name="resume_paused_autofill_done">Automatisches Ausfüllen wieder aktiv</string>
     <string name="previous_login_at">Vorheriger Login</string>
     <string name="last_denied_login_at">Letzter erfolgloser Login</string>
     <string name="last_denied_login_attempts">Letzte erfolglose Loginversuche</string>
@@ -599,13 +610,13 @@
 
     <string name="cannot_parse_csv_credentials">Zugangsdaten konnten nicht gelesen werden</string>
     <string name="go_back_to_app">Zurück zur App</string>
-    <string name="no_autofill_for_app">Kein Autofill für \'%1$s\'</string>
-    <string name="no_autofill_for_current_app">Kein Autofill für diese App</string>
-    <string name="excluded_from_autofill">Autofill für diese App ist nun dauerhaft deaktiviert.</string>
+    <string name="no_autofill_for_app">Kein Ausfüllen für \'%1$s\'</string>
+    <string name="no_autofill_for_current_app">Kein Ausfüllen für diese App</string>
+    <string name="excluded_from_autofill">Automatisches Ausfüllen für diese App ist nun dauerhaft deaktiviert.</string>
     <string name="vault_locked">Der Tresor ist nun gesperrt</string>
 
-    <string name="autofill_inline_presentations_title">Integriere Autofill-Optionen in die Tastatur</string>
-    <string name="autofill_inline_presentations_summary">Ab Android 11 können Autofill-Optionen in die virtuellen Tastatur integriert werden. Die virtuelle Tastatur muss dies aber unterstützen. Wenn nicht, wird stattdessen der normale Popup-Dialog angezeigt.</string>
+    <string name="autofill_inline_presentations_title">Integriere Automatisches Ausfüllen in die Tastatur</string>
+    <string name="autofill_inline_presentations_summary">Ab Android 11 kann Automatisches Ausfüllen in die virtuellen Tastatur integriert werden. Die virtuelle Tastatur muss dies aber unterstützen. Wenn nicht, wird stattdessen der normale Popup-Dialog angezeigt.</string>
     <string name="autofill_suggest_credentials_title">Schlage Zugangsdaten vor</string>
-    <string name="autofill_suggest_credentials_summary">Wenn möglich, schlage Zugangsdaten vor, die zur aktuellen Autofill-Aktion passen könnten.</string>
+    <string name="autofill_suggest_credentials_summary">Wenn möglich, schlage Zugangsdaten vor, die zur aktuellen Ausfüllaktion passen könnten.</string>
 </resources>

@@ -361,7 +361,7 @@ object ResponseFiller {
             createAuthDataSets(
                 structure,
                 fields.getAllFields(), R.drawable.ic_baseline_pause_gray_24,
-                context.getString(R.string.temp_deact_autofill), ACTION_PAUSE_AUTOFILL, false, context
+                context.getString(R.string.temp_deact_autofill), ACTION_PAUSE_AUTOFILL, true, context
             ).forEach { responseBuilder.addDataset(it) }
         }
 

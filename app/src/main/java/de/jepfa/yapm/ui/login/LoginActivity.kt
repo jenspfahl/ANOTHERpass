@@ -25,6 +25,7 @@ import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_ATTEMPTS
 import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_SUCCEEDED_AT
 import de.jepfa.yapm.service.PreferenceService.STATE_PREVIOUS_LOGIN_ATTEMPTS
 import de.jepfa.yapm.service.PreferenceService.STATE_PREVIOUS_LOGIN_SUCCEEDED_AT
+import de.jepfa.yapm.service.PreferenceService.STATE_WHATS_NEW_SHOWED_FOR_VERSION
 import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.*
@@ -64,10 +65,24 @@ class LoginActivity : NfcBaseActivity() {
 
         super.onCreate(null)
 
-        val introShowed = PreferenceService.getAsBool(STATE_INTRO_SHOWED, this)
-        if (!introShowed && !isFromAutofill && Session.isLoggedOut()) {
-            val intent = Intent(this, IntroActivity::class.java)
-            startActivity(intent)
+        if (!isFromAutofill && Session.isLoggedOut()) {
+            val introShowed = PreferenceService.getAsBool(STATE_INTRO_SHOWED, this)
+            if (!introShowed) {
+                val intent = Intent(this, IntroActivity::class.java)
+                startActivity(intent)
+                // don't show WhatsNew when Intro was just showed automatically
+                PreferenceService.putInt(STATE_WHATS_NEW_SHOWED_FOR_VERSION,
+                    DebugInfo.getVersionCodeForWhatsNew(this), this)
+
+            }
+            else {
+                val whatsNewShowedForVersion = PreferenceService.getAsInt(STATE_WHATS_NEW_SHOWED_FOR_VERSION, this)
+                val currentVersion = DebugInfo.getVersionCodeForWhatsNew(this)
+                if (currentVersion > whatsNewShowedForVersion) {
+                    val intent = Intent(this, WhatsNewActivity::class.java)
+                    startActivity(intent)
+                }
+            }
         }
 
         if (MasterKeyService.isMasterKeyStored(this)) {

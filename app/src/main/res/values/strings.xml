@@ -455,6 +455,16 @@
     <string name="whats_new">What\'s new</string>
     <string name="whats_new_in_1_7">What\'s new in version 1.7</string>
     <string name="whats_new_in_1_7_subtext">Besides several bugfixes and improvements these new main features shipped in:</string>
+    <string name="whats_new_in_1_7_bullet_1_head">Import credentials from browsers</string>
+    <string name="whats_new_in_1_7_bullet_1_text">You can import credentials from browsers like Firefox or Chrome or other sources by importing them from CSV files.</string>
+    <string name="whats_new_in_1_7_bullet_2_head">Improved Autofill</string>
+    <string name="whats_new_in_1_7_bullet_2_text">Autofill has been improved to work smoother and to support automatic credential suggestions.</string>
+    <string name="whats_new_in_1_7_bullet_3_head">Copy protection for NFC-Master Password Token</string>
+    <string name="whats_new_in_1_7_bullet_3_text">New ability to make copied NFC tags containing MPTs useless for the copier.</string>
+    <string name="whats_new_in_1_7_bullet_4_head">Change existing vault encryption</string>
+    <string name="whats_new_in_1_7_bullet_4_text">Now you can change the vaults encryption algorithm afterwards to use new modern ciphers.</string>
+    <string name="whats_new_in_1_7_bullet_5_head">Optimize random generator</string>
+    <string name="whats_new_in_1_7_bullet_5_text">Add your own real-world-entropy to the internal random generator to achieve more randomness.</string>
     <string name="intro">Show intro</string>
     <string name="intro_1_head">Another way to manage passwords</string>
     <string name="intro_1_subtext">ANOTHERpass is another approach of a password manager. See what it means:</string>

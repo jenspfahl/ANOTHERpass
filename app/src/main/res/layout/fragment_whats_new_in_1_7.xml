@@ -72,12 +72,12 @@
                             android:textSize="16sp"
                             android:textStyle="bold"
                             android:padding="6dp"
-                            android:text="Import credentials from browsers" />
+                            android:text="@string/whats_new_in_1_7_bullet_1_head" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingHorizontal="12dp"
-                            android:text="You can import credentials from browsers like Firefox or Chrome by importing them from CSV files." />
+                            android:text="@string/whats_new_in_1_7_bullet_1_text" />
                     </LinearLayout>
                 </TableRow>
 
@@ -94,35 +94,12 @@
                             android:textSize="16sp"
                             android:textStyle="bold"
                             android:padding="6dp"
-                            android:text="Improved Autofill" />
+                            android:text="@string/whats_new_in_1_7_bullet_2_head" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingHorizontal="12dp"
-                            android:text="Autofill has been improved to work smoother and to support automatic credential suggestions." />
-                    </LinearLayout>
-                </TableRow>
-
-
-                <TableRow>
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingVertical="8dp"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:padding="6dp"
-                            android:text="Copy protect NFC-Master Password Token" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingHorizontal="12dp"
-                            android:text="New ability to make copied NFC tokens containing MPTs useless." />
+                            android:text="@string/whats_new_in_1_7_bullet_2_text" />
                     </LinearLayout>
                 </TableRow>
 
@@ -140,12 +117,12 @@
                             android:textSize="16sp"
                             android:textStyle="bold"
                             android:padding="6dp"
-                            android:text="Change vault encryption" />
+                            android:text="@string/whats_new_in_1_7_bullet_3_head" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingHorizontal="12dp"
-                            android:text="Now you can change the vaults encryption algorithm afterwards to use new modern ciphers." />
+                            android:text="@string/whats_new_in_1_7_bullet_3_text" />
                     </LinearLayout>
                 </TableRow>
 
@@ -163,12 +140,35 @@
                             android:textSize="16sp"
                             android:textStyle="bold"
                             android:padding="6dp"
-                            android:text="Optimize random generator" />
+                            android:text="@string/whats_new_in_1_7_bullet_4_head" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingHorizontal="12dp"
-                            android:text="Add your own real-world-entrophy to the internal random generator to achieve more randomness." />
+                            android:text="@string/whats_new_in_1_7_bullet_4_text" />
+                    </LinearLayout>
+                </TableRow>
+
+
+                <TableRow>
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingVertical="8dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:padding="6dp"
+                            android:text="@string/whats_new_in_1_7_bullet_5_head" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingHorizontal="12dp"
+                            android:text="@string/whats_new_in_1_7_bullet_5_text" />
                     </LinearLayout>
                 </TableRow>
 
