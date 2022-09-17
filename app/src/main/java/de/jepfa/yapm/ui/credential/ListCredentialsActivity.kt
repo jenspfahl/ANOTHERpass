@@ -823,6 +823,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 // refresh filtering
                 listCredentialAdapter?.filter?.filter(searchView.query)
             }
+            else {
+                listCredentialAdapter?.filter?.filter("")
+            }
         }
     }
 
