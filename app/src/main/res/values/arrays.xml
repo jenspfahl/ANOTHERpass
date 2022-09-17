@@ -115,6 +115,8 @@
         <item>@color/Navy</item>
         <item>@color/Fuchsia</item>
         <item>@color/Purple</item>
+        <item>@color/StoneGray</item>
+        <item>@color/LightGray</item>
     </integer-array>
 
     <string-array name="dark_mode_entries">

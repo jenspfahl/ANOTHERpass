@@ -21,6 +21,7 @@ import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.ui.label.Label.Companion.DEFAULT_CHIP_COLOR_ID
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.*
 import java.util.*
@@ -104,8 +105,11 @@ class EditLabelActivity : SecureActivity() {
                     colorDialog.dismiss()
                 }
 
-                val usageCount = LabelService.defaultHolder.getAllLabels().filter { it.colorRGB == color }.size
-                var usageString = if (usageCount == 1) {
+                val usageCount = LabelService.defaultHolder.getAllLabels()
+                    .filter { it.getColor(this) == color }
+                    .size
+
+                val usageString = if (usageCount == 1) {
                     getString(R.string.label_used_once, usageCount)
                 }
                 else if (usageCount > 1) {

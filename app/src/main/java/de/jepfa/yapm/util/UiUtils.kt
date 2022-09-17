@@ -75,10 +75,8 @@ fun createLabelChip(
         chip.ensureAccessibleTouchTarget(32)
     }
     context?.let {
-        if (label.labelId != -1) {
-            chip.chipBackgroundColor = ColorStateList.valueOf(label.getColor(it))
-            chip.setTextColor(it.getColor(android.R.color.white))
-        }
+        chip.chipBackgroundColor = ColorStateList.valueOf(label.getColor(it))
+        chip.setTextColor(it.getColor(android.R.color.white))
     }
     return chip
 }

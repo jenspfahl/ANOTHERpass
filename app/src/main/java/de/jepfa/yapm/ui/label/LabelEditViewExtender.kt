@@ -17,6 +17,7 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.createAndAddLabelChip
 import de.jepfa.yapm.util.toastText
+import kotlin.random.Random
 
 
 class LabelEditViewExtender(private val activity: SecureActivity,
@@ -47,7 +48,7 @@ class LabelEditViewExtender(private val activity: SecureActivity,
         editCredentialLabelsTextView.setOnEditorActionListener { v, actionId, event ->
             if(actionId == EditorInfo.IME_ACTION_DONE){
                 val unfinishedText = editCredentialLabelsTextView.text.toString()
-                addChipToLabelGroup(unfinishedText)
+                addTextToLabelGroup(unfinishedText)
                 editCredentialLabelsTextView.text = null
                 editCredentialLabelsTextView.dismissDropDown()
 
@@ -62,7 +63,7 @@ class LabelEditViewExtender(private val activity: SecureActivity,
             val committedText = it.toString()
             if (isCommittedLabelName(committedText)) {
                 val labelName = clearCommittedLabelName(committedText)
-                addChipToLabelGroup(labelName)
+                addTextToLabelGroup(labelName)
                 editCredentialLabelsTextView.text = null
                 editCredentialLabelsTextView.dismissDropDown()
 
@@ -92,9 +93,9 @@ class LabelEditViewExtender(private val activity: SecureActivity,
         return chipNames.toList()
     }
 
-    private fun addChipToLabelGroup(labelName: String) {
+    private fun addTextToLabelGroup(labelName: String) {
         if (labelName.isNotBlank()) {
-            val label = LabelService.defaultHolder.lookupByLabelName(labelName) ?: Label(labelName)
+            val label = LabelService.defaultHolder.lookupByLabelName(labelName) ?: createNewLabel(labelName)
             val maxLabelLength = activity.resources.getInteger(R.integer.max_label_name_length)
             val chipsCount = editCredentialLabelsChipGroup.size
             if (containsLabel(editCredentialLabelsChipGroup, label)) {
@@ -121,13 +122,30 @@ class LabelEditViewExtender(private val activity: SecureActivity,
         }
     }
 
+    private fun createNewLabel(labelName: String): Label {
+        val labelColors = activity.resources.getIntArray(R.array.label_colors)
+        val allLabelColors = LabelService.defaultHolder.getAllLabels()
+            .mapNotNull { it.colorRGB }
+            .toSet()
+        var freeColor = labelColors
+            .filterNot { allLabelColors.contains(it) }
+            .firstOrNull()
+
+        if (freeColor == null) {
+            val randId = Random.nextInt(allLabelColors.size)
+            freeColor = allLabelColors.elementAt(randId)
+        }
+
+        return Label(labelName, freeColor)
+    }
+
     private fun saveLabelIfNeeded(label: Label) {
         activity.masterSecretKey?.let { key ->
             val existing = LabelService.defaultHolder.lookupByLabelName(label.name)
             if (existing == null) {
                 val encName = encryptCommonString(key, label.name)
                 val encDesc = encryptCommonString(key, label.description)
-                val encLabel = EncLabel(null, null, encName, encDesc, null)
+                val encLabel = EncLabel(null, null, encName, encDesc, label.colorRGB)
                 activity.labelViewModel.insert(encLabel, activity)
             }
         }
