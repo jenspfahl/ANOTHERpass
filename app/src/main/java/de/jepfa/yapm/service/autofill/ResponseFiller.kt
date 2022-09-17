@@ -351,7 +351,7 @@ object ResponseFiller {
             fields.getAllFields(), R.drawable.ic_baseline_not_interested_gray_24,
             message,
             ACTION_EXCLUDE_FROM_AUTOFILL,
-            suggestEverywhere,
+            true,
             context)
             .forEach { responseBuilder.addDataset(it) }
 
@@ -618,6 +618,8 @@ object ResponseFiller {
     }
 
     fun isInlinePresentationSupported() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+
+    fun isAutofillSupported() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
 
     private fun createInlinePresentation(
         autofillId: AutofillId,

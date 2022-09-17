@@ -268,6 +268,22 @@ class SettingsActivity : SecureActivity(),
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.autofill_preferences, rootKey)
 
+            findPreference<SwitchPreferenceCompat>(PreferenceService.PREF_AUTOFILL_EVERYWHERE)?.let { pref ->
+                activity?.let { pref.isEnabled = ResponseFiller.isAutofillSupported() }
+            }
+
+            findPreference<SwitchPreferenceCompat>(PreferenceService.PREF_AUTOFILL_SUGGEST_CREDENTIALS)?.let { pref ->
+                activity?.let { pref.isEnabled = ResponseFiller.isAutofillSupported() }
+            }
+
+            findPreference<MultiSelectListPreference>(PreferenceService.PREF_AUTOFILL_EXCLUSION_LIST)?.let { pref ->
+                activity?.let { pref.isEnabled = ResponseFiller.isAutofillSupported() }
+            }
+
+            findPreference<ListPreference>(PreferenceService.PREF_AUTOFILL_DEACTIVATION_DURATION)?.let { pref ->
+                activity?.let { pref.isEnabled = ResponseFiller.isAutofillSupported() }
+            }
+
             findPreference<SwitchPreferenceCompat>(PreferenceService.PREF_AUTOFILL_INLINE_PRESENTATIONS)?.let { pref ->
                 activity?.let { pref.isEnabled = ResponseFiller.isInlinePresentationSupported() }
             }

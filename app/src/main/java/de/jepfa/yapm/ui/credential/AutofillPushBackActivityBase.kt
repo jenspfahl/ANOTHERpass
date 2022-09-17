@@ -21,7 +21,7 @@ abstract class AutofillPushBackActivityBase : SecureActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AutofillCredentialHolder.clear()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (ResponseFiller.isAutofillSupported()) {
             assistStructure = intent.getParcelableExtra(AutofillManager.EXTRA_ASSIST_STRUCTURE)
         }
         if (ResponseFiller.isInlinePresentationSupported()) {
@@ -32,7 +32,7 @@ abstract class AutofillPushBackActivityBase : SecureActivity() {
     }
 
     fun shouldPushBackAutoFill() : Boolean {
-        return assistStructure != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+        return assistStructure != null && ResponseFiller.isAutofillSupported()
     }
 
     fun pushBackAutofill(credential: EncCredential, deobfuscationKey: Key?) {
@@ -42,7 +42,7 @@ abstract class AutofillPushBackActivityBase : SecureActivity() {
 
     fun pushBackAutofill(ignoreCurrentApp: Boolean = false, allowCreateAuthentication: Boolean = false) {
         val structure = assistStructure
-        if (structure != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (structure != null && ResponseFiller.isAutofillSupported()) {
             val replyIntent = Intent().apply {
                 ResponseFiller.updateInlinePresentationRequest(inlineSuggestionsRequest)
                 val fillResponse = ResponseFiller.createFillResponse(
