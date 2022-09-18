@@ -94,9 +94,12 @@ class NdefTag @Throws(FormatException::class) constructor(val tag: Tag, val data
         return false
     }
 
-    @Throws(IOException::class)
-    fun close() {
-        ndef?.close() ?: ndefFormatable?.close()
+    fun safeClose() {
+        try {
+            ndef?.close() ?: ndefFormatable?.close()
+        } catch (e: Exception) {
+            Log.e("NFC", "cannot close", e)
+        }
     }
 
     companion object {
