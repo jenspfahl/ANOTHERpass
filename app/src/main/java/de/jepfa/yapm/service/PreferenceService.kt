@@ -53,6 +53,11 @@ object PreferenceService {
 
     const val DATA_MPT_CREATED_AT = DATA_PREFIX + "mpt_created_at"
 
+    const val DATA_NAV_MENU_QUICK_ACCESS_EXPANDED = DATA_PREFIX + "nav_menu_quick_access_expanded"
+    const val DATA_NAV_MENU_EXPORT_EXPANDED = DATA_PREFIX + "nav_menu_export_expanded"
+    const val DATA_NAV_MENU_IMPORT_EXPANDED = DATA_PREFIX + "nav_menu_import_expanded"
+    const val DATA_NAV_MENU_VAULT_EXPANDED = DATA_PREFIX + "nav_menu_vault_expanded"
+
     const val DATA_MP_EXPORTED_AT = DATA_PREFIX + "mp_exported_at"
     const val DATA_MP_MODIFIED_AT = DATA_PREFIX + "mp_modified_at"
     const val DATA_MP_EXPORT_NOTIFICATION_SHOWED_AT = DATA_PREFIX + "mp_export_notification_showed_at"

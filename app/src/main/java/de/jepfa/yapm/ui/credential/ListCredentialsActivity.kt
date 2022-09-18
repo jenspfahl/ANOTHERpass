@@ -37,6 +37,10 @@ import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
+import de.jepfa.yapm.service.PreferenceService.DATA_NAV_MENU_EXPORT_EXPANDED
+import de.jepfa.yapm.service.PreferenceService.DATA_NAV_MENU_IMPORT_EXPANDED
+import de.jepfa.yapm.service.PreferenceService.DATA_NAV_MENU_QUICK_ACCESS_EXPANDED
+import de.jepfa.yapm.service.PreferenceService.DATA_NAV_MENU_VAULT_EXPANDED
 import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_SUGGEST_CREDENTIALS
 import de.jepfa.yapm.service.PreferenceService.PREF_CREDENTIAL_SORT_ORDER
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_CREDENTIAL_IDS
@@ -325,11 +329,16 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         super.onCreateOptionsMenu(menu)
 
+        // update navigation menu items (collapse or not)
+        navMenuQuickAccessVisible = PreferenceService.getAsBool(
+            DATA_NAV_MENU_QUICK_ACCESS_EXPANDED, navMenuQuickAccessVisible, this)
+        navMenuExportVisible = PreferenceService.getAsBool(
+            DATA_NAV_MENU_EXPORT_EXPANDED, navMenuExportVisible, this)
+        navMenuImportVisible = PreferenceService.getAsBool(
+            DATA_NAV_MENU_IMPORT_EXPANDED, navMenuImportVisible, this)
+        navMenuVaultVisible = PreferenceService.getAsBool(
+            DATA_NAV_MENU_VAULT_EXPANDED, navMenuVaultVisible, this)
         refreshNavigationMenu()
-        updateNavigationMenuVisibility(R.id.group_quick_access, R.id.item_quick_access, R.string.quick_access, navMenuQuickAccessVisible)
-        updateNavigationMenuVisibility(R.id.group_export, R.id.item_export, R.string.action_export, navMenuExportVisible)
-        updateNavigationMenuVisibility(R.id.group_import, R.id.item_import, R.string.import_read, navMenuImportVisible)
-        updateNavigationMenuVisibility(R.id.group_vault, R.id.item_vault, R.string.vault, navMenuVaultVisible)
 
         return true
     }
@@ -598,34 +607,33 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
             R.id.item_quick_access -> {
                 navMenuQuickAccessVisible = !navMenuQuickAccessVisible
+                PreferenceService.putBoolean(
+                    DATA_NAV_MENU_QUICK_ACCESS_EXPANDED, navMenuQuickAccessVisible, this)
                 needNavMenuUpdate = true
             }
             R.id.item_export -> {
                 navMenuExportVisible = !navMenuExportVisible
+                PreferenceService.putBoolean(
+                    DATA_NAV_MENU_EXPORT_EXPANDED, navMenuExportVisible, this)
                 needNavMenuUpdate = true
             }
             R.id.item_import -> {
                 navMenuImportVisible = !navMenuImportVisible
+                PreferenceService.putBoolean(
+                    DATA_NAV_MENU_IMPORT_EXPANDED, navMenuImportVisible, this)
                 needNavMenuUpdate = true
             }
             R.id.item_vault -> {
                 navMenuVaultVisible = !navMenuVaultVisible
+                PreferenceService.putBoolean(
+                    DATA_NAV_MENU_VAULT_EXPANDED, navMenuVaultVisible, this)
                 needNavMenuUpdate = true
 
             }
         }
 
         if (needNavMenuUpdate) {
-            
             refreshNavigationMenu()
-            updateNavigationMenuVisibility(R.id.group_quick_access, R.id.item_quick_access, R.string.quick_access, navMenuQuickAccessVisible)
-            updateNavigationMenuVisibility(R.id.group_export, R.id.item_export, R.string.action_export, navMenuExportVisible)
-            updateNavigationMenuVisibility(R.id.group_import, R.id.item_import, R.string.import_read, navMenuImportVisible)
-            updateNavigationMenuVisibility(R.id.group_vault, R.id.item_vault, R.string.vault, navMenuVaultVisible)
-
-            refreshMenuMasterPasswordItem(navigationView.menu)
-            refreshRevokeMptItem(navigationView.menu)
-
             return false
         }
 
@@ -812,6 +820,39 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         return true
     }
 
+    private fun refreshNavigationMenu() {
+        navigationView.menu.clear()
+        navigationView.inflateMenu(R.menu.menu_main_drawer)
+
+        updateNavigationMenuVisibility(
+            R.id.group_quick_access,
+            R.id.item_quick_access,
+            R.string.quick_access,
+            navMenuQuickAccessVisible
+        )
+        updateNavigationMenuVisibility(
+            R.id.group_export,
+            R.id.item_export,
+            R.string.action_export,
+            navMenuExportVisible
+        )
+        updateNavigationMenuVisibility(
+            R.id.group_import,
+            R.id.item_import,
+            R.string.import_read,
+            navMenuImportVisible
+        )
+        updateNavigationMenuVisibility(
+            R.id.group_vault,
+            R.id.item_vault,
+            R.string.vault,
+            navMenuVaultVisible
+        )
+
+        refreshMenuMasterPasswordItem(navigationView.menu)
+        refreshRevokeMptItem(navigationView.menu)
+    }
+
     private fun refreshCredentials() {
         credentialViewModel.allCredentials.removeObservers(this)
         credentialViewModel.allCredentials.observe(this) { credentials ->
@@ -966,11 +1007,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private fun updateResumeAutofillMenuItem() {
         resumeAutofillItem?.isVisible =
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && ResponseFiller.isAutofillPaused(this)
-    }
-
-    private fun refreshNavigationMenu() {
-        navigationView.menu.clear()
-        navigationView.inflateMenu(R.menu.menu_main_drawer)
     }
 
     private fun updateNavigationMenuVisibility(groupResId: Int, itemResId: Int, stringResId: Int, visible: Boolean) {
