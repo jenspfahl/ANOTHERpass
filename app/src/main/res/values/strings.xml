@@ -379,6 +379,7 @@
     <string name="pref_general_theme">Theme</string>
     <string name="pref_general_show_labels">Show labels in overview list</string>
     <string name="pref_general_show_dividers">Show dividers in overview list</string>
+    <string name="pref_general_nav_menu_always_collapsed">Start always with a collapsed menu tree</string>
     <string name="pref_general_show_formatted_passwords">Show formatted passwords</string>
     <string name="pref_general_summary_show_formatted_passwords">Show passwords separated into words and accent highlighting colors for better readability</string>
     <string name="pref_general_colorize_passwords">Colorize showed passwords</string>

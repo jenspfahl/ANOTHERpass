@@ -6,12 +6,14 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Bitmap
+import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.util.Log
 import android.view.*
 import android.view.autofill.AutofillManager
@@ -43,6 +45,7 @@ import de.jepfa.yapm.service.PreferenceService.DATA_NAV_MENU_QUICK_ACCESS_EXPAND
 import de.jepfa.yapm.service.PreferenceService.DATA_NAV_MENU_VAULT_EXPANDED
 import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_SUGGEST_CREDENTIALS
 import de.jepfa.yapm.service.PreferenceService.PREF_CREDENTIAL_SORT_ORDER
+import de.jepfa.yapm.service.PreferenceService.PREF_NAV_MENU_ALWAYS_COLLAPSED
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_CREDENTIAL_IDS
 import de.jepfa.yapm.service.PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD
 import de.jepfa.yapm.service.PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_RELOAD
@@ -213,13 +216,23 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         refreshRevokeMptItem(navigationView.menu)
         refreshMenuDebugItem(navigationView.menu)
 
-        toggle = ActionBarDrawerToggle(
+        toggle = object: ActionBarDrawerToggle(
             this,
             drawerLayout,
             toolbar,
             R.string.navigation_drawer_open,
             R.string.navigation_drawer_close
-        )
+        ) {
+            override fun onDrawerClosed(drawerView: View) {
+                val navMenuAlwaysCollapsed = PreferenceService.getAsBool(
+                    PREF_NAV_MENU_ALWAYS_COLLAPSED, false, this@ListCredentialsActivity)
+                if (navMenuAlwaysCollapsed) {
+                    setNavMenuCollapsed()
+                    refreshNavigationMenu()
+                }
+                super.onDrawerOpened(drawerView)
+            }
+        }
         drawerLayout.addDrawerListener(toggle)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -330,15 +343,26 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         super.onCreateOptionsMenu(menu)
 
         // update navigation menu items (collapse or not)
-        navMenuQuickAccessVisible = PreferenceService.getAsBool(
-            DATA_NAV_MENU_QUICK_ACCESS_EXPANDED, navMenuQuickAccessVisible, this)
-        navMenuExportVisible = PreferenceService.getAsBool(
-            DATA_NAV_MENU_EXPORT_EXPANDED, navMenuExportVisible, this)
-        navMenuImportVisible = PreferenceService.getAsBool(
-            DATA_NAV_MENU_IMPORT_EXPANDED, navMenuImportVisible, this)
-        navMenuVaultVisible = PreferenceService.getAsBool(
-            DATA_NAV_MENU_VAULT_EXPANDED, navMenuVaultVisible, this)
+        val navMenuAlwaysCollapsed = PreferenceService.getAsBool(PREF_NAV_MENU_ALWAYS_COLLAPSED, false, this)
+        if (navMenuAlwaysCollapsed) {
+            setNavMenuCollapsed()
+        }
+        else {
+            navMenuQuickAccessVisible = PreferenceService.getAsBool(
+                DATA_NAV_MENU_QUICK_ACCESS_EXPANDED, navMenuQuickAccessVisible, this
+            )
+            navMenuExportVisible = PreferenceService.getAsBool(
+                DATA_NAV_MENU_EXPORT_EXPANDED, navMenuExportVisible, this
+            )
+            navMenuImportVisible = PreferenceService.getAsBool(
+                DATA_NAV_MENU_IMPORT_EXPANDED, navMenuImportVisible, this
+            )
+            navMenuVaultVisible = PreferenceService.getAsBool(
+                DATA_NAV_MENU_VAULT_EXPANDED, navMenuVaultVisible, this
+            )
+        }
         refreshNavigationMenu()
+
 
         return true
     }
@@ -1019,13 +1043,19 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         val s =
             SpannableString(getString(stringResId) + (if (visible) " ▲" else " ▼"))
         s.setSpan(
-            ForegroundColorSpan(getColor(android.R.color.darker_gray/*R.color.colorAltAccent*/)),
-            0,
-            s.length,
-            0
+            StyleSpan(Typeface.BOLD), 0, s.length, 0
+        )
+        s.setSpan(
+           ForegroundColorSpan(getColor(android.R.color.darker_gray/*R.color.colorAltAccent*/)), 0, s.length, 0
         )
         item.title = s
     }
 
+    private fun setNavMenuCollapsed() {
+        navMenuQuickAccessVisible = false
+        navMenuExportVisible = false
+        navMenuImportVisible = false
+        navMenuVaultVisible = false
+    }
 }
 

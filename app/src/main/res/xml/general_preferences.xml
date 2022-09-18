@@ -33,6 +33,14 @@
     <SwitchPreferenceCompat
         app:key="YAPM/pref:show_dividers_in_list"
         app:title="@string/pref_general_show_dividers"
+        app:allowDividerBelow="false"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:defaultValue="false"/>
+
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:nav_menu_always_collapsed"
+        app:title="@string/pref_general_nav_menu_always_collapsed"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"

@@ -368,6 +368,7 @@
     <string name="pref_general_theme">Theme</string>
     <string name="pref_general_show_labels">Zeige Kategorien in Übersichtsliste</string>
     <string name="pref_general_show_dividers">Zeige Trennlinien in Übersichtsliste</string>
+    <string name="pref_general_nav_menu_always_collapsed">Starte immer mit zusammengeklapptem Menübaum</string>
     <string name="pref_general_show_formatted_passwords">Formatiere Passwörter</string>
     <string name="pref_general_summary_show_formatted_passwords">Formatiert Passwörter separiert als Wörter und unterschiedlichen Farben um die Lesbarkeit zu erhöhen</string>
     <string name="pref_general_colorize_passwords">Verwende unterschiedliche Farben </string>
