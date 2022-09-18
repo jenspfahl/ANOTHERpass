@@ -216,13 +216,16 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         refreshRevokeMptItem(navigationView.menu)
         refreshMenuDebugItem(navigationView.menu)
 
-        toggle = object: ActionBarDrawerToggle(
+        toggle = ActionBarDrawerToggle(
             this,
             drawerLayout,
             toolbar,
             R.string.navigation_drawer_open,
             R.string.navigation_drawer_close
-        ) {
+        )
+        drawerLayout.addDrawerListener(toggle)
+        drawerLayout.addDrawerListener(object: DrawerLayout.SimpleDrawerListener() {
+
             override fun onDrawerClosed(drawerView: View) {
                 val navMenuAlwaysCollapsed = PreferenceService.getAsBool(
                     PREF_NAV_MENU_ALWAYS_COLLAPSED, false, this@ListCredentialsActivity)
@@ -230,10 +233,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     setNavMenuCollapsed()
                     refreshNavigationMenu()
                 }
-                super.onDrawerOpened(drawerView)
             }
-        }
-        drawerLayout.addDrawerListener(toggle)
+        })
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
@@ -248,8 +249,13 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     override fun onResume() {
         super.onResume()
 
-        refreshMenuMasterPasswordItem(navigationView.menu)
-        refreshRevokeMptItem(navigationView.menu)
+        val navMenuAlwaysCollapsed = PreferenceService.getAsBool(
+            PREF_NAV_MENU_ALWAYS_COLLAPSED, false, this@ListCredentialsActivity)
+        if (navMenuAlwaysCollapsed) {
+            setNavMenuCollapsed()
+        }
+        refreshNavigationMenu()
+
         updateResumeAutofillMenuItem()
 
         val requestReload = PreferenceService.getAsBool(STATE_REQUEST_CREDENTIAL_LIST_RELOAD, applicationContext)
