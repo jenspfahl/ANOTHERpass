@@ -45,7 +45,10 @@
             android:title="@string/export_masterkey" />
         <item
             android:id="@+id/export_vault"
-            android:title="@string/export_vault_as_file" />
+            android:title="@string/export_vault" />
+        <item
+            android:id="@+id/export_plain_credentials"
+            android:title="@string/export_plain_credentials" />
     </group>
 
 
@@ -68,12 +71,13 @@
             android:title="@string/import_read_credential" />
 
         <item
+            android:id="@+id/import_vault"
+            android:title="@string/import_vault_as_file" />
+
+        <item
             android:id="@+id/import_credentials_from_file"
             android:title="@string/import_credentials_file" />
 
-        <item
-            android:id="@+id/import_vault"
-            android:title="@string/import_vault_as_file" />
 
     </group>
 

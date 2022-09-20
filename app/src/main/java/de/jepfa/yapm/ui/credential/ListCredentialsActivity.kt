@@ -63,6 +63,7 @@ import de.jepfa.yapm.ui.changelogin.ChangeEncryptionActivity
 import de.jepfa.yapm.ui.changelogin.ChangeMasterPasswordActivity
 import de.jepfa.yapm.ui.changelogin.ChangePinActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
+import de.jepfa.yapm.ui.exportvault.ExportPlainCredentialsActivity
 import de.jepfa.yapm.ui.exportvault.ExportVaultActivity
 import de.jepfa.yapm.ui.importcredentials.ImportCredentialsActivity
 import de.jepfa.yapm.ui.importread.ImportCredentialActivity
@@ -740,6 +741,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             R.id.export_masterkey -> {
                 UseCaseBackgroundLauncher(ExportEncMasterKeyUseCase)
                     .launch(this, Unit)
+                return true
+            }
+            R.id.export_plain_credentials -> {
+                val intent = Intent(this, ExportPlainCredentialsActivity::class.java)
+                startActivity(intent)
                 return true
             }
             R.id.export_vault -> {

@@ -97,17 +97,22 @@
     <string name="action_export_masterkey">Export \nmaster key</string>
     <string name="action_export_masterpasswd">Export\nmaster password</string>
     <string name="export_vault">Export vault</string>
-    <string name="export_vault_as_file">Export vault as file</string>
     <string name="import_vault_as_file">Import vault file</string>
     <string name="message_import_vault_records">You are going to import %1$d credentials and %2$d labels. Existing records may be overridden! Continue?</string>
     <string name="message_import_credential_records">You are going to import %1$d external credentials. They will be created as new records. Continue?</string>
     <string name="qrc_download_as_img">Save QR code as image</string>
     <string name="download_as_nfc_tag">Push on NFC tag</string>
-    <string name="export_vault_explanation">Here you can share or export your complete vault into a file for backup purposes. Use this file to import your vault after a fresh new app installation without data or to recorver changed data. \nYou may include or exclude the Encrypted Master Key. If you exclude it, export the master key by your own and store it on a safe place. You need it to import the vault file. \nThe separation of Encrypted Master Key and vault file makes the vault file useless for hackers even if they obtain your PIN and master password.</string>
+    <string name="export_vault_explanation">Here you can share or export your complete encrypted vault into a file for backup purposes. Use this file to import your vault after a fresh new app installation without data or to recorver changed data. \nYou may include or exclude the Encrypted Master Key. If you exclude it, export the master key by your own and store it on a safe place. You need it to import the vault file. \nThe separation of Encrypted Master Key and vault file makes the vault file useless for hackers even if they obtain your PIN and master password.</string>
     <string name="button_share_vault">Share vault</string>
-    <string name="button_export_vault">Export vault</string>
+    <string name="button_export_vault">Save vault</string>
     <string name="include_enc_masterkey">Include Encrypted Master Key</string>
     <string name="include_preferences">Include current app settings</string>
+
+    <string name="export_plain_credentials">Takeout credentials</string>
+    <string name="export_plain_credentials_explanation">Here you can takeout all plain (decrypted!!!) credentials as CSV file to e.g. import them into other password tools. This feature should not be used for backup purposes! Use \'Export Vault\' instead! Note: Obfuscated passwords are not de-obfuscated with this export! You need to de-obfuscate them first manually if you need them de-obfuscated.</string>
+    <string name="button_share_plain_credentials">Share CSV file</string>
+    <string name="button_export_plain_credentials">Save CSV file</string>
+
     <string name="too_may_wrong_logins">Too many login attempts, master password is now needed</string>
     <string name="too_may_wrong_logins_self_destruction">Too many login attempts, vault completely deleted</string>
 
@@ -254,6 +259,7 @@
     <string name="paste_passwd_for_autofill">Password for \'%1$s\'</string>
     <string name="paste_credential_for_autofill">Credential for \'%1$s\'</string>
     <string name="backup_file_saved">Vault file saved</string>
+    <string name="csv_file_saved">CSV file saved</string>
     <string name="backup_failed">Error while creating the backup file</string>
     <string name="backup_permission_missing">Permission to write to external storage is missing</string>
     <string name="qr_code_saved">QR code as image saved</string>
@@ -417,6 +423,7 @@
     <string name="send_to">Send to</string>
     <string name="cannot_share_qr_code">Unable to share this QR code</string>
     <string name="cannot_share_vault">Unable to share the vault file</string>
+    <string name="cannot_share_csvfile">Unable to share the csv file</string>
     <string name="hint_store_qr_as_file">Please note if you store sensitive QR codes in your device storage, other apps could access these codes as well.</string>
     <string name="show_export_vault_reminder">Reminder to export vault</string>
     <string name="summary_show_export_vault_reminder">Show a reminder when the vault has changed and needs to be exported.</string>

@@ -94,18 +94,23 @@
     <string name="export_masterpasswd">Exportiere Masterpasswort</string>
     <string name="action_export_masterkey">Exportiere \nMasterkey</string>
     <string name="action_export_masterpasswd">Exportiere \nMasterpasswort</string>
-    <string name="export_vault">Exportiere Tresor</string>
-    <string name="export_vault_as_file">Exportiere Tresor als Datei</string>
+    <string name="export_vault">Exportiere/Backup Tresor</string>
     <string name="import_vault_as_file">Importiere Tresor-Datei</string>
     <string name="message_import_vault_records">Du bist dabei %1$d Zugangsdaten und %2$d Kategorien zu importieren. Schon existierende Daten werden überschrieben. Fortsetzen?</string>
     <string name="message_import_credential_records">Du bist dabei %1$d Zugangsdaten zu importieren. Es werden keine existierende Zugangsdaten überschrieben. Fortfahren?</string>
     <string name="qrc_download_as_img">Speichere QR-Code als Bilddatei</string>
     <string name="download_as_nfc_tag">Schreibe auf NFC-Tag</string>
-    <string name="export_vault_explanation">Hier kannst du deinen kompletten Tresor als Datei teilen oder exportieren, z.B. als Backup auf Google Drive. Importiere diese Datei, wenn du die App neu installiert hast oder um geänderte Daten wiederherzustellen.\nDer verschlüsselte Masterkey kann Bestandteil dieser Datei sein. Wenn nicht, exportiere ihn separat als QR-Code oder NFC-Tag. Du brauchst ihn, wenn du die Tresor-Datei neu importierst.\nDas Trennen des verschlüsselten Masterkeys von der Tresor-Datei macht die Datei unnütz für Hacker, auch wenn sie deine PIN oder dein Masterpasswort hätten.</string>
+    <string name="export_vault_explanation">Hier kannst du deinen kompletten (verschlüsselten) Tresor als Datei teilen oder exportieren, z.B. als Backup auf Google Drive. Importiere diese Datei, wenn du die App neu installiert hast oder um geänderte Daten wiederherzustellen.\nDer verschlüsselte Masterkey kann Bestandteil dieser Datei sein. Wenn nicht, exportiere ihn separat als QR-Code oder NFC-Tag. Du brauchst ihn, wenn du die Tresor-Datei neu importierst.\nDas Trennen des verschlüsselten Masterkeys von der Tresor-Datei macht die Datei unnütz für Hacker, auch wenn sie deine PIN oder dein Masterpasswort hätten.</string>
     <string name="button_share_vault">Tresor teilen</string>
-    <string name="button_export_vault">Tresor exportieren</string>
+    <string name="button_export_vault">Tresor speichern</string>
     <string name="include_enc_masterkey">Inklusive verschlüsselter Masterkey</string>
     <string name="include_preferences">Inklusive App-Einstellungen</string>
+
+    <string name="export_plain_credentials">Entnehme Zugangsdaten</string>
+    <string name="export_plain_credentials_explanation">Hier kannst du alle Zugangsdaten unverschlüsselt(!!!) als CSV-Datei entnehmen um diese z.B. in anderen Passworttools zu verwenden. Dies ist keine Backupfunktion, verwende \'Exportiere Tresor\' dafür! Beachte: Verschleierte Passwörter werden mit diesem Export nicht automatisch entschleiert! Du musst sie erst entschleiert abspeichern wenn du sie entschleiert exportieren möchtest.</string>
+    <string name="button_share_plain_credentials">CSV-Datei teilen</string>
+    <string name="button_export_plain_credentials">CSV-Datei speichern</string>
+
     <string name="too_may_wrong_logins">Zu viele Loginversuche, Masterpasswort wird nun benötigt</string>
     <string name="too_may_wrong_logins_self_destruction">Zu viele Loginversuche, Tresordaten werden nun gelöscht!</string>
 
@@ -245,6 +250,7 @@
     <string name="paste_passwd_for_autofill">Passwort für \'%1$s\'</string>
     <string name="paste_credential_for_autofill">Zugangsdaten für \'%1$s\'</string>
     <string name="backup_file_saved">Tresor-Datei gespeichert</string>
+    <string name="csv_file_saved">CSV-Datei gespeichert</string>
     <string name="backup_failed">Fehler beim Erzeugen der Tresor-Datei</string>
     <string name="backup_permission_missing">Berechtigung zum Schreiben des Externen Speichers fehlt</string>
     <string name="qr_code_saved">QR-Code als Bild gespeichert</string>
@@ -407,6 +413,7 @@
     <string name="send_to">Sende an</string>
     <string name="cannot_share_qr_code">QR-Code konnte nicht geteilt werden</string>
     <string name="cannot_share_vault">Tresor-Datei konnte nicht geteilt werden</string>
+    <string name="cannot_share_csvfile">UCSV-Datei konnte nicht geteilt werden</string>
     <string name="hint_store_qr_as_file">Beachte dass auf dem Gerät gespeicherte QR-Codes mit sensitivem Inhalt potentiell von anderen Apps gelesen werden können.</string>
     <string name="show_export_vault_reminder">Erinnerung den Tresor zu exportieren</string>
     <string name="summary_show_export_vault_reminder">Zeige eine Erinnerung wenn sich der Tresorinhalt geändert hat und deshalb exportiert werden sollte.</string>

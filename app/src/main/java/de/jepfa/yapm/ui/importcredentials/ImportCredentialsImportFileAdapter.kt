@@ -25,7 +25,13 @@ class ImportCredentialsImportFileAdapter(
 ): BaseExpandableListAdapter() {
 
 
-    data class FileRecord(val id: Int, val name: String, val url: String?, val userName: String?, val plainPassword: String)
+    data class FileRecord(
+        val id: Int,
+        val name: String,
+        val url: String?,
+        val userName: String?,
+        val plainPassword: String,
+        val description: String)
 
     private val checkBoxes = ArrayList<CheckBox>()
 

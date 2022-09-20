@@ -85,6 +85,7 @@
         <entry key="app/src/main/res/layout/activity_create_vault.xml" value="0.1359375" />
         <entry key="app/src/main/res/layout/activity_edit_label.xml" value="0.33747178329571104" />
         <entry key="app/src/main/res/layout/activity_error.xml" value="0.18072916666666666" />
+        <entry key="app/src/main/res/layout/activity_export_plain_credentials.xml" value="0.33" />
         <entry key="app/src/main/res/layout/activity_export_vault.xml" value="0.176" />
         <entry key="app/src/main/res/layout/activity_import_credential.xml" value="0.264" />
         <entry key="app/src/main/res/layout/activity_import_credentials.xml" value="0.17604166666666668" />

@@ -8,8 +8,11 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Handler
 import android.util.Log
+import androidx.core.net.toFile
+import androidx.core.net.toUri
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.VaultExportService.createVaultFile
 import de.jepfa.yapm.service.secret.AndroidKey
@@ -30,6 +33,7 @@ class FileIOService: IntentService("FileIOService") {
 
         const val ACTION_SAVE_QRC = "action_saveQrc"
         const val ACTION_EXPORT_VAULT = "action_exportVault"
+        const val ACTION_EXPORT_PLAIN_CREDENTIALS = "action_exportPlainCredentials"
 
         const val PARAM_FILE_URI = "param_file_url"
         const val PARAM_QRC = "param_qrc"
@@ -56,6 +60,7 @@ class FileIOService: IntentService("FileIOService") {
         when (intent.action) {
             ACTION_SAVE_QRC -> saveQrCodeAsImage(intent)
             ACTION_EXPORT_VAULT -> exportVault(intent)
+            ACTION_EXPORT_PLAIN_CREDENTIALS -> exportPlainCredentials(intent)
         }
     }
 
@@ -78,6 +83,37 @@ class FileIOService: IntentService("FileIOService") {
             }
             else {
                 message = getString(R.string.backup_failed)
+            }
+        }
+        else {
+            message = getString(R.string.backup_permission_missing)
+        }
+        if (message.isNotBlank()) {
+            handler.post {
+                toastText(baseContext, message)
+            }
+        }
+
+    }
+
+    private fun exportPlainCredentials(intent: Intent) {
+        var message: String
+        if (FileUtil.isExternalStorageWritable()) {
+            val uri = intent.getParcelableExtra<Uri>(PARAM_FILE_URI) ?: return
+
+            val csvData = CsvService.createCsvExportContent(
+                getApp().credentialRepository.getAllSync(), Session.getMasterKeySK()
+            )
+
+            var success = false
+            if (csvData != null) {
+                success = CsvService.writeCsvExportFile(this, uri, csvData)
+            }
+
+            message = if (success) {
+                getString(R.string.csv_file_saved)
+            } else {
+                getString(R.string.something_went_wrong)
             }
         }
         else {

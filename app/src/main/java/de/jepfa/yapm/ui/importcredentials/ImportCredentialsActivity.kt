@@ -51,16 +51,18 @@ class ImportCredentialsActivity : SecureActivity() {
             val nameKey = extractKey(record, "name")
             val urlKey = extractKey(record, "url")
             val userKey = extractKey(record, "username")
+            val descriptionKey = extractKey(record, "description")
             val passwordKey = extractKey(record, "password") ?: return null
 
             val id = record.index
             val url = record.value[urlKey]
             val name = record.value[nameKey]
             val user = record.value[userKey]
+            val description = record.value[descriptionKey]
             val password = record.value[passwordKey] ?: return null
             ImportCredentialsImportFileAdapter.FileRecord(id,
                 name ?: url?.let { getDomainAsName(it)} ?: "unknown $id",
-                url, user, password)
+                url, user, password, description ?: "")
 
         }
 
@@ -87,7 +89,7 @@ class ImportCredentialsActivity : SecureActivity() {
         labelNames: List<String>
     ): EncCredential {
         val encName = SecretService.encryptCommonString(key, record.name)
-        val encAddInfo = SecretService.encryptCommonString(key, "")
+        val encAddInfo = SecretService.encryptCommonString(key, record.description)
         val encUser = SecretService.encryptCommonString(key, record.userName ?: "")
         val encPassword = SecretService.encryptPassword(key, Password(record.plainPassword))
         val encWebsite = SecretService.encryptCommonString(key, record.url ?: "")
