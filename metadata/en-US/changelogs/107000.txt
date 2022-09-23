@@ -1,0 +1,7 @@
+* import/export plain credentials from/to csv files (e.g. from/for browsers)
+* improved Autofill (inline presentations, suggestions, smoother flow)
+* copy-protect NFC tags containing a Master Password Token
+* possibility to change the current tresors encryption cipher and master key
+* optimize random generator by adding user entropy (hashed picture)
+* UI improvements (labels, foldable main menu tree, ..)
+* bugfixes and other improvements
