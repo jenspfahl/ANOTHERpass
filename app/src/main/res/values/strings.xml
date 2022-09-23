@@ -102,7 +102,7 @@
     <string name="message_import_credential_records">You are going to import %1$d external credentials. They will be created as new records. Continue?</string>
     <string name="qrc_download_as_img">Save QR code as image</string>
     <string name="download_as_nfc_tag">Push on NFC tag</string>
-    <string name="export_vault_explanation">Here you can share or export your complete encrypted vault into a file for backup purposes. Use this file to import your vault after a fresh new app installation without data or to recorver changed data. \nYou may include or exclude the Encrypted Master Key. If you exclude it, export the master key by your own and store it on a safe place. You need it to import the vault file. \nThe separation of Encrypted Master Key and vault file makes the vault file useless for hackers even if they obtain your PIN and master password.</string>
+    <string name="export_vault_explanation">Here you can share or export your complete encrypted vault into a file for backup purposes. Use this file to import your vault after a fresh new app installation without data or to recover changed data. \nYou may include or exclude the Encrypted Master Key. If you exclude it, export the master key by your own and store it on a safe place. You need it to import the vault file. \nThe separation of Encrypted Master Key and vault file makes the vault file useless for hackers even if they obtain your PIN and master password.</string>
     <string name="button_share_vault">Share vault</string>
     <string name="button_export_vault">Save vault</string>
     <string name="include_enc_masterkey">Include Encrypted Master Key</string>
@@ -458,7 +458,7 @@
     <string name="pref_header_reminder">Reminders</string>
     <string name="reminder_period_title">How often to show reminders</string>
     <string name="pref_auth_smp_with_biometric_title">Authorize stored master passwords with biometric</string>
-    <string name="pref_auth_smp_with_biometric_summary">It is highly recommend to protect stored master passwords with e.g. a fingerprint to mitigate the risk of getting it stolen by compromised malware. (Only if your device supports it.) Note: An already stored master password is not touched by changeing this setting now. You have to remove it and set it again to take this setting in effect.</string>
+    <string name="pref_auth_smp_with_biometric_summary">It is highly recommend to protect stored master passwords with e.g. a fingerprint to mitigate the risk of getting it stolen by compromised malware. (Only if your device supports it.) Note: An already stored master password is not touched by changing this setting now. You have to remove it and set it again to take this setting in effect.</string>
     <string name="auth_to_decrypt_emp_omit">Scan Master Password</string>
     <string name="whats_new">What\'s new</string>
     <string name="whats_new_in_1_7">What\'s new in version 1.7</string>
@@ -603,8 +603,8 @@
     <string name="used_seed">Additional seed: %1$s</string>
     <string name="add_additional_source_of_entropy">Add additional source of entropy</string>
     <string name="title_add_user_seed">Add more entropy to generate random keys</string>
-    <string name="message_add_user_seed">If you don\'t trust the seed generator from the operating system, which normally uses a lot of entropy to get a real unpredicable seed, you can add an additional source of entropy by taking a random detailed picture with the camera. \nThe taken picture is hashed and added to the entropy from the operation system to enlarge the randomness even more. So, take a picture of a random scene with lot of details. The photo is not stored on the device!</string>
-    <string name="message_confirm_add_user_seed">You have aleady added an additional entropy. Do wou want to do it again?</string>
+    <string name="message_add_user_seed">If you don\'t trust the seed generator from the operating system, which normally uses a lot of entropy to get a real unpredictable seed, you can add an additional source of entropy by taking a random detailed picture with the camera.\nThe taken picture is hashed and added to the entropy from the operation system to enlarge the randomness even more. So, take a picture of a random scene with lot of details. The photo is not stored on the device!</string>
+    <string name="message_confirm_add_user_seed">You have already added an additional entropy. Do wou want to do it again?</string>
     <string name="error_add_user_seed">Could not open a camera app</string>
     <string name="error_picture_too_small_for_user_seed">Taken picture is too small to extract a random seed</string>
     <string name="seed_random_generator">Optimize random generator</string>

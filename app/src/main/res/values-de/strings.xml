@@ -594,7 +594,7 @@
     <string name="used_seed">Zusätzliches Seed: %1$s</string>
     <string name="add_additional_source_of_entropy">Zusätzliche Entropie hinzufügen</string>
     <string name="title_add_user_seed">Füge zusätzliche Entropie für den Zufallsgenerator hinzu</string>
-    <string name="message_add_user_seed">Falls du dem Zufallsgenerator des Betriebssystems nicht traust, welcher normalerweise verschiedene Entropie des Gerätes verwendet, um unvorhersagbare Zufallszahlen zu generieren, kannst du hier eine weitere Entropie hinzufügen: ein Foto von deiner Kamera.\n  Das fotografierte Bild wird gehasht und als zusätzliche Entropy verwendet, um die Zufälligkeit weiter zu erhöhen. Das heißt, mache ein zufälliges Foto mit vielen unterschiedlichen Details. Das Foto wird nicht auf dem Gerät gespeichert!</string>
+    <string name="message_add_user_seed">Falls du dem Zufallsgenerator des Betriebssystems nicht traust, welcher normalerweise verschiedene Entropie des Gerätes verwendet, um unvorhersagbare Zufallszahlen zu generieren, kannst du hier eine weitere Entropie hinzufügen: ein Foto von deiner Kamera.\nDas fotografierte Bild wird gehasht und als zusätzliche Entropy verwendet, um die Zufälligkeit weiter zu erhöhen. Das heißt, mache ein zufälliges Foto mit vielen unterschiedlichen Details. Das Foto wird nicht auf dem Gerät gespeichert!</string>
     <string name="message_confirm_add_user_seed">Du hast schon eine eigene Entropie hinzugefügt. Willst du den Vorgang wiederholen?</string>
     <string name="error_add_user_seed">Die Kamera-App konnte nicht geöffnet werden</string>
     <string name="error_picture_too_small_for_user_seed">Das geschossene Foto ist zu klein um es als Entropie zu verwenden</string>
