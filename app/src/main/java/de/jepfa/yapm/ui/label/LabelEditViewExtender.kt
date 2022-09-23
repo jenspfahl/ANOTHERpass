@@ -125,7 +125,7 @@ class LabelEditViewExtender(private val activity: SecureActivity,
     private fun createNewLabel(labelName: String): Label {
         val labelColors = activity.resources.getIntArray(R.array.label_colors)
         val allLabelColors = LabelService.defaultHolder.getAllLabels()
-            .mapNotNull { it.colorRGB }
+            .map { it.getColor(activity) }
             .toSet()
         var freeColor = labelColors
             .filterNot { allLabelColors.contains(it) }
