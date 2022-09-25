@@ -463,8 +463,8 @@
     <string name="whats_new">What\'s new</string>
     <string name="whats_new_in_1_7">What\'s new in version 1.7</string>
     <string name="whats_new_in_1_7_subtext">Besides several bugfixes and improvements these new main features shipped in:</string>
-    <string name="whats_new_in_1_7_bullet_1_head">Import credentials from browsers</string>
-    <string name="whats_new_in_1_7_bullet_1_text">You can import credentials from browsers like Firefox or Chrome or other sources by importing them from CSV files.</string>
+    <string name="whats_new_in_1_7_bullet_1_head">Import and export credentials</string>
+    <string name="whats_new_in_1_7_bullet_1_text">You can import credentials from browsers (e.g Firefox) or other sources by importing them from CSV files. Or takeout all credentials as CSV file.</string>
     <string name="whats_new_in_1_7_bullet_2_head">Improved Autofill</string>
     <string name="whats_new_in_1_7_bullet_2_text">Autofill has been improved to work smoother and to support automatic credential suggestions.</string>
     <string name="whats_new_in_1_7_bullet_3_head">Copy protection for NFC-Master Password Token</string>
