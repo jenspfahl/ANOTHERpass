@@ -11,10 +11,10 @@ data class Label(
     var colorRGB: Int?) {
 
     init {
-        name = name.toUpperCase(Locale.ROOT).trim()
+        name = name.uppercase(Locale.ROOT).trim()
     }
 
-    constructor(name: String) : this(name, "")
+    constructor(name: String, colorRGB: Int?) : this(null, name, "", colorRGB)
 
     constructor(name: String, description: String) : this(
         null,

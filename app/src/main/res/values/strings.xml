@@ -18,7 +18,7 @@
     <string name="credential_passwd_params">Here you generate the password for this credential. It is recommend to generate them instead of creating them manually. \'Pseudo Phrase\' passwords are easier to read and type but still highly random and unpredictable.</string>
     <string name="button_gen_passwd">Generate</string>
 
-    <string name="search">Search</string>
+    <string name="search">Search (!-extended)</string>
     <string name="EASY">Easy</string>
     <string name="NORMAL">Normal</string>
     <string name="STRONG">Strong</string>
@@ -27,7 +27,8 @@
 
 
     <string name="cipher_name">Encryption algorithm</string>
-    <string name="create_vault_cipher_explanation">Choose an encryption algorithm. You cannot change that later. If in doubt, use the current default.</string>
+    <string name="create_vault_cipher_explanation">Choose an encryption algorithm. You change that later. If in doubt, use the current default.</string>
+    <string name="update_vault_cipher_explanation">Choose an encryption algorithm. Current used algorithm is %1$s</string>
 
     <string name="CIPHER_AES_128">AES (128bit key)</string>
     <string name="CIPHER_AES_256">AES (256bit key)</string>
@@ -96,34 +97,51 @@
     <string name="action_export_masterkey">Export \nmaster key</string>
     <string name="action_export_masterpasswd">Export\nmaster password</string>
     <string name="export_vault">Export vault</string>
-    <string name="export_vault_as_file">Export vault as file</string>
     <string name="import_vault_as_file">Import vault file</string>
     <string name="message_import_vault_records">You are going to import %1$d credentials and %2$d labels. Existing records may be overridden! Continue?</string>
+    <string name="message_import_credential_records">You are going to import %1$d external credentials. They will be created as new records. Continue?</string>
     <string name="qrc_download_as_img">Save QR code as image</string>
     <string name="download_as_nfc_tag">Push on NFC tag</string>
-    <string name="export_vault_explanation">Here you can share or export your complete vault into a file for backup purposes. Use this file to import your vault after a fresh new app installation without data or to recorver changed data. \nYou may include or exclude the Encrypted Master Key. If you exclude it, export the master key by your own and store it on a safe place. You need it to import the vault file. \nThe separation of Encrypted Master Key and vault file makes the vault file useless for hackers even if they obtain your PIN and master password.</string>
+    <string name="export_vault_explanation">Here you can share or export your complete encrypted vault into a file for backup purposes. Use this file to import your vault after a fresh new app installation without data or to recover changed data. \nYou may include or exclude the Encrypted Master Key. If you exclude it, export the master key by your own and store it on a safe place. You need it to import the vault file. \nThe separation of Encrypted Master Key and vault file makes the vault file useless for hackers even if they obtain your PIN and master password.</string>
     <string name="button_share_vault">Share vault</string>
-    <string name="button_export_vault">Export vault</string>
+    <string name="button_export_vault">Save vault</string>
     <string name="include_enc_masterkey">Include Encrypted Master Key</string>
     <string name="include_preferences">Include current app settings</string>
+
+    <string name="export_plain_credentials">Takeout credentials</string>
+    <string name="export_plain_credentials_explanation">Here you can takeout all plain (decrypted!!!) credentials as CSV file to e.g. import them into other password tools. This feature should not be used for backup purposes! Use \'Export Vault\' instead! Note: Obfuscated passwords are not de-obfuscated with this export! You need to de-obfuscate them first manually if you need them de-obfuscated.</string>
+    <string name="button_share_plain_credentials">Share CSV file</string>
+    <string name="button_export_plain_credentials">Save CSV file</string>
+
     <string name="too_may_wrong_logins">Too many login attempts, master password is now needed</string>
     <string name="too_may_wrong_logins_self_destruction">Too many login attempts, vault completely deleted</string>
+
     <string name="import_vault_explanation">Select a vault file to import. Note: You need the PIN and the (exported) master password and, depending on the file, the Encrypted Master Key.</string>
     <string name="import_vault_to_vault_explanation">Select a vault file to import. Note: The vault file must belong to the same vault with the current vault (Id = %1$s).</string>
     <string name="import_vault_load_file_fragment_label" tools:ignore="TypographyFractions">Import Vault 1/2</string>
     <string name="import_vault_import_file_fragment_label">Import Vault 2/2</string>
     <string name="button_load_vault">Load vault file</string>
     <string name="button_import_vault">Import vault</string>
+
+    <string name="import_credentials_load_file_explanation">Select a file which contains the unencrypted credentials to import. Currently only CSV-files are supported. Use this to import your credentials e.g. from browsers like Firefox or Chrome.</string>
+    <string name="import_credentials_load_file_fragment_label" tools:ignore="TypographyFractions">Import Credentials 1/2</string>
+    <string name="import_credentials_import_file_fragment_label">Import Credentials 2/2</string>
+    <string name="button_load_credentials_file">Load credentials file</string>
+    <string name="button_import_credentials">Import credentials</string>
+
     <string name="scan_mk">Scan your master key</string>
     <string name="drop_vault">Drop vault (delete all)</string>
-    <string name="chooser_select_vault_file">Select vault file to import</string>
+    <string name="chooser_select_file_to_import">Select file to import</string>
     <string name="toast_import_vault_failure">The selected file cannot be imported.</string>
     <string name="toast_import_vault_failure_cipher_not_supported">The selected file is encrypted with an unsupported cipher.</string>
     <string name="toast_import_vault_failure_no_vault_match">The selected file doesn\'t belong to the current vault.</string>
+    <string name="toast_import_vault_failure_not_same_algo">The selected file uses another encryption algorithm.</string>
     <string name="quick_access">Quick access</string>
-    <string name="generate_encrypted_masterpasswd">Create Master Password Token</string>
+    <string name="generate_new_mpt">Create Master Password Token</string>
+    <string name="revoke_last_mpt">Invalidate Master Password Token</string>
     <string name="master_password_not_changed">Master password has not been changed.</string>
     <string name="use_pseudo_phrase">Use pseudo phrases to generate master password</string>
+    <string name="generate_new_masterkey">Generate new master key (the internal key to en-/decrypt all vault data will be renewed)</string>
     <string name="help">Online help</string>
     <string name="about">About</string>
     <string name="title_about_the_app">About the app</string>
@@ -134,7 +152,11 @@
     <string name="repeat_new_pin">Repeat new PIN</string>
     <string name="current_pin">Enter current PIN</string>
     <string name="change_master_password">Change master password</string>
+    <string name="change_encryption">Change encryption</string>
+    <string name="title_change_encryption">Change vault\'s encryption</string>
+    <string name="message_change_encryption">With changing the vault\'s encryption and/or master key all exported vault files cannot be read anymore. It is also recommended to have a fresh backup of your vault and Exported Master Key in case of something goes wrong.</string>
     <string name="change_master_password_explanation">Change your master password by enter your current PIN and generate a new master password. Note, that the Encrypted Master Key will be changed, so you need to export it again. This also effects old vault export files with the old key. You should also export your master password and tokens again.</string>
+    <string name="change_encryption_explanation">Change the vault\'s encryption algorithm if you have migrated your vault to a newer device with support for additional encryption algorithms. Note, that the Encrypted Master Key will be changed, so you need to export it again. This also effects old vault export files and exported credentials (ECRs) which might become unreadable.</string>
     <string name="vault">Vault</string>
     <string name="delete_stored_masterpasswd_confirmation">Do you want to delete the stored master password from this device? For future logins you will need the (exported) master password or a Master Password Token then.</string>
     <string name="pref_header_general">General</string>
@@ -229,11 +251,15 @@
     <string name="label_used_many">Used %1$d times</string>
     <string name="save_as">Save as</string>
     <string name="password_pasted_by_another">Password pasted by another app</string>
-    <string name="login_required_first">Login into your vault and select a credential</string>
-    <string name="select_credential_for_autofill">Select a credential to autofill</string>
-    <string name="paste_user_for_autofill">Paste user for \'%1$s\'</string>
-    <string name="paste_passwd_for_autofill">Paste password for \'%1$s\'</string>
+
+    <string name="login_required_first">Unlock your vault</string>
+    <string name="select_credential_for_autofill">Select a credential</string>
+    <string name="paste_user_for_autofill">User for \'%1$s\'</string>
+    <string name="no_user_for_autofill">No user for \'%1$s\' available</string>
+    <string name="paste_passwd_for_autofill">Password for \'%1$s\'</string>
+    <string name="paste_credential_for_autofill">Credential for \'%1$s\'</string>
     <string name="backup_file_saved">Vault file saved</string>
+    <string name="csv_file_saved">CSV file saved</string>
     <string name="backup_failed">Error while creating the backup file</string>
     <string name="backup_permission_missing">Permission to write to external storage is missing</string>
     <string name="qr_code_saved">QR code as image saved</string>
@@ -243,6 +269,7 @@
     <string name="message_missing_overlay_permission">App cannot draw over other apps. Enable permission and try again.</string>
     <string name="open_overlay_permission">Open permission</string>
     <string name="masterpassword_changed">Master password successfully changed</string>
+    <string name="encryption_changed">Encryption successfully changed</string>
     <string name="pin_changed">PIN successfully changed</string>
     <string name="masterpassword_stored">Master password stored on device</string>
     <string name="masterpassword_not_stored">Master password couldn\'t be stored</string>
@@ -333,6 +360,7 @@
     <string name="unknown_emp_scanned">\u274C Unknown Exported Master Password (EMP) scanned</string>
     <string name="well_known_emp_scanned">\u2705 Well known Exported Master Password (EMP) scanned</string>
     <string name="unknown_mpt_scanned">\u274C Unknown Master Password Token (MPT) scanned</string>
+    <string name="mpt_qr_scan_forbidden">\u274C Master Password Token (MPT) as QR code not allowed due to copy-protected NFC tag priority</string>
     <string name="well_known_mpt_scanned">\u2705 Well known Master Password Token (MPT #%1$s) scanned</string>
     <string name="well_known_ecr_scanned">\u2705 Well known Encrypted Credential Record (ECR) with name \'%1$s\' scanned</string>
     <string name="unknown_ecr_scanned">\u274C Unknown Encrypted Credential Record (ECR) scanned</string>
@@ -357,6 +385,7 @@
     <string name="pref_general_theme">Theme</string>
     <string name="pref_general_show_labels">Show labels in overview list</string>
     <string name="pref_general_show_dividers">Show dividers in overview list</string>
+    <string name="pref_general_nav_menu_always_collapsed">Start always with a collapsed menu tree</string>
     <string name="pref_general_show_formatted_passwords">Show formatted passwords</string>
     <string name="pref_general_summary_show_formatted_passwords">Show passwords separated into words and accent highlighting colors for better readability</string>
     <string name="pref_general_colorize_passwords">Colorize showed passwords</string>
@@ -394,13 +423,16 @@
     <string name="send_to">Send to</string>
     <string name="cannot_share_qr_code">Unable to share this QR code</string>
     <string name="cannot_share_vault">Unable to share the vault file</string>
+    <string name="cannot_share_csvfile">Unable to share the csv file</string>
     <string name="hint_store_qr_as_file">Please note if you store sensitive QR codes in your device storage, other apps could access these codes as well.</string>
     <string name="show_export_vault_reminder">Reminder to export vault</string>
     <string name="summary_show_export_vault_reminder">Show a reminder when the vault has changed and needs to be exported.</string>
     <string name="show_export_mk_reminder">Reminder to export Encrypted Master Key</string>
     <string name="show_export_mp_reminder">Reminder to export Master Password</string>
+    <string name="show_refresh_mpt_reminder">Reminder to renew Master Password Token</string>
     <string name="summary_show_export_mk_reminder">Show a reminder when the Encrypted Master Key has changed and needs to be exported.</string>
     <string name="summary_show_export_mp_reminder">Show a reminder when the Master Password needs to be exported. Note: Without the master password you cannot login!</string>
+    <string name="summary_show_refresh_mpt_reminder">Show a reminder when the Master Password Token should be renewed (if created). This can help to reduce the risk of abusing stolen token.</string>
     <string name="show_biometric_smp_reminder">Reminder to setup biometrics for stored master password</string>
     <string name="summary_show_biometric_smp_reminder">Show a reminder when the stored master password is not protected by a biometric (e.g. a fingerprint) but the device would support it.</string>
     <string name="export_vault_reminder">Vault should be exported after recent modifications.</string>
@@ -408,6 +440,8 @@
     <string name="export_mp_reminder">Master password should be strongly exported!</string>
     <string name="biometric_smp_reminder">Biometrics should be used for stored master password.</string>
     <string name="show_biometric_smp_howto">How?</string>
+    <string name="refresh_mpt_reminder">Master Password Token should be renewed.</string>
+    <string name="show_refresh_mpt">Renew now</string>
     <string name="dont_ask_again">Don\'t nag again</string>
     <string name="manage_reminder_settings_hint">You can manage reminder under Settings / Reminders</string>
     <string name="no_label">WITH NO LABELS</string>
@@ -424,8 +458,21 @@
     <string name="pref_header_reminder">Reminders</string>
     <string name="reminder_period_title">How often to show reminders</string>
     <string name="pref_auth_smp_with_biometric_title">Authorize stored master passwords with biometric</string>
-    <string name="pref_auth_smp_with_biometric_summary">It is highly recommend to protect stored master passwords with e.g. a fingerprint to mitigate the risk of getting it stolen by compromised malware. (Only if your device supports it.) Note: An already stored master password is not touched by changeing this setting now. You have to remove it and set it again to take this setting in effect.</string>
+    <string name="pref_auth_smp_with_biometric_summary">It is highly recommend to protect stored master passwords with e.g. a fingerprint to mitigate the risk of getting it stolen by compromised malware. (Only if your device supports it.) Note: An already stored master password is not touched by changing this setting now. You have to remove it and set it again to take this setting in effect.</string>
     <string name="auth_to_decrypt_emp_omit">Scan Master Password</string>
+    <string name="whats_new">What\'s new</string>
+    <string name="whats_new_in_1_7">What\'s new in version 1.7</string>
+    <string name="whats_new_in_1_7_subtext">Besides several bugfixes and improvements these new main features shipped in:</string>
+    <string name="whats_new_in_1_7_bullet_1_head">Import and export credentials</string>
+    <string name="whats_new_in_1_7_bullet_1_text">You can import credentials from browsers (e.g Firefox) or other sources by importing them from CSV files. Or takeout all credentials as CSV file.</string>
+    <string name="whats_new_in_1_7_bullet_2_head">Improved Autofill</string>
+    <string name="whats_new_in_1_7_bullet_2_text">Autofill has been improved to work smoother and to support automatic credential suggestions.</string>
+    <string name="whats_new_in_1_7_bullet_3_head">Copy protection for NFC-Master Password Token</string>
+    <string name="whats_new_in_1_7_bullet_3_text">New ability to make copied NFC tags containing MPTs useless for the copier.</string>
+    <string name="whats_new_in_1_7_bullet_4_head">Change existing vault encryption</string>
+    <string name="whats_new_in_1_7_bullet_4_text">Now you can change the vaults encryption algorithm afterwards to use new modern ciphers.</string>
+    <string name="whats_new_in_1_7_bullet_5_head">Optimize random generator</string>
+    <string name="whats_new_in_1_7_bullet_5_text">Add your own real-world-entropy to the internal random generator to achieve more randomness.</string>
     <string name="intro">Show intro</string>
     <string name="intro_1_head">Another way to manage passwords</string>
     <string name="intro_1_subtext">ANOTHERpass is another approach of a password manager. See what it means:</string>
@@ -447,6 +494,7 @@
     <string name="intro_5_bullet_3">Strong encryption of ALL sensitive vault data with at least 128 bit keys.</string>
     <string name="intro_5_bullet_4">ANOTHERpass uses a security chip if present for secure keys.</string>
 
+    <string name="credentials_to_be_imported">%1$d of %2$d credentials to be imported</string>
     <string name="credentials_to_be_inserted">%1$d of %2$d credentials to be re-created</string>
     <string name="credentials_to_be_updated">%1$d of %2$d credentials to be replaced</string>
     <string name="labels_to_be_inserted">%1$d of %2$d labels to be re-created</string>
@@ -454,8 +502,10 @@
     <string name="copy_of_name" translatable="false">%1$s (orig)</string>
     <string name="duplicate_of_name" translatable="false">%1$s (copied)</string>
     <string name="nothing_to_import">Nothing to import</string>
+    <string name="nothing_has_been_changed">Nothing has been changed</string>
     <string name="copy_origin">Make a copy of the origin record before updating it. Its name will be followed by \'(orig)\'.</string>
     <string name="import_vault_override_explanation">Here you see the content of the loaded vault file, but only records that differs to the current vault! You can expand the lists and check or uncheck each record to select which should be imported. To see details, click on them.</string>
+    <string name="import_credentials_explanation">Here you see the content of the loaded credentials file. You can check or uncheck each record to select which should be imported. To see details, click on them.</string>
     <string name="dont_think_about_passwords">Don\'t think about passwords!</string>
     <string name="details">Show details</string>
     <string name="title_credential_details">Credential details</string>
@@ -465,7 +515,7 @@
     <string name="identifier" translatable="false">Id</string>
     <string name="universal_identifier" translatable="false">Uid</string>
     <string name="source">Source</string>
-    <string name="source_from_vault_file">from external vault file</string>
+    <string name="source_from_file">from external file</string>
     <string name="source_from_record">from external QR code or NFC tag</string>
     <string name="source_from_the_app">from the app</string>
     <string name="make_nfc_tag_write_protected">Write protect NFC tag (cannot be underdone!!)</string>
@@ -534,6 +584,7 @@
     <string name="previous_login_at">Previous login</string>
     <string name="last_denied_login_at">Last denied login</string>
     <string name="last_denied_login_attempts">Last denied login attempts</string>
+    <string name="recent_created_mpt">Master Password Token #%1$d created at</string>
     <string name="last_succeeded_login">"%2$d login attempt(s) was/were denied %1$s!!</string>
     <string name="last_denied_login_attempt">Last succeeded login was %1$s</string>
 
@@ -545,5 +596,42 @@
     <string name="show_last_login_state_denies_and_succeeds">Denied and succeeded logins</string>
     <string name="show_last_login_state_denies_only">Only denied logins</string>
     <string name="show_last_login_state_nothing">None</string>
+    <string name="protect_mpt_against_copying">Protect token against copying. The token will only work with the current NFC tag. It also disables the usage of QR code for this token!</string>
+    <string name="cannot_copy_protect_nfc_tag">Cannot copy-protect this token</string>
+    <string name="mpt_qrcode_scan_not_allowed">Scanning Master Password Token not allowed</string>
+    <string name="not_a_original_mpt_nfc_token">Not an origin Master Password Token tag</string>
+    <string name="used_seed">Additional seed: %1$s</string>
+    <string name="add_additional_source_of_entropy">Add additional source of entropy</string>
+    <string name="title_add_user_seed">Add more entropy to generate random keys</string>
+    <string name="message_add_user_seed">If you don\'t trust the seed generator from the operating system, which normally uses a lot of entropy to get a real unpredictable seed, you can add an additional source of entropy by taking a random detailed picture with the camera.\nThe taken picture is hashed and added to the entropy from the operation system to enlarge the randomness even more. So, take a picture of a random scene with lot of details. The photo is not stored on the device!</string>
+    <string name="message_confirm_add_user_seed">You have already added an additional entropy. Do wou want to do it again?</string>
+    <string name="error_add_user_seed">Could not open a camera app</string>
+    <string name="error_picture_too_small_for_user_seed">Taken picture is too small to extract a random seed</string>
+    <string name="seed_random_generator">Optimize random generator</string>
 
+    <string name="reminder_refresh_mpt_none">Never</string>
+    <string name="reminder_refresh_mpt_one_week">After a week</string>
+    <string name="reminder_refresh_mpt_two_weeks">After two weeks</string>
+    <string name="reminder_refresh_mpt_one_month">After one month</string>
+    <string name="reminder_refresh_mpt_two_months">After two months</string>
+    <string name="reminder_refresh_mpt_half_a_year">After half a year</string>
+    <string name="reminder_refresh_mpt_year">After a year</string>
+
+    <string name="permission_granted_please_repeat">Permission granted, please repeat your action.</string>
+    <string name="permission_denied">Permission denied!</string>
+
+    <string name="import_credentials_file">Import credentials from file</string>
+    <string name="import_credentials_explanation_labels">You can use labels to find your imported credentials easier.</string>
+    <string name="start_typing_to_filter_labels">Start typing or press space to see existing labels</string>
+    <string name="credentials_in_file">%1$d credentials found in file</string>
+    <string name="cannot_parse_csv_credentials">Cannot read credentials from CSV file</string>
+    <string name="go_back_to_app">Back to the app</string>
+    <string name="no_autofill_for_app">No Autofill for \'%1%s\'</string>
+    <string name="no_autofill_for_current_app">No Autofill for this app</string>
+    <string name="excluded_from_autofill">This app is now excluded from Autofill.</string>
+    <string name="vault_locked">Vault is now locked</string>
+    <string name="autofill_inline_presentations_title">Show Autofill options inlined of the keyboard</string>
+    <string name="autofill_inline_presentations_summary">Since Android 11 Autofill options can be shown integrated in the virtual keyboard, if the keyboard supports it. If not, the common popup dialog will be shown.</string>
+    <string name="autofill_suggest_credentials_title">Suggest credentials</string>
+    <string name="autofill_suggest_credentials_summary">If possible, suggest credentials which could fit for the current dialog to Autofill</string>
 </resources>

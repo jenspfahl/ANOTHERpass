@@ -1,6 +1,8 @@
 package de.jepfa.yapm.service.secretgenerator.passphrase
 
+import android.content.Context
 import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secretgenerator.GeneratorBase
 import de.jepfa.yapm.service.secretgenerator.SecretStrength
 import java.lang.Math.*
@@ -14,8 +16,9 @@ class PassphraseGenerator(
     val vocals: String = DEFAULT_VOCALS,
     val consonants: String = DEFAULT_CONSONANTS,
     val digits: String = DEFAULT_DIGITS,
-    val specialChars: String = DEFAULT_SPECIAL_CHARS
-): GeneratorBase<PassphraseGeneratorSpec>() {
+    val specialChars: String = DEFAULT_SPECIAL_CHARS,
+    context: Context?
+): GeneratorBase<PassphraseGeneratorSpec>(context) {
 
 
     override fun generate(spec: PassphraseGeneratorSpec): Password {
@@ -37,8 +40,6 @@ class PassphraseGenerator(
         if (spec.addSpecialChar) {
             buffer.add(random(specialChars))
         }
-
-        maybeResetPRNG()
 
         return buffer
     }
@@ -93,7 +94,7 @@ class PassphraseGenerator(
     }
 
     private fun random(material: String): Char {
-        val index = random.nextInt(material.length)
+        val index = SecretService.getSecureRandom(context).nextInt(material.length)
 
         return material[index]
     }

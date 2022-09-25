@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import de.jepfa.yapm.R
@@ -200,7 +199,7 @@ class ImportVaultFileOverrideVaultNamedAdapter(
         if (isExternal) {
             intent.putExtra(
                 ShowCredentialActivity.EXTRA_MODE,
-                ShowCredentialActivity.EXTRA_MODE_SHOW_EXTERNAL_FROM_VAULT_FILE
+                ShowCredentialActivity.EXTRA_MODE_SHOW_EXTERNAL_FROM_FILE
             )
         }
         else {

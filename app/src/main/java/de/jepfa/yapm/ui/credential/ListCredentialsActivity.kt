@@ -5,12 +5,20 @@ import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.Typeface
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.util.Log
 import android.view.*
 import android.view.autofill.AutofillManager
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
@@ -19,6 +27,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.MenuItemCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
@@ -30,10 +39,18 @@ import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
+import de.jepfa.yapm.service.PreferenceService.DATA_NAV_MENU_EXPORT_EXPANDED
+import de.jepfa.yapm.service.PreferenceService.DATA_NAV_MENU_IMPORT_EXPANDED
+import de.jepfa.yapm.service.PreferenceService.DATA_NAV_MENU_QUICK_ACCESS_EXPANDED
+import de.jepfa.yapm.service.PreferenceService.DATA_NAV_MENU_VAULT_EXPANDED
+import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_SUGGEST_CREDENTIALS
 import de.jepfa.yapm.service.PreferenceService.PREF_CREDENTIAL_SORT_ORDER
+import de.jepfa.yapm.service.PreferenceService.PREF_NAV_MENU_ALWAYS_COLLAPSED
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_CREDENTIAL_IDS
 import de.jepfa.yapm.service.PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD
 import de.jepfa.yapm.service.PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_RELOAD
+import de.jepfa.yapm.service.autofill.ResponseFiller
+import de.jepfa.yapm.service.autofill.ResponseFiller.ACTION_DELIMITER
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelFilter.WITH_NO_LABELS_ID
 import de.jepfa.yapm.service.label.LabelService
@@ -42,10 +59,13 @@ import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromS
 import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
+import de.jepfa.yapm.ui.changelogin.ChangeEncryptionActivity
 import de.jepfa.yapm.ui.changelogin.ChangeMasterPasswordActivity
 import de.jepfa.yapm.ui.changelogin.ChangePinActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
+import de.jepfa.yapm.ui.exportvault.ExportPlainCredentialsActivity
 import de.jepfa.yapm.ui.exportvault.ExportVaultActivity
+import de.jepfa.yapm.ui.importcredentials.ImportCredentialsActivity
 import de.jepfa.yapm.ui.importread.ImportCredentialActivity
 import de.jepfa.yapm.ui.importread.VerifyActivity
 import de.jepfa.yapm.ui.importvault.ImportVaultActivity
@@ -53,20 +73,16 @@ import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.ui.label.ListLabelsActivity
 import de.jepfa.yapm.ui.settings.SettingsActivity
 import de.jepfa.yapm.usecase.app.ShowInfoUseCase
-import de.jepfa.yapm.usecase.secret.ExportEncMasterKeyUseCase
-import de.jepfa.yapm.usecase.secret.ExportEncMasterPasswordUseCase
-import de.jepfa.yapm.usecase.secret.GenerateMasterPasswordTokenUseCase
-import de.jepfa.yapm.usecase.secret.RemoveStoredMasterPasswordUseCase
+import de.jepfa.yapm.usecase.secret.*
 import de.jepfa.yapm.usecase.session.LogoutUseCase
 import de.jepfa.yapm.usecase.vault.DropVaultUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.usecase.vault.ShowVaultInfoUseCase
 import de.jepfa.yapm.util.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.*
-import kotlin.collections.ArrayList
-import androidx.recyclerview.widget.DividerItemDecoration
-
-
 
 
 /**
@@ -74,10 +90,17 @@ import androidx.recyclerview.widget.DividerItemDecoration
  */
 class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.OnNavigationItemSelectedListener  {
 
+    private var navMenuQuickAccessVisible = true
+    private var navMenuExportVisible = false
+    private var navMenuImportVisible = false
+    private var navMenuVaultVisible = false
+
+    private var searchItem: MenuItem? = null
     private var credentialsRecycleView: RecyclerView? = null
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var toggle: ActionBarDrawerToggle
+    private var resumeAutofillItem: MenuItem? = null
 
     val newOrUpdateCredentialActivityRequestCode = 1
 
@@ -88,11 +111,37 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private var jumpToItemPosition: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // session check would bring LoginActivity to front when action is invoked
+        checkSession = false
         super.onCreate(savedInstanceState)
+        intent?.action?.let { action ->
+            Log.i("LST", "action=$action")
+            if (action.startsWith(ResponseFiller.ACTION_CLOSE_VAULT)) {
+                Session.lock()
+                pushBackAutofill(allowCreateAuthentication = true)
+                toastText(this, R.string.vault_locked)
+                return
+            }
+            if (action.startsWith(ResponseFiller.ACTION_EXCLUDE_FROM_AUTOFILL)) {
+                pushBackAutofill(ignoreCurrentApp = true)
+                toastText(this, R.string.excluded_from_autofill)
+                return
+            }
+            if (action.startsWith(ResponseFiller.ACTION_PAUSE_AUTOFILL)) {
+                val pauseDurationInSec = PreferenceService.getAsString(PreferenceService.PREF_AUTOFILL_DEACTIVATION_DURATION, this)
+                if (pauseDurationInSec != null) {
+                    pauseAutofill(pauseDurationInSec)
+                    return
+                }
+            }
+        }
+        // now lets check session
+        checkSession = true
+        SecretChecker.getOrAskForSecret(this)
+
         setContentView(R.layout.activity_list_credentials)
         val toolbar: Toolbar = findViewById(R.id.list_credentials_toolbar)
         setSupportActionBar(toolbar)
-
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
         listCredentialAdapter = ListCredentialAdapter(this)
         recyclerView.adapter = listCredentialAdapter
@@ -139,6 +188,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
             val intent = Intent(this@ListCredentialsActivity, EditCredentialActivity::class.java)
+            intent.action = this.intent.action
             intent.putExtras(this.intent) // forward all extras, especially needed for Autofill
             startActivityForResult(intent, newOrUpdateCredentialActivityRequestCode)
         }
@@ -164,6 +214,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         navigationView.setNavigationItemSelectedListener(this)
         refreshMenuMasterPasswordItem(navigationView.menu)
+        refreshRevokeMptItem(navigationView.menu)
         refreshMenuDebugItem(navigationView.menu)
 
         toggle = ActionBarDrawerToggle(
@@ -174,6 +225,17 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             R.string.navigation_drawer_close
         )
         drawerLayout.addDrawerListener(toggle)
+        drawerLayout.addDrawerListener(object: DrawerLayout.SimpleDrawerListener() {
+
+            override fun onDrawerClosed(drawerView: View) {
+                val navMenuAlwaysCollapsed = PreferenceService.getAsBool(
+                    PREF_NAV_MENU_ALWAYS_COLLAPSED, false, this@ListCredentialsActivity)
+                if (navMenuAlwaysCollapsed) {
+                    setNavMenuCollapsed()
+                    refreshNavigationMenu()
+                }
+            }
+        })
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
@@ -187,7 +249,15 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     override fun onResume() {
         super.onResume()
-        refreshMenuMasterPasswordItem(navigationView.menu)
+
+        val navMenuAlwaysCollapsed = PreferenceService.getAsBool(
+            PREF_NAV_MENU_ALWAYS_COLLAPSED, false, this@ListCredentialsActivity)
+        if (navMenuAlwaysCollapsed) {
+            setNavMenuCollapsed()
+        }
+        refreshNavigationMenu()
+
+        updateResumeAutofillMenuItem()
 
         val requestReload = PreferenceService.getAsBool(STATE_REQUEST_CREDENTIAL_LIST_RELOAD, applicationContext)
         val requestHardReload = PreferenceService.getAsBool(STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD, applicationContext)
@@ -215,6 +285,10 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         if (!showed) {
             showed = ReminderService.showReminders(ReminderService.StoredMasterPassword, view, this)
         }
+        if (!showed) {
+            showed = ReminderService.showReminders(ReminderService.RefreshMasterPasswordToken, view, this)
+        }
+
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -226,8 +300,10 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
 
         menuInflater.inflate(R.menu.menu_main, menu)
+        Log.d("LST", "inflate menues")
 
         val searchItem: MenuItem = menu.findItem(R.id.action_search)
+        this.searchItem = searchItem
         val searchView = MenuItemCompat.getActionView(searchItem) as SearchView
 
         val searchPlate = searchView.findViewById(R.id.search_src_text) as EditText
@@ -258,20 +334,85 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 getSystemService(Context.SEARCH_SERVICE) as SearchManager
         searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
 
-
         refreshMenuLockItem(menu.findItem(R.id.menu_lock_items))
         refreshMenuFiltersItem(menu.findItem(R.id.menu_filter))
         refreshMenuShowIdsItem(menu.findItem(R.id.menu_show_ids))
 
-
-        labelViewModel.allLabels.observe(this, { labels ->
-            masterSecretKey?.let{ key ->
+        labelViewModel.allLabels.observe(this) { labels ->
+            masterSecretKey?.let { key ->
                 refreshMenuFiltersItem(menu.findItem(R.id.menu_filter))
             }
-        })
+        }
 
-        return super.onCreateOptionsMenu(menu)
+        resumeAutofillItem = menu.findItem(R.id.menu_resume_autofill)
+        updateResumeAutofillMenuItem()
+
+        super.onCreateOptionsMenu(menu)
+
+        // update navigation menu items (collapse or not)
+        val navMenuAlwaysCollapsed = PreferenceService.getAsBool(PREF_NAV_MENU_ALWAYS_COLLAPSED, false, this)
+        if (navMenuAlwaysCollapsed) {
+            setNavMenuCollapsed()
+        }
+        else {
+            navMenuQuickAccessVisible = PreferenceService.getAsBool(
+                DATA_NAV_MENU_QUICK_ACCESS_EXPANDED, navMenuQuickAccessVisible, this
+            )
+            navMenuExportVisible = PreferenceService.getAsBool(
+                DATA_NAV_MENU_EXPORT_EXPANDED, navMenuExportVisible, this
+            )
+            navMenuImportVisible = PreferenceService.getAsBool(
+                DATA_NAV_MENU_IMPORT_EXPANDED, navMenuImportVisible, this
+            )
+            navMenuVaultVisible = PreferenceService.getAsBool(
+                DATA_NAV_MENU_VAULT_EXPANDED, navMenuVaultVisible, this
+            )
+        }
+        refreshNavigationMenu()
+
+
+        return true
     }
+
+    override fun onPostResume() {
+        super.onPostResume()
+        updateSearchFieldWithAutofillSuggestion()
+    }
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        updateSearchFieldWithAutofillSuggestion()
+        return super.onPrepareOptionsMenu(menu)
+    }
+
+    private fun updateSearchFieldWithAutofillSuggestion() {
+        if (!Session.isDenied()) {
+            intent?.action?.let { action ->
+                Log.i("LST", "action2=$action")
+                if (action.startsWith(ResponseFiller.ACTION_OPEN_VAULT)) {
+                    val suggestCredentials =
+                        PreferenceService.getAsBool(PREF_AUTOFILL_SUGGEST_CREDENTIALS, true, this)
+                    if (suggestCredentials) {
+                        val searchString = action.substringAfter(ACTION_DELIMITER).substringBeforeLast(ACTION_DELIMITER).lowercase()
+                        if (searchString.isNotBlank()) {
+                            searchItem?.let { searchItem ->
+                                Log.i("LST", "update search text")
+
+                                val searchView =
+                                    MenuItemCompat.getActionView(searchItem) as SearchView
+                                val searchPlate =
+                                    searchView.findViewById(R.id.search_src_text) as EditText
+
+                                searchView.setQuery("!$searchString", true)
+                                searchItem.expandActionView()
+                                searchPlate.text = SpannableStringBuilder("!$searchString")
+                                searchPlate.selectAll()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
@@ -281,6 +422,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         return when (item.itemId) {
             R.id.menu_lock_items -> {
+                if (shouldPushBackAutoFill()) {
+                    Session.lock()
+                    pushBackAutofill(allowCreateAuthentication = true)
+                    return true
+                }
                 LockVaultUseCase.execute(this)
                 refreshMenuLockItem(item)
                 return true
@@ -341,7 +487,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         }
 
                         LabelFilter.persistState(this)
-                        listCredentialAdapter?.filter?.filter("")
+                        filterAgain()
                         refreshMenuFiltersItem(item)
                         dialog.dismiss()
                     }
@@ -389,6 +535,14 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 listCredentialAdapter?.notifyDataSetChanged()
                 return true
             }
+            R.id.menu_resume_autofill -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && ResponseFiller.isAutofillPaused(this)) {
+                    ResponseFiller.resumeAutofill(this)
+                    toastText(this, R.string.resume_paused_autofill_done)
+                    item.isVisible = false
+                }
+                return true
+            }
             else -> super.onOptionsItemSelected(item)
         }
 
@@ -404,7 +558,23 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             return
         }
 
-        if (requestCode == newOrUpdateCredentialActivityRequestCode && resultCode == Activity.RESULT_OK) {
+        if (requestCode == SeedRandomGeneratorUseCase.REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            val imageBitmap = data?.extras?.get("data") as Bitmap?
+            if (imageBitmap != null) {
+                UseCaseBackgroundLauncher(SeedRandomGeneratorUseCase)
+                    .launch(this, imageBitmap)
+                    { output ->
+                        if (output.success) {
+                            val text = getString(
+                                R.string.used_seed,
+                                output.data
+                            )
+                            toastText(this, text)
+                        }
+                    }
+            }
+        }
+        else if (requestCode == newOrUpdateCredentialActivityRequestCode && resultCode == Activity.RESULT_OK) {
             data?.let {
 
                 val credential = EncCredential.fromIntent(it, createUuid = true)
@@ -415,9 +585,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 }
                 else {
                     credentialViewModel.insert(credential, this)
-                }
-                if (shouldPushBackAutoFill()) {
-                    pushBackAutofill()
+                    if (shouldPushBackAutoFill()) {
+                        pushBackAutofill()
+                    } else {
+                        // nothing
+                    }
                 }
             }
         }
@@ -451,12 +623,54 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
     }
 
+    private fun refreshRevokeMptItem(menu: Menu) {
+        if (!navMenuQuickAccessVisible) {
+            return
+        }
+        val hasMpt = PreferenceService.isPresent(PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY, this)
+        menu.findItem(R.id.revoke_masterpasswd_token).isVisible = hasMpt
+    }
+
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
+
+        var needNavMenuUpdate = false
+        when (item.itemId) {
+
+            R.id.item_quick_access -> {
+                navMenuQuickAccessVisible = !navMenuQuickAccessVisible
+                PreferenceService.putBoolean(
+                    DATA_NAV_MENU_QUICK_ACCESS_EXPANDED, navMenuQuickAccessVisible, this)
+                needNavMenuUpdate = true
+            }
+            R.id.item_export -> {
+                navMenuExportVisible = !navMenuExportVisible
+                PreferenceService.putBoolean(
+                    DATA_NAV_MENU_EXPORT_EXPANDED, navMenuExportVisible, this)
+                needNavMenuUpdate = true
+            }
+            R.id.item_import -> {
+                navMenuImportVisible = !navMenuImportVisible
+                PreferenceService.putBoolean(
+                    DATA_NAV_MENU_IMPORT_EXPANDED, navMenuImportVisible, this)
+                needNavMenuUpdate = true
+            }
+            R.id.item_vault -> {
+                navMenuVaultVisible = !navMenuVaultVisible
+                PreferenceService.putBoolean(
+                    DATA_NAV_MENU_VAULT_EXPANDED, navMenuVaultVisible, this)
+                needNavMenuUpdate = true
+
+            }
+        }
+
+        if (needNavMenuUpdate) {
+            refreshNavigationMenu()
+            return false
+        }
 
         drawerLayout.closeDrawer(GravityCompat.START)
 
         when (item.itemId) {
-
             R.id.store_masterpasswd -> {
                 val masterPasswd = getMasterPasswordFromSession(this)
                 if (masterPasswd != null) {
@@ -502,7 +716,16 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 return true
             }
             R.id.generate_masterpasswd_token -> {
-                GenerateMasterPasswordTokenUseCase.openDialog(this)
+                GenerateMasterPasswordTokenUseCase.openDialog(this) {
+                    refreshRevokeMptItem(navigationView.menu)
+                }
+                return true
+            }
+            R.id.revoke_masterpasswd_token -> {
+                RevokeMasterPasswordTokenUseCase.openDialog(this) {
+                    refreshRevokeMptItem(navigationView.menu)
+                }
+
                 return true
             }
             R.id.export_encrypted_masterpasswd -> {
@@ -520,6 +743,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     .launch(this, Unit)
                 return true
             }
+            R.id.export_plain_credentials -> {
+                val intent = Intent(this, ExportPlainCredentialsActivity::class.java)
+                startActivity(intent)
+                return true
+            }
             R.id.export_vault -> {
                 val intent = Intent(this, ExportVaultActivity::class.java)
                 startActivity(intent)
@@ -532,6 +760,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             }
             R.id.test_verify_qr_code_or_nfc_tag -> {
                 val intent = Intent(this, VerifyActivity::class.java)
+                startActivity(intent)
+                return true
+            }
+            R.id.import_credentials_from_file -> {
+                val intent = Intent(this, ImportCredentialsActivity::class.java)
                 startActivity(intent)
                 return true
             }
@@ -551,9 +784,21 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 startActivity(intent)
                 return true
             }
+            R.id.change_master_key_and_encryption -> {
+                val intent = Intent(this, ChangeEncryptionActivity::class.java)
+                startActivity(intent)
+                return true
+            }
+            R.id.seed_random_generator -> {
+                SeedRandomGeneratorUseCase.openDialog(this)
+
+                return true
+            }
             R.id.show_vault_info -> {
                 val labelCount = LabelService.defaultHolder.getAllLabels().size
-                ShowVaultInfoUseCase.execute(ShowVaultInfoUseCase.Input(credentialCount, labelCount), this)
+                CoroutineScope(Dispatchers.Main).launch {
+                    ShowVaultInfoUseCase.execute(ShowVaultInfoUseCase.Input(credentialCount, labelCount), this@ListCredentialsActivity)
+                }
 
                 return true
             }
@@ -611,6 +856,39 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         return true
     }
 
+    private fun refreshNavigationMenu() {
+        navigationView.menu.clear()
+        navigationView.inflateMenu(R.menu.menu_main_drawer)
+
+        updateNavigationMenuVisibility(
+            R.id.group_quick_access,
+            R.id.item_quick_access,
+            R.string.quick_access,
+            navMenuQuickAccessVisible
+        )
+        updateNavigationMenuVisibility(
+            R.id.group_export,
+            R.id.item_export,
+            R.string.action_export,
+            navMenuExportVisible
+        )
+        updateNavigationMenuVisibility(
+            R.id.group_import,
+            R.id.item_import,
+            R.string.import_read,
+            navMenuImportVisible
+        )
+        updateNavigationMenuVisibility(
+            R.id.group_vault,
+            R.id.item_vault,
+            R.string.vault,
+            navMenuVaultVisible
+        )
+
+        refreshMenuMasterPasswordItem(navigationView.menu)
+        refreshRevokeMptItem(navigationView.menu)
+    }
+
     private fun refreshCredentials() {
         credentialViewModel.allCredentials.removeObservers(this)
         credentialViewModel.allCredentials.observe(this) { credentials ->
@@ -657,13 +935,32 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 }
 
                 listCredentialAdapter?.submitOriginList(sortedCredentials)
-                listCredentialAdapter?.filter?.filter("")
+                filterAgain()
 
             }
         }
     }
 
+    private fun filterAgain() {
+        searchItem?.let { searchItem ->
+
+            val searchView =
+                MenuItemCompat.getActionView(searchItem) as SearchView
+
+            if (searchView.query != null && searchView.query.isNotEmpty()) {
+                // refresh filtering
+                listCredentialAdapter?.filter?.filter(searchView.query)
+            }
+            else {
+                listCredentialAdapter?.filter?.filter("")
+            }
+        }
+    }
+
     private fun refreshMenuMasterPasswordItem(menu: Menu) {
+        if (!navMenuQuickAccessVisible) {
+            return
+        }
         val storedMasterPasswdPresent = PreferenceService.isPresent(
             DATA_ENCRYPTED_MASTER_PASSWORD,
             this
@@ -723,5 +1020,54 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         toastText(this, R.string.credential_deleted)
     }
 
+    @RequiresApi(Build.VERSION_CODES.P)
+    private fun pauseAutofill(
+        pauseDurationInSec: String
+    ) {
+        val replyIntent = Intent().apply {
+            val pauseResponse = ResponseFiller.createAutofillPauseResponse(this@ListCredentialsActivity, pauseDurationInSec.toLong())
+            putExtra(AutofillManager.EXTRA_AUTHENTICATION_RESULT, pauseResponse)
+        }
+        setResult(Activity.RESULT_OK, replyIntent)
+        Log.i("CFS", "disable clicked")
+        val entries = resources.getStringArray(R.array.autofill_deactivation_duration_entries)
+        val values = resources.getStringArray(R.array.autofill_deactivation_duration_values)
+        values.indexOf(pauseDurationInSec).let {
+            entries[it]?.let { entry ->
+                toastText(this, getString(R.string.temp_deact_autofill_on, entry))
+            }
+        }
+        finish()
+    }
+
+    private fun updateResumeAutofillMenuItem() {
+        resumeAutofillItem?.isVisible =
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && ResponseFiller.isAutofillPaused(this)
+    }
+
+    private fun updateNavigationMenuVisibility(groupResId: Int, itemResId: Int, stringResId: Int, visible: Boolean) {
+        navigationView.menu.setGroupVisible(groupResId, visible)
+        navigationView.menu.setGroupEnabled(groupResId, visible)
+
+        val item = navigationView.menu.findItem(itemResId)
+        item.isEnabled = true
+        item.isVisible = true
+        val s =
+            SpannableString(getString(stringResId) + (if (visible) " ▲" else " ▼"))
+        s.setSpan(
+            StyleSpan(Typeface.BOLD), 0, s.length, 0
+        )
+        s.setSpan(
+           ForegroundColorSpan(getColor(android.R.color.darker_gray/*R.color.colorAltAccent*/)), 0, s.length, 0
+        )
+        item.title = s
+    }
+
+    private fun setNavMenuCollapsed() {
+        navMenuQuickAccessVisible = false
+        navMenuExportVisible = false
+        navMenuImportVisible = false
+        navMenuVaultVisible = false
+    }
 }
 

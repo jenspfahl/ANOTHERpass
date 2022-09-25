@@ -18,7 +18,7 @@ import de.jepfa.yapm.util.Constants
 
 object LoginUseCase: InputUseCase<LoginData, BaseActivity>() {
 
-    override fun doExecute(loginData: LoginData, baseActivity: BaseActivity): Boolean {
+    override suspend fun doExecute(loginData: LoginData, baseActivity: BaseActivity): Boolean {
 
         val salt = SaltService.getSalt(baseActivity)
         val cipherAlgorithm = SecretService.getCipherAlgorithm(baseActivity)

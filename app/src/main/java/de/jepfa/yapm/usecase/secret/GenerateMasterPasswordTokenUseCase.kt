@@ -13,13 +13,14 @@ import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
+import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.usecase.BasicUseCase
 import de.jepfa.yapm.util.putEncryptedExtra
 
 object GenerateMasterPasswordTokenUseCase: BasicUseCase<SecureActivity>() {
 
-    fun openDialog(activity: SecureActivity) {
+    fun openDialog(activity: SecureActivity, successHandler: () -> Unit) {
         val mptCounter = PreferenceService.getAsInt(
             PreferenceService.STATE_MASTER_PASSWD_TOKEN_COUNTER,
             activity
@@ -31,7 +32,9 @@ object GenerateMasterPasswordTokenUseCase: BasicUseCase<SecureActivity>() {
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
                         UseCaseBackgroundLauncher(GenerateMasterPasswordTokenUseCase)
-                            .launch(activity, Unit)
+                            .launch(activity, Unit) {
+                                successHandler()
+                            }
                     }
                     .setNegativeButton(android.R.string.no, null)
                     .show()
@@ -39,7 +42,8 @@ object GenerateMasterPasswordTokenUseCase: BasicUseCase<SecureActivity>() {
         }
         else {
             UseCaseBackgroundLauncher(GenerateMasterPasswordTokenUseCase)
-                .launch(activity, Unit)        }
+                .launch(activity, Unit)
+        }
     }
 
     override fun execute(activity: SecureActivity): Boolean {
@@ -56,7 +60,7 @@ object GenerateMasterPasswordTokenUseCase: BasicUseCase<SecureActivity>() {
             ) + 1
             val cipherAlgorithm = SecretService.getCipherAlgorithm(activity)
 
-            val masterPasswordTokenKey = SecretService.generateRandomKey(32)
+            val masterPasswordTokenKey = SecretService.generateRandomKey(32, null)
             val encMasterPasswordTokenKey = SecretService.encryptKey(mptKey, masterPasswordTokenKey)
             val masterPasswordTokenSK = SecretService.generateStrongSecretKey(
                 masterPasswordTokenKey,
@@ -91,6 +95,8 @@ object GenerateMasterPasswordTokenUseCase: BasicUseCase<SecureActivity>() {
                 nextMptNumber.toString(),
                 activity
             )
+            PreferenceService.delete(PreferenceService.DATA_MASTER_PASSWORD_TOKEN_NFC_TAG_ID, activity)
+            PreferenceService.putCurrentDate(PreferenceService.DATA_MPT_CREATED_AT, activity)
 
             val intent = Intent(activity, QrCodeActivity::class.java)
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_HEADLINE, encHead)
@@ -98,7 +104,8 @@ object GenerateMasterPasswordTokenUseCase: BasicUseCase<SecureActivity>() {
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE_HEADER, encQrcHeader)
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE, encQrc)
             intent.putExtra(QrCodeActivity.EXTRA_COLOR, Color.BLUE)
-            intent.putExtra(QrCodeActivity.EXTRA_NFC_WITH_APP_RECORD, true)
+            intent.putExtra(NfcActivity.EXTRA_WITH_APP_RECORD, true)
+            intent.putExtra(NfcActivity.EXTRA_PROTECT_COPYING_MPT, true)
 
             activity.startActivity(intent)
 

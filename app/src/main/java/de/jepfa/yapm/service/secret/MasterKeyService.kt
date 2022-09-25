@@ -49,8 +49,8 @@ object MasterKeyService {
         return masterSK
     }
 
-    fun generateMasterKey(): Key {
-        return generateRandomKey(MASTER_KEY_BYTE_SIZE)
+    fun generateMasterKey(context: Context?): Key {
+        return generateRandomKey(MASTER_KEY_BYTE_SIZE, context)
     }
 
     fun getMasterKey(masterPassPhraseSK: SecretKeyHolder, storedEncMasterKey: Encrypted, context: Context): Key? {
@@ -64,13 +64,17 @@ object MasterKeyService {
         return masterKey
     }
 
+    /**
+     * Returns the stored encrypted master key
+     */
     fun encryptAndStoreMasterKey(
         masterKey: Key,
         pin: Password,
         masterPasswd: Password,
         salt: Key,
         cipherAlgorithm: CipherAlgorithm,
-        context: Context) {
+        context: Context)
+    : Encrypted {
 
         val mkSK = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_MK, context)
         val masterPassphrase = SecretService.conjunctPasswords(pin, masterPasswd, salt)
@@ -86,6 +90,8 @@ object MasterKeyService {
             encEncryptedMasterKey,
             context
         )
+
+        return encEncryptedMasterKey
     }
 
     fun isMasterKeyStored(context: Context): Boolean {

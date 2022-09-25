@@ -2,12 +2,18 @@ package de.jepfa.yapm.util
 
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import android.content.res.ColorStateList
+import android.content.res.Resources
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.Toast
 import com.google.android.material.chip.Chip
@@ -15,6 +21,7 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.ui.label.Label
 import java.util.*
+
 
 fun toastText(context: Context?, text: String) {
     if (context != null) {
@@ -68,10 +75,8 @@ fun createLabelChip(
         chip.ensureAccessibleTouchTarget(32)
     }
     context?.let {
-        if (label.labelId != -1) {
-            chip.chipBackgroundColor = ColorStateList.valueOf(label.getColor(it))
-            chip.setTextColor(it.getColor(android.R.color.white))
-        }
+        chip.chipBackgroundColor = ColorStateList.valueOf(label.getColor(it))
+        chip.setTextColor(it.getColor(android.R.color.white))
     }
     return chip
 }
@@ -135,7 +140,18 @@ private fun ensureHttp(s: String): String {
         return s
     }
     else {
-        return "http://" + s
+        return "https://" + s
     }
+}
+
+fun getAppNameFromPackage(packageName: String, context: Context): String? {
+    val pm: PackageManager = context.packageManager
+    val ai: ApplicationInfo? = try {
+        pm.getApplicationInfo(packageName, 0)
+    } catch (e: PackageManager.NameNotFoundException) {
+        null
+    }
+
+    return ai?.loadLabel(pm)?.toString()
 }
 

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="6dp"
+    android:orientation="horizontal"
+    tools:showIn="@layout/fragment_edit_credential_data">
+
+    <ImageView
+        android:id="@+id/autocomplete_label_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:clickable="false"
+        android:focusable="false"
+        android:src="@drawable/ic_baseline_label_24" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/autocomplete_labels_chipgroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:singleLine="false" />
+
+        <AutoCompleteTextView
+            android:id="@+id/autocomplete_labels_textview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:completionThreshold="1"
+            android:inputType="text"
+            android:minWidth="100dp"
+            android:imeOptions="actionDone"
+            android:hint="@string/hint_edit_credential_labels" />
+    </LinearLayout>
+
+</LinearLayout>

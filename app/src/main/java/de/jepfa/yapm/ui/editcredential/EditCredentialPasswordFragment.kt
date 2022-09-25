@@ -1,5 +1,6 @@
 package de.jepfa.yapm.ui.editcredential
 
+import android.content.Context
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputFilter.LengthFilter
@@ -53,8 +54,8 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
     private var generatedPassword: Password = Password.empty()
 
-    private val passphraseGenerator = PassphraseGenerator()
-    private val passwordGenerator = PasswordGenerator()
+    private lateinit var passphraseGenerator: PassphraseGenerator
+    private lateinit var passwordGenerator: PasswordGenerator
 
     private var passwordPresentation = Password.FormattingStyle.DEFAULT
     private var multiLine = false
@@ -69,6 +70,13 @@ class EditCredentialPasswordFragment : SecureFragment() {
         enableBack = true
         backToPreviousFragment = true
     }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        passphraseGenerator = PassphraseGenerator(context = context)
+        passwordGenerator = PasswordGenerator(context = context)
+    }
+
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
@@ -266,10 +274,6 @@ class EditCredentialPasswordFragment : SecureFragment() {
         passwordCombinations = ShowPasswordStrengthUseCase.guessPasswordCombinations(password)
         passwordCombinationsGuessed = true
     }
-
-    private fun containsChars(password: Password, chars: String) =
-        if (password.contains(Regex("[${Regex.escape(chars)}]"))) chars.length
-        else 0
 
     private fun calcPasswordStrength() {
         passwordCombinations = if (isPassphraseSelected()) {

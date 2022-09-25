@@ -6,6 +6,7 @@ import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.usecase.BasicUseCase
 import de.jepfa.yapm.util.putEncryptedExtra
@@ -40,7 +41,7 @@ object ExportEncMasterKeyUseCase: BasicUseCase<SecureActivity>() {
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_SUBTEXT, encSub)
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE_HEADER, encQrcHeader)
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE, encQrc)
-            intent.putExtra(QrCodeActivity.EXTRA_NFC_WITH_APP_RECORD, true)
+            intent.putExtra(NfcActivity.EXTRA_WITH_APP_RECORD, true)
 
             activity.startActivity(intent)
 

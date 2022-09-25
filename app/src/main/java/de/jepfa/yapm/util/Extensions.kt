@@ -100,9 +100,13 @@ fun Date.removeTime(): Date {
 }
 
 fun Date.yesterday(): Date {
+    return addDays(-1)
+}
+
+fun Date.addDays(days: Int): Date {
     val cal = Calendar.getInstance()
     cal.time = this
-    cal.add(Calendar.DATE, -1)
+    cal.add(Calendar.DATE, days)
     return cal.time
 }
 
@@ -151,5 +155,9 @@ fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observ
             removeObserver(this)
         }
     })
+}
+
+fun ByteArray.toHex(): String = joinToString(separator = "") { eachByte ->
+    "%02x".format(eachByte)
 }
 

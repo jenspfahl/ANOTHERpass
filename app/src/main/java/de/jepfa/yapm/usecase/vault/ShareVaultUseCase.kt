@@ -24,7 +24,7 @@ object ShareVaultUseCase: UseCase<ShareVaultUseCase.Input, Uri?, SecureActivity>
     data class Input(val includeMasterKey: Boolean,
                      val includeSettings: Boolean)
 
-    override fun execute(input: Input, activity: SecureActivity): UseCaseOutput<Uri?> {
+    override suspend fun execute(input: Input, activity: SecureActivity): UseCaseOutput<Uri?> {
         activity.masterSecretKey?.let{ key ->
 
             var tempFile = TempFileService.createTempFile(activity, getBackupFileName(activity))

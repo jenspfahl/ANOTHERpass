@@ -15,8 +15,12 @@ import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.encrypted.EncryptedType
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_SEED
 import de.jepfa.yapm.service.biometrix.BiometricUtils
+import de.jepfa.yapm.util.DebugInfo
+import de.jepfa.yapm.util.toastText
 import java.security.*
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -34,8 +38,51 @@ object SecretService {
 
     private val ANDROID_KEY_STORE = "AndroidKeyStore"
 
-    private val random = SecureRandom()
+    private var userSeed: Key? = null
+    private var userSeedUsed: Boolean = false
+    private var random: SecureRandom? = null
     private val androidKeyStore = KeyStore.getInstance(ANDROID_KEY_STORE)
+
+    @Synchronized
+    fun getSecureRandom(context: Context?): SecureRandom {
+        if (random == null || random!!.nextInt(100) <= 0) {
+            Log.d("SEED", "init PRNG")
+            random = SecureRandom()
+        }
+        else {
+            Log.d("SEED", "return current PRNG")
+        }
+        loadUserSeed(context)
+        if (!userSeedUsed) {
+            userSeed?.let { seed ->
+                Log.d("SEED", "add user seed to PRNG")
+                random?.setSeed(seed.data)
+                if (DebugInfo.isDebug && context != null) {
+                    toastText(context, "PRNG seeded with user seed")
+                }
+                userSeedUsed = true
+            }
+        }
+        return random!!
+    }
+
+    fun clear() {
+        userSeed?.clear()
+        userSeed = null
+        userSeedUsed = false
+        random = null
+    }
+
+    private fun loadUserSeed(context: Context?) {
+        if (context != null && userSeed == null) {
+            Session.getMasterKeySK()?.let { key ->
+                PreferenceService.getEncrypted(DATA_ENCRYPTED_SEED, context)?.let { encSeed ->
+                    userSeed = decryptKey(key, encSeed)
+                    userSeedUsed = false
+                }
+            }
+        }
+    }
 
     fun getCipherAlgorithm(context: Context): CipherAlgorithm {
         val cipherAlgorithmName =
@@ -44,9 +91,9 @@ object SecretService {
         return CipherAlgorithm.valueOf(cipherAlgorithmName)
     }
 
-    fun generateRandomKey(length: Int): Key {
+    fun generateRandomKey(length: Int, context: Context?): Key {
         val bytes = ByteArray(length)
-        random.nextBytes(bytes)
+        getSecureRandom(context).nextBytes(bytes)
         return Key(bytes)
     }
 
@@ -155,7 +202,7 @@ object SecretService {
         }
         else {
             val iv = ByteArray(cipher.blockSize)
-            random.nextBytes(iv)
+            getSecureRandom(null).nextBytes(iv)
             val ivParams = IvParameterSpec(iv)
             cipher.init(Cipher.ENCRYPT_MODE, secretKeyHolder.secretKey, ivParams)
         }
@@ -244,6 +291,23 @@ object SecretService {
                 spec.setIsStrongBoxBacked(false)
                 keyGenerator.init(spec.build())
                 return keyGenerator.generateKey()
+            }
+        }
+    }
+
+    fun setUserSeed(seed: Key?, context: Context) {
+        userSeed = seed
+        userSeedUsed = false
+        Log.d("SEED", "update user seed")
+        persistUserSeed(context)
+    }
+
+    fun persistUserSeed(context: Context) {
+        userSeed?.let { seed ->
+            Session.getMasterKeySK()?.let { key ->
+                val encSeed = encryptKey(key, seed)
+                PreferenceService.putEncrypted(DATA_ENCRYPTED_SEED, encSeed, context)
+                Log.d("SEED", "persist user seed")
             }
         }
     }

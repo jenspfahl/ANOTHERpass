@@ -22,15 +22,17 @@ object PreferenceService {
      * TODO If you add new preference xml files inside #initDefaults, they should be recognised as well.
      * To achieve this, count the version value up here.
      */
-    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_17"
+    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_22"
 
     const val STATE_DEFAULT_INIT_DONE = STATE_PREFIX + "default_init_done"
 
     const val DATA_CIPHER_ALGORITHM = DATA_PREFIX + "cipher_algorithm"
     const val DATA_SALT = DATA_PREFIX + "aslt"
+    const val DATA_ENCRYPTED_SEED = DATA_PREFIX + "seed"
     const val DATA_ENCRYPTED_MASTER_PASSWORD = DATA_PREFIX + "mpwd"
     const val DATA_ENCRYPTED_MASTER_KEY = DATA_PREFIX + "enmk"
     const val DATA_MASTER_PASSWORD_TOKEN_KEY = DATA_PREFIX + "mpt"
+    const val DATA_MASTER_PASSWORD_TOKEN_NFC_TAG_ID = DATA_PREFIX + "mpt_nfc_tag_id"
     const val STATE_MASTER_PASSWD_TOKEN_COUNTER = STATE_PREFIX + "mpt_counter"
 
     const val DATA_VAULT_VERSION = DATA_PREFIX + "vault_version"
@@ -49,6 +51,13 @@ object PreferenceService {
     const val DATA_MK_EXPORT_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "mk_export_notification_showed_as"
     const val PREF_SHOW_EXPORT_MK_REMINDER = PREF_PREFIX + "show_export_mk_reminder"
 
+    const val DATA_MPT_CREATED_AT = DATA_PREFIX + "mpt_created_at"
+
+    const val DATA_NAV_MENU_QUICK_ACCESS_EXPANDED = DATA_PREFIX + "nav_menu_quick_access_expanded"
+    const val DATA_NAV_MENU_EXPORT_EXPANDED = DATA_PREFIX + "nav_menu_export_expanded"
+    const val DATA_NAV_MENU_IMPORT_EXPANDED = DATA_PREFIX + "nav_menu_import_expanded"
+    const val DATA_NAV_MENU_VAULT_EXPANDED = DATA_PREFIX + "nav_menu_vault_expanded"
+
     const val DATA_MP_EXPORTED_AT = DATA_PREFIX + "mp_exported_at"
     const val DATA_MP_MODIFIED_AT = DATA_PREFIX + "mp_modified_at"
     const val DATA_MP_EXPORT_NOTIFICATION_SHOWED_AT = DATA_PREFIX + "mp_export_notification_showed_at"
@@ -58,6 +67,10 @@ object PreferenceService {
     const val DATA_BIOMETRIC_SMP_NOTIFICATION_SHOWED_AT = DATA_PREFIX + "biometric_smp_notification_showed_at"
     const val DATA_BIOMETRIC_SMP_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "biometric_smp_notification_showed_as"
     const val PREF_SHOW_BIOMETRIC_SMP_REMINDER = PREF_PREFIX + "show_biometric_smp_reminder"
+
+    const val DATA_REFRESH_MPT_NOTIFICATION_SHOWED_AT = DATA_PREFIX + "refresh_mpt_notification_showed_at"
+    const val DATA_REFRESH_MPT_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "refresh_mpt_notification_showed_as"
+    const val PREF_SHOW_REFRESH_MPT_REMINDER = PREF_PREFIX + "show_refresh_mpt_reminder"
 
     const val PREF_SHOW_LAST_LOGIN_STATE = PREF_PREFIX + "show_last_login_state"
     const val PREF_MAX_LOGIN_ATTEMPTS = PREF_PREFIX + "max_login_attempts"
@@ -87,10 +100,13 @@ object PreferenceService {
     const val PREF_PASSWD_WORDS_ON_NL = PREF_PREFIX + "password_words_on_nl"
     const val PREF_SHOW_LABELS_IN_LIST = PREF_PREFIX + "show_labels_in_list"
     const val PREF_SHOW_DIVIDERS_IN_LIST = PREF_PREFIX + "show_dividers_in_list"
+    const val PREF_NAV_MENU_ALWAYS_COLLAPSED = PREF_PREFIX + "nav_menu_always_collapsed"
     const val PREF_COLORIZE_MP_QRCODES = PREF_PREFIX + "colorize_mp_qrcodes"
     const val PREF_QRCODES_WITH_HEADER = PREF_PREFIX + "qrcodes_with_header"
 
     const val PREF_AUTOFILL_EVERYWHERE = PREF_PREFIX + "autofill_suggest_everywhere"
+    const val PREF_AUTOFILL_INLINE_PRESENTATIONS = PREF_PREFIX + "autofill_inline_presentations"
+    const val PREF_AUTOFILL_SUGGEST_CREDENTIALS = PREF_PREFIX + "autofill_suggest_credentials"
     const val PREF_AUTOFILL_EXCLUSION_LIST = PREF_PREFIX + "autofill_exclusion_list"
     const val PREF_AUTOFILL_DEACTIVATION_DURATION = PREF_PREFIX + "autofill_deactivation_duration"
 
@@ -116,6 +132,7 @@ object PreferenceService {
 
     const val DATA_USED_LABEL_FILTER = DATA_PREFIX + "used_label_filter"
     const val STATE_INTRO_SHOWED = STATE_PREFIX + "intro_showed"
+    const val STATE_WHATS_NEW_SHOWED_FOR_VERSION = STATE_PREFIX + "whats_new_showed_for_version"
 
     const val PREF_REMINDER_PERIOD = PREF_PREFIX + "reminder_period"
     const val PREF_AUTH_SMP_WITH_BIOMETRIC = PREF_PREFIX + "auth_smp_with_biometric"

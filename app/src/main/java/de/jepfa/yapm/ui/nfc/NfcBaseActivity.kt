@@ -29,7 +29,7 @@ abstract class NfcBaseActivity : SecureActivity() {
     }
 
     override fun onPause() {
-        ndefTag?.close()
+        ndefTag?.safeClose()
         disableNfcForegroundDispatch()
         super.onPause()
     }

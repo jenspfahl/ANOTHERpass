@@ -33,6 +33,10 @@ object DebugInfo {
         return pInfo.versionCode
     }
 
+    fun getVersionCodeForWhatsNew(context: Context): Int {
+        return getVersionCode(context) / 1000
+    }
+
     fun getDebugInfo(context: Context): String {
         val sb = StringBuilder()
         sb.append("\n************ APP INFORMATION ***********\n")

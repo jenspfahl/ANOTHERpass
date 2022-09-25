@@ -18,7 +18,7 @@ object ChangePinUseCase: InputUseCase<ChangePinUseCase.Input, SecureActivity>() 
 
     data class Input(val currentPin: Password, val newPin: Password)
 
-    override fun doExecute(input: Input, activity: SecureActivity): Boolean {
+    override suspend fun doExecute(input: Input, activity: SecureActivity): Boolean {
 
         val salt = SaltService.getSalt(activity)
         val masterPassword = MasterPasswordService.getMasterPasswordFromSession(activity)

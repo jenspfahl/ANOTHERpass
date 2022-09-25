@@ -1,31 +1,43 @@
 package de.jepfa.yapm.ui.createvault
 
+import android.app.Activity.RESULT_OK
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.os.Bundle
+import android.provider.MediaStore
 import android.text.InputFilter
 import android.text.InputType
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SwitchCompat
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
+import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.AndroidKey.ALIAS_KEY_TRANSPORT
+import de.jepfa.yapm.service.secret.SaltService
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.ui.BaseFragment
+import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER_PASSWD
 import de.jepfa.yapm.usecase.secret.GenerateMasterPasswordUseCase
+import de.jepfa.yapm.usecase.secret.SeedRandomGeneratorUseCase
 import de.jepfa.yapm.util.*
+import java.nio.ByteBuffer
 
 
 class CreateVaultEnterPassphraseFragment : BaseFragment() {
 
+    private var manuallySeedView: TextView? = null
     private var generatedPassword: Password = Password.empty()
 
     init {
@@ -45,6 +57,20 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
 
         val pseudoPhraseSwitch: SwitchCompat = view.findViewById(R.id.switch_use_pseudo_phrase)
         val generatedPasswdView: TextView = view.findViewById(R.id.generated_passwd)
+
+        manuallySeedView = view.findViewById(R.id.button_seed_manually)
+        val hasCamera = requireContext().packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
+        if (!hasCamera) {
+            manuallySeedView?.visibility = View.GONE
+        }
+        else {
+            manuallySeedView?.setOnClickListener {
+
+                getBaseActivity()?.let {
+                    SeedRandomGeneratorUseCase.openDialog(it, this)
+                }
+            }
+        }
 
         val buttonGeneratePasswd: Button = view.findViewById(R.id.button_generate_passwd)
         if (DebugInfo.isDebug) {
@@ -77,9 +103,13 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
 
         buttonGeneratePasswd.setOnClickListener {
            getBaseActivity()?.let { baseActivity ->
-               generatedPassword = GenerateMasterPasswordUseCase.execute(pseudoPhraseSwitch.isChecked, baseActivity).data
-               var spannedString = PasswordColorizer.spannableString(generatedPassword, getBaseActivity())
-               generatedPasswdView.text = spannedString
+               UseCaseBackgroundLauncher(GenerateMasterPasswordUseCase)
+                   .launch(baseActivity, pseudoPhraseSwitch.isChecked)
+                   { output ->
+                       generatedPassword = output.data
+                       var spannedString = PasswordColorizer.spannableString(generatedPassword, getBaseActivity())
+                       generatedPasswdView.text = spannedString
+                   }
            }
         }
 
@@ -98,6 +128,25 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
                 val args = Bundle()
                 args.putEncrypted(ARG_ENC_MASTER_PASSWD, encPassword)
                 findNavController().navigate(R.id.action_Create_Vault_FirstFragment_to_SecondFragment, args)
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == SeedRandomGeneratorUseCase.REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            val imageBitmap = data?.extras?.get("data") as Bitmap?
+            val baseActivity = getBaseActivity()
+            if (baseActivity != null && imageBitmap != null) {
+                UseCaseBackgroundLauncher(SeedRandomGeneratorUseCase)
+                    .launch(baseActivity, imageBitmap)
+                    { output ->
+                        if (output.success) {
+                            manuallySeedView?.text = getString(
+                                R.string.used_seed,
+                                output.data
+                            )
+                        }
+                    }
             }
         }
     }

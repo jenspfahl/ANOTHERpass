@@ -20,6 +20,8 @@ import de.jepfa.yapm.util.toastText
 
 abstract class ReadActivityBase : NfcBaseActivity() {
 
+    protected var isFromQRScan = false
+
     init {
         enableBack = true
     }
@@ -54,6 +56,7 @@ abstract class ReadActivityBase : NfcBaseActivity() {
         if (ndefTag != null) {
             toastText(this, R.string.nfc_tag_detected)
             ndefTag?.let {
+                isFromQRScan = false
                 handleScannedData(it.data ?: "")
             }
         }
@@ -74,12 +77,13 @@ abstract class ReadActivityBase : NfcBaseActivity() {
 
     private fun getScannedFromIntent(requestCode: Int, resultCode: Int, data: Intent?): String? {
         if (requestCode == NfcActivity.ACTION_READ_NFC_TAG) {
+            isFromQRScan = false
             return data?.getStringExtra(NfcActivity.EXTRA_SCANNED_NDC_TAG_DATA)
         }
         else {
+            isFromQRScan = true
             return QRCodeUtil.extractContentFromIntent(requestCode, resultCode, data)
         }
-        return null
     }
 
     abstract fun getLayoutId(): Int

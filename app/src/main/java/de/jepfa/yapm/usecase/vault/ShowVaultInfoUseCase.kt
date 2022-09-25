@@ -4,9 +4,12 @@ import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY
+import de.jepfa.yapm.service.PreferenceService.DATA_MPT_CREATED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_EXPORTED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_MODIFIED_AT
 import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_DENIED_AT
+import de.jepfa.yapm.service.PreferenceService.STATE_MASTER_PASSWD_TOKEN_COUNTER
 import de.jepfa.yapm.service.PreferenceService.STATE_PREVIOUS_LOGIN_ATTEMPTS
 import de.jepfa.yapm.service.PreferenceService.STATE_PREVIOUS_LOGIN_SUCCEEDED_AT
 import de.jepfa.yapm.service.secret.SaltService
@@ -19,7 +22,7 @@ object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActi
 
     data class Input(val credentialCount: Int, val labelCount: Int)
 
-    override fun doExecute(input: Input, activity: SecureActivity): Boolean {
+    override suspend fun doExecute(input: Input, activity: SecureActivity): Boolean {
 
         val builder: AlertDialog.Builder = AlertDialog.Builder(activity)
         val icon: Drawable = activity.applicationInfo.loadIcon(activity.packageManager)
@@ -60,6 +63,18 @@ object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActi
         val vaultExportedAt = PreferenceService.getAsDate(DATA_VAULT_EXPORTED_AT, activity)
         vaultExportedAt?.let {
             sb.addFormattedLine(activity.getString(R.string.vault_exported_at), dateToNiceString(it, activity))
+        }
+        val hasMPT = PreferenceService.isPresent(DATA_MASTER_PASSWORD_TOKEN_KEY, activity)
+        if (hasMPT) {
+            val recentCreatedMPT = PreferenceService.getAsDate(DATA_MPT_CREATED_AT, activity)
+            val mptCounter = PreferenceService.getAsInt(STATE_MASTER_PASSWD_TOKEN_COUNTER, activity)
+            recentCreatedMPT?.let {
+                sb.addNewLine()
+                sb.addFormattedLine(
+                    activity.getString(R.string.recent_created_mpt, mptCounter),
+                    dateToNiceString(it, activity)
+                )
+            }
         }
         sb.addNewLine()
         val previousLoginSucceededAt = PreferenceService.getAsDate(STATE_PREVIOUS_LOGIN_SUCCEEDED_AT, activity)

@@ -1,7 +1,6 @@
 package de.jepfa.yapm.ui.label
 
 import android.content.res.ColorStateList
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
@@ -17,16 +16,14 @@ import com.google.android.material.chip.Chip
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.encrypted.EncLabel
+import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.label.LabelService
-import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.ui.label.Label.Companion.DEFAULT_CHIP_COLOR_ID
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
-import de.jepfa.yapm.util.DebugInfo
-import de.jepfa.yapm.util.createAndAddLabelChip
-import de.jepfa.yapm.util.getIntExtra
-import de.jepfa.yapm.util.observeOnce
+import de.jepfa.yapm.util.*
 import java.util.*
 
 
@@ -99,7 +96,7 @@ class EditLabelActivity : SecureActivity() {
                 val labelName = labelNameTextView.text.toString()
                 val labelDesc = labelDescTextView.text.toString()
                 val label = Label(labelName, labelDesc)
-                val chip = createAndAddLabelChip(label, labelsContainer, thinner = false, this)
+                val chip = createLabelChip(label, thinner = false, this)
                 chip.chipBackgroundColor = ColorStateList.valueOf(color)
 
                 chip.setOnClickListener {
@@ -107,6 +104,32 @@ class EditLabelActivity : SecureActivity() {
                     labelColorChip.chipBackgroundColor = ColorStateList.valueOf(color)
                     colorDialog.dismiss()
                 }
+
+                val usageCount = LabelService.defaultHolder.getAllLabels()
+                    .filter { it.getColor(this) == color }
+                    .size
+
+                val usageString = if (usageCount == 1) {
+                    getString(R.string.label_used_once, usageCount)
+                }
+                else if (usageCount > 1) {
+                    getString(R.string.label_used_many, usageCount)
+                } else {
+                    null
+                }
+
+
+                val row = LinearLayout(this)
+                row.orientation = LinearLayout.VERTICAL
+                row.addView(chip)
+
+                if (usageString != null) {
+                    val usageText = TextView(this)
+                    usageText.text = usageString
+                    row.addView(usageText)
+                }
+
+                labelsContainer.addView(row)
             }
 
             val builder = AlertDialog.Builder(this)
@@ -191,17 +214,38 @@ class EditLabelActivity : SecureActivity() {
     private fun updateLabel(label: Label) {
 
         masterSecretKey?.let { key ->
-            val encName = SecretService.encryptCommonString(key, label.name)
-            val encDesc = SecretService.encryptCommonString(key, label.description)
-            val encLabel = EncLabel(label.labelId, null, encName, encDesc, label.colorRGB) //TODO retrieve uid from original
+            if (label.labelId != null) {
+                labelViewModel.getById(label.labelId).observeOnce(this) { encLabel ->
+                    val uid = encLabel.uid
+                    saveLabel(key, label, uid)
 
-            if (encLabel.isPersistent()) {
-                labelViewModel.update(encLabel, this)
+                }
             }
             else {
-                labelViewModel.insert(encLabel, this)
+                saveLabel(key, label)
             }
-            LabelService.defaultHolder.updateLabel(label)
+        }
+    }
+
+    private fun saveLabel(
+        key: SecretKeyHolder,
+        label: Label,
+        uid: UUID? = null
+    ) {
+        val encName = SecretService.encryptCommonString(key, label.name)
+        val encDesc = SecretService.encryptCommonString(key, label.description)
+        val encLabel = EncLabel(
+            label.labelId,
+            uid,
+            encName,
+            encDesc,
+            label.colorRGB
+        )
+
+        if (encLabel.isPersistent()) {
+            labelViewModel.update(encLabel, this)
+        } else {
+            labelViewModel.insert(encLabel, this)
         }
     }
 }

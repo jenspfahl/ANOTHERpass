@@ -85,12 +85,18 @@ class ChangeMasterPasswordActivity : SecureActivity() {
 
                 true
             }
+
+            hideKeyboard(currentPinTextView)
         }
 
         buttonGeneratePasswd.setOnClickListener {
-            generatedPassword = GenerateMasterPasswordUseCase.execute(pseudoPhraseSwitch.isChecked, this).data
-            generatedPasswdView.text = PasswordColorizer.spannableString(generatedPassword, this)
-            passwordChanged = true
+            UseCaseBackgroundLauncher(GenerateMasterPasswordUseCase)
+                .launch(this, pseudoPhraseSwitch.isChecked)
+                { output ->
+                    generatedPassword = output.data
+                    generatedPasswdView.text = PasswordColorizer.spannableString(generatedPassword, this)
+                    passwordChanged = true
+                }
         }
 
         val changeButton = findViewById<Button>(R.id.button_change)

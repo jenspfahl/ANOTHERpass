@@ -17,7 +17,7 @@
     <string name="credential_passwd_params">Hier kannst du das Passwort generieren. Es wird empfohlen es zu generieren anstatt es manuell einzugeben. \'Pseudophrase\'-Passwörter sind leicht zu lesen und zu tippen aber dennoch zufällig und stark.</string>
     <string name="button_gen_passwd">Generiere</string>
 
-    <string name="search">Suche</string>
+    <string name="search">Suche (!-erweitert)</string>
     <string name="EASY">Leicht</string>
     <string name="NORMAL">Normal</string>
     <string name="STRONG">Stark</string>
@@ -26,7 +26,8 @@
 
 
     <string name="cipher_name">Verschlüsselungsalgorithmus</string>
-    <string name="create_vault_cipher_explanation">Wähle einen Verschlüsselungsalgorithmus. Er kann später nicht mehr geändert werden. Im Zweifel belasse die Voreinstellung.</string>
+    <string name="create_vault_cipher_explanation">Wähle einen Verschlüsselungsalgorithmus. Er kann später auch geändert werden. Im Zweifel belasse die Voreinstellung.</string>
+    <string name="update_vault_cipher_explanation">Wähle einen Verschlüsselungsalgorithmus. Der aktuelle Algorithmus ist %1$s</string>
 
     <string name="CIPHER_AES_128">AES (128bit-Schlüssel)</string>
     <string name="CIPHER_AES_256">AES (256bit-Schlüssel)</string>
@@ -93,35 +94,52 @@
     <string name="export_masterpasswd">Exportiere Masterpasswort</string>
     <string name="action_export_masterkey">Exportiere \nMasterkey</string>
     <string name="action_export_masterpasswd">Exportiere \nMasterpasswort</string>
-    <string name="export_vault">Exportiere Tresor</string>
-    <string name="export_vault_as_file">Exportiere Tresor als Datei</string>
+    <string name="export_vault">Exportiere/Backup Tresor</string>
     <string name="import_vault_as_file">Importiere Tresor-Datei</string>
     <string name="message_import_vault_records">Du bist dabei %1$d Zugangsdaten und %2$d Kategorien zu importieren. Schon existierende Daten werden überschrieben. Fortsetzen?</string>
+    <string name="message_import_credential_records">Du bist dabei %1$d Zugangsdaten zu importieren. Es werden keine existierende Zugangsdaten überschrieben. Fortfahren?</string>
     <string name="qrc_download_as_img">Speichere QR-Code als Bilddatei</string>
     <string name="download_as_nfc_tag">Schreibe auf NFC-Tag</string>
-    <string name="export_vault_explanation">Hier kannst du deinen kompletten Tresor als Datei teilen oder exportieren, z.B. als Backup auf Google Drive. Importiere diese Datei, wenn du die App neu installiert hast oder um geänderte Daten wiederherzustellen.\nDer verschlüsselte Masterkey kann Bestandteil dieser Datei sein. Wenn nicht, exportiere ihn separat als QR-Code oder NFC-Tag. Du brauchst ihn, wenn du die Tresor-Datei neu importierst.\nDas Trennen des verschlüsselten Masterkeys von der Tresor-Datei macht die Datei unnütz für Hacker, auch wenn sie deine PIN oder dein Masterpasswort hätten.</string>
+    <string name="export_vault_explanation">Hier kannst du deinen kompletten (verschlüsselten) Tresor als Datei teilen oder exportieren, z.B. als Backup auf Google Drive. Importiere diese Datei, wenn du die App neu installiert hast oder um geänderte Daten wiederherzustellen.\nDer verschlüsselte Masterkey kann Bestandteil dieser Datei sein. Wenn nicht, exportiere ihn separat als QR-Code oder NFC-Tag. Du brauchst ihn, wenn du die Tresor-Datei neu importierst.\nDas Trennen des verschlüsselten Masterkeys von der Tresor-Datei macht die Datei unnütz für Hacker, auch wenn sie deine PIN oder dein Masterpasswort hätten.</string>
     <string name="button_share_vault">Tresor teilen</string>
-    <string name="button_export_vault">Tresor exportieren</string>
+    <string name="button_export_vault">Tresor speichern</string>
     <string name="include_enc_masterkey">Inklusive verschlüsselter Masterkey</string>
     <string name="include_preferences">Inklusive App-Einstellungen</string>
+
+    <string name="export_plain_credentials">Entnehme Zugangsdaten</string>
+    <string name="export_plain_credentials_explanation">Hier kannst du alle Zugangsdaten unverschlüsselt(!!!) als CSV-Datei entnehmen um diese z.B. in anderen Passworttools zu verwenden. Dies ist keine Backupfunktion, verwende \'Exportiere Tresor\' dafür! Beachte: Verschleierte Passwörter werden mit diesem Export nicht automatisch entschleiert! Du musst sie erst entschleiert abspeichern wenn du sie entschleiert exportieren möchtest.</string>
+    <string name="button_share_plain_credentials">CSV-Datei teilen</string>
+    <string name="button_export_plain_credentials">CSV-Datei speichern</string>
+
     <string name="too_may_wrong_logins">Zu viele Loginversuche, Masterpasswort wird nun benötigt</string>
     <string name="too_may_wrong_logins_self_destruction">Zu viele Loginversuche, Tresordaten werden nun gelöscht!</string>
+
     <string name="import_vault_explanation">Wähle eine Tresor-Datei zum Importieren aus. Beachte: Du benötigst die zugehörige PIN und das (exportierte) Masterpasswort, und abhängig von der Datei, den exportierten Masterkey.</string>
     <string name="import_vault_to_vault_explanation">Wähle eine Tresor-Datei zum Importieren aus. Beachte: Die Datei muss zum aktuellen Tresor gehören (aktuelle Id = %1$s).</string>
-    <string name="import_vault_load_file_fragment_label" tools:ignore="TypographyFractions">Importiere Tresor 1/2</string>
-    <string name="import_vault_import_file_fragment_label">Importiere Tresor 2/2</string>
-    <string name="button_load_vault">Lade Tresor-Datei</string>
+    <string name="import_vault_load_file_fragment_label" tools:ignore="TypographyFractions">Tresor importieren 1/2</string>
+    <string name="import_vault_import_file_fragment_label">Tresor importieren 2/2</string>
+    <string name="button_load_vault">Tresor-Datei laden</string>
     <string name="button_import_vault">Tresor importieren</string>
+
+    <string name="import_credentials_load_file_explanation">Wähle eine Datei mit unverschlüsselten Zugangsdaten aus. Zur Zeit werden nur CSV-Dateien unterstützt. Erkannt werden z.B. Zugangsdaten exportiert aus Browsern wie Firefox oder Chrome.</string>
+    <string name="import_credentials_load_file_fragment_label" tools:ignore="TypographyFractions">Zugangsdaten importieren 1/2</string>
+    <string name="import_credentials_import_file_fragment_label">Zugangsdaten importieren 2/2</string>
+    <string name="button_load_credentials_file">Zugangsdatendatei laden</string>
+    <string name="button_import_credentials">Zugangsdaten importieren</string>
+
     <string name="scan_mk">Scanne deinen Masterkey</string>
     <string name="drop_vault">Tresor vernichten (alles löschen)</string>
-    <string name="chooser_select_vault_file">Wähle eine Tresor-Datei zum Importieren aus</string>
+    <string name="chooser_select_file_to_import">Wähle eine Datei zum Importieren aus</string>
     <string name="toast_import_vault_failure">Die ausgewählte Datei kann nicht importiert werden.</string>
     <string name="toast_import_vault_failure_cipher_not_supported">Die ausgewählte Datei ist mit einem nicht unterstützten Algorithmus verschlüsselt.</string>
     <string name="toast_import_vault_failure_no_vault_match">Die ausgewählte Datei gehört nicht zum aktuellen Tresor.</string>
+    <string name="toast_import_vault_failure_not_same_algo">Die ausgewählte Datei verwendet eine andere Verschlüsselung.</string>
     <string name="quick_access">Schnellzugang</string>
-    <string name="generate_encrypted_masterpasswd">Erzeuge Masterpasswort-Token</string>
+    <string name="generate_new_mpt">Erzeuge Masterpasswort-Token</string>
+    <string name="revoke_last_mpt">Invalidiere Masterpasswort-Token</string>
     <string name="master_password_not_changed">Das Masterpasswort wurde nicht geändert.</string>
     <string name="use_pseudo_phrase">Verwende Pseudophrasen zum Generieren des Masterpasswortes</string>
+    <string name="generate_new_masterkey">Generiere neuen Masterkey (der interne Schlüssel zum Ver- und Entschlüsseln aller Tresordaten wird erneuert)</string>
     <string name="help">Onlinehilfe</string>
     <string name="about">Über</string>
     <string name="title_about_the_app">Über die App</string>
@@ -132,7 +150,11 @@
     <string name="repeat_new_pin">Neue PIN wiederholen</string>
     <string name="current_pin">Aktuelle PIN</string>
     <string name="change_master_password">Ändere Masterpasswort</string>
+    <string name="change_encryption">Ändere Verschlüsselung</string>
+    <string name="title_change_encryption">Ändere Tresorverschlüsselung</string>
+    <string name="message_change_encryption">Nach der Änderung der Verschlüsselung und/oder des Masterkeys können alle bisher exportierten Tresor-Dateien nicht mehr gelesen werden. Es wird außerdem empfohlen, ein aktuelles Backup des Tresors und des verschlüsselten Masterkeys für den Notfall zu haben.</string>
     <string name="change_master_password_explanation">Ändere dein Masterpasswort, indem du die aktuelle PIN eingibst und ein neues Masterpasswort generierst. Beachte, dass sich der verschlüsselte Masterkey ändert, so dass du ihn erneut exportieren solltest. Das betrifft auch Tresor-Dateien mit verschlüsselten Masterkey.</string>
+    <string name="change_encryption_explanation">Ändere den Verschlüsselungsalgorithmus des Tresors, wenn du den Tresor von einem alten Gerät migriert hast und dein neues Gerät zusätzliche Algorithmen unterstützt. Beachte, dass sich der verschlüsselte Masterkey ändert, so dass du ihn erneut exportieren solltest. Das betrifft auch Tresor-Dateien und exportierte Zugangsdaten (ECRs), welche dann nicht mehr gelesen werden können.</string>
     <string name="vault">Tresor</string>
     <string name="delete_stored_masterpasswd_confirmation">Willst du das gespeicherte Masterpasswort vom Gerät entfernen? Für zukünftige Logins brauchst dann das (exportierte) Masterpasswort oder ein Masterpasswort-Token.</string>
     <string name="pref_header_general">Allgemein</string>
@@ -161,7 +183,7 @@
     <string name="hint_edit_credential_website">Webseite</string>
     <string name="hint_edit_credential_labels">Füge Kategorien hinzu</string>
     <string name="filter">Nach Kategorien filtern</string>
-    <string name="pref_header_autofill">Autofill-Unterstützung</string>
+    <string name="pref_header_autofill">Unterstützung für Automatisches Ausfüllen</string>
     <string name="title_activity_list_label">Kategorien verwalten</string>
     <string name="action_labels">Verwalte Kategorien</string>
     <string name="label_data_params">Gib der Kategorie einen Namen, eine Beschreibung und eine Farbe.</string>
@@ -220,10 +242,15 @@
     <string name="label_used_many">%1$d mal verwendet</string>
     <string name="save_as">Speichern als</string>
     <string name="password_pasted_by_another">Passwort gelesen von einer anderen App</string>
-    <string name="select_credential_for_autofill">Wähle Zugangsdaten für Autofill</string>
-    <string name="paste_user_for_autofill">Füge Nutzer für \'%1$s\' ein</string>
-    <string name="paste_passwd_for_autofill">Füge Passwort für \'%1$s\' ein</string>
+
+    <string name="login_required_first">Tresor entsperren</string>
+    <string name="select_credential_for_autofill">Zugangsdaten auswählen</string>
+    <string name="paste_user_for_autofill">Nutzer für \'%1$s\'</string>
+    <string name="no_user_for_autofill">Kein Nutzer für \'%1$s\' vorhanden</string>
+    <string name="paste_passwd_for_autofill">Passwort für \'%1$s\'</string>
+    <string name="paste_credential_for_autofill">Zugangsdaten für \'%1$s\'</string>
     <string name="backup_file_saved">Tresor-Datei gespeichert</string>
+    <string name="csv_file_saved">CSV-Datei gespeichert</string>
     <string name="backup_failed">Fehler beim Erzeugen der Tresor-Datei</string>
     <string name="backup_permission_missing">Berechtigung zum Schreiben des Externen Speichers fehlt</string>
     <string name="qr_code_saved">QR-Code als Bild gespeichert</string>
@@ -232,6 +259,7 @@
     <string name="message_missing_overlay_permission">Passwörter können nicht über anderen Apps eingeblendet werden. Aktiviere die entsprechende Berechtigung und probiere es danach erneut.</string>
     <string name="open_overlay_permission">Öffne Berechtigungen</string>
     <string name="masterpassword_changed">Masterpasswort erfolgreich geändert</string>
+    <string name="encryption_changed">Verschlüsselung erfolgreich geändert</string>
     <string name="pin_changed">PIN erfolgreich geändert</string>
     <string name="masterpassword_stored">Masterpasswort auf dem Gerät gespeichert</string>
     <string name="masterpassword_not_stored">Masterpasswort konnte nicht gespeichert werden</string>
@@ -321,6 +349,7 @@
     <string name="unknown_emp_scanned">\u274C Unbekanntes exportiertes Masterpasswort (EMP) gescannt</string>
     <string name="well_known_emp_scanned">\u2705 Gültiges exportiertes Masterpasswort (EMP) gescannt</string>
     <string name="unknown_mpt_scanned">\u274C Unbekanntes Masterpasswort-Token (MPT) gescannt</string>
+    <string name="mpt_qr_scan_forbidden">\u274C Masterpasswort-Token (MPT) als QR-Code nicht erlaubt, da es als kopiergeschützes NFC-Tag vorliegt</string>
     <string name="well_known_mpt_scanned">\u2705 Gültiges Masterpasswort-Token (MPT #%1$s) gescannt</string>
     <string name="well_known_ecr_scanned">\u2705 Gültige verschlüsselte Zugangsdaten mit Name \'%1$s\' gescannt</string>
     <string name="unknown_ecr_scanned">\u274C Unbekannte verschlüsselte Zugangsdaten gescannt</string>
@@ -345,6 +374,7 @@
     <string name="pref_general_theme">Theme</string>
     <string name="pref_general_show_labels">Zeige Kategorien in Übersichtsliste</string>
     <string name="pref_general_show_dividers">Zeige Trennlinien in Übersichtsliste</string>
+    <string name="pref_general_nav_menu_always_collapsed">Starte immer mit zusammengeklapptem Menübaum</string>
     <string name="pref_general_show_formatted_passwords">Formatiere Passwörter</string>
     <string name="pref_general_summary_show_formatted_passwords">Formatiert Passwörter separiert als Wörter und unterschiedlichen Farben um die Lesbarkeit zu erhöhen</string>
     <string name="pref_general_colorize_passwords">Verwende unterschiedliche Farben </string>
@@ -354,9 +384,9 @@
     <string name="pref_general_colorize_qrcodes">Verwende Farben um die Kritikalität von QR-Code Inhalten zu verdeutlichen</string>
     <string name="pref_general_qrcodes_with_header">Drucke eine kurze inhaltsbezogene Kopfzeile am oberen Rand eines QR-Codes</string>
 
-    <string name="pref_autofill_summary_off_suggest">Biete Autofill nur für eindeutig erkannte Nutzer- oder Passwortfelder an. Dadurch könnten allerdings einige Felder ignoriert werden, die nicht eindeutig erkannt werden können, z.B. in Webbrowsern. </string>
-    <string name="pref_autofill_summary_on_suggest">Biete Autofill für jedes Textfeld an.</string>
-    <string name="pref_autofill_exclude_apps">Ignoriere Autofill für Apps</string>
+    <string name="pref_autofill_summary_off_suggest">Biete Automatisches Ausfüllen nur für eindeutig erkannte Nutzer- oder Passwortfelder an. Dadurch könnten allerdings einige Felder ignoriert werden, die nicht eindeutig erkannt werden können, z.B. in Webbrowsern. </string>
+    <string name="pref_autofill_summary_on_suggest">Biete Automatisches Ausfüllen für jedes Textfeld an.</string>
+    <string name="pref_autofill_exclude_apps">Ignoriere Automatisches Ausfüllen für diese Apps</string>
     <string name="pref_clipboard_enable">Aktiviere Passwort in die Zwischenablage zu kopieren</string>
     <string name="pref_clipboard_summary_enable">Passwörter in die Zwischenablage zu kopieren ist riskant und könnte dein Passwort an andere Apps preisgeben. Verwende diese Option mit Vorsicht!</string>
     <string name="pref_clipboard_show_warning">Zeige Warnung wenn Passwörter in die Zwischenablage kopiert werden</string>
@@ -383,13 +413,16 @@
     <string name="send_to">Sende an</string>
     <string name="cannot_share_qr_code">QR-Code konnte nicht geteilt werden</string>
     <string name="cannot_share_vault">Tresor-Datei konnte nicht geteilt werden</string>
+    <string name="cannot_share_csvfile">UCSV-Datei konnte nicht geteilt werden</string>
     <string name="hint_store_qr_as_file">Beachte dass auf dem Gerät gespeicherte QR-Codes mit sensitivem Inhalt potentiell von anderen Apps gelesen werden können.</string>
     <string name="show_export_vault_reminder">Erinnerung den Tresor zu exportieren</string>
     <string name="summary_show_export_vault_reminder">Zeige eine Erinnerung wenn sich der Tresorinhalt geändert hat und deshalb exportiert werden sollte.</string>
     <string name="show_export_mk_reminder">Erinnerung den verschlüsselten Masterkey zu exportieren</string>
     <string name="show_export_mp_reminder">Erinnerung das Masterpasswort zu exportieren</string>
+    <string name="show_refresh_mpt_reminder">Erinnerung das Masterpasswort-Token zu erneuern</string>
     <string name="summary_show_export_mk_reminder">Zeige eine Erinnerung wenn sich der verschlüsselte Masterkey (EMK) geändert hat und exportiert werden sollte.</string>
     <string name="summary_show_export_mp_reminder">Zeige eine Erinnerung wenn sich das Masterpasswort (EMP) geändert hat und exportiert werden sollte. Beachte: Ohne aktuelles Masterpasswort kannst du dich ggf. nicht mehr einloggen!</string>
+    <string name="summary_show_refresh_mpt_reminder">Erinnerung das Masterpasswort-Token zu erneuern (wenn vorhanden). Dies kann helfen das Risiko zu minimieren, dass ein gestohlenes Token missbräuchlich verwendet wird.</string>
     <string name="show_biometric_smp_reminder">Erinnerung ein biometrisches Merkmal einzurichten (für das gespeicherte Masterpasswort)</string>
     <string name="summary_show_biometric_smp_reminder">Zeige eine Erinnerung wenn das gespeicherte Masterpasswort nicht mit einem biometrischem Merkmal (z.B. Fingerabdruck) geschützt wurde aber dies vom Gerät unterstützt werden würde.</string>
 
@@ -398,6 +431,8 @@
     <string name="export_mp_reminder">Masterpasswort sollte exportiert werden!</string>
     <string name="biometric_smp_reminder">Biometrie sollte für Masterpasswort eingerichtet werden.</string>
     <string name="show_biometric_smp_howto">Wie?</string>
+    <string name="refresh_mpt_reminder">Masterpassword-Token sollte erneuert werden.</string>
+    <string name="show_refresh_mpt">Jetzt erneuern</string>
     <string name="dont_ask_again">Nicht mehr nerven</string>
     <string name="manage_reminder_settings_hint">Erinnerungen können geändert werden unter \'Einstellungen / Erinnerungen\'</string>
     <string name="no_label">OHNE KATEGORIE</string>
@@ -416,6 +451,19 @@
     <string name="pref_auth_smp_with_biometric_title">Autorisiere gespeichertes Masterpasswort mit biometrischem Merkmal</string>
     <string name="pref_auth_smp_with_biometric_summary">Es wird dringend empfohlen das in der App gespeicherte Massterpasswort mit einem biometrischem Merkmal zu schützen (falls vom Gerät unterstützt). Beachte: Ein bereits gespeichertes Masterpasswort wird nicht geschützt nur weil diese Option aktiviert wurde. Du musst es erst aus der App entfernen und neu speichern.</string>
     <string name="auth_to_decrypt_emp_omit">Scanne Masterpasswort</string>
+    <string name="whats_new">Was ist neu</string>
+    <string name="whats_new_in_1_7">Was ist neu in Version 1.7</string>
+    <string name="whats_new_in_1_7_subtext">Neben einigen Fehlerkorrekturen und Verbesserungen kommen diese neuen Features hinzu:</string>
+    <string name="whats_new_in_1_7_bullet_1_head">Importiere und exportiere Zugangsdaten</string>
+    <string name="whats_new_in_1_7_bullet_1_text">Du kannst deine Zugangsdaten von Browsern wie Firefox oder Chrome oder von anderen Quellen als CSV importieren und als CSV-Datei exportieren.</string>
+    <string name="whats_new_in_1_7_bullet_2_head">Verbessertes Automtisches Ausfüllen</string>
+    <string name="whats_new_in_1_7_bullet_2_text">Automatisches Ausfüllen wurde signifikant verbessert und unterstützt jetzt automatische Vorschläge zum Ausfüllen.</string>
+    <string name="whats_new_in_1_7_bullet_3_head">Kopierschutz für Masterpasswort-Token auf NFC Tag</string>
+    <string name="whats_new_in_1_7_bullet_3_text">Wenn aktiviert, können NFC-Tags mit MPTs zwar noch kopiert werden, die Kopien sind aber wirkungslos zum Einloggen.</string>
+    <string name="whats_new_in_1_7_bullet_4_head">Änderung der aktuellen Tresorverschlüsselung</string>
+    <string name="whats_new_in_1_7_bullet_4_text">Jetzt kannst du den Verschlüsselungs-Algorithmus deines Tresors nachträglich ändern, um z.B. einen neueren Algorithmus zu verwenden.</string>
+    <string name="whats_new_in_1_7_bullet_5_head">Optimiere Zufallsgenerator</string>
+    <string name="whats_new_in_1_7_bullet_5_text">Füge zusätzliche Entropie für den Zufallsgenerator hinzu um eine höhere Zufälligkeit zu erhalten.</string>
 
     <string name="intro">Starte Intro</string>
     <string name="intro_1_head">Ein etwas anderer Passwortmanager</string>
@@ -438,20 +486,24 @@
     <string name="intro_5_bullet_3">Starke Verschlüsselung ALLER sensitiven Daten mit mindestens 128 bit Schlüsseln.</string>
     <string name="intro_5_bullet_4">ANOTHERpass kann einen integrierten Sicherheitschip verwenden, falls vorhanden.</string>
 
+    <string name="credentials_to_be_imported">%1$d von %2$d Zugangsdaten zum Importieren</string>
     <string name="credentials_to_be_inserted">%1$d von %2$d Zugangsdaten zum Wiederherstellen</string>
     <string name="credentials_to_be_updated">%1$d von %2$d Zugangsdaten zum Ersetzen</string>
     <string name="labels_to_be_inserted">%1$d von %2$d Kategorien zum Wiederherstellen</string>
     <string name="labels_to_be_updated">%1$d von %2$d Kategorien zum Ersetzen</string>
     <string name="nothing_to_import">Nichts zum Importieren</string>
+    <string name="nothing_has_been_changed">Nichts hat sich geändert</string>
     <string name="copy_origin">Erstelle eine Kopie des Originals bevor das Original überschrieben wird. Der Name der Kopie trägt \'(orig)\' am Ende.</string>
     <string name="import_vault_override_explanation">Hier siehst du den Inhalt der geladenen Tresor-Datei, allerdings nur Datensätze die sich zum aktuellen Tresor unterscheiden! Du kannst die Listen ausklappen und prüfen und jene Datensätze anhaken, die importiert werden sollen. Mit einem Klick auf den Datensatz siehst du mehr Details.</string>
+    <string name="import_credentials_explanation">Hier siehst du den Inhalt der geladenen Zugangsdaten-Datei. Du kannst die Zugangsdaten anhaken, die importiert werden sollen. Mit einem Klick auf den Datensatz siehst du mehr Details.</string>
+
     <string name="dont_think_about_passwords">Denke nicht über Passwörter nach!</string>
     <string name="details">Zeige Details</string>
     <string name="title_credential_details">Details der Zugangsdaten</string>
     <string name="last_modified">Zuletzt geändert</string>
     <string name="name">Name</string>
     <string name="source">Quelle</string>
-    <string name="source_from_vault_file">von Tresor-Datei</string>
+    <string name="source_from_file">aus Datei</string>
     <string name="source_from_record">von QR-Code oder NFC-Tag</string>
     <string name="source_from_the_app">von der App</string>
     <string name="make_nfc_tag_write_protected">Mache NFC-Tag schreibgeschützt (kann nicht rückgängig gemacht werden!!)</string>
@@ -464,7 +516,6 @@
     <string name="credential_data_params">Bearbeite Zugangsdaten hier. Der Name ist ein Pflichtfeld. Mit Kategorien kannst du verschiedene Zugangsdaten gruppieren.</string>
     <string name="message_write_nfc_tag">Der NFC-Tag ist schon beschrieben worden. Überschreiben?</string>
     <string name="drop_to_remove">FENSTER SCHLIESSEN</string>
-    <string name="login_required_first">Tresor entsperren und Zugangsdaten auswählen</string>
     <string name="duplicate">Duplizieren</string>
     <string name="message_change_language">Die gewählte Sprache wird erst nach einem App-Neustart richtig angezeigt.</string>
     <string name="title_change_language">Sprache ändern</string>
@@ -506,10 +557,10 @@
     <string name="reminder_period_1_week">Einmal pro Woche</string>
     <string name="colorize_qr_codes">Coloriere QR-Codes</string>
     <string name="print_qr_code_header">Drucke QR-Code Kopfzeile</string>
-    <string name="autofill_suggest_everywhere">Autofill-Vorschläge überall anzeigen</string>
+    <string name="autofill_suggest_everywhere">Vorschläge für Automatisches Ausfüllen überall anzeigen</string>
     <string name="report_a_bug">Der Fehlerbericht wird nun zu einer Bug-Tracking-Website (Github) gesendet. Dafür brauchst du ein Github-Konto. Außerdem wurde der Bericht in die Zwischenablage kopiert. Danke für deine Hilfe.</string>
-    <string name="autofill_deactivation_duration_title">Auf Aufforderung Autofill temporär pausieren</string>
-    <string name="temp_deact_autofill">Autofill pausieren</string>
+    <string name="autofill_deactivation_duration_title">Auf Aufforderung Automatisches Ausfüllen temporär pausieren</string>
+    <string name="temp_deact_autofill">Ausfüllen pausieren</string>
     <string name="temp_deact_autofill_never">Nie</string>
     <string name="temp_deact_autofill_15_sec">Für 15 Sekunden</string>
     <string name="temp_deact_autofill_30_sec">Für 30 Sekunden</string>
@@ -518,12 +569,13 @@
     <string name="temp_deact_autofill_10_minutes">Für 10 Minuten</string>
     <string name="temp_deact_autofill_1_hour">Für eine Stunde</string>
     <string name="temp_deact_autofill_12_hours">Für 12 Stunden</string>
-    <string name="temp_deact_autofill_on">Autofill pausiert (%1$s)</string>
-    <string name="resume_paused_autofill">Pausiertes Autofill fortsetzen</string>
-    <string name="resume_paused_autofill_done">Autofill wieder aktiv</string>
+    <string name="temp_deact_autofill_on">Automatisches Ausfüllen pausiert (%1$s)</string>
+    <string name="resume_paused_autofill">Pausiertes Automatisches Ausfüllen fortsetzen</string>
+    <string name="resume_paused_autofill_done">Automatisches Ausfüllen wieder aktiv</string>
     <string name="previous_login_at">Vorheriger Login</string>
     <string name="last_denied_login_at">Letzter erfolgloser Login</string>
     <string name="last_denied_login_attempts">Letzte erfolglose Loginversuche</string>
+    <string name="recent_created_mpt">Masterpasswort-Token #%1$d erzeugt am</string>
     <string name="last_succeeded_login">"%2$d Loginversuch(e) wurde(n) %1$s abgelehnt!!</string>
     <string name="last_denied_login_attempt">Letzter Login war %1$s</string>
 
@@ -535,5 +587,44 @@
     <string name="show_last_login_state_denies_and_succeeds">Abgelehnte und erfolgreiche Logins</string>
     <string name="show_last_login_state_denies_only">Nur abgelehnte Loginversuche</string>
     <string name="show_last_login_state_nothing">Keine</string>
+    <string name="protect_mpt_against_copying">Schützt das Token vorm Kopieren. Nur das aktuelle NFC Token wird erkannt. Weiterhin kann dieses Token nicht als QR-Code verwendet werden!</string>
+    <string name="cannot_copy_protect_nfc_tag">Token kann nicht kopier-geschützt werden</string>
+    <string name="mpt_qrcode_scan_not_allowed">Masterpassword-Token als QR-Code nicht erlaubt</string>
+    <string name="not_a_original_mpt_nfc_token">Kein original Masterpassword-Token NFC-Tag</string>
+    <string name="used_seed">Zusätzliches Seed: %1$s</string>
+    <string name="add_additional_source_of_entropy">Zusätzliche Entropie hinzufügen</string>
+    <string name="title_add_user_seed">Füge zusätzliche Entropie für den Zufallsgenerator hinzu</string>
+    <string name="message_add_user_seed">Falls du dem Zufallsgenerator des Betriebssystems nicht traust, welcher normalerweise verschiedene Entropie des Gerätes verwendet, um unvorhersagbare Zufallszahlen zu generieren, kannst du hier eine weitere Entropie hinzufügen: ein Foto von deiner Kamera.\nDas fotografierte Bild wird gehasht und als zusätzliche Entropy verwendet, um die Zufälligkeit weiter zu erhöhen. Das heißt, mache ein zufälliges Foto mit vielen unterschiedlichen Details. Das Foto wird nicht auf dem Gerät gespeichert!</string>
+    <string name="message_confirm_add_user_seed">Du hast schon eine eigene Entropie hinzugefügt. Willst du den Vorgang wiederholen?</string>
+    <string name="error_add_user_seed">Die Kamera-App konnte nicht geöffnet werden</string>
+    <string name="error_picture_too_small_for_user_seed">Das geschossene Foto ist zu klein um es als Entropie zu verwenden</string>
+    <string name="seed_random_generator">Optimiere Zufallsgenerator</string>
 
+    <string name="reminder_refresh_mpt_none">Nie</string>
+    <string name="reminder_refresh_mpt_one_week">Nach einer Woche</string>
+    <string name="reminder_refresh_mpt_two_weeks">Nach zwei Wochen</string>
+    <string name="reminder_refresh_mpt_one_month">Nach einem Monat</string>
+    <string name="reminder_refresh_mpt_two_months">Nach zwei Monaten</string>
+    <string name="reminder_refresh_mpt_half_a_year">Nach einem halben Jahr</string>
+    <string name="reminder_refresh_mpt_year">Nach einem Jahr</string>
+
+    <string name="permission_granted_please_repeat">Berechtigung erteilt, bitte wiederholen sie ihre Aktion.</string>
+    <string name="permission_denied">Berechtigung nicht erteilt!</string>
+
+    <string name="import_credentials_file">Importiere Zugangsdaten aus Datei</string>
+    <string name="import_credentials_explanation_labels">Du kannst deine importierten Zugangsdaten kategorisieren um sie leichter wiederzufinden,</string>
+    <string name="start_typing_to_filter_labels">Beginne zu tippen oder drücke die Leertaste um nach Kategorien zu suchen</string>
+    <string name="credentials_in_file">%1$d Zugangsdaten in Datei gefunden</string>
+
+    <string name="cannot_parse_csv_credentials">Zugangsdaten konnten nicht gelesen werden</string>
+    <string name="go_back_to_app">Zurück zur App</string>
+    <string name="no_autofill_for_app">Kein Ausfüllen für \'%1$s\'</string>
+    <string name="no_autofill_for_current_app">Kein Ausfüllen für diese App</string>
+    <string name="excluded_from_autofill">Automatisches Ausfüllen für diese App ist nun dauerhaft deaktiviert.</string>
+    <string name="vault_locked">Der Tresor ist nun gesperrt</string>
+
+    <string name="autofill_inline_presentations_title">Integriere Automatisches Ausfüllen in die Tastatur</string>
+    <string name="autofill_inline_presentations_summary">Ab Android 11 kann Automatisches Ausfüllen in die virtuellen Tastatur integriert werden. Die virtuelle Tastatur muss dies aber unterstützen. Wenn nicht, wird stattdessen der normale Popup-Dialog angezeigt.</string>
+    <string name="autofill_suggest_credentials_title">Schlage Zugangsdaten vor</string>
+    <string name="autofill_suggest_credentials_summary">Wenn möglich, schlage Zugangsdaten vor, die zur aktuellen Ausfüllaktion passen könnten.</string>
 </resources>

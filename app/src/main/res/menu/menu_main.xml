@@ -47,5 +47,12 @@
         app:showAsAction="never">
     </item>
 
+    <item
+        android:id="@+id/menu_resume_autofill"
+        android:orderInCategory="1000"
+        android:title="@string/resume_paused_autofill"
+        android:visible="false">
+    </item>
+
 
 </menu>

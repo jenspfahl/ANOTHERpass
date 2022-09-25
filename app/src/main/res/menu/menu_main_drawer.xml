@@ -3,84 +3,117 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <item android:title="@string/quick_access" >
-        <menu >
-            <item
-                android:id="@+id/generate_masterpasswd_token"
-                android:orderInCategory="50"
-                android:title="@string/generate_encrypted_masterpasswd" />
-            <item
-                android:id="@+id/delete_stored_masterpasswd"
-                android:orderInCategory="70"
-                android:title="@string/delete_stored_masterpasswd" />
-            <item
-                android:id="@+id/store_masterpasswd"
-                android:orderInCategory="70"
-                android:title="@string/store_master_password" />
-        </menu>
-    </item>
+    <group
+        android:checkableBehavior="none"
+        android:id="@+id/group_quick_access">
 
-    <item android:title="@string/action_export" >
-        <menu >
-            <item
-                android:id="@+id/export_encrypted_masterpasswd"
-                android:orderInCategory="10"
-                android:title="@string/export_masterpasswd" />
-            <item
-                android:id="@+id/export_masterkey"
-                android:orderInCategory="20"
-                android:title="@string/export_masterkey" />
-            <item
-                android:id="@+id/export_vault"
-                android:orderInCategory="50"
-                android:title="@string/export_vault_as_file" />
-        </menu>
-    </item>
+        <item
+            android:id="@+id/item_quick_access"
+            android:title="@string/quick_access">
+        </item>
 
-    <item android:title="@string/import_read" >
-        <menu>
+        <item
+            android:id="@+id/generate_masterpasswd_token"
+            android:title="@string/generate_new_mpt" />
+        <item
+            android:id="@+id/revoke_masterpasswd_token"
+            android:title="@string/revoke_last_mpt"
+            android:visible="false"/>
+        <item
+            android:id="@+id/delete_stored_masterpasswd"
+            android:title="@string/delete_stored_masterpasswd" />
+        <item
+            android:id="@+id/store_masterpasswd"
+            android:title="@string/store_master_password" />
+    </group>
 
-            <item
-                android:id="@+id/test_verify_qr_code_or_nfc_tag"
-                android:orderInCategory="85"
-                android:title="@string/verify_test" />
 
-            <item
-                android:id="@+id/import_credential"
-                android:orderInCategory="95"
-                android:title="@string/import_read_credential" />
+    <group
+        android:checkableBehavior="none"
+        android:id="@+id/group_export">
 
-            <item
-                android:id="@+id/import_vault"
-                android:orderInCategory="99"
-                android:title="@string/import_vault_as_file" />
-        </menu>
-    </item>
+        <item
+            android:id="@+id/item_export"
+            android:title="@string/action_export">
+        </item>
 
-    <item android:title="@string/vault" >
-        <menu>
+        <item
+            android:id="@+id/export_encrypted_masterpasswd"
+            android:title="@string/export_masterpasswd" />
+        <item
+            android:id="@+id/export_masterkey"
+            android:title="@string/export_masterkey" />
+        <item
+            android:id="@+id/export_vault"
+            android:title="@string/export_vault" />
+        <item
+            android:id="@+id/export_plain_credentials"
+            android:title="@string/export_plain_credentials" />
+    </group>
 
-            <item
-                android:id="@+id/show_vault_info"
-                android:orderInCategory="80"
-                android:title="@string/show_vault_info" />
 
-            <item
-                android:id="@+id/change_pin"
-                android:orderInCategory="90"
-                android:title="@string/change_pin" />
+    <group
+        android:checkableBehavior="none"
+        android:id="@+id/group_import">
 
-            <item
-                android:id="@+id/change_master_password"
-                android:orderInCategory="90"
-                android:title="@string/change_master_password" />
+        <item
+            android:id="@+id/item_import"
+            android:title="@string/import_read">
+        </item>
 
-            <item
-                android:id="@+id/drop_vault"
-                android:orderInCategory="100"
-                android:title="@string/drop_vault" />
-        </menu>
-    </item>
+
+        <item
+            android:id="@+id/test_verify_qr_code_or_nfc_tag"
+            android:title="@string/verify_test" />
+
+        <item
+            android:id="@+id/import_credential"
+            android:title="@string/import_read_credential" />
+
+        <item
+            android:id="@+id/import_vault"
+            android:title="@string/import_vault_as_file" />
+
+        <item
+            android:id="@+id/import_credentials_from_file"
+            android:title="@string/import_credentials_file" />
+
+
+    </group>
+
+    <group
+        android:checkableBehavior="none"
+        android:id="@+id/group_vault">
+        <item
+            android:id="@+id/item_vault"
+            android:title="@string/vault">
+        </item>
+
+        <item
+            android:id="@+id/show_vault_info"
+            android:title="@string/show_vault_info" />
+
+        <item
+            android:id="@+id/change_pin"
+            android:title="@string/change_pin" />
+
+        <item
+            android:id="@+id/change_master_password"
+            android:title="@string/change_master_password" />
+
+        <item
+            android:id="@+id/change_master_key_and_encryption"
+            android:title="@string/change_encryption" />
+
+        <item
+            android:id="@+id/seed_random_generator"
+            android:title="@string/seed_random_generator" />
+
+        <item
+            android:id="@+id/drop_vault"
+            android:title="@string/drop_vault" />
+
+    </group>
 
     <group>
 

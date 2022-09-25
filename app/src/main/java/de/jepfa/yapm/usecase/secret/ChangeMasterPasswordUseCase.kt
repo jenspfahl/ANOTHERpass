@@ -16,7 +16,7 @@ object ChangeMasterPasswordUseCase:
 
     private const val TAG = "CHANGE_MP"
 
-    override fun doExecute(loginData: LoginData, activity: SecureActivity): Boolean {
+    override suspend fun doExecute(loginData: LoginData, activity: SecureActivity): Boolean {
 
         val salt = SaltService.getSalt(activity)
         val currentMasterPassword = MasterPasswordService.getMasterPasswordFromSession(activity)

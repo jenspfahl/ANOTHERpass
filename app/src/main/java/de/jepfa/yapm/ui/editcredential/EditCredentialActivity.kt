@@ -3,12 +3,16 @@ package de.jepfa.yapm.ui.editcredential
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.lifecycle.LiveData
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.session.Session
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.autofill.AutofillCredentialHolder
+import de.jepfa.yapm.service.autofill.ResponseFiller
+import de.jepfa.yapm.service.autofill.ResponseFiller.ACTION_DELIMITER
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.credential.AutofillPushBackActivityBase
@@ -18,6 +22,8 @@ import de.jepfa.yapm.util.enrichId
 
 class EditCredentialActivity : AutofillPushBackActivityBase() {
 
+    internal var suggestedCredentialName: String? =null
+    internal var suggestedWebSite: String? =null
     internal var currentId: Int? = null
     internal var current: EncCredential? = null
     internal var original: EncCredential? = null
@@ -39,6 +45,12 @@ class EditCredentialActivity : AutofillPushBackActivityBase() {
             original?.let {updateTitle(it) }
         }
 
+        intent?.action?.let { action ->
+            if (action.startsWith(ResponseFiller.ACTION_OPEN_VAULT)) {
+                suggestedCredentialName = action.substringAfter(ACTION_DELIMITER).substringBeforeLast(ACTION_DELIMITER)
+                suggestedWebSite = action.substringAfterLast(ACTION_DELIMITER)
+            }
+        }
 
         super.onCreate(savedInstanceState)
         

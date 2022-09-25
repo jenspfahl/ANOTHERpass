@@ -57,34 +57,6 @@
                 android:textStyle="bold"
                />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="32dp">
-                <Button
-                    android:id="@+id/button_no_autofill"
-                    style="?android:textAppearanceSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:background="@color/white"
-                    android:paddingHorizontal="8dp"
-                    android:text="@string/temp_deact_autofill"
-                    android:textAlignment="center"
-                    android:textColor="@color/colorAccent"
-                    android:textStyle="normal" />
-                <Button
-                    android:id="@+id/button_no_autofill_dropdown"
-                    style="?android:textAppearanceSmall"
-                    android:layout_width="32dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:drawableEnd="@android:drawable/arrow_down_float"
-                    android:background="@color/white"
-                    android:paddingHorizontal="8dp"
-                    android:drawableTint="@color/colorAccent" />
-                </LinearLayout>
-
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

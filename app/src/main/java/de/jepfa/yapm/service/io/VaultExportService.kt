@@ -35,6 +35,7 @@ object VaultExportService {
     const val JSON_VAULT_VERSION = "vaultVersion"
     const val JSON_CIPHER_ALGORITHM = "cipherAlgoritm"
     const val JSON_ENC_MK = "encMk"
+    const val JSON_ENC_SEED = "encSeed"
     const val JSON_CREDENTIALS = "credentials"
     const val JSON_CREDENTIALS_COUNT = "credentialsCount"
     const val JSON_LABELS = "labels"
@@ -144,7 +145,11 @@ object VaultExportService {
                 val encMasterKeyBase64 = SecretService.decryptEncrypted(mkKey, encStoredMasterKey).toBase64String()
                 root.addProperty(JSON_ENC_MK, encMasterKeyBase64)
             }
+        }
 
+        val encSeed = PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_SEED, context)
+        if (encSeed != null) {
+            root.addProperty(JSON_ENC_SEED, encSeed.toBase64String())
         }
 
         val credentials = app.credentialRepository.getAllSync()

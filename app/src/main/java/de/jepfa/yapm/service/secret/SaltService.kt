@@ -51,7 +51,7 @@ object SaltService {
     }
 
     private fun createAndStoreSalt(context: Context): Key {
-        val salt = generateRandomKey(Constants.MASTER_KEY_BYTE_SIZE)
+        val salt = generateRandomKey(Constants.MASTER_KEY_BYTE_SIZE, context)
         storeSalt(salt, context)
 
         return salt

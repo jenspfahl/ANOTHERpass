@@ -58,6 +58,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/read_nfc_status_layout">
 
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switch_protect_mpt_against_copying"
+            android:checked="false"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12pt"
+            android:text="@string/protect_mpt_against_copying"
+            android:visibility="invisible"/>
+
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/switch_make_nfc_tag_write_protected"
             android:checked="false"

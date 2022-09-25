@@ -115,6 +115,8 @@
         <item>@color/Navy</item>
         <item>@color/Fuchsia</item>
         <item>@color/Purple</item>
+        <item>@color/StoneGray</item>
+        <item>@color/LightGray</item>
     </integer-array>
 
     <string-array name="dark_mode_entries">
@@ -157,6 +159,26 @@
         <item>3600</item>
         <item>86400</item>
         <item>604800</item>
+    </string-array>
+
+    <string-array name="reminder_refresh_mpt_entries">
+        <item>@string/reminder_refresh_mpt_none</item>
+        <item>@string/reminder_refresh_mpt_one_week</item>
+        <item>@string/reminder_refresh_mpt_two_weeks</item>
+        <item>@string/reminder_refresh_mpt_one_month</item>
+        <item>@string/reminder_refresh_mpt_two_months</item>
+        <item>@string/reminder_refresh_mpt_half_a_year</item>
+        <item>@string/reminder_refresh_mpt_year</item>
+    </string-array>
+
+    <string-array name="reminder_refresh_mpt_values">
+        <item>0</item>
+        <item>7</item>
+        <item>14</item>
+        <item>31</item>
+        <item>62</item>
+        <item>183</item>
+        <item>365</item>
     </string-array>
 
     <string-array name="overlay_size_entries">

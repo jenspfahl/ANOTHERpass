@@ -19,6 +19,7 @@ import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.AndroidKey.ALIAS_KEY_TRANSPORT
 import de.jepfa.yapm.service.secret.MasterKeyService
 import de.jepfa.yapm.service.secret.MasterPasswordService
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.decryptPassword
 import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
@@ -148,7 +149,6 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
         activity: BaseActivity
     ) {
 
-
         val input = CreateVaultUseCase.Input(
             LoginData(pin, masterPasswd),
             cipherAlgorithm
@@ -160,6 +160,8 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
                     toastText(context, R.string.something_went_wrong)
                 }
                 else {
+                    // here we are logged in so we can store the user seed encrypted
+                    SecretService.persistUserSeed(activity)
                     pin.clear()
                     masterPasswd.clear()
                     findNavController().navigate(R.id.action_Create_Vault_to_ThirdFragment_to_Root)

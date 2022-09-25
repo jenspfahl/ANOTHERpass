@@ -48,7 +48,7 @@ object ExportEncMasterPasswordUseCase:
         val obfuscationKey: Key? = null
     )
 
-    override fun doExecute(input: Input, activity: BaseActivity): Boolean {
+    override suspend fun doExecute(input: Input, activity: BaseActivity): Boolean {
         val tempKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, activity)
 
         val encHead =
@@ -97,7 +97,7 @@ object ExportEncMasterPasswordUseCase:
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE, encQrc)
             intent.putExtra(QrCodeActivity.EXTRA_COLOR, Color.RED)
             intent.putExtra(QrCodeActivity.EXTRA_NO_SESSION_CHECK, input.noSessionCheck)
-            intent.putExtra(QrCodeActivity.EXTRA_NFC_WITH_APP_RECORD, true)
+            intent.putExtra(NfcActivity.EXTRA_WITH_APP_RECORD, true)
             activity.startActivity(intent)
         }
 

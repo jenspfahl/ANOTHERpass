@@ -11,6 +11,7 @@ import com.yariksoffice.lingver.Lingver
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.service.biometrix.BiometricUtils
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.ui.SecureActivity
@@ -267,6 +268,29 @@ class SettingsActivity : SecureActivity(),
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.autofill_preferences, rootKey)
 
+            findPreference<SwitchPreferenceCompat>(PreferenceService.PREF_AUTOFILL_EVERYWHERE)?.let { pref ->
+                activity?.let { pref.isEnabled = ResponseFiller.isAutofillSupported() }
+            }
+
+            findPreference<SwitchPreferenceCompat>(PreferenceService.PREF_AUTOFILL_SUGGEST_CREDENTIALS)?.let { pref ->
+                activity?.let { pref.isEnabled = ResponseFiller.isAutofillSupported() }
+            }
+
+            findPreference<MultiSelectListPreference>(PreferenceService.PREF_AUTOFILL_EXCLUSION_LIST)?.let { pref ->
+                activity?.let { pref.isEnabled = ResponseFiller.isAutofillSupported() }
+            }
+
+            findPreference<ListPreference>(PreferenceService.PREF_AUTOFILL_DEACTIVATION_DURATION)?.let { pref ->
+                activity?.let { pref.isEnabled = ResponseFiller.isAutofillSupported() }
+            }
+
+            findPreference<SwitchPreferenceCompat>(PreferenceService.PREF_AUTOFILL_INLINE_PRESENTATIONS)?.let { pref ->
+                activity?.let { pref.isEnabled = ResponseFiller.isInlinePresentationSupported() }
+            }
+
+            val excludedApps = PreferenceService.getAsStringSet(
+                PreferenceService.PREF_AUTOFILL_EXCLUSION_LIST, context)?: emptySet()
+
             val exclusionAppPref = findPreference<MultiSelectListPreference>(
                 PreferenceService.PREF_AUTOFILL_EXCLUSION_LIST)
             exclusionAppPref?.let { pref ->
@@ -278,7 +302,7 @@ class SettingsActivity : SecureActivity(),
                         .filterNotNull()
                         .filterNot { it.packageName == requireContext().packageName}
                         .filter { it.enabled }
-                        .filter { isUserApp(it) }
+                        .filter { isUserOrExcludedApp(it, excludedApps) }
                         .sortedBy { it.loadLabel(pm).toString().uppercase(Locale.ROOT) }
 
                     pref.entries = filteredPackages.map { it.loadLabel(pm) }.toTypedArray()
@@ -288,7 +312,10 @@ class SettingsActivity : SecureActivity(),
             }
         }
 
-        fun isUserApp(ai: ApplicationInfo): Boolean {
+        fun isUserOrExcludedApp(ai: ApplicationInfo, excludedApps: Set<String>): Boolean {
+            if (excludedApps.contains(ai.packageName)) {
+                return true // always show excluded apps, so filter them
+            }
             val mask = ApplicationInfo.FLAG_SYSTEM or ApplicationInfo.FLAG_UPDATED_SYSTEM_APP
             return ai.flags and mask == 0
         }

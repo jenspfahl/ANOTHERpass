@@ -1,4 +1,4 @@
-<b>Ein etwas anderer Passwortmanager</b>
+<b>Ein etwas anderer Weg um Passwörter zu verwalten</b>
 
 ANOTHERpass generiert leicht zu tippende aber starke Passwörter für dich. Sogenannte <i>Pseudophrasen</i> schauen aus wie echte Wörter, sind aber dennoch zufällig und unvorhersehbar.
 

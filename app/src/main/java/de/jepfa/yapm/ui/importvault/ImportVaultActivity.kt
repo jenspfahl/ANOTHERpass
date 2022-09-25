@@ -1,15 +1,15 @@
 package de.jepfa.yapm.ui.importvault
 
 import android.os.Bundle
-import com.google.gson.JsonObject
 import de.jepfa.yapm.R
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
 import de.jepfa.yapm.usecase.vault.ImportVaultUseCase.parseVaultFileContent
 
 class ImportVaultActivity : SecureActivity() {
 
     lateinit var mode: String
-    var jsonContent: JsonObject? = null
+    var parsedVault: ImportVaultUseCase.ParsedVault? = null
 
     init {
         checkSession = false
@@ -19,7 +19,7 @@ class ImportVaultActivity : SecureActivity() {
         mode = intent.getStringExtra(EXTRA_MODE) ?: EXTRA_MODE_INITIAL_IMPORT
 
         savedInstanceState?.getString("JSON")?.let {
-            jsonContent = parseVaultFileContent(it, this)
+            parsedVault = parseVaultFileContent(it, this)
         }
 
         super.onCreate(savedInstanceState)
@@ -32,7 +32,7 @@ class ImportVaultActivity : SecureActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString("JSON", jsonContent.toString())
+        outState.putString("JSON", parsedVault.toString())
     }
 
     override fun lock() {

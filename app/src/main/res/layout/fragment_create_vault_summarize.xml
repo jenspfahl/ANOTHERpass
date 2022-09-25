@@ -119,7 +119,7 @@
                         android:focusable="true" />
 
                 </LinearLayout>
-        </LinearLayout>
+            </LinearLayout>
 
 
             <Button

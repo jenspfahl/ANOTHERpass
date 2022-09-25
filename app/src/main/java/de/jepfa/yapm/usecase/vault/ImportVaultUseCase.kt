@@ -36,7 +36,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
         val copyOrigin: Boolean = false,
     )
 
-    override fun doExecute(input: Input, activity: SecureActivity): Boolean {
+    override suspend fun doExecute(input: Input, activity: SecureActivity): Boolean {
         try {
             val success =
                 if (input.override)
@@ -57,11 +57,15 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
     }
 
 
+    data class ParsedVault(val vaultId: String?, val cipherAlgorithm: CipherAlgorithm?, val content: JsonObject?)
 
-    fun parseVaultFileContent(content: String, context: Context, handleBlob: Boolean = false): JsonObject? {
+    fun parseVaultFileContent(content: String, context: Context, handleBlob: Boolean = false): ParsedVault {
         try {
             val masterKeySK = Session.getMasterKeySK()
             val rawJson = JsonParser.parseString(content).asJsonObject
+
+            val vaultId = rawJson.get(VaultExportService.JSON_VAULT_ID)?.asString
+            val cipherAlgorithm = rawJson.get(VaultExportService.JSON_CIPHER_ALGORITHM)?.asString?.let { CipherAlgorithm.valueOf(it) }
 
             // credentials
             val jsonCredentials = rawJson.get(VaultExportService.JSON_CREDENTIALS)
@@ -77,7 +81,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
                                 SecretService.decryptCommonString(masterKeySK, encJsonCredentials)
 
                             if (jsonCredentialsAsString == Validable.FAILED_STRING) {
-                                return null
+                                return ParsedVault(vaultId, cipherAlgorithm, null)
                             }
 
                             val jsonCredentials = JsonParser.parseString(jsonCredentialsAsString).asJsonArray
@@ -107,7 +111,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
                                 SecretService.decryptCommonString(masterKeySK, encJsonLabels)
 
                             if (jsonLabelsAsString == Validable.FAILED_STRING) {
-                                return null
+                                return ParsedVault(vaultId, cipherAlgorithm, null)
                             }
 
                             val jsonLabels = JsonParser.parseString(jsonLabelsAsString).asJsonArray
@@ -138,7 +142,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
                                 SecretService.decryptCommonString(masterKeySK, encJsonAppSettings)
 
                             if (jsonAppSettingsAsString == Validable.FAILED_STRING) {
-                                return null
+                                return ParsedVault(vaultId, cipherAlgorithm, null)
                             }
 
                             val jsonAppSettings = JsonParser.parseString(jsonAppSettingsAsString).asJsonObject
@@ -154,10 +158,10 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
                 }
             }
 
-            return rawJson
+            return ParsedVault(vaultId, cipherAlgorithm, rawJson)
         } catch (e: Exception) {
             Log.e("JSON", "cannot parse JSON", e)
-            return null
+            return ParsedVault(null, null, null)
         }
     }
     
@@ -247,6 +251,15 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
             PreferenceService.putEncrypted(
                 PreferenceService.DATA_ENCRYPTED_MASTER_KEY,
                 encEncryptedMasterKey,
+                activity
+            )
+        }
+
+        val encSeedBase64String = jsonContent.get(VaultExportService.JSON_ENC_SEED)?.asString
+        if (encSeedBase64String != null) {
+            PreferenceService.putEncrypted(
+                PreferenceService.DATA_ENCRYPTED_SEED,
+                Encrypted.fromBase64String(encSeedBase64String),
                 activity
             )
         }

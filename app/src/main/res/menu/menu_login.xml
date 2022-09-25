@@ -22,6 +22,12 @@
     </item>
 
     <item
+        android:id="@+id/menu_whats_new"
+        app:showAsAction="never"
+        android:title="@string/whats_new">
+    </item>
+
+    <item
         android:id="@+id/menu_about"
         app:showAsAction="never"
         android:title="@string/about">

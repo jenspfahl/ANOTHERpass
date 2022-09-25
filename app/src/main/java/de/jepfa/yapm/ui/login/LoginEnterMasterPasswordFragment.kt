@@ -13,17 +13,10 @@ import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.encrypted.EncryptedType.Types.*
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.LoginData
-import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.service.PreferenceService.PREF_FAST_MASTERPASSWD_LOGIN_WITH_NFC
-import de.jepfa.yapm.service.PreferenceService.PREF_FAST_MASTERPASSWD_LOGIN_WITH_QRC
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.MasterPasswordService
-import de.jepfa.yapm.service.secret.MasterPasswordService.generateEncMasterPasswdSKForExport
-import de.jepfa.yapm.service.secret.SaltService.getSalt
 import de.jepfa.yapm.service.secret.SecretService
-import de.jepfa.yapm.service.secret.SecretService.decryptKey
-import de.jepfa.yapm.service.secret.SecretService.generateStrongSecretKey
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
@@ -39,6 +32,8 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
 
     private lateinit var masterPasswdTextView: EditText
     private lateinit var loginButton: Button
+    private var isFromQRScan = false
+
 
     init {
         enableBack = true
@@ -128,7 +123,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         val scannedNdefTag = loginActivity.ndefTag?.data
         if (scannedNdefTag != null) {
             Log.i("LOGIN", "Tag available")
-
+            isFromQRScan = false
             readAndUpdateMasterPassword(scannedNdefTag, loginActivity, loginActivity.isFastLoginWithNfcTag())
 
         }
@@ -144,9 +139,9 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        val scanned = getScannedFromIntent(requestCode, resultCode, data)
+        val loginActivity = getBaseActivity() as LoginActivity
+        val scanned = getScannedFromIntent(requestCode, resultCode, data, loginActivity)
         if (scanned != null) {
-            val loginActivity = getBaseActivity() as LoginActivity
             readAndUpdateMasterPassword(scanned, loginActivity,
                 (requestCode == NfcActivity.ACTION_READ_NFC_TAG && loginActivity.isFastLoginWithNfcTag()
                         || (requestCode != NfcActivity.ACTION_READ_NFC_TAG && loginActivity.isFastLoginWithQrCode())))
@@ -162,13 +157,14 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         val scannedNdefTag = loginActivity.ndefTag?.data
         if (scannedNdefTag != null) {
             Log.i("LOGIN", "Tag available")
+            isFromQRScan = false
             readAndUpdateMasterPassword(scannedNdefTag, loginActivity, loginActivity.isFastLoginWithNfcTag())
         }
     }
 
 
     private fun readAndUpdateMasterPassword(scanned: String, loginActivity: LoginActivity, isFastLogin: Boolean) {
-        loginActivity.readMasterPassword(scanned)
+        loginActivity.readMasterPassword(scanned, isFromQRScan)
         { masterPassword ->
             masterPassword?.let {
                 masterPasswdTextView.setText(masterPassword.toRawFormattedPassword())
@@ -184,14 +180,21 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
     }
 
 
-    private fun getScannedFromIntent(requestCode: Int, resultCode: Int, data: Intent?): String? {
+    private fun getScannedFromIntent(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?,
+        loginActivity: LoginActivity
+    ): String? {
         if (requestCode == NfcActivity.ACTION_READ_NFC_TAG) {
+            isFromQRScan = false
+            loginActivity.readTagFromIntent(data) // important to update the tag instance
             return data?.getStringExtra(NfcActivity.EXTRA_SCANNED_NDC_TAG_DATA)
         }
         else {
+            isFromQRScan = true
             return extractContentFromIntent(requestCode, resultCode, data)
         }
-        return null
     }
 
     private fun login(

@@ -49,7 +49,7 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
             .show()
     }
 
-    override fun doExecute(input: Input, activity: SecureActivity): Boolean {
+    override suspend fun doExecute(input: Input, activity: SecureActivity): Boolean {
         activity.masterSecretKey?.let{ key ->
             val tempKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, activity)
             val credentialName = SecretService.decryptCommonString(

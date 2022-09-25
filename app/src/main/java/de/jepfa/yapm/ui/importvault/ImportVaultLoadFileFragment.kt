@@ -12,15 +12,14 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.navigation.fragment.findNavController
-import com.google.gson.JsonObject
 import de.jepfa.yapm.R
-import de.jepfa.yapm.service.io.VaultExportService
+import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.service.secret.SaltService
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
 import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.FileUtil
-import de.jepfa.yapm.util.shortenBase64String
 import de.jepfa.yapm.util.toastText
 
 class ImportVaultLoadFileFragment : BaseFragment() {
@@ -57,7 +56,7 @@ class ImportVaultLoadFileFragment : BaseFragment() {
                     .setType("*/*")
                     .setAction(Intent.ACTION_GET_CONTENT)
                 val chooserIntent =
-                    Intent.createChooser(intent, getString(R.string.chooser_select_vault_file))
+                    Intent.createChooser(intent, getString(R.string.chooser_select_file_to_import))
                 startActivityForResult(chooserIntent, importVaultFile)
             }
         }
@@ -76,7 +75,7 @@ class ImportVaultLoadFileFragment : BaseFragment() {
                         val baseActivity = getBaseActivity() ?: return
                         val content = FileUtil.readFile(baseActivity, selectedFile)
                         if (content != null) {
-                            getImportVaultActivity().jsonContent = ImportVaultUseCase.parseVaultFileContent(
+                            getImportVaultActivity().parsedVault = ImportVaultUseCase.parseVaultFileContent(
                                 content, importVaultActivity, handleBlob = true)
                         }
                     } catch (e: Exception) {
@@ -85,14 +84,21 @@ class ImportVaultLoadFileFragment : BaseFragment() {
                 }
             }
 
-            if (importVaultActivity.jsonContent == null) {
+            val parsedVault = importVaultActivity.parsedVault
+            if (parsedVault == null) {
                 toastText(activity, R.string.toast_import_vault_failure)
             }
-            else if (importVaultActivity.isOverrideMode() && !sameVaultId(importVaultActivity.jsonContent!!, importVaultActivity)) {
+            else if (importVaultActivity.isOverrideMode() && parsedVault.vaultId != null && !sameVaultId(parsedVault.vaultId, importVaultActivity)) {
                 toastText(activity, R.string.toast_import_vault_failure_no_vault_match)
             }
-            else if(!cipherVersionSupported(importVaultActivity.jsonContent!!)) {
+            else if(parsedVault.cipherAlgorithm != null && !cipherVersionSupported(parsedVault.cipherAlgorithm)) {
                 toastText(activity, R.string.toast_import_vault_failure_cipher_not_supported)
+            }
+            else if (importVaultActivity.isOverrideMode() && parsedVault.cipherAlgorithm != null && !sameCipherAlgorithm(parsedVault.cipherAlgorithm, importVaultActivity)) {
+                toastText(activity, R.string.toast_import_vault_failure_not_same_algo)
+            }
+            else if (parsedVault.content == null || parsedVault.vaultId == null || parsedVault.cipherAlgorithm == null) {
+                toastText(activity, R.string.toast_import_vault_failure)
             }
             else {
                 if (importVaultActivity.isOverrideMode()) {
@@ -105,14 +111,17 @@ class ImportVaultLoadFileFragment : BaseFragment() {
         }
     }
 
-    private fun sameVaultId(jsonContent: JsonObject, context: Context): Boolean {
-        val fileSalt = jsonContent.get(VaultExportService.JSON_VAULT_ID)?.asString
-        val currentSalt = SaltService.getSaltAsBase64String(context)
-        return fileSalt != null && fileSalt == currentSalt
+    private fun sameVaultId(vaultId: String, context: Context): Boolean {
+        val currentSaltAsVaultId = SaltService.getSaltAsBase64String(context)
+        return vaultId == currentSaltAsVaultId
     }
 
-    private fun cipherVersionSupported(jsonContent: JsonObject): Boolean {
-        val cipherAlgorithm = ImportVaultUseCase.extractCipherAlgorithm(jsonContent)
+    private fun sameCipherAlgorithm(cipherAlgorithm: CipherAlgorithm, context: Context): Boolean {
+        val currentAlgo = SecretService.getCipherAlgorithm(context)
+        return cipherAlgorithm == currentAlgo
+    }
+
+    private fun cipherVersionSupported(cipherAlgorithm: CipherAlgorithm): Boolean {
         return Build.VERSION.SDK_INT >= cipherAlgorithm.supportedSdkVersion
     }
 
