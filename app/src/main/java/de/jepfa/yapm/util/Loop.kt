@@ -1,4 +1,4 @@
-package de.jepfa.obfusser.util
+package de.jepfa.yapm.util
 
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password

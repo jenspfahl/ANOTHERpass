@@ -1,2 +1,2 @@
-* replace weird missleading text string
+* replace weird misleading text string
 * add icon and improved description to metadata

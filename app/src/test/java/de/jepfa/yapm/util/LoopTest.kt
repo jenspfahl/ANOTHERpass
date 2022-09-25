@@ -1,6 +1,6 @@
 package de.jepfa.obfusser.util.encrypt
 
-import de.jepfa.obfusser.util.Loop
+import de.jepfa.yapm.util.Loop
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import org.junit.Assert

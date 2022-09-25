@@ -275,10 +275,6 @@ class EditCredentialPasswordFragment : SecureFragment() {
         passwordCombinationsGuessed = true
     }
 
-    private fun containsChars(password: Password, chars: String) =
-        if (password.contains(Regex("[${Regex.escape(chars)}]"))) chars.length
-        else 0
-
     private fun calcPasswordStrength() {
         passwordCombinations = if (isPassphraseSelected()) {
             passphraseGenerator.calcCombinationCount(buildPassphraseGeneratorSpec())

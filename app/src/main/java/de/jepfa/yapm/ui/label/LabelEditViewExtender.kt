@@ -124,6 +124,7 @@ class LabelEditViewExtender(private val activity: SecureActivity,
 
     private fun createNewLabel(labelName: String): Label {
         val labelColors = activity.resources.getIntArray(R.array.label_colors)
+        labelColors.shuffle() // to get next color by random
         val allLabelColors = LabelService.defaultHolder.getAllLabels()
             .map { it.getColor(activity) }
             .toSet()
