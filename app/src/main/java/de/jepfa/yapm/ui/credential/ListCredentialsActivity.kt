@@ -887,6 +887,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         refreshMenuMasterPasswordItem(navigationView.menu)
         refreshRevokeMptItem(navigationView.menu)
+        refreshMenuDebugItem(navigationView.menu)
+
     }
 
     private fun refreshCredentials() {
