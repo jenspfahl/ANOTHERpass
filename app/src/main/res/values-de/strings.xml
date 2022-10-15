@@ -627,4 +627,8 @@
     <string name="autofill_inline_presentations_summary">Ab Android 11 kann Automatisches Ausfüllen in die virtuellen Tastatur integriert werden. Die virtuelle Tastatur muss dies aber unterstützen. Wenn nicht, wird stattdessen der normale Popup-Dialog angezeigt.</string>
     <string name="autofill_suggest_credentials_title">Schlage Zugangsdaten vor</string>
     <string name="autofill_suggest_credentials_summary">Wenn möglich, schlage Zugangsdaten vor, die zur aktuellen Ausfüllaktion passen könnten.</string>
+
+    <string name="chooser_select_image_to_scan">Wähle eine Bilddatei zum Scannen aus</string>
+    <string name="image_to_scan_failed">Bilddatei konnte nicht gescannt werden!</string>
+
 </resources>

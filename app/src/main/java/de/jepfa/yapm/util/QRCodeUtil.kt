@@ -18,6 +18,8 @@ import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_COLORIZE_MP_QRCODES
 import de.jepfa.yapm.service.PreferenceService.PREF_QRCODES_WITH_HEADER
 import de.jepfa.yapm.ui.qrcode.CaptureActivity
+import de.jepfa.yapm.ui.qrcode.CaptureActivity.Companion.DATA_FROM_IMAGE_FILE
+import de.jepfa.yapm.ui.qrcode.CaptureActivity.Companion.RESULT_FROM_IMAGE_FILE
 
 
 object QRCodeUtil {
@@ -76,33 +78,43 @@ object QRCodeUtil {
     }
 
     fun scanQRCode(fragment: Fragment, prompt: String) {
+        val timeout = PreferenceService.getAsInt(PreferenceService.PREF_LOGOUT_TIMEOUT, fragment.requireContext()) * 60000
         val integrator = IntentIntegrator.forSupportFragment(fragment).apply {
             captureActivity = CaptureActivity::class.java
             setOrientationLocked(false)
             setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
             setPrompt(prompt)
             setBarcodeImageEnabled(false)
+            setTimeout(timeout.toLong())
             setBeepEnabled(false)
         }
         integrator.initiateScan()
     }
 
     fun scanQRCode(activity: Activity, prompt: String) {
+        val timeout = PreferenceService.getAsInt(PreferenceService.PREF_LOGOUT_TIMEOUT, activity) * 60000
         val integrator = IntentIntegrator(activity).apply {
             captureActivity = CaptureActivity::class.java
             setOrientationLocked(false)
             setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
             setPrompt(prompt)
             setBarcodeImageEnabled(false)
+            setTimeout(timeout.toLong())
             setBeepEnabled(false)
         }
         integrator.initiateScan()
     }
 
     fun extractContentFromIntent(requestCode: Int, resultCode: Int, data: Intent?): String? {
-        val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
-        if (result != null && result.contents != null) {
-            val withoutTrailingZeroChars = result.contents.substringBefore(0.toChar())
+
+        val result = if (resultCode == RESULT_FROM_IMAGE_FILE && data != null) {
+            data.getStringExtra(DATA_FROM_IMAGE_FILE)
+        }
+        else {
+            IntentIntegrator.parseActivityResult(requestCode, resultCode, data)?.contents
+        }
+        if (result != null) {
+            val withoutTrailingZeroChars = result.substringBefore(0.toChar())
             return withoutTrailingZeroChars
         }
         return null
