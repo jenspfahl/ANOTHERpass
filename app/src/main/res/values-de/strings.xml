@@ -70,7 +70,7 @@
     <string name="password_not_equal">Wiederholung des Passworts nicht gleich</string>
     <string name="pin_wrong">Falsche PIN</string>
     <string name="button_create_vault">Tresor erstellen</string>
-    <string name="create_vault_explanation_3">Hier siehst du nochmal dein Masterpasswort. Exportiere es als QR-Code oder auf ein NFC-Tag indem du auf das entsprechende Symbol klickst. Wenn du es als QR-Code exportierst, kannst du es entweder als Bild sichern oder du scannst oder fotografierst den QR-Code direkt vom Gerät ab. Verwahre es an einem sicheren Ort! Du wirst es zusammen mit deiner PIN brauchen, um dich einzuloggen. \n Für einen einfacheren und schnelleren Login kannst du das Masterpasswort auch in der App speichern (geschützt mit einem biometrischem Merkmal wenn unterstützt).</string>
+    <string name="create_vault_explanation_3">Hier siehst du nochmal dein Masterpasswort. Exportiere es als QR-Code oder auf ein NFC-Tag indem du auf das entsprechende Symbol klickst. Wenn du es als QR-Code exportierst, kannst du es entweder als Bild sichern oder du scannst oder fotografierst den QR-Code direkt vom Gerät ab. Verwahre es an einem sicheren Ort! Du wirst es zusammen mit deiner PIN brauchen, um dich einzuloggen. \nFür einen einfacheren und schnelleren Login kannst du das Masterpasswort auch in der App speichern (geschützt mit einem biometrischem Merkmal wenn unterstützt).</string>
     <string name="store_master_password">Speichere Masterpasswort</string>
     <string name="create_vault_summarize_fragment_label">Tresor erstellen 3/3</string>
     <string name="login_explanation_1">Bitte PIN zum Einloggen eingeben</string>
