@@ -55,6 +55,28 @@ object FileUtil {
         return text.toString()
     }
 
+    fun readBinaryFile(context: Context, uri: Uri): ByteArray? {
+        try {
+            context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                val buffer = ByteArrayOutputStream()
+
+                var nRead: Int
+                val data = ByteArray(16384)
+
+                while (inputStream.read(data, 0, data.size).also { nRead = it } != -1) {
+                    buffer.write(data, 0, nRead)
+                }
+
+                return buffer.toByteArray()
+            }
+        } catch (e: IOException) {
+            Log.e("READFILE", "Cannot read $uri", e)
+            return null
+        }
+
+        return null
+    }
+
     fun writeFile(context: Context, uri: Uri, content: String): Boolean {
 
         try {

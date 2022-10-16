@@ -1,0 +1,4 @@
+* remove "Copied" button during login for Android 13
+* QR code scanner can now scan image files (#27)
+* QR code scanner with flash light / torch
+* small bugfixes and typos

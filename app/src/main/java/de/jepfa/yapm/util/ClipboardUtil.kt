@@ -4,6 +4,7 @@ import androidx.appcompat.app.AlertDialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.os.Build
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.secret.Key
@@ -71,7 +72,12 @@ object ClipboardUtil {
 
     fun clearClips(context: Context) {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText("", "")
-        clipboard.setPrimaryClip(clip)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            clipboard.clearPrimaryClip()
+        }
+        else {
+            val clip = ClipData.newPlainText("", "")
+            clipboard.setPrimaryClip(clip)
+        }
     }
 }
