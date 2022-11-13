@@ -456,7 +456,7 @@
     <string name="whats_new_in_1_7_subtext">Neben einigen Fehlerkorrekturen und Verbesserungen kommen diese neuen Features hinzu:</string>
     <string name="whats_new_in_1_7_bullet_1_head">Importiere und exportiere Zugangsdaten</string>
     <string name="whats_new_in_1_7_bullet_1_text">Du kannst deine Zugangsdaten von Browsern wie Firefox oder Chrome oder von anderen Quellen als CSV importieren und als CSV-Datei exportieren.</string>
-    <string name="whats_new_in_1_7_bullet_2_head">Verbessertes Automtisches Ausfüllen</string>
+    <string name="whats_new_in_1_7_bullet_2_head">Verbessertes Automatisches Ausfüllen</string>
     <string name="whats_new_in_1_7_bullet_2_text">Automatisches Ausfüllen wurde signifikant verbessert und unterstützt jetzt automatische Vorschläge zum Ausfüllen.</string>
     <string name="whats_new_in_1_7_bullet_3_head">Kopierschutz für Masterpasswort-Token auf NFC Tag</string>
     <string name="whats_new_in_1_7_bullet_3_text">Wenn aktiviert, können NFC-Tags mit MPTs zwar noch kopiert werden, die Kopien sind aber wirkungslos zum Einloggen.</string>

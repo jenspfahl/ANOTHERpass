@@ -457,8 +457,8 @@
     <string name="howto_biometrics_for_smp_text">First, enrol biometrics (e.g. fingerprints) on your device. Next, remove stored master password and set it again authenticated with your biometric.</string>
     <string name="pref_header_reminder">Reminders</string>
     <string name="reminder_period_title">How often to show reminders</string>
-    <string name="pref_auth_smp_with_biometric_title">Authorize stored master passwords with biometric</string>
-    <string name="pref_auth_smp_with_biometric_summary">It is highly recommend to protect stored master passwords with e.g. a fingerprint to mitigate the risk of getting it stolen by compromised malware. (Only if your device supports it.) Note: An already stored master password is not touched by changing this setting now. You have to remove it and set it again to take this setting in effect.</string>
+    <string name="pref_auth_smp_with_biometric_title">Authorize stored master password with biometric</string>
+    <string name="pref_auth_smp_with_biometric_summary">It is highly recommend to protect stored master password with e.g. a fingerprint to mitigate the risk of getting it stolen by compromised malware. (Only if your device supports it.) Note: An already stored master password is not touched by changing this setting now. You have to remove it and set it again to take this setting in effect.</string>
     <string name="auth_to_decrypt_emp_omit">Scan Master Password</string>
     <string name="whats_new">What\'s new</string>
     <string name="whats_new_in_1_7">What\'s new in version 1.7</string>
