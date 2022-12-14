@@ -57,9 +57,6 @@ object SecretService {
             userSeed?.let { seed ->
                 Log.d("SEED", "add user seed to PRNG")
                 random?.setSeed(seed.data)
-                if (DebugInfo.isDebug && context != null) {
-                    toastText(context, "PRNG seeded with user seed")
-                }
                 userSeedUsed = true
             }
         }
