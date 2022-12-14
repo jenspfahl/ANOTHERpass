@@ -21,8 +21,7 @@ object SaltService {
         val encSalt = PreferenceService.getEncrypted(PreferenceService.DATA_SALT, context)
         if (encSalt != null) {
             val saltKey = getAndroidSecretKey(AndroidKey.ALIAS_KEY_SALT, context)
-            val salt = decryptKey(saltKey, encSalt)
-            return salt
+            return decryptKey(saltKey, encSalt)
         }
         else {
             return createAndStoreSalt(context)

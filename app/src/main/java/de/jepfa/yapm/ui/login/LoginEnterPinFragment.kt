@@ -104,7 +104,6 @@ class LoginEnterPinFragment : BaseFragment() {
             val scannedNdefTag = loginActivity.ndefTag?.data
 
             if (!Session.isLoggedOut()) {
-                val keyForTemp = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, view.context)
                 val encMasterPasswd = Session.getEncMasterPasswd()
                 if (encMasterPasswd == null) {
                     toastText(context, R.string.something_went_wrong)

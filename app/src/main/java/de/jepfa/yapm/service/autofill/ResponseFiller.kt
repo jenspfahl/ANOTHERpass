@@ -379,7 +379,7 @@ object ResponseFiller {
         R.drawable.ic_baseline_bug_report_gray_24,
         "aId: ${it.autofillId}, webScheme: ${it.webScheme}, webDomain: ${it.webDomain}, " +
                 "aHints: ${Arrays.toString(it.autofillHints)}, hint: ${it.hint}, " +
-                "text: ${it.text}, idEntry: ${it.idEntry}, htmlInfoTag: ${it.htmlInfo?.tag}, " +
+                "text: ${it.text}, idEntry: ${it.idEntry}, hintIdEntry: ${it.hintIdEntry}, htmlInfoTag: ${it.htmlInfo?.tag}, " +
                 "htmlInfoAttr: ${it.htmlInfo?.attributes}, type: ${it.autofillType}, important: ${it.importantForAutofill}, " +
                 "class: ${it.className}, isUserField: ${fields.hasUserField(it)}, " +
                 "isPasswordField: ${fields.hasPasswordField(it)}, isPotentialField: ${fields.hasPotentialField(it)}",
@@ -487,6 +487,8 @@ object ResponseFiller {
     ) {
         node.text?.let { identifyField(it.toString(), node, fields) }
         node.hint?.let { identifyField(it, node, fields) }
+        node.idEntry?.let { identifyField(it, node, fields) }
+        node.hintIdEntry?.let { identifyField(it, node, fields) }
         node.htmlInfo?.let { identifyField(it.tag, node, fields) }
         node.autofillHints?.map { identifyField(it, node, fields) }
         node.htmlInfo?.attributes?.mapNotNull {

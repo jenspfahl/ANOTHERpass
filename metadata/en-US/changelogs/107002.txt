@@ -1,0 +1,3 @@
+* make external storage access working for Android 13 (e.g. importing vault file)
+* Autofill for Instagram app
+* small bugfixes and typos
