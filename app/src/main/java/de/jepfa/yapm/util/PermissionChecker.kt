@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import android.provider.Settings
 import androidx.core.app.ActivityCompat
 import de.jepfa.yapm.ui.BaseActivity
@@ -16,7 +17,7 @@ object PermissionChecker {
     private val PERMISSIONS_READ_STORAGE = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
 
     fun hasRWStoragePermissions(context: Context): Boolean {
-        return hasPermissions(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        return !isExtReadWritePermissionsNeeded() || hasPermissions(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
     }
 
     fun verifyRWStoragePermissions(activity: Activity) {
@@ -30,7 +31,7 @@ object PermissionChecker {
     }
 
     fun hasReadStoragePermissions(context: Context): Boolean {
-        return hasPermissions(context, Manifest.permission.READ_EXTERNAL_STORAGE)
+        return !isExtReadWritePermissionsNeeded() || hasPermissions(context, Manifest.permission.READ_EXTERNAL_STORAGE)
     }
 
     fun verifyReadStoragePermissions(activity: Activity) {
@@ -67,5 +68,7 @@ object PermissionChecker {
         val permission = ActivityCompat.checkSelfPermission(context, permissionName)
         return permission == PackageManager.PERMISSION_GRANTED
     }
+
+    private fun isExtReadWritePermissionsNeeded() = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
 
 }
