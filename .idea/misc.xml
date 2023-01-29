@@ -8,6 +8,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../../data/jens/Projekte/yapm/app/app/src/main/res/layout/fragment_edit_credential_data.xml" value="0.17604166666666668" />
         <entry key="../../../../../layout/custom_preview.xml" value="0.22" />
         <entry key="../../../.gradle/caches/transforms-3/b5fc9fe81f432b473c9d18cad7139f18/transformed/jetified-AppIntro-6.1.0/res/drawable/ic_appintro_arrow.xml" value="0.15" />
         <entry key="../../../.gradle/caches/transforms-3/ce6a40af2f1f0fe5fc3064ac3a22e363/transformed/jetified-zxing-android-embedded-3.6.0/res/layout/zxing_capture.xml" value="0.3489583333333333" />

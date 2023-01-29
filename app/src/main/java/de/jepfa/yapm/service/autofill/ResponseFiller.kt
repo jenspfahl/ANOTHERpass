@@ -488,7 +488,9 @@ object ResponseFiller {
         node.text?.let { identifyField(it.toString(), node, fields) }
         node.hint?.let { identifyField(it, node, fields) }
         node.idEntry?.let { identifyField(it, node, fields) }
-        node.hintIdEntry?.let { identifyField(it, node, fields) }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            node.hintIdEntry?.let { identifyField(it, node, fields) }
+        }
         node.htmlInfo?.let { identifyField(it.tag, node, fields) }
         node.autofillHints?.map { identifyField(it, node, fields) }
         node.htmlInfo?.attributes?.mapNotNull {
@@ -593,7 +595,12 @@ object ResponseFiller {
 
     private fun createDomainString(structure: AssistStructure, field: ViewNode, context: Context): String? {
         return if (field.webDomain != null) {
-            (field.webScheme?:"https") + "://" + field.webDomain
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                (field.webScheme ?: "https") + "://" + field.webDomain
+            }
+            else {
+                "https" + "://" + field.webDomain
+            }
         } else {
             null
         }

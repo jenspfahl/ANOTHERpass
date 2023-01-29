@@ -37,8 +37,8 @@ object ShowPasswordStrengthUseCase: InputUseCase<ShowPasswordStrengthUseCase.Inp
 
         var strengthLevel = emoji(0x1f625)
         if (entropy >= 128) strengthLevel = emoji(0x1f606)
-        else if (entropy >= 60) strengthLevel = emoji(0x1f642)
-        else if (entropy >= 36) strengthLevel = emoji(0x1f610)
+        else if (entropy >= 80) strengthLevel = emoji(0x1f642)
+        else if (entropy >= 50) strengthLevel = emoji(0x1f610)
         else if (entropy >= 28) strengthLevel = emoji(0x1f641)
         AlertDialog.Builder(activity)
             .setTitle(titleId)
