@@ -1,5 +1,6 @@
 package de.jepfa.yapm.ui.credential
 
+import android.R.menu
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -167,8 +168,8 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                     }
                 }
             })
-
             popup.inflate(R.menu.menu_credential_list)
+            popup.setForceShowIcon(true)
             popup.show()
         }
 

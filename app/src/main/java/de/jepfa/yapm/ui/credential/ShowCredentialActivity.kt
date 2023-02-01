@@ -11,8 +11,10 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.children
+import androidx.core.view.iterator
 import androidx.core.view.setPadding
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
@@ -176,13 +178,15 @@ class ShowCredentialActivity : SecureActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        if (mode == Mode.EXTERNAL_FROM_FILE || mode == Mode.NORMAL_READONLY) {
-            menuInflater.inflate(R.menu.menu_credential_detail_raw, menu)
+        val menuId = if (mode == Mode.EXTERNAL_FROM_FILE || mode == Mode.NORMAL_READONLY) {
+            R.menu.menu_credential_detail_raw
         } else if (mode == Mode.EXTERNAL_FROM_RECORD) {
-            menuInflater.inflate(R.menu.menu_credential_detail_import, menu)
+            R.menu.menu_credential_detail_import
         } else {
-            menuInflater.inflate(R.menu.menu_credential_detail, menu)
+            R.menu.menu_credential_detail
         }
+        inflateActionsMenu(menu, menuId)
+
 
         val enableCopyPassword = PreferenceService.getAsBool(PREF_ENABLE_COPY_PASSWORD, this)
         if (!enableCopyPassword) {
