@@ -4,18 +4,19 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.children
-import androidx.core.view.iterator
 import androidx.core.view.setPadding
+import androidx.core.widget.NestedScrollView
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.chip.Chip
@@ -114,7 +115,19 @@ class ShowCredentialActivity : SecureActivity() {
 
         userTextView = findViewById(R.id.user)
         websiteTextView = findViewById(R.id.website)
+
         additionalInfoTextView = findViewById(R.id.additional_info)
+        val additionalInfoScrollView = findViewById<ScrollView>(R.id.additional_info_scroll_view)
+        additionalInfoTextView.setOnClickListener {
+            appBarLayout.setExpanded(false, true)
+        }
+        additionalInfoTextView.setOnScrollChangeListener{ _, _, _, _, _ ->
+            appBarLayout.setExpanded(false, true)
+        }
+        additionalInfoScrollView.setOnScrollChangeListener{ _, _, _, _, _ ->
+            appBarLayout.setExpanded(false, true)
+        }
+
         passwordTextView = findViewById(R.id.passwd)
 
         passwordTextView.setOnLongClickListener {
