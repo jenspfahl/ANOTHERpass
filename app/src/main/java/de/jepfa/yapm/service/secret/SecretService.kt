@@ -253,8 +253,6 @@ object SecretService {
     }
 
     private fun initAndroidSecretKey(androidKey: AndroidKey, context: Context): SecretKey {
-        val keyGenerator = KeyGenerator
-                .getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE)
 
         val spec = KeyGenParameterSpec.Builder(androidKey.alias,
                 KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
@@ -269,15 +267,23 @@ object SecretService {
             if (androidKey.requireUserAuth && BiometricUtils.isFingerprintAvailable(context)) {
                 spec
                     .setUserAuthenticationRequired(true)
-                    .setUserAuthenticationValidityDurationSeconds(-1)
                     .setInvalidatedByBiometricEnrollment(true)
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    spec.setUserAuthenticationParameters(10, KeyProperties.AUTH_BIOMETRIC_STRONG or KeyProperties.AUTH_DEVICE_CREDENTIAL)
+                }
+                else {
+                    spec.setUserAuthenticationValidityDurationSeconds(10)
+                }
 
             }
         }
 
+        val keyGenerator = KeyGenerator
+            .getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE)
+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-            keyGenerator.init(spec.build())
-            return keyGenerator.generateKey()
+            return initSecretKey(keyGenerator, spec.build())
         }
         else {
             try {
@@ -286,9 +292,24 @@ object SecretService {
             } catch (e: StrongBoxUnavailableException) {
                 Log.w("SS", "Strong box not supported, falling back to without it", e)
                 spec.setIsStrongBoxBacked(false)
-                keyGenerator.init(spec.build())
-                return keyGenerator.generateKey()
+                return initSecretKey(keyGenerator, spec.build())
             }
+            catch (e: Exception) {
+                Log.w("SS", "Unknown exception, just retry", e)
+                return initSecretKey(keyGenerator, spec.build())
+            }
+        }
+    }
+
+    private fun initSecretKey(keyGenerator: KeyGenerator, spec: KeyGenParameterSpec): SecretKey {
+
+        return try {
+            keyGenerator.init(spec)
+            keyGenerator.generateKey()
+        } catch (e: Exception) {
+            Log.w("SS", "Unknown exception, just retry", e)
+            keyGenerator.init(spec)
+            keyGenerator.generateKey()
         }
     }
 
