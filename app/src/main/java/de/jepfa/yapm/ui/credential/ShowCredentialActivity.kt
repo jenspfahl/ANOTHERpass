@@ -74,6 +74,7 @@ class ShowCredentialActivity : SecureActivity() {
     private lateinit var userTextView: TextView
     private lateinit var websiteTextView: TextView
     private lateinit var additionalInfoTextView: TextView
+    private lateinit var expandAdditionalInfoImageView: ImageView
     private var optionsMenu: Menu? = null
 
     init {
@@ -118,14 +119,19 @@ class ShowCredentialActivity : SecureActivity() {
 
         additionalInfoTextView = findViewById(R.id.additional_info)
         val additionalInfoScrollView = findViewById<ScrollView>(R.id.additional_info_scroll_view)
+        expandAdditionalInfoImageView = findViewById(R.id.imageview_expand_additional_info)
+
+        expandAdditionalInfoImageView.setOnClickListener {
+            expandAdditionalInfoView(expandAdditionalInfoImageView)
+        }
         additionalInfoTextView.setOnClickListener {
-            appBarLayout.setExpanded(false, true)
+            expandAdditionalInfoView(expandAdditionalInfoImageView)
         }
         additionalInfoTextView.setOnScrollChangeListener{ _, _, _, _, _ ->
-            appBarLayout.setExpanded(false, true)
+            expandAdditionalInfoView(expandAdditionalInfoImageView)
         }
         additionalInfoScrollView.setOnScrollChangeListener{ _, _, _, _, _ ->
-            appBarLayout.setExpanded(false, true)
+            expandAdditionalInfoView(expandAdditionalInfoImageView)
         }
 
         passwordTextView = findViewById(R.id.passwd)
@@ -177,6 +183,12 @@ class ShowCredentialActivity : SecureActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+    }
+
+    private fun expandAdditionalInfoView(expandAdditionalInfoImageView: ImageView) {
+        appBarLayout.setExpanded(false, true)
+        expandAdditionalInfoImageView.visibility = View.GONE
+        additionalInfoTextView.maxLines = R.integer.max_credential_additional_info_length
     }
 
     override fun onResume() {
@@ -475,6 +487,8 @@ class ShowCredentialActivity : SecureActivity() {
             }
 
             additionalInfoTextView.text = additionalInfo
+            expandAdditionalInfoImageView.visibility =
+                if (additionalInfo.lines().count() > 3) View.VISIBLE else View.INVISIBLE
 
             updatePasswordTextView(key, credential, true)
 
