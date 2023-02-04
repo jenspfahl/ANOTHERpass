@@ -11,12 +11,14 @@
         <entry key="../../../../../data/jens/Projekte/yapm/app/app/src/main/res/drawable/ic_baseline_delete_24.xml" value="0.139" />
         <entry key="../../../../../data/jens/Projekte/yapm/app/app/src/main/res/drawable/ic_baseline_edit_24.xml" value="0.139" />
         <entry key="../../../../../data/jens/Projekte/yapm/app/app/src/main/res/drawable/ic_baseline_exit_to_app_24.xml" value="0.139" />
+        <entry key="../../../../../data/jens/Projekte/yapm/app/app/src/main/res/drawable/ic_baseline_expand_less_24.xml" value="0.139" />
         <entry key="../../../../../data/jens/Projekte/yapm/app/app/src/main/res/drawable/ic_baseline_expand_more_24.xml" value="0.139" />
         <entry key="../../../../../data/jens/Projekte/yapm/app/app/src/main/res/drawable/ic_baseline_file_copy_24.xml" value="0.139" />
         <entry key="../../../../../data/jens/Projekte/yapm/app/app/src/main/res/drawable/ic_baseline_import_export_24.xml" value="0.139" />
         <entry key="../../../../../data/jens/Projekte/yapm/app/app/src/main/res/drawable/ic_baseline_qr_code_24_white.xml" value="0.139" />
         <entry key="../../../../../data/jens/Projekte/yapm/app/app/src/main/res/drawable/ic_baseline_replay_24.xml" value="0.139" />
         <entry key="../../../../../data/jens/Projekte/yapm/app/app/src/main/res/layout/activity_create_or_import_vault.xml" value="0.17604166666666668" />
+        <entry key="../../../../../data/jens/Projekte/yapm/app/app/src/main/res/layout/activity_edit_credential.xml" value="0.17604166666666668" />
         <entry key="../../../../../data/jens/Projekte/yapm/app/app/src/main/res/layout/activity_list_credentials.xml" value="0.3489583333333333" />
         <entry key="../../../../../data/jens/Projekte/yapm/app/app/src/main/res/layout/activity_login.xml" value="0.3489583333333333" />
         <entry key="../../../../../data/jens/Projekte/yapm/app/app/src/main/res/layout/activity_show_credential.xml" value="0.2" />

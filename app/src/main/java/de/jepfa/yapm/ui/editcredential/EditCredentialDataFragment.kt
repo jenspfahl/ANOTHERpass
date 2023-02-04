@@ -3,13 +3,16 @@
 package de.jepfa.yapm.ui.editcredential
 
 import android.os.Bundle
+import android.text.Editable
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.widget.addTextChangedListener
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
@@ -36,6 +39,7 @@ class EditCredentialDataFragment : SecureFragment() {
     private lateinit var editCredentialUserView: EditText
     private lateinit var editCredentialWebsiteView: EditText
     private lateinit var editCredentialAdditionalInfoView: EditText
+    private lateinit var expandAdditionalInfoImageView: ImageView
 
     init {
         enableBack = true
@@ -61,6 +65,22 @@ class EditCredentialDataFragment : SecureFragment() {
         editCredentialUserView = view.findViewById(R.id.edit_credential_user)
         editCredentialWebsiteView = view.findViewById(R.id.edit_credential_website)
         editCredentialAdditionalInfoView = view.findViewById(R.id.edit_credential_additional_info)
+        expandAdditionalInfoImageView = view.findViewById<ImageView>(R.id.imageview_expand_additional_info)
+
+        editCredentialAdditionalInfoView.addTextChangedListener {
+            if (it == null) return@addTextChangedListener
+            updateExpandAddInfoVisibility(expandAdditionalInfoImageView, it)
+        }
+        expandAdditionalInfoImageView.setOnClickListener {
+            if (editCredentialAdditionalInfoView.maxLines == R.integer.max_credential_additional_info_length) {
+                editCredentialAdditionalInfoView.maxLines = 3
+                expandAdditionalInfoImageView.setImageDrawable(editCredentialActivity.getDrawable(R.drawable.ic_baseline_expand_more_24))
+            }
+            else {
+                editCredentialAdditionalInfoView.maxLines = R.integer.max_credential_additional_info_length
+                expandAdditionalInfoImageView.setImageDrawable(editCredentialActivity.getDrawable(R.drawable.ic_baseline_expand_less_24))
+            }
+        }
 
         val explanationView: TextView = view.findViewById(R.id.edit_credential_explanation)
         explanationView.setOnLongClickListener {
@@ -123,6 +143,14 @@ class EditCredentialDataFragment : SecureFragment() {
         }
     }
 
+    private fun updateExpandAddInfoVisibility(
+        expandAdditionalInfoImageView: ImageView,
+        charSequence: CharSequence
+    ) {
+        expandAdditionalInfoImageView.visibility =
+            if (charSequence.lines().count() > 3) View.VISIBLE else View.INVISIBLE
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         if (isVisible) {
@@ -149,6 +177,7 @@ class EditCredentialDataFragment : SecureFragment() {
         editCredentialUserView.setText(user)
         editCredentialWebsiteView.setText(website)
         editCredentialAdditionalInfoView.setText(additionalInfo)
+        updateExpandAddInfoVisibility(expandAdditionalInfoImageView, additionalInfo)
 
         val allLabelsForCredential = LabelService.defaultHolder.decryptLabelsForCredential(key, current)
 
