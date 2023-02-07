@@ -268,14 +268,7 @@ object SecretService {
                 spec
                     .setUserAuthenticationRequired(true)
                     .setInvalidatedByBiometricEnrollment(true)
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    spec.setUserAuthenticationParameters(10, KeyProperties.AUTH_BIOMETRIC_STRONG or KeyProperties.AUTH_DEVICE_CREDENTIAL)
-                }
-                else {
-                    spec.setUserAuthenticationValidityDurationSeconds(10)
-                }
-
+                
             }
         }
 
