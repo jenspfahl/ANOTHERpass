@@ -2,8 +2,11 @@ package de.jepfa.yapm.service
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
 import android.util.Log
 import androidx.preference.PreferenceManager
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.util.Constants
@@ -23,6 +26,9 @@ object PreferenceService {
      * To achieve this, count the version value up here.
      */
     private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_22"
+
+    private const val ENC_SHARED_PREFERENCES_NAME = "de.jepfa.yapm.enc-preferences"
+
 
     const val STATE_DEFAULT_INIT_DONE = STATE_PREFIX + "default_init_done"
 
@@ -146,6 +152,29 @@ object PreferenceService {
     const val TEMP_BLOB_LABELS = TEMP_PREFIX + "blob_labels"
     const val TEMP_BLOB_SETTINGS = TEMP_PREFIX + "blob_settings"
 
+    private lateinit var prefs: SharedPreferences
+
+    /**
+     * Must be called before this object can be used!!!
+     */
+    fun initStorage(context: Context) {
+
+        prefs = initDefaultPrefs(context)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val encPrefs = initEncPrefs(context)
+            if (encPrefs != null) {
+                if (prefs.all.isNotEmpty()) {
+                    // migrate non encrypted shared preferences
+                    // to encrypted shared preferences and clear them once finished.
+                    prefs.copyTo(encPrefs)
+                    prefs.clear()
+                }
+                prefs = encPrefs
+            }
+        }
+    }
+
 
     fun initDefaults(context: Context?) {
         if (context == null) return
@@ -202,12 +231,12 @@ object PreferenceService {
 
     fun getAsBool(prefKey: String, context: Context?): Boolean {
         if (context == null) return false
-        return getDefault(context).getBoolean(prefKey, false)
+        return prefs.getBoolean(prefKey, false)
     }
 
     fun getAsBool(prefKey: String, defaultValue: Boolean, context: Context?): Boolean {
         if (context == null) return defaultValue
-        return getDefault(context).getBoolean(prefKey, defaultValue)
+        return prefs.getBoolean(prefKey, defaultValue)
     }
 
     fun getAsString(prefKey: String, context: Context?): String? {
@@ -216,12 +245,12 @@ object PreferenceService {
 
     fun getAsStringSet(prefKey: String, context: Context?): Set<String>? {
         if (context == null) return null
-        return getDefault(context).getStringSet(prefKey, null)
+        return prefs.getStringSet(prefKey, null)
     }
 
     private fun get(prefKey: String, context: Context?): String? {
         if (context == null) return null
-        return getDefault(context).getString(prefKey, null)
+        return prefs.getString(prefKey, null)
     }
 
     fun isPresent(prefKey: String, context: Context?): Boolean {
@@ -245,27 +274,19 @@ object PreferenceService {
     }
 
     fun putInt(prefKey: String, value: Int, context: Context) {
-        val editor = getDefault(context).edit()
-        editor.putString(prefKey, value.toString())
-        editor.apply()
+        prefs.edit { it.putString(prefKey, value.toString()) }
     }
 
     fun putString(prefKey: String, value: String, context: Context) {
-        val editor = getDefault(context).edit()
-        editor.putString(prefKey, value)
-        editor.apply()
+        prefs.edit { it.putString(prefKey, value) }
     }
 
     fun putStringSet(prefKey: String, value: Set<String>, context: Context) {
-        val editor = getDefault(context).edit()
-        editor.putStringSet(prefKey, value)
-        editor.apply()
+        prefs.edit { it.putStringSet(prefKey, value) }
     }
 
     fun putBoolean(prefKey: String, value: Boolean, context: Context) {
-        val editor = getDefault(context).edit()
-        editor.putBoolean(prefKey, value)
-        editor.apply()
+        prefs.edit { it.putBoolean(prefKey, value) }
     }
 
     fun toggleBoolean(prefKey: String, context: Context) {
@@ -274,28 +295,75 @@ object PreferenceService {
     }
 
     fun delete(prefKey: String, context: Context) {
-        val editor = getDefault(context).edit()
-        editor.putString(prefKey, null)
-        editor.apply()
+        prefs.remove(prefKey)
     }
 
     fun deleteAllData(context: Context) {
-        getDefault(context).all
+        prefs.all
             .filter { (k, _) -> k.startsWith(DATA_PREFIX) }
             .forEach { (k, _) -> delete(k, context)}
     }
 
     fun deleteAllTempData(context: Context) {
-        getDefault(context).all
+        prefs.all
             .filter { (k, _) -> k.startsWith(TEMP_PREFIX) }
             .forEach { (k, _) -> delete(k, context)}
     }
 
     fun getAllPrefs(context: Context): Map<String, Any?> {
-        return getDefault(context).all.filter { (k, _) -> k.startsWith(PREF_PREFIX) }
+        return prefs.all.filter { (k, _) -> k.startsWith(PREF_PREFIX) }
     }
 
-    private fun getDefault(context: Context): SharedPreferences {
+    private fun initDefaultPrefs(context: Context): SharedPreferences {
         return PreferenceManager.getDefaultSharedPreferences(context)
     }
+
+    private fun initEncPrefs(context: Context): SharedPreferences? {
+        return try {
+            val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+            EncryptedSharedPreferences.create(
+                ENC_SHARED_PREFERENCES_NAME,
+                masterKeyAlias,
+                context,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+        } catch (e: Exception) {
+            Log.e("PREFS", "cannot create encrypted shared preferences", e)
+            null
+        }
+    }
+}
+
+fun SharedPreferences.copyTo(dest: SharedPreferences) {
+    for (entry in all.entries) {
+        val key = entry.key
+        val value: Any? = entry.value
+        dest.set(key, value)
+    }
+}
+
+inline fun SharedPreferences.edit(operation: (SharedPreferences.Editor) -> Unit) {
+    val editor = this.edit()
+    operation(editor)
+    editor.apply()
+}
+
+fun SharedPreferences.set(key: String, value: Any?) {
+    when (value) {
+        is String? -> edit { it.putString(key, value) }
+        is Set<*>? -> edit { it.putStringSet(key, value?.map { it.toString() }?.toSet()) }
+        is Boolean -> edit { it.putBoolean(key, value) }
+        else -> {
+            Log.e("PREFS", "Unsupported Type: $value")
+        }
+    }
+}
+
+fun SharedPreferences.clear() {
+    edit() { it.clear() }
+}
+
+fun SharedPreferences.remove(key: String) {
+    edit { it.remove(key) }
 }
