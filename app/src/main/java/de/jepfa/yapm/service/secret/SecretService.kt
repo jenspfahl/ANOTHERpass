@@ -268,7 +268,7 @@ object SecretService {
                 spec
                     .setUserAuthenticationRequired(true)
                     .setInvalidatedByBiometricEnrollment(true)
-                
+
             }
         }
 

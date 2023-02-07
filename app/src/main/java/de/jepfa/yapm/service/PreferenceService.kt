@@ -165,10 +165,13 @@ object PreferenceService {
             val encPrefs = initEncPrefs(context)
             if (encPrefs != null) {
                 if (prefs.all.isNotEmpty()) {
-                    // migrate non encrypted shared preferences
-                    // to encrypted shared preferences and clear them once finished.
-                    prefs.copyTo(encPrefs)
-                    prefs.clear()
+                    try {
+                        prefs.copyTo(encPrefs)
+                        prefs.clear()
+                    } catch (e: Exception) {
+                        Log.e("PREFS", "could not migrate to enc prefs", e)
+                        return
+                    }
                 }
                 prefs = encPrefs
             }
@@ -336,9 +339,9 @@ object PreferenceService {
 }
 
 fun SharedPreferences.copyTo(dest: SharedPreferences) {
-    for (entry in all.entries) {
+    all.entries.forEach { entry ->
         val key = entry.key
-        val value: Any? = entry.value
+        val value = entry.value
         dest.set(key, value)
     }
 }
