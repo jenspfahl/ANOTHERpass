@@ -13,6 +13,7 @@ import java.text.DecimalFormatSymbols
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.floor
 
 fun Bundle?.getEncrypted(key: String): Encrypted? {
 
@@ -111,6 +112,11 @@ fun Date.addDays(days: Int): Date {
 }
 
 fun Double.toReadableFormat(): String {
+    val f = NumberFormat.getInstance(Locale.getDefault(Locale.Category.FORMAT))
+    return f.format(floor(this))
+}
+
+fun Int.toReadableFormat(): String {
     val f = NumberFormat.getInstance(Locale.getDefault(Locale.Category.FORMAT))
     return f.format(this)
 }

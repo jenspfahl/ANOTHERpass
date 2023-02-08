@@ -312,8 +312,9 @@
     <string name="password_strength_from_generator">Passwortstärke (vom Passwortgenerator)</string>
     <string name="password_strength_guessed">Passwortstärke (vom aktuellen Passwort)</string>
     <string name="combinations">Kombinationen</string>
-    <string name="bruteforce_years_pc">Jahre um das Passwort mit einem gewöhnlichem PC zu erraten</string>
-    <string name="bruteforce_year_supercomp">Jahre um das Passwort mit einem Supercomputer zu erraten</string>
+    <string name="years">Jahre</string>
+    <string name="bruteforce_years_pc">Zeit um das Passwort mit einem gewöhnlichem PC zu erraten (%1$s Versuche pro Sekunde)</string>
+    <string name="bruteforce_year_supercomp">Zeit um das Passwort mit einem Supercomputer zu erraten (%1$s Versuche pro Sekunde)</string>
     <string name="show_vault_info">Zeige Tresorinformationen</string>
     <string name="vault_info">Tresorinformationen</string>
     <string name="vault_id">Tresor Id</string>

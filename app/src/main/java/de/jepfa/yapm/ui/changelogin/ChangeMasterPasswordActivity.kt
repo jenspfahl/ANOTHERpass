@@ -14,8 +14,10 @@ import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.secret.MasterPasswordService
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
+import de.jepfa.yapm.usecase.credential.ShowPasswordStrengthUseCase
 import de.jepfa.yapm.usecase.secret.ChangeMasterPasswordUseCase
 import de.jepfa.yapm.usecase.secret.GenerateMasterPasswordUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
@@ -23,10 +25,14 @@ import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.toastText
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ChangeMasterPasswordActivity : SecureActivity() {
 
     private var generatedPassword: Password = Password.empty()
+    private var combinations = 0.0
     private var passwordChanged = false
 
     init {
@@ -54,6 +60,14 @@ class ChangeMasterPasswordActivity : SecureActivity() {
         if (!Session.isDenied() && masterPasswd != null) {
             generatedPassword = masterPasswd
             generatedPasswdView.text = PasswordColorizer.spannableString(generatedPassword, this)
+        }
+
+        generatedPasswdView.setOnLongClickListener {
+            if (combinations == 0.0) {
+                combinations = ShowPasswordStrengthUseCase.guessPasswordCombinations(generatedPassword)
+            }
+            ShowPasswordStrengthUseCase.showPasswordStrength(combinations, R.string.password_strength, this )
+            true
         }
 
         val buttonGeneratePasswd: Button = findViewById(R.id.button_generate_passwd)
@@ -93,7 +107,8 @@ class ChangeMasterPasswordActivity : SecureActivity() {
             UseCaseBackgroundLauncher(GenerateMasterPasswordUseCase)
                 .launch(this, pseudoPhraseSwitch.isChecked)
                 { output ->
-                    generatedPassword = output.data
+                    generatedPassword = output.data.first
+                    combinations = output.data.second
                     generatedPasswdView.text = PasswordColorizer.spannableString(generatedPassword, this)
                     passwordChanged = true
                 }

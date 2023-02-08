@@ -11,28 +11,26 @@ import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.usecase.UseCase
 import de.jepfa.yapm.usecase.UseCaseOutput
 
-object GenerateMasterPasswordUseCase: UseCase<Boolean, Password, BaseActivity> {
+object GenerateMasterPasswordUseCase: UseCase<Boolean, Pair<Password, Double>, BaseActivity> {
 
-    override suspend fun execute(usePseudoPhrase: Boolean, activity: BaseActivity): UseCaseOutput<Password> {
+    override suspend fun execute(usePseudoPhrase: Boolean, activity: BaseActivity): UseCaseOutput<Pair<Password, Double>> {
 
         val generated = generate(usePseudoPhrase, activity)
 
         return UseCaseOutput(generated)
     }
 
-    private fun generate(usePseudoPhrase: Boolean, context : Context): Password {
-        if (usePseudoPhrase) {
-            return PassphraseGenerator(context = context).generate(
-                PassphraseGeneratorSpec(
-                    strength = SecretStrength.HYPER
-                )
-            )
+    private fun generate(usePseudoPhrase: Boolean, context : Context): Pair<Password, Double> {
+        return if (usePseudoPhrase) {
+            val generator = PassphraseGenerator(context = context)
+            val spec = PassphraseGeneratorSpec(strength = SecretStrength.HYPER)
+
+            Pair(generator.generate(spec), generator.calcCombinationCount(spec))
         } else {
-            return PasswordGenerator(context = context).generate(
-                PasswordGeneratorSpec(
-                    strength = SecretStrength.HYPER
-                )
-            )
+            val generator = PasswordGenerator(context = context)
+            val spec = PasswordGeneratorSpec(strength = SecretStrength.HYPER)
+
+            Pair(generator.generate(spec), generator.calcCombinationCount(spec))
         }
     }
 
