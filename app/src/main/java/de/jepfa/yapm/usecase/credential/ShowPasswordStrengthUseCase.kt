@@ -38,12 +38,13 @@ object ShowPasswordStrengthUseCase: InputUseCase<ShowPasswordStrengthUseCase.Inp
             combinations, GeneratorBase.BRUTEFORCE_ATTEMPTS_SUPERCOMP
         )
 
-        var strengthLevel = emoji(0x1f625)
-        if (entropy >= 128) strengthLevel = emoji(0x1f606)
-        else if (entropy >= 80) strengthLevel = emoji(0x1f603)
-        else if (entropy >= 62) strengthLevel = emoji(0x1f642)
-        else if (entropy >= 50) strengthLevel = emoji(0x1f610)
-        else if (entropy >= 28) strengthLevel = emoji(0x1f641)
+        var strengthLevel =
+        if (entropy >= 128) emoji(0x1f606)              // 😆 too strong 
+            else if (entropy >= 80) emoji(0x1f603)      // 😃 strong
+            else if (entropy >= 65) emoji(0x1f642)      // 🙂 ok
+            else if (entropy >= 50) emoji(0x1f610)      // 😐 weak
+            else if (entropy >= 28) emoji(0x1f641)      // 🙁 poor
+            else emoji(0x1f625)                         // 😥 very poor
 
         val markerIconCombinations = "%iconCombination%"
         val markerIconEntropy = "%iconEntropy%"
