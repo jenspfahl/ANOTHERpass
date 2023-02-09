@@ -39,7 +39,7 @@ object ShowPasswordStrengthUseCase: InputUseCase<ShowPasswordStrengthUseCase.Inp
         )
 
         var strengthLevel =
-        if (entropy >= 128) emoji(0x1f606)              // 😆 too strong 
+        if (entropy >= 128) emoji(0x1f606)              // 😆 too strong
             else if (entropy >= 80) emoji(0x1f603)      // 😃 strong
             else if (entropy >= 65) emoji(0x1f642)      // 🙂 ok
             else if (entropy >= 50) emoji(0x1f610)      // 😐 weak
@@ -126,6 +126,7 @@ object ShowPasswordStrengthUseCase: InputUseCase<ShowPasswordStrengthUseCase.Inp
             .setTitle(titleId)
             .setIcon(R.drawable.ic_baseline_fitness_center_24)
             .setMessage(span)
+            .setNegativeButton(R.string.close, null)
             .show()
     }
 
