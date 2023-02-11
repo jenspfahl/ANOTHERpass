@@ -42,7 +42,7 @@ object MasterKeyService {
     ): SecretKeyHolder? {
         val masterKey = getMasterKey(masterPassPhraseSK, storedEncMasterKey, context) ?: return null
         val masterSK =
-            if (useLegacyGeneration) SecretService.generateStrongSecretKey(masterKey, salt, masterPassPhraseSK.cipherAlgorithm)
+            if (useLegacyGeneration) SecretService.generateDefaultSecretKey(masterKey, salt, masterPassPhraseSK.cipherAlgorithm)
             else SecretService.createSecretKey(masterKey, masterPassPhraseSK.cipherAlgorithm)
         masterKey.clear()
 

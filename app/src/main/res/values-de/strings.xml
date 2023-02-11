@@ -26,6 +26,7 @@
 
 
     <string name="cipher_name">Verschlüsselungsalgorithmus</string>
+    <string name="pbkdf_iterations">PBKDF-Iterationen</string>
     <string name="create_vault_cipher_explanation">Wähle einen Verschlüsselungsalgorithmus. Er kann später auch geändert werden. Im Zweifel belasse die Voreinstellung.</string>
     <string name="update_vault_cipher_explanation">Wähle einen Verschlüsselungsalgorithmus. Der aktuelle Algorithmus ist %1$s</string>
 
@@ -60,7 +61,7 @@
     <string name="create_vault_explanation_1">Zuerst musst du dein Masterpasswort generieren. Es wird benutzt, um dich in deinen Tresor einzuloggen. Du brauchst dir es nicht zu merken! Später hast du die Gelegenheit, es stattdessen zu exportieren.</string>
     <string name="button_next">Weiter</string>
     <string name="create_vault_enter_passphrase_fragment_label" tools:ignore="TypographyFractions">Tresor erstellen 1/3</string>
-    <string name="create_vault_explanation_2">Wähle eine PIN oder ein einprägsames Passwort um den Tresor zu entsperren. Es darf Buchstaben, Zahlen und Sonderzeichen enthalten. Im Vergleich zum Masterpasswort kann es viel kürzer sein (minimal 6 Zeichen) und ist deshalb einfach zu merken. Merke es dir gut und achte darauf dass niemand es erfahren kann!</string>
+    <string name="create_vault_explanation_2">Wähle eine PIN oder ein einprägsames Passwort um den Tresor bei jeder Benutzung zu entsperren. Es darf Buchstaben, Zahlen und Sonderzeichen enthalten. Im Vergleich zum Masterpasswort kann es viel kürzer sein (minimal 6 Zeichen) und ist deshalb einfach zu merken. Du kannst aber auch ein komplexes Passwort wählen, um den Tresor noch besser zu schützen. Merke es dir gut und achte darauf dass niemand es erfahren kann!</string>
     <string name="pin">PIN eingeben</string>
     <string name="repeat_pin">PIN wiederholen</string>
     <string name="create_vault_enter_pin_fragment_label">Tresor erstellen 2/3</string>
@@ -153,6 +154,7 @@
     <string name="change_encryption">Ändere Verschlüsselung</string>
     <string name="title_change_encryption">Ändere Tresorverschlüsselung</string>
     <string name="message_change_encryption">Nach der Änderung der Verschlüsselung und/oder des Masterkeys können alle bisher exportierten Tresor-Dateien nicht mehr gelesen werden. Es wird außerdem empfohlen, ein aktuelles Backup des Tresors und des verschlüsselten Masterkeys für den Notfall zu haben.</string>
+    <string name="message_change_iterations">Nach der Änderung der Login-Iterationen ändert sich der verschlüsselte Masterkey (EMK), d.h. du solltest ihn erneut exportieren.</string>
     <string name="change_master_password_explanation">Ändere dein Masterpasswort, indem du die aktuelle PIN eingibst und ein neues Masterpasswort generierst. Beachte, dass sich der verschlüsselte Masterkey ändert, so dass du ihn erneut exportieren solltest. Das betrifft auch Tresor-Dateien mit verschlüsselten Masterkey.</string>
     <string name="change_encryption_explanation">Ändere den Verschlüsselungsalgorithmus des Tresors, wenn du den Tresor von einem alten Gerät migriert hast und dein neues Gerät zusätzliche Algorithmen unterstützt. Beachte, dass sich der verschlüsselte Masterkey ändert, so dass du ihn erneut exportieren solltest. Das betrifft auch Tresor-Dateien und exportierte Zugangsdaten (ECRs), welche dann nicht mehr gelesen werden können.</string>
     <string name="vault">Tresor</string>
@@ -595,7 +597,7 @@
     <string name="used_seed">Zusätzliches Seed: %1$s</string>
     <string name="add_additional_source_of_entropy">Zusätzliche Entropie hinzufügen</string>
     <string name="title_add_user_seed">Füge zusätzliche Entropie für den Zufallsgenerator hinzu</string>
-    <string name="message_add_user_seed">Falls du dem Zufallsgenerator des Betriebssystems nicht traust, welcher normalerweise verschiedene Entropie des Gerätes verwendet, um unvorhersagbare Zufallszahlen zu generieren, kannst du hier eine weitere Entropie hinzufügen: ein Foto von deiner Kamera.\nDas fotografierte Bild wird gehasht und als zusätzliche Entropy verwendet, um die Zufälligkeit weiter zu erhöhen. Das heißt, mache ein zufälliges Foto mit vielen unterschiedlichen Details. Das Foto wird nicht auf dem Gerät gespeichert!</string>
+    <string name="message_add_user_seed">Falls du dem Zufallsgenerator des Betriebssystems nicht traust, welcher normalerweise verschiedene Entropie des Gerätes verwendet, um unvorhersagbare Zufallszahlen zu generieren, kannst du hier eine weitere Entropie hinzufügen: ein Foto von deiner Kamera.\nDas fotografierte Bild wird gehasht und als zusätzliche Entropie verwendet, um die Zufälligkeit weiter zu erhöhen. Das heißt, mache ein zufälliges Foto mit vielen unterschiedlichen Details. Das Foto wird nicht auf dem Gerät gespeichert!</string>
     <string name="message_confirm_add_user_seed">Du hast schon eine eigene Entropie hinzugefügt. Willst du den Vorgang wiederholen?</string>
     <string name="error_add_user_seed">Die Kamera-App konnte nicht geöffnet werden</string>
     <string name="error_picture_too_small_for_user_seed">Das geschossene Foto ist zu klein um es als Entropie zu verwenden</string>

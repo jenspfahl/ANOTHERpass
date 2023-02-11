@@ -12,6 +12,7 @@ import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_DENIED_AT
 import de.jepfa.yapm.service.PreferenceService.STATE_MASTER_PASSWD_TOKEN_COUNTER
 import de.jepfa.yapm.service.PreferenceService.STATE_PREVIOUS_LOGIN_ATTEMPTS
 import de.jepfa.yapm.service.PreferenceService.STATE_PREVIOUS_LOGIN_SUCCEEDED_AT
+import de.jepfa.yapm.service.secret.PbkdfIterationService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
@@ -46,6 +47,7 @@ object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActi
         sb.addFormattedLine(activity.getString(R.string.vault_id), vaultId)
         sb.addFormattedLine(activity.getString(R.string.vault_version), vaultVersion)
         sb.addFormattedLine(activity.getString(R.string.cipher_name), activity.getString(cipherAlgorithm.uiLabel))
+        sb.addFormattedLine(activity.getString(R.string.pbkdf_iterations), PbkdfIterationService.getStoredPbkdfIterations().toReadableFormat())
         sb.addNewLine()
         sb.addFormattedLine(activity.getString(R.string.credential_count), input.credentialCount)
         sb.addFormattedLine(activity.getString(R.string.label_count), input.labelCount)
@@ -93,6 +95,7 @@ object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActi
         builder.setTitle(R.string.vault_info)
             .setMessage(sb.toString())
             .setIcon(icon)
+            .setNegativeButton(R.string.close, null)
             .show()
 
         return true

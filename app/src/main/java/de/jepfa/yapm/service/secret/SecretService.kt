@@ -20,8 +20,7 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_SEED
 import de.jepfa.yapm.service.biometrix.BiometricUtils
-import de.jepfa.yapm.util.DebugInfo
-import de.jepfa.yapm.util.toastText
+import de.jepfa.yapm.service.secret.PbkdfIterationService.getStoredPbkdfIterations
 import java.security.*
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -100,19 +99,19 @@ object SecretService {
         return SecretKeyHolder(sk, cipherAlgorithm)
     }
 
-    fun generateStrongSecretKey(data: Key, salt: Key, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
-        return generateStrongSecretKey(Password(data), salt, cipherAlgorithm)
+    fun generateDefaultSecretKey(data: Key, salt: Key, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
+        return generatePBESecretKey(Password(data), salt, PbkdfIterationService.LEGACY_PBKDF_ITERATIONS, cipherAlgorithm)
     }
 
     fun generateStrongSecretKey(password: Password, salt: Key, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
-        return generatePBESecretKey(password, salt, 65536, cipherAlgorithm)
+        return generatePBESecretKey(password, salt, getStoredPbkdfIterations(), cipherAlgorithm)
     }
 
     fun generateNormalSecretKey(password: Password, salt: Key, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
         return generatePBESecretKey(password, salt, 1000, cipherAlgorithm)
     }
 
-    private fun generatePBESecretKey(password: Password, salt: Key, iterations: Int, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
+    fun generatePBESecretKey(password: Password, salt: Key, iterations: Int, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
         val keySpec = PBEKeySpec(password.toEncodedCharArray(), salt.data, iterations, cipherAlgorithm.keyLength)
         val factory = SecretKeyFactory.getInstance(cipherAlgorithm.secretKeyAlgorithm)
         try {

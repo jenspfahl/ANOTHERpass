@@ -2,31 +2,32 @@ package de.jepfa.yapm.ui.changelogin
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.InputFilter
-import android.text.InputType
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.AppCompatSeekBar
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.appcompat.widget.SwitchCompat
+import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm
-import de.jepfa.yapm.model.encrypted.DEFAULT_CIPHER_ALGORITHM
+import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.secret.MasterPasswordService
+import de.jepfa.yapm.service.secret.PbkdfIterationService
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.ui.AsyncWithProgressBar
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
-import de.jepfa.yapm.usecase.secret.ChangeMasterPasswordUseCase
 import de.jepfa.yapm.usecase.secret.ChangeVaultEncryptionUseCase
-import de.jepfa.yapm.usecase.secret.GenerateMasterPasswordUseCase
+import de.jepfa.yapm.usecase.vault.BenchmarkLoginIterationsUseCase
+import de.jepfa.yapm.usecase.vault.CreateVaultUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
-import de.jepfa.yapm.util.Constants
-import de.jepfa.yapm.util.DebugInfo
-import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.toastText
+import kotlin.time.Duration.Companion.milliseconds
 
 class ChangeEncryptionActivity : SecureActivity(), AdapterView.OnItemSelectedListener {
 
@@ -76,16 +77,34 @@ class ChangeEncryptionActivity : SecureActivity(), AdapterView.OnItemSelectedLis
 
         }
 
+        val iterationsSeekBar = findViewById<AppCompatSeekBar>(R.id.login_iterations_selection)
+        val currentIterations = PbkdfIterationService.getStoredPbkdfIterations()
+        iterationsSeekBar.progress = PbkdfIterationService.mapIterationsToPercentage(currentIterations)
+
+        findViewById<Button>(R.id.button_test_login_time).setOnClickListener {
+            val iterations = PbkdfIterationService.mapPercentageToIterations(iterationsSeekBar.progress)
+            val input = BenchmarkLoginIterationsUseCase.Input(iterations, selectedCipherAlgorithm)
+            UseCaseBackgroundLauncher(BenchmarkLoginIterationsUseCase)
+                .launch(this, input)
+                { output ->
+                    BenchmarkLoginIterationsUseCase.openResultDialog(input, output.data, this)
+                }
+        }
+
         val changeButton = findViewById<Button>(R.id.button_change)
         changeButton.setOnClickListener {
 
+            val newIterations = PbkdfIterationService.mapPercentageToIterations(iterationsSeekBar.progress)
+            Log.d("ITERATIONS", "final iterations=$newIterations")
             val currentPin = Password(currentPinTextView.text)
 
             if (currentPin.isEmpty()) {
                 currentPinTextView.error = getString(R.string.pin_required)
                 currentPinTextView.requestFocus()
             }
-            else if (selectedCipherAlgorithm == originCipherAlgorithm && !newMasterKeySwitch.isChecked) {
+            else if (selectedCipherAlgorithm == originCipherAlgorithm
+                && !newMasterKeySwitch.isChecked
+                && newIterations == currentIterations) {
                 toastText(this, R.string.nothing_has_been_changed)
                 currentPin.clear()
             }
@@ -95,6 +114,7 @@ class ChangeEncryptionActivity : SecureActivity(), AdapterView.OnItemSelectedLis
                 ChangeVaultEncryptionUseCase.openDialog(
                     ChangeVaultEncryptionUseCase.Input(
                         LoginData(currentPin, masterPassword),
+                        newIterations,
                         selectedCipherAlgorithm,
                         newMasterKeySwitch.isChecked
                 ), this)

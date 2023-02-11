@@ -9,6 +9,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.LoginData
+import de.jepfa.yapm.service.secret.PbkdfIterationService.LEGACY_PBKDF_ITERATIONS
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.login.LoginActivity
 import de.jepfa.yapm.usecase.session.LoginUseCase
@@ -40,7 +41,7 @@ class BruteForceTest {
     fun testBruteForce() {
         loginScenario.onActivity { loginActivity ->
             CreateVaultUseCase.execute(
-                CreateVaultUseCase.Input(LoginData(pin, masterPassword), cipherAlgorithm),
+                CreateVaultUseCase.Input(LoginData(pin, masterPassword), LEGACY_PBKDF_ITERATIONS, cipherAlgorithm),
                 loginActivity)
             attack(loginActivity)
         }

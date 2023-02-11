@@ -61,7 +61,7 @@ class SecretServiceTest {
 
         // Credential enc-/decryption with masterKey --> AES
         val credential = Password("9999")
-        val masterKeySK = SecretService.generateStrongSecretKey(masterKey, salt, cipherAlgorithm)
+        val masterKeySK = SecretService.generateDefaultSecretKey(masterKey, salt, cipherAlgorithm)
         // not needed anymore
         masterKey.clear()
 
