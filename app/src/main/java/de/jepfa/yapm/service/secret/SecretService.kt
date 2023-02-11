@@ -3,6 +3,7 @@ package de.jepfa.yapm.service.secret
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.SystemClock
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.security.keystore.StrongBoxUnavailableException
@@ -192,12 +193,25 @@ object SecretService {
     }
 
     private fun encryptData(type: EncryptedType?, secretKeyHolder: SecretKeyHolder, data: ByteArray): Encrypted {
+        return try {
+            encrypt(secretKeyHolder, type, data)
+        } catch (e: Exception) {
+            Log.e("SS", "Encryption failed, trying again", e)
+            SystemClock.sleep(100) // artificial wait before retry
+            encrypt(secretKeyHolder, type, data)
+        }
+    }
+
+    private fun encrypt(
+        secretKeyHolder: SecretKeyHolder,
+        type: EncryptedType?,
+        data: ByteArray
+    ): Encrypted {
         val cipher: Cipher = Cipher.getInstance(secretKeyHolder.cipherAlgorithm.cipherName)
 
         if (secretKeyHolder.cipherAlgorithm.integratedIvSupport) {
             cipher.init(Cipher.ENCRYPT_MODE, secretKeyHolder.secretKey)
-        }
-        else {
+        } else {
             val iv = ByteArray(cipher.blockSize)
             getSecureRandom(null).nextBytes(iv)
             val ivParams = IvParameterSpec(iv)
@@ -301,6 +315,7 @@ object SecretService {
             keyGenerator.generateKey()
         } catch (e: Exception) {
             Log.w("SS", "Unknown exception, just retry", e)
+            SystemClock.sleep(100) // artificial wait before retry
             keyGenerator.init(spec)
             keyGenerator.generateKey()
         }
