@@ -32,7 +32,8 @@ object PbkdfIterationService {
 
     fun mapIterationsToPercentage(iterations: Int): Float {
         val base = MAX_PBKDF_ITERATIONS - MIN_PBKDF_ITERATIONS
-        return (iterations - MIN_PBKDF_ITERATIONS).toFloat() / base
+        val p = (iterations - MIN_PBKDF_ITERATIONS).toFloat() / base
+        return (p * 100).roundToInt() / 100.0F
     }
 
     /**
