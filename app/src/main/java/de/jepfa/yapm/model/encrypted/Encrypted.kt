@@ -63,7 +63,7 @@ data class Encrypted(val type: EncryptedType?, val iv: ByteArray, val data: Byte
 
 
         fun toBase64String(encrypted: Encrypted): String {
-            val type = encrypted.type?.toString() ?: ""
+            val type = encrypted.type?.serialize() ?: ""
             val iv = Base64.encodeToString(encrypted.iv, BASE64_FLAGS)
             val data = Base64.encodeToString(encrypted.data, BASE64_FLAGS)
             return type + BASE64_PAIR_DELIMITOR + iv + BASE64_PAIR_DELIMITOR + data + BASE64_PAIR_DELIMITOR + encrypted.cipherAlgorithm.ordinal

@@ -258,15 +258,15 @@ object PreferenceService {
         return get(prefKey, context) != null
     }
 
-    fun putEncrypted(prefKey: String, encrypted: Encrypted, context: Context) {
+    fun putEncrypted(prefKey: String, encrypted: Encrypted, context: Context?) {
         putString(prefKey, encrypted.toBase64String(), context)
     }
 
-    fun putCurrentDate(prefKey: String, context: Context) {
+    fun putCurrentDate(prefKey: String, context: Context?) {
         putDate(prefKey, Date(), context)
     }
 
-    fun putDate(prefKey: String, date: Date, context: Context) {
+    fun putDate(prefKey: String, date: Date, context: Context?) {
         putString(
             prefKey,
             date.time.toString(),
@@ -274,28 +274,28 @@ object PreferenceService {
         )
     }
 
-    fun putInt(prefKey: String, value: Int, context: Context) {
+    fun putInt(prefKey: String, value: Int, context: Context?) {
         prefs.edit { it.putString(prefKey, value.toString()) }
     }
 
-    fun putString(prefKey: String, value: String, context: Context) {
+    fun putString(prefKey: String, value: String, context: Context?) {
         prefs.edit { it.putString(prefKey, value) }
     }
 
-    fun putStringSet(prefKey: String, value: Set<String>, context: Context) {
+    fun putStringSet(prefKey: String, value: Set<String>, context: Context?) {
         prefs.edit { it.putStringSet(prefKey, value) }
     }
 
-    fun putBoolean(prefKey: String, value: Boolean, context: Context) {
+    fun putBoolean(prefKey: String, value: Boolean, context: Context?) {
         prefs.edit { it.putBoolean(prefKey, value) }
     }
 
-    fun toggleBoolean(prefKey: String, context: Context) {
+    fun toggleBoolean(prefKey: String, context: Context?) {
         val value = getAsBool(prefKey, context)
         putBoolean(prefKey, !value, context)
     }
 
-    fun delete(prefKey: String, context: Context) {
+    fun delete(prefKey: String, context: Context?) {
         prefs.remove(prefKey)
     }
 

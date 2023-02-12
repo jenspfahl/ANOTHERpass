@@ -13,6 +13,7 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.service.secret.AndroidKey
+import de.jepfa.yapm.service.secret.PbkdfIterationService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
@@ -242,11 +243,21 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
 
         if (encMasterKey != null) {
             val keyForMK = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_MK, activity)
+            val encryptedMK = Encrypted.fromBase64String(encMasterKey)
             val encEncryptedMasterKey = SecretService.encryptEncrypted(
-                keyForMK, Encrypted.fromBase64String(
-                    encMasterKey
-                )
+                keyForMK, encryptedMK
             )
+
+            val payload = encryptedMK.type?.payload
+            if (payload != null) {
+                val pbkdfIterations = PbkdfIterationService.fromBase64String(payload)
+                if (pbkdfIterations != null) {
+                    PbkdfIterationService.storePbkdfIterations(pbkdfIterations)
+                }
+                else {
+                    Log.w("IMP", "Cannot parse login iterations: $payload")
+                }
+            }
 
             PreferenceService.putEncrypted(
                 PreferenceService.DATA_ENCRYPTED_MASTER_KEY,

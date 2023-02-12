@@ -12,6 +12,7 @@ import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.MasterKeyService
+import de.jepfa.yapm.service.secret.PbkdfIterationService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
@@ -36,7 +37,7 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
     fun openDialog(input: Input, activity: SecureActivity, postHandler: (backgroundResult: UseCaseOutput<Unit>) -> Unit) {
 
         val currentCipherAlgorithm = SecretService.getCipherAlgorithm(activity)
-        val currentIterations = PreferenceService.getAsInt(PreferenceService.DATA_PBKDF_ITERATIONS, activity)
+        val currentIterations = PbkdfIterationService.getStoredPbkdfIterations()
 
         val messageId = if (currentCipherAlgorithm == input.newCipherAlgorithm
             && !input.generateNewMasterKey
@@ -69,18 +70,15 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
             checkAndGetMasterPassphraseSK(input.loginData, salt, currentCipherAlgorithm, activity)
                 ?: return false
 
-         val currentIterations = PreferenceService.getAsInt(PreferenceService.DATA_PBKDF_ITERATIONS, activity)
+         val currentIterations = PbkdfIterationService.getStoredPbkdfIterations()
          if (currentCipherAlgorithm != input.newCipherAlgorithm
              || input.generateNewMasterKey
              || currentIterations != input.pbkdfIterations) {
 
             val success = if (currentCipherAlgorithm == input.newCipherAlgorithm && !input.generateNewMasterKey) {
                 //only iterations has been changed, no need to renew the whole vault but only the master key
-                PreferenceService.putInt(
-                    PreferenceService.DATA_PBKDF_ITERATIONS,
-                    input.pbkdfIterations,
-                    activity
-                )
+                PbkdfIterationService.storePbkdfIterations(input.pbkdfIterations)
+
                 Log.d("ITERATIONS", "store changed iterations=${input.pbkdfIterations}")
                 renewMasterSK(masterPassphraseSK, input, salt, activity) != null
             }
@@ -224,6 +222,7 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
             input.loginData.pin,
             input.loginData.masterPassword,
             salt,
+            input.pbkdfIterations,
             input.newCipherAlgorithm,
             activity
         )

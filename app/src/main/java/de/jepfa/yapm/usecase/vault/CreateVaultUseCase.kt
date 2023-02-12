@@ -5,6 +5,7 @@ import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.MasterKeyService
+import de.jepfa.yapm.service.secret.PbkdfIterationService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.usecase.InputUseCase
@@ -19,7 +20,7 @@ object CreateVaultUseCase: InputUseCase<CreateVaultUseCase.Input, BaseActivity>(
 
     override suspend fun doExecute(input: Input, activity: BaseActivity): Boolean {
 
-        PreferenceService.putInt(PreferenceService.DATA_PBKDF_ITERATIONS, input.pbkdfIterations, activity) // before mk encryption!
+        PbkdfIterationService.storePbkdfIterations(input.pbkdfIterations) // before mk encryption!
         Log.d("ITERATIONS", "store iterations=${input.pbkdfIterations}")
 
         val salt = SaltService.getSalt(activity)
@@ -29,6 +30,7 @@ object CreateVaultUseCase: InputUseCase<CreateVaultUseCase.Input, BaseActivity>(
             input.loginData.pin,
             input.loginData.masterPassword,
             salt,
+            input.pbkdfIterations,
             input.cipherAlgorithm,
             activity
         )
