@@ -8,10 +8,10 @@ import kotlin.math.roundToInt
 
 object PbkdfIterationService {
 
-    const val MIN_PBKDF_ITERATIONS = 10_001
+    const val MIN_PBKDF_ITERATIONS = 10_000
     const val LEGACY_PBKDF_ITERATIONS = 65_536
-    const val DEFAULT_PBKDF_ITERATIONS = 100_001
-    const val MAX_PBKDF_ITERATIONS = 1_000_001
+    const val DEFAULT_PBKDF_ITERATIONS = 100_000
+    const val MAX_PBKDF_ITERATIONS = 2_000_000 + MIN_PBKDF_ITERATIONS
 
 
     fun getStoredPbkdfIterations(): Int {
@@ -25,18 +25,22 @@ object PbkdfIterationService {
         PreferenceService.putInt(PreferenceService.DATA_PBKDF_ITERATIONS, iterations, null)
     }
 
-    fun mapPercentageToIterations(percentValue: Int): Int {
+    fun mapPercentageToIterations(percentValue: Float): Int {
         val base = MAX_PBKDF_ITERATIONS - MIN_PBKDF_ITERATIONS
-        return (base * percentValue.toDouble() / 100).roundToInt() + MIN_PBKDF_ITERATIONS
+        return (base * percentValue).roundToInt() + MIN_PBKDF_ITERATIONS
     }
 
-    fun mapIterationsToPercentage(iterations: Int): Int {
+    fun mapIterationsToPercentage(iterations: Int): Float {
         val base = MAX_PBKDF_ITERATIONS - MIN_PBKDF_ITERATIONS
-        return (100 * (iterations.toDouble() - MIN_PBKDF_ITERATIONS) / base).roundToInt()
+        return (iterations - MIN_PBKDF_ITERATIONS).toFloat() / base
     }
 
+    /**
+     * Removed leading AA will be considered
+     */
     fun fromBase64String(base64: String): Int? {
-        val bytes = Base64.decode(base64, Base64.NO_WRAP or Base64.NO_PADDING)
+        val base64Padded = base64.padStart(6, 'A')
+        val bytes = Base64.decode(base64Padded, Base64.NO_WRAP or Base64.NO_PADDING)
 
         if (bytes.size > 4) {
             return null
@@ -54,9 +58,13 @@ object PbkdfIterationService {
         }
     }
 
+    /**
+     * Leading empty AA will be removed
+     */
     fun toBase64String(iterations: Int): String {
         val bytes = ByteBuffer.allocate(Int.SIZE_BYTES).putInt(iterations).array()
-        return Base64.encodeToString(bytes, Base64.NO_WRAP or Base64.NO_PADDING)
+        val s = Base64.encodeToString(bytes, Base64.NO_WRAP or Base64.NO_PADDING)
+        return s.trimStart('A')
     }
-    
+
 }

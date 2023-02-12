@@ -7,14 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.AppCompatSeekBar
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.appcompat.widget.SwitchCompat
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.slider.Slider
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.encrypted.DEFAULT_CIPHER_ALGORITHM
-import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.service.nfc.NfcService
@@ -26,7 +25,6 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.decryptPassword
 import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
-import de.jepfa.yapm.ui.AsyncWithProgressBar
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
@@ -35,7 +33,6 @@ import de.jepfa.yapm.usecase.secret.ExportEncMasterPasswordUseCase
 import de.jepfa.yapm.usecase.vault.BenchmarkLoginIterationsUseCase
 import de.jepfa.yapm.usecase.vault.CreateVaultUseCase
 import de.jepfa.yapm.util.*
-import kotlin.time.Duration.Companion.milliseconds
 
 class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedListener {
 
@@ -110,12 +107,20 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
             }
         }
 
-        val iterationsSeekBar = view.findViewById<AppCompatSeekBar>(R.id.login_iterations_selection)
-        iterationsSeekBar.progress = PbkdfIterationService.mapIterationsToPercentage(PbkdfIterationService.DEFAULT_PBKDF_ITERATIONS)
+        val iterationsSlider = view.findViewById<Slider>(R.id.login_iterations_selection)
+        val iterationsSelectionView = view.findViewById<TextView>(R.id.current_iterations_selection)
+        iterationsSlider.addOnChangeListener(Slider.OnChangeListener { slider, value, fromUser ->
+            val iterations = PbkdfIterationService.mapPercentageToIterations(value)
+            iterationsSelectionView.text = iterations.toReadableFormat() + " " + getString(R.string.pbkdf_iterations)
+        })
+
+        val currentIterations = PbkdfIterationService.getStoredPbkdfIterations()
+        iterationsSlider.value = PbkdfIterationService.mapIterationsToPercentage(currentIterations)
+        iterationsSelectionView.text = currentIterations.toReadableFormat() + " " + getString(R.string.pbkdf_iterations)
 
         view.findViewById<Button>(R.id.button_test_login_time).setOnClickListener {
             getBaseActivity()?.let { activity ->
-                val iterations = PbkdfIterationService.mapPercentageToIterations(iterationsSeekBar.progress)
+                val iterations = PbkdfIterationService.mapPercentageToIterations(iterationsSlider.value)
                 val input = BenchmarkLoginIterationsUseCase.Input(iterations, cipherAlgorithm)
                 UseCaseBackgroundLauncher(BenchmarkLoginIterationsUseCase)
                     .launch(activity, input)
@@ -141,7 +146,7 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
                 }
 
                 val pin = decryptPassword(transSK, encPin)
-                val iterations = PbkdfIterationService.mapPercentageToIterations(iterationsSeekBar.progress)
+                val iterations = PbkdfIterationService.mapPercentageToIterations(iterationsSlider.value)
                 Log.d("ITERATIONS", "final iterations=$iterations")
 
                 getBaseActivity()?.let { baseActivity ->

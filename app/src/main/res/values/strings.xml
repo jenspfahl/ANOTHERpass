@@ -27,7 +27,7 @@
 
 
     <string name="cipher_name">Encryption algorithm</string>
-    <string name="pbkdf_iterations">PBKDF iterations</string>
+    <string name="pbkdf_iterations">Iterations</string>
     <string name="create_vault_cipher_explanation">Choose an encryption algorithm. You change that later. If in doubt, use the current default.</string>
     <string name="update_vault_cipher_explanation">Choose an encryption algorithm. Current used algorithm is %1$s</string>
 

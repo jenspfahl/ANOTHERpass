@@ -77,9 +77,6 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
 
             val success = if (currentCipherAlgorithm == input.newCipherAlgorithm && !input.generateNewMasterKey) {
                 //only iterations has been changed, no need to renew the whole vault but only the master key
-                PbkdfIterationService.storePbkdfIterations(input.pbkdfIterations)
-
-                Log.d("ITERATIONS", "store changed iterations=${input.pbkdfIterations}")
                 renewMasterSK(masterPassphraseSK, input, salt, activity) != null
             }
             else {
@@ -217,6 +214,10 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
             Log.e("VaultEnc", "stored master key not valid")
             return null
         }
+
+        PbkdfIterationService.storePbkdfIterations(input.pbkdfIterations)
+        Log.d("ITERATIONS", "store changed iterations=${input.pbkdfIterations}")
+
         val newEncryptedMasterKey = MasterKeyService.encryptAndStoreMasterKey(
             masterKey,
             input.loginData.pin,

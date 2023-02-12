@@ -26,7 +26,7 @@
 
 
     <string name="cipher_name">Verschlüsselungsalgorithmus</string>
-    <string name="pbkdf_iterations">PBKDF-Iterationen</string>
+    <string name="pbkdf_iterations">Iterationen</string>
     <string name="create_vault_cipher_explanation">Wähle einen Verschlüsselungsalgorithmus. Er kann später auch geändert werden. Im Zweifel belasse die Voreinstellung.</string>
     <string name="update_vault_cipher_explanation">Wähle einen Verschlüsselungsalgorithmus. Der aktuelle Algorithmus ist %1$s</string>
 
