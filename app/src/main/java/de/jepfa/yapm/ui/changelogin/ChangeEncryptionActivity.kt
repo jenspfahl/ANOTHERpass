@@ -29,6 +29,7 @@ class ChangeEncryptionActivity : SecureActivity(), AdapterView.OnItemSelectedLis
 
     private lateinit var originCipherAlgorithm: CipherAlgorithm
     private lateinit var selectedCipherAlgorithm: CipherAlgorithm
+    private var askForBenchmarking = true
 
     init {
         enableBack = true
@@ -87,11 +88,18 @@ class ChangeEncryptionActivity : SecureActivity(), AdapterView.OnItemSelectedLis
         findViewById<Button>(R.id.button_test_login_time).setOnClickListener {
             val iterations = PbkdfIterationService.mapPercentageToIterations(iterationsSlider.value)
             val input = BenchmarkLoginIterationsUseCase.Input(iterations, selectedCipherAlgorithm)
-            UseCaseBackgroundLauncher(BenchmarkLoginIterationsUseCase)
-                .launch(this, input)
-                { output ->
-                    BenchmarkLoginIterationsUseCase.openResultDialog(input, output.data, this)
-                }
+
+            if (askForBenchmarking) {
+                BenchmarkLoginIterationsUseCase.openStartBenchmarkingDialog(input, this)
+                { askForBenchmarking = false }
+            }
+            else {
+                UseCaseBackgroundLauncher(BenchmarkLoginIterationsUseCase)
+                    .launch(this, input)
+                    { output ->
+                        BenchmarkLoginIterationsUseCase.openResultDialog(input, output.data, this)
+                    }
+            }
         }
 
         val changeButton = findViewById<Button>(R.id.button_change)

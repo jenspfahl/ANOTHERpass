@@ -37,6 +37,7 @@ import de.jepfa.yapm.util.*
 class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedListener {
 
     private var cipherAlgorithm = DEFAULT_CIPHER_ALGORITHM
+    private var askForBenchmarking = true
 
     init {
         enableBack = true
@@ -114,7 +115,7 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
             iterationsSelectionView.text = iterations.toReadableFormat() + " " + getString(R.string.pbkdf_iterations)
         })
 
-        val currentIterations = PbkdfIterationService.getStoredPbkdfIterations()
+        val currentIterations = PbkdfIterationService.DEFAULT_PBKDF_ITERATIONS
         iterationsSlider.value = PbkdfIterationService.mapIterationsToPercentage(currentIterations)
         iterationsSelectionView.text = currentIterations.toReadableFormat() + " " + getString(R.string.pbkdf_iterations)
 
@@ -122,11 +123,17 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
             getBaseActivity()?.let { activity ->
                 val iterations = PbkdfIterationService.mapPercentageToIterations(iterationsSlider.value)
                 val input = BenchmarkLoginIterationsUseCase.Input(iterations, cipherAlgorithm)
-                UseCaseBackgroundLauncher(BenchmarkLoginIterationsUseCase)
-                    .launch(activity, input)
-                    { output ->
-                        BenchmarkLoginIterationsUseCase.openResultDialog(input, output.data, activity)
-                    }
+                if (askForBenchmarking) {
+                    BenchmarkLoginIterationsUseCase.openStartBenchmarkingDialog(input, activity)
+                    { askForBenchmarking = false }
+                }
+                else {
+                    UseCaseBackgroundLauncher(BenchmarkLoginIterationsUseCase)
+                        .launch(activity, input)
+                        { output ->
+                            BenchmarkLoginIterationsUseCase.openResultDialog(input, output.data, activity)
+                        }
+                }
             }
         }
 
