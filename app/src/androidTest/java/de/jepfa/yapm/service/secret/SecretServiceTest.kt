@@ -27,9 +27,9 @@ class SecretServiceTest {
 
         val masterPin = Password("1234") // given by the user (knowledge)
 
-        val masterPassword = Password("h9w4mlwmaf") // generated and securelly stored by the user (owning)
+        val masterPassword = Password("h9w4mlwmaf") // generated and securely stored by the user (owning)
 
-        // optionally store masterPassword encrypted in the app4
+        // optionally store masterPassword encrypted in the app
         val androidSecretKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_MK, context)
         val encMasterPassword = SecretService.encryptPassword(androidSecretKey, masterPassword)
         Log.i(TAG, "encMasterPassword=${encMasterPassword.debugToString()}")
