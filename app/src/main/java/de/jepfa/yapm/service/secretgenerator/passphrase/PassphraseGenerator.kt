@@ -6,6 +6,7 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secretgenerator.GeneratorBase
 import de.jepfa.yapm.service.secretgenerator.SecretStrength
 import java.lang.Math.*
+import java.security.SecureRandom
 
 val DEFAULT_VOCALS = "aeiouy"
 val DEFAULT_CONSONANTS = "bcdfghjklmnpqrstvwxz"
@@ -17,8 +18,9 @@ class PassphraseGenerator(
     val consonants: String = DEFAULT_CONSONANTS,
     val digits: String = DEFAULT_DIGITS,
     val specialChars: String = DEFAULT_SPECIAL_CHARS,
-    context: Context?
-): GeneratorBase<PassphraseGeneratorSpec>(context) {
+    context: Context?,
+    secureRandom: SecureRandom? = null,
+    ): GeneratorBase<PassphraseGeneratorSpec>(context, secureRandom) {
 
 
     override fun generate(spec: PassphraseGeneratorSpec): Password {
@@ -91,12 +93,6 @@ class PassphraseGenerator(
             totalCombinations *= specialChars.length
         }
         return totalCombinations
-    }
-
-    private fun random(material: String): Char {
-        val index = SecretService.getSecureRandom(context).nextInt(material.length)
-
-        return material[index]
     }
 
     private fun isVocal(char: Char): Boolean {

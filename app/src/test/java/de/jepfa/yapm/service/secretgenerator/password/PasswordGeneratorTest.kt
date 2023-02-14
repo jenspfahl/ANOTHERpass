@@ -5,11 +5,13 @@ import de.jepfa.yapm.service.secretgenerator.SecretStrength
 import de.jepfa.yapm.util.secondsToYear
 import org.junit.Assert
 import org.junit.Test
+import java.security.SecureRandom
 import java.util.concurrent.atomic.AtomicInteger
 
 class PasswordGeneratorTest {
 
-    val passwordGenerator = PasswordGenerator()
+    val rnd = SecureRandom()
+    val passwordGenerator = PasswordGenerator(context = null, secureRandom = rnd)
 
     @Test
     fun generatePassword() {
@@ -103,7 +105,9 @@ class PasswordGeneratorTest {
             upperCase = "ABCDEFG",
             lowerCase = "abcdef",
             digits = "01234",
-            specialChars = "!.#%"
+            specialChars = "!.#%",
+            context = null,
+            secureRandom = rnd
         )
 
         val combinationCount = passwordGenerator.calcCombinationCount(spec)

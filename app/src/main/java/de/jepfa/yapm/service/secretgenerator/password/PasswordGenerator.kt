@@ -4,6 +4,7 @@ import android.content.Context
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secretgenerator.GeneratorBase
+import java.security.SecureRandom
 import java.util.*
 
 class PasswordGenerator(
@@ -11,8 +12,9 @@ class PasswordGenerator(
     val lowerCase: String = DEFAULT_ALPHA_CHARS_LOWER_CASE,
     val digits: String = DEFAULT_DIGITS,
     val specialChars: String = DEFAULT_SPECIAL_CHARS,
-    context: Context?
-) : GeneratorBase<PasswordGeneratorSpec>(context) {
+    context: Context?,
+    secureRandom: SecureRandom? = null,
+) : GeneratorBase<PasswordGeneratorSpec>(context, secureRandom) {
 
     companion object {
         val DEFAULT_ALPHA_CHARS_LOWER_CASE = "abcdefghijklmnopqrstuvwxyz"
@@ -147,7 +149,7 @@ class PasswordGenerator(
         val material = extractMaterial(spec)
 
         for (i in buffer.indices) {
-            buffer[i] = random(material, context)
+            buffer[i] = random(material)
         }
         return buffer
     }
@@ -164,12 +166,6 @@ class PasswordGenerator(
             material += upperCase
         }
         return material
-    }
-
-    private fun random(material: String, context: Context?): Char {
-        val index = SecretService.getSecureRandom(context).nextInt(material.length)
-
-        return material[index]
     }
 
 }
