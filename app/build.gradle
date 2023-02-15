@@ -26,6 +26,7 @@ android {
         versionName "1.8.0_rc"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments clearPackageData: 'true'
     }
 
     buildTypes {
@@ -49,39 +50,40 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
         jvmTarget = '11'
     }
+    namespace 'de.jepfa.yapm'
 }
 
 dependencies {
-    implementation "androidx.appcompat:appcompat:$rootProject.appCompatVersion"
-    implementation "androidx.activity:activity-ktx:$rootProject.activityVersion"
+    implementation "androidx.appcompat:appcompat:1.6.1"
+    implementation "androidx.activity:activity-ktx:1.6.1"
 
     // Dependencies for working with Architecture components
     // You'll probably have to update the version numbers in build.gradle (Project)
 
     // Room components
-    implementation "androidx.room:room-ktx:$rootProject.roomVersion"
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.4.2'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.4.2'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.4.2'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.4.2'
+    implementation "androidx.room:room-ktx:2.5.0"
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.annotation:annotation:1.2.0'
+    implementation 'androidx.annotation:annotation:1.5.0'
     implementation 'androidx.slice:slice-builders:1.0.0'
     implementation 'androidx.autofill:autofill:1.1.0'
-    kapt "androidx.room:room-compiler:$rootProject.roomVersion"
-    androidTestImplementation "androidx.room:room-testing:$rootProject.roomVersion"
-    androidTestImplementation "androidx.test:core-ktx:1.4.0"
+    kapt "androidx.room:room-compiler:2.5.0"
+    androidTestImplementation "androidx.room:room-testing:2.5.0"
+    androidTestImplementation 'androidx.test:core-ktx:1.5.0'
 
     // Lifecycle components
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.lifecycleVersion"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$rootProject.lifecycleVersion"
-    implementation "androidx.lifecycle:lifecycle-common-java8:$rootProject.lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
+    implementation "androidx.lifecycle:lifecycle-common-java8:2.5.1"
 
     // Kotlin components
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -89,8 +91,8 @@ dependencies {
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$rootProject.coroutines"
 
     // UI
-    implementation "androidx.constraintlayout:constraintlayout:$rootProject.constraintLayoutVersion"
-    implementation "com.google.android.material:material:$rootProject.materialVersion"
+    implementation "androidx.constraintlayout:constraintlayout:2.1.4"
+    implementation "com.google.android.material:material:1.8.0"
 
     implementation "androidx.preference:preference-ktx:1.2.0"
 
@@ -98,7 +100,7 @@ dependencies {
     implementation 'com.journeyapps:zxing-android-embedded:3.6.0'
     implementation 'com.google.code.gson:gson:2.8.6'
 
-    implementation 'com.google.android.material:material:1.6.1'
+    implementation 'com.google.android.material:material:1.8.0'
 
     implementation "androidx.security:security-crypto:1.0.0"
 
@@ -113,9 +115,9 @@ dependencies {
 
     // Testing
     testImplementation "junit:junit:$rootProject.junitVersion"
-    androidTestImplementation "androidx.arch.core:core-testing:$rootProject.coreTestingVersion"
-    androidTestImplementation ("androidx.test.espresso:espresso-core:$rootProject.espressoVersion", {
-        exclude group: 'com.android.support', module: 'support-annotations'
+    androidTestImplementation "androidx.arch.core:core-testing:2.1.0"
+    androidTestImplementation ("androidx.test.espresso:espresso-core:3.5.1", {
+      //  exclude group: 'com.android.support', module: 'support-annotations'
     })
-    androidTestImplementation "androidx.test.ext:junit:$rootProject.androidxJunitVersion"
+    androidTestImplementation "androidx.test.ext:junit:1.1.5"
 }
