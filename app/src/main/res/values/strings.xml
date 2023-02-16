@@ -27,7 +27,6 @@
 
 
     <string name="cipher_name">Encryption algorithm</string>
-    <string name="pbkdf_iterations">Iterations</string>
     <string name="create_vault_cipher_explanation">Choose an encryption algorithm. You change that later. If in doubt, use the current default.</string>
     <string name="update_vault_cipher_explanation">Choose an encryption algorithm. Current used algorithm is %1$s</string>
 
@@ -640,5 +639,15 @@
 
     <string name="chooser_select_image_to_scan">Select image file to scan</string>
     <string name="image_to_scan_failed">Image file cannot be scanned!</string>
+
+    <string name="login_iterations_explanation">Select the strength of the vault login process. The stronger the harder it is to crack your login credentials, but more login time is needed. If in doubt keep the default value.</string>
+    <string name="login_iterations_faster">Weaker but faster</string>
+    <string name="login_iterations">Iterations</string>
+    <string name="login_iterations_slower">Stronger but slower</string>
+    <string name="benchmark_login_iterations">Gauge time to login</string>
+    <string name="benchmark_login_iterations_explanation">This benchmark gauges the time needed to login into your vault. Running it may take some time, from some seconds or less up to some minutes depending of the selected value and the CPU power of your device. Try to find a value starting from the smallest one which takes an acceptable time, e.g. 3 seconds. This will be your iterations amount.</string>
+    <string name="start">Start</string>
+    <string name="result">Result</string>
+    <string name="elapsed_time">Elapsed time</string>
 
 </resources>

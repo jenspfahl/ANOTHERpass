@@ -15,7 +15,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="Wähle, ob du dich lieber schnell oder eher sicher aber dafür langsamer in den Tresor einloggen möchtest. Teste, wie langsam für dich noch akzeptabel ist, indem du den Benchmark ausführst. Im Zweifel belasse es bei der Voreinstellung, welche extrem sicher ist, solange dein Masterpassword nicht in die falschen Hände gerät."
+            android:text="@string/login_iterations_explanation"
             android:layout_marginHorizontal="8dp"
             android:layout_marginBottom="16dp"/>
 
@@ -31,7 +31,7 @@
                 android:layout_weight="1"
                 android:layout_height="match_parent"
                 android:gravity="start"
-                android:text="Schneller" />
+                android:text="@string/login_iterations_faster" />
 
             <TextView
                 android:id="@+id/current_iterations_selection"
@@ -39,7 +39,7 @@
                 android:layout_weight="1"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:text="Iterationen"/>
+                android:text="@string/login_iterations"/>
 
 
             <TextView
@@ -47,7 +47,7 @@
                 android:layout_weight="1"
                 android:layout_height="match_parent"
                 android:gravity="end"
-                android:text="Sicherer"/>
+                android:text="@string/login_iterations_slower"/>
 
         </LinearLayout>
 
@@ -69,7 +69,7 @@
         android:layout_gravity="center"
         android:layout_marginTop="16dp"
         android:paddingHorizontal="16dp"
-        android:text="Benchmark Loginzeit"
+        android:text="@string/benchmark_login_iterations"
         android:background="@color/white"
         android:textAlignment="center"
         android:textColor="@color/colorAccent" />

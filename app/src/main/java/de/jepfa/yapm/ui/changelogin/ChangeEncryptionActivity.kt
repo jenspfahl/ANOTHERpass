@@ -78,12 +78,12 @@ class ChangeEncryptionActivity : SecureActivity(), AdapterView.OnItemSelectedLis
         val iterationsSelectionView = findViewById<TextView>(R.id.current_iterations_selection)
         iterationsSlider.addOnChangeListener(Slider.OnChangeListener { slider, value, fromUser ->
             val iterations = PbkdfIterationService.mapPercentageToIterations(value)
-            iterationsSelectionView.text = iterations.toReadableFormat() + " " + getString(R.string.pbkdf_iterations)
+            iterationsSelectionView.text = iterations.toReadableFormat() + " " + getString(R.string.login_iterations)
         })
 
         val currentIterations = PbkdfIterationService.getStoredPbkdfIterations()
         iterationsSlider.value = PbkdfIterationService.mapIterationsToPercentage(currentIterations)
-        iterationsSelectionView.text = currentIterations.toReadableFormat() + " " + getString(R.string.pbkdf_iterations)
+        iterationsSelectionView.text = currentIterations.toReadableFormat() + " " + getString(R.string.login_iterations)
 
         findViewById<Button>(R.id.button_test_login_time).setOnClickListener {
             val iterations = PbkdfIterationService.mapPercentageToIterations(iterationsSlider.value)

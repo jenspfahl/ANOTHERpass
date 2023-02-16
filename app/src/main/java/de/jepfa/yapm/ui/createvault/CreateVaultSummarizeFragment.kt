@@ -112,12 +112,12 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
         val iterationsSelectionView = view.findViewById<TextView>(R.id.current_iterations_selection)
         iterationsSlider.addOnChangeListener(Slider.OnChangeListener { slider, value, fromUser ->
             val iterations = PbkdfIterationService.mapPercentageToIterations(value)
-            iterationsSelectionView.text = iterations.toReadableFormat() + " " + getString(R.string.pbkdf_iterations)
+            iterationsSelectionView.text = iterations.toReadableFormat() + " " + getString(R.string.login_iterations)
         })
 
         val currentIterations = PbkdfIterationService.DEFAULT_PBKDF_ITERATIONS
         iterationsSlider.value = PbkdfIterationService.mapIterationsToPercentage(currentIterations)
-        iterationsSelectionView.text = currentIterations.toReadableFormat() + " " + getString(R.string.pbkdf_iterations)
+        iterationsSelectionView.text = currentIterations.toReadableFormat() + " " + getString(R.string.login_iterations)
 
         view.findViewById<Button>(R.id.button_test_login_time).setOnClickListener {
             getBaseActivity()?.let { activity ->

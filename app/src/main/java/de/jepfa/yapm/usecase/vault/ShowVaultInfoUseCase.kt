@@ -47,7 +47,7 @@ object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActi
         sb.addFormattedLine(activity.getString(R.string.vault_id), vaultId)
         sb.addFormattedLine(activity.getString(R.string.vault_version), vaultVersion)
         sb.addFormattedLine(activity.getString(R.string.cipher_name), activity.getString(cipherAlgorithm.uiLabel))
-        sb.addFormattedLine(activity.getString(R.string.pbkdf_iterations), PbkdfIterationService.getStoredPbkdfIterations().toReadableFormat())
+        sb.addFormattedLine(activity.getString(R.string.login_iterations), PbkdfIterationService.getStoredPbkdfIterations().toReadableFormat())
         sb.addNewLine()
         sb.addFormattedLine(activity.getString(R.string.credential_count), input.credentialCount)
         sb.addFormattedLine(activity.getString(R.string.label_count), input.labelCount)

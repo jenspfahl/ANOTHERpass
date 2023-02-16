@@ -26,7 +26,6 @@
 
 
     <string name="cipher_name">Verschlüsselungsalgorithmus</string>
-    <string name="pbkdf_iterations">Iterationen</string>
     <string name="create_vault_cipher_explanation">Wähle einen Verschlüsselungsalgorithmus. Er kann später auch geändert werden. Im Zweifel belasse die Voreinstellung.</string>
     <string name="update_vault_cipher_explanation">Wähle einen Verschlüsselungsalgorithmus. Der aktuelle Algorithmus ist %1$s</string>
 
@@ -633,5 +632,15 @@
 
     <string name="chooser_select_image_to_scan">Wähle eine Bilddatei zum Scannen aus</string>
     <string name="image_to_scan_failed">Bilddatei konnte nicht gescannt werden!</string>
+
+    <string name="login_iterations_explanation">Wähle die Stärke deiner Login-Verschlüsselung. Je stärker, umso härter ist es deinen Login zu knacken, es benötigt aber auch mehr Loginzeit. Im Zweifel belasse es bei der Voreinstellung.</string>
+    <string name="login_iterations_faster">Schwächer aber schneller</string>
+    <string name="login_iterations">Iterationen</string>
+    <string name="login_iterations_slower">Stärker aber langsamer</string>
+    <string name="benchmark_login_iterations">Loginzeit messen</string>
+    <string name="benchmark_login_iterations_explanation">Der Loginzeit-Benchmark misst die zu erwartende Dauer um den Tresor zu entsperren. Dies kann einige Zeit dauern, von einigen Sekunden bis zu ein paar Minuten, abhängig vom gewählten Wert und der CPU-Leistung deines Gerätes. Teste, wie langsam für dich noch akzeptabel ist, indem du mit einem kleinen Wert startest und diesen langsam erhöhst.</string>
+    <string name="start">Start</string>
+    <string name="result">Ergebnis</string>
+    <string name="elapsed_time">Benötigte Zeit</string>
 
 </resources>
