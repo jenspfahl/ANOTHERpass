@@ -38,7 +38,7 @@ class PassphraseGeneratorTest {
 
     @Test
     fun testCalcCombinations() {
-        val spec = PassphraseGeneratorSpec(SecretStrength.ONE_WORD)
+        val spec = PassphraseGeneratorSpec(SecretStrength.ONE_WORD, addSpecialChar = true, useExtendedSpecialChars = false)
         val passphraseGenerator = PassphraseGenerator(vocals = "ai", consonants = "hst", context = null, secureRandom = rnd)
 
         val hits = HashSet<String>()

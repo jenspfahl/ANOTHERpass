@@ -72,6 +72,14 @@ class PasswordGeneratorTest {
     }
 
     @Test
+    fun testCalcCombinationsLowerExtendedCaseSpecialCharWord() {
+        val spec = PasswordGeneratorSpec(noDigits = true,
+            noUpperCase = true, useExtendedSpecialChars = true, strength = SecretStrength.ONE_WORD)
+
+        calcAndGenAllCombinations(spec, 50)
+    }
+
+    @Test
     fun testCalcCombinationsNoUpperCaseWord() {
         val spec = PasswordGeneratorSpec(noUpperCase = true, strength = SecretStrength.ONE_WORD)
 
@@ -106,6 +114,7 @@ class PasswordGeneratorTest {
             lowerCase = "abcdef",
             digits = "01234",
             specialChars = "!.#%",
+            extendedSpecialChars = "()[]",
             context = null,
             secureRandom = rnd
         )

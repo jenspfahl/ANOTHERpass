@@ -12,16 +12,11 @@ class PasswordGenerator(
     val lowerCase: String = DEFAULT_ALPHA_CHARS_LOWER_CASE,
     val digits: String = DEFAULT_DIGITS,
     val specialChars: String = DEFAULT_SPECIAL_CHARS,
+    val extendedSpecialChars: String = EXTENDED_SPECIAL_CHARS,
     context: Context?,
     secureRandom: SecureRandom? = null,
 ) : GeneratorBase<PasswordGeneratorSpec>(context, secureRandom) {
 
-    companion object {
-        val DEFAULT_ALPHA_CHARS_LOWER_CASE = "abcdefghijklmnopqrstuvwxyz"
-        val DEFAULT_ALPHA_CHARS_UPPER_CASE = DEFAULT_ALPHA_CHARS_LOWER_CASE.toUpperCase(Locale.ROOT)
-        val DEFAULT_DIGITS = "0123456789"
-        val DEFAULT_SPECIAL_CHARS = "!?-,.:/$%&@#_;"
-    }
 
     override fun generate(spec: PasswordGeneratorSpec): Password {
         while(true){
@@ -34,7 +29,9 @@ class PasswordGenerator(
 
     override fun calcCombinationCount(spec: PasswordGeneratorSpec): Double {
         val material = extractMaterial(spec)
+        val specialChars = getSpecialCharsToUse(spec)
         var combinations = Math.pow(material.length.toDouble(), spec.strength.ordinaryPasswordLength.toDouble())
+
 
         // step 1: always remove all with no lower case
 
@@ -67,6 +64,7 @@ class PasswordGenerator(
 
         // if with special chars
         if (!spec.noSpecialChars) {
+
             // remove all with no special chars
             val noSpecialCharsCombinations = Math.pow(material.length.toDouble() - specialChars.length, spec.strength.ordinaryPasswordLength.toDouble())
             combinations -= noSpecialCharsCombinations
@@ -74,6 +72,8 @@ class PasswordGenerator(
             // add back all with no special chars AND no lower case (still removed at step 1)
             val noLowerCaseAndSpecialCharsCombinations = Math.pow(material.length.toDouble() - lowerCase.length - specialChars.length, spec.strength.ordinaryPasswordLength.toDouble())
             combinations += noLowerCaseAndSpecialCharsCombinations
+
+
         }
 
         // step 3: inclusion, add back to much removed
@@ -119,7 +119,17 @@ class PasswordGenerator(
         return combinations;
     }
 
+    private fun getSpecialCharsToUse(spec: PasswordGeneratorSpec): String {
+        return if (spec.useExtendedSpecialChars) {
+            specialChars + extendedSpecialChars
+        } else {
+            specialChars
+        }
+    }
+
     private fun matchSpec(spec: PasswordGeneratorSpec, buffer: CharArray): Boolean {
+        val specialChars = getSpecialCharsToUse(spec)
+
         if (!containsChar(buffer, lowerCase)) {
             // must always have lower case
             return false
@@ -161,6 +171,9 @@ class PasswordGenerator(
         }
         if (!spec.noSpecialChars) {
             material += specialChars
+            if (spec.useExtendedSpecialChars) {
+                material += extendedSpecialChars
+            }
         }
         if (!spec.noUpperCase) {
             material += upperCase

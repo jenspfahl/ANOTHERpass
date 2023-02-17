@@ -155,13 +155,14 @@ object ShowPasswordStrengthUseCase: InputUseCase<ShowPasswordStrengthUseCase.Inp
     fun guessPasswordCombinations(password: Password): Double {
         // rudimentary combination calculation by assuming a-Z, A-Z, 0-9 and some typical special chars
         val containsLowerCase =
-            containsChars(password, PasswordGenerator.DEFAULT_ALPHA_CHARS_LOWER_CASE)
+            containsChars(password, GeneratorBase.DEFAULT_ALPHA_CHARS_LOWER_CASE)
         val containsUpperCase =
-            containsChars(password, PasswordGenerator.DEFAULT_ALPHA_CHARS_UPPER_CASE)
-        val containsDigits = containsChars(password, PasswordGenerator.DEFAULT_DIGITS)
-        val containsSpecialChars = containsChars(password, PasswordGenerator.DEFAULT_SPECIAL_CHARS)
+            containsChars(password, GeneratorBase.DEFAULT_ALPHA_CHARS_UPPER_CASE)
+        val containsDigits = containsChars(password, GeneratorBase.DEFAULT_DIGITS)
+        val containsSpecialChars = containsChars(password, GeneratorBase.DEFAULT_SPECIAL_CHARS)
+        val containsExtendedSpecialChars = containsChars(password, GeneratorBase.EXTENDED_SPECIAL_CHARS)
         return Math.pow(
-            (containsLowerCase + containsUpperCase + containsDigits + containsSpecialChars).toDouble(),
+            (containsLowerCase + containsUpperCase + containsDigits + containsSpecialChars + containsExtendedSpecialChars).toDouble(),
             password.length.toDouble()
         )
     }

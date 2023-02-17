@@ -14,6 +14,8 @@
     <string name="with_upper_case">Mit Großbuchstaben</string>
     <string name="with_digits">Mit Ziffern</string>
     <string name="with_special_chars">Mit Sonderzeichen</string>
+    <string name="title_use_extended_special_chars">Verwende weitere Sonderzeichen</string>
+    <string name="summary_use_extended_special_chars">Wenn mit Sonderzeichen generiert wird, werden weitere Sonderzeichen in Betracht gezogen, die auf den meisten Tastaturen erst auf der zweiten Seite auswählbar sind, wie z.B. diverse Klammern, Tilde, Prozentzeichen etc.</string>
     <string name="credential_passwd_params">Hier kannst du das Passwort generieren. Es wird empfohlen es zu generieren anstatt es manuell einzugeben. \'Pseudophrase\'-Passwörter sind leicht zu lesen und zu tippen aber dennoch zufällig und stark.</string>
     <string name="button_gen_passwd">Generiere</string>
 

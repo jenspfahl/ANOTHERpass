@@ -15,6 +15,8 @@
     <string name="with_upper_case">With upper case chars</string>
     <string name="with_digits">With digits</string>
     <string name="with_special_chars">With special chars</string>
+    <string name="title_use_extended_special_chars">Use extended special chars</string>
+    <string name="summary_use_extended_special_chars">If generation happens with special chars included, the set of possible characters is extended to characters usually accessible on the second page of keyboards like all kinds of brackets, tilde, percentage sign etc.</string>
     <string name="credential_passwd_params">Here you generate the password for this credential. It is recommend to generate them instead of creating them manually. \'Pseudo Phrase\' passwords are easier to read and type but still highly random and unpredictable.</string>
     <string name="button_gen_passwd">Generate</string>
 
