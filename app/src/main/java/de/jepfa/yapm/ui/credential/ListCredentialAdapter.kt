@@ -1,6 +1,5 @@
 package de.jepfa.yapm.ui.credential
 
-import android.R.menu
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -101,7 +100,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             }
             current.modifyTimestamp?.let{
                 if (it > 1000) // modifyTimestamp is the credential Id after running db migration, assume ids are lower than 1000
-                    sb.addFormattedLine(listCredentialsActivity.getString(R.string.last_modified), dateToNiceString(it.toDate(), listCredentialsActivity))
+                    sb.addFormattedLine(listCredentialsActivity.getString(R.string.last_modified), dateTimeToNiceString(it.toDate(), listCredentialsActivity))
             }
 
             AlertDialog.Builder(listCredentialsActivity)

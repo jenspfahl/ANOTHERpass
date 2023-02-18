@@ -23,7 +23,7 @@ import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.importvault.ImportVaultFileOverrideVaultNamedAdapter.ChildType
 import de.jepfa.yapm.ui.importvault.ImportVaultFileOverrideVaultNamedAdapter.GroupType
 import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
-import de.jepfa.yapm.util.formatAsDate
+import de.jepfa.yapm.util.formatAsDateTime
 import de.jepfa.yapm.util.toastText
 
 class ImportVaultFileOverrideVaultFragment : BaseFragment() {
@@ -57,7 +57,7 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
         val labelsCount = jsonContent.get(VaultExportService.JSON_LABELS_COUNT)?.asString ?: 0
 
         loadedFileStatusTextView.text = getString(R.string.vault_export_info2,
-            formatAsDate(createdAt, importVaultActivity), credentialsCount, labelsCount)
+            formatAsDateTime(createdAt, importVaultActivity), credentialsCount, labelsCount)
 
         var credentialsToInsert: Set<ChildType>? = null
         var credentialsToUpdate: Set<ChildType>? = null

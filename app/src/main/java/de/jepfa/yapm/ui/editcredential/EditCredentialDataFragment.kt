@@ -2,16 +2,13 @@
 
 package de.jepfa.yapm.ui.editcredential
 
+import android.app.DatePickerDialog
 import android.os.Bundle
-import android.text.Editable
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import androidx.core.widget.addTextChangedListener
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
@@ -23,11 +20,15 @@ import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.encryptCommonString
+import de.jepfa.yapm.ui.DropDownList
 import de.jepfa.yapm.ui.SecureFragment
 import de.jepfa.yapm.ui.label.LabelEditViewExtender
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.DebugInfo
+import de.jepfa.yapm.util.dateTimeToNiceString
+import de.jepfa.yapm.util.dateToNiceString
 import de.jepfa.yapm.util.toastText
+import java.util.*
 
 
 class EditCredentialDataFragment : SecureFragment() {
@@ -38,6 +39,11 @@ class EditCredentialDataFragment : SecureFragment() {
     private lateinit var editCredentialNameView: EditText
     private lateinit var editCredentialUserView: EditText
     private lateinit var editCredentialWebsiteView: EditText
+    private lateinit var editCredentialExpiredAtImageView: ImageView
+    private lateinit var editCredentialExpiredAtSpinner: DropDownList
+    private lateinit var editCredentialExpiredAtAdapter: ArrayAdapter<String>
+    private var openSelectExpiryDateDialog = false
+
     private lateinit var editCredentialAdditionalInfoView: EditText
     private lateinit var expandAdditionalInfoImageView: ImageView
 
@@ -64,8 +70,48 @@ class EditCredentialDataFragment : SecureFragment() {
         editCredentialNameView = view.findViewById(R.id.edit_credential_name)
         editCredentialUserView = view.findViewById(R.id.edit_credential_user)
         editCredentialWebsiteView = view.findViewById(R.id.edit_credential_website)
+        editCredentialExpiredAtImageView = view.findViewById(R.id.expired_at_imageview)
+        editCredentialExpiredAtSpinner = view.findViewById(R.id.expired_at_spinner)
         editCredentialAdditionalInfoView = view.findViewById(R.id.edit_credential_additional_info)
         expandAdditionalInfoImageView = view.findViewById<ImageView>(R.id.imageview_expand_additional_info)
+
+
+        editCredentialExpiredAtAdapter = ArrayAdapter(editCredentialActivity, android.R.layout.simple_spinner_dropdown_item, mutableListOf<String>())
+        editCredentialExpiredAtSpinner.adapter = editCredentialExpiredAtAdapter
+        updateExpiredAtAdapter(updateSelection = false, null)
+
+        editCredentialExpiredAtImageView.setOnClickListener {
+            editCredentialExpiredAtSpinner.setSelection(editCredentialExpiredAtAdapter.count - 1)
+        }
+        editCredentialExpiredAtSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                if (position == 0) {
+                    updateExpiredAtAdapter(updateSelection = false, null)
+                }
+                else if (position == 1) {
+                    updateExpiredAtAdapter(updateSelection = false, Date(0))
+                }
+                else if (position == editCredentialExpiredAtAdapter.count - 1) {
+                    // This flag is needed to prevent open the dialog for existing credentials with a expiryDate != null,
+                    // because the setSelection - call from fillUi() would trigger it.
+                    if (openSelectExpiryDateDialog) {
+                        selectExpiryDate()
+                    }
+                    else {
+                        openSelectExpiryDateDialog = true
+                    }
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+
+        }
 
         editCredentialAdditionalInfoView.addTextChangedListener {
             if (it == null) return@addTextChangedListener
@@ -123,6 +169,7 @@ class EditCredentialDataFragment : SecureFragment() {
             editCredentialActivity.suggestedWebSite?.let {
                 editCredentialWebsiteView.setText(it)
             }
+            openSelectExpiryDateDialog = true
         }
 
         val buttonNext: Button = view.findViewById(R.id.button_next)
@@ -141,6 +188,52 @@ class EditCredentialDataFragment : SecureFragment() {
                 }
             }
         }
+    }
+
+    private fun updateExpiredAtAdapter(updateSelection: Boolean, newDate: Date?) {
+        editCredentialExpiredAtAdapter.clear()
+        editCredentialExpiredAtAdapter.addAll(
+            "Kein Ablaufdatum", // 0
+            "Expires in a month", // 1
+            "Expires in three months", // 2
+            "Expires in half a year", // 3
+            "Expires in a year", // 4
+        )
+        if (newDate == null) {
+            editCredentialExpiredAtAdapter.add( "Expires on ... ") // 5
+            editCredentialExpiredAtAdapter.notifyDataSetChanged()
+
+            if (updateSelection) {
+                editCredentialExpiredAtSpinner.setSelection(0)
+            }
+        }
+        else {
+            editCredentialExpiredAtAdapter.add( "Expires ${dateToNiceString(newDate, editCredentialActivity)} ") // 5
+            editCredentialExpiredAtAdapter.notifyDataSetChanged()
+
+            if (updateSelection) {
+               editCredentialExpiredAtSpinner.setSelection(editCredentialExpiredAtAdapter.count - 1)
+            }
+        }
+    }
+
+    private fun selectExpiryDate() {
+
+        val c = Calendar.getInstance()
+        val mYear = c.get(Calendar.YEAR)
+        val mMonth = c.get(Calendar.MONTH)
+        val mDay = c.get(Calendar.DAY_OF_MONTH)
+
+        val datePickerDialog = DatePickerDialog(
+            editCredentialActivity,
+            { _, year, monthOfYear, dayOfMonth ->
+                val c = Calendar.getInstance()
+                c.set(year, monthOfYear, dayOfMonth)
+                updateExpiredAtAdapter(updateSelection = false, c.time)
+
+            }, mYear, mMonth, mDay
+        )
+        datePickerDialog.show()
     }
 
     private fun updateExpandAddInfoVisibility(
@@ -176,6 +269,10 @@ class EditCredentialDataFragment : SecureFragment() {
         editCredentialNameView.setText(name)
         editCredentialUserView.setText(user)
         editCredentialWebsiteView.setText(website)
+
+        val expiresAt = Date()
+        updateExpiredAtAdapter(updateSelection = true, expiresAt)
+
         editCredentialAdditionalInfoView.setText(additionalInfo)
         updateExpandAddInfoVisibility(expandAdditionalInfoImageView, additionalInfo)
 

@@ -596,6 +596,11 @@
     <string name="date_yesterday_at">yesterday at %1$s</string>
     <string name="date_on_date_at">on %1$s at %2$s</string>
 
+    <string name="date_today">today</string>
+    <string name="date_yesterday">yesterday</string>
+    <string name="date_tomorrow">tomorrow</string>
+    <string name="date_on_date">on %1$s</string>
+
     <string name="pref_show_last_login_state">Show previous login state</string>
     <string name="show_last_login_state_denies_and_succeeds">Denied and succeeded logins</string>
     <string name="show_last_login_state_denies_only">Only denied logins</string>

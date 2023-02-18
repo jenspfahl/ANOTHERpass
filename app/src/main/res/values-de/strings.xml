@@ -587,6 +587,11 @@
     <string name="date_yesterday_at">gestern %1$s</string>
     <string name="date_on_date_at">am %1$s %2$s</string>
 
+    <string name="date_today">heute</string>
+    <string name="date_yesterday">gestern</string>
+    <string name="date_tomorrow">morgen</string>
+    <string name="date_on_date">am %1$s</string>
+
     <string name="pref_show_last_login_state">Zeige letzte Loginereignisse</string>
     <string name="show_last_login_state_denies_and_succeeds">Abgelehnte und erfolgreiche Logins</string>
     <string name="show_last_login_state_denies_only">Nur abgelehnte Loginversuche</string>

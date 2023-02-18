@@ -104,6 +104,10 @@ fun Date.yesterday(): Date {
     return addDays(-1)
 }
 
+fun Date.tomorrow(): Date {
+    return addDays(1)
+}
+
 fun Date.addDays(days: Int): Date {
     val cal = Calendar.getInstance()
     cal.time = this

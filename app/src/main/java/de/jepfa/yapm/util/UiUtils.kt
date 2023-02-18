@@ -2,18 +2,14 @@ package de.jepfa.yapm.util
 
 import android.app.Dialog
 import android.content.Context
-import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import android.content.pm.ResolveInfo
 import android.content.res.ColorStateList
-import android.content.res.Resources
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.Toast
 import com.google.android.material.chip.Chip
@@ -98,7 +94,30 @@ fun linkifyDialogMessage(dialog: Dialog) {
     }
 }
 
-fun dateToNiceString(dateTime: Date?, context: Context): String {
+fun dateToNiceString(date: Date?, context: Context): String {
+    if (date != null) {
+        val date = date.removeTime()
+        val today = Date().removeTime()
+        val yesterday = Date().yesterday().removeTime()
+        val tomorrow = Date().tomorrow().removeTime()
+        if (date == today) {
+            return context.getString(R.string.date_today)
+        }
+        if (date == yesterday) {
+            return context.getString(R.string.date_yesterday)
+        }
+        if (date == tomorrow) {
+            return context.getString(R.string.date_tomorrow)
+        }
+        return context.getString(R.string.date_on_date,
+            date.toSimpleDateFormat())
+    }
+    else {
+        return "??"
+    }
+}
+
+fun dateTimeToNiceString(dateTime: Date?, context: Context): String {
     if (dateTime != null) {
         val date = dateTime.removeTime()
         val today = Date().removeTime()
@@ -118,11 +137,11 @@ fun dateToNiceString(dateTime: Date?, context: Context): String {
 }
 
 
-fun formatAsDate(s: String?, context: Context): String {
+fun formatAsDateTime(s: String?, context: Context): String {
     if (s != null) {
         val timestamp = s.toLongOrNull()
         if (timestamp != null) {
-            return dateToNiceString(Date(timestamp), context)
+            return dateTimeToNiceString(Date(timestamp), context)
         }
         else {
             return s
