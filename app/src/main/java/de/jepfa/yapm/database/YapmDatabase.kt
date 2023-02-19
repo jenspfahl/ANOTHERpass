@@ -12,7 +12,7 @@ import de.jepfa.yapm.database.entity.EncCredentialEntity
 import de.jepfa.yapm.database.entity.EncLabelEntity
 import java.util.*
 
-const val DB_VERSION = 5
+const val DB_VERSION = 6
 
 @Database(
     entities = [EncCredentialEntity::class, EncLabelEntity::class],
@@ -63,12 +63,20 @@ abstract class YapmDatabase : RoomDatabase() {
                                 updateUuid(database, EncLabelEntity::class.simpleName!!)
                             }
                         }
+                        val migration5to6 = object : Migration(5, 6) {
+                            override fun migrate(database: SupportSQLiteDatabase) {
+                                database.execSQL("ALTER TABLE EncCredentialEntity ADD COLUMN expiresAt TEXT")
+
+                                updateUuid(database, EncCredentialEntity::class.simpleName!!)
+                                updateUuid(database, EncLabelEntity::class.simpleName!!)
+                            }
+                        }
 
                         INSTANCE = Room.databaseBuilder(
                             context.applicationContext,
                             YapmDatabase::class.java, "yapm_database"
                         )
-                        .addMigrations(migration1to2, migration2to3, migration3to4, migration4to5)
+                        .addMigrations(migration1to2, migration2to3, migration3to4, migration4to5, migration5to6)
                         .build()
                     }
                 }

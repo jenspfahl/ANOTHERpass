@@ -15,7 +15,8 @@ data class EncCredential(val id: Int?,
                          var password: Encrypted,
                          var lastPassword: Encrypted?,
                          var website: Encrypted,
-                         var labels: Encrypted,
+                         var labels: Encrypted,  // enc(comma-separated labelIds or "")
+                         var expiresAt: Encrypted,  //enc(Date.getTime() or 0L) or enc.empty
                          var isObfuscated: Boolean,
                          var isLastPasswordObfuscated: Boolean?,
                          var modifyTimestamp: Long?
@@ -30,6 +31,7 @@ data class EncCredential(val id: Int?,
                 lastPasswordBase64: String?,
                 websiteBase64: String,
                 labelsBase64: String,
+                expiresAtBase64: String?,
                 isObfuscated: Boolean,
                 isLastPasswordObfuscated: Boolean?,
                 modifyTimestamp: Long?) :
@@ -42,6 +44,7 @@ data class EncCredential(val id: Int?,
                 lastPasswordBase64?.run { Encrypted.fromBase64String(lastPasswordBase64) },
                 Encrypted.fromBase64String(websiteBase64),
                 Encrypted.fromBase64String(labelsBase64),
+                if (expiresAtBase64 != null) Encrypted.fromBase64String(expiresAtBase64) else Encrypted.empty(),
                 isObfuscated,
                 isLastPasswordObfuscated,
                 modifyTimestamp
@@ -77,6 +80,7 @@ data class EncCredential(val id: Int?,
         user = other.user
         website = other.website
         additionalInfo = other.additionalInfo
+        expiresAt = other.expiresAt
         isObfuscated = other.isObfuscated
         password = other.password
     }
@@ -95,6 +99,7 @@ data class EncCredential(val id: Int?,
         lastPassword?.let { intent.putEncryptedExtra(EXTRA_CREDENTIAL_LAST_PASSWORD, it) }
         intent.putEncryptedExtra(EXTRA_CREDENTIAL_WEBSITE, website)
         intent.putEncryptedExtra(EXTRA_CREDENTIAL_LABELS, labels)
+        intent.putEncryptedExtra(EXTRA_CREDENTIAL_EXPIRES_AT, expiresAt)
         intent.putExtra(EXTRA_CREDENTIAL_IS_OBFUSCATED, isObfuscated)
         intent.putExtra(EXTRA_CREDENTIAL_IS_LAST_PASSWORD_OBFUSCATED, isLastPasswordObfuscated)
         intent.putExtra(EXTRA_CREDENTIAL_MODIFY_TIMESTAMP, modifyTimestamp)
@@ -116,6 +121,7 @@ data class EncCredential(val id: Int?,
         if (password != other.password) return false
         if (website != other.website) return false
         if (labels != other.labels) return false
+        if (expiresAt != other.expiresAt) return false
         if (isObfuscated != other.isObfuscated) return false
 
         return true
@@ -130,6 +136,7 @@ data class EncCredential(val id: Int?,
         result = 31 * result + password.hashCode()
         result = 31 * result + website.hashCode()
         result = 31 * result + labels.hashCode()
+        result = 31 * result + expiresAt.hashCode()
         result = 31 * result + isObfuscated.hashCode()
         return result
     }
@@ -144,6 +151,7 @@ data class EncCredential(val id: Int?,
         const val EXTRA_CREDENTIAL_LAST_PASSWORD = "de.jepfa.yapm.ui.credential.lastpassword"
         const val EXTRA_CREDENTIAL_WEBSITE = "de.jepfa.yapm.ui.credential.website"
         const val EXTRA_CREDENTIAL_LABELS = "de.jepfa.yapm.ui.credential.labels"
+        const val EXTRA_CREDENTIAL_EXPIRES_AT = "de.jepfa.yapm.ui.credential.expiresAt"
         const val EXTRA_CREDENTIAL_IS_OBFUSCATED = "de.jepfa.yapm.ui.credential.isObfuscated"
         const val EXTRA_CREDENTIAL_IS_LAST_PASSWORD_OBFUSCATED = "de.jepfa.yapm.ui.credential.isLastPasswordObfuscated"
         const val EXTRA_CREDENTIAL_MODIFY_TIMESTAMP = "de.jepfa.yapm.ui.credential.modifyTimestamp"
@@ -157,6 +165,7 @@ data class EncCredential(val id: Int?,
         const val ATTRIB_LAST_PASSWORD = "lastPassword"
         const val ATTRIB_WEBSITE = "website"
         const val ATTRIB_LABELS = "labels"
+        const val ATTRIB_EXPIRES_AT = "expiresAt"
         const val ATTRIB_IS_OBFUSCATED = "isObfuscated"
         const val ATTRIB_IS_LAST_PASSWORD_OBFUSCATED = "isLastPasswordObfuscated"
         const val ATTRIB_MODIFY_TIMESTAMP = "modifyTimestamp"
@@ -175,6 +184,7 @@ data class EncCredential(val id: Int?,
             val encLastPassword = intent.getEncryptedExtra(EXTRA_CREDENTIAL_LAST_PASSWORD)
             val encWebsite = intent.getEncryptedExtra(EXTRA_CREDENTIAL_WEBSITE, Encrypted.empty())
             val encLabels = intent.getEncryptedExtra(EXTRA_CREDENTIAL_LABELS, Encrypted.empty())
+            val encExpiresAt = intent.getEncryptedExtra(EXTRA_CREDENTIAL_EXPIRES_AT, Encrypted.empty())
             val isObfuscated = intent.getBooleanExtra(EXTRA_CREDENTIAL_IS_OBFUSCATED, false)
             val isLastPasswordObfuscated = intent.getBooleanExtra(
                 EXTRA_CREDENTIAL_IS_LAST_PASSWORD_OBFUSCATED, false)
@@ -186,7 +196,7 @@ data class EncCredential(val id: Int?,
 
             return EncCredential(
                 id, uid, encName, encAdditionalInfo, encUser, encPassword, encLastPassword, encWebsite, encLabels,
-                isObfuscated, isLastPasswordObfuscated, modifyTimestamp)
+                encExpiresAt, isObfuscated, isLastPasswordObfuscated, modifyTimestamp)
         }
 
         fun fromJson(json: JsonElement): EncCredential? {
@@ -202,6 +212,7 @@ data class EncCredential(val id: Int?,
                     jsonObject.get(ATTRIB_LAST_PASSWORD)?.asString,
                     jsonObject.get(ATTRIB_WEBSITE).asString,
                     jsonObject.get(ATTRIB_LABELS).asString,
+                    jsonObject.get(ATTRIB_EXPIRES_AT).asString,
                     jsonObject.get(ATTRIB_IS_OBFUSCATED)?.asBoolean ?: false,
                     jsonObject.get(ATTRIB_IS_LAST_PASSWORD_OBFUSCATED)?.asBoolean ?: false,
                     jsonObject.get(ATTRIB_MODIFY_TIMESTAMP)?.asLong

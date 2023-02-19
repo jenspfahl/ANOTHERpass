@@ -93,6 +93,7 @@ class ImportCredentialsActivity : SecureActivity() {
         val encUser = SecretService.encryptCommonString(key, record.userName ?: "")
         val encPassword = SecretService.encryptPassword(key, Password(record.plainPassword))
         val encWebsite = SecretService.encryptCommonString(key, record.url ?: "")
+        val encExpiresAt = SecretService.encryptLong(key, 0L)
         val encLabels = LabelService.defaultHolder.encryptLabelIds(
             key,
             labelNames
@@ -106,6 +107,7 @@ class ImportCredentialsActivity : SecureActivity() {
             null,
             encWebsite,
             encLabels,
+            encExpiresAt,
             false,
             null,
             null

@@ -178,6 +178,18 @@ object SecretService {
         return String(decryptData(secretKeyHolder, encrypted))
     }
 
+    fun encryptLong(secretKeyHolder:  SecretKeyHolder, long: Long): Encrypted {
+        return encryptData(null, secretKeyHolder, long.toString().toByteArray())
+    }
+
+    fun decryptLong(secretKeyHolder:  SecretKeyHolder, encrypted: Encrypted): Long? {
+        if (encrypted.isEmpty()) {
+            return null
+        }
+        val longAsString = String(decryptData(secretKeyHolder, encrypted))
+        return longAsString.toLongOrNull()
+    }
+
     fun encryptEncrypted(secretKeyHolder:  SecretKeyHolder, encrypted: Encrypted): Encrypted {
         return encryptData(encrypted.type, secretKeyHolder, encrypted.toBase64())
     }

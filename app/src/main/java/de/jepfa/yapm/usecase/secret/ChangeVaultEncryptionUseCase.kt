@@ -144,6 +144,7 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
                     if (credential.lastPassword != null) reencryptPassword(credential.lastPassword!!, oldMasterSK, newMasterSK) else null,
                     reencryptString(credential.website, oldMasterSK, newMasterSK),
                     reencryptString(credential.labels, oldMasterSK, newMasterSK),
+                    reencryptString(credential.expiresAt, oldMasterSK, newMasterSK),
                     credential.isObfuscated,
                     credential.isLastPasswordObfuscated,
                     credential.modifyTimestamp

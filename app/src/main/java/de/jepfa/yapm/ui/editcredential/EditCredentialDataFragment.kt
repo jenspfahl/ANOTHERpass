@@ -19,7 +19,9 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
+import de.jepfa.yapm.service.secret.SecretService.decryptLong
 import de.jepfa.yapm.service.secret.SecretService.encryptCommonString
+import de.jepfa.yapm.service.secret.SecretService.encryptLong
 import de.jepfa.yapm.ui.DropDownList
 import de.jepfa.yapm.ui.SecureFragment
 import de.jepfa.yapm.ui.label.LabelEditViewExtender
@@ -43,6 +45,7 @@ class EditCredentialDataFragment : SecureFragment() {
     private lateinit var editCredentialExpiredAtSpinner: DropDownList
     private lateinit var editCredentialExpiredAtAdapter: ArrayAdapter<String>
     private var openSelectExpiryDateDialog = false
+    private var selectedExpiryDate: Date? = null
 
     private lateinit var editCredentialAdditionalInfoView: EditText
     private lateinit var expandAdditionalInfoImageView: ImageView
@@ -215,11 +218,15 @@ class EditCredentialDataFragment : SecureFragment() {
                editCredentialExpiredAtSpinner.setSelection(editCredentialExpiredAtAdapter.count - 1)
             }
         }
+        selectedExpiryDate = newDate
     }
 
     private fun selectExpiryDate() {
 
         val c = Calendar.getInstance()
+        if (selectedExpiryDate != null) {
+            c.time = selectedExpiryDate
+        }
         val mYear = c.get(Calendar.YEAR)
         val mMonth = c.get(Calendar.MONTH)
         val mDay = c.get(Calendar.DAY_OF_MONTH)
@@ -260,6 +267,7 @@ class EditCredentialDataFragment : SecureFragment() {
         val name = decryptCommonString(key, current.name)
         val user = decryptCommonString(key, current.user)
         val website = decryptCommonString(key, current.website)
+        val expiresAtAsLong = decryptLong(key, current.expiresAt)
         val additionalInfo = decryptCommonString(
             key,
             current.additionalInfo
@@ -270,7 +278,7 @@ class EditCredentialDataFragment : SecureFragment() {
         editCredentialUserView.setText(user)
         editCredentialWebsiteView.setText(website)
 
-        val expiresAt = Date()
+        val expiresAt = if (expiresAtAsLong != null && expiresAtAsLong > 0) Date(expiresAtAsLong) else null
         updateExpiredAtAdapter(updateSelection = true, expiresAt)
 
         editCredentialAdditionalInfoView.setText(additionalInfo)
@@ -290,6 +298,7 @@ class EditCredentialDataFragment : SecureFragment() {
         val additionalInfo = editCredentialAdditionalInfoView.text.toString()
         val user = editCredentialUserView.text.toString().trim()
         val website = editCredentialWebsiteView.text.toString().trim()
+        val expiresAt = selectedExpiryDate?.time
 
         val encName = encryptCommonString(key, name)
         val encAdditionalInfo = encryptCommonString(key, additionalInfo)
@@ -299,6 +308,7 @@ class EditCredentialDataFragment : SecureFragment() {
             ?: SecretService.encryptPassword(key, Password.empty()
         )
         val encWebsite = encryptCommonString(key, website)
+        val encExpiresAt = encryptLong(key, expiresAt ?: 0L)
         val encLabels = LabelService.defaultHolder.encryptLabelIds(
             key,
             labelEditViewExtender.getCommitedLabelNames()
@@ -315,6 +325,7 @@ class EditCredentialDataFragment : SecureFragment() {
             editCredentialActivity.original?.lastPassword,
             encWebsite,
             encLabels,
+            encExpiresAt,
             editCredentialActivity.current?.isObfuscated
                 ?: editCredentialActivity.original?.isObfuscated
                 ?: false,
