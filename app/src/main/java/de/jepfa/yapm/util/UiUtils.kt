@@ -94,7 +94,7 @@ fun linkifyDialogMessage(dialog: Dialog) {
     }
 }
 
-fun dateToNiceString(date: Date?, context: Context): String {
+fun dateToNiceString(date: Date?, context: Context, withPreposition: Boolean = true): String {
     if (date != null) {
         val date = date.removeTime()
         val today = Date().removeTime()
@@ -109,8 +109,15 @@ fun dateToNiceString(date: Date?, context: Context): String {
         if (date == tomorrow) {
             return context.getString(R.string.date_tomorrow)
         }
-        return context.getString(R.string.date_on_date,
-            date.toSimpleDateFormat())
+        if (withPreposition) {
+            return context.getString(
+                R.string.date_on_date,
+                date.toSimpleDateFormat()
+            )
+        }
+        else {
+            return date.toSimpleDateFormat()
+        }
     }
     else {
         return "??"

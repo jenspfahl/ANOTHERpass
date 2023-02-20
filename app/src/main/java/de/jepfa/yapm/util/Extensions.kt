@@ -115,6 +115,13 @@ fun Date.addDays(days: Int): Date {
     return cal.time
 }
 
+fun Date.addMonths(months: Int): Date {
+    val cal = Calendar.getInstance()
+    cal.time = this
+    cal.add(Calendar.MONTH, months)
+    return cal.time
+}
+
 fun Double.toReadableFormat(): String {
     val f = NumberFormat.getInstance(Locale.getDefault(Locale.Category.FORMAT))
     return f.format(floor(this))
