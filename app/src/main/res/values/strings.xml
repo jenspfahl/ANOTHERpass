@@ -657,4 +657,15 @@
     <string name="result">Result</string>
     <string name="elapsed_time">Elapsed time</string>
 
+    <string name="expired">Expired</string>
+    <string name="expired_since">Expired since</string>
+    <string name="expires">Expires</string>
+    <string name="no_expiration">No expiration</string>
+    <string name="expires_in_1_month">Expires in a month</string>
+    <string name="expires_in_3_months">Expires in three month</string>
+    <string name="expires_in_6_months">Expires in half a year</string>
+    <string name="expires_in_12_months">Expires in a year</string>
+    <string name="expires_on">Expires on …</string>
+
+
 </resources>

@@ -1,5 +1,6 @@
 package de.jepfa.yapm.ui.credential
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -442,6 +443,7 @@ class ShowCredentialActivity : SecureActivity() {
     }
 
 
+    @SuppressLint("SetTextI18n")
     private fun updatePasswordView(credential: EncCredential) {
         masterSecretKey?.let { key ->
             val decName = decryptCommonString(key, credential.name)
@@ -452,24 +454,28 @@ class ShowCredentialActivity : SecureActivity() {
             val additionalInfo = decryptCommonString(key, credential.additionalInfo)
 
             toolBarLayout.title = name
-
             toolbarChipGroup.removeAllViews()
 
-            if (credential.isExpired(key)) { // expired
+
+
+            val labelHolder = if (mode == Mode.EXTERNAL_FROM_FILE) LabelService.externalHolder else LabelService.defaultHolder
+            val labelsForCredential = labelHolder.decryptLabelsForCredential(key, credential)
+
+            val credentialExpired = credential.isExpired(key)
+            val thinner = shouldMakeLabelThinner(labelsForCredential, credentialExpired)
+
+            if (credentialExpired) { // expired
                 createAndAddLabelChip(
-                    Label("Expired", getColor(R.color.Red), R.drawable.baseline_lock_clock_24),
+                    Label(getString(R.string.expired), getColor(R.color.Red), R.drawable.baseline_lock_clock_24),
                     toolbarChipGroup,
-                    thinner = false,
+                    thinner,
                     this,
                     outlined = true,
                     placedOnAppBar = true,
                 )
             }
 
-            val labelHolder = if (mode == Mode.EXTERNAL_FROM_FILE) LabelService.externalHolder else LabelService.defaultHolder
-            val labelsForCredential = labelHolder.decryptLabelsForCredential(key, credential)
             if (labelsForCredential.isNotEmpty()) {
-                val thinner = shouldMakeLabelThinner(labelsForCredential)
                 labelsForCredential.forEachIndexed { idx, label ->
                     val chip = createAndAddLabelChip(label, toolbarChipGroup, thinner, this)
                     chip.setOnClickListener {
@@ -513,9 +519,9 @@ class ShowCredentialActivity : SecureActivity() {
             val expiresAtImageView: ImageView = findViewById(R.id.expires_at_image)
             if (expiresAt != null && expiresAt > 0) {
                 val expiryDate = Date(expiresAt)
-                if (!credential.isExpired(key)) {
+                if (!credentialExpired) {
                     // good
-                    expiresAtTextView.text = "Expires ${dateToNiceString(expiryDate, this)}"
+                    expiresAtTextView.text = "${getString(R.string.expires)}: ${dateToNiceString(expiryDate, this)}"
                     expiresAtTextView.typeface = Typeface.DEFAULT
                     defaultTextColor?.let {
                         expiresAtTextView.setTextColor(it)
@@ -523,7 +529,7 @@ class ShowCredentialActivity : SecureActivity() {
                 }
                 else {
                     // expired
-                    expiresAtTextView.text = "Already expired since ${dateToNiceString(expiryDate, this, withPreposition = false)}!"
+                    expiresAtTextView.text = "${getString(R.string.expired_since)}: ${dateToNiceString(expiryDate, this, withPreposition = false)}!"
                     expiresAtTextView.typeface = Typeface.DEFAULT_BOLD
                     defaultTextColor = expiresAtTextView.textColors
                     expiresAtTextView.setTextColor(getColor(R.color.Red))
@@ -588,8 +594,11 @@ class ShowCredentialActivity : SecureActivity() {
         password.clear()
     }
 
-    private fun shouldMakeLabelThinner(labels: List<Label>): Boolean {
-        val totalLabelsLength = labels.map { it.name.length }.sum()
+    private fun shouldMakeLabelThinner(labels: List<Label>, credentialExpired: Boolean): Boolean {
+        var totalLabelsLength = labels.sumOf { it.name.length }
+        if (credentialExpired) {
+            totalLabelsLength+= getString(R.string.expired).length
+        }
         val maxLabelLength = resources.getInteger(R.integer.max_label_name_length)
         return totalLabelsLength > maxLabelLength * 2
     }

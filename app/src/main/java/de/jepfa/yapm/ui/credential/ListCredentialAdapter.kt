@@ -340,7 +340,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
 
                 if (credential.isExpired(key)) { // expired
                     createAndAddLabelChip(
-                        Label("Expired", activity.getColor(R.color.Red), R.drawable.baseline_lock_clock_24),
+                        Label(itemView.context.getString(R.string.expired), activity.getColor(R.color.Red), R.drawable.baseline_lock_clock_24),
                         credentialLabelContainerGroup,
                         thinner = true,
                         itemView.context,

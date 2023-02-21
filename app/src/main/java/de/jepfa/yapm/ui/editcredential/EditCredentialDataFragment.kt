@@ -3,11 +3,9 @@
 package de.jepfa.yapm.ui.editcredential
 
 import android.app.DatePickerDialog
-import android.content.res.ColorStateList
-import android.graphics.ColorFilter
+import android.content.Context
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,13 +33,13 @@ import java.util.*
 
 class EditCredentialDataFragment : SecureFragment() {
 
-    private enum class ExpiryOptions(val representation: String) {
-        NO_EXPIRATION("No expiration"),
-        EXPIRES_IN_A_MONTH("Expires in a month"),
-        EXPIRES_IN_3_MONTHS("Expires in three months"),
-        EXPIRES_IN_6_MONTHS("Expires in half a year"),
-        EXPIRES_IN_12_MONTHS("Expires in a year"),
-        EXPIRES_ON_CUSTOM("Expires on ..."),
+    private enum class ExpiryOptions(val representationId: Int) {
+        NO_EXPIRATION(R.string.no_expiration),
+        EXPIRES_IN_A_MONTH(R.string.expires_in_1_month),
+        EXPIRES_IN_3_MONTHS(R.string.expires_in_3_months),
+        EXPIRES_IN_6_MONTHS(R.string.expires_in_6_months),
+        EXPIRES_IN_12_MONTHS(R.string.expires_in_12_months),
+        EXPIRES_ON_CUSTOM(R.string.expires_on),
     }
 
     private lateinit var editCredentialActivity: EditCredentialActivity
@@ -90,7 +88,7 @@ class EditCredentialDataFragment : SecureFragment() {
 
         editCredentialExpiredAtAdapter = ArrayAdapter(editCredentialActivity, android.R.layout.simple_spinner_dropdown_item, mutableListOf<String>())
         editCredentialExpiredAtSpinner.adapter = editCredentialExpiredAtAdapter
-        updateExpiredAtAdapter(updateSelection = false, null)
+        updateExpiredAtAdapter(updateSelection = false, null, editCredentialActivity)
 
         editCredentialExpiredAtImageView.setOnClickListener {
             editCredentialExpiredAtSpinner.setSelection(ExpiryOptions.EXPIRES_ON_CUSTOM.ordinal)
@@ -103,23 +101,23 @@ class EditCredentialDataFragment : SecureFragment() {
                 id: Long
             ) {
                 if (position == ExpiryOptions.NO_EXPIRATION.ordinal) {
-                    updateExpiredAtAdapter(updateSelection = false, null)
+                    updateExpiredAtAdapter(updateSelection = false, null, editCredentialActivity)
                 }
                 else if (position == ExpiryOptions.EXPIRES_IN_A_MONTH.ordinal) {
                     openSelectExpiryDateDialog = false
-                    updateExpiredAtAdapter(updateSelection = true, Date().addMonths(1))
+                    updateExpiredAtAdapter(updateSelection = true, Date().addMonths(1), editCredentialActivity)
                 }
                 else if (position == ExpiryOptions.EXPIRES_IN_3_MONTHS.ordinal) {
                     openSelectExpiryDateDialog = false
-                    updateExpiredAtAdapter(updateSelection = true, Date().addMonths(3))
+                    updateExpiredAtAdapter(updateSelection = true, Date().addMonths(3), editCredentialActivity)
                 }
                 else if (position == ExpiryOptions.EXPIRES_IN_6_MONTHS.ordinal) {
                     openSelectExpiryDateDialog = false
-                    updateExpiredAtAdapter(updateSelection = true, Date().addMonths(6))
+                    updateExpiredAtAdapter(updateSelection = true, Date().addMonths(6), editCredentialActivity)
                 }
                 else if (position == ExpiryOptions.EXPIRES_IN_12_MONTHS.ordinal) {
                     openSelectExpiryDateDialog = false
-                    updateExpiredAtAdapter(updateSelection = true, Date().addMonths(12))
+                    updateExpiredAtAdapter(updateSelection = true, Date().addMonths(12), editCredentialActivity)
                 }
                 else if (position == ExpiryOptions.EXPIRES_ON_CUSTOM.ordinal) {
                     // This flag is needed to prevent open the dialog for existing credentials with a expiryDate != null,
@@ -215,17 +213,17 @@ class EditCredentialDataFragment : SecureFragment() {
         }
     }
 
-    private fun updateExpiredAtAdapter(updateSelection: Boolean, expiryDate: Date?) {
+    private fun updateExpiredAtAdapter(updateSelection: Boolean, expiryDate: Date?, context: Context) {
         editCredentialExpiredAtAdapter.clear()
         editCredentialExpiredAtAdapter.addAll(
-            ExpiryOptions.NO_EXPIRATION.representation,
-            ExpiryOptions.EXPIRES_IN_A_MONTH.representation,
-            ExpiryOptions.EXPIRES_IN_3_MONTHS.representation,
-            ExpiryOptions.EXPIRES_IN_6_MONTHS.representation,
-            ExpiryOptions.EXPIRES_IN_12_MONTHS.representation,
+            context.getString(ExpiryOptions.NO_EXPIRATION.representationId),
+            context.getString(ExpiryOptions.EXPIRES_IN_A_MONTH.representationId),
+            context.getString(ExpiryOptions.EXPIRES_IN_3_MONTHS.representationId),
+            context.getString(ExpiryOptions.EXPIRES_IN_6_MONTHS.representationId),
+            context.getString(ExpiryOptions.EXPIRES_IN_12_MONTHS.representationId),
         )
         if (expiryDate == null) {
-            editCredentialExpiredAtAdapter.add( ExpiryOptions.EXPIRES_ON_CUSTOM.representation) // 5
+            editCredentialExpiredAtAdapter.add(context.getString(ExpiryOptions.EXPIRES_ON_CUSTOM.representationId))
             editCredentialExpiredAtImageView.colorFilter = null
 
             editCredentialExpiredAtAdapter.notifyDataSetChanged()
@@ -238,12 +236,12 @@ class EditCredentialDataFragment : SecureFragment() {
             val now = Date()
             if (expiryDate.after(now)) {
                 // good
-                editCredentialExpiredAtAdapter.add( "Expires ${dateToNiceString(expiryDate, editCredentialActivity)} ") // 5
+                editCredentialExpiredAtAdapter.add("${getString(R.string.expires)}: ${dateToNiceString(expiryDate, editCredentialActivity)} ")
                 editCredentialExpiredAtImageView.colorFilter = null
             }
             else {
                 // expired
-                editCredentialExpiredAtAdapter.add( "Expired since ${dateToNiceString(expiryDate, editCredentialActivity, withPreposition = false)} ") // 5
+                editCredentialExpiredAtAdapter.add("${getString(R.string.expired_since)}: ${dateToNiceString(expiryDate, editCredentialActivity, withPreposition = false)} ") // 5
                 editCredentialExpiredAtImageView.setColorFilter(editCredentialActivity.getColor(R.color.Red))
 
             }
@@ -259,9 +257,7 @@ class EditCredentialDataFragment : SecureFragment() {
     private fun selectExpiryDate() {
 
         val c = Calendar.getInstance()
-        if (selectedExpiryDate != null) {
-            c.time = selectedExpiryDate
-        }
+        selectedExpiryDate?.let { c.time = it }
         val mYear = c.get(Calendar.YEAR)
         val mMonth = c.get(Calendar.MONTH)
         val mDay = c.get(Calendar.DAY_OF_MONTH)
@@ -271,7 +267,7 @@ class EditCredentialDataFragment : SecureFragment() {
             { _, year, monthOfYear, dayOfMonth ->
                 val c = Calendar.getInstance()
                 c.set(year, monthOfYear, dayOfMonth)
-                updateExpiredAtAdapter(updateSelection = false, c.time)
+                updateExpiredAtAdapter(updateSelection = false, c.time, editCredentialActivity)
 
             }, mYear, mMonth, mDay
         )
@@ -314,7 +310,7 @@ class EditCredentialDataFragment : SecureFragment() {
         editCredentialWebsiteView.setText(website)
 
         val expiresAt = if (expiresAtAsLong != null && expiresAtAsLong > 0) Date(expiresAtAsLong) else null
-        updateExpiredAtAdapter(updateSelection = true, expiresAt)
+        updateExpiredAtAdapter(updateSelection = true, expiresAt, editCredentialActivity)
         if (expiresAt == null) {
             // allow open selection dialog since there is currently no value so no progrmmatic selection will be triggered
             openSelectExpiryDateDialog = true

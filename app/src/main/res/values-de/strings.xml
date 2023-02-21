@@ -650,4 +650,15 @@
     <string name="result">Ergebnis</string>
     <string name="elapsed_time">Benötigte Zeit</string>
 
+    <string name="expired">Abgelaufen</string>
+    <string name="expired_since">Abgelaufen seit</string>
+    <string name="expires">Läuft ab</string>
+    <string name="no_expiration">Läuft nie ab</string>
+    <string name="expires_in_1_month">Läuft in einem Monat ab</string>
+    <string name="expires_in_3_months">Läuft in drei Monaten ab</string>
+    <string name="expires_in_6_months">Läuft in einem halben Jahr ab</string>
+    <string name="expires_in_12_months">Läuft in einem Jahr ab</string>
+    <string name="expires_on">Läuft ab am …</string>
+
+
 </resources>
