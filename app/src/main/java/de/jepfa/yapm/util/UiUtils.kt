@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.content.res.AppCompatResources
 import com.google.android.material.chip.Chip
 import de.jepfa.yapm.R
@@ -89,11 +90,25 @@ fun createLabelChip(
                     chip.textStartPadding = 0.0F
                     chip.chipIconSize = 20.0F
                 }
+                else {
+                    chip.textStartPadding = 4.0F
+                    chip.iconStartPadding = 6.0F
+                    chip.chipEndPadding = 4.0F
+                }
                 chip.isChipIconVisible = true
             }
 
             if (placedOnAppBar) {
                 chip.chipBackgroundColor = ColorStateList.valueOf(context.getColor(R.color.BlackGray))
+
+            }
+            else {
+                val isDarkMode = context.resources.getBoolean(R.bool.dark_mode)
+                if (!isDarkMode) {
+                    chip.chipBackgroundColor =
+                        ColorStateList.valueOf(context.getColor(android.R.color.background_light))
+                }
+
             }
         }
         else {
