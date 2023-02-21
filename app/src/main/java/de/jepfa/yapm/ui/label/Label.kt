@@ -8,13 +8,15 @@ data class Label(
     val labelId: Int?,
     var name: String,
     var description: String,
-    var colorRGB: Int?) {
+    var colorRGB: Int?,
+    var iconResId: Int? = null
+) {
 
     init {
         name = name.uppercase(Locale.ROOT).trim()
     }
 
-    constructor(name: String, colorRGB: Int?) : this(null, name, "", colorRGB)
+    constructor(name: String, colorRGB: Int?, iconResId: Int? = null) : this(null, name, "", colorRGB, iconResId)
 
     constructor(name: String, description: String) : this(
         null,

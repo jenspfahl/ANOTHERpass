@@ -455,6 +455,17 @@ class ShowCredentialActivity : SecureActivity() {
 
             toolbarChipGroup.removeAllViews()
 
+            if (credential.isExpired(key)) { // expired
+                createAndAddLabelChip(
+                    Label("Expired", getColor(R.color.Red), R.drawable.baseline_lock_clock_24),
+                    toolbarChipGroup,
+                    thinner = false,
+                    this,
+                    outlined = true,
+                    placedOnAppBar = true,
+                )
+            }
+
             val labelHolder = if (mode == Mode.EXTERNAL_FROM_FILE) LabelService.externalHolder else LabelService.defaultHolder
             val labelsForCredential = labelHolder.decryptLabelsForCredential(key, credential)
             if (labelsForCredential.isNotEmpty()) {
@@ -502,8 +513,7 @@ class ShowCredentialActivity : SecureActivity() {
             val expiresAtImageView: ImageView = findViewById(R.id.expires_at_image)
             if (expiresAt != null && expiresAt > 0) {
                 val expiryDate = Date(expiresAt)
-                val now = Date()
-                if (expiryDate.after(now)) {
+                if (!credential.isExpired(key)) {
                     // good
                     expiresAtTextView.text = "Expires ${dateToNiceString(expiryDate, this)}"
                     expiresAtTextView.typeface = Typeface.DEFAULT

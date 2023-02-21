@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.content.res.AppCompatResources
 import com.google.android.material.chip.Chip
 import de.jepfa.yapm.R
 import de.jepfa.yapm.service.PreferenceService
@@ -47,9 +48,11 @@ fun createAndAddLabelChip(
     label: Label,
     container: ViewGroup,
     thinner: Boolean,
-    context: Context?
-): Chip {
-    val chip = createLabelChip(label, thinner, context)
+    context: Context?,
+    outlined: Boolean = false,
+    placedOnAppBar: Boolean = false,
+    ): Chip {
+    val chip = createLabelChip(label, thinner, context, outlined, placedOnAppBar)
     container.addView(chip)
     return chip
 }
@@ -57,7 +60,9 @@ fun createAndAddLabelChip(
 fun createLabelChip(
     label: Label,
     thinner: Boolean,
-    context: Context?
+    context: Context?,
+    outlined: Boolean = false,
+    placedOnAppBar: Boolean = false,
 ): Chip {
     val chip = Chip(context)
     chip.text = label.name
@@ -71,8 +76,30 @@ fun createLabelChip(
         chip.ensureAccessibleTouchTarget(32)
     }
     context?.let {
-        chip.chipBackgroundColor = ColorStateList.valueOf(label.getColor(it))
-        chip.setTextColor(it.getColor(android.R.color.white))
+        if (outlined) {
+            chip.chipStrokeWidth = 1.0F
+            chip.chipStrokeColor = ColorStateList.valueOf(label.getColor(it))
+            chip.setTextColor(label.getColor(it))
+            label.iconResId?.let { iconResId ->
+                chip.chipIcon =
+                    AppCompatResources.getDrawable(context, iconResId)
+                chip.chipIconTint = chip.chipStrokeColor
+                chip.chipEndPadding = 0.0F
+                if (thinner) {
+                    chip.textStartPadding = 0.0F
+                    chip.chipIconSize = 20.0F
+                }
+                chip.isChipIconVisible = true
+            }
+
+            if (placedOnAppBar) {
+                chip.chipBackgroundColor = ColorStateList.valueOf(context.getColor(R.color.BlackGray))
+            }
+        }
+        else {
+            chip.chipBackgroundColor = ColorStateList.valueOf(label.getColor(it))
+            chip.setTextColor(it.getColor(android.R.color.white))
+        }
     }
     return chip
 }

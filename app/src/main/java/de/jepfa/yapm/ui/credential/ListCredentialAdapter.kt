@@ -27,6 +27,7 @@ import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
+import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.ui.label.LabelDialogs
 import de.jepfa.yapm.usecase.credential.ExportCredentialUseCase
 import de.jepfa.yapm.util.*
@@ -336,6 +337,16 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             if (key != null) {
                 name = SecretService.decryptCommonString(key, credential.name)
                 name = enrichId(activity, name, credential.id)
+
+                if (credential.isExpired(key)) { // expired
+                    createAndAddLabelChip(
+                        Label("Expired", activity.getColor(R.color.Red), R.drawable.baseline_lock_clock_24),
+                        credentialLabelContainerGroup,
+                        thinner = true,
+                        itemView.context,
+                        outlined = true,
+                    )
+                }
 
                 val showLabels = PreferenceService.getAsBool(PREF_SHOW_LABELS_IN_LIST, itemView.context)
                 if (showLabels) {

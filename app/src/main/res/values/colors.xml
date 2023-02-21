@@ -8,8 +8,10 @@
 
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="BlackGray">#151515</color>
 
-<!--label colors-->
+
+    <!--label colors-->
     <color name="Red">#FF0000</color>
     <color name="Maroon">#800000</color>
     <color name="Orange">#F39C12</color>

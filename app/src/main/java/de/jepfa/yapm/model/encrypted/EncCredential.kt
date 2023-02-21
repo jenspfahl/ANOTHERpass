@@ -3,6 +3,8 @@ package de.jepfa.yapm.model.encrypted
 import android.content.Intent
 import android.util.Log
 import com.google.gson.JsonElement
+import de.jepfa.yapm.model.secret.SecretKeyHolder
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.util.getEncryptedExtra
 import de.jepfa.yapm.util.putEncryptedExtra
 import java.util.*
@@ -106,6 +108,18 @@ data class EncCredential(val id: Int?,
 
     }
 
+    fun isExpired(key: SecretKeyHolder): Boolean {
+        val expiresAt = SecretService.decryptLong(key, expiresAt)
+        if (expiresAt != null && expiresAt > 0) {
+            val expiryDate = Date(expiresAt)
+            val now = Date()
+            return expiryDate.before(now)
+        }
+        else {
+            return false
+        }
+    }
+
     // Equals not by last? dates and timestamp
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -140,6 +154,7 @@ data class EncCredential(val id: Int?,
         result = 31 * result + isObfuscated.hashCode()
         return result
     }
+
 
     companion object {
         const val EXTRA_CREDENTIAL_ID = "de.jepfa.yapm.ui.credential.id"
