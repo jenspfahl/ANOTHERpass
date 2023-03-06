@@ -198,14 +198,21 @@ class EditCredentialDataFragment : SecureFragment() {
         val buttonNext: Button = view.findViewById(R.id.button_next)
         buttonNext.setOnClickListener {
 
-            if (TextUtils.isEmpty(editCredentialNameView.text)) {
+            val now = Date()
+            if (selectedExpiryDate?.after(now) == false) {
+                toastText(editCredentialActivity, R.string.error_expired_in_the_past)
+                editCredentialExpiredAtSpinner.requestFocus()
+            }
+            else if (TextUtils.isEmpty(editCredentialNameView.text)) {
                 editCredentialNameView.error = getString(R.string.error_field_required)
                 editCredentialNameView.requestFocus()
-            } else {
+            }
+            else {
 
                 masterSecretKey?.let{ key ->
                     saveCurrentUiData(key)
 
+                    openSelectExpiryDateDialog = false
                     findNavController().navigate(R.id.action_EditCredential_DataFragment_to_PasswordFragment)
 
                 }

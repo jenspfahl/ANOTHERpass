@@ -659,6 +659,8 @@
     <string name="expires_in_6_months">Läuft in einem halben Jahr ab</string>
     <string name="expires_in_12_months">Läuft in einem Jahr ab</string>
     <string name="expires_on">Läuft ab am …</string>
+    <string name="error_expired_in_the_past">Ablaufdatum muss in der Zukunft sein!</string>
+
 
 
 </resources>

@@ -666,6 +666,7 @@
     <string name="expires_in_6_months">Expires in half a year</string>
     <string name="expires_in_12_months">Expires in a year</string>
     <string name="expires_on">Expires on …</string>
+    <string name="error_expired_in_the_past">Expiry date must be in the future!</string>
 
 
 </resources>
