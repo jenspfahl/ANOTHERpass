@@ -230,6 +230,7 @@
     <string name="credential_sort_by_recently_modified">Kürzlich geändert (neuste zuerst)</string>
     <string name="credential_sort_by_id">Zugangsdaten-ID</string>
     <string name="show_ids">Zeige Zugangsdaten-IDs</string>
+    <string name="expired_credentials_on_top">Abgelaufene Zugansdaten ganz oben</string>
     <string name="tab_pseudo_phrase">Pseudophrase</string>
     <string name="tab_ordinary">Normales Passwort</string>
     <string name="drop_to_close">APP SCHLIESSEN</string>
@@ -429,6 +430,8 @@
     <string name="summary_show_refresh_mpt_reminder">Erinnerung das Masterpasswort-Token zu erneuern (wenn vorhanden). Dies kann helfen das Risiko zu minimieren, dass ein gestohlenes Token missbräuchlich verwendet wird.</string>
     <string name="show_biometric_smp_reminder">Erinnerung ein biometrisches Merkmal einzurichten (für das gespeicherte Masterpasswort)</string>
     <string name="summary_show_biometric_smp_reminder">Zeige eine Erinnerung wenn das gespeicherte Masterpasswort nicht mit einem biometrischem Merkmal (z.B. Fingerabdruck) geschützt wurde aber dies vom Gerät unterstützt werden würde.</string>
+    <string name="show_expired_passwords_reminder">Erinnerung für abgelaufene Zugangsdaten</string>
+    <string name="summary_show_expired_passwords_reminder">Zeige eine Erinnerung wenn Zugangsdaten abgelaufen sind.</string>
 
     <string name="export_vault_reminder">Tresor wurde geändert und sollte exportiert werden.</string>
     <string name="export_mk_reminder">Masterkey hat sich geändert und sollte exportiert werden.</string>
@@ -437,6 +440,8 @@
     <string name="show_biometric_smp_howto">Wie?</string>
     <string name="refresh_mpt_reminder">Masterpassword-Token sollte erneuert werden.</string>
     <string name="show_refresh_mpt">Jetzt erneuern</string>
+    <string name="expired_passwords_reminder">Einige Zugangsdaten sind abgelaufen</string>
+    <string name="show_expired_passwords">Anzeigen</string>
     <string name="dont_ask_again">Nicht mehr nerven</string>
     <string name="manage_reminder_settings_hint">Erinnerungen können geändert werden unter \'Einstellungen / Erinnerungen\'</string>
     <string name="no_label">OHNE KATEGORIE</string>

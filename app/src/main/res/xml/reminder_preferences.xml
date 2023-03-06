@@ -60,4 +60,13 @@
         app:singleLineTitle="false"
         app:defaultValue="true"/>
 
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:show_expired_passwords_reminder"
+        app:title="@string/show_expired_passwords_reminder"
+        app:summary="@string/summary_show_expired_passwords_reminder"
+        app:allowDividerAbove="true"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:defaultValue="true"/>
+
 </PreferenceScreen>

@@ -25,8 +25,9 @@ object PreferenceService {
      * TODO If you add new preference xml files inside #initDefaults, they should be recognised as well.
      * To achieve this, count the version value up here.
      */
-    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_22"
+    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_25"
 
+    private const val DEFAULT_SHARED_PREFERENCES_NAME = "de.jepfa.yapm_preferences"
     private const val ENC_SHARED_PREFERENCES_NAME = "de.jepfa.yapm.enc-preferences"
 
 
@@ -80,6 +81,10 @@ object PreferenceService {
     const val DATA_REFRESH_MPT_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "refresh_mpt_notification_showed_as"
     const val PREF_SHOW_REFRESH_MPT_REMINDER = PREF_PREFIX + "show_refresh_mpt_reminder"
 
+    const val DATA_EXPIRED_PASSWORDS_NOTIFICATION_SHOWED_AT = DATA_PREFIX + "expired_passwords_notification_showed_at"
+    const val DATA_EXPIRED_PASSWORDS_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "expired_passwords_notification_showed_as"
+    const val PREF_SHOW_EXPIRED_PASSWORDS_REMINDER = PREF_PREFIX + "show_expired_passwords_reminder"
+
     const val PREF_SHOW_LAST_LOGIN_STATE = PREF_PREFIX + "show_last_login_state"
     const val PREF_MAX_LOGIN_ATTEMPTS = PREF_PREFIX + "max_login_attempts"
     const val PREF_SELF_DESTRUCTION = PREF_PREFIX + "drop_vault_if_login_declined"
@@ -132,6 +137,7 @@ object PreferenceService {
 
     const val PREF_CREDENTIAL_SORT_ORDER = PREF_PREFIX + "credential_sort_order"
     const val PREF_SHOW_CREDENTIAL_IDS = PREF_PREFIX + "show_credential_ids"
+    const val PREF_EXPIRED_CREDENTIALS_ON_TOP = PREF_PREFIX + "expired_credentials_on_top"
 
     const val PREF_DARK_MODE = PREF_PREFIX + "dark_mode"
     const val PREF_LANGUAGE = PREF_PREFIX + "language"
@@ -156,6 +162,7 @@ object PreferenceService {
     const val TEMP_BLOB_SETTINGS = TEMP_PREFIX + "blob_settings"
 
     private lateinit var prefs: SharedPreferences
+    private lateinit var prefsFileName: String
 
     /**
      * Must be called before this object can be used!!!
@@ -163,6 +170,7 @@ object PreferenceService {
     fun initStorage(context: Context) {
 
         prefs = initDefaultPrefs(context)
+        prefsFileName = DEFAULT_SHARED_PREFERENCES_NAME
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val encPrefs = initEncPrefs(context)
@@ -177,6 +185,7 @@ object PreferenceService {
                     }
                 }
                 prefs = encPrefs
+                prefsFileName = ENC_SHARED_PREFERENCES_NAME
             }
         }
     }
@@ -186,14 +195,15 @@ object PreferenceService {
         if (context == null) return
         val defaultInitDone = getAsString(STATE_DEFAULT_INIT_DONE, context)
         if (defaultInitDone == null || defaultInitDone != STATE_DEFAULT_INIT_DONE_VERSION) {
-            PreferenceManager.setDefaultValues(context, R.xml.autofill_preferences, true)
-            PreferenceManager.setDefaultValues(context, R.xml.clipboard_preferences, true)
-            PreferenceManager.setDefaultValues(context, R.xml.general_preferences, true)
-            PreferenceManager.setDefaultValues(context, R.xml.login_preferences, true)
-            PreferenceManager.setDefaultValues(context, R.xml.overlay_preferences, true)
-            PreferenceManager.setDefaultValues(context, R.xml.password_generator_preferences, true)
-            PreferenceManager.setDefaultValues(context, R.xml.security_preferences, true)
-            PreferenceManager.setDefaultValues(context, R.xml.reminder_preferences, true)
+            //TODO resets all encrypted prefs
+            PreferenceManager.setDefaultValues(context, prefsFileName, Context.MODE_PRIVATE,  R.xml.autofill_preferences, true)
+            PreferenceManager.setDefaultValues(context, prefsFileName, Context.MODE_PRIVATE, R.xml.clipboard_preferences, true)
+            PreferenceManager.setDefaultValues(context, prefsFileName, Context.MODE_PRIVATE, R.xml.general_preferences, true)
+            PreferenceManager.setDefaultValues(context, prefsFileName, Context.MODE_PRIVATE, R.xml.login_preferences, true)
+            PreferenceManager.setDefaultValues(context, prefsFileName, Context.MODE_PRIVATE, R.xml.overlay_preferences, true)
+            PreferenceManager.setDefaultValues(context, prefsFileName, Context.MODE_PRIVATE, R.xml.password_generator_preferences, true)
+            PreferenceManager.setDefaultValues(context, prefsFileName, Context.MODE_PRIVATE, R.xml.security_preferences, true)
+            PreferenceManager.setDefaultValues(context, prefsFileName, Context.MODE_PRIVATE, R.xml.reminder_preferences, true)
             /*
             If you add new preference xml files here, don't forget to count up STATE_DEFAULT_INIT_DONE_VERSION.
             Also do so when adding new prefs in existing files

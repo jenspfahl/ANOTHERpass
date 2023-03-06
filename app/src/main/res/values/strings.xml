@@ -236,6 +236,7 @@
     <string name="credential_sort_by_recently_modified">Recently modified (recent first)</string>
     <string name="credential_sort_by_id">Credential identifier</string>
     <string name="show_ids">Show credential identifiers</string>
+    <string name="expired_credentials_on_top">Expired credentials on top</string>
     <string name="nothing_placeholder" translatable="false">…</string>
     <string name="unknown_placeholder" translatable="false">\???</string>
     <string name="tab_pseudo_phrase">Pseudo phrase</string>
@@ -439,6 +440,9 @@
     <string name="summary_show_refresh_mpt_reminder">Show a reminder when the Master Password Token should be renewed (if created). This can help to reduce the risk of abusing stolen token.</string>
     <string name="show_biometric_smp_reminder">Reminder to setup biometrics for stored master password</string>
     <string name="summary_show_biometric_smp_reminder">Show a reminder when the stored master password is not protected by a biometric (e.g. a fingerprint) but the device would support it.</string>
+    <string name="show_expired_passwords_reminder">Reminder for expired credentials</string>
+    <string name="summary_show_expired_passwords_reminder">Show a reminder when any credential has been expired.</string>
+
     <string name="export_vault_reminder">Vault should be exported after recent modifications.</string>
     <string name="export_mk_reminder">Master key should be exported after recent modifications.</string>
     <string name="export_mp_reminder">Master password should be strongly exported!</string>
@@ -446,6 +450,8 @@
     <string name="show_biometric_smp_howto">How?</string>
     <string name="refresh_mpt_reminder">Master Password Token should be renewed.</string>
     <string name="show_refresh_mpt">Renew now</string>
+    <string name="expired_passwords_reminder">Some credentials are expired</string>
+    <string name="show_expired_passwords">Show them</string>
     <string name="dont_ask_again">Don\'t nag again</string>
     <string name="manage_reminder_settings_hint">You can manage reminder under Settings / Reminders</string>
     <string name="no_label">WITH NO LABELS</string>

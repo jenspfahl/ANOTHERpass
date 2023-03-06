@@ -15,6 +15,8 @@ import de.jepfa.yapm.service.PreferenceService.DATA_MK_EXPORT_NOTIFICATION_SHOWE
 import de.jepfa.yapm.service.PreferenceService.DATA_MK_MODIFIED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_BIOMETRIC_SMP_NOTIFICATION_SHOWED_AS
 import de.jepfa.yapm.service.PreferenceService.DATA_BIOMETRIC_SMP_NOTIFICATION_SHOWED_AT
+import de.jepfa.yapm.service.PreferenceService.DATA_EXPIRED_PASSWORDS_NOTIFICATION_SHOWED_AS
+import de.jepfa.yapm.service.PreferenceService.DATA_EXPIRED_PASSWORDS_NOTIFICATION_SHOWED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_MPT_CREATED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_MP_EXPORTED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_MP_EXPORT_NOTIFICATION_SHOWED_AS
@@ -29,13 +31,16 @@ import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_MODIFIED_AT
 import de.jepfa.yapm.service.PreferenceService.PREF_REMINDER_PERIOD
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_EXPORT_MK_REMINDER
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_BIOMETRIC_SMP_REMINDER
+import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_EXPIRED_PASSWORDS_REMINDER
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_EXPORT_MP_REMINDER
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_EXPORT_VAULT_REMINDER
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_REFRESH_MPT_REMINDER
 import de.jepfa.yapm.service.biometrix.BiometricUtils
 import de.jepfa.yapm.service.secret.MasterPasswordService
+import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
+import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.ui.exportvault.ExportVaultActivity
 import de.jepfa.yapm.usecase.secret.ExportEncMasterKeyUseCase
 import de.jepfa.yapm.usecase.secret.ExportEncMasterPasswordUseCase
@@ -173,8 +178,35 @@ object ReminderService {
         }
     }
 
+    object ExpiredPasswords: ReminderConfig {
+        override val showIt = { activity: SecureActivity ->
+            PreferenceService.getAsBool(PREF_SHOW_EXPIRED_PASSWORDS_REMINDER, activity)
+        }
+        override val doDeactivate: (SecureActivity) -> Unit = { activity: SecureActivity ->
+            PreferenceService.putBoolean(PREF_SHOW_EXPIRED_PASSWORDS_REMINDER, false, activity)
+        }
+        override val dataNotificationShowedAt = DATA_EXPIRED_PASSWORDS_NOTIFICATION_SHOWED_AT
+        override val dataNotificationShowedAs = DATA_EXPIRED_PASSWORDS_NOTIFICATION_SHOWED_AS
+        override val notificationText = R.string.expired_passwords_reminder
+        override val notificationAction = R.string.show_expired_passwords
+        override val condition = { activity: SecureActivity ->
+            if (!Session.isDenied()) {
+                activity.credentialViewModel.hasExpiredCredentials()
+            }
+            else {
+                false
+            }
+        }
+        override val action: (SecureActivity) -> Unit = { activity: SecureActivity ->
+            // search !!expired
+            if (activity is ListCredentialsActivity) {
+                activity.searchForExpiredCredentials()
+            }
+        }
+    }
 
-    fun showReminders(config: ReminderConfig, view: View, activity: SecureActivity): Boolean {
+
+    private fun showReminders(config: ReminderConfig, view: View, activity: SecureActivity): Boolean {
         val remindEnabled = config.showIt(activity)
         if (!remindEnabled) {
             return false
@@ -244,5 +276,15 @@ object ReminderService {
         }
         val before = System.currentTimeMillis() - (seconds * 1000)
         return date.time < before
+    }
+
+    fun showNextReminder(view: View, activity: SecureActivity): Boolean {
+
+        return showReminders(ExpiredPasswords, view, activity) ||
+                showReminders(MasterPassword, view, activity) ||
+                showReminders(Vault, view, activity) ||
+                showReminders(MasterKey, view, activity) ||
+                showReminders(StoredMasterPassword, view, activity) ||
+                showReminders(RefreshMasterPasswordToken, view, activity)
     }
 }

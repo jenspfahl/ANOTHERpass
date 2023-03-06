@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.*
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.database.repository.CredentialRepository
+import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.ui.YapmApp
 import kotlinx.coroutines.launch
@@ -12,6 +13,7 @@ import java.util.*
 class CredentialViewModel(private val repository: CredentialRepository) : ViewModel() {
 
     val allCredentials: LiveData<List<EncCredential>> = repository.getAll().asLiveData()
+    val expiredCredentialIds = HashSet<Int?>()
 
     fun getById(id: Int): LiveData<EncCredential> {
         return repository.getById(id).asLiveData()
@@ -40,6 +42,10 @@ class CredentialViewModel(private val repository: CredentialRepository) : ViewMo
     fun delete(credential: EncCredential)  = viewModelScope.launch {
         credential.touchModify()
         repository.delete(credential)
+    }
+
+    fun hasExpiredCredentials(): Boolean {
+        return expiredCredentialIds.isNotEmpty()
     }
 }
 
