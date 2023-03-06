@@ -189,9 +189,14 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                 val key = listCredentialsActivity.masterSecretKey
 
                 val filterResults = FilterResults()
+                val filterId = charSequence.startsWith("!!:")
+                val filterExpired = charSequence.startsWith("!!exp")
+                val filterLabel = charSequence.startsWith("!:")
                 val filterAll = charSequence.startsWith("!")
-                val charString =
-                    if (filterAll) charSequence.substring(1).lowercase().trimStart()
+                var charString =
+                    if (filterLabel) charSequence.substring(2).lowercase().trimStart()
+                    else if (filterId) charSequence.substring(3).lowercase().trimStart()
+                    else if (filterAll) charSequence.substring(1).lowercase().trimStart()
                     else charSequence.toString().lowercase()
 
                 if (charString.isEmpty()) {
@@ -205,18 +210,73 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                             val website = SecretService.decryptCommonString(key, credential.website)
                             val user = SecretService.decryptCommonString(key, credential.user)
                             val addInfo = SecretService.decryptCommonString(key, credential.additionalInfo)
+                            val uid = credential.uid?.toBase64String()
+                            val id = credential.id?.toString()
 
-                            if (name.lowercase().contains(charString)) {
-                                filteredList.add(credential)
+                            if (filterExpired) {
+                                if (credential.isExpired(key)) {
+                                    filteredList.add(credential)
+                                }
                             }
-                            else if (filterAll && website.lowercase().contains(charString)) {
-                                filteredList.add(credential)
+                            else if (filterId) {
+                                val exactMatch = charString.endsWith(":")
+                                if (exactMatch) {
+                                    val searchId = charString.removeSuffix(":")
+                                    if (id != null && id == searchId) {
+                                        filteredList.add(credential)
+                                    }
+                                }
+                                else {
+                                    if (id != null && isFilterValue(id, charString)) {
+                                        filteredList.add(credential)
+                                    }
+                                }
                             }
-                            else if (filterAll && user.lowercase().contains(charString)) {
-                                filteredList.add(credential)
+                            else if (filterLabel) {
+                                val labels =
+                                    LabelService.defaultHolder.decryptLabelsForCredential(
+                                        key,
+                                        credential
+                                    )
+                                val exactMatch = charString.endsWith(":")
+                                if (exactMatch) {
+                                    val searchLabel = charString.removeSuffix(":")
+                                    labels.forEach { label ->
+                                        if (label.name.lowercase() == searchLabel) {
+                                            filteredList.add(credential)
+                                        }
+                                    }
+                                }
+                                else {
+                                    labels.forEach { label ->
+                                        if (isFilterValue(label.name, charString)) {
+                                            filteredList.add(credential)
+                                        }
+                                    }
+                                }
                             }
-                            else if (filterAll && addInfo.lowercase().contains(charString)) {
-                                filteredList.add(credential)
+                            else if (filterAll) {
+                                if (isFilterValue(name, charString)) {
+                                    filteredList.add(credential)
+                                }
+                                else if (isFilterValue(website, charString)) {
+                                    filteredList.add(credential)
+                                }
+                                else if (isFilterValue(user, charString)) {
+                                    filteredList.add(credential)
+                                }
+                                else if (isFilterValue(addInfo, charString)) {
+                                    filteredList.add(credential)
+                                }
+                                else if (uid != null && isFilterValue(uid, charString)) {
+                                    filteredList.add(credential)
+                                }
+                            }
+                            else {
+                                // filter only credential name
+                                if (isFilterValue(name, charString)) {
+                                    filteredList.add(credential)
+                                }
                             }
                         }
 
@@ -241,6 +301,10 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                     // in some cases the filter result is null in Android 13, recreate it
                     listCredentialsActivity.recreate()
                 }
+            }
+
+            private fun isFilterValue(value: String, searchString: String): Boolean {
+                return value.lowercase().contains(searchString)
             }
         }
     }
