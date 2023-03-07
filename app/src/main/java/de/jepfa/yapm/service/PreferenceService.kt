@@ -27,8 +27,8 @@ object PreferenceService {
      */
     private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_25"
 
-    private const val DEFAULT_SHARED_PREFERENCES_NAME = "de.jepfa.yapm_preferences"
     private const val ENC_SHARED_PREFERENCES_NAME = "de.jepfa.yapm.enc-preferences"
+    private const val SYSTEM_SHARED_PREFERENCES_NAME = "de.jepfa.yapm.sys-preferences"
 
 
     const val STATE_DEFAULT_INIT_DONE = STATE_PREFIX + "default_init_done"
@@ -162,18 +162,18 @@ object PreferenceService {
     const val TEMP_BLOB_SETTINGS = TEMP_PREFIX + "blob_settings"
 
     private lateinit var prefs: SharedPreferences
-    private lateinit var prefsFileName: String
 
     /**
      * Must be called before this object can be used!!!
      */
     fun initStorage(context: Context) {
 
-        prefs = initDefaultPrefs(context)
-        prefsFileName = DEFAULT_SHARED_PREFERENCES_NAME
+        initDefaultValues(context)
+
+        prefs = getDefaultPrefs(context)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val encPrefs = initEncPrefs(context)
+            val encPrefs = getEncPrefs(context)
             if (encPrefs != null) {
                 if (prefs.all.isNotEmpty()) {
                     try {
@@ -185,30 +185,34 @@ object PreferenceService {
                     }
                 }
                 prefs = encPrefs
-                prefsFileName = ENC_SHARED_PREFERENCES_NAME
             }
         }
     }
 
+    /**
+     * Initializes the default values from the preferences if needed. Initializes them to the
+     * default shared preferences, not the encrypted.
+     */
+    private fun initDefaultValues(context: Context) {
 
-    fun initDefaults(context: Context?) {
-        if (context == null) return
-        val defaultInitDone = getAsString(STATE_DEFAULT_INIT_DONE, context)
+        val systemPreferences = getSystemPrefs(context) // system preferences are never migrated to enc prefs
+
+        val defaultInitDone = systemPreferences.getString(STATE_DEFAULT_INIT_DONE, null)
+
         if (defaultInitDone == null || defaultInitDone != STATE_DEFAULT_INIT_DONE_VERSION) {
-            //TODO resets all encrypted prefs
-            PreferenceManager.setDefaultValues(context, prefsFileName, Context.MODE_PRIVATE,  R.xml.autofill_preferences, true)
-            PreferenceManager.setDefaultValues(context, prefsFileName, Context.MODE_PRIVATE, R.xml.clipboard_preferences, true)
-            PreferenceManager.setDefaultValues(context, prefsFileName, Context.MODE_PRIVATE, R.xml.general_preferences, true)
-            PreferenceManager.setDefaultValues(context, prefsFileName, Context.MODE_PRIVATE, R.xml.login_preferences, true)
-            PreferenceManager.setDefaultValues(context, prefsFileName, Context.MODE_PRIVATE, R.xml.overlay_preferences, true)
-            PreferenceManager.setDefaultValues(context, prefsFileName, Context.MODE_PRIVATE, R.xml.password_generator_preferences, true)
-            PreferenceManager.setDefaultValues(context, prefsFileName, Context.MODE_PRIVATE, R.xml.security_preferences, true)
-            PreferenceManager.setDefaultValues(context, prefsFileName, Context.MODE_PRIVATE, R.xml.reminder_preferences, true)
+            PreferenceManager.setDefaultValues(context, R.xml.autofill_preferences, true)
+            PreferenceManager.setDefaultValues(context, R.xml.clipboard_preferences, true)
+            PreferenceManager.setDefaultValues(context, R.xml.general_preferences, true)
+            PreferenceManager.setDefaultValues(context, R.xml.login_preferences, true)
+            PreferenceManager.setDefaultValues(context, R.xml.overlay_preferences, true)
+            PreferenceManager.setDefaultValues(context, R.xml.password_generator_preferences, true)
+            PreferenceManager.setDefaultValues(context, R.xml.security_preferences, true)
+            PreferenceManager.setDefaultValues(context, R.xml.reminder_preferences, true)
             /*
             If you add new preference xml files here, don't forget to count up STATE_DEFAULT_INIT_DONE_VERSION.
             Also do so when adding new prefs in existing files
              */
-            putString(STATE_DEFAULT_INIT_DONE, STATE_DEFAULT_INIT_DONE_VERSION, context)
+            systemPreferences.set(STATE_DEFAULT_INIT_DONE, STATE_DEFAULT_INIT_DONE_VERSION)
             Log.i("PREFS", "default values set with version $STATE_DEFAULT_INIT_DONE_VERSION")
         }
     }
@@ -326,11 +330,15 @@ object PreferenceService {
         return prefs.all.filter { (k, _) -> k.startsWith(PREF_PREFIX) }
     }
 
-    private fun initDefaultPrefs(context: Context): SharedPreferences {
+    private fun getDefaultPrefs(context: Context): SharedPreferences {
         return PreferenceManager.getDefaultSharedPreferences(context)
     }
 
-    private fun initEncPrefs(context: Context): SharedPreferences? {
+    private fun getSystemPrefs(context: Context): SharedPreferences {
+        return context.getSharedPreferences(SYSTEM_SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
+    }
+
+    private fun getEncPrefs(context: Context): SharedPreferences? {
         return try {
             val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
             EncryptedSharedPreferences.create(
@@ -350,8 +358,10 @@ object PreferenceService {
 fun SharedPreferences.copyTo(dest: SharedPreferences) {
     all.entries.forEach { entry ->
         val key = entry.key
-        val value = entry.value
-        dest.set(key, value)
+        if (!dest.contains(key)) {
+            val value = entry.value
+            dest.set(key, value)
+        }
     }
 }
 

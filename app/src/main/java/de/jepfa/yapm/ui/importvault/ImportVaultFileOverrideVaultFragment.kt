@@ -254,6 +254,7 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
         val externalPasswd = SecretService.decryptPassword(masterSecretKey, externalCredential.password)
         val externalUser = SecretService.decryptCommonString(masterSecretKey, externalCredential.user)
         val externalWebsite = SecretService.decryptCommonString(masterSecretKey, externalCredential.website)
+        val externalExpiresAt = SecretService.decryptLong(masterSecretKey, externalCredential.expiresAt)
         val externalAdditionalInfo =
             SecretService.decryptCommonString(masterSecretKey, externalCredential.additionalInfo)
         val externalLabelIds =
@@ -266,6 +267,7 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
         val existingPasswd = SecretService.decryptPassword(masterSecretKey, existingCredential.password)
         val existingUser = SecretService.decryptCommonString(masterSecretKey, existingCredential.user)
         val existingWebsite = SecretService.decryptCommonString(masterSecretKey, existingCredential.website)
+        val existingExpiresAt = SecretService.decryptLong(masterSecretKey, existingCredential.expiresAt)
         val existingAdditionalInfo =
             SecretService.decryptCommonString(masterSecretKey, existingCredential.additionalInfo)
         val existingLabelIds =
@@ -275,6 +277,7 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
                 && externalPasswd.isEqual(existingPasswd)
                 && externalUser == existingUser
                 && externalWebsite == existingWebsite
+                && externalExpiresAt == existingExpiresAt
                 && externalAdditionalInfo == existingAdditionalInfo
                 && externalLabelIds == existingLabelIds
                 && externalCredential.isObfuscated == existingCredential.isObfuscated

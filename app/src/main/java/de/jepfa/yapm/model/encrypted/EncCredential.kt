@@ -227,7 +227,7 @@ data class EncCredential(val id: Int?,
                     jsonObject.get(ATTRIB_LAST_PASSWORD)?.asString,
                     jsonObject.get(ATTRIB_WEBSITE).asString,
                     jsonObject.get(ATTRIB_LABELS).asString,
-                    jsonObject.get(ATTRIB_EXPIRES_AT).asString,
+                    jsonObject.get(ATTRIB_EXPIRES_AT)?.asString,
                     jsonObject.get(ATTRIB_IS_OBFUSCATED)?.asBoolean ?: false,
                     jsonObject.get(ATTRIB_IS_LAST_PASSWORD_OBFUSCATED)?.asBoolean ?: false,
                     jsonObject.get(ATTRIB_MODIFY_TIMESTAMP)?.asLong
