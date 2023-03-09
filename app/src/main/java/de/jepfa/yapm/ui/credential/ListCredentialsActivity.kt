@@ -4,7 +4,6 @@ import android.app.Activity
 import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Typeface
@@ -22,13 +21,12 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.MenuItemCompat
-import androidx.core.view.forEach
 import androidx.core.view.setPadding
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -50,6 +48,7 @@ import de.jepfa.yapm.service.PreferenceService.DATA_NAV_MENU_VAULT_EXPANDED
 import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_SUGGEST_CREDENTIALS
 import de.jepfa.yapm.service.PreferenceService.PREF_CREDENTIAL_SORT_ORDER
 import de.jepfa.yapm.service.PreferenceService.PREF_EXPIRED_CREDENTIALS_ON_TOP
+import de.jepfa.yapm.service.PreferenceService.PREF_LABEL_FILTER_SINGLE_CHOICE
 import de.jepfa.yapm.service.PreferenceService.PREF_NAV_MENU_ALWAYS_COLLAPSED
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_CREDENTIAL_IDS
 import de.jepfa.yapm.service.PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD
@@ -84,7 +83,6 @@ import de.jepfa.yapm.usecase.vault.DropVaultUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.usecase.vault.ShowVaultInfoUseCase
 import de.jepfa.yapm.util.*
-import de.jepfa.yapm.viewmodel.CredentialViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -423,7 +421,15 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             R.id.menu_filter -> {
                 val inflater: LayoutInflater = layoutInflater
                 val labelsView: View = inflater.inflate(R.layout.content_dynamic_labels_list, null)
+                val container = LinearLayout(this)
+                container.orientation = LinearLayout.VERTICAL
                 val labelsContainer: LinearLayout = labelsView.findViewById(R.id.dynamic_labels)
+
+                val multipleChoiceSwitch = SwitchCompat(this)
+                multipleChoiceSwitch.text = getString(R.string.multiple_choice_selection)
+                multipleChoiceSwitch.isChecked = !PreferenceService.getAsBool(PREF_LABEL_FILTER_SINGLE_CHOICE, this)
+                multipleChoiceSwitch.switchPadding = 16
+                multipleChoiceSwitch.setPadding(32)
 
                 val allLabels = ArrayList<Label>()
                 val noLabel = Label(WITH_NO_LABELS_ID, getString(R.string.no_label), "", null)
@@ -436,11 +442,20 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     chip.isClickable = true
                     chip.isCheckable = true
                     chip.isChecked = LabelFilter.isFilterFor(label)
+                    chip.setOnClickListener {
+                        if (!multipleChoiceSwitch.isChecked) {
+                            allChips
+                                .forEach { it.isChecked = false }
+                            chip.isChecked = true
+                        }
+                    }
                     allChips.add(chip)
                 }
                 val builder = AlertDialog.Builder(this)
-                val container = ScrollView(builder.context)
-                container.addView(labelsView)
+                val scrollView = ScrollView(builder.context)
+                scrollView.addView(labelsView)
+                container.addView(multipleChoiceSwitch)
+                container.addView(scrollView)
 
                 val dialog = AlertDialog.Builder(this)
                     .setTitle(getString(R.string.filter))
@@ -454,6 +469,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 dialog.setOnShowListener {
                     val buttonPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                     buttonPositive.setOnClickListener {
+                        PreferenceService.putBoolean(PREF_LABEL_FILTER_SINGLE_CHOICE, !multipleChoiceSwitch.isChecked, this)
+
                         LabelFilter.unsetAllFilters()
                         for (i in 0 until allChips.size) {
                             val checked = allChips[i].isChecked

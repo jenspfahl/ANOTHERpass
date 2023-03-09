@@ -272,6 +272,7 @@
     <string name="title_drop_vault">Vernichte Tresor</string>
     <string name="message_drop_vault">Du bist dabei ALLE deine Zugangsdaten zu löschen.</string>
     <string name="select_none_all">Keine/Alle</string>
+    <string name="multiple_choice_selection">Erlaube Mehrfachauswahl</string>
     <string name="title_copy_password">Kopiere Passwort</string>
     <string name="message_copy_password">Das Kopieren von Passwörtern in die Zwischenablage kann deine Passwörter preisgeben, da andere Apps ohne Weiters auf Änderungen der Zwischenablage reagieren und diese lesen können. Weiterhin kann das Passwort in der Zwischenablage verbleiben wenn diese eine History-Funktion besitzt (z.B. Samsung Clipboard).\nDu kannst diese Warnung unter \'Einstellungen/Sicherheit\' deaktivieren.</string>
     <string name="head_generate_mpt">Dein Masterpasswort-Token \#%1$d</string>

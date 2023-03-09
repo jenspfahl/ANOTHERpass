@@ -117,6 +117,7 @@ object PreferenceService {
     const val PREF_NAV_MENU_ALWAYS_COLLAPSED = PREF_PREFIX + "nav_menu_always_collapsed"
     const val PREF_COLORIZE_MP_QRCODES = PREF_PREFIX + "colorize_mp_qrcodes"
     const val PREF_QRCODES_WITH_HEADER = PREF_PREFIX + "qrcodes_with_header"
+    const val PREF_LABEL_FILTER_SINGLE_CHOICE = PREF_PREFIX + "label_filter_single_choice"
 
     const val PREF_AUTOFILL_EVERYWHERE = PREF_PREFIX + "autofill_suggest_everywhere"
     const val PREF_AUTOFILL_INLINE_PRESENTATIONS = PREF_PREFIX + "autofill_inline_presentations"
