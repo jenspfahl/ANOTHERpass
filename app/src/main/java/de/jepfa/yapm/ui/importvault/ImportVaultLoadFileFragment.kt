@@ -18,6 +18,7 @@ import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
+import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.FileUtil
 import de.jepfa.yapm.util.toastText
@@ -87,6 +88,9 @@ class ImportVaultLoadFileFragment : BaseFragment() {
             val parsedVault = importVaultActivity.parsedVault
             if (parsedVault == null) {
                 toastText(activity, R.string.toast_import_vault_failure)
+            }
+            else if ((parsedVault.appVersionCode ?: 0) > DebugInfo.getVersionCode(importVaultActivity)) {
+                toastText(activity, R.string.toast_import_vault_from_future_app_version)
             }
             else if (importVaultActivity.isOverrideMode() && parsedVault.vaultId != null && !sameVaultId(parsedVault.vaultId, importVaultActivity)) {
                 toastText(activity, R.string.toast_import_vault_failure_no_vault_match)

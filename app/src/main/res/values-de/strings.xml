@@ -133,6 +133,7 @@
     <string name="drop_vault">Tresor vernichten (alles löschen)</string>
     <string name="chooser_select_file_to_import">Wähle eine Datei zum Importieren aus</string>
     <string name="toast_import_vault_failure">Die ausgewählte Datei kann nicht importiert werden.</string>
+    <string name="toast_import_vault_from_future_app_version">Die ausgewählte Datei wurde von einer zukünftigen App-Version erstellt.</string>
     <string name="toast_import_vault_failure_cipher_not_supported">Die ausgewählte Datei ist mit einem nicht unterstützten Algorithmus verschlüsselt.</string>
     <string name="toast_import_vault_failure_no_vault_match">Die ausgewählte Datei gehört nicht zum aktuellen Tresor.</string>
     <string name="toast_import_vault_failure_not_same_algo">Die ausgewählte Datei verwendet eine andere Verschlüsselung.</string>

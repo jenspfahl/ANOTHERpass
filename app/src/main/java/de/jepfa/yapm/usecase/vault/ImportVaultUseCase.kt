@@ -58,13 +58,14 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
     }
 
 
-    data class ParsedVault(val vaultId: String?, val cipherAlgorithm: CipherAlgorithm?, val content: JsonObject?)
+    data class ParsedVault(val appVersionCode: Int?, val vaultId: String?, val cipherAlgorithm: CipherAlgorithm?, val content: JsonObject?)
 
     fun parseVaultFileContent(content: String, context: Context, handleBlob: Boolean = false): ParsedVault {
         try {
             val masterKeySK = Session.getMasterKeySK()
             val rawJson = JsonParser.parseString(content).asJsonObject
 
+            val appVersionCode = rawJson.get(VaultExportService.JSON_APP_VERSION_CODE)?.asInt
             val vaultId = rawJson.get(VaultExportService.JSON_VAULT_ID)?.asString
             val cipherAlgorithm = rawJson.get(VaultExportService.JSON_CIPHER_ALGORITHM)?.asString?.let { CipherAlgorithm.valueOf(it) }
 
@@ -82,7 +83,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
                                 SecretService.decryptCommonString(masterKeySK, encJsonCredentials)
 
                             if (jsonCredentialsAsString == Validable.FAILED_STRING) {
-                                return ParsedVault(vaultId, cipherAlgorithm, null)
+                                return ParsedVault(appVersionCode, vaultId, cipherAlgorithm, null)
                             }
 
                             val jsonCredentials = JsonParser.parseString(jsonCredentialsAsString).asJsonArray
@@ -112,7 +113,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
                                 SecretService.decryptCommonString(masterKeySK, encJsonLabels)
 
                             if (jsonLabelsAsString == Validable.FAILED_STRING) {
-                                return ParsedVault(vaultId, cipherAlgorithm, null)
+                                return ParsedVault(appVersionCode, vaultId, cipherAlgorithm, null)
                             }
 
                             val jsonLabels = JsonParser.parseString(jsonLabelsAsString).asJsonArray
@@ -143,7 +144,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
                                 SecretService.decryptCommonString(masterKeySK, encJsonAppSettings)
 
                             if (jsonAppSettingsAsString == Validable.FAILED_STRING) {
-                                return ParsedVault(vaultId, cipherAlgorithm, null)
+                                return ParsedVault(appVersionCode, vaultId, cipherAlgorithm, null)
                             }
 
                             val jsonAppSettings = JsonParser.parseString(jsonAppSettingsAsString).asJsonObject
@@ -159,10 +160,10 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
                 }
             }
 
-            return ParsedVault(vaultId, cipherAlgorithm, rawJson)
+            return ParsedVault(appVersionCode, vaultId, cipherAlgorithm, rawJson)
         } catch (e: Exception) {
             Log.e("JSON", "cannot parse JSON", e)
-            return ParsedVault(null, null, null)
+            return ParsedVault(null, null, null, null)
         }
     }
     
