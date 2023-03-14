@@ -58,6 +58,7 @@ import de.jepfa.yapm.service.autofill.ResponseFiller.ACTION_DELIMITER
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelFilter.WITH_NO_LABELS_ID
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.notification.NotificationService
 import de.jepfa.yapm.service.notification.ReminderService
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
 import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
@@ -87,6 +88,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -115,6 +117,13 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private var jumpToItemPosition: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        NotificationService.createNotificationChannel(
+            this,
+            NotificationService.CHANNEL_ID_SCHEDULED,
+            getString(R.string.notification_channel_scheduled_title)
+        )
+
         // session check would bring LoginActivity to front when action is invoked
         checkSession = false
         super.onCreate(savedInstanceState)
@@ -919,7 +928,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
                 masterSecretKey?.let { key ->
 
-                    credentialViewModel.expiredCredentialIds.clear()
+                    credentialViewModel.clearExpiredCredentials()
 
                     credentials.forEach { credential ->
                         LabelService.defaultHolder.updateLabelsForCredential(
@@ -927,9 +936,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                             credential
                         )
 
-                        if (credential.isExpired(key)) {
-                            credentialViewModel.expiredCredentialIds.add(credential.id)
-                        }
+                        credentialViewModel.updateExpiredCredential(credential, key, this)
                     }
 
                     val expiredCredentialsOnTop = PreferenceService.getAsBool(PREF_EXPIRED_CREDENTIALS_ON_TOP, this)
