@@ -58,6 +58,7 @@ import de.jepfa.yapm.service.autofill.ResponseFiller.ACTION_DELIMITER
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelFilter.WITH_NO_LABELS_ID
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.notification.NotificationService
 import de.jepfa.yapm.service.notification.ReminderService
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
 import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
@@ -115,6 +116,13 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private var jumpToItemPosition: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        NotificationService.createNotificationChannel(
+            this,
+            NotificationService.CHANNEL_ID_SCHEDULED,
+            getString(R.string.notification_channel_scheduled_title)
+        )
+
         // session check would bring LoginActivity to front when action is invoked
         checkSession = false
         super.onCreate(savedInstanceState)
@@ -372,7 +380,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     override fun onPostResume() {
         super.onPostResume()
-        updateSearchFieldWithAutofillSuggestion()
+        updateSearchFieldWithAutofillSuggestion() //TODO is this really needed?
     }
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         updateSearchFieldWithAutofillSuggestion()
@@ -383,7 +391,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         if (!Session.isDenied()) {
             intent?.action?.let { action ->
                 Log.i("LST", "action2=$action")
-                if (action.startsWith(ResponseFiller.ACTION_OPEN_VAULT)) {
+                if (action.startsWith(ResponseFiller.ACTION_OPEN_VAULT_FOR_AUTOFILL)) {
                     val suggestCredentials =
                         PreferenceService.getAsBool(PREF_AUTOFILL_SUGGEST_CREDENTIALS, true, this)
                     if (suggestCredentials) {
@@ -391,6 +399,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         if (searchString.isNotBlank()) {
                             startSearchFor("!$searchString")
                         }
+                    }
+                }
+                else if (action.startsWith(ResponseFiller.ACTION_OPEN_VAULT_FOR_FILTERING)) {
+                    val searchString = action.substringAfter(ACTION_DELIMITER).substringBeforeLast(ACTION_DELIMITER).lowercase()
+                    if (searchString.isNotBlank()) {
+                        startSearchFor("$searchString")
                     }
                 }
             }
@@ -919,7 +933,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
                 masterSecretKey?.let { key ->
 
-                    credentialViewModel.expiredCredentialIds.clear()
+                    credentialViewModel.clearExpiredCredentials()
 
                     credentials.forEach { credential ->
                         LabelService.defaultHolder.updateLabelsForCredential(
@@ -927,9 +941,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                             credential
                         )
 
-                        if (credential.isExpired(key)) {
-                            credentialViewModel.expiredCredentialIds.add(credential.id)
-                        }
+                        credentialViewModel.updateExpiredCredential(credential, key, this)
                     }
 
                     val expiredCredentialsOnTop = PreferenceService.getAsBool(PREF_EXPIRED_CREDENTIALS_ON_TOP, this)

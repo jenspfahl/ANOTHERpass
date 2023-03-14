@@ -69,7 +69,7 @@ abstract class SecureActivity : BaseActivity() {
     object SecretChecker {
 
         const val fromSecretChecker = "fromSecretChecker"
-        const val fromAutofill = "fromAutofill"
+        const val fromAutofillOrNotification = "fromAutofill"
         const val loginRequestCode = 38632
 
         private val DELTA_LOGIN_ACTIVITY_INTENDED = TimeUnit.SECONDS.toMillis(5)
@@ -97,7 +97,7 @@ abstract class SecureActivity : BaseActivity() {
                     val intent = Intent(activity, LoginActivity::class.java)
                     intent.putExtras(activity.intent)
                     intent.putExtra(fromSecretChecker, true)
-                    if (activity.intent.getBooleanExtra(fromAutofill, false)) {
+                    if (activity.intent.getBooleanExtra(fromAutofillOrNotification, false)) {
                         activity.startActivityForResult(intent, loginRequestCode)
                         activity.lock()
                     }

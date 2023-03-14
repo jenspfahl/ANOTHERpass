@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:installLocation="internalOnly">
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -44,6 +46,19 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
         </provider>
+
+        <receiver android:name=".service.notification.NotificationScheduleBootReceiver"
+            android:enabled="true" android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".service.notification.AlarmNotificationReceiver"
+            android:enabled="true" android:exported="false">
+            <intent-filter>
+                <action android:name="NOTIFICATION_SERVICE" />
+            </intent-filter>
+        </receiver>
 
         <activity
             android:name=".ui.intro.IntroActivity"
@@ -154,6 +169,7 @@
                 <action android:name="android.service.autofill.AutofillService" />
             </intent-filter>
         </service>
+
     </application>
 
     <queries>

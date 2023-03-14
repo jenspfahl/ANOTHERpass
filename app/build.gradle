@@ -74,18 +74,20 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
     implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.annotation:annotation:1.5.0'
+    implementation 'androidx.annotation:annotation:1.6.0'
     implementation 'androidx.slice:slice-builders:1.0.0'
     implementation 'androidx.autofill:autofill:1.1.0'
+    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.work:work-runtime-ktx:2.8.0'
     implementation 'androidx.core:core-ktx:1.9.0'
     kapt "androidx.room:room-compiler:2.5.0"
     androidTestImplementation "androidx.room:room-testing:2.5.0"
     androidTestImplementation 'androidx.test:core-ktx:1.5.0'
 
     // Lifecycle components
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
-    implementation "androidx.lifecycle:lifecycle-common-java8:2.5.1"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.0"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.6.0"
+    implementation "androidx.lifecycle:lifecycle-common-java8:2.6.0"
 
     // Kotlin components
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -100,7 +102,7 @@ dependencies {
 
     implementation 'com.google.zxing:core:3.4.1'
     implementation 'com.journeyapps:zxing-android-embedded:3.6.0'
-    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.google.code.gson:gson:2.9.0'
 
     implementation 'com.google.android.material:material:1.8.0'
 
@@ -117,7 +119,7 @@ dependencies {
 
     // Testing
     testImplementation "junit:junit:$rootProject.junitVersion"
-    androidTestImplementation "androidx.arch.core:core-testing:2.1.0"
+    androidTestImplementation "androidx.arch.core:core-testing:2.2.0"
     androidTestImplementation ("androidx.test.espresso:espresso-core:3.5.1", {
       //  exclude group: 'com.android.support', module: 'support-annotations'
     })

@@ -37,7 +37,8 @@ import java.util.*
 object ResponseFiller {
 
     const val ACTION_DELIMITER = "$"
-    const val ACTION_OPEN_VAULT = "openVault"
+    const val ACTION_OPEN_VAULT_FOR_AUTOFILL = "openVault"
+    const val ACTION_OPEN_VAULT_FOR_FILTERING = "openAndFilter"
     const val ACTION_CLOSE_VAULT = "closeVault"
     const val ACTION_EXCLUDE_FROM_AUTOFILL = "excludeFromAutofill"
     const val ACTION_PAUSE_AUTOFILL = "pauseAutofill"
@@ -252,7 +253,7 @@ object ResponseFiller {
         createAuthDataSets(structure, fields.getAllFields(),
             R.drawable.ic_baseline_arrow_back_24_gray,
             context.getString(R.string.go_back_to_app),
-            ACTION_OPEN_VAULT,
+            ACTION_OPEN_VAULT_FOR_AUTOFILL,
             true,
             context)
             .forEach { dataSets.add(it) }
@@ -326,14 +327,14 @@ object ResponseFiller {
             createAuthDataSets(structure,
                 fields.getAllFields(),
                 R.drawable.ic_lock_open_gray_24dp,
-                context.getString(R.string.login_required_first), ACTION_OPEN_VAULT, true, context)
+                context.getString(R.string.login_required_first), ACTION_OPEN_VAULT_FOR_AUTOFILL, true, context)
                 .forEach { responseBuilder.addDataset(it) }
         }
         else {
             createAuthDataSets(structure,
                 fields.getAllFields(),
                 R.drawable.ic_baseline_list_gray_24,
-                context.getString(R.string.select_credential_for_autofill), ACTION_OPEN_VAULT, true, context)
+                context.getString(R.string.select_credential_for_autofill), ACTION_OPEN_VAULT_FOR_AUTOFILL, true, context)
                 .forEach { responseBuilder.addDataset(it) }
         }
 
@@ -388,7 +389,7 @@ object ResponseFiller {
 
     private fun createPendingIntent(context: Context, action: String, actionData: String?): PendingIntent {
         val authIntent = Intent(context, ListCredentialsActivity::class.java)
-        authIntent.putExtra(SecureActivity.SecretChecker.fromAutofill, true)
+        authIntent.putExtra(SecureActivity.SecretChecker.fromAutofillOrNotification, true)
         if (actionData != null) {
             authIntent.action = "$action$ACTION_DELIMITER$actionData" // do it as extra doesn't work (extra gets lost)
         }

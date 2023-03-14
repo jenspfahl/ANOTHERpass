@@ -61,6 +61,7 @@ object PreferenceService {
     const val PREF_SHOW_EXPORT_MK_REMINDER = PREF_PREFIX + "show_export_mk_reminder"
 
     const val DATA_MPT_CREATED_AT = DATA_PREFIX + "mpt_created_at"
+    const val DATA_EXPIRY_DATES = DATA_PREFIX + "expiry_dates"
 
     const val DATA_NAV_MENU_QUICK_ACCESS_EXPANDED = DATA_PREFIX + "nav_menu_quick_access_expanded"
     const val DATA_NAV_MENU_EXPORT_EXPANDED = DATA_PREFIX + "nav_menu_export_expanded"
@@ -315,20 +316,27 @@ object PreferenceService {
         prefs.remove(prefKey)
     }
 
-    fun deleteAllData(context: Context) {
-        prefs.all
-            .filter { (k, _) -> k.startsWith(DATA_PREFIX) }
+    fun deleteAllData(context: Context?) {
+        deleteAllStartingWith(DATA_PREFIX, context)
+    }
+
+
+    fun getAllStartingWith(prefix:String, context: Context?): Map<String, Any?> {
+        return prefs.all.filter { (k, _) -> k.startsWith(prefix) }
+    }
+
+    fun deleteAllStartingWith(prefix: String, context: Context?) {
+        getAllStartingWith(prefix, context)
             .forEach { (k, _) -> delete(k, context)}
     }
 
     fun deleteAllTempData(context: Context) {
-        prefs.all
-            .filter { (k, _) -> k.startsWith(TEMP_PREFIX) }
+        getAllStartingWith(TEMP_PREFIX, context)
             .forEach { (k, _) -> delete(k, context)}
     }
 
     fun getAllPrefs(context: Context): Map<String, Any?> {
-        return prefs.all.filter { (k, _) -> k.startsWith(PREF_PREFIX) }
+        return getAllStartingWith(PREF_PREFIX, context)
     }
 
     private fun getDefaultPrefs(context: Context): SharedPreferences {

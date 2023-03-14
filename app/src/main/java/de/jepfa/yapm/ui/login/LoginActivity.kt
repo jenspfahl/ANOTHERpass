@@ -60,7 +60,7 @@ class LoginActivity : NfcBaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofill, false)
+        isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofillOrNotification, false)
         loginAttempts = PreferenceService.getAsInt(STATE_LOGIN_ATTEMPTS,  this)
 
         super.onCreate(null)
@@ -265,7 +265,7 @@ class LoginActivity : NfcBaseActivity() {
         PreferenceService.putCurrentDate(STATE_LOGIN_SUCCEEDED_AT, this)
         PreferenceService.delete(STATE_LOGIN_ATTEMPTS, this)
 
-        val isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofill, false)
+        val isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofillOrNotification, false)
         if (isFromAutofill) {
             setResult(SecretChecker.loginRequestCode, intent)
         }
