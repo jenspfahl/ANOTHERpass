@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatSpinner
 
-class DropDownList(context: Context, attributeSet: AttributeSet): AppCompatSpinner(context, attributeSet) {
+class DropDownList(context: Context, attributeSet: AttributeSet?): AppCompatSpinner(context, attributeSet) {
 
     override fun setSelection(position: Int, animate: Boolean) {
         val sameSelected = position == selectedItemPosition

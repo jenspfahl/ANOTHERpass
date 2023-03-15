@@ -1,15 +1,19 @@
 package de.jepfa.yapm.ui.credential
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.database.Cursor
+import android.database.MatrixCursor
 import android.graphics.Bitmap
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
+import android.provider.BaseColumns
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
@@ -84,12 +88,17 @@ import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.usecase.vault.ShowVaultInfoUseCase
 import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.Constants.ACTION_DELIMITER
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_ID
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_IN_ALL
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_LABEL
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_UID
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_USER
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_WEBSITE
 import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_EXPIRED
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 
 /**
@@ -311,7 +320,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         this.searchItem = searchItem
         val searchView = MenuItemCompat.getActionView(searchItem) as SearchView
 
-        val searchPlate = searchView.findViewById(R.id.search_src_text) as EditText
+        val searchPlate = searchView.findViewById(R.id.search_src_text) as AutoCompleteTextView
+        searchPlate.threshold = 1
+
         searchPlate.hint = getString(R.string.search)
         val searchPlateView: View =
             searchView.findViewById(R.id.search_plate)
@@ -322,14 +333,55 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             )
         )
 
+        val from = arrayOf(SearchManager.SUGGEST_COLUMN_TEXT_1)
+        val to = intArrayOf(R.id.search_suggestion)
+        val cursorAdapter = androidx.cursoradapter.widget.SimpleCursorAdapter(this, R.layout.content_search_suggestion, null, from, to, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER)
+        val suggestions = listOf(
+            SEARCH_COMMAND_SEARCH_IN_ALL,
+            SEARCH_COMMAND_SEARCH_LABEL,
+            SEARCH_COMMAND_SEARCH_ID,
+            SEARCH_COMMAND_SEARCH_UID,
+            SEARCH_COMMAND_SEARCH_USER,
+            SEARCH_COMMAND_SEARCH_WEBSITE,
+            SEARCH_COMMAND_SHOW_EXPIRED,
+        )
+
+        searchView.suggestionsAdapter = cursorAdapter
+
+        searchView.setOnSuggestionListener(object: SearchView.OnSuggestionListener {
+            override fun onSuggestionSelect(position: Int): Boolean {
+                return false
+            }
+
+            @SuppressLint("Range")
+            override fun onSuggestionClick(position: Int): Boolean {
+                val cursor = searchView.suggestionsAdapter.getItem(position) as Cursor
+                val selection = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1))
+                searchView.setQuery(selection, false)
+
+                return true
+            }
+        })
+
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 searchItem.collapseActionView()
                 return false
             }
 
-            override fun onQueryTextChange(s: String?): Boolean {
-                listCredentialAdapter?.filter?.filter(s)
+            override fun onQueryTextChange(query: String?): Boolean {
+                listCredentialAdapter?.filter?.filter(query)
+
+                val cursor = MatrixCursor(arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1))
+                query?.let {
+                    suggestions.forEachIndexed { index, suggestion ->
+                        if (suggestion.startsWith(it, ignoreCase = true)) {
+                            cursor.addRow(arrayOf(index, suggestion))
+                        }
+                    }
+                }
+
+                cursorAdapter.changeCursor(cursor)
 
                 return false
             }
