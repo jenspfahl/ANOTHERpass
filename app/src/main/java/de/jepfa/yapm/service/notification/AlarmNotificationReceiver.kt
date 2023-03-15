@@ -9,6 +9,7 @@ import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
+import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.removeTime
 import de.jepfa.yapm.util.toSimpleDateFormat
 import java.util.*
@@ -38,14 +39,14 @@ class AlarmNotificationReceiver : BroadcastReceiver() {
 
         if (expiryDateForId != null) {
             val contentIntent = createPendingExpiryIntent(context, id,
-                action = "${ResponseFiller.ACTION_OPEN_VAULT_FOR_FILTERING}}${ResponseFiller.ACTION_DELIMITER}!!:$id:" )
+                action = "${Constants.ACTION_OPEN_VAULT_FOR_FILTERING}}${Constants.ACTION_DELIMITER}${Constants.SEARCH_COMMAND_SEARCH_ID}${Constants.SEARCH_COMMAND_END}" )
             val actionIntent = createPendingExpiryIntent(context, id,
-                action = "${ResponseFiller.ACTION_OPEN_VAULT_FOR_FILTERING}}${ResponseFiller.ACTION_DELIMITER}!!expired" )
+                action = "${Constants.ACTION_OPEN_VAULT_FOR_FILTERING}}${Constants.ACTION_DELIMITER}${Constants.SEARCH_COMMAND_SHOW_EXPIRED}" )
             NotificationService.pushNotification(
                 context,
                 NotificationService.CHANNEL_ID_SCHEDULED,
-                "A credential has been expired",
-                "The credential has been expired on " + expiryDateForId.toSimpleDateFormat(),
+                "A credential is expired",
+                "The credential is expired on " + expiryDateForId.toSimpleDateFormat(),
                 id,
                 contentIntent,
                 "Show all expired credentials",

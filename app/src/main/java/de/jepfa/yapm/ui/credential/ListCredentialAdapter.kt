@@ -31,6 +31,12 @@ import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.ui.label.LabelDialogs
 import de.jepfa.yapm.usecase.credential.ExportCredentialUseCase
 import de.jepfa.yapm.util.*
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_END
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_ID
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_IN_ALL
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_LABEL
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_UID
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_EXPIRED
 import java.util.*
 
 
@@ -189,14 +195,16 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                 val key = listCredentialsActivity.masterSecretKey
 
                 val filterResults = FilterResults()
-                val filterId = charSequence.startsWith("!!:")
-                val filterExpired = charSequence.startsWith("!!exp")
-                val filterLabel = charSequence.startsWith("!:")
-                val filterAll = charSequence.startsWith("!")
+                val filterId = charSequence.startsWith(SEARCH_COMMAND_SEARCH_ID)
+                val filterUid = charSequence.startsWith(SEARCH_COMMAND_SEARCH_UID)
+                val filterExpired = charSequence.startsWith(SEARCH_COMMAND_SHOW_EXPIRED)
+                val filterLabel = charSequence.startsWith(SEARCH_COMMAND_SEARCH_LABEL)
+                val filterAll = charSequence.startsWith(SEARCH_COMMAND_SEARCH_IN_ALL)
                 var charString =
-                    if (filterLabel) charSequence.substring(2).lowercase().trimStart()
-                    else if (filterId) charSequence.substring(3).lowercase().trimStart()
-                    else if (filterAll) charSequence.substring(1).lowercase().trimStart()
+                    if (filterLabel) charSequence.substring(SEARCH_COMMAND_SEARCH_LABEL.length).lowercase().trimStart()
+                    else if (filterId) charSequence.substring(SEARCH_COMMAND_SEARCH_ID.length).lowercase().trimStart()
+                    else if (filterUid) charSequence.substring(SEARCH_COMMAND_SEARCH_UID.length).lowercase().trimStart()
+                    else if (filterAll) charSequence.substring(SEARCH_COMMAND_SEARCH_IN_ALL.length).lowercase().trimStart()
                     else charSequence.toString().lowercase()
 
                 if (charString.isEmpty()) {
@@ -219,9 +227,9 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                                 }
                             }
                             else if (filterId) {
-                                val exactMatch = charString.endsWith(":")
+                                val exactMatch = charString.endsWith(SEARCH_COMMAND_END)
                                 if (exactMatch) {
-                                    val searchId = charString.removeSuffix(":")
+                                    val searchId = charString.removeSuffix(SEARCH_COMMAND_END)
                                     if (id != null && id == searchId) {
                                         filteredList.add(credential)
                                     }
@@ -232,15 +240,29 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                                     }
                                 }
                             }
+                            else if (filterUid) {
+                                val exactMatch = charString.endsWith(SEARCH_COMMAND_END)
+                                if (exactMatch) {
+                                    val searchUid = charString.removeSuffix(SEARCH_COMMAND_END)
+                                    if (uid != null && uid == searchUid) {
+                                        filteredList.add(credential)
+                                    }
+                                }
+                                else {
+                                    if (uid != null && isFilterValue(uid, charString)) {
+                                        filteredList.add(credential)
+                                    }
+                                }
+                            }
                             else if (filterLabel) {
                                 val labels =
                                     LabelService.defaultHolder.decryptLabelsForCredential(
                                         key,
                                         credential
                                     )
-                                val exactMatch = charString.endsWith(":")
+                                val exactMatch = charString.endsWith(SEARCH_COMMAND_END)
                                 if (exactMatch) {
-                                    val searchLabel = charString.removeSuffix(":")
+                                    val searchLabel = charString.removeSuffix(SEARCH_COMMAND_END)
                                     labels.forEach { label ->
                                         if (label.name.lowercase() == searchLabel) {
                                             filteredList.add(credential)

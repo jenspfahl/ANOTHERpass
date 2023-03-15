@@ -54,7 +54,6 @@ import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_CREDENTIAL_IDS
 import de.jepfa.yapm.service.PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD
 import de.jepfa.yapm.service.PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_RELOAD
 import de.jepfa.yapm.service.autofill.ResponseFiller
-import de.jepfa.yapm.service.autofill.ResponseFiller.ACTION_DELIMITER
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelFilter.WITH_NO_LABELS_ID
 import de.jepfa.yapm.service.label.LabelService
@@ -84,6 +83,8 @@ import de.jepfa.yapm.usecase.vault.DropVaultUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.usecase.vault.ShowVaultInfoUseCase
 import de.jepfa.yapm.util.*
+import de.jepfa.yapm.util.Constants.ACTION_DELIMITER
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_EXPIRED
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -129,18 +130,18 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         super.onCreate(savedInstanceState)
         intent?.action?.let { action ->
             Log.i("LST", "action=$action")
-            if (action.startsWith(ResponseFiller.ACTION_CLOSE_VAULT)) {
+            if (action.startsWith(Constants.ACTION_CLOSE_VAULT)) {
                 Session.lock()
                 pushBackAutofill(allowCreateAuthentication = true)
                 toastText(this, R.string.vault_locked)
                 return
             }
-            if (action.startsWith(ResponseFiller.ACTION_EXCLUDE_FROM_AUTOFILL)) {
+            if (action.startsWith(Constants.ACTION_EXCLUDE_FROM_AUTOFILL)) {
                 pushBackAutofill(ignoreCurrentApp = true)
                 toastText(this, R.string.excluded_from_autofill)
                 return
             }
-            if (action.startsWith(ResponseFiller.ACTION_PAUSE_AUTOFILL)) {
+            if (action.startsWith(Constants.ACTION_PAUSE_AUTOFILL)) {
                 val pauseDurationInSec = PreferenceService.getAsString(PreferenceService.PREF_AUTOFILL_DEACTIVATION_DURATION, this)
                 if (pauseDurationInSec != null) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -392,7 +393,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         if (!Session.isDenied()) {
             intent?.action?.let { action ->
                 Log.i("LST", "action2=$action")
-                if (action.startsWith(ResponseFiller.ACTION_OPEN_VAULT_FOR_AUTOFILL)) {
+                if (action.startsWith(Constants.ACTION_OPEN_VAULT_FOR_AUTOFILL)) {
                     val suggestCredentials =
                         PreferenceService.getAsBool(PREF_AUTOFILL_SUGGEST_CREDENTIALS, true, this)
                     if (suggestCredentials) {
@@ -402,7 +403,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         }
                     }
                 }
-                else if (action.startsWith(ResponseFiller.ACTION_OPEN_VAULT_FOR_FILTERING)) {
+                else if (action.startsWith(Constants.ACTION_OPEN_VAULT_FOR_FILTERING)) {
                     val searchString = action.substringAfter(ACTION_DELIMITER).substringBeforeLast(ACTION_DELIMITER).lowercase()
                     if (searchString.isNotBlank()) {
                         startSearchFor("$searchString")
@@ -1143,7 +1144,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     }
 
     fun searchForExpiredCredentials() {
-        startSearchFor("!!expired")
+        startSearchFor(SEARCH_COMMAND_SHOW_EXPIRED)
     }
 
     private fun startSearchFor(searchString: String) {

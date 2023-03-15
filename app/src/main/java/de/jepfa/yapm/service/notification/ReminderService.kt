@@ -198,7 +198,6 @@ object ReminderService {
             }
         }
         override val action: (SecureActivity) -> Unit = { activity: SecureActivity ->
-            // search !!expired
             if (activity is ListCredentialsActivity) {
                 activity.searchForExpiredCredentials()
             }

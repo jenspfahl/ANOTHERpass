@@ -27,4 +27,21 @@ object Constants {
     const val FAST_KEYGEN_VAULT_VERSION = 2
     const val CURRENT_VERSION = FAST_KEYGEN_VAULT_VERSION
 
+
+    const val ACTION_DELIMITER = "$"
+    const val ACTION_OPEN_VAULT_FOR_AUTOFILL = "openVault"
+    const val ACTION_OPEN_VAULT_FOR_FILTERING = "openAndFilter"
+    const val ACTION_CLOSE_VAULT = "closeVault"
+    const val ACTION_EXCLUDE_FROM_AUTOFILL = "excludeFromAutofill"
+    const val ACTION_PAUSE_AUTOFILL = "pauseAutofill"
+
+
+    const val SEARCH_COMMAND_SEARCH_IN_ALL = "!"
+    const val SEARCH_COMMAND_SHOW_EXPIRED = "!!exp"
+    const val SEARCH_COMMAND_SEARCH_ID = "!!id:"
+    const val SEARCH_COMMAND_SEARCH_UID = "!!uid:"
+    const val SEARCH_COMMAND_SEARCH_LABEL = "!!tag:"
+
+    const val SEARCH_COMMAND_END = ";"
+
 }

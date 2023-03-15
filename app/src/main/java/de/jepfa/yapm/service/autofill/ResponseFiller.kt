@@ -29,19 +29,17 @@ import de.jepfa.yapm.service.PreferenceService.STATE_PAUSE_AUTOFILL
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
+import de.jepfa.yapm.util.Constants.ACTION_CLOSE_VAULT
+import de.jepfa.yapm.util.Constants.ACTION_DELIMITER
+import de.jepfa.yapm.util.Constants.ACTION_EXCLUDE_FROM_AUTOFILL
+import de.jepfa.yapm.util.Constants.ACTION_OPEN_VAULT_FOR_AUTOFILL
+import de.jepfa.yapm.util.Constants.ACTION_PAUSE_AUTOFILL
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.getAppNameFromPackage
 import java.util.*
 
 @RequiresApi(Build.VERSION_CODES.O)
 object ResponseFiller {
-
-    const val ACTION_DELIMITER = "$"
-    const val ACTION_OPEN_VAULT_FOR_AUTOFILL = "openVault"
-    const val ACTION_OPEN_VAULT_FOR_FILTERING = "openAndFilter"
-    const val ACTION_CLOSE_VAULT = "closeVault"
-    const val ACTION_EXCLUDE_FROM_AUTOFILL = "excludeFromAutofill"
-    const val ACTION_PAUSE_AUTOFILL = "pauseAutofill"
 
     private const val VIEW_TO_IDENTIFY = "text"
     private val PASSWORD_INDICATORS = listOf("password", "passwd", "passphrase",
