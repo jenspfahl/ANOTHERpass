@@ -95,6 +95,8 @@ import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_UID
 import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_USER
 import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_WEBSITE
 import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_EXPIRED
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_EXPIRES
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_VEILED
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -344,6 +346,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             SEARCH_COMMAND_SEARCH_USER,
             SEARCH_COMMAND_SEARCH_WEBSITE,
             SEARCH_COMMAND_SHOW_EXPIRED,
+            SEARCH_COMMAND_SHOW_EXPIRES,
+            SEARCH_COMMAND_SHOW_VEILED,
         )
 
         searchView.suggestionsAdapter = cursorAdapter

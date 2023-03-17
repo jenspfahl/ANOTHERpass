@@ -39,9 +39,9 @@ class AlarmNotificationReceiver : BroadcastReceiver() {
 
         if (expiryDateForId != null) {
             val contentIntent = createPendingExpiryIntent(context, id,
-                action = "${Constants.ACTION_OPEN_VAULT_FOR_FILTERING}}${Constants.ACTION_DELIMITER}${Constants.SEARCH_COMMAND_SEARCH_ID}${Constants.SEARCH_COMMAND_END}" )
+                action = "${Constants.ACTION_OPEN_VAULT_FOR_FILTERING}}${Constants.ACTION_DELIMITER}${Constants.SEARCH_COMMAND_SEARCH_ID}$id${Constants.SEARCH_COMMAND_END}" )
             val actionIntent = createPendingExpiryIntent(context, id,
-                action = "${Constants.ACTION_OPEN_VAULT_FOR_FILTERING}}${Constants.ACTION_DELIMITER}${Constants.SEARCH_COMMAND_SHOW_EXPIRED}" )
+                action = "${Constants.ACTION_OPEN_VAULT_FOR_FILTERING}}${Constants.ACTION_DELIMITER}${Constants.SEARCH_COMMAND_SHOW_EXPIRED} " ) //tailing whitespace to not open autocomplete
             NotificationService.pushNotification(
                 context,
                 NotificationService.CHANNEL_ID_SCHEDULED,

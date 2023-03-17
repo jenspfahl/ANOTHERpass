@@ -32,6 +32,7 @@ import de.jepfa.yapm.ui.label.LabelDialogs
 import de.jepfa.yapm.usecase.credential.ExportCredentialUseCase
 import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_END
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_EXTENDED_SEARCH
 import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_ID
 import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_IN_ALL
 import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_LABEL
@@ -39,6 +40,8 @@ import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_UID
 import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_USER
 import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_WEBSITE
 import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_EXPIRED
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_EXPIRES
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_VEILED
 import java.util.*
 
 
@@ -200,10 +203,13 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                 val filterId = charSequence.startsWith(SEARCH_COMMAND_SEARCH_ID)
                 val filterUid = charSequence.startsWith(SEARCH_COMMAND_SEARCH_UID)
                 val filterExpired = charSequence.startsWith(SEARCH_COMMAND_SHOW_EXPIRED)
+                val filterExpires = charSequence.startsWith(SEARCH_COMMAND_SHOW_EXPIRES)
+                val filterVeiled = charSequence.startsWith(SEARCH_COMMAND_SHOW_VEILED)
                 val filterLabel = charSequence.startsWith(SEARCH_COMMAND_SEARCH_LABEL)
                 val filterUser = charSequence.startsWith(SEARCH_COMMAND_SEARCH_USER)
                 val filterWebsite = charSequence.startsWith(SEARCH_COMMAND_SEARCH_WEBSITE)
-                val filterAll = charSequence.startsWith(SEARCH_COMMAND_SEARCH_IN_ALL)
+                var filterAll = charSequence.startsWith(SEARCH_COMMAND_SEARCH_IN_ALL)
+                val filterExtended = charSequence.startsWith(SEARCH_COMMAND_EXTENDED_SEARCH)
                 var charString =
                     if (filterLabel) charSequence.substring(SEARCH_COMMAND_SEARCH_LABEL.length).lowercase().trimStart()
                     else if (filterUser) charSequence.substring(SEARCH_COMMAND_SEARCH_USER.length).lowercase().trimStart()
@@ -211,6 +217,10 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                     else if (filterId) charSequence.substring(SEARCH_COMMAND_SEARCH_ID.length).lowercase().trimStart()
                     else if (filterUid) charSequence.substring(SEARCH_COMMAND_SEARCH_UID.length).lowercase().trimStart()
                     else if (filterAll) charSequence.substring(SEARCH_COMMAND_SEARCH_IN_ALL.length).lowercase().trimStart()
+                    else if (filterExtended) {
+                        filterAll = true // map to filter all
+                        charSequence.substring(SEARCH_COMMAND_EXTENDED_SEARCH.length).lowercase().trimStart()
+                    }
                     else charSequence.toString().lowercase()
 
                 if (charString.isEmpty()) {
@@ -224,11 +234,22 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                             val website = SecretService.decryptCommonString(key, credential.website)
                             val user = SecretService.decryptCommonString(key, credential.user)
                             val addInfo = SecretService.decryptCommonString(key, credential.additionalInfo)
+                            val expiredAt = SecretService.decryptLong(key, credential.expiresAt)
                             val uid = credential.uid?.toBase64String()
                             val id = credential.id?.toString()
 
                             if (filterExpired) {
                                 if (credential.isExpired(key)) {
+                                    filteredList.add(credential)
+                                }
+                            }
+                            else if (filterExpires) {
+                                if ((expiredAt != null) && (expiredAt > 0)) {
+                                    filteredList.add(credential)
+                                }
+                            }
+                            else if (filterVeiled) {
+                                if (credential.isObfuscated) {
                                     filteredList.add(credential)
                                 }
                             }
