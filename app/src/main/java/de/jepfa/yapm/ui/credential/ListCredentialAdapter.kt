@@ -118,6 +118,18 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             AlertDialog.Builder(listCredentialsActivity)
                 .setTitle(R.string.title_credential_details)
                 .setMessage(sb.toString())
+                .setNegativeButton(R.string.close, null)
+                .setNeutralButton(R.string.copy_universal_identifier) { _, _ ->
+                    current.uid?.let { uid ->
+                        ClipboardUtil.copy(
+                            listCredentialsActivity.getString(R.string.universal_identifier),
+                            shortenBase64String(uid.toBase64String()),
+                            listCredentialsActivity,
+                            isSensible = false,
+                        )
+                    }
+                    toastText(listCredentialsActivity, R.string.universal_identifier_copied)
+                }
                 .show()
 
             true

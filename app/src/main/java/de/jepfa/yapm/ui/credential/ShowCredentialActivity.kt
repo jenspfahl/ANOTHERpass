@@ -398,6 +398,18 @@ class ShowCredentialActivity : SecureActivity() {
                 AlertDialog.Builder(this)
                     .setTitle(R.string.title_credential_details)
                     .setMessage(sb.toString())
+                    .setNegativeButton(R.string.close, null)
+                    .setNeutralButton(R.string.copy_universal_identifier) { _, _ ->
+                        credential.uid?.let { uid ->
+                            ClipboardUtil.copy(
+                                this.getString(R.string.universal_identifier),
+                                shortenBase64String(uid.toBase64String()),
+                                this,
+                                isSensible = false,
+                            )
+                        }
+                        toastText(this, R.string.universal_identifier_copied)
+                    }
                     .show()
 
                 return true

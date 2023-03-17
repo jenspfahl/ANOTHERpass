@@ -48,11 +48,11 @@ object ClipboardUtil {
         }
     }
 
-    fun copy(label: String, text: CharSequence, context: Context) {
+    fun copy(label: String, text: CharSequence, context: Context, isSensible: Boolean = true) {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText(label, text)
         clip.description.extras = PersistableBundle().apply {
-            putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, true)
+            putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, isSensible)
         }
 
         clipboard.setPrimaryClip(clip)
