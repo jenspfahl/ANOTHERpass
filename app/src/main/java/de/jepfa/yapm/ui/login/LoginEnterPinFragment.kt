@@ -31,6 +31,7 @@ import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.usecase.secret.RemoveStoredMasterPasswordUseCase
+import de.jepfa.yapm.usecase.secret.RevokeMasterPasswordTokenUseCase
 import de.jepfa.yapm.usecase.session.LoginUseCase
 import de.jepfa.yapm.util.dateTimeToNiceString
 import de.jepfa.yapm.util.putEncrypted
@@ -68,12 +69,13 @@ class LoginEnterPinFragment : BaseFragment() {
 
         nextButton.setOnLongClickListener{
             AlertDialog.Builder(loginActivity)
-                .setTitle(getString(R.string.delete_stored_masterpasswd))
-                .setMessage(getString(R.string.delete_stored_masterpasswd_confirmation))
+                .setTitle(getString(R.string.revoke_quick_access))
+                .setMessage(getString(R.string.revoke_quick_access_desc))
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                .setPositiveButton(android.R.string.yes) { _, _ ->
                     RemoveStoredMasterPasswordUseCase.execute(loginActivity)
-                    toastText(loginActivity, R.string.masterpassword_removed)
+                    RevokeMasterPasswordTokenUseCase.execute(loginActivity)
+                    toastText(loginActivity, R.string.quick_access_revoked)
                 }
                 .setNegativeButton(android.R.string.no, null)
                 .show()

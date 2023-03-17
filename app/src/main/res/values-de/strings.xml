@@ -81,6 +81,9 @@
     <string name="button_login">Login</string>
     <string name="password_required">Passwort erforderlich</string>
     <string name="delete_stored_masterpasswd">Entferne Masterpasswort</string>
+    <string name="revoke_quick_access">Schnellzugriff entfernen</string>
+    <string name="revoke_quick_access_desc">Dies entfernt das gespeicherte Masterpassword sowie das Masterpasswort-Token (MPT) vom Gerät. Um sich einzuloggen wird dann das Exportierte Master Password (EMP) benötigt.</string>
+    <string name="quick_access_revoked">Schnellzugriff wurde entfernt</string>
     <string name="password_wrong">PIN oder Masterpasswort nicht korrekt</string>
     <string name="something_went_wrong">Irgendwas ging leider schief :-(</string>
     <string name="title_new_credential">Erstelle neue Zugangsdaten</string>
