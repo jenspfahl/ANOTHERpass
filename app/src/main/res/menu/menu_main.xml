@@ -31,7 +31,7 @@
         android:id="@+id/menu_logout"
         android:icon="@drawable/ic_baseline_exit_to_app_24"
         android:title="@string/logout"
-        app:showAsAction="ifRoom">
+        app:showAsAction="never">
     </item>
 
     <item

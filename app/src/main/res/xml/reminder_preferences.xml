@@ -69,4 +69,12 @@
         app:singleLineTitle="false"
         app:defaultValue="true"/>
 
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:expired_credentials_notification_enabled"
+        app:title="@string/expired_credentials_notification_enabled"
+        app:allowDividerAbove="false"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:defaultValue="true"/>
+
 </PreferenceScreen>

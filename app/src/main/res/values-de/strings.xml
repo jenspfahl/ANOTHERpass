@@ -437,6 +437,7 @@
     <string name="summary_show_biometric_smp_reminder">Zeige eine Erinnerung wenn das gespeicherte Masterpasswort nicht mit einem biometrischem Merkmal (z.B. Fingerabdruck) geschützt wurde aber dies vom Gerät unterstützt werden würde.</string>
     <string name="show_expired_passwords_reminder">Erinnerung für abgelaufene Zugangsdaten</string>
     <string name="summary_show_expired_passwords_reminder">Zeige eine Erinnerung wenn Zugangsdaten abgelaufen sind.</string>
+    <string name="expired_credentials_notification_enabled">Benachrichtigung wenn Zugangsdaten abgelaufen sind</string>
 
     <string name="export_vault_reminder">Tresor wurde geändert und sollte exportiert werden.</string>
     <string name="export_mk_reminder">Masterkey hat sich geändert und sollte exportiert werden.</string>
@@ -673,6 +674,9 @@
     <string name="expires_on">Läuft ab am …</string>
     <string name="error_expired_in_the_past">Ablaufdatum muss in der Zukunft sein!</string>
 
+    <string name="credential_expired_notifiction_title">Abgelaufene Zugangsdaten</string>
+    <string name="credential_expired_notifiction_message">Zugangsdaten laufen am %1$s ab. Drücke hier um sie anzuzeigen.</string>
+    <string name="credential_expired_notifiction_show_all_expired">Zeige alle abgelaufenen Zugangsdaten</string>
 
 
 </resources>

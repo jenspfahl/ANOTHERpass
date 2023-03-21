@@ -55,7 +55,8 @@ abstract class NfcBaseActivity : SecureActivity() {
     private fun enableNfcForegroundDispatch() {
         try {
             val intent = Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            val nfcPendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_MUTABLE) // TODO PendingIntent.FLAG_IMMUTABLE doesn't work, must maybe be mutable
+            intent.component = componentName // important when having mutable intents
+            val nfcPendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_MUTABLE) // PendingIntent.FLAG_IMMUTABLE doesn't work, NFC dispatch changes it
             nfcAdapter?.enableForegroundDispatch(this, nfcPendingIntent, null, null)
         } catch (ex: IllegalStateException) {
             Log.e("NFC", "Error enabling NFC foreground dispatch", ex)

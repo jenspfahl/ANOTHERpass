@@ -3,6 +3,7 @@ package de.jepfa.yapm.service.autofill
 import android.app.PendingIntent
 import android.app.assist.AssistStructure
 import android.app.assist.AssistStructure.ViewNode
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -378,7 +379,7 @@ object ResponseFiller {
         R.drawable.ic_baseline_bug_report_gray_24,
         "aId: ${it.autofillId}, webScheme: ${it.webScheme}, webDomain: ${it.webDomain}, " +
                 "aHints: ${Arrays.toString(it.autofillHints)}, hint: ${it.hint}, " +
-                "text: ${it.text}, idEntry: ${it.idEntry}, hintIdEntry: ${it.hintIdEntry}, htmlInfoTag: ${it.htmlInfo?.tag}, " +
+                "text: ${it.text}, idEntry: ${it.idEntry},, htmlInfoTag: ${it.htmlInfo?.tag}, " +
                 "htmlInfoAttr: ${it.htmlInfo?.attributes}, type: ${it.autofillType}, important: ${it.importantForAutofill}, " +
                 "class: ${it.className}, isUserField: ${fields.hasUserField(it)}, " +
                 "isPasswordField: ${fields.hasPasswordField(it)}, isPotentialField: ${fields.hasPotentialField(it)}",
@@ -394,12 +395,13 @@ object ResponseFiller {
         else {
             authIntent.action = action
         }
+        authIntent.component = ComponentName(context, ListCredentialsActivity::class.java)  // important when having mutable intents
 
         return PendingIntent.getActivity(
             context,
             1001,
             authIntent,
-            PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_ONE_SHOT
+            PendingIntent.FLAG_MUTABLE // must be immutable to return the selected credential
         )
     }
 

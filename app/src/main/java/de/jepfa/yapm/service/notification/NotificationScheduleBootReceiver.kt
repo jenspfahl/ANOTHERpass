@@ -7,15 +7,21 @@ import android.util.Log
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.util.removeTime
 import de.jepfa.yapm.util.toDate
+import de.jepfa.yapm.util.toastText
 import java.util.*
 
 class NotificationScheduleBootReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
+        Log.d("NOTIF", "boot completed: intent=$intent")
+
         if (intent.action ==Intent.ACTION_BOOT_COMPLETED) {
+
             PreferenceService.initStorage(context)
 
             val expiresAtValues = PreferenceService.getAllStartingWith(PreferenceService.DATA_EXPIRY_DATES, context)
+            Log.d("NOTIF", "expiresAtValues=$expiresAtValues")
+
             expiresAtValues
                 .forEach {
                     val id = it.key.substringAfter("_").toIntOrNull()

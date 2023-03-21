@@ -447,7 +447,8 @@
     <string name="show_biometric_smp_reminder">Reminder to setup biometrics for stored master password</string>
     <string name="summary_show_biometric_smp_reminder">Show a reminder when the stored master password is not protected by a biometric (e.g. a fingerprint) but the device would support it.</string>
     <string name="show_expired_passwords_reminder">Reminder for expired credentials</string>
-    <string name="summary_show_expired_passwords_reminder">Show a reminder when any credential has been expired.</string>
+    <string name="summary_show_expired_passwords_reminder">Show a reminder when any credential is expired.</string>
+    <string name="expired_credentials_notification_enabled">Show a notification when any credential is expired.</string>
 
     <string name="export_vault_reminder">Vault should be exported after recent modifications.</string>
     <string name="export_mk_reminder">Master key should be exported after recent modifications.</string>
@@ -681,6 +682,10 @@
     <string name="expires_in_12_months">Expires in a year</string>
     <string name="expires_on">Expires on …</string>
     <string name="error_expired_in_the_past">Expiry date must be in the future!</string>
+
+    <string name="credential_expired_notifiction_title">Expired credential</string>
+    <string name="credential_expired_notifiction_message">A credential is expired on %1$s. Tap here to show.</string>
+    <string name="credential_expired_notifiction_show_all_expired">Show all expired credentials</string>
 
 
 </resources>

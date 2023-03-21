@@ -25,7 +25,7 @@ object PreferenceService {
      * TODO If you add new preference xml files inside #initDefaults, they should be recognised as well.
      * To achieve this, count the version value up here.
      */
-    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_25"
+    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_26"
 
     private const val ENC_SHARED_PREFERENCES_NAME = "de.jepfa.yapm.enc-preferences"
     private const val SYSTEM_SHARED_PREFERENCES_NAME = "de.jepfa.yapm.sys-preferences"
@@ -85,6 +85,7 @@ object PreferenceService {
     const val DATA_EXPIRED_PASSWORDS_NOTIFICATION_SHOWED_AT = DATA_PREFIX + "expired_passwords_notification_showed_at"
     const val DATA_EXPIRED_PASSWORDS_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "expired_passwords_notification_showed_as"
     const val PREF_SHOW_EXPIRED_PASSWORDS_REMINDER = PREF_PREFIX + "show_expired_passwords_reminder"
+    const val PREF_EXPIRED_CREDENTIALS_NOTIFICATION_ENABLED = PREF_PREFIX + "expired_credentials_notification_enabled"
 
     const val PREF_SHOW_LAST_LOGIN_STATE = PREF_PREFIX + "show_last_login_state"
     const val PREF_MAX_LOGIN_ATTEMPTS = PREF_PREFIX + "max_login_attempts"

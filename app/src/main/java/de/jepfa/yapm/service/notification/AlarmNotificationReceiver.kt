@@ -5,8 +5,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import de.jepfa.yapm.R
 import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.service.autofill.ResponseFiller
+import de.jepfa.yapm.service.PreferenceService.PREF_EXPIRED_CREDENTIALS_NOTIFICATION_ENABLED
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.util.Constants
@@ -23,6 +24,12 @@ class AlarmNotificationReceiver : BroadcastReceiver() {
         Log.d("NOTIF", "scheduled notification with id=$id alarm received")
 
         PreferenceService.initStorage(context)
+
+        val enabled = PreferenceService.getAsBool(PREF_EXPIRED_CREDENTIALS_NOTIFICATION_ENABLED, context)
+        if (!enabled) {
+            Log.d("NOTIF", "scheduled notifications disabled")
+            return
+        }
 
         val today = Date().removeTime()
         val expiresAtValues = PreferenceService.getAllStartingWith(PreferenceService.DATA_EXPIRY_DATES, context)
@@ -42,14 +49,15 @@ class AlarmNotificationReceiver : BroadcastReceiver() {
                 action = "${Constants.ACTION_OPEN_VAULT_FOR_FILTERING}}${Constants.ACTION_DELIMITER}${Constants.SEARCH_COMMAND_SEARCH_ID}$id${Constants.SEARCH_COMMAND_END}" )
             val actionIntent = createPendingExpiryIntent(context, id,
                 action = "${Constants.ACTION_OPEN_VAULT_FOR_FILTERING}}${Constants.ACTION_DELIMITER}${Constants.SEARCH_COMMAND_SHOW_EXPIRED} " ) //tailing whitespace to not open autocomplete
+
             NotificationService.pushNotification(
                 context,
                 NotificationService.CHANNEL_ID_SCHEDULED,
-                "A credential is expired",
-                "The credential is expired on " + expiryDateForId.toSimpleDateFormat(),
+                context.getString(R.string.credential_expired_notifiction_title),
+                context.getString(R.string.credential_expired_notifiction_message, expiryDateForId.toSimpleDateFormat()),
                 id,
                 contentIntent,
-                "Show all expired credentials",
+                context.getString(R.string.credential_expired_notifiction_show_all_expired),
                 actionIntent
             )
         }
@@ -64,7 +72,7 @@ class AlarmNotificationReceiver : BroadcastReceiver() {
             context,
             credentialId,
             authIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+            PendingIntent.FLAG_IMMUTABLE
         )
     }
 }
