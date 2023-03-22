@@ -68,17 +68,7 @@ class LoginEnterPinFragment : BaseFragment() {
         pinTextView.requestFocus()
 
         nextButton.setOnLongClickListener{
-            AlertDialog.Builder(loginActivity)
-                .setTitle(getString(R.string.revoke_quick_access))
-                .setMessage(getString(R.string.revoke_quick_access_desc))
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes) { _, _ ->
-                    RemoveStoredMasterPasswordUseCase.execute(loginActivity)
-                    RevokeMasterPasswordTokenUseCase.execute(loginActivity)
-                    toastText(loginActivity, R.string.quick_access_revoked)
-                }
-                .setNegativeButton(android.R.string.no, null)
-                .show()
+            loginActivity.showRevokeQuickAccessDialog()
             true
         }
 

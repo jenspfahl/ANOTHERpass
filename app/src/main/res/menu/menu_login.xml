@@ -9,6 +9,14 @@
         app:showAsAction="always"
         android:title="@string/login_help">
     </item>
+
+    <item
+        android:id="@+id/action_revoke_quick_access"
+        app:showAsAction="never"
+        android:title="@string/revoke_quick_access"
+        android:visible="false">
+    </item>
+
     <item
         android:id="@+id/action_reset_vault"
         app:showAsAction="never"
