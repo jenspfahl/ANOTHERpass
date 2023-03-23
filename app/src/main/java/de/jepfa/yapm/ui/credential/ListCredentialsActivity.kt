@@ -138,6 +138,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         // session check would bring LoginActivity to front when action is invoked
         checkSession = false
+        Log.i("LST", "onCreate")
         super.onCreate(savedInstanceState)
         intent?.action?.let { action ->
             Log.i("LST", "action=$action")
@@ -277,6 +278,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     override fun onResume() {
         super.onResume()
+        Log.i("LST", "onResume")
+        updateSearchFieldWithAutofillSuggestion(intent)
 
         val navMenuAlwaysCollapsed = PreferenceService.getAsBool(
             PREF_NAV_MENU_ALWAYS_COLLAPSED, false, this@ListCredentialsActivity)
@@ -294,10 +297,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             PreferenceService.delete(STATE_REQUEST_CREDENTIAL_LIST_RELOAD, applicationContext)
 
             if (requestHardReload) {
+                Log.d("LST", "hard reload")
                 recreate()
             }
             else {
                 listCredentialAdapter?.notifyDataSetChanged()
+                Log.d("LST", "soft reload")
             }
         }
 
@@ -317,6 +322,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         inflateActionsMenu(menu, R.menu.menu_main)
+        Log.i("LST", "onCreateOptionsMenu")
 
         val searchItem: MenuItem = menu.findItem(R.id.action_search)
         this.searchItem = searchItem
@@ -436,16 +442,19 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     }
 
 
-    override fun onPostResume() {
-        super.onPostResume()
-        updateSearchFieldWithAutofillSuggestion() //TODO is this really needed?
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        Log.i("LST", "onNewIntent: action=${intent?.action}")
+        updateSearchFieldWithAutofillSuggestion(intent)
     }
+
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        updateSearchFieldWithAutofillSuggestion()
+        Log.i("LST", "onPrepareOptionsMenu")
+        updateSearchFieldWithAutofillSuggestion(intent)  //somehow important for autofill
         return super.onPrepareOptionsMenu(menu)
     }
 
-    private fun updateSearchFieldWithAutofillSuggestion() {
+    private fun updateSearchFieldWithAutofillSuggestion(intent: Intent?) {
         if (!Session.isDenied()) {
             intent?.action?.let { action ->
                 Log.i("LST", "action2=$action")
@@ -461,8 +470,13 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 }
                 else if (action.startsWith(Constants.ACTION_OPEN_VAULT_FOR_FILTERING)) {
                     val searchString = action.substringAfter(ACTION_DELIMITER).substringBeforeLast(ACTION_DELIMITER).lowercase()
+                    Log.i("LST", "extracted search string=$searchString")
+
                     if (searchString.isNotBlank()) {
-                        startSearchFor("$searchString")
+                        val success = startSearchFor("$searchString")
+                        if (success) {
+                            intent.action = null // one shot, don't filter again
+                        }
                     }
                 }
             }
@@ -682,6 +696,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         // nothing
                     }
                 }
+            }
+        }
+        else if (requestCode == SecretChecker.loginRequestCode) {
+            if (intent.getBooleanExtra(SecretChecker.fromAutofillOrNotification, false)) {
+                Log.i("LST", "onActivityResult")
+                updateSearchFieldWithAutofillSuggestion(intent)
             }
         }
 
@@ -1203,7 +1223,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         startSearchFor(SEARCH_COMMAND_SHOW_EXPIRED)
     }
 
-    private fun startSearchFor(searchString: String) {
+    private fun startSearchFor(searchString: String): Boolean {
+        Log.i("LST", "searchItem=$searchItem")
         searchItem?.let { searchItem ->
             Log.i("LST", "update search text")
 
@@ -1216,7 +1237,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             searchItem.expandActionView()
             searchPlate.text = SpannableStringBuilder(searchString)
             searchPlate.selectAll()
+            return true
         }
+        return false
     }
 }
 

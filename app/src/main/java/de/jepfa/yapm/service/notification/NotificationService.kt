@@ -27,6 +27,8 @@ object NotificationService {
     val NOTIFICATION_ID_PASTE_SUCCESS = 1001
     val SCHEDULED_NOTIFICATION_SUCCESS = 1002
 
+    val SCHEDULED_NOTIFICATION_KEY_SEPARATOR = "#"
+
 
     fun createNotificationChannel(context: Context, channelId: String, name: String) {
         // Create the NotificationChannel, but only on API 26+ because
@@ -83,9 +85,11 @@ object NotificationService {
         val alarmIntent = createAlarmPendingIntent(context, id)
 
         val calendar = Calendar.getInstance()
-        //calendar.time = TODO date
-        calendar.timeInMillis = System.currentTimeMillis()
-        calendar.add(Calendar.MINUTE, 1)
+        calendar.time = date
+
+        // for testing:
+        //calendar.timeInMillis = System.currentTimeMillis()
+        //calendar.add(Calendar.MINUTE, 1)
 
 
         alarmManager.set(

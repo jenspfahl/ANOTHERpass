@@ -277,6 +277,7 @@ class LoginActivity : NfcBaseActivity() {
         PreferenceService.delete(STATE_LOGIN_ATTEMPTS, this)
 
         val isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofillOrNotification, false)
+        Log.i("LST", "login done, fromAutofill=$isFromAutofill")
         if (isFromAutofill) {
             setResult(SecretChecker.loginRequestCode, intent)
         }

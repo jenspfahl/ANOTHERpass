@@ -1,12 +1,18 @@
 package de.jepfa.yapm.service.notification
 
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import de.jepfa.yapm.R
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.notification.NotificationService.SCHEDULED_NOTIFICATION_KEY_SEPARATOR
+import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.util.removeTime
 import de.jepfa.yapm.util.toDate
+import de.jepfa.yapm.util.toSimpleDateFormat
 import de.jepfa.yapm.util.toastText
 import java.util.*
 
@@ -22,9 +28,10 @@ class NotificationScheduleBootReceiver : BroadcastReceiver() {
             val expiresAtValues = PreferenceService.getAllStartingWith(PreferenceService.DATA_EXPIRY_DATES, context)
             Log.d("NOTIF", "expiresAtValues=$expiresAtValues")
 
+
             expiresAtValues
                 .forEach {
-                    val id = it.key.substringAfter("_").toIntOrNull()
+                    val id = it.key.substringAfter(SCHEDULED_NOTIFICATION_KEY_SEPARATOR).toIntOrNull()
                     val expiresAt = it.value.toString().toLongOrNull()?.toDate()
                     Log.d("NOTIF", "after boot: scheduled notification with id=$id rescheduling...")
 

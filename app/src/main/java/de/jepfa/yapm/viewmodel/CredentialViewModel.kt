@@ -8,6 +8,7 @@ import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_EXPIRY_DATES
 import de.jepfa.yapm.service.notification.NotificationService
+import de.jepfa.yapm.service.notification.NotificationService.SCHEDULED_NOTIFICATION_KEY_SEPARATOR
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.YapmApp
 import kotlinx.coroutines.launch
@@ -58,12 +59,12 @@ class CredentialViewModel(private val repository: CredentialRepository) : ViewMo
             val expiresAt = SecretService.decryptLong(key, credential.expiresAt)
             if (expiresAt != null && expiresAt > 0) {
                 credentialIdsAndExpiresAt[id] = expiresAt
-                PreferenceService.putString(DATA_EXPIRY_DATES + "_" + id, expiresAt.toString(), null)
+                PreferenceService.putString(DATA_EXPIRY_DATES + SCHEDULED_NOTIFICATION_KEY_SEPARATOR + id, expiresAt.toString(), null)
                 NotificationService.scheduleNotification(context, id, Date(expiresAt))
             }
             else {
                 credentialIdsAndExpiresAt.remove(id)
-                PreferenceService.delete(DATA_EXPIRY_DATES + "_" + id, null)
+                PreferenceService.delete(DATA_EXPIRY_DATES + SCHEDULED_NOTIFICATION_KEY_SEPARATOR + id, null)
                 NotificationService.cancelScheduledNotification(context, id)
             }
         }

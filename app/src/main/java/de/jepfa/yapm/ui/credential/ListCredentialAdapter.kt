@@ -1,6 +1,7 @@
 package de.jepfa.yapm.ui.credential
 
 import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -49,7 +50,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         ListAdapter<EncCredential, ListCredentialAdapter.CredentialViewHolder>(CredentialsComparator()),
         Filterable {
 
-    private lateinit var originList: List<EncCredential>
+    private var originList: List<EncCredential> = emptyList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CredentialViewHolder {
         val holder = CredentialViewHolder.create(parent)
@@ -388,7 +389,8 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                 }
                 else {
                     // in some cases the filter result is null in Android 13, recreate it
-                    listCredentialsActivity.recreate()
+                    Log.i("LST", "Null in pop search result")
+                    //listCredentialsActivity.recreate() this seems useless in most cases
                 }
             }
 
