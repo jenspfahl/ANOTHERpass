@@ -20,7 +20,7 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:gravity="center"
-                android:text="@string/whats_new_in_1_7"
+                android:text="@string/whats_new_in_1_8"
                 android:textColor="@color/colorAltAccent"
                 android:textSize="28sp"
                 android:textStyle="bold"
@@ -72,12 +72,12 @@
                             android:textSize="16sp"
                             android:textStyle="bold"
                             android:padding="6dp"
-                            android:text="@string/whats_new_in_1_7_bullet_1_head" />
+                            android:text="@string/whats_new_in_1_8_bullet_1_head" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingHorizontal="12dp"
-                            android:text="@string/whats_new_in_1_7_bullet_1_text" />
+                            android:text="@string/whats_new_in_1_8_bullet_1_text" />
                     </LinearLayout>
                 </TableRow>
 
@@ -94,35 +94,12 @@
                             android:textSize="16sp"
                             android:textStyle="bold"
                             android:padding="6dp"
-                            android:text="@string/whats_new_in_1_7_bullet_2_head" />
+                            android:text="@string/whats_new_in_1_8_bullet_2_head" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingHorizontal="12dp"
-                            android:text="@string/whats_new_in_1_7_bullet_2_text" />
-                    </LinearLayout>
-                </TableRow>
-
-
-                <TableRow>
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingVertical="6dp"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:padding="6dp"
-                            android:text="@string/whats_new_in_1_7_bullet_3_head" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingHorizontal="12dp"
-                            android:text="@string/whats_new_in_1_7_bullet_3_text" />
+                            android:text="@string/whats_new_in_1_8_bullet_2_text" />
                     </LinearLayout>
                 </TableRow>
 
@@ -140,12 +117,12 @@
                             android:textSize="16sp"
                             android:textStyle="bold"
                             android:padding="6dp"
-                            android:text="@string/whats_new_in_1_7_bullet_4_head" />
+                            android:text="@string/whats_new_in_1_8_bullet_3_head" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingHorizontal="12dp"
-                            android:text="@string/whats_new_in_1_7_bullet_4_text" />
+                            android:text="@string/whats_new_in_1_8_bullet_3_text" />
                     </LinearLayout>
                 </TableRow>
 
@@ -163,16 +140,17 @@
                             android:textSize="16sp"
                             android:textStyle="bold"
                             android:padding="6dp"
-                            android:text="@string/whats_new_in_1_7_bullet_5_head" />
+                            android:text="@string/whats_new_in_1_8_bullet_4_head" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:paddingHorizontal="12dp"
-                            android:text="@string/whats_new_in_1_7_bullet_5_text" />
+                            android:text="@string/whats_new_in_1_8_bullet_4_text" />
                     </LinearLayout>
                 </TableRow>
 
 
+                
             </TableLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>

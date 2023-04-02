@@ -94,6 +94,7 @@ fun Date.removeTime(): Date {
     val cal = Calendar.getInstance()
     cal.time = this
     cal[Calendar.HOUR_OF_DAY] = 0
+    cal[Calendar.HOUR] = 0
     cal[Calendar.MINUTE] = 0
     cal[Calendar.SECOND] = 0
     cal[Calendar.MILLISECOND] = 0

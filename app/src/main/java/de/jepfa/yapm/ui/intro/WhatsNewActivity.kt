@@ -15,8 +15,11 @@ class WhatsNewActivity : IntroBaseActivity() {
         super.onCreate(savedInstanceState)
         // Make sure you don't call setContentView!
 
+        //TODO new fragment layout for each new minor App version (e.g 1.7.x -> 1.7)
         addSlide(
-            //TODO new fragment layout for each new minor App version (e.g 1.7.x -> 1.7)
+            AppIntroCustomLayoutFragment.newInstance(R.layout.fragment_whats_new_in_1_8
+            ))
+        addSlide(
             AppIntroCustomLayoutFragment.newInstance(R.layout.fragment_whats_new_in_1_7
             ))
 

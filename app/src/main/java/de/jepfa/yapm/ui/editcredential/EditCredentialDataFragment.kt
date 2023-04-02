@@ -258,7 +258,7 @@ class EditCredentialDataFragment : SecureFragment() {
                editCredentialExpiredAtSpinner.setSelection(ExpiryOptions.EXPIRES_ON_CUSTOM.ordinal)
             }
         }
-        selectedExpiryDate = expiryDate
+        selectedExpiryDate = expiryDate?.removeTime()
     }
 
     private fun selectExpiryDate() {

@@ -217,7 +217,7 @@ object ReminderService {
             val snackBar = Snackbar.make(
                 view,
                 config.notificationText,
-                7_000
+                15_000 //TODO make it configurable //TODO show Icon to redisplay
             )
 
             snackBar.view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)?.apply {

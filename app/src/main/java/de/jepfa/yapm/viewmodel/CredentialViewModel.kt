@@ -53,11 +53,12 @@ class CredentialViewModel(private val repository: CredentialRepository) : ViewMo
         return credentialIdsAndExpiresAt.values.any { it < currMillis }
     }
 
-    fun updateExpiredCredential(credential: EncCredential, key: SecretKeyHolder, context: Context) {
+    fun updateExpiredCredential(credential: EncCredential, key: SecretKeyHolder, context: Context, considerExpiredForThePast: Boolean = false) {
         val id = credential.id
         if (id != null) {
+            val currentMillis = if (considerExpiredForThePast) 0 else System.currentTimeMillis()
             val expiresAt = SecretService.decryptLong(key, credential.expiresAt)
-            if (expiresAt != null && expiresAt > 0) {
+            if (expiresAt != null && expiresAt > currentMillis) {
                 credentialIdsAndExpiresAt[id] = expiresAt
                 PreferenceService.putString(DATA_EXPIRY_DATES + SCHEDULED_NOTIFICATION_KEY_SEPARATOR + id, expiresAt.toString(), null)
                 NotificationService.scheduleNotification(context, id, Date(expiresAt))
