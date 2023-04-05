@@ -25,7 +25,7 @@ object PreferenceService {
      * TODO If you add new preference xml files inside #initDefaults, they should be recognised as well.
      * To achieve this, count the version value up here.
      */
-    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_26"
+    private const val STATE_DEFAULT_INIT_DONE_VERSION = "DONE_VERSION_27"
 
     private const val ENC_SHARED_PREFERENCES_NAME = "de.jepfa.yapm.enc-preferences"
     private const val SYSTEM_SHARED_PREFERENCES_NAME = "de.jepfa.yapm.sys-preferences"

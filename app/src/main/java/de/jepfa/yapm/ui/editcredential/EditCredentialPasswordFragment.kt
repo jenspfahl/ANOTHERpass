@@ -349,7 +349,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
         credential.password = encPassword
         LabelService.defaultHolder.updateLabelsForCredential(key, credential)
 
-        editCredentialActivity.credentialViewModel.updateExpiredCredential(credential, key, editCredentialActivity)
+        editCredentialActivity.credentialViewModel.updateExpiredCredential(credential, key, editCredentialActivity, considerExpiredForThePast = true)
 
         editCredentialActivity.reply(obfuscationKey)
     }

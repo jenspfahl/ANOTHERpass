@@ -176,8 +176,8 @@
     <string name="pref_header_login">Login</string>
     <string name="pref_header_passwd">Password generator</string>
     <string name="max_login_attempts_title">Maximum login attempts</string>
-    <string name="notification_channel_paste_title" translatable="false">ANOTHERpass paste notifications</string>
-    <string name="notification_channel_scheduled_title" translatable="false">ANOTHERpass schedules notifications</string>
+    <string name="notification_channel_paste_title">ANOTHERpass paste notifications</string>
+    <string name="notification_channel_scheduled_title">ANOTHERpass schedules notifications</string>
     <string name="toast_copied_to_clipboard">Password copied to clipboard</string>
     <string name="toast_test_copypaste_password">Test data copied to clipboard</string>
     <string name="copy_to_clipboard">Copy password to clipboard</string>
@@ -492,14 +492,14 @@
     <string name="whats_new_in_1_7_bullet_5_text">Add your own real-world-entropy to the internal random generator to achieve more randomness.</string>
 
     <string name="whats_new_in_1_8">What\'s new in version 1.8</string>
-    <string name="whats_new_in_1_8_bullet_1_head">Ablaufdatum für Zugangsdaten</string>
-    <string name="whats_new_in_1_8_bullet_1_text">Setze ein optionales Ablaufdatum und erhalte eine Benachrichtigung wenn Zugangsdaten ablaufen. Abgelaufene Zugangsdaten werden entsprechend markiert.</string>
-    <string name="whats_new_in_1_8_bullet_2_head">Überarbeitete erweiterte Suche</string>
-    <string name="whats_new_in_1_8_bullet_2_text">Suche in diversen Attributen der Zugangsdaten mit dem \'!\'-Kommando.</string>
-    <string name="whats_new_in_1_8_bullet_3_head">Ändere Passwort-Iterationen nachträglich</string>
-    <string name="whats_new_in_1_8_bullet_3_text">Ändere Die PBKDF-Iterationen deines Verschlüsselten Masterkeys.</string>
-    <string name="whats_new_in_1_8_bullet_4_head">Verbesserung einiger UI-Komponenten</string>
-    <string name="whats_new_in_1_8_bullet_4_text">Mehr Platz für Zusatzinformationen, verbesserte Passwortstärken-Dialog, Filtern nach Kategorien u.v.m.</string>
+    <string name="whats_new_in_1_8_bullet_1_head">Expiry dates for credentials</string>
+    <string name="whats_new_in_1_8_bullet_1_text">Define optional expiry dates and obtain notifications once credentials expire. Expired credentials are marked accordingly.</string>
+    <string name="whats_new_in_1_8_bullet_2_head">Reworked extended search</string>
+    <string name="whats_new_in_1_8_bullet_2_text">Improved search in separate credential attributes with the \'!\'-command. Search directly by expired or veiled/obfuscated credentials.</string>
+    <string name="whats_new_in_1_8_bullet_3_head">Change login iterations afterwards</string>
+    <string name="whats_new_in_1_8_bullet_3_text">Change the PBKDF-iteration count taken to en- and decrypt your Encrypted Master Key.</string>
+    <string name="whats_new_in_1_8_bullet_4_head">Improvement of some UI-components</string>
+    <string name="whats_new_in_1_8_bullet_4_text">Have more space in displaying and editing additional information for credentials, improved password-strength dialog, single filter by labels, etc…</string>
 
     <string name="intro">Show intro</string>
     <string name="intro_1_head">Another way to manage passwords</string>

@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -89,6 +90,7 @@ open class BaseActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("RestrictedApi")
     fun inflateActionsMenu(menu: Menu, id: Int) {
         if (menu is MenuBuilder) {
             menu.setOptionalIconsVisible(true)
@@ -97,7 +99,12 @@ open class BaseActivity : AppCompatActivity() {
         if (menu is MenuBuilder) {
             menu.forEach { item ->
                 if (isActionItemInOverflowMenu(item)) {
-                    item.iconTintList = ColorStateList.valueOf(R.color.black)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        item.iconTintList = ColorStateList.valueOf(resources.getColor(R.color.black))
+                    }
+                    else {
+                        item.icon = null
+                    }
                 }
             }
         }

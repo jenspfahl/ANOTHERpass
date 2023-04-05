@@ -11,6 +11,7 @@ import de.jepfa.yapm.service.notification.NotificationService
 import de.jepfa.yapm.service.notification.NotificationService.SCHEDULED_NOTIFICATION_KEY_SEPARATOR
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.YapmApp
+import de.jepfa.yapm.util.removeTime
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -56,7 +57,7 @@ class CredentialViewModel(private val repository: CredentialRepository) : ViewMo
     fun updateExpiredCredential(credential: EncCredential, key: SecretKeyHolder, context: Context, considerExpiredForThePast: Boolean = false) {
         val id = credential.id
         if (id != null) {
-            val currentMillis = if (considerExpiredForThePast) 0 else System.currentTimeMillis()
+            val currentMillis = if (considerExpiredForThePast) 0 else Date().removeTime().time
             val expiresAt = SecretService.decryptLong(key, credential.expiresAt)
             if (expiresAt != null && expiresAt > currentMillis) {
                 credentialIdsAndExpiresAt[id] = expiresAt
@@ -64,11 +65,15 @@ class CredentialViewModel(private val repository: CredentialRepository) : ViewMo
                 NotificationService.scheduleNotification(context, id, Date(expiresAt))
             }
             else {
-                credentialIdsAndExpiresAt.remove(id)
-                PreferenceService.delete(DATA_EXPIRY_DATES + SCHEDULED_NOTIFICATION_KEY_SEPARATOR + id, null)
-                NotificationService.cancelScheduledNotification(context, id)
+                deleteExpiredCredential(id, context)
             }
         }
+    }
+
+    fun deleteExpiredCredential(id: Int, context: Context) {
+        credentialIdsAndExpiresAt.remove(id)
+        PreferenceService.delete(DATA_EXPIRY_DATES + SCHEDULED_NOTIFICATION_KEY_SEPARATOR + id, null)
+        NotificationService.cancelScheduledNotification(context, id)
     }
 
 

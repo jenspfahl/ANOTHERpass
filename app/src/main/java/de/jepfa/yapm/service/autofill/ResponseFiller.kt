@@ -39,7 +39,6 @@ import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.getAppNameFromPackage
 import java.util.*
 
-@RequiresApi(Build.VERSION_CODES.O)
 object ResponseFiller {
 
     private const val VIEW_TO_IDENTIFY = "text"
@@ -121,6 +120,9 @@ object ResponseFiller {
         ignoreCurrentApp: Boolean = false,
         context: Context
     ) : FillResponse? {
+        if (!isAutofillSupported()) {
+            return null
+        }
         if (structure.isHomeActivity) {
             Log.i("CFS", "home activity")
             return null
@@ -312,6 +314,7 @@ object ResponseFiller {
         return responseBuilder.build()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createAuthenticationFillResponse(
         fields: Fields,
         structure: AssistStructure,
@@ -370,6 +373,7 @@ object ResponseFiller {
         return responseBuilder.build()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createDebugDataSet(
         it: ViewNode,
         fields: Fields,
@@ -377,10 +381,10 @@ object ResponseFiller {
     ) = createDataSet(
         it,
         R.drawable.ic_baseline_bug_report_gray_24,
-        "aId: ${it.autofillId}, webScheme: ${it.webScheme}, webDomain: ${it.webDomain}, " +
+        "aId: ${it.autofillId}, webDomain: ${it.webDomain}, " +
                 "aHints: ${Arrays.toString(it.autofillHints)}, hint: ${it.hint}, " +
                 "text: ${it.text}, idEntry: ${it.idEntry},, htmlInfoTag: ${it.htmlInfo?.tag}, " +
-                "htmlInfoAttr: ${it.htmlInfo?.attributes}, type: ${it.autofillType}, important: ${it.importantForAutofill}, " +
+                "htmlInfoAttr: ${it.htmlInfo?.attributes}, type: ${it.autofillType}, " +
                 "class: ${it.className}, isUserField: ${fields.hasUserField(it)}, " +
                 "isPasswordField: ${fields.hasPasswordField(it)}, isPotentialField: ${fields.hasPotentialField(it)}",
         "debug", context, false
@@ -420,6 +424,7 @@ object ResponseFiller {
         return headerView
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun identifyFields(structure: AssistStructure, suggestEverywhere: Boolean): Fields? {
 
         val fields = Fields()
@@ -439,6 +444,7 @@ object ResponseFiller {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun identifyFields(node: ViewNode, fields: Fields, suggestEverywhere: Boolean) {
 
         /*
@@ -482,6 +488,7 @@ object ResponseFiller {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun inspectNodeAttributes(
         node: ViewNode,
         fields: Fields
@@ -520,6 +527,7 @@ object ResponseFiller {
         return contents.any { s.contains(it) }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createUserDataSets(structure: AssistStructure, fields : Set<ViewNode>, name: String, user: String, context: Context): List<Dataset> {
         var message = context.getString(R.string.paste_user_for_autofill, name)
         var withInlinePresentation = true
@@ -536,6 +544,7 @@ object ResponseFiller {
             context)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createPasswordDataSets(structure: AssistStructure, fields : Set<ViewNode>, name: String, password: Password, context: Context): List<Dataset> {
         return createDataSets(
             fields,
@@ -547,14 +556,17 @@ object ResponseFiller {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createDataSets(fields : Set<ViewNode>, iconId: Int, text: String, content: CharSequence, withInlinePresentation: Boolean, context: Context): List<Dataset> {
         return fields.mapNotNull { createDataSet( it, iconId, text, content, context, withInlinePresentation) }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createAuthDataSets(structure: AssistStructure, fields : Set<ViewNode>, iconId: Int, text: String, action: String, withInlinePresentation: Boolean, context: Context): List<Dataset> {
         return fields.mapNotNull { createAuthDataSet(structure, it, iconId, text, action, context, withInlinePresentation) }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createDataSet(
         field: ViewNode,
         iconId : Int,
@@ -588,12 +600,14 @@ object ResponseFiller {
             .build()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createSearchString(structure: AssistStructure, field: ViewNode, context: Context): String? {
         val appName = structure.activityComponent.packageName.let { getAppNameFromPackage(it, context) }
         val webDomain = field.webDomain?.substringBeforeLast(".")?.substringAfterLast(".")
         return webDomain ?: appName
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createDomainString(structure: AssistStructure, field: ViewNode, context: Context): String? {
         return if (field.webDomain != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -631,6 +645,7 @@ object ResponseFiller {
 
     fun isAutofillSupported() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
 
+    @RequiresApi(Build.VERSION_CODES.R)
     private fun createInlinePresentation(
         autofillId: AutofillId,
         iconId: Int,
@@ -662,6 +677,7 @@ object ResponseFiller {
 
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createUserAndPasswordDataSet(
         userFields: Set<ViewNode>,
         passwordFields: Set<ViewNode>,
@@ -724,6 +740,7 @@ object ResponseFiller {
         return builder.build()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createAuthDataSet(
         structure: AssistStructure,
         field: ViewNode,

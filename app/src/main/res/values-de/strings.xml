@@ -174,6 +174,8 @@
     <string name="pref_header_login">Login</string>
     <string name="pref_header_passwd">Passwortgenerator</string>
     <string name="max_login_attempts_title">Maximale Loginversuche</string>
+    <string name="notification_channel_paste_title">ANOTHERpass Test-Benachrichtigungen</string>
+    <string name="notification_channel_scheduled_title">ANOTHERpass Ablauf-Benachrichtigungen</string>
     <string name="toast_copied_to_clipboard">Passwort in die Zwischenablage kopiert</string>
     <string name="toast_test_copypaste_password">Testdaten in die Zwischenablage kopiert</string>
     <string name="copy_to_clipboard">Kopiere Passwort in die Zwischenablage</string>
@@ -480,15 +482,15 @@
     <string name="whats_new_in_1_7_bullet_5_head">Optimiere Zufallsgenerator</string>
     <string name="whats_new_in_1_7_bullet_5_text">Füge zusätzliche Entropie für den Zufallsgenerator hinzu um eine höhere Zufälligkeit zu erhalten.</string>
 
-    <string name="whats_new_in_1_8">Was is neu in Version 1.8</string>
+    <string name="whats_new_in_1_8">Was ist neu in Version 1.8</string>
     <string name="whats_new_in_1_8_bullet_1_head">Ablaufdatum für Zugangsdaten</string>
     <string name="whats_new_in_1_8_bullet_1_text">Setze ein optionales Ablaufdatum und erhalte eine Benachrichtigung wenn Zugangsdaten ablaufen. Abgelaufene Zugangsdaten werden entsprechend markiert.</string>
     <string name="whats_new_in_1_8_bullet_2_head">Überarbeitete erweiterte Suche</string>
-    <string name="whats_new_in_1_8_bullet_2_text">Suche in diversen Attributen der Zugangsdaten mit dem \'!\'-Kommando.</string>
-    <string name="whats_new_in_1_8_bullet_3_head">Ändere Passwort-Iterationen nachträglich</string>
-    <string name="whats_new_in_1_8_bullet_3_text">Ändere Die PBKDF-Iterationen deines Verschlüsselten Masterkeys.</string>
+    <string name="whats_new_in_1_8_bullet_2_text">Verbesserte Suche in diversen Attributen der Zugangsdaten mit dem \'!\'-Kommando. Suche direkt nach abgelaufenen order verschleierten Zugangsdaten.</string>
+    <string name="whats_new_in_1_8_bullet_3_head">Ändere Login-Iterationen nachträglich</string>
+    <string name="whats_new_in_1_8_bullet_3_text">Ändere die PBKDF-Iterationen deines Verschlüsselten Masterkeys abhängig von der CPU-Power deines Gerätes, um die Sicherheit zu erhöhen.</string>
     <string name="whats_new_in_1_8_bullet_4_head">Verbesserung einiger UI-Komponenten</string>
-    <string name="whats_new_in_1_8_bullet_4_text">Mehr Platz für Zusatzinformationen, verbesserte Passwortstärken-Dialog, Filtern nach Kategorien u.v.m.</string>
+    <string name="whats_new_in_1_8_bullet_4_text">Mehr Platz zum Bearbeiten und Zeigen von Zusatzinformationen, verbesserter Passwortstärken-Dialog, vereinfachtes Filtern nach Kategorien u.v.m.</string>
 
 
     <string name="intro">Starte Intro</string>

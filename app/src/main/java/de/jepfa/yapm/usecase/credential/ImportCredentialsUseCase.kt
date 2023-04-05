@@ -17,6 +17,9 @@ object ImportCredentialsUseCase: InputUseCase<ImportCredentialsUseCase.Input, Se
     override suspend fun doExecute(input: Input, activity: SecureActivity): Boolean {
         input.credentials.forEach { credential ->
             activity.credentialViewModel.insert(credential, activity)
+            activity.masterSecretKey?.let { key ->
+                activity.credentialViewModel.updateExpiredCredential(credential, key, activity, considerExpiredForThePast = true)
+            }
         }
 
         return true

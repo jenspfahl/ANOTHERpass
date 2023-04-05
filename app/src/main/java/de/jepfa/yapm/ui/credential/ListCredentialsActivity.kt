@@ -1165,6 +1165,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     fun deleteCredential(credential: EncCredential) {
         jumpToItemPosition = (credentialsRecycleView?.layoutManager as LinearLayoutManager)
             .findFirstVisibleItemPosition()
+        credential.id?.let { id ->
+            credentialViewModel.deleteExpiredCredential(id, this)
+        }
         credentialViewModel.delete(credential)
         toastText(this, R.string.credential_deleted)
     }
@@ -1220,7 +1223,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     }
 
     fun searchForExpiredCredentials() {
-        startSearchFor(SEARCH_COMMAND_SHOW_EXPIRED)
+        startSearchFor(SEARCH_COMMAND_SHOW_EXPIRED + " ") // space at the end to not show suggestion menu popup
     }
 
     private fun startSearchFor(searchString: String): Boolean {
