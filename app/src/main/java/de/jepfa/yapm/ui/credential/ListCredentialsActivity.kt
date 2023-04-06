@@ -119,6 +119,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private lateinit var navigationView: NavigationView
     private lateinit var toggle: ActionBarDrawerToggle
     private var resumeAutofillItem: MenuItem? = null
+    private var lastReminderItem: MenuItem? = null
+    private var nextReminderItem: MenuItem? = null
 
     val newOrUpdateCredentialActivityRequestCode = 1
 
@@ -289,6 +291,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         refreshNavigationMenu()
 
         updateResumeAutofillMenuItem()
+        updateReminderMenuItems()
 
         val requestReload = PreferenceService.getAsBool(STATE_REQUEST_CREDENTIAL_LIST_RELOAD, applicationContext)
         val requestHardReload = PreferenceService.getAsBool(STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD, applicationContext)
@@ -413,6 +416,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         resumeAutofillItem = menu.findItem(R.id.menu_resume_autofill)
         updateResumeAutofillMenuItem()
+        lastReminderItem = menu.findItem(R.id.menu_show_last_reminder)
+        nextReminderItem = menu.findItem(R.id.menu_show_next_reminder)
+        updateReminderMenuItems()
 
         super.onCreateOptionsMenu(menu)
 
@@ -514,8 +520,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 val multipleChoiceSwitch = SwitchCompat(this)
                 multipleChoiceSwitch.text = getString(R.string.multiple_choice_selection)
                 multipleChoiceSwitch.isChecked = !PreferenceService.getAsBool(PREF_LABEL_FILTER_SINGLE_CHOICE, this)
-                multipleChoiceSwitch.switchPadding = 16
-                multipleChoiceSwitch.setPadding(32)
+                multipleChoiceSwitch.switchPadding = 32
+                multipleChoiceSwitch.setPadding(64, 32, 64, 32)
 
                 val allLabels = ArrayList<Label>()
                 val noLabel = Label(WITH_NO_LABELS_ID, getString(R.string.no_label), "", null)
@@ -603,7 +609,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
                 val view = LinearLayout(this)
                 view.orientation = LinearLayout.HORIZONTAL
-                view.setPadding(24)
+                view.setPadding(54, 32, 64, 32)
                 val checkBox = CheckBox(this)
                 checkBox.isChecked = PreferenceService.getAsBool(PREF_EXPIRED_CREDENTIALS_ON_TOP, this)
                 val desc = TextView(this)
@@ -638,6 +644,19 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 PreferenceService.toggleBoolean(PREF_SHOW_CREDENTIAL_IDS, this)
                 refreshMenuShowIdsItem(item)
                 listCredentialAdapter?.notifyDataSetChanged()
+
+                return true
+            }
+            R.id.menu_show_next_reminder -> {
+                val view: View = findViewById(R.id.content_list_credentials)
+                ReminderService.showNextReminder(view, this, showNow = true)
+
+                return true
+            }
+            R.id.menu_show_last_reminder -> {
+                val view: View = findViewById(R.id.content_list_credentials)
+                ReminderService.showLastReminder(view, this)
+
                 return true
             }
             R.id.menu_resume_autofill -> {
@@ -1195,6 +1214,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private fun updateResumeAutofillMenuItem() {
         resumeAutofillItem?.isVisible =
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && ResponseFiller.isAutofillPaused(this)
+    }
+
+    private fun updateReminderMenuItems() {
+        nextReminderItem?.isVisible = ReminderService.hasNextReminder(this)
+        lastReminderItem?.isVisible = ReminderService.hasLastReminder(this)
     }
 
     private fun updateNavigationMenuVisibility(groupResId: Int, itemResId: Int, stringResId: Int, visible: Boolean) {

@@ -49,11 +49,25 @@
     </item>
 
     <item
+        android:id="@+id/menu_show_last_reminder"
+        android:icon="@drawable/outline_notifications_active_last_24"
+        android:title="@string/last_reminder"
+        app:showAsAction="never">
+    </item>
+
+    <item
+        android:id="@+id/menu_show_next_reminder"
+        android:icon="@drawable/outline_notifications_active_next_24"
+        android:title="@string/next_reminder"
+        app:showAsAction="never">
+    </item>
+
+
+    <item
         android:id="@+id/menu_resume_autofill"
         android:orderInCategory="1000"
         android:title="@string/resume_paused_autofill"
         android:visible="false">
     </item>
-
 
 </menu>

@@ -161,6 +161,20 @@
         <item>604800</item>
     </string-array>
 
+    <string-array name="reminder_duration_entries">
+        <item>@string/reminder_duration_5_sec</item>
+        <item>@string/reminder_duration_10_sec</item>
+        <item>@string/reminder_duration_15_sec</item>
+        <item>@string/reminder_duration_until_swipe</item>
+    </string-array>
+
+    <string-array name="reminder_duration_values">
+        <item>5000</item>
+        <item>10000</item>
+        <item>15000</item>
+        <item>-2</item>
+    </string-array>
+
     <string-array name="reminder_refresh_mpt_entries">
         <item>@string/reminder_refresh_mpt_none</item>
         <item>@string/reminder_refresh_mpt_one_week</item>

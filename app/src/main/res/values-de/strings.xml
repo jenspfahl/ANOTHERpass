@@ -439,7 +439,11 @@
     <string name="summary_show_biometric_smp_reminder">Zeige eine Erinnerung wenn das gespeicherte Masterpasswort nicht mit einem biometrischem Merkmal (z.B. Fingerabdruck) geschützt wurde aber dies vom Gerät unterstützt werden würde.</string>
     <string name="show_expired_passwords_reminder">Erinnerung für abgelaufene Zugangsdaten</string>
     <string name="summary_show_expired_passwords_reminder">Zeige eine Erinnerung wenn Zugangsdaten abgelaufen sind.</string>
-    <string name="expired_credentials_notification_enabled">Benachrichtigung wenn Zugangsdaten abgelaufen sind</string>
+    <string name="expired_credentials_notification_enabled_title">Erhalte eine Benachrichtigung wenn Zugangsdaten abgelaufen sind</string>
+    <string name="expired_credentials_notification_enabled_summary">Du erhältst eine Benachrichtigung zur rechten Zeit, auch wenn die App geschlossen ist.</string>
+
+    <string name="next_reminder">Nächste Erinnerung</string>
+    <string name="last_reminder">Letzte Erinnerung</string>
 
     <string name="export_vault_reminder">Tresor wurde geändert und sollte exportiert werden.</string>
     <string name="export_mk_reminder">Masterkey hat sich geändert und sollte exportiert werden.</string>
@@ -465,6 +469,7 @@
     <string name="howto_biometrics_for_smp_text">Als erstes muss ein biometrisches Merkmal hinterlegt werden (z.B. Fingerabruck). Danach muss das ggf. schon gespeicherte Masterpasswort aus der App entfernt und wieder angelegt werden. Beim Anlegen erfolgt die Verwendung des biometrischen Merkmals.</string>
     <string name="pref_header_reminder">Erinnerungen</string>
     <string name="reminder_period_title">Wie oft sollen Erinnerungen angezeigt werden?</string>
+    <string name="reminder_duration_title">Wie lange sollen Erinnerungen angezeigt werden?</string>
     <string name="pref_auth_smp_with_biometric_title">Autorisiere gespeichertes Masterpasswort mit biometrischem Merkmal</string>
     <string name="pref_auth_smp_with_biometric_summary">Es wird dringend empfohlen das in der App gespeicherte Massterpasswort mit einem biometrischem Merkmal zu schützen (falls vom Gerät unterstützt). Beachte: Ein bereits gespeichertes Masterpasswort wird nicht geschützt nur weil diese Option aktiviert wurde. Du musst es erst aus der App entfernen und neu speichern.</string>
     <string name="auth_to_decrypt_emp_omit">Scanne Masterpasswort</string>
@@ -585,6 +590,12 @@
     <string name="reminder_period_1_hour">Jede Stunde</string>
     <string name="reminder_period_1_day">Einmal am Tag</string>
     <string name="reminder_period_1_week">Einmal pro Woche</string>
+
+    <string name="reminder_duration_5_sec">5 Sekunden</string>
+    <string name="reminder_duration_10_sec">10 Sekunden</string>
+    <string name="reminder_duration_15_sec">15 Sekunden</string>
+    <string name="reminder_duration_until_swipe">Bis sie weggewischt wird</string>
+
     <string name="colorize_qr_codes">Coloriere QR-Codes</string>
     <string name="print_qr_code_header">Drucke QR-Code Kopfzeile</string>
     <string name="autofill_suggest_everywhere">Vorschläge für Automatisches Ausfüllen überall anzeigen</string>

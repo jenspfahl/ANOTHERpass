@@ -153,6 +153,7 @@ object PreferenceService {
     const val STATE_WHATS_NEW_SHOWED_FOR_VERSION = STATE_PREFIX + "whats_new_showed_for_version"
 
     const val PREF_REMINDER_PERIOD = PREF_PREFIX + "reminder_period"
+    const val PREF_REMINDER_DURATION = PREF_PREFIX + "reminder_duration"
     const val PREF_AUTH_SMP_WITH_BIOMETRIC = PREF_PREFIX + "auth_smp_with_biometric"
 
     const val STATE_REQUEST_CREDENTIAL_LIST_RELOAD = STATE_PREFIX + "request_credential_list_reload"
