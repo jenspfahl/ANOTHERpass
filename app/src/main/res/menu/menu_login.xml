@@ -12,6 +12,7 @@
 
     <item
         android:id="@+id/action_revoke_quick_access"
+        android:icon="@drawable/baseline_accessibility_24"
         app:showAsAction="never"
         android:title="@string/revoke_quick_access"
         android:visible="false">
@@ -19,6 +20,7 @@
 
     <item
         android:id="@+id/action_reset_vault"
+        android:icon="@drawable/ic_baseline_replay_24"
         app:showAsAction="never"
         android:title="@string/reset_vault">
     </item>
@@ -26,17 +28,20 @@
     <item
         android:id="@+id/menu_intro"
         app:showAsAction="never"
+        android:icon="@drawable/ic_keywithqrcode_normal"
         android:title="@string/intro">
     </item>
 
     <item
         android:id="@+id/menu_whats_new"
+        android:icon="@drawable/round_fiber_new_24"
         app:showAsAction="never"
         android:title="@string/whats_new">
     </item>
 
     <item
         android:id="@+id/menu_about"
+        android:icon="@drawable/ic_baseline_info_24"
         app:showAsAction="never"
         android:title="@string/about">
     </item>

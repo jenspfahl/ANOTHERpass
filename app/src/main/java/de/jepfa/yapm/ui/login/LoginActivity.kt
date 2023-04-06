@@ -121,7 +121,8 @@ class LoginActivity : NfcBaseActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_login, menu)
+        inflateActionsMenu(menu, R.menu.menu_login)
+
         val debugItem: MenuItem = menu.findItem(R.id.menu_debug)
         debugItem.isVisible = DebugInfo.isDebug
 

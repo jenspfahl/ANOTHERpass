@@ -100,7 +100,7 @@ open class BaseActivity : AppCompatActivity() {
             menu.forEach { item ->
                 if (isActionItemInOverflowMenu(item)) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        item.iconTintList = ColorStateList.valueOf(resources.getColor(R.color.black))
+                        item.iconTintList = ColorStateList.valueOf(resources.getColor(R.color.Gray))
                     }
                     else {
                         item.icon = null

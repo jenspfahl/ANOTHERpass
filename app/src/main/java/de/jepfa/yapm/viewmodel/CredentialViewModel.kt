@@ -1,6 +1,7 @@
 package de.jepfa.yapm.viewmodel
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.*
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.database.repository.CredentialRepository
@@ -11,6 +12,7 @@ import de.jepfa.yapm.service.notification.NotificationService
 import de.jepfa.yapm.service.notification.NotificationService.SCHEDULED_NOTIFICATION_KEY_SEPARATOR
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.YapmApp
+import de.jepfa.yapm.util.addDays
 import de.jepfa.yapm.util.removeTime
 import kotlinx.coroutines.launch
 import java.util.*
@@ -57,12 +59,19 @@ class CredentialViewModel(private val repository: CredentialRepository) : ViewMo
     fun updateExpiredCredential(credential: EncCredential, key: SecretKeyHolder, context: Context, considerExpiredForThePast: Boolean = false) {
         val id = credential.id
         if (id != null) {
-            val currentMillis = if (considerExpiredForThePast) 0 else Date().removeTime().time
+            val currentMillis = if (considerExpiredForThePast) 0 else Date().removeTime().addDays(1).time
             val expiresAt = SecretService.decryptLong(key, credential.expiresAt)
-            if (expiresAt != null && expiresAt > currentMillis) {
+            if (expiresAt != null && expiresAt > 0) {
                 credentialIdsAndExpiresAt[id] = expiresAt
-                PreferenceService.putString(DATA_EXPIRY_DATES + SCHEDULED_NOTIFICATION_KEY_SEPARATOR + id, expiresAt.toString(), null)
-                NotificationService.scheduleNotification(context, id, Date(expiresAt))
+                Log.i("EXP", "${credential.id}: $expiresAt >= $currentMillis ${expiresAt >= currentMillis}")
+                if (expiresAt >= currentMillis) {
+                    PreferenceService.putString(
+                        DATA_EXPIRY_DATES + SCHEDULED_NOTIFICATION_KEY_SEPARATOR + id,
+                        expiresAt.toString(),
+                        null
+                    )
+                    NotificationService.scheduleNotification(context, id, Date(expiresAt))
+                }
             }
             else {
                 deleteExpiredCredential(id, context)
@@ -71,6 +80,7 @@ class CredentialViewModel(private val repository: CredentialRepository) : ViewMo
     }
 
     fun deleteExpiredCredential(id: Int, context: Context) {
+        Log.i("EXP", "remove notification for $id")
         credentialIdsAndExpiresAt.remove(id)
         PreferenceService.delete(DATA_EXPIRY_DATES + SCHEDULED_NOTIFICATION_KEY_SEPARATOR + id, null)
         NotificationService.cancelScheduledNotification(context, id)

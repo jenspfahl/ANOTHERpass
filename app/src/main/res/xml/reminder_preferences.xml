@@ -10,6 +10,16 @@
         app:singleLineTitle="false"
         app:useSimpleSummaryProvider="true"/>
 
+    <ListPreference
+        app:defaultValue="10000"
+        app:entries="@array/reminder_duration_entries"
+        app:entryValues="@array/reminder_duration_values"
+        app:key="YAPM/pref:reminder_duration"
+        app:title="@string/reminder_duration_title"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:useSimpleSummaryProvider="true"/>
+
 
     <SwitchPreferenceCompat
         app:key="YAPM/pref:show_export_vault_reminder"
@@ -71,7 +81,8 @@
 
     <SwitchPreferenceCompat
         app:key="YAPM/pref:expired_credentials_notification_enabled"
-        app:title="@string/expired_credentials_notification_enabled"
+        app:title="@string/expired_credentials_notification_enabled_title"
+        app:summary="@string/expired_credentials_notification_enabled_summary"
         app:allowDividerAbove="false"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
