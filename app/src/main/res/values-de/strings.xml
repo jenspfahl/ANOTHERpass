@@ -492,10 +492,10 @@
     <string name="whats_new_in_1_8_bullet_1_text">Setze ein optionales Ablaufdatum und erhalte eine Benachrichtigung wenn Zugangsdaten ablaufen. Abgelaufene Zugangsdaten werden entsprechend markiert.</string>
     <string name="whats_new_in_1_8_bullet_2_head">Überarbeitete erweiterte Suche</string>
     <string name="whats_new_in_1_8_bullet_2_text">Verbesserte Suche in diversen Attributen der Zugangsdaten mit dem \'!\'-Kommando. Suche direkt nach abgelaufenen order verschleierten Zugangsdaten.</string>
-    <string name="whats_new_in_1_8_bullet_3_head">Ändere Login-Iterationen nachträglich</string>
-    <string name="whats_new_in_1_8_bullet_3_text">Ändere die PBKDF-Iterationen deines Verschlüsselten Masterkeys abhängig von der CPU-Power deines Gerätes, um die Sicherheit zu erhöhen.</string>
+    <string name="whats_new_in_1_8_bullet_3_head">Anpassen der Login-Iterationen</string>
+    <string name="whats_new_in_1_8_bullet_3_text">Optimiere die PBKDF-Iterationen deines Verschlüsselten Masterkeys abhängig von der CPU-Power deines Gerätes, um die Sicherheit zu erhöhen.</string>
     <string name="whats_new_in_1_8_bullet_4_head">Verbesserung einiger UI-Komponenten</string>
-    <string name="whats_new_in_1_8_bullet_4_text">Mehr Platz zum Bearbeiten und Zeigen von Zusatzinformationen, verbesserter Passwortstärken-Dialog, vereinfachtes Filtern nach Kategorien u.v.m.</string>
+    <string name="whats_new_in_1_8_bullet_4_text">Mehr Platz zum Bearbeiten und Zeigen von Zusatzinformationen, verbesserte Anzeigen von Erinnerungen, überarbeiteter Passwortstärken-Dialog, vereinfachtes Filtern nach Kategorien u.v.m.</string>
 
 
     <string name="intro">Starte Intro</string>
