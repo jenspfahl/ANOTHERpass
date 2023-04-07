@@ -1,6 +1,7 @@
 * Optional expiry dates for credentials with notification support
 * Reworked extended credential search with command suggestions
 * Ability to adjust and optimize login (PBKDF) iterations
+* Multiple selection of credentials for deletion
 * Improvement of some UI-components
 * Use encrypted preference store for settings
 * retry erroneous encryption attempts up to 2 times before failing

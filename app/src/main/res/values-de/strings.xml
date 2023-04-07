@@ -308,6 +308,12 @@
     <string name="invalid_emp">Ungültiges exportiertes Masterpasswort</string>
     <string name="invalid_emp_mpt">Dies ist kein exportiertes Masterpasswort oder Token</string>
     <string name="scanning_emp">Scanne Masterpasswort</string>
+
+    <string name="title_delete_selected">Lösche ausgewählte Zugangsdaten</string>
+    <string name="message_delete_selected">Du bist dabei, %1$d Zugangsdaten zu löschen! Fortfahren?</string>
+    <string name="message_selected_deleted">Ausgewählte Zugangsdaten gelöscht</string>
+    <string name="reset_selection">Auswahl aufheben</string>
+
     <string name="title_reset_all">Alles zurücksetzen</string>
     <string name="message_reset_all">Falls du dich nicht mehr einloggen kannst oder anderweitig feststeckst, kannst du hier alles zurücksetzen. Wenn du fortfährst, werden alle Daten gelöscht. Bist du dir sicher?</string>
     <string name="message_reset_all_double_check">Dein Tresor enthält schon %1$d Zugangsdaten. Soll wirklich alles gelöscht werden?</string>
@@ -495,7 +501,7 @@
     <string name="whats_new_in_1_8_bullet_3_head">Anpassen der Login-Iterationen</string>
     <string name="whats_new_in_1_8_bullet_3_text">Optimiere die PBKDF-Iterationen deines Verschlüsselten Masterkeys abhängig von der CPU-Power deines Gerätes, um die Sicherheit zu erhöhen.</string>
     <string name="whats_new_in_1_8_bullet_4_head">Verbesserung einiger UI-Komponenten</string>
-    <string name="whats_new_in_1_8_bullet_4_text">Mehr Platz zum Bearbeiten und Zeigen von Zusatzinformationen, verbesserte Anzeigen von Erinnerungen, überarbeiteter Passwortstärken-Dialog, vereinfachtes Filtern nach Kategorien u.v.m.</string>
+    <string name="whats_new_in_1_8_bullet_4_text">Mehr Platz zum Bearbeiten und Zeigen von Zusatzinformationen, verbesserte Anzeigen von Erinnerungen, Mehrfachauswahl von Zugangsdaten, überarbeiteter Passwortstärken-Dialog, vereinfachtes Filtern nach Kategorien u.v.m.</string>
 
 
     <string name="intro">Starte Intro</string>

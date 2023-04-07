@@ -31,7 +31,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.MenuItemCompat
-import androidx.core.view.setPadding
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -81,6 +80,7 @@ import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.ui.label.ListLabelsActivity
 import de.jepfa.yapm.ui.settings.SettingsActivity
 import de.jepfa.yapm.usecase.app.ShowInfoUseCase
+import de.jepfa.yapm.usecase.credential.DeleteMultipleCredentialsUseCase
 import de.jepfa.yapm.usecase.secret.*
 import de.jepfa.yapm.usecase.session.LogoutUseCase
 import de.jepfa.yapm.usecase.vault.DropVaultUseCase
@@ -174,7 +174,17 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         setSupportActionBar(toolbar)
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
+        val fab = findViewById<FloatingActionButton>(R.id.fab)
+
         listCredentialAdapter = ListCredentialAdapter(this)
+        { selected ->
+            if (selected.isNotEmpty()) {
+                fab.setImageResource(R.drawable.ic_baseline_delete_24_white)
+            }
+            else {
+                fab.setImageResource(R.drawable.ic_add_white_24dp)
+            }
+        }
         recyclerView.adapter = listCredentialAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
         val showDividers = PreferenceService.getAsBool(PreferenceService.PREF_SHOW_DIVIDERS_IN_LIST, this)
@@ -216,12 +226,40 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             }
         }
 
-        val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
-            val intent = Intent(this@ListCredentialsActivity, EditCredentialActivity::class.java)
-            intent.action = this.intent.action
-            intent.putExtras(this.intent) // forward all extras, especially needed for Autofill
-            startActivityForResult(intent, newOrUpdateCredentialActivityRequestCode)
+            val selectedCredentials = listCredentialAdapter?.getSelectedCredentials()
+            if (selectedCredentials?.isNotEmpty() == true) {
+
+                AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.title_delete_selected))
+                    .setMessage(getString(R.string.message_delete_selected, selectedCredentials.size))
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        UseCaseBackgroundLauncher(DeleteMultipleCredentialsUseCase)
+                            .launch(this, DeleteMultipleCredentialsUseCase.Input(selectedCredentials))
+                            { output ->
+                                if (output.success) {
+                                    toastText(this, R.string.message_selected_deleted)
+                                    listCredentialAdapter?.resetSelection()
+
+                                }
+                            }
+                    }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .setNeutralButton(R.string.reset_selection) { _, _ ->
+                        listCredentialAdapter?.resetSelection()
+                    }
+                    .show()
+
+
+            }
+            else {
+                val intent =
+                    Intent(this@ListCredentialsActivity, EditCredentialActivity::class.java)
+                intent.action = this.intent.action
+                intent.putExtras(this.intent) // forward all extras, especially needed for Autofill
+                startActivityForResult(intent, newOrUpdateCredentialActivityRequestCode)
+            }
         }
 
         fab.setOnLongClickListener {
@@ -700,7 +738,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
         else if (requestCode == newOrUpdateCredentialActivityRequestCode && resultCode == Activity.RESULT_OK) {
             data?.let {
-
+                listCredentialAdapter?.resetSelection()
                 val credential = EncCredential.fromIntent(it, createUuid = true)
                 jumpToUuid = credential.uid
 

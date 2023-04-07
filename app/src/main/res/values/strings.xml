@@ -318,6 +318,12 @@
     <string name="invalid_emp">Invalid Exported Master Password</string>
     <string name="invalid_emp_mpt">Not an Exported Master Password or token</string>
     <string name="scanning_emp">Scanning Master Password</string>
+
+    <string name="title_delete_selected">Delete selected credentials</string>
+    <string name="message_delete_selected">You are going to delete %1$d selected credentials! Continue?</string>
+    <string name="message_selected_deleted">Selected credentials deleted</string>
+    <string name="reset_selection">Reset selection</string>
+
     <string name="title_reset_all">Reset all</string>
     <string name="message_reset_all">If you cannot login and got stuck you can reset all data here. If you continue all data is going to be deleted. Are you sure?</string>
     <string name="message_reset_all_double_check">Your vault already contains %1$d credentials. Do you really want to delete them?</string>
@@ -505,7 +511,7 @@
     <string name="whats_new_in_1_8_bullet_3_head">Adjust login iterations</string>
     <string name="whats_new_in_1_8_bullet_3_text">Tweak the PBKDF-iteration count taken to en- and decrypt your Encrypted Master Key.</string>
     <string name="whats_new_in_1_8_bullet_4_head">Improvement of some UI-components</string>
-    <string name="whats_new_in_1_8_bullet_4_text">More space in displaying and editing additional information for credentials, improved reminders, reworked password-strength dialog, single filter by labels, etc…</string>
+    <string name="whats_new_in_1_8_bullet_4_text">More space in displaying and editing additional information for credentials, improved reminders, multiple selection of credentials, reworked password-strength dialog, single filter by labels, etc…</string>
 
     <string name="intro">Show intro</string>
     <string name="intro_1_head">Another way to manage passwords</string>

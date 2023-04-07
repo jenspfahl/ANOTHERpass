@@ -1,6 +1,7 @@
 package de.jepfa.yapm.ui.credential
 
 import android.content.Intent
+import android.net.wifi.hotspot2.pps.Credential
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -9,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -44,13 +44,18 @@ import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_EXPIRED
 import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_EXPIRES
 import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_VEILED
 import java.util.*
+import kotlin.collections.HashSet
 
 
-class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity) :
+class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity, val multipleSelectionCallback: (Set<EncCredential>) -> Unit) :
         ListAdapter<EncCredential, ListCredentialAdapter.CredentialViewHolder>(CredentialsComparator()),
         Filterable {
 
     private var originList: List<EncCredential> = emptyList()
+    private var selected = HashSet<EncCredential>() 
+
+    fun getSelectedCredentials() = HashSet(selected)
+    
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CredentialViewHolder {
         val holder = CredentialViewHolder.create(parent)
@@ -58,6 +63,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         if (Session.isDenied()) {
             return holder
         }
+
         val enableCopyPassword = PreferenceService.getAsBool(PREF_ENABLE_COPY_PASSWORD, listCredentialsActivity)
         if (!enableCopyPassword) {
             holder.hideCopyPasswordIcon()
@@ -96,42 +102,17 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
 
         holder.listenForLongClick { pos, _ ->
 
-            val current = getItem(pos)
+            val current = getItem(pos) ?: return@listenForLongClick false
 
-            val sb = StringBuilder()
-
-            current.id?.let { sb.addFormattedLine(listCredentialsActivity.getString(R.string.identifier), it)}
-            current.uid?.let {
-                sb.addFormattedLine(
-                    listCredentialsActivity.getString(R.string.universal_identifier),
-                    shortenBase64String(it.toBase64String()))
+            if (!selected.contains(current)) {
+                holder.credentialSelectionContainerView.visibility = View.VISIBLE
+                selected.add(current)
             }
-
-            listCredentialsActivity.masterSecretKey?.let { key ->
-                val name = SecretService.decryptCommonString(key, current.name)
-                sb.addFormattedLine(listCredentialsActivity.getString(R.string.name), name)
+            else {
+                holder.credentialSelectionContainerView.visibility = View.GONE
+                selected.remove(current)
             }
-            current.modifyTimestamp?.let{
-                if (it > 1000) // modifyTimestamp is the credential Id after running db migration, assume ids are lower than 1000
-                    sb.addFormattedLine(listCredentialsActivity.getString(R.string.last_modified), dateTimeToNiceString(it.toDate(), listCredentialsActivity))
-            }
-
-            AlertDialog.Builder(listCredentialsActivity)
-                .setTitle(R.string.title_credential_details)
-                .setMessage(sb.toString())
-                .setNegativeButton(R.string.close, null)
-                .setNeutralButton(R.string.copy_universal_identifier) { _, _ ->
-                    current.uid?.let { uid ->
-                        ClipboardUtil.copy(
-                            listCredentialsActivity.getString(R.string.universal_identifier),
-                            shortenBase64String(uid.toBase64String()),
-                            listCredentialsActivity,
-                            isSensible = false,
-                        )
-                    }
-                    toastText(listCredentialsActivity, R.string.universal_identifier_copied)
-                }
-                .show()
+            multipleSelectionCallback(selected)
 
             true
         }
@@ -204,6 +185,12 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
     override fun onBindViewHolder(holder: CredentialViewHolder, position: Int) {
         val current = getItem(position)
         val key = listCredentialsActivity.masterSecretKey
+        if (selected.contains(current)) {
+            holder.credentialSelectionContainerView.visibility = View.VISIBLE
+        }
+        else {
+            holder.credentialSelectionContainerView.visibility = View.GONE
+        }
         holder.bind(key, current, listCredentialsActivity)
     }
 
@@ -418,6 +405,14 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             .toList()
     }
 
+    fun resetSelection() {
+        if (selected.isNotEmpty()) {
+            selected.clear()
+            multipleSelectionCallback(selected)
+            notifyDataSetChanged()
+        }
+    }
+
     class CredentialViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val credentialContainerView: LinearLayout = itemView.findViewById(R.id.credential_container)
         private val credentialItemView: TextView = itemView.findViewById(R.id.credential_name)
@@ -425,7 +420,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         private val credentialCopyImageView: ImageView = itemView.findViewById(R.id.credential_copy)
         private val credentialMenuImageView: ImageView = itemView.findViewById(R.id.credential_menu_popup)
         private val credentialLabelContainerGroup: ChipGroup = itemView.findViewById(R.id.label_container)
-        private val credentialToolbarContainerView: ConstraintLayout = itemView.findViewById(R.id.toolbar_container)
+        val credentialSelectionContainerView: LinearLayout = itemView.findViewById(R.id.selection_container)
 
         fun hideCopyPasswordIcon() {
             credentialCopyImageView.visibility = View.GONE
