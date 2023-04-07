@@ -418,6 +418,7 @@ class LoginActivity : NfcBaseActivity() {
             .setPositiveButton(android.R.string.yes) { _, _ ->
                 RemoveStoredMasterPasswordUseCase.execute(this)
                 RevokeMasterPasswordTokenUseCase.execute(this)
+                Session.logout()
                 toastText(this, R.string.quick_access_revoked)
             }
             .setNegativeButton(android.R.string.no, null)

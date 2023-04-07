@@ -19,13 +19,6 @@
     </item>
 
     <item
-        android:id="@+id/action_reset_vault"
-        android:icon="@drawable/ic_baseline_replay_24"
-        app:showAsAction="never"
-        android:title="@string/reset_vault">
-    </item>
-
-    <item
         android:id="@+id/menu_intro"
         app:showAsAction="never"
         android:icon="@drawable/ic_keywithqrcode_normal"
@@ -45,6 +38,14 @@
         app:showAsAction="never"
         android:title="@string/about">
     </item>
+
+    <item
+        android:id="@+id/action_reset_vault"
+        android:icon="@drawable/ic_baseline_replay_24"
+        app:showAsAction="never"
+        android:title="@string/reset_vault">
+    </item>
+
 
     <item
         android:id="@+id/menu_debug"

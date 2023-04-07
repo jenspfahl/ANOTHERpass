@@ -63,7 +63,7 @@ class CredentialViewModel(private val repository: CredentialRepository) : ViewMo
             val expiresAt = SecretService.decryptLong(key, credential.expiresAt)
             if (expiresAt != null && expiresAt > 0) {
                 credentialIdsAndExpiresAt[id] = expiresAt
-                Log.i("EXP", "${credential.id}: $expiresAt >= $currentMillis ${expiresAt >= currentMillis}")
+                Log.i("NOTIF", "${credential.id}: ${Date(expiresAt)} >= ${Date(currentMillis)} ${expiresAt >= currentMillis}")
                 if (expiresAt >= currentMillis) {
                     PreferenceService.putString(
                         DATA_EXPIRY_DATES + SCHEDULED_NOTIFICATION_KEY_SEPARATOR + id,
@@ -71,6 +71,8 @@ class CredentialViewModel(private val repository: CredentialRepository) : ViewMo
                         null
                     )
                     NotificationService.scheduleNotification(context, id, Date(expiresAt))
+                    Log.i("NOTIF", "${credential.id}: scheduled for ${Date(expiresAt)}")
+
                 }
             }
             else {
