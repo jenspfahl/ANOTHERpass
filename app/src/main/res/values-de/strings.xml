@@ -446,7 +446,7 @@
     <string name="show_expired_passwords_reminder">Erinnerung für abgelaufene Zugangsdaten</string>
     <string name="summary_show_expired_passwords_reminder">Zeige eine Erinnerung wenn Zugangsdaten abgelaufen sind.</string>
     <string name="expired_credentials_notification_enabled_title">Erhalte eine Benachrichtigung wenn Zugangsdaten abgelaufen sind</string>
-    <string name="expired_credentials_notification_enabled_summary">Du erhältst eine Benachrichtigung zur rechten Zeit, auch wenn die App geschlossen ist.</string>
+    <string name="expired_credentials_notification_enabled_summary">Du erhältst eine Benachrichtigung zur rechten Zeit, auch wenn die App geschlossen ist. Ab Android 13 muss du der App erlauben, Benachrichtigungen zu senden.</string>
 
     <string name="next_reminder">Nächste Erinnerung</string>
     <string name="last_reminder">Letzte Erinnerung</string>

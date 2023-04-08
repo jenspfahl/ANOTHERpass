@@ -1,6 +1,7 @@
 package de.jepfa.yapm.util
 
 import android.Manifest
+import android.Manifest.permission.POST_NOTIFICATIONS
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
@@ -26,6 +27,20 @@ object PermissionChecker {
                     activity,
                     PERMISSIONS_RW_STORAGE,
                     PERMISSION_REQUEST_CODE
+            )
+        }
+    }
+
+    fun hasNotificationPermission(context: Context): Boolean {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || hasPermissions(context, POST_NOTIFICATIONS)
+    }
+
+    fun verifyNotificationPermissions(activity: BaseActivity, withUiResponse: Boolean = true) {
+        if (!hasNotificationPermission(activity)) {
+            ActivityCompat.requestPermissions(
+                activity,
+                arrayOf(POST_NOTIFICATIONS),
+                if (withUiResponse) PERMISSION_REQUEST_CODE else 0
             )
         }
     }

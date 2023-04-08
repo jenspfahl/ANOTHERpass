@@ -97,6 +97,7 @@ import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_WEBSITE
 import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_EXPIRED
 import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_EXPIRES
 import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_VEILED
+import de.jepfa.yapm.util.PermissionChecker.verifyNotificationPermissions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -132,6 +133,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
+        verifyNotificationPermissions(this, withUiResponse = false)
         NotificationService.createNotificationChannel(
             this,
             NotificationService.CHANNEL_ID_SCHEDULED,

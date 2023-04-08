@@ -25,11 +25,13 @@ class PasteContentProvider : ContentProvider() {
     override fun getType(uri: Uri): String {
         if (enablePushNotification) {
             context?.let {
+
                 NotificationService.pushNotification(
                     it,
                     NotificationService.CHANNEL_ID_PASTE,
                     it.getString(R.string.test_copypaste_password), it.getString(R.string.password_pasted_by_another),
-                    NotificationService.NOTIFICATION_ID_PASTE_SUCCESS
+                    NotificationService.NOTIFICATION_ID_PASTE_SUCCESS,
+                    silent = false,
                 )
             }
         }

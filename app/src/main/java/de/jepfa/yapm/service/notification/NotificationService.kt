@@ -1,6 +1,7 @@
 package de.jepfa.yapm.service.notification
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -14,9 +15,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import de.jepfa.yapm.R
-import de.jepfa.yapm.service.autofill.ResponseFiller
-import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.ui.credential.ListCredentialsActivity
+import de.jepfa.yapm.util.PermissionChecker.hasNotificationPermission
 import java.util.*
 
 object NotificationService {
@@ -41,7 +40,8 @@ object NotificationService {
         }
     }
 
-    fun pushNotification(context: Context, channelId: String, title: String, text:String, notificationId: Int,
+    @SuppressLint("MissingPermission") // permission check in hasNotificationPermission()
+    fun pushNotification(context: Context, channelId: String, title: String, text:String, notificationId: Int, silent: Boolean,
                          contentIntent: PendingIntent? = null, actionTitle: String? = null, actionIntent: PendingIntent? = null) {
         val mBuilder =
             NotificationCompat.Builder(context, channelId)
@@ -50,6 +50,7 @@ object NotificationService {
                 .setContentText(text)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(contentIntent)
+                .setSilent(silent)
                 .setColor(context.getColor(R.color.colorAccent))
 
         if (actionTitle != null && actionIntent != null) {
@@ -57,25 +58,19 @@ object NotificationService {
                 .addAction(0, actionTitle, actionIntent)
         }
 
-        val notificationManager = NotificationManagerCompat.from(context)
-        if (ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+        if (!hasNotificationPermission(context)) {
+            Log.w("NOTIF", "notification permission not granted")
             return
         }
-        notificationManager.notify(
-            notificationId,
-            mBuilder.build()
-        )
+        else {
+            val notificationManager = NotificationManagerCompat.from(context)
+
+            // permission check done above
+            notificationManager.notify(
+                notificationId,
+                mBuilder.build()
+            )
+        }
 
     }
 
@@ -116,7 +111,7 @@ object NotificationService {
         context: Context,
         id: Int
     ): PendingIntent? {
-        val alarmIntent = Intent(context, AlarmNotificationReceiver::class.java).let { intent ->
+        val alarmIntent = Intent(context, ExpiryAlarmNotificationReceiver::class.java).let { intent ->
             intent.putExtra("ID", id)
             PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }

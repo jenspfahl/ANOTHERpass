@@ -455,7 +455,7 @@
     <string name="show_expired_passwords_reminder">Reminder for expired credentials</string>
     <string name="summary_show_expired_passwords_reminder">Show a reminder when any credential is expired.</string>
     <string name="expired_credentials_notification_enabled_title">Receive a notification when any credential is expired.</string>
-    <string name="expired_credentials_notification_enabled_summary">You will receive a notification at the right time even if the app is closed.</string>
+    <string name="expired_credentials_notification_enabled_summary">You will receive a notification at the right time even if the app is closed. Since Android 13 you must grant a permission to receive notifications.</string>
 
 
     <string name="next_reminder">Next reminder</string>

@@ -65,6 +65,7 @@ object DebugInfo {
         sb.append("\n************ PERMISSIONS ************\n")
         sb.addFormattedLine("Read Storage granted", PermissionChecker.hasReadStoragePermissions(context))
         sb.addFormattedLine("Read/write storage granted", PermissionChecker.hasRWStoragePermissions(context))
+        sb.addFormattedLine("Notifications granted", PermissionChecker.hasNotificationPermission(context))
         sb.addFormattedLine("Overlay dialog granted", PermissionChecker.hasOverlayPermission(context))
         sb.addFormattedLine("Camera granted", PermissionChecker.hasCameraPermission(context))
         sb.addFormattedLine("Biometric granted", BiometricUtils.isPermissionGranted(context))

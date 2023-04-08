@@ -1,22 +1,14 @@
 package de.jepfa.yapm.service.notification
 
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import de.jepfa.yapm.R
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.notification.NotificationService.SCHEDULED_NOTIFICATION_KEY_SEPARATOR
-import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.ui.credential.ListCredentialsActivity
-import de.jepfa.yapm.util.removeTime
 import de.jepfa.yapm.util.toDate
-import de.jepfa.yapm.util.toSimpleDateFormat
-import de.jepfa.yapm.util.toastText
-import java.util.*
 
-class NotificationScheduleBootReceiver : BroadcastReceiver() {
+class ExpiryNotificationScheduleBootReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         Log.d("NOTIF", "boot completed: intent=$intent")

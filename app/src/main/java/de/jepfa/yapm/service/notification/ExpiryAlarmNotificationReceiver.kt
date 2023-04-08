@@ -17,7 +17,7 @@ import de.jepfa.yapm.util.removeTime
 import de.jepfa.yapm.util.toSimpleDateFormat
 import java.util.*
 
-class AlarmNotificationReceiver : BroadcastReceiver() {
+class ExpiryAlarmNotificationReceiver : BroadcastReceiver() {
 
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -59,6 +59,7 @@ class AlarmNotificationReceiver : BroadcastReceiver() {
                 context.getString(R.string.credential_expired_notifiction_title),
                 context.getString(R.string.credential_expired_notifiction_message, expiryDateForId.toSimpleDateFormat()),
                 id,
+                silent = true,
                 contentIntent,
                 context.getString(R.string.credential_expired_notifiction_show_all_expired),
                 actionIntent
