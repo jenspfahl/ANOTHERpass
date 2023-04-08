@@ -310,7 +310,7 @@
     <string name="scanning_emp">Scanne Masterpasswort</string>
 
     <string name="title_delete_selected">Lösche ausgewählte Zugangsdaten</string>
-    <string name="message_delete_selected">Du bist dabei, %1$d Zugangsdaten zu löschen! Fortfahren?</string>
+    <string name="message_delete_selected">Du bist dabei, %1$d Zugangsdaten zu löschen! Sind Sie sicher?</string>
     <string name="message_selected_deleted">Ausgewählte Zugangsdaten gelöscht</string>
     <string name="reset_selection">Auswahl aufheben</string>
 

@@ -52,6 +52,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         Filterable {
 
     private var originList: List<EncCredential> = emptyList()
+    private var selectionMode = false
     private var selected = HashSet<EncCredential>() 
 
     fun getSelectedCredentials() = HashSet(selected)
@@ -100,19 +101,33 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             }
         }
 
-        holder.listenForLongClick { pos, _ ->
-
-            val current = getItem(pos) ?: return@listenForLongClick false
+        holder.listenForToggleSelection { pos, _ ->
+            val current = getItem(pos)
 
             if (!selected.contains(current)) {
-                holder.credentialSelectionContainerView.visibility = View.VISIBLE
                 selected.add(current)
             }
             else {
-                holder.credentialSelectionContainerView.visibility = View.GONE
                 selected.remove(current)
             }
+            notifyItemChanged(pos)
             multipleSelectionCallback(selected)
+        }
+
+        holder.listenForLongClick { pos, _ ->
+
+
+            if (selectionMode) {
+                resetSelection()
+            }
+            else {
+                selectionMode = true
+                val current = getItem(pos)
+                selected.add(current)
+
+                notifyDataSetChanged()
+                multipleSelectionCallback(selected)
+            }
 
             true
         }
@@ -185,8 +200,14 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
     override fun onBindViewHolder(holder: CredentialViewHolder, position: Int) {
         val current = getItem(position)
         val key = listCredentialsActivity.masterSecretKey
-        if (selected.contains(current)) {
+        if (selectionMode) {
             holder.credentialSelectionContainerView.visibility = View.VISIBLE
+            if (selected.contains(current)) {
+                holder.credentialSelectedView.setImageDrawable(listCredentialsActivity.getDrawable(R.drawable.outline_check_circle_24))
+            }
+            else {
+                holder.credentialSelectedView.setImageDrawable(listCredentialsActivity.getDrawable(R.drawable.outline_circle_24))
+            }
         }
         else {
             holder.credentialSelectionContainerView.visibility = View.GONE
@@ -405,10 +426,11 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             .toList()
     }
 
-    fun resetSelection() {
-        if (selected.isNotEmpty()) {
-            selected.clear()
-            multipleSelectionCallback(selected)
+    fun resetSelection(withRefresh: Boolean = true) {
+        selectionMode = false
+        selected.clear()
+        multipleSelectionCallback(selected)
+        if (withRefresh) {
             notifyDataSetChanged()
         }
     }
@@ -421,6 +443,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         private val credentialMenuImageView: ImageView = itemView.findViewById(R.id.credential_menu_popup)
         private val credentialLabelContainerGroup: ChipGroup = itemView.findViewById(R.id.label_container)
         val credentialSelectionContainerView: LinearLayout = itemView.findViewById(R.id.selection_container)
+        val credentialSelectedView: ImageView = itemView.findViewById(R.id.selected)
 
         fun hideCopyPasswordIcon() {
             credentialCopyImageView.visibility = View.GONE
@@ -436,6 +459,15 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
 
         fun listenForShowCredential(event: (position: Int, type: Int) -> Unit) {
             credentialContainerView.setOnClickListener {
+                if (adapterPosition == RecyclerView.NO_POSITION) {
+                    return@setOnClickListener
+                }
+                event.invoke(adapterPosition, itemViewType)
+            }
+        }
+
+        fun listenForToggleSelection(event: (position: Int, type: Int) -> Unit) {
+            credentialSelectedView.setOnClickListener {
                 if (adapterPosition == RecyclerView.NO_POSITION) {
                     return@setOnClickListener
                 }

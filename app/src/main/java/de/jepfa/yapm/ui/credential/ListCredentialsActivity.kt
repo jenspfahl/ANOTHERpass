@@ -240,7 +240,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                             { output ->
                                 if (output.success) {
                                     toastText(this, R.string.message_selected_deleted)
-                                    listCredentialAdapter?.resetSelection()
+                                    listCredentialAdapter?.resetSelection(withRefresh = false)
 
                                 }
                             }
@@ -738,7 +738,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
         else if (requestCode == newOrUpdateCredentialActivityRequestCode && resultCode == Activity.RESULT_OK) {
             data?.let {
-                listCredentialAdapter?.resetSelection()
+                listCredentialAdapter?.resetSelection(withRefresh = false)
                 val credential = EncCredential.fromIntent(it, createUuid = true)
                 jumpToUuid = credential.uid
 

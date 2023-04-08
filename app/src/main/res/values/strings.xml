@@ -320,7 +320,7 @@
     <string name="scanning_emp">Scanning Master Password</string>
 
     <string name="title_delete_selected">Delete selected credentials</string>
-    <string name="message_delete_selected">You are going to delete %1$d selected credentials! Continue?</string>
+    <string name="message_delete_selected">You are going to delete %1$d selected credentials! Are you sure?</string>
     <string name="message_selected_deleted">Selected credentials deleted</string>
     <string name="reset_selection">Reset selection</string>
 
