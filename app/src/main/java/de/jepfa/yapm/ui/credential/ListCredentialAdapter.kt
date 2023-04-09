@@ -379,7 +379,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                         }
 
                     }
-                    if (filterAll) {
+                    if (filterExtended) {
                         filterResults.values = filteredList
 
                     }
