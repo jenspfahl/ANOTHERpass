@@ -90,13 +90,13 @@ class EditCredentialDataFragment : SecureFragment() {
 
         editCredentialExpiredAtAdapter = ArrayAdapter(editCredentialActivity, android.R.layout.simple_spinner_dropdown_item, mutableListOf<String>())
         editCredentialExpiredAtSpinner.adapter = editCredentialExpiredAtAdapter
-        updateExpiredAtAdapter(updateSelection = false, null, editCredentialActivity)
+        updateExpiredAtAdapter(null, editCredentialActivity)
 
         editCredentialChooseExpiredAtImageView.setOnClickListener {
             selectExpiryDate()
         }
         editCredentialRemoveExpiredAtImageView.setOnClickListener {
-            updateExpiredAtAdapter(updateSelection = true, null, editCredentialActivity)
+            updateExpiredAtAdapter(null, editCredentialActivity)
         }
         editCredentialExpiredAtSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -111,16 +111,16 @@ class EditCredentialDataFragment : SecureFragment() {
                     // explicitly nothing!
                 }
                 else if (position == ExpiryOptions.EXPIRES_IN_A_MONTH.ordinal) {
-                    updateExpiredAtAdapter(updateSelection = true, Date().addMonths(1), editCredentialActivity)
+                    updateExpiredAtAdapter(Date().addMonths(1), editCredentialActivity)
                 }
                 else if (position == ExpiryOptions.EXPIRES_IN_3_MONTHS.ordinal) {
-                    updateExpiredAtAdapter(updateSelection = true, Date().addMonths(3), editCredentialActivity)
+                    updateExpiredAtAdapter(Date().addMonths(3), editCredentialActivity)
                 }
                 else if (position == ExpiryOptions.EXPIRES_IN_6_MONTHS.ordinal) {
-                    updateExpiredAtAdapter(updateSelection = true, Date().addMonths(6), editCredentialActivity)
+                    updateExpiredAtAdapter(Date().addMonths(6), editCredentialActivity)
                 }
                 else if (position == ExpiryOptions.EXPIRES_IN_12_MONTHS.ordinal) {
-                    updateExpiredAtAdapter(updateSelection = true, Date().addMonths(12), editCredentialActivity)
+                    updateExpiredAtAdapter(Date().addMonths(12), editCredentialActivity)
                 }
                 else if (position == ExpiryOptions.EXPIRES_ON_CUSTOM.ordinal) {
                     selectExpiryDate()
@@ -212,7 +212,7 @@ class EditCredentialDataFragment : SecureFragment() {
         }
     }
 
-    private fun updateExpiredAtAdapter(updateSelection: Boolean, expiryDate: Date?, context: Context) {
+    private fun updateExpiredAtAdapter(expiryDate: Date?, context: Context) {
         editCredentialExpiredAtAdapter.clear()
         editCredentialExpiredAtAdapter.addAll(
             context.getString(ExpiryOptions.EXPIRES_IN_A_MONTH.representationId),
@@ -253,9 +253,7 @@ class EditCredentialDataFragment : SecureFragment() {
         }
 
         selectedExpiryDate = expiryDate?.removeTime()
-        if (updateSelection) {
-            editCredentialExpiredAtSpinner.setSelection(0)
-        }
+        editCredentialExpiredAtSpinner.setSelection(0)
 
         editCredentialRemoveExpiredAtImageView.visibility =
             if (selectedExpiryDate != null) View.VISIBLE else View.GONE
@@ -276,7 +274,7 @@ class EditCredentialDataFragment : SecureFragment() {
             { _, year, monthOfYear, dayOfMonth ->
                 val c = Calendar.getInstance()
                 c.set(year, monthOfYear, dayOfMonth)
-                updateExpiredAtAdapter(updateSelection = true, c.time, editCredentialActivity)
+                updateExpiredAtAdapter(c.time, editCredentialActivity)
 
             }, mYear, mMonth, mDay
         )
@@ -319,7 +317,7 @@ class EditCredentialDataFragment : SecureFragment() {
         editCredentialWebsiteView.setText(website)
 
         val expiresAt = if (expiresAtAsLong != null && expiresAtAsLong > 0) Date(expiresAtAsLong) else null
-        updateExpiredAtAdapter(updateSelection = true, expiresAt, editCredentialActivity)
+        updateExpiredAtAdapter(expiresAt, editCredentialActivity)
 
         editCredentialAdditionalInfoView.setText(additionalInfo)
         updateExpandAddInfoVisibility(expandAdditionalInfoImageView, additionalInfo)
