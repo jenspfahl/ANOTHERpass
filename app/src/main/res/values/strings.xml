@@ -511,7 +511,7 @@
     <string name="whats_new_in_1_8_bullet_3_head">Adjust login iterations</string>
     <string name="whats_new_in_1_8_bullet_3_text">Tweak the PBKDF-iteration count taken to en- and decrypt your Encrypted Master Key.</string>
     <string name="whats_new_in_1_8_bullet_4_head">Improvement of some UI-components</string>
-    <string name="whats_new_in_1_8_bullet_4_text">More space in displaying and editing additional information for credentials, improved reminders, multiple selection of credentials, reworked password-strength dialog, single filter by labels, etc…</string>
+    <string name="whats_new_in_1_8_bullet_4_text">More space in displaying and editing additional information for credentials, improved reminders, multiple selection of credentials, etc…</string>
 
     <string name="intro">Show intro</string>
     <string name="intro_1_head">Another way to manage passwords</string>

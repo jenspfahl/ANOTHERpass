@@ -649,10 +649,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
                 val view = LinearLayout(this)
                 view.orientation = LinearLayout.HORIZONTAL
-                view.setPadding(54, 32, 64, 32)
+                view.setPadding(54, 16, 64, 16)
+
                 val checkBox = CheckBox(this)
                 checkBox.isChecked = PreferenceService.getAsBool(PREF_EXPIRED_CREDENTIALS_ON_TOP, this)
                 val desc = TextView(this)
+                desc.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT)
                 desc.text = getString(R.string.expired_credentials_on_top)
                 view.addView(checkBox)
                 view.addView(desc)

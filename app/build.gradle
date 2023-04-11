@@ -69,7 +69,7 @@ dependencies {
     // You'll probably have to update the version numbers in build.gradle (Project)
 
     // Room components
-    implementation "androidx.room:room-ktx:2.5.0"
+    implementation 'androidx.room:room-ktx:2.5.1'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
     implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
@@ -79,16 +79,16 @@ dependencies {
     implementation 'androidx.slice:slice-builders:1.0.0'
     implementation 'androidx.autofill:autofill:1.1.0'
     implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.work:work-runtime-ktx:2.8.0'
+    implementation 'androidx.work:work-runtime-ktx:2.8.1'
     implementation 'androidx.core:core-ktx:1.9.0'
-    kapt "androidx.room:room-compiler:2.5.0"
-    androidTestImplementation "androidx.room:room-testing:2.5.0"
+    kapt 'androidx.room:room-compiler:2.5.1'
+    androidTestImplementation 'androidx.room:room-testing:2.5.1'
     androidTestImplementation 'androidx.test:core-ktx:1.5.0'
 
     // Lifecycle components
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.0"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.6.0"
-    implementation "androidx.lifecycle:lifecycle-common-java8:2.6.0"
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-common-java8:2.6.1'
 
     // Kotlin components
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

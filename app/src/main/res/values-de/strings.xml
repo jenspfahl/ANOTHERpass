@@ -236,7 +236,7 @@
     <string name="credential_sort_by_recently_modified">Kürzlich geändert (neuste zuerst)</string>
     <string name="credential_sort_by_id">Zugangsdaten-ID</string>
     <string name="show_ids">Zeige Zugangsdaten-IDs</string>
-    <string name="expired_credentials_on_top">Abgelaufene Zugansdaten ganz oben</string>
+    <string name="expired_credentials_on_top">Abgelaufene Zugangsdaten ganz oben</string>
     <string name="tab_pseudo_phrase">Pseudophrase</string>
     <string name="tab_ordinary">Normales Passwort</string>
     <string name="drop_to_close">APP SCHLIESSEN</string>
@@ -501,7 +501,7 @@
     <string name="whats_new_in_1_8_bullet_3_head">Anpassen der Login-Iterationen</string>
     <string name="whats_new_in_1_8_bullet_3_text">Optimiere die PBKDF-Iterationen deines Verschlüsselten Masterkeys abhängig von der CPU-Power deines Gerätes, um die Sicherheit zu erhöhen.</string>
     <string name="whats_new_in_1_8_bullet_4_head">Verbesserung einiger UI-Komponenten</string>
-    <string name="whats_new_in_1_8_bullet_4_text">Mehr Platz zum Bearbeiten und Zeigen von Zusatzinformationen, verbesserte Anzeigen von Erinnerungen, Mehrfachauswahl von Zugangsdaten, überarbeiteter Passwortstärken-Dialog, vereinfachtes Filtern nach Kategorien u.v.m.</string>
+    <string name="whats_new_in_1_8_bullet_4_text">Mehr Platz zum Bearbeiten und Zeigen von Zusatzinformationen, verbessertes Anzeigen von Erinnerungen, Mehrfachauswahl von Zugangsdaten, u.v.m.</string>
 
 
     <string name="intro">Starte Intro</string>
