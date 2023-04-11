@@ -15,6 +15,7 @@ import androidx.autofill.inline.UiVersions
 
 object SliceCreator {
 
+    @SuppressLint("RestrictedApi")
     @RequiresApi(api = Build.VERSION_CODES.R)
     fun createSlice(
         imeSpec: InlinePresentationSpec,

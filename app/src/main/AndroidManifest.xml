@@ -20,13 +20,16 @@
     <application
         android:name=".ui.YapmApp"
         android:allowBackup="false"
+        android:fullBackupContent="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.YetAnotherPasswordManager"
-        tools:replace="android:allowBackup">
+        tools:replace="android:allowBackup"
+        tools:targetApi="s">
         <activity
             android:name=".ui.intro.LicencesActivity"
             android:exported="false" />

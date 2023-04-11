@@ -93,27 +93,6 @@ object FileUtil {
         return true
     }
 
-    fun getFileName(context: Context, uri: Uri): String? {
-        var result: String? = null
-        if (uri.scheme == "content") {
-            val cursor = context.contentResolver.query(uri, null, null, null, null)
-            try {
-                if (cursor != null && cursor.moveToFirst()) {
-                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
-                }
-            } finally {
-                cursor?.close()
-            }
-        }
-        if (result == null) {
-            result = uri.path
-            val cut = result?.lastIndexOf('/')
-            if (cut != null && cut != -1) {
-                result = result?.substring(cut + 1)
-            }
-        }
-        return result
-    }
 
 
 }
