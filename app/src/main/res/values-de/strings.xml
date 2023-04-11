@@ -496,10 +496,10 @@
     <string name="whats_new_in_1_8">Was ist neu in Version 1.8</string>
     <string name="whats_new_in_1_8_bullet_1_head">Ablaufdatum für Zugangsdaten</string>
     <string name="whats_new_in_1_8_bullet_1_text">Setze ein optionales Ablaufdatum und erhalte eine Benachrichtigung wenn Zugangsdaten ablaufen. Abgelaufene Zugangsdaten werden entsprechend markiert.</string>
-    <string name="whats_new_in_1_8_bullet_2_head">Überarbeitete erweiterte Suche</string>
-    <string name="whats_new_in_1_8_bullet_2_text">Verbesserte Suche in diversen Attributen der Zugangsdaten mit dem \'!\'-Kommando. Suche direkt nach abgelaufenen order verschleierten Zugangsdaten.</string>
-    <string name="whats_new_in_1_8_bullet_3_head">Anpassen der Login-Iterationen</string>
-    <string name="whats_new_in_1_8_bullet_3_text">Optimiere die PBKDF-Iterationen deines Verschlüsselten Masterkeys abhängig von der CPU-Power deines Gerätes, um die Sicherheit zu erhöhen.</string>
+    <string name="whats_new_in_1_8_bullet_2_head">Anpassen der Login-Iterationen</string>
+    <string name="whats_new_in_1_8_bullet_2_text">Optimiere die PBKDF-Iterationen deines Verschlüsselten Masterkeys abhängig von der CPU-Power deines Gerätes, um die Sicherheit zu erhöhen.</string>
+    <string name="whats_new_in_1_8_bullet_3_head">Überarbeitete erweiterte Suche</string>
+    <string name="whats_new_in_1_8_bullet_3_text">Verbesserte Suche in diversen Attributen der Zugangsdaten mit dem \'!\'-Kommando. Suche direkt nach abgelaufenen order verschleierten Zugangsdaten.</string>
     <string name="whats_new_in_1_8_bullet_4_head">Verbesserung einiger UI-Komponenten</string>
     <string name="whats_new_in_1_8_bullet_4_text">Mehr Platz zum Bearbeiten und Zeigen von Zusatzinformationen, verbessertes Anzeigen von Erinnerungen, Mehrfachauswahl von Zugangsdaten, u.v.m.</string>
 

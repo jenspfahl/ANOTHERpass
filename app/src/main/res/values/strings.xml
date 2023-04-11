@@ -506,10 +506,10 @@
     <string name="whats_new_in_1_8">What\'s new in version 1.8</string>
     <string name="whats_new_in_1_8_bullet_1_head">Expiry dates for credentials</string>
     <string name="whats_new_in_1_8_bullet_1_text">Define optional expiry dates and obtain notifications once credentials expire. Expired credentials are marked accordingly.</string>
-    <string name="whats_new_in_1_8_bullet_2_head">Reworked extended search</string>
-    <string name="whats_new_in_1_8_bullet_2_text">Improved search in separate credential attributes with the \'!\'-command. Search directly by expired or veiled/obfuscated credentials.</string>
-    <string name="whats_new_in_1_8_bullet_3_head">Adjust login iterations</string>
-    <string name="whats_new_in_1_8_bullet_3_text">Tweak the PBKDF-iteration count taken to en- and decrypt your Encrypted Master Key.</string>
+    <string name="whats_new_in_1_8_bullet_2_head">Adjust login iterations</string>
+    <string name="whats_new_in_1_8_bullet_2_text">Tweak the PBKDF-iteration count taken to en- and decrypt your Encrypted Master Key.</string>
+    <string name="whats_new_in_1_8_bullet_3_head">Reworked extended search</string>
+    <string name="whats_new_in_1_8_bullet_3_text">Improved search in separate credential attributes with the \'!\'-command. Search directly by expired or veiled/obfuscated credentials.</string>
     <string name="whats_new_in_1_8_bullet_4_head">Improvement of some UI-components</string>
     <string name="whats_new_in_1_8_bullet_4_text">More space in displaying and editing additional information for credentials, improved reminders, multiple selection of credentials, etc…</string>
 
