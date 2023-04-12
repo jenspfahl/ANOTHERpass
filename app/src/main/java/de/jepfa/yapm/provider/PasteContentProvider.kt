@@ -6,7 +6,7 @@ import android.database.Cursor
 import android.database.MatrixCursor
 import android.net.Uri
 import de.jepfa.yapm.R
-import de.jepfa.yapm.util.NotificationHelper
+import de.jepfa.yapm.service.notification.NotificationService
 
 
 class PasteContentProvider : ContentProvider() {
@@ -25,11 +25,13 @@ class PasteContentProvider : ContentProvider() {
     override fun getType(uri: Uri): String {
         if (enablePushNotification) {
             context?.let {
-                NotificationHelper.pushNotification(
+
+                NotificationService.pushNotification(
                     it,
-                    NotificationHelper.CHANNEL_ID_PASTE,
-                    it.getString(R.string.app_name), it.getString(R.string.password_pasted_by_another),
-                    NotificationHelper.NOTIFICATION_ID_PASTE_SUCCESS
+                    NotificationService.CHANNEL_ID_PASTE,
+                    it.getString(R.string.test_copypaste_password), it.getString(R.string.password_pasted_by_another),
+                    NotificationService.NOTIFICATION_ID_PASTE_SUCCESS,
+                    silent = false,
                 )
             }
         }
@@ -42,9 +44,9 @@ class PasteContentProvider : ContentProvider() {
 
     override fun onCreate(): Boolean {
         context?.let {
-            NotificationHelper.createNotificationChannel(
+            NotificationService.createNotificationChannel(
                 it,
-                NotificationHelper.CHANNEL_ID_PASTE,
+                NotificationService.CHANNEL_ID_PASTE,
                 it.getString(R.string.notification_channel_paste_title)
             )
         }

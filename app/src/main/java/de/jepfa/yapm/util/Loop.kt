@@ -2,9 +2,9 @@ package de.jepfa.yapm.util
 
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.service.secretgenerator.GeneratorBase.Companion.DEFAULT_DIGITS
+import de.jepfa.yapm.service.secretgenerator.GeneratorBase.Companion.DEFAULT_OBFUSCATIONABLE_SPECIAL_CHARS
 import de.jepfa.yapm.service.secretgenerator.passphrase.DEFAULT_CONSONANTS
-import de.jepfa.yapm.service.secretgenerator.passphrase.DEFAULT_DIGITS
-import de.jepfa.yapm.service.secretgenerator.passphrase.DEFAULT_SPECIAL_CHARS
 import de.jepfa.yapm.service.secretgenerator.passphrase.DEFAULT_VOCALS
 import java.util.ArrayList
 import java.util.HashMap
@@ -90,7 +90,7 @@ class Loop<T>(data: List<T>) {
         val DIGITS_LOOP = Loop(DEFAULT_DIGITS.toCharArray().asList())
         val VOCALS_LOOP = Loop(DEFAULT_VOCALS.toCharArray().asList())
         val CONSONANTS_LOOP = Loop(DEFAULT_CONSONANTS.toCharArray().asList())
-        val SPECIAL_CHARS_LOOP = Loop(DEFAULT_SPECIAL_CHARS.toCharArray().asList())
+        val SPECIAL_CHARS_LOOP = Loop(DEFAULT_OBFUSCATIONABLE_SPECIAL_CHARS.toCharArray().asList())
 
         /*
         key length must at least password length

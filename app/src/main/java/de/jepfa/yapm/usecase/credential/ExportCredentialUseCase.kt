@@ -14,6 +14,7 @@ import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.service.secret.SecretService.decryptLong
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
@@ -35,7 +36,7 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
         val listItems = ExportMode.values().map { activity.getString(it.labelId) }.toTypedArray()
 
         AlertDialog.Builder(activity)
-            .setIcon(R.drawable.ic_baseline_import_export_24)
+            .setIcon(R.drawable.ic_baseline_qr_code_24_white)
             .setTitle(R.string.export_credential)
             .setSingleChoiceItems(listItems, -1) { dialogInterface, i ->
                 val mode = ExportMode.values()[i]
@@ -140,6 +141,7 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
             }
             ExportMode.PLAIN_CREDENTIAL_RECORD -> {
                 val passwd = decryptPasswd(credential, key, obfuscationKey)
+                val expiresAt = decryptLong(key, credential.expiresAt)
 
                 val shortPlainCredential = PlainShareableCredential(
                     credential.uid?.toBase64String(),
@@ -147,7 +149,8 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
                     SecretService.decryptCommonString(key, credential.additionalInfo),
                     SecretService.decryptCommonString(key, credential.user),
                     passwd,
-                    SecretService.decryptCommonString(key, credential.website)
+                    SecretService.decryptCommonString(key, credential.website),
+                    if (expiresAt != null && expiresAt > 0) expiresAt else null,
                 )
                 val jsonString = VaultExportService.credentialToJson(shortPlainCredential)
                 val encData = SecretService.encryptCommonString(transportKey, jsonString)

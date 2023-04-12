@@ -1,15 +1,19 @@
 package de.jepfa.yapm.ui.credential
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.database.Cursor
+import android.database.MatrixCursor
 import android.graphics.Bitmap
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
+import android.provider.BaseColumns
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
@@ -22,6 +26,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
@@ -45,15 +50,17 @@ import de.jepfa.yapm.service.PreferenceService.DATA_NAV_MENU_QUICK_ACCESS_EXPAND
 import de.jepfa.yapm.service.PreferenceService.DATA_NAV_MENU_VAULT_EXPANDED
 import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_SUGGEST_CREDENTIALS
 import de.jepfa.yapm.service.PreferenceService.PREF_CREDENTIAL_SORT_ORDER
+import de.jepfa.yapm.service.PreferenceService.PREF_EXPIRED_CREDENTIALS_ON_TOP
+import de.jepfa.yapm.service.PreferenceService.PREF_LABEL_FILTER_SINGLE_CHOICE
 import de.jepfa.yapm.service.PreferenceService.PREF_NAV_MENU_ALWAYS_COLLAPSED
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_CREDENTIAL_IDS
 import de.jepfa.yapm.service.PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD
 import de.jepfa.yapm.service.PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_RELOAD
 import de.jepfa.yapm.service.autofill.ResponseFiller
-import de.jepfa.yapm.service.autofill.ResponseFiller.ACTION_DELIMITER
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelFilter.WITH_NO_LABELS_ID
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.notification.NotificationService
 import de.jepfa.yapm.service.notification.ReminderService
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
 import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
@@ -73,12 +80,24 @@ import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.ui.label.ListLabelsActivity
 import de.jepfa.yapm.ui.settings.SettingsActivity
 import de.jepfa.yapm.usecase.app.ShowInfoUseCase
+import de.jepfa.yapm.usecase.credential.DeleteMultipleCredentialsUseCase
 import de.jepfa.yapm.usecase.secret.*
 import de.jepfa.yapm.usecase.session.LogoutUseCase
 import de.jepfa.yapm.usecase.vault.DropVaultUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.usecase.vault.ShowVaultInfoUseCase
 import de.jepfa.yapm.util.*
+import de.jepfa.yapm.util.Constants.ACTION_DELIMITER
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_ID
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_IN_ALL
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_LABEL
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_UID
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_USER
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_WEBSITE
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_EXPIRED
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_EXPIRES
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_VEILED
+import de.jepfa.yapm.util.PermissionChecker.verifyNotificationPermissions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -101,6 +120,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private lateinit var navigationView: NavigationView
     private lateinit var toggle: ActionBarDrawerToggle
     private var resumeAutofillItem: MenuItem? = null
+    private var lastReminderItem: MenuItem? = null
+    private var nextReminderItem: MenuItem? = null
 
     val newOrUpdateCredentialActivityRequestCode = 1
 
@@ -111,26 +132,37 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private var jumpToItemPosition: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        verifyNotificationPermissions(this, withUiResponse = false)
+        NotificationService.createNotificationChannel(
+            this,
+            NotificationService.CHANNEL_ID_SCHEDULED,
+            getString(R.string.notification_channel_scheduled_title)
+        )
+
         // session check would bring LoginActivity to front when action is invoked
         checkSession = false
+        Log.i("LST", "onCreate")
         super.onCreate(savedInstanceState)
         intent?.action?.let { action ->
             Log.i("LST", "action=$action")
-            if (action.startsWith(ResponseFiller.ACTION_CLOSE_VAULT)) {
+            if (action.startsWith(Constants.ACTION_CLOSE_VAULT)) {
                 Session.lock()
                 pushBackAutofill(allowCreateAuthentication = true)
                 toastText(this, R.string.vault_locked)
                 return
             }
-            if (action.startsWith(ResponseFiller.ACTION_EXCLUDE_FROM_AUTOFILL)) {
+            if (action.startsWith(Constants.ACTION_EXCLUDE_FROM_AUTOFILL)) {
                 pushBackAutofill(ignoreCurrentApp = true)
                 toastText(this, R.string.excluded_from_autofill)
                 return
             }
-            if (action.startsWith(ResponseFiller.ACTION_PAUSE_AUTOFILL)) {
+            if (action.startsWith(Constants.ACTION_PAUSE_AUTOFILL)) {
                 val pauseDurationInSec = PreferenceService.getAsString(PreferenceService.PREF_AUTOFILL_DEACTIVATION_DURATION, this)
                 if (pauseDurationInSec != null) {
-                    pauseAutofill(pauseDurationInSec)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        pauseAutofill(pauseDurationInSec)
+                    }
                     return
                 }
             }
@@ -142,8 +174,19 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         setContentView(R.layout.activity_list_credentials)
         val toolbar: Toolbar = findViewById(R.id.list_credentials_toolbar)
         setSupportActionBar(toolbar)
+
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
+        val fab = findViewById<FloatingActionButton>(R.id.fab)
+
         listCredentialAdapter = ListCredentialAdapter(this)
+        { selected ->
+            if (selected.isNotEmpty()) {
+                fab.setImageResource(R.drawable.ic_baseline_delete_24_white)
+            }
+            else {
+                fab.setImageResource(R.drawable.ic_add_white_24dp)
+            }
+        }
         recyclerView.adapter = listCredentialAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
         val showDividers = PreferenceService.getAsBool(PreferenceService.PREF_SHOW_DIVIDERS_IN_LIST, this)
@@ -185,12 +228,40 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             }
         }
 
-        val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
-            val intent = Intent(this@ListCredentialsActivity, EditCredentialActivity::class.java)
-            intent.action = this.intent.action
-            intent.putExtras(this.intent) // forward all extras, especially needed for Autofill
-            startActivityForResult(intent, newOrUpdateCredentialActivityRequestCode)
+            val selectedCredentials = listCredentialAdapter?.getSelectedCredentials()
+            if (selectedCredentials?.isNotEmpty() == true) {
+
+                AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.title_delete_selected))
+                    .setMessage(getString(R.string.message_delete_selected, selectedCredentials.size))
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        UseCaseBackgroundLauncher(DeleteMultipleCredentialsUseCase)
+                            .launch(this, DeleteMultipleCredentialsUseCase.Input(selectedCredentials))
+                            { output ->
+                                if (output.success) {
+                                    toastText(this, R.string.message_selected_deleted)
+                                    listCredentialAdapter?.resetSelection(withRefresh = false)
+
+                                }
+                            }
+                    }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .setNeutralButton(R.string.reset_selection) { _, _ ->
+                        listCredentialAdapter?.resetSelection()
+                    }
+                    .show()
+
+
+            }
+            else {
+                val intent =
+                    Intent(this@ListCredentialsActivity, EditCredentialActivity::class.java)
+                intent.action = this.intent.action
+                intent.putExtras(this.intent) // forward all extras, especially needed for Autofill
+                startActivityForResult(intent, newOrUpdateCredentialActivityRequestCode)
+            }
         }
 
         fab.setOnLongClickListener {
@@ -249,6 +320,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     override fun onResume() {
         super.onResume()
+        Log.i("LST", "onResume")
+        updateSearchFieldWithAutofillSuggestion(intent)
 
         val navMenuAlwaysCollapsed = PreferenceService.getAsBool(
             PREF_NAV_MENU_ALWAYS_COLLAPSED, false, this@ListCredentialsActivity)
@@ -258,6 +331,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         refreshNavigationMenu()
 
         updateResumeAutofillMenuItem()
+        updateReminderMenuItems()
 
         val requestReload = PreferenceService.getAsBool(STATE_REQUEST_CREDENTIAL_LIST_RELOAD, applicationContext)
         val requestHardReload = PreferenceService.getAsBool(STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD, applicationContext)
@@ -266,29 +340,21 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             PreferenceService.delete(STATE_REQUEST_CREDENTIAL_LIST_RELOAD, applicationContext)
 
             if (requestHardReload) {
+                Log.d("LST", "hard reload")
                 recreate()
             }
             else {
                 listCredentialAdapter?.notifyDataSetChanged()
+                Log.d("LST", "soft reload")
             }
         }
 
         val view: View = findViewById(R.id.content_list_credentials)
 
-        var showed = ReminderService.showReminders(ReminderService.MasterPassword, view, this)
-        if (!showed) {
-            showed = ReminderService.showReminders(ReminderService.Vault, view, this)
-        }
-        if (!showed) {
-            showed = ReminderService.showReminders(ReminderService.MasterKey, view, this)
-        }
-        if (!showed) {
-            showed = ReminderService.showReminders(ReminderService.StoredMasterPassword, view, this)
-        }
-        if (!showed) {
-            showed = ReminderService.showReminders(ReminderService.RefreshMasterPasswordToken, view, this)
-        }
-
+        // wait until ViewModel is fully loaded
+        view.postDelayed({
+            ReminderService.showNextReminder(view, this)
+        }, 500L)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -298,15 +364,16 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-
-        menuInflater.inflate(R.menu.menu_main, menu)
-        Log.d("LST", "inflate menues")
+        inflateActionsMenu(menu, R.menu.menu_main)
+        Log.i("LST", "onCreateOptionsMenu")
 
         val searchItem: MenuItem = menu.findItem(R.id.action_search)
         this.searchItem = searchItem
         val searchView = MenuItemCompat.getActionView(searchItem) as SearchView
 
-        val searchPlate = searchView.findViewById(R.id.search_src_text) as EditText
+        val searchPlate = searchView.findViewById(R.id.search_src_text) as AutoCompleteTextView
+        searchPlate.threshold = 1
+
         searchPlate.hint = getString(R.string.search)
         val searchPlateView: View =
             searchView.findViewById(R.id.search_plate)
@@ -317,14 +384,57 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             )
         )
 
+        val from = arrayOf(SearchManager.SUGGEST_COLUMN_TEXT_1)
+        val to = intArrayOf(R.id.search_suggestion)
+        val cursorAdapter = androidx.cursoradapter.widget.SimpleCursorAdapter(this, R.layout.content_search_suggestion, null, from, to, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER)
+        val suggestions = listOf(
+            SEARCH_COMMAND_SEARCH_IN_ALL,
+            SEARCH_COMMAND_SEARCH_LABEL,
+            SEARCH_COMMAND_SEARCH_ID,
+            SEARCH_COMMAND_SEARCH_UID,
+            SEARCH_COMMAND_SEARCH_USER,
+            SEARCH_COMMAND_SEARCH_WEBSITE,
+            SEARCH_COMMAND_SHOW_EXPIRED,
+            SEARCH_COMMAND_SHOW_EXPIRES,
+            SEARCH_COMMAND_SHOW_VEILED,
+        )
+
+        searchView.suggestionsAdapter = cursorAdapter
+
+        searchView.setOnSuggestionListener(object: SearchView.OnSuggestionListener {
+            override fun onSuggestionSelect(position: Int): Boolean {
+                return false
+            }
+
+            @SuppressLint("Range")
+            override fun onSuggestionClick(position: Int): Boolean {
+                val cursor = searchView.suggestionsAdapter.getItem(position) as Cursor
+                val selection = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1))
+                searchView.setQuery(selection, false)
+
+                return true
+            }
+        })
+
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 searchItem.collapseActionView()
                 return false
             }
 
-            override fun onQueryTextChange(s: String?): Boolean {
-                listCredentialAdapter?.filter?.filter(s)
+            override fun onQueryTextChange(query: String?): Boolean {
+                listCredentialAdapter?.filter?.filter(query)
+
+                val cursor = MatrixCursor(arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1))
+                query?.let {
+                    suggestions.forEachIndexed { index, suggestion ->
+                        if (suggestion.startsWith(it, ignoreCase = true)) {
+                            cursor.addRow(arrayOf(index, suggestion))
+                        }
+                    }
+                }
+
+                cursorAdapter.changeCursor(cursor)
 
                 return false
             }
@@ -346,6 +456,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         resumeAutofillItem = menu.findItem(R.id.menu_resume_autofill)
         updateResumeAutofillMenuItem()
+        lastReminderItem = menu.findItem(R.id.menu_show_last_reminder)
+        nextReminderItem = menu.findItem(R.id.menu_show_next_reminder)
+        updateReminderMenuItems()
 
         super.onCreateOptionsMenu(menu)
 
@@ -374,38 +487,41 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         return true
     }
 
-    override fun onPostResume() {
-        super.onPostResume()
-        updateSearchFieldWithAutofillSuggestion()
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        Log.i("LST", "onNewIntent: action=${intent?.action}")
+        updateSearchFieldWithAutofillSuggestion(intent)
     }
+
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        updateSearchFieldWithAutofillSuggestion()
+        Log.i("LST", "onPrepareOptionsMenu")
+        updateSearchFieldWithAutofillSuggestion(intent)  //somehow important for autofill
         return super.onPrepareOptionsMenu(menu)
     }
 
-    private fun updateSearchFieldWithAutofillSuggestion() {
+    private fun updateSearchFieldWithAutofillSuggestion(intent: Intent?) {
         if (!Session.isDenied()) {
             intent?.action?.let { action ->
                 Log.i("LST", "action2=$action")
-                if (action.startsWith(ResponseFiller.ACTION_OPEN_VAULT)) {
+                if (action.startsWith(Constants.ACTION_OPEN_VAULT_FOR_AUTOFILL)) {
                     val suggestCredentials =
                         PreferenceService.getAsBool(PREF_AUTOFILL_SUGGEST_CREDENTIALS, true, this)
                     if (suggestCredentials) {
                         val searchString = action.substringAfter(ACTION_DELIMITER).substringBeforeLast(ACTION_DELIMITER).lowercase()
                         if (searchString.isNotBlank()) {
-                            searchItem?.let { searchItem ->
-                                Log.i("LST", "update search text")
+                            startSearchFor("!$searchString")
+                        }
+                    }
+                }
+                else if (action.startsWith(Constants.ACTION_OPEN_VAULT_FOR_FILTERING)) {
+                    val searchString = action.substringAfter(ACTION_DELIMITER).substringBeforeLast(ACTION_DELIMITER).lowercase()
+                    Log.i("LST", "extracted search string=$searchString")
 
-                                val searchView =
-                                    MenuItemCompat.getActionView(searchItem) as SearchView
-                                val searchPlate =
-                                    searchView.findViewById(R.id.search_src_text) as EditText
-
-                                searchView.setQuery("!$searchString", true)
-                                searchItem.expandActionView()
-                                searchPlate.text = SpannableStringBuilder("!$searchString")
-                                searchPlate.selectAll()
-                            }
+                    if (searchString.isNotBlank()) {
+                        val success = startSearchFor("$searchString")
+                        if (success) {
+                            intent.action = null // one shot, don't filter again
                         }
                     }
                 }
@@ -437,7 +553,15 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             R.id.menu_filter -> {
                 val inflater: LayoutInflater = layoutInflater
                 val labelsView: View = inflater.inflate(R.layout.content_dynamic_labels_list, null)
+                val container = LinearLayout(this)
+                container.orientation = LinearLayout.VERTICAL
                 val labelsContainer: LinearLayout = labelsView.findViewById(R.id.dynamic_labels)
+
+                val multipleChoiceSwitch = SwitchCompat(this)
+                multipleChoiceSwitch.text = getString(R.string.multiple_choice_selection)
+                multipleChoiceSwitch.isChecked = !PreferenceService.getAsBool(PREF_LABEL_FILTER_SINGLE_CHOICE, this)
+                multipleChoiceSwitch.switchPadding = 32
+                multipleChoiceSwitch.setPadding(64, 32, 64, 32)
 
                 val allLabels = ArrayList<Label>()
                 val noLabel = Label(WITH_NO_LABELS_ID, getString(R.string.no_label), "", null)
@@ -450,11 +574,20 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     chip.isClickable = true
                     chip.isCheckable = true
                     chip.isChecked = LabelFilter.isFilterFor(label)
+                    chip.setOnClickListener {
+                        if (!multipleChoiceSwitch.isChecked) {
+                            allChips
+                                .forEach { it.isChecked = false }
+                            chip.isChecked = true
+                        }
+                    }
                     allChips.add(chip)
                 }
                 val builder = AlertDialog.Builder(this)
-                val container = ScrollView(builder.context)
-                container.addView(labelsView)
+                val scrollView = ScrollView(builder.context)
+                scrollView.addView(labelsView)
+                container.addView(multipleChoiceSwitch)
+                container.addView(scrollView)
 
                 val dialog = AlertDialog.Builder(this)
                     .setTitle(getString(R.string.filter))
@@ -468,6 +601,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 dialog.setOnShowListener {
                     val buttonPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                     buttonPositive.setOnClickListener {
+                        PreferenceService.putBoolean(PREF_LABEL_FILTER_SINGLE_CHOICE, !multipleChoiceSwitch.isChecked, this)
+
                         LabelFilter.unsetAllFilters()
                         for (i in 0 until allChips.size) {
                             val checked = allChips[i].isChecked
@@ -512,14 +647,32 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 val prefSortOrder = getPrefSortOrder()
                 val listItems = CredentialSortOrder.values().map { getString(it.labelId) }.toTypedArray()
 
+                val view = LinearLayout(this)
+                view.orientation = LinearLayout.HORIZONTAL
+                view.setPadding(54, 16, 64, 16)
+
+                val checkBox = CheckBox(this)
+                checkBox.isChecked = PreferenceService.getAsBool(PREF_EXPIRED_CREDENTIALS_ON_TOP, this)
+                val desc = TextView(this)
+                desc.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT)
+                desc.text = getString(R.string.expired_credentials_on_top)
+                view.addView(checkBox)
+                view.addView(desc)
+
+                var selectedSortOrder = prefSortOrder.ordinal
                 AlertDialog.Builder(this)
                     .setIcon(R.drawable.ic_baseline_sort_24)
                     .setTitle(R.string.sort_order)
-                    .setSingleChoiceItems(listItems, prefSortOrder.ordinal) { dialogInterface, i ->
-                        dialogInterface.dismiss()
+                    .setSingleChoiceItems(listItems, prefSortOrder.ordinal) { _, i ->
+                       selectedSortOrder = i
+                    }
+                    .setView(view)
+                    .setPositiveButton(android.R.string.ok) { dialog, _ ->
+                        dialog.dismiss()
 
-                        val newSortOrder = CredentialSortOrder.values()[i]
+                        val newSortOrder = CredentialSortOrder.values()[selectedSortOrder]
                         PreferenceService.putString(PREF_CREDENTIAL_SORT_ORDER, newSortOrder.name, this)
+                        PreferenceService.putBoolean(PREF_EXPIRED_CREDENTIALS_ON_TOP, checkBox.isChecked, this)
                         refreshCredentials()
                     }
                     .setNegativeButton(android.R.string.cancel) { dialog, _ ->
@@ -533,6 +686,19 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 PreferenceService.toggleBoolean(PREF_SHOW_CREDENTIAL_IDS, this)
                 refreshMenuShowIdsItem(item)
                 listCredentialAdapter?.notifyDataSetChanged()
+
+                return true
+            }
+            R.id.menu_show_next_reminder -> {
+                val view: View = findViewById(R.id.content_list_credentials)
+                ReminderService.showNextReminder(view, this, showNow = true)
+
+                return true
+            }
+            R.id.menu_show_last_reminder -> {
+                val view: View = findViewById(R.id.content_list_credentials)
+                ReminderService.showLastReminder(view, this)
+
                 return true
             }
             R.id.menu_resume_autofill -> {
@@ -576,7 +742,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
         else if (requestCode == newOrUpdateCredentialActivityRequestCode && resultCode == Activity.RESULT_OK) {
             data?.let {
-
+                listCredentialAdapter?.resetSelection(withRefresh = false)
                 val credential = EncCredential.fromIntent(it, createUuid = true)
                 jumpToUuid = credential.uid
 
@@ -591,6 +757,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         // nothing
                     }
                 }
+            }
+        }
+        else if (requestCode == SecretChecker.loginRequestCode) {
+            if (intent.getBooleanExtra(SecretChecker.fromAutofillOrNotification, false)) {
+                Log.i("LST", "onActivityResult")
+                updateSearchFieldWithAutofillSuggestion(intent)
             }
         }
 
@@ -900,37 +1072,73 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
                 masterSecretKey?.let { key ->
 
-                    credentials.forEach {
+                    credentialViewModel.clearExpiredCredentials()
+
+                    credentials.forEach { credential ->
                         LabelService.defaultHolder.updateLabelsForCredential(
                             key,
-                            it
+                            credential
                         )
+
+                        credentialViewModel.updateExpiredCredential(credential, key, this)
                     }
+
+                    val expiredCredentialsOnTop = PreferenceService.getAsBool(PREF_EXPIRED_CREDENTIALS_ON_TOP, this)
 
                     when (getPrefSortOrder()) {
                         CredentialSortOrder.CREDENTIAL_NAME_ASC -> {
                             sortedCredentials = credentials
-                                .sortedBy {
-                                    SecretService.decryptCommonString(key, it.name)
-                                        .toLowerCase(Locale.ROOT)
-                                }
+                                .sortedWith(
+                                    compareBy(
+                                        {
+                                            if (expiredCredentialsOnTop && it.isExpired(key)) 0 else 1
+                                        },
+                                        {
+                                            SecretService.decryptCommonString(key, it.name)
+                                                .lowercase()
+                                        }
+                                    )
+                                )
                         }
                         CredentialSortOrder.CREDENTIAL_NAME_DESC -> {
                             sortedCredentials = credentials
-                                .sortedBy {
-                                    SecretService.decryptCommonString(key, it.name)
-                                        .toLowerCase(Locale.ROOT)
-                                }
-                                .reversed()
+                                .sortedWith(
+                                    compareBy(
+                                        {
+                                            if (expiredCredentialsOnTop && it.isExpired(key)) 1 else 0
+                                        },
+                                        {
+                                            SecretService.decryptCommonString(key, it.name)
+                                                .lowercase()
+                                        }
+                                    )
+                                ).reversed()
                         }
                         CredentialSortOrder.RECENTLY_MODIFIED -> {
                             sortedCredentials = credentials
-                                .sortedBy { it.modifyTimestamp }
-                                .reversed()
+                                .sortedWith(
+                                    compareBy(
+                                        {
+                                            if (expiredCredentialsOnTop && it.isExpired(key)) 1 else 0
+                                        },
+                                        {
+                                            it.modifyTimestamp
+                                        }
+                                    )
+                                ).reversed()
                         }
                         CredentialSortOrder.CREDENTIAL_IDENTIFIER -> {
                             sortedCredentials = credentials
-                                .sortedBy { it.id }
+                                .sortedWith(
+                                    compareBy(
+                                        {
+                                            if (expiredCredentialsOnTop && it.isExpired(key)) 0 else 1
+                                        },
+                                        {
+                                            it.id
+                                        }
+                                    )
+                                )
                         }
 
                     }
@@ -1018,6 +1226,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     fun deleteCredential(credential: EncCredential) {
         jumpToItemPosition = (credentialsRecycleView?.layoutManager as LinearLayoutManager)
             .findFirstVisibleItemPosition()
+        credential.id?.let { id ->
+            credentialViewModel.deleteExpiredCredential(id, this)
+        }
         credentialViewModel.delete(credential)
         toastText(this, R.string.credential_deleted)
     }
@@ -1047,6 +1258,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && ResponseFiller.isAutofillPaused(this)
     }
 
+    private fun updateReminderMenuItems() {
+        nextReminderItem?.isVisible = ReminderService.hasNextReminder(this)
+        lastReminderItem?.isVisible = ReminderService.hasLastReminder(this)
+    }
+
     private fun updateNavigationMenuVisibility(groupResId: Int, itemResId: Int, stringResId: Int, visible: Boolean) {
         navigationView.menu.setGroupVisible(groupResId, visible)
         navigationView.menu.setGroupEnabled(groupResId, visible)
@@ -1070,6 +1286,29 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         navMenuExportVisible = false
         navMenuImportVisible = false
         navMenuVaultVisible = false
+    }
+
+    fun searchForExpiredCredentials() {
+        startSearchFor(SEARCH_COMMAND_SHOW_EXPIRED + " ") // space at the end to not show suggestion menu popup
+    }
+
+    private fun startSearchFor(searchString: String): Boolean {
+        Log.i("LST", "searchItem=$searchItem")
+        searchItem?.let { searchItem ->
+            Log.i("LST", "update search text")
+
+            val searchView =
+                MenuItemCompat.getActionView(searchItem) as SearchView
+            val searchPlate =
+                searchView.findViewById(R.id.search_src_text) as EditText
+
+            searchView.setQuery(searchString, true)
+            searchItem.expandActionView()
+            searchPlate.text = SpannableStringBuilder(searchString)
+            searchPlate.selectAll()
+            return true
+        }
+        return false
     }
 }
 

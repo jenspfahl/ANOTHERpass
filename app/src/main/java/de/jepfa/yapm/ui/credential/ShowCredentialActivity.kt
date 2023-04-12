@@ -1,7 +1,10 @@
 package de.jepfa.yapm.ui.credential
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.Menu
@@ -9,6 +12,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
@@ -33,6 +37,7 @@ import de.jepfa.yapm.service.autofill.AutofillCredentialHolder
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
+import de.jepfa.yapm.service.secret.SecretService.decryptLong
 import de.jepfa.yapm.service.secret.SecretService.decryptPassword
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
@@ -47,6 +52,7 @@ import de.jepfa.yapm.util.PasswordColorizer.spannableObfusableAndMaskableString
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
 
 
 class ShowCredentialActivity : SecureActivity() {
@@ -70,8 +76,11 @@ class ShowCredentialActivity : SecureActivity() {
     private lateinit var passwordTextView: TextView
     private lateinit var userTextView: TextView
     private lateinit var websiteTextView: TextView
+    private lateinit var expiresAtTextView: TextView
     private lateinit var additionalInfoTextView: TextView
+    private lateinit var expandAdditionalInfoImageView: ImageView
     private var optionsMenu: Menu? = null
+    private var defaultTextColor: ColorStateList? = null
 
     init {
         enableBack = true
@@ -112,7 +121,25 @@ class ShowCredentialActivity : SecureActivity() {
 
         userTextView = findViewById(R.id.user)
         websiteTextView = findViewById(R.id.website)
+        expiresAtTextView = findViewById(R.id.expires_at)
+
         additionalInfoTextView = findViewById(R.id.additional_info)
+        val additionalInfoScrollView = findViewById<ScrollView>(R.id.additional_info_scroll_view)
+        expandAdditionalInfoImageView = findViewById(R.id.imageview_expand_additional_info)
+
+        expandAdditionalInfoImageView.setOnClickListener {
+            expandAdditionalInfoView(expandAdditionalInfoImageView)
+        }
+        additionalInfoTextView.setOnClickListener {
+            expandAdditionalInfoView(expandAdditionalInfoImageView)
+        }
+        additionalInfoTextView.setOnScrollChangeListener{ _, _, _, _, _ ->
+            expandAdditionalInfoView(expandAdditionalInfoImageView)
+        }
+        additionalInfoScrollView.setOnScrollChangeListener{ _, _, _, _, _ ->
+            expandAdditionalInfoView(expandAdditionalInfoImageView)
+        }
+
         passwordTextView = findViewById(R.id.passwd)
 
         passwordTextView.setOnLongClickListener {
@@ -164,6 +191,12 @@ class ShowCredentialActivity : SecureActivity() {
 
     }
 
+    private fun expandAdditionalInfoView(expandAdditionalInfoImageView: ImageView) {
+        appBarLayout.setExpanded(false, true)
+        expandAdditionalInfoImageView.visibility = View.GONE
+        additionalInfoTextView.maxLines = R.integer.max_credential_additional_info_length
+    }
+
     override fun onResume() {
         super.onResume()
         credential?.let { AutofillCredentialHolder.update(it, obfuscationKey) }
@@ -176,13 +209,15 @@ class ShowCredentialActivity : SecureActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        if (mode == Mode.EXTERNAL_FROM_FILE || mode == Mode.NORMAL_READONLY) {
-            menuInflater.inflate(R.menu.menu_credential_detail_raw, menu)
+        val menuId = if (mode == Mode.EXTERNAL_FROM_FILE || mode == Mode.NORMAL_READONLY) {
+            R.menu.menu_credential_detail_raw
         } else if (mode == Mode.EXTERNAL_FROM_RECORD) {
-            menuInflater.inflate(R.menu.menu_credential_detail_import, menu)
+            R.menu.menu_credential_detail_import
         } else {
-            menuInflater.inflate(R.menu.menu_credential_detail, menu)
+            R.menu.menu_credential_detail
         }
+        inflateActionsMenu(menu, menuId)
+
 
         val enableCopyPassword = PreferenceService.getAsBool(PREF_ENABLE_COPY_PASSWORD, this)
         if (!enableCopyPassword) {
@@ -271,6 +306,9 @@ class ShowCredentialActivity : SecureActivity() {
                         .setMessage(getString(R.string.message_delete_credential, name))
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                            credential.id?.let { id ->
+                                credentialViewModel.deleteExpiredCredential(id, this)
+                            }
                             credentialViewModel.delete(credential)
                             toastText(this, R.string.credential_deleted)
 
@@ -357,12 +395,24 @@ class ShowCredentialActivity : SecureActivity() {
 
                 credential.modifyTimestamp?.let{
                     if (it > 1000) // modifyTimestamp is the credential Id after running db migration, assume ids are lower than 1000
-                        sb.addFormattedLine(getString(R.string.last_modified), dateToNiceString(it.toDate(), this))
+                        sb.addFormattedLine(getString(R.string.last_modified), dateTimeToNiceString(it.toDate(), this))
                 }
 
                 AlertDialog.Builder(this)
                     .setTitle(R.string.title_credential_details)
                     .setMessage(sb.toString())
+                    .setNegativeButton(R.string.close, null)
+                    .setNeutralButton(R.string.copy_universal_identifier) { _, _ ->
+                        credential.uid?.let { uid ->
+                            ClipboardUtil.copy(
+                                this.getString(R.string.universal_identifier),
+                                shortenBase64String(uid.toBase64String()),
+                                this,
+                                isSensible = false,
+                            )
+                        }
+                        toastText(this, R.string.universal_identifier_copied)
+                    }
                     .show()
 
                 return true
@@ -408,22 +458,39 @@ class ShowCredentialActivity : SecureActivity() {
     }
 
 
+    @SuppressLint("SetTextI18n")
     private fun updatePasswordView(credential: EncCredential) {
         masterSecretKey?.let { key ->
             val decName = decryptCommonString(key, credential.name)
             val name = enrichId(this, decName, credential.id)
             val user = decryptCommonString(key, credential.user)
             val website = decryptCommonString(key, credential.website)
+            val expiresAt = decryptLong(key, credential.expiresAt)
             val additionalInfo = decryptCommonString(key, credential.additionalInfo)
 
             toolBarLayout.title = name
-
             toolbarChipGroup.removeAllViews()
+
+
 
             val labelHolder = if (mode == Mode.EXTERNAL_FROM_FILE) LabelService.externalHolder else LabelService.defaultHolder
             val labelsForCredential = labelHolder.decryptLabelsForCredential(key, credential)
+
+            val credentialExpired = credential.isExpired(key)
+            val thinner = shouldMakeLabelThinner(labelsForCredential, credentialExpired)
+
+            if (credentialExpired) { // expired
+                createAndAddLabelChip(
+                    Label(getString(R.string.expired), getColor(R.color.Red), R.drawable.baseline_lock_clock_24),
+                    toolbarChipGroup,
+                    thinner,
+                    this,
+                    outlined = true,
+                    placedOnAppBar = true,
+                )
+            }
+
             if (labelsForCredential.isNotEmpty()) {
-                val thinner = shouldMakeLabelThinner(labelsForCredential)
                 labelsForCredential.forEachIndexed { idx, label ->
                     val chip = createAndAddLabelChip(label, toolbarChipGroup, thinner, this)
                     chip.setOnClickListener {
@@ -442,22 +509,56 @@ class ShowCredentialActivity : SecureActivity() {
                 }
             }
 
+            val userImageView: ImageView = findViewById(R.id.user_image)
             if (user.isEmpty()) {
-                val userView: ImageView = findViewById(R.id.user_image)
-                userView.visibility = View.INVISIBLE
+                userImageView.visibility = View.GONE
+                userTextView.visibility = View.GONE
+            }
+            else {
+                userImageView.visibility = View.VISIBLE
+                userTextView.visibility = View.VISIBLE
             }
             userTextView.text = user
 
-            val websiteView: ImageView = findViewById(R.id.website_image)
+            val websiteImageView: ImageView = findViewById(R.id.website_image)
             websiteTextView.text = website
             if (website.isEmpty()) {
-                websiteView.visibility = View.INVISIBLE
+                websiteImageView.visibility = View.GONE
+                websiteTextView.visibility = View.GONE
             } else {
-                websiteView.visibility = View.VISIBLE
+                websiteImageView.visibility = View.VISIBLE
+                websiteTextView.visibility = View.VISIBLE
                 linkify(websiteTextView)
             }
 
+            val expiresAtImageView: ImageView = findViewById(R.id.expires_at_image)
+            if (expiresAt != null && expiresAt > 0) {
+                val expiryDate = Date(expiresAt)
+                if (!credentialExpired) {
+                    // good
+                    expiresAtTextView.text = "${getString(R.string.expires)}: ${dateToNiceString(expiryDate, this)}"
+                    expiresAtTextView.typeface = Typeface.DEFAULT
+                    defaultTextColor?.let {
+                        expiresAtTextView.setTextColor(it)
+                    }
+                }
+                else {
+                    // expired
+                    expiresAtTextView.text = "${getString(R.string.expired_since)}: ${dateToNiceString(expiryDate, this, withPreposition = false)}!"
+                    expiresAtTextView.typeface = Typeface.DEFAULT_BOLD
+                    defaultTextColor = expiresAtTextView.textColors
+                    expiresAtTextView.setTextColor(getColor(R.color.Red))
+                }
+                expiresAtImageView.visibility = View.VISIBLE
+                expiresAtTextView.visibility = View.VISIBLE
+            } else {
+                expiresAtImageView.visibility = View.GONE
+                expiresAtTextView.visibility = View.GONE
+            }
+
             additionalInfoTextView.text = additionalInfo
+            expandAdditionalInfoImageView.visibility =
+                if (additionalInfo.lines().count() > 3) View.VISIBLE else View.INVISIBLE
 
             updatePasswordTextView(key, credential, true)
 
@@ -497,7 +598,7 @@ class ShowCredentialActivity : SecureActivity() {
                 password.deobfuscate(it) //TODO this seems to cause a change of current item and a credential adapter list reload
             }
         }
-        var spannedString = spannableObfusableAndMaskableString(
+        val spannedString = spannableObfusableAndMaskableString(
             password,
             passwordPresentation,
             maskPassword,
@@ -508,8 +609,11 @@ class ShowCredentialActivity : SecureActivity() {
         password.clear()
     }
 
-    private fun shouldMakeLabelThinner(labels: List<Label>): Boolean {
-        val totalLabelsLength = labels.map { it.name.length }.sum()
+    private fun shouldMakeLabelThinner(labels: List<Label>, credentialExpired: Boolean): Boolean {
+        var totalLabelsLength = labels.sumOf { it.name.length }
+        if (credentialExpired) {
+            totalLabelsLength+= getString(R.string.expired).length
+        }
         val maxLabelLength = resources.getInteger(R.integer.max_label_name_length)
         return totalLabelsLength > maxLabelLength * 2
     }

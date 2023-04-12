@@ -12,6 +12,7 @@ import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.MasterKeyService
+import de.jepfa.yapm.service.secret.PbkdfIterationService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
@@ -29,14 +30,28 @@ import kotlinx.coroutines.launch
 object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.Input, SecureActivity>() {
 
     data class Input(val loginData: LoginData,
+                     val pbkdfIterations: Int,
                      val newCipherAlgorithm: CipherAlgorithm,
                      val generateNewMasterKey: Boolean)
 
     fun openDialog(input: Input, activity: SecureActivity, postHandler: (backgroundResult: UseCaseOutput<Unit>) -> Unit) {
 
+        val currentCipherAlgorithm = SecretService.getCipherAlgorithm(activity)
+        val currentIterations = PbkdfIterationService.getStoredPbkdfIterations()
+
+        val messageId = if (currentCipherAlgorithm == input.newCipherAlgorithm
+            && !input.generateNewMasterKey
+            && currentIterations != input.pbkdfIterations) {
+            //only iterations has been changed, no need to renew the whole vault but only the master key
+            R.string.message_change_iterations
+        }
+        else {
+            R.string.message_change_encryption
+        }
+
         AlertDialog.Builder(activity)
             .setTitle(R.string.title_change_encryption)
-            .setMessage(R.string.message_change_encryption)
+            .setMessage(messageId)
             .setPositiveButton(android.R.string.ok) { _, _ ->
                 UseCaseBackgroundLauncher(this)
                     .launch(activity, input, postHandler)
@@ -50,12 +65,23 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
         val salt = SaltService.getSalt(activity)
         val currentCipherAlgorithm = SecretService.getCipherAlgorithm(activity)
 
+
         val masterPassphraseSK =
             checkAndGetMasterPassphraseSK(input.loginData, salt, currentCipherAlgorithm, activity)
                 ?: return false
 
-        if (currentCipherAlgorithm != input.newCipherAlgorithm || input.generateNewMasterKey) {
-            val success = renewVaultEncryption(activity, masterPassphraseSK, input, salt)
+         val currentIterations = PbkdfIterationService.getStoredPbkdfIterations()
+         if (currentCipherAlgorithm != input.newCipherAlgorithm
+             || input.generateNewMasterKey
+             || currentIterations != input.pbkdfIterations) {
+
+            val success = if (currentCipherAlgorithm == input.newCipherAlgorithm && !input.generateNewMasterKey) {
+                //only iterations has been changed, no need to renew the whole vault but only the master key
+                renewMasterSK(masterPassphraseSK, input, salt, activity) != null
+            }
+            else {
+                renewVaultEncryption(activity, masterPassphraseSK, input, salt)
+            }
 
             if (success) {
                 return LoginUseCase.execute(input.loginData, activity).success
@@ -118,6 +144,7 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
                     if (credential.lastPassword != null) reencryptPassword(credential.lastPassword!!, oldMasterSK, newMasterSK) else null,
                     reencryptString(credential.website, oldMasterSK, newMasterSK),
                     reencryptString(credential.labels, oldMasterSK, newMasterSK),
+                    reencryptString(credential.expiresAt, oldMasterSK, newMasterSK),
                     credential.isObfuscated,
                     credential.isLastPasswordObfuscated,
                     credential.modifyTimestamp
@@ -137,7 +164,6 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
             }
 
             PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_MODIFIED_AT, activity)
-            PreferenceService.putCurrentDate(PreferenceService.DATA_MK_MODIFIED_AT, activity)
             PreferenceService.putString(
                 PreferenceService.DATA_CIPHER_ALGORITHM,
                 input.newCipherAlgorithm.name,
@@ -189,15 +215,22 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
             Log.e("VaultEnc", "stored master key not valid")
             return null
         }
+
+        PbkdfIterationService.storePbkdfIterations(input.pbkdfIterations)
+        Log.d("ITERATIONS", "store changed iterations=${input.pbkdfIterations}")
+
         val newEncryptedMasterKey = MasterKeyService.encryptAndStoreMasterKey(
             masterKey,
             input.loginData.pin,
             input.loginData.masterPassword,
             salt,
+            input.pbkdfIterations,
             input.newCipherAlgorithm,
             activity
         )
         masterKey.clear()
+
+        PreferenceService.putCurrentDate(PreferenceService.DATA_MK_MODIFIED_AT, activity)
 
         val newMasterPassphraseSK =
             MasterKeyService.getMasterPassPhraseSK(

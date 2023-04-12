@@ -1,9 +1,13 @@
 package de.jepfa.yapm.ui
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
+import android.os.Build
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -11,6 +15,9 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.menu.MenuBuilder
+import androidx.appcompat.view.menu.MenuItemImpl
+import androidx.core.view.forEach
 import de.jepfa.yapm.R
 import de.jepfa.yapm.ui.errorhandling.ExceptionHandler
 import de.jepfa.yapm.util.PermissionChecker
@@ -80,6 +87,38 @@ open class BaseActivity : AppCompatActivity() {
             } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
                 toastText(applicationContext, R.string.permission_denied)
             }
+        }
+    }
+
+    @SuppressLint("RestrictedApi")
+    fun inflateActionsMenu(menu: Menu, id: Int) {
+        if (menu is MenuBuilder) {
+            menu.setOptionalIconsVisible(true)
+        }
+        menuInflater.inflate(id, menu)
+        if (menu is MenuBuilder) {
+            menu.forEach { item ->
+                if (isActionItemInOverflowMenu(item)) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        item.iconTintList = ColorStateList.valueOf(resources.getColor(R.color.Gray))
+                    }
+                    else {
+                        item.icon = null
+                    }
+                }
+            }
+        }
+    }
+
+    @SuppressLint("RestrictedApi")
+    private fun isActionItemInOverflowMenu(item: MenuItem): Boolean {
+        return if (item is MenuItemImpl) {
+            return if (item.requiresActionButton()) false
+            else if (item.requestsActionButton()) true
+            else !item.showsTextAsAction()
+        }
+        else {
+            return false
         }
     }
 

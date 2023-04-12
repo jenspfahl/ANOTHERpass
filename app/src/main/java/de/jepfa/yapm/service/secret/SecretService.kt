@@ -3,6 +3,7 @@ package de.jepfa.yapm.service.secret
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.SystemClock
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.security.keystore.StrongBoxUnavailableException
@@ -19,8 +20,7 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_SEED
 import de.jepfa.yapm.service.biometrix.BiometricUtils
-import de.jepfa.yapm.util.DebugInfo
-import de.jepfa.yapm.util.toastText
+import de.jepfa.yapm.service.secret.PbkdfIterationService.getStoredPbkdfIterations
 import java.security.*
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -99,19 +99,19 @@ object SecretService {
         return SecretKeyHolder(sk, cipherAlgorithm)
     }
 
-    fun generateStrongSecretKey(data: Key, salt: Key, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
-        return generateStrongSecretKey(Password(data), salt, cipherAlgorithm)
+    fun generateDefaultSecretKey(data: Key, salt: Key, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
+        return generatePBESecretKey(Password(data), salt, PbkdfIterationService.LEGACY_PBKDF_ITERATIONS, cipherAlgorithm)
     }
 
     fun generateStrongSecretKey(password: Password, salt: Key, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
-        return generatePBESecretKey(password, salt, 65536, cipherAlgorithm)
+        return generatePBESecretKey(password, salt, getStoredPbkdfIterations(), cipherAlgorithm)
     }
 
     fun generateNormalSecretKey(password: Password, salt: Key, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
         return generatePBESecretKey(password, salt, 1000, cipherAlgorithm)
     }
 
-    private fun generatePBESecretKey(password: Password, salt: Key, iterations: Int, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
+    fun generatePBESecretKey(password: Password, salt: Key, iterations: Int, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
         val keySpec = PBEKeySpec(password.toEncodedCharArray(), salt.data, iterations, cipherAlgorithm.keyLength)
         val factory = SecretKeyFactory.getInstance(cipherAlgorithm.secretKeyAlgorithm)
         try {
@@ -178,6 +178,18 @@ object SecretService {
         return String(decryptData(secretKeyHolder, encrypted))
     }
 
+    fun encryptLong(secretKeyHolder:  SecretKeyHolder, long: Long): Encrypted {
+        return encryptData(null, secretKeyHolder, long.toString().toByteArray())
+    }
+
+    fun decryptLong(secretKeyHolder:  SecretKeyHolder, encrypted: Encrypted): Long? {
+        if (encrypted.isEmpty()) {
+            return null
+        }
+        val longAsString = String(decryptData(secretKeyHolder, encrypted))
+        return longAsString.toLongOrNull()
+    }
+
     fun encryptEncrypted(secretKeyHolder:  SecretKeyHolder, encrypted: Encrypted): Encrypted {
         return encryptData(encrypted.type, secretKeyHolder, encrypted.toBase64())
     }
@@ -192,12 +204,25 @@ object SecretService {
     }
 
     private fun encryptData(type: EncryptedType?, secretKeyHolder: SecretKeyHolder, data: ByteArray): Encrypted {
+        return try {
+            encrypt(secretKeyHolder, type, data)
+        } catch (e: Exception) {
+            Log.e("SS", "Encryption failed, trying again", e)
+            SystemClock.sleep(100) // artificial wait before retry
+            encrypt(secretKeyHolder, type, data)
+        }
+    }
+
+    private fun encrypt(
+        secretKeyHolder: SecretKeyHolder,
+        type: EncryptedType?,
+        data: ByteArray
+    ): Encrypted {
         val cipher: Cipher = Cipher.getInstance(secretKeyHolder.cipherAlgorithm.cipherName)
 
         if (secretKeyHolder.cipherAlgorithm.integratedIvSupport) {
             cipher.init(Cipher.ENCRYPT_MODE, secretKeyHolder.secretKey)
-        }
-        else {
+        } else {
             val iv = ByteArray(cipher.blockSize)
             getSecureRandom(null).nextBytes(iv)
             val ivParams = IvParameterSpec(iv)
@@ -253,8 +278,6 @@ object SecretService {
     }
 
     private fun initAndroidSecretKey(androidKey: AndroidKey, context: Context): SecretKey {
-        val keyGenerator = KeyGenerator
-                .getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE)
 
         val spec = KeyGenParameterSpec.Builder(androidKey.alias,
                 KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
@@ -269,15 +292,16 @@ object SecretService {
             if (androidKey.requireUserAuth && BiometricUtils.isFingerprintAvailable(context)) {
                 spec
                     .setUserAuthenticationRequired(true)
-                    .setUserAuthenticationValidityDurationSeconds(-1)
                     .setInvalidatedByBiometricEnrollment(true)
 
             }
         }
 
+        val keyGenerator = KeyGenerator
+            .getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEY_STORE)
+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-            keyGenerator.init(spec.build())
-            return keyGenerator.generateKey()
+            return initSecretKey(keyGenerator, spec.build())
         }
         else {
             try {
@@ -286,9 +310,25 @@ object SecretService {
             } catch (e: StrongBoxUnavailableException) {
                 Log.w("SS", "Strong box not supported, falling back to without it", e)
                 spec.setIsStrongBoxBacked(false)
-                keyGenerator.init(spec.build())
-                return keyGenerator.generateKey()
+                return initSecretKey(keyGenerator, spec.build())
             }
+            catch (e: Exception) {
+                Log.w("SS", "Unknown exception, just retry", e)
+                return initSecretKey(keyGenerator, spec.build())
+            }
+        }
+    }
+
+    private fun initSecretKey(keyGenerator: KeyGenerator, spec: KeyGenParameterSpec): SecretKey {
+
+        return try {
+            keyGenerator.init(spec)
+            keyGenerator.generateKey()
+        } catch (e: Exception) {
+            Log.w("SS", "Unknown exception, just retry", e)
+            SystemClock.sleep(100) // artificial wait before retry
+            keyGenerator.init(spec)
+            keyGenerator.generateKey()
         }
     }
 

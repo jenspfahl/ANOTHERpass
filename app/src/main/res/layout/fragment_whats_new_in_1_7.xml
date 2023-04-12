@@ -37,7 +37,7 @@
                 android:gravity="center"
                 android:textSize="16sp"
                 android:paddingHorizontal="15dp"
-                android:text="@string/whats_new_in_1_7_subtext"
+                android:text="@string/whats_new_subtext"
 
                 app:layout_constraintBottom_toTopOf="@id/textview_bulletpoints"
                 app:layout_constraintEnd_toEndOf="parent"

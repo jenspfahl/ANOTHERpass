@@ -42,7 +42,7 @@ object MasterKeyService {
     ): SecretKeyHolder? {
         val masterKey = getMasterKey(masterPassPhraseSK, storedEncMasterKey, context) ?: return null
         val masterSK =
-            if (useLegacyGeneration) SecretService.generateStrongSecretKey(masterKey, salt, masterPassPhraseSK.cipherAlgorithm)
+            if (useLegacyGeneration) SecretService.generateDefaultSecretKey(masterKey, salt, masterPassPhraseSK.cipherAlgorithm)
             else SecretService.createSecretKey(masterKey, masterPassPhraseSK.cipherAlgorithm)
         masterKey.clear()
 
@@ -72,6 +72,7 @@ object MasterKeyService {
         pin: Password,
         masterPasswd: Password,
         salt: Key,
+        pdkdfIterations: Int,
         cipherAlgorithm: CipherAlgorithm,
         context: Context)
     : Encrypted {
@@ -81,7 +82,8 @@ object MasterKeyService {
         val masterPassphraseSK = SecretService.generateStrongSecretKey(masterPassphrase, salt, cipherAlgorithm)
         masterPassphrase.clear()
 
-        val encryptedMasterKey = SecretService.encryptKey(EncryptedType(ENC_MASTER_KEY), masterPassphraseSK, masterKey)
+        val pdkdfIterationsAsBase64String = PbkdfIterationService.toBase64String(pdkdfIterations)
+        val encryptedMasterKey = SecretService.encryptKey(EncryptedType(ENC_MASTER_KEY, pdkdfIterationsAsBase64String), masterPassphraseSK, masterKey)
 
         val encEncryptedMasterKey = SecretService.encryptEncrypted(mkSK, encryptedMasterKey)
 

@@ -2,10 +2,7 @@ package de.jepfa.yapm.util
 
 import android.net.Uri
 import java.text.DateFormat
-import java.text.DecimalFormat
-import java.text.NumberFormat
 import java.text.SimpleDateFormat
-import java.util.*
 
 object Constants {
     val HOMEPAGE = Uri.parse("https://anotherpass.jepfa.de")
@@ -26,5 +23,27 @@ object Constants {
     const val INITIAL_VAULT_VERSION = 1
     const val FAST_KEYGEN_VAULT_VERSION = 2
     const val CURRENT_VERSION = FAST_KEYGEN_VAULT_VERSION
+
+
+    const val ACTION_DELIMITER = "$"
+    const val ACTION_OPEN_VAULT_FOR_AUTOFILL = "openVault"
+    const val ACTION_OPEN_VAULT_FOR_FILTERING = "openAndFilter"
+    const val ACTION_CLOSE_VAULT = "closeVault"
+    const val ACTION_EXCLUDE_FROM_AUTOFILL = "excludeFromAutofill"
+    const val ACTION_PAUSE_AUTOFILL = "pauseAutofill"
+
+
+    const val SEARCH_COMMAND_EXTENDED_SEARCH = "!"
+    const val SEARCH_COMMAND_SEARCH_IN_ALL = "!all:"
+    const val SEARCH_COMMAND_SEARCH_ID = "!id:"
+    const val SEARCH_COMMAND_SEARCH_UID = "!uid:"
+    const val SEARCH_COMMAND_SEARCH_LABEL = "!tag:"
+    const val SEARCH_COMMAND_SEARCH_USER = "!user:"
+    const val SEARCH_COMMAND_SEARCH_WEBSITE = "!web:"
+    const val SEARCH_COMMAND_SHOW_EXPIRED = "!expired"
+    const val SEARCH_COMMAND_SHOW_EXPIRES = "!expires"
+    const val SEARCH_COMMAND_SHOW_VEILED = "!veiled"
+
+    const val SEARCH_COMMAND_END = ";"
 
 }

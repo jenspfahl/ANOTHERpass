@@ -17,6 +17,7 @@ data class PlainShareableCredential(val ui: String?,
                                     val u: String,
                                     val p: Password,
                                     val w: String,
+                                    val e: Long?, // Date.getTime()
 ) {
     fun toEncCredential(key: SecretKeyHolder): EncCredential {
         val encName = SecretService.encryptCommonString(key, n)
@@ -24,6 +25,7 @@ data class PlainShareableCredential(val ui: String?,
         val encUser = SecretService.encryptCommonString(key, u)
         val encPasswd = SecretService.encryptPassword(key, p)
         val encWebsite = SecretService.encryptCommonString(key, w)
+        val encExpiresAt = if (e != null) SecretService.encryptLong(key, e) else SecretService.encryptLong(key, 0L)
         val encLabels = SecretService.encryptCommonString(key, "")
 
         p.clear()
@@ -37,6 +39,7 @@ data class PlainShareableCredential(val ui: String?,
             null,
             encWebsite,
             encLabels,
+            encExpiresAt,
             false,
             null,
             null
@@ -50,6 +53,7 @@ data class PlainShareableCredential(val ui: String?,
         const val ATTRIB_USER = "u"
         const val ATTRIB_PASSWORD = "p"
         const val ATTRIB_WEBSITE = "w"
+        const val ATTRIB_EXPIRES_AT = "e"
 
         fun fromJson(json: JsonElement): PlainShareableCredential? {
             try {
@@ -61,6 +65,7 @@ data class PlainShareableCredential(val ui: String?,
                     jsonObject.get(ATTRIB_USER).asString,
                     Password.fromBase64String(jsonObject.get(ATTRIB_PASSWORD).asString),
                     jsonObject.get(ATTRIB_WEBSITE).asString,
+                    jsonObject.get(ATTRIB_EXPIRES_AT)?.asLong,
                 )
             } catch (e: Exception) {
                 Log.e("PCR", "cannot parse json container", e)

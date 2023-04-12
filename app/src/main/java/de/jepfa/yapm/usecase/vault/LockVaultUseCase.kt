@@ -14,6 +14,7 @@ object LockVaultUseCase: BasicUseCase<SecureActivity>() {
         activity.closeOverlayDialogs()
         SecureActivity.SecretChecker.getOrAskForSecret(activity)
         ClipboardUtil.clearClips(activity)
+        activity.finish()
 
         return true
     }

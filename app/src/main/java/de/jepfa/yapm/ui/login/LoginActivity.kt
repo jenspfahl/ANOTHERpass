@@ -37,6 +37,8 @@ import de.jepfa.yapm.ui.intro.IntroActivity
 import de.jepfa.yapm.ui.intro.WhatsNewActivity
 import de.jepfa.yapm.ui.nfc.NfcBaseActivity
 import de.jepfa.yapm.usecase.app.ShowInfoUseCase
+import de.jepfa.yapm.usecase.secret.RemoveStoredMasterPasswordUseCase
+import de.jepfa.yapm.usecase.secret.RevokeMasterPasswordTokenUseCase
 import de.jepfa.yapm.usecase.vault.DropVaultUseCase
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.DebugInfo
@@ -53,6 +55,7 @@ class LoginActivity : NfcBaseActivity() {
     val importVaultActivityRequestCode = 2
 
     private var resumeAutofillItem: MenuItem? = null
+    private var revokeQuickAccessItem: MenuItem? = null
 
     init {
         checkSession = false
@@ -60,7 +63,7 @@ class LoginActivity : NfcBaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofill, false)
+        isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofillOrNotification, false)
         loginAttempts = PreferenceService.getAsInt(STATE_LOGIN_ATTEMPTS,  this)
 
         super.onCreate(null)
@@ -118,19 +121,23 @@ class LoginActivity : NfcBaseActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_login, menu)
+        inflateActionsMenu(menu, R.menu.menu_login)
+
         val debugItem: MenuItem = menu.findItem(R.id.menu_debug)
         debugItem.isVisible = DebugInfo.isDebug
 
         resumeAutofillItem = menu.findItem(R.id.menu_resume_autofill)
-        updateResumeAutfillMenuItem()
+        revokeQuickAccessItem = menu.findItem(R.id.action_revoke_quick_access)
+        updateResumeAutofillMenuItem()
+        updateRevokeQuickAccessMenuItem()
 
         return true
     }
 
     override fun onResume() {
         super.onResume()
-        updateResumeAutfillMenuItem()
+        updateResumeAutofillMenuItem()
+        updateRevokeQuickAccessMenuItem()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -150,6 +157,11 @@ class LoginActivity : NfcBaseActivity() {
         if (id == R.id.menu_whats_new) {
             val intent = Intent(this, WhatsNewActivity::class.java)
             startActivity(intent)
+            return true
+        }
+
+        if (id == R.id.action_revoke_quick_access) {
+            showRevokeQuickAccessDialog()
             return true
         }
 
@@ -265,7 +277,8 @@ class LoginActivity : NfcBaseActivity() {
         PreferenceService.putCurrentDate(STATE_LOGIN_SUCCEEDED_AT, this)
         PreferenceService.delete(STATE_LOGIN_ATTEMPTS, this)
 
-        val isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofill, false)
+        val isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofillOrNotification, false)
+        Log.i("LST", "login done, fromAutofill=$isFromAutofill")
         if (isFromAutofill) {
             setResult(SecretChecker.loginRequestCode, intent)
         }
@@ -295,9 +308,15 @@ class LoginActivity : NfcBaseActivity() {
         return  PreferenceService.getAsBool(PreferenceService.PREF_FAST_MASTERPASSWD_LOGIN_WITH_NFC, this)
     }
 
-    private fun updateResumeAutfillMenuItem() {
+    private fun updateResumeAutofillMenuItem() {
         resumeAutofillItem?.isVisible =
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && ResponseFiller.isAutofillPaused(this)
+    }
+
+    private fun updateRevokeQuickAccessMenuItem() {
+        val hasMPT = PreferenceService.isPresent(PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY, this)
+        val hasStoredMP = PreferenceService.isPresent(PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD, this)
+        revokeQuickAccessItem?.isVisible = hasMPT || hasStoredMP
     }
 
     private fun readEMP(emp: Encrypted, handlePassword: (passwd: Password?) -> Unit) {
@@ -366,7 +385,7 @@ class LoginActivity : NfcBaseActivity() {
             val cipherAlgorithm = SecretService.getCipherAlgorithm(this)
 
             val mptSK =
-                SecretService.generateStrongSecretKey(masterPasswordTokenKey, salt, cipherAlgorithm)
+                SecretService.generateDefaultSecretKey(masterPasswordTokenKey, salt, cipherAlgorithm)
 
             val masterPassword =
                 SecretService.decryptPassword(mptSK, mpt)
@@ -389,5 +408,20 @@ class LoginActivity : NfcBaseActivity() {
         Session.logout()
         val intent = Intent(this, LoginActivity::class.java)
         startActivity(intent)
+    }
+
+    fun showRevokeQuickAccessDialog() {
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.revoke_quick_access))
+            .setMessage(getString(R.string.revoke_quick_access_desc))
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .setPositiveButton(android.R.string.yes) { _, _ ->
+                RemoveStoredMasterPasswordUseCase.execute(this)
+                RevokeMasterPasswordTokenUseCase.execute(this)
+                Session.logout()
+                toastText(this, R.string.quick_access_revoked)
+            }
+            .setNegativeButton(android.R.string.no, null)
+            .show()
     }
 }

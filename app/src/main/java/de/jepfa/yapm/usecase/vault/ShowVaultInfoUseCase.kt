@@ -12,6 +12,7 @@ import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_DENIED_AT
 import de.jepfa.yapm.service.PreferenceService.STATE_MASTER_PASSWD_TOKEN_COUNTER
 import de.jepfa.yapm.service.PreferenceService.STATE_PREVIOUS_LOGIN_ATTEMPTS
 import de.jepfa.yapm.service.PreferenceService.STATE_PREVIOUS_LOGIN_SUCCEEDED_AT
+import de.jepfa.yapm.service.secret.PbkdfIterationService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
@@ -46,23 +47,24 @@ object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActi
         sb.addFormattedLine(activity.getString(R.string.vault_id), vaultId)
         sb.addFormattedLine(activity.getString(R.string.vault_version), vaultVersion)
         sb.addFormattedLine(activity.getString(R.string.cipher_name), activity.getString(cipherAlgorithm.uiLabel))
+        sb.addFormattedLine(activity.getString(R.string.login_iterations), PbkdfIterationService.getStoredPbkdfIterations().toReadableFormat())
         sb.addNewLine()
         sb.addFormattedLine(activity.getString(R.string.credential_count), input.credentialCount)
         sb.addFormattedLine(activity.getString(R.string.label_count), input.labelCount)
         sb.addNewLine()
         if (vaultCreatedAt != null) {
-            sb.addFormattedLine(activity.getString(R.string.vault_created_at), dateToNiceString(vaultCreatedAt, activity))
+            sb.addFormattedLine(activity.getString(R.string.vault_created_at), dateTimeToNiceString(vaultCreatedAt, activity))
         }
         if (vaultImportedAt != null) {
-            sb.addFormattedLine(activity.getString(R.string.vault_imported_at), dateToNiceString(vaultImportedAt, activity))
+            sb.addFormattedLine(activity.getString(R.string.vault_imported_at), dateTimeToNiceString(vaultImportedAt, activity))
         }
         val vaultModifiedAt = PreferenceService.getAsDate(DATA_VAULT_MODIFIED_AT, activity)
         vaultModifiedAt?.let {
-            sb.addFormattedLine(activity.getString(R.string.vault_modified_at), dateToNiceString(it, activity))
+            sb.addFormattedLine(activity.getString(R.string.vault_modified_at), dateTimeToNiceString(it, activity))
         }
         val vaultExportedAt = PreferenceService.getAsDate(DATA_VAULT_EXPORTED_AT, activity)
         vaultExportedAt?.let {
-            sb.addFormattedLine(activity.getString(R.string.vault_exported_at), dateToNiceString(it, activity))
+            sb.addFormattedLine(activity.getString(R.string.vault_exported_at), dateTimeToNiceString(it, activity))
         }
         val hasMPT = PreferenceService.isPresent(DATA_MASTER_PASSWORD_TOKEN_KEY, activity)
         if (hasMPT) {
@@ -72,18 +74,18 @@ object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActi
                 sb.addNewLine()
                 sb.addFormattedLine(
                     activity.getString(R.string.recent_created_mpt, mptCounter),
-                    dateToNiceString(it, activity)
+                    dateTimeToNiceString(it, activity)
                 )
             }
         }
         sb.addNewLine()
         val previousLoginSucceededAt = PreferenceService.getAsDate(STATE_PREVIOUS_LOGIN_SUCCEEDED_AT, activity)
         previousLoginSucceededAt?.let {
-            sb.addFormattedLine(activity.getString(R.string.previous_login_at), dateToNiceString(it, activity))
+            sb.addFormattedLine(activity.getString(R.string.previous_login_at), dateTimeToNiceString(it, activity))
         }
         val lastDeniedLoginAt = PreferenceService.getAsDate(STATE_LOGIN_DENIED_AT, activity)
         lastDeniedLoginAt?.let {
-            sb.addFormattedLine(activity.getString(R.string.last_denied_login_at), dateToNiceString(it, activity))
+            sb.addFormattedLine(activity.getString(R.string.last_denied_login_at), dateTimeToNiceString(it, activity))
         }
         val lastDeniedLoginAttempts = PreferenceService.getAsInt(STATE_PREVIOUS_LOGIN_ATTEMPTS, activity)
         lastDeniedLoginAttempts?.let {
@@ -93,6 +95,7 @@ object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActi
         builder.setTitle(R.string.vault_info)
             .setMessage(sb.toString())
             .setIcon(icon)
+            .setNegativeButton(R.string.close, null)
             .show()
 
         return true

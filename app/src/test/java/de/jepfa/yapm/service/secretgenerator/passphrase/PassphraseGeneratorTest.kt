@@ -6,16 +6,19 @@ import de.jepfa.yapm.service.secretgenerator.SecretStrength
 import de.jepfa.yapm.util.secondsToYear
 import org.junit.Assert
 import org.junit.Test
+import java.security.SecureRandom
 import java.util.concurrent.atomic.AtomicInteger
 
 class PassphraseGeneratorTest {
+
+    val rnd = SecureRandom()
 
     @Test
     fun generateAndClearPassphrase() {
         val spec = PassphraseGeneratorSpec(
             SecretStrength.STRONG,
             wordBeginningUpperCase = true, addDigit = false, addSpecialChar = true)
-        val passphraseGenerator = PassphraseGenerator()
+        val passphraseGenerator = PassphraseGenerator(context = null, secureRandom = rnd)
 
         for (i in 0..100) {
             val passphrase = passphraseGenerator.generate(spec)
@@ -35,8 +38,8 @@ class PassphraseGeneratorTest {
 
     @Test
     fun testCalcCombinations() {
-        val spec = PassphraseGeneratorSpec(SecretStrength.ONE_WORD)
-        val passphraseGenerator = PassphraseGenerator(vocals = "ai", consonants = "hst")
+        val spec = PassphraseGeneratorSpec(SecretStrength.ONE_WORD, addSpecialChar = true, useExtendedSpecialChars = false)
+        val passphraseGenerator = PassphraseGenerator(vocals = "ai", consonants = "hst", context = null, secureRandom = rnd)
 
         val hits = HashSet<String>()
         for (i in 0..500000) {
@@ -58,7 +61,7 @@ class PassphraseGeneratorTest {
     @Test
     fun testCalcCombinationsRealWord() {
         val spec = PassphraseGeneratorSpec(SecretStrength.ONE_WORD)
-        val passphraseGenerator = PassphraseGenerator()
+        val passphraseGenerator = PassphraseGenerator(context = null, secureRandom = rnd)
 
         val combinationCount = passphraseGenerator.calcCombinationCount(spec)
         println("calculated combinations: $combinationCount")

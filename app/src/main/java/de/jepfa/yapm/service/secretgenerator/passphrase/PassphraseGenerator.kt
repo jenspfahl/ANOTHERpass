@@ -6,19 +6,20 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secretgenerator.GeneratorBase
 import de.jepfa.yapm.service.secretgenerator.SecretStrength
 import java.lang.Math.*
+import java.security.SecureRandom
 
 val DEFAULT_VOCALS = "aeiouy"
 val DEFAULT_CONSONANTS = "bcdfghjklmnpqrstvwxz"
-val DEFAULT_DIGITS = "1234567890"
-val DEFAULT_SPECIAL_CHARS = "!?-,.:/$%&@#"
 
 class PassphraseGenerator(
     val vocals: String = DEFAULT_VOCALS,
     val consonants: String = DEFAULT_CONSONANTS,
     val digits: String = DEFAULT_DIGITS,
     val specialChars: String = DEFAULT_SPECIAL_CHARS,
-    context: Context?
-): GeneratorBase<PassphraseGeneratorSpec>(context) {
+    val extendedSpecialChars: String = EXTENDED_SPECIAL_CHARS,
+    context: Context?,
+    secureRandom: SecureRandom? = null,
+    ): GeneratorBase<PassphraseGeneratorSpec>(context, secureRandom) {
 
 
     override fun generate(spec: PassphraseGeneratorSpec): Password {
@@ -38,7 +39,12 @@ class PassphraseGenerator(
         }
 
         if (spec.addSpecialChar) {
-            buffer.add(random(specialChars))
+            if (spec.useExtendedSpecialChars) {
+                buffer.add(random(specialChars + extendedSpecialChars))
+            }
+            else {
+                buffer.add(random(specialChars))
+            }
         }
 
         return buffer
@@ -88,15 +94,14 @@ class PassphraseGenerator(
             totalCombinations *= digits.length
         }
         if (spec.addSpecialChar) {
-            totalCombinations *= specialChars.length
+            if (spec.useExtendedSpecialChars) {
+                totalCombinations *= (extendedSpecialChars.length + specialChars.length)
+            }
+            else {
+                totalCombinations *= specialChars.length
+            }
         }
         return totalCombinations
-    }
-
-    private fun random(material: String): Char {
-        val index = SecretService.getSecureRandom(context).nextInt(material.length)
-
-        return material[index]
     }
 
     private fun isVocal(char: Char): Boolean {

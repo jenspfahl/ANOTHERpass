@@ -35,7 +35,7 @@ object QRCodeUtil {
         val showHeader = PreferenceService.getAsBool(PREF_QRCODES_WITH_HEADER, context)
         val printColor = if (colorize) color else Color.BLACK
 
-        val isBig = data.length >= 200
+        val isBig = data.length >= 120
         val size =  if (isBig) 550 else 500
         val width = size
         val height = size

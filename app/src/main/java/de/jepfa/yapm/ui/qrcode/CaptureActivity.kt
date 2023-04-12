@@ -112,7 +112,7 @@ class CaptureActivity: CaptureActivity() {
         try {
             return reader.decode(bitmap)?.text
         } catch (e: Exception) {
-            Log.e("SCAN_QR", "Error scanning file", e)
+            Log.e("SCAN_QR", "Error scanning file: ${e.message}", e)
         }
         return null
     }

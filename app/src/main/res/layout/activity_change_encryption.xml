@@ -94,6 +94,9 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <include layout="@layout/change_login_iterations_slider" />
+
+
             <Button
                 android:id="@+id/button_change"
                 style="?android:textAppearanceSmall"

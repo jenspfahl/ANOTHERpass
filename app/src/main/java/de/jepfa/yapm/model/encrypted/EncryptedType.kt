@@ -2,11 +2,11 @@ package de.jepfa.yapm.model.encrypted
 
 data class EncryptedType(val type: Types, val payload: String? = null) {
 
-    enum class Types(val code: String) {
-        MASTER_PASSWD_TOKEN("MPT"),
-        ENC_MASTER_PASSWD("EMP"),
-        ENC_MASTER_KEY("EMK"),
-        ENC_SALT("SLT");
+    enum class Types(val code: String, val hiddenPayload: Boolean) {
+        MASTER_PASSWD_TOKEN("MPT", hiddenPayload = false),
+        ENC_MASTER_PASSWD("EMP", hiddenPayload = false),
+        ENC_MASTER_KEY("EMK", hiddenPayload = true),
+        ENC_SALT("SLT", hiddenPayload = false);
 
         companion object {
             fun of(type: String): Types? {
@@ -21,12 +21,18 @@ data class EncryptedType(val type: Types, val payload: String? = null) {
         }
     }
 
-    override fun toString(): String {
-        if (payload != null) {
-           return type.code + ADD_ON_SEPARATOR + payload
+    fun serialize(): String {
+        return if (payload != null) {
+            type.code + ADD_ON_SEPARATOR + payload
+        } else {
+            type.code
         }
-        else {
-            return type.code
+    }
+    override fun toString(): String {
+        return if (!type.hiddenPayload && payload != null) {
+            type.code + ADD_ON_SEPARATOR + payload
+        } else {
+            type.code
         }
     }
 

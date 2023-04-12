@@ -3,6 +3,8 @@ package de.jepfa.obfusser.util.encrypt
 import de.jepfa.yapm.util.Loop
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.service.secretgenerator.GeneratorBase.Companion.DEFAULT_OBFUSCATIONABLE_SPECIAL_CHARS
+import de.jepfa.yapm.service.secretgenerator.GeneratorBase.Companion.EXTENDED_SPECIAL_CHARS
 import org.junit.Assert
 import org.junit.Test
 import java.util.*
@@ -58,6 +60,28 @@ class LoopTest {
         val key = Key(byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8))
         Loop.loopPassword(password, key, forwards = true)
         Assert.assertEquals("Edgj680&", password.toString())
+        Loop.loopPassword(password, key, forwards = false)
+        Assert.assertEquals(PASSWORD, password.toString())
+    }
+
+    @Test
+    fun loopLoopableSpecialChars() {
+        val PASSWORD = DEFAULT_OBFUSCATIONABLE_SPECIAL_CHARS
+        val password = Password(PASSWORD)
+        val key = Key(byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8))
+        Loop.loopPassword(password, key, forwards = true)
+        Assert.assertEquals("?,:$&#?,&#?,", password.toString())
+        Loop.loopPassword(password, key, forwards = false)
+        Assert.assertEquals(PASSWORD, password.toString())
+    }
+
+    @Test
+    fun loopNotLoopableSpecialChars() {
+        val PASSWORD = "_;+*()[]{}<>\"'=\\~|°"
+        val password = Password(PASSWORD)
+        val key = Key(byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8))
+        Loop.loopPassword(password, key, forwards = true)
+        Assert.assertEquals(PASSWORD, password.toString())
         Loop.loopPassword(password, key, forwards = false)
         Assert.assertEquals(PASSWORD, password.toString())
     }

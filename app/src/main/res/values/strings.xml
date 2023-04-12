@@ -15,6 +15,8 @@
     <string name="with_upper_case">With upper case chars</string>
     <string name="with_digits">With digits</string>
     <string name="with_special_chars">With special chars</string>
+    <string name="title_use_extended_special_chars">Use extended special chars</string>
+    <string name="summary_use_extended_special_chars">If generation happens with special chars included, the set of possible characters is extended to characters usually accessible on the second page of keyboards like all kinds of brackets, tilde, percentage sign etc.</string>
     <string name="credential_passwd_params">Here you generate the password for this credential. It is recommend to generate them instead of creating them manually. \'Pseudo Phrase\' passwords are easier to read and type but still highly random and unpredictable.</string>
     <string name="button_gen_passwd">Generate</string>
 
@@ -27,7 +29,7 @@
 
 
     <string name="cipher_name">Encryption algorithm</string>
-    <string name="create_vault_cipher_explanation">Choose an encryption algorithm. You change that later. If in doubt, use the current default.</string>
+    <string name="create_vault_cipher_explanation">Choose an encryption algorithm. You can change that later. If in doubt, use the current default.</string>
     <string name="update_vault_cipher_explanation">Choose an encryption algorithm. Current used algorithm is %1$s</string>
 
     <string name="CIPHER_AES_128">AES (128bit key)</string>
@@ -62,7 +64,7 @@
     <string name="create_vault_explanation_1">First you need to generate the master password. This is used to login into your vault. You don\'t need to remember this! Later you will have the chance to export it.</string>
     <string name="button_next">Next</string>
     <string name="create_vault_enter_passphrase_fragment_label" tools:ignore="TypographyFractions">Create Vault 1/3</string>
-    <string name="create_vault_explanation_2">Create a PIN or a short password used to unlock your vault. It may contain characters, digits and other chars. In comparison to a master password it can be shorter and is therefore easier to remember (minimum 6 characters). Memorize it well, don\'t note it somewhere!</string>
+    <string name="create_vault_explanation_2">Create a PIN or a short password used to unlock your vault for every usage. It may contain characters, digits and other chars. In comparison to a master password it can be shorter and is therefore easier to remember (minimum 6 characters). You can also choose a complex password here to protect the vault to a maximum. Memorize it well, don\'t note it somewhere!</string>
     <string name="pin">Enter a PIN</string>
     <string name="repeat_pin">Repeat the PIN</string>
     <string name="create_vault_enter_pin_fragment_label">Create Vault 2/3</string>
@@ -81,6 +83,9 @@
     <string name="button_login">Login</string>
     <string name="password_required">Password required</string>
     <string name="delete_stored_masterpasswd">Remove stored master password</string>
+    <string name="revoke_quick_access">Revoke quick access</string>
+    <string name="revoke_quick_access_desc">This will remove the stored master password and the Master Password Token (MPT) from the device. The Exported Master Password (EMP) will be needed for future logins.</string>
+    <string name="quick_access_revoked">Quick access revoked</string>
     <string name="password_wrong">Master password or PIN wrong</string>
     <string name="something_went_wrong">Something went wrong :-(</string>
     <string name="title_new_credential">Create Credential</string>
@@ -132,6 +137,7 @@
     <string name="scan_mk">Scan your master key</string>
     <string name="drop_vault">Drop vault (delete all)</string>
     <string name="chooser_select_file_to_import">Select file to import</string>
+    <string name="toast_import_vault_from_future_app_version">The selected file was created by a future app version.</string>
     <string name="toast_import_vault_failure">The selected file cannot be imported.</string>
     <string name="toast_import_vault_failure_cipher_not_supported">The selected file is encrypted with an unsupported cipher.</string>
     <string name="toast_import_vault_failure_no_vault_match">The selected file doesn\'t belong to the current vault.</string>
@@ -155,6 +161,7 @@
     <string name="change_encryption">Change encryption</string>
     <string name="title_change_encryption">Change vault\'s encryption</string>
     <string name="message_change_encryption">With changing the vault\'s encryption and/or master key all exported vault files cannot be read anymore. It is also recommended to have a fresh backup of your vault and Exported Master Key in case of something goes wrong.</string>
+    <string name="message_change_iterations">By changing the login iterations the Encrypted Master Key will be changed, so you need to export them again.</string>
     <string name="change_master_password_explanation">Change your master password by enter your current PIN and generate a new master password. Note, that the Encrypted Master Key will be changed, so you need to export it again. This also effects old vault export files with the old key. You should also export your master password and tokens again.</string>
     <string name="change_encryption_explanation">Change the vault\'s encryption algorithm if you have migrated your vault to a newer device with support for additional encryption algorithms. Note, that the Encrypted Master Key will be changed, so you need to export it again. This also effects old vault export files and exported credentials (ECRs) which might become unreadable.</string>
     <string name="vault">Vault</string>
@@ -169,7 +176,8 @@
     <string name="pref_header_login">Login</string>
     <string name="pref_header_passwd">Password generator</string>
     <string name="max_login_attempts_title">Maximum login attempts</string>
-    <string name="notification_channel_paste_title" translatable="false">ANOTHERpass paste notifications</string>
+    <string name="notification_channel_paste_title">ANOTHERpass paste notifications</string>
+    <string name="notification_channel_scheduled_title">ANOTHERpass schedules notifications</string>
     <string name="toast_copied_to_clipboard">Password copied to clipboard</string>
     <string name="toast_test_copypaste_password">Test data copied to clipboard</string>
     <string name="copy_to_clipboard">Copy password to clipboard</string>
@@ -233,6 +241,7 @@
     <string name="credential_sort_by_recently_modified">Recently modified (recent first)</string>
     <string name="credential_sort_by_id">Credential identifier</string>
     <string name="show_ids">Show credential identifiers</string>
+    <string name="expired_credentials_on_top">Expired credentials on top</string>
     <string name="nothing_placeholder" translatable="false">…</string>
     <string name="unknown_placeholder" translatable="false">\???</string>
     <string name="tab_pseudo_phrase">Pseudo phrase</string>
@@ -277,6 +286,7 @@
     <string name="title_drop_vault">Drop vault</string>
     <string name="message_drop_vault">You are going to delete ALL your credentials and login data.</string>
     <string name="select_none_all">None / All</string>
+    <string name="multiple_choice_selection">Allow multiple selection</string>
     <string name="title_copy_password">Copy password</string>
     <string name="message_copy_password">Copying passwords to clipboard may leak your passwords since any other app can listen to clipboard changes and read from it. Further it can remain there when you use a clipboard with history function (e.g. Samsung).  Use \'Privacy/Test C&amp;P password\' to figure out if someone reads the clipboard beside you. You can disable this warning in \'Settings/Security\'.</string>
     <string name="head_generate_mpt">Your Master Password Token \#%1$d</string>
@@ -308,6 +318,12 @@
     <string name="invalid_emp">Invalid Exported Master Password</string>
     <string name="invalid_emp_mpt">Not an Exported Master Password or token</string>
     <string name="scanning_emp">Scanning Master Password</string>
+
+    <string name="title_delete_selected">Delete selected credentials</string>
+    <string name="message_delete_selected">You are going to delete %1$d selected credentials! Are you sure?</string>
+    <string name="message_selected_deleted">Selected credentials deleted</string>
+    <string name="reset_selection">Reset selection</string>
+
     <string name="title_reset_all">Reset all</string>
     <string name="message_reset_all">If you cannot login and got stuck you can reset all data here. If you continue all data is going to be deleted. Are you sure?</string>
     <string name="message_reset_all_double_check">Your vault already contains %1$d credentials. Do you really want to delete them?</string>
@@ -324,8 +340,9 @@
     <string name="password_strength_guessed">Password strength (based on current password)</string>
     <string name="combinations">Combinations</string>
     <string name="entropy" translatable="false">Entropy</string>
-    <string name="bruteforce_years_pc">Years to brute force with a usual PC</string>
-    <string name="bruteforce_year_supercomp">Years to brute force with a super computer</string>
+    <string name="years">years</string>
+    <string name="bruteforce_years_pc">Duration to brute force with a usual PC (%1$s attempts per second)</string>
+    <string name="bruteforce_year_supercomp">Duration to brute force with a super computer (%1$s attempts per second)</string>
     <string name="show_vault_info">Show vault info</string>
     <string name="vault_info">Vault info</string>
     <string name="vault_id">Vault Id</string>
@@ -435,6 +452,15 @@
     <string name="summary_show_refresh_mpt_reminder">Show a reminder when the Master Password Token should be renewed (if created). This can help to reduce the risk of abusing stolen token.</string>
     <string name="show_biometric_smp_reminder">Reminder to setup biometrics for stored master password</string>
     <string name="summary_show_biometric_smp_reminder">Show a reminder when the stored master password is not protected by a biometric (e.g. a fingerprint) but the device would support it.</string>
+    <string name="show_expired_passwords_reminder">Reminder for expired credentials</string>
+    <string name="summary_show_expired_passwords_reminder">Show a reminder when any credential is expired.</string>
+    <string name="expired_credentials_notification_enabled_title">Receive a notification when any credential is expired.</string>
+    <string name="expired_credentials_notification_enabled_summary">You will receive a notification at the right time even if the app is closed. Since Android 13 you must grant a permission to receive notifications.</string>
+
+
+    <string name="next_reminder">Next reminder</string>
+    <string name="last_reminder">Previous reminder</string>
+
     <string name="export_vault_reminder">Vault should be exported after recent modifications.</string>
     <string name="export_mk_reminder">Master key should be exported after recent modifications.</string>
     <string name="export_mp_reminder">Master password should be strongly exported!</string>
@@ -442,6 +468,8 @@
     <string name="show_biometric_smp_howto">How?</string>
     <string name="refresh_mpt_reminder">Master Password Token should be renewed.</string>
     <string name="show_refresh_mpt">Renew now</string>
+    <string name="expired_passwords_reminder">Some credentials are expired</string>
+    <string name="show_expired_passwords">Show them</string>
     <string name="dont_ask_again">Don\'t nag again</string>
     <string name="manage_reminder_settings_hint">You can manage reminder under Settings / Reminders</string>
     <string name="no_label">WITH NO LABELS</string>
@@ -457,12 +485,13 @@
     <string name="howto_biometrics_for_smp_text">First, enrol biometrics (e.g. fingerprints) on your device. Next, remove stored master password and set it again authenticated with your biometric.</string>
     <string name="pref_header_reminder">Reminders</string>
     <string name="reminder_period_title">How often to show reminders</string>
+    <string name="reminder_duration_title">How long to show a reminder</string>
     <string name="pref_auth_smp_with_biometric_title">Authorize stored master password with biometric</string>
     <string name="pref_auth_smp_with_biometric_summary">It is highly recommend to protect stored master password with e.g. a fingerprint to mitigate the risk of getting it stolen by compromised malware. (Only if your device supports it.) Note: An already stored master password is not touched by changing this setting now. You have to remove it and set it again to take this setting in effect.</string>
     <string name="auth_to_decrypt_emp_omit">Scan Master Password</string>
     <string name="whats_new">What\'s new</string>
     <string name="whats_new_in_1_7">What\'s new in version 1.7</string>
-    <string name="whats_new_in_1_7_subtext">Besides several bugfixes and improvements these new main features shipped in:</string>
+    <string name="whats_new_subtext">Besides several bugfixes and improvements these new main features shipped in:</string>
     <string name="whats_new_in_1_7_bullet_1_head">Import and export credentials</string>
     <string name="whats_new_in_1_7_bullet_1_text">You can import credentials from browsers (e.g Firefox) or other sources by importing them from CSV files. Or takeout all credentials as CSV file.</string>
     <string name="whats_new_in_1_7_bullet_2_head">Improved Autofill</string>
@@ -473,6 +502,17 @@
     <string name="whats_new_in_1_7_bullet_4_text">Now you can change the vaults encryption algorithm afterwards to use new modern ciphers.</string>
     <string name="whats_new_in_1_7_bullet_5_head">Optimize random generator</string>
     <string name="whats_new_in_1_7_bullet_5_text">Add your own real-world-entropy to the internal random generator to achieve more randomness.</string>
+
+    <string name="whats_new_in_1_8">What\'s new in version 1.8</string>
+    <string name="whats_new_in_1_8_bullet_1_head">Expiry dates for credentials</string>
+    <string name="whats_new_in_1_8_bullet_1_text">Define optional expiry dates and obtain notifications once credentials expire. Expired credentials are marked accordingly.</string>
+    <string name="whats_new_in_1_8_bullet_2_head">Adjust login iterations</string>
+    <string name="whats_new_in_1_8_bullet_2_text">Tweak the PBKDF-iteration count taken to en- and decrypt your Encrypted Master Key.</string>
+    <string name="whats_new_in_1_8_bullet_3_head">Reworked extended search</string>
+    <string name="whats_new_in_1_8_bullet_3_text">Improved search in separate credential attributes with the \'!\'-command. Search directly by expired or veiled/obfuscated credentials.</string>
+    <string name="whats_new_in_1_8_bullet_4_head">Improvement of some UI-components</string>
+    <string name="whats_new_in_1_8_bullet_4_text">More space in displaying and editing additional information for credentials, improved reminders, multiple selection of credentials, etc…</string>
+
     <string name="intro">Show intro</string>
     <string name="intro_1_head">Another way to manage passwords</string>
     <string name="intro_1_subtext">ANOTHERpass is another approach of a password manager. See what it means:</string>
@@ -514,6 +554,8 @@
     <string name="name">Name</string>
     <string name="identifier" translatable="false">Id</string>
     <string name="universal_identifier" translatable="false">Uid</string>
+    <string name="copy_universal_identifier">Copy Uid</string>
+    <string name="universal_identifier_copied">Uid copied to the clipboard</string>
     <string name="source">Source</string>
     <string name="source_from_file">from external file</string>
     <string name="source_from_record">from external QR code or NFC tag</string>
@@ -564,6 +606,13 @@
     <string name="reminder_period_1_hour">Every hour</string>
     <string name="reminder_period_1_day">Once a day</string>
     <string name="reminder_period_1_week">Once a week</string>
+
+    <string name="reminder_duration_5_sec">5 seconds</string>
+    <string name="reminder_duration_10_sec">10 seconds</string>
+    <string name="reminder_duration_15_sec">15 seconds</string>
+    <string name="reminder_duration_until_swipe">Until swipe out</string>
+
+
     <string name="colorize_qr_codes">Colorize QR codes</string>
     <string name="print_qr_code_header">Print QR code header</string>
     <string name="autofill_suggest_everywhere">Autofill suggestion everywhere</string>
@@ -591,6 +640,11 @@
     <string name="date_today_at">today at %1$s</string>
     <string name="date_yesterday_at">yesterday at %1$s</string>
     <string name="date_on_date_at">on %1$s at %2$s</string>
+
+    <string name="date_today">today</string>
+    <string name="date_yesterday">yesterday</string>
+    <string name="date_tomorrow">tomorrow</string>
+    <string name="date_on_date">on %1$s</string>
 
     <string name="pref_show_last_login_state">Show previous login state</string>
     <string name="show_last_login_state_denies_and_succeeds">Denied and succeeded logins</string>
@@ -637,5 +691,31 @@
 
     <string name="chooser_select_image_to_scan">Select image file to scan</string>
     <string name="image_to_scan_failed">Image file cannot be scanned!</string>
+
+    <string name="login_iterations_explanation">Select the strength of the vault login process. The stronger the harder it is to crack your login credentials, but more login time is needed. If in doubt keep the default value.</string>
+    <string name="login_iterations_faster">Weaker but faster</string>
+    <string name="login_iterations">Iterations</string>
+    <string name="login_iterations_slower">Stronger but slower</string>
+    <string name="benchmark_login_iterations">Gauge time to login</string>
+    <string name="benchmark_login_iterations_explanation">This benchmark gauges the time needed to login into your vault. Running it may take some time, from some seconds or less up to some minutes depending of the selected value and the CPU power of your device. Try to find a value starting from the smallest one which takes an acceptable time, e.g. 3 seconds. This will be your iterations amount.</string>
+    <string name="start">Start</string>
+    <string name="result">Result</string>
+    <string name="elapsed_time">Elapsed time</string>
+
+    <string name="expired">Expired</string>
+    <string name="expired_since">Expired since</string>
+    <string name="expires">Expires</string>
+    <string name="no_expiration">No expiration</string>
+    <string name="expires_in_1_month">Expires in a month</string>
+    <string name="expires_in_3_months">Expires in three month</string>
+    <string name="expires_in_6_months">Expires in half a year</string>
+    <string name="expires_in_12_months">Expires in a year</string>
+    <string name="expires_on">Expires on …</string>
+    <string name="error_expired_in_the_past">Expiry date must be in the future!</string>
+
+    <string name="credential_expired_notifiction_title">Expired credential</string>
+    <string name="credential_expired_notifiction_message">A credential is expired on %1$s. Tap here to show.</string>
+    <string name="credential_expired_notifiction_show_all_expired">Show all expired credentials</string>
+
 
 </resources>

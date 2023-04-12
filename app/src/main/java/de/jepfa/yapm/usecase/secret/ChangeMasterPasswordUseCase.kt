@@ -3,10 +3,7 @@ package de.jepfa.yapm.usecase.secret
 import android.util.Log
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.service.secret.MasterKeyService
-import de.jepfa.yapm.service.secret.MasterPasswordService
-import de.jepfa.yapm.service.secret.SaltService
-import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.service.secret.*
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.InputUseCase
 import de.jepfa.yapm.usecase.session.LoginUseCase
@@ -45,11 +42,14 @@ object ChangeMasterPasswordUseCase:
             return false
         }
 
+        val pbkdfIterations = PbkdfIterationService.getStoredPbkdfIterations()
+
         MasterKeyService.encryptAndStoreMasterKey(
             masterKey,
             loginData.pin,
             loginData.masterPassword,
             salt,
+            pbkdfIterations,
             cipherAlgorithm,
             activity
         )

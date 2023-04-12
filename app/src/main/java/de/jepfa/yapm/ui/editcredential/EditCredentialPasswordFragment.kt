@@ -17,11 +17,12 @@ import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.PREF_USE_EXTENDED_SPECIAL_CHARS
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.service.secretgenerator.GeneratorBase.Companion.DEFAULT_OBFUSCATIONABLE_SPECIAL_CHARS
 import de.jepfa.yapm.service.secretgenerator.SecretStrength
-import de.jepfa.yapm.service.secretgenerator.passphrase.DEFAULT_SPECIAL_CHARS
 import de.jepfa.yapm.service.secretgenerator.passphrase.PassphraseGenerator
 import de.jepfa.yapm.service.secretgenerator.passphrase.PassphraseGeneratorSpec
 import de.jepfa.yapm.service.secretgenerator.password.PasswordGenerator
@@ -199,7 +200,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                     if (obfuscatePasswordRequired) {
                         DeobfuscationDialog.openObfuscationDialog(editCredentialActivity,
                             editCredentialActivity.getString(R.string.obfuscate_while_saving),
-                            editCredentialActivity.getString(R.string.obfuscate_while_saving_message, DEFAULT_SPECIAL_CHARS),
+                            editCredentialActivity.getString(R.string.obfuscate_while_saving_message, DEFAULT_OBFUSCATIONABLE_SPECIAL_CHARS),
                             editCredentialActivity.getString(android.R.string.ok),
                             editCredentialActivity.getString(android.R.string.cancel))
                         { newObfuscationKey ->
@@ -348,6 +349,8 @@ class EditCredentialPasswordFragment : SecureFragment() {
         credential.password = encPassword
         LabelService.defaultHolder.updateLabelsForCredential(key, credential)
 
+        editCredentialActivity.credentialViewModel.updateExpiredCredential(credential, key, editCredentialActivity, considerExpiredForThePast = true)
+
         editCredentialActivity.reply(obfuscationKey)
     }
 
@@ -385,12 +388,13 @@ class EditCredentialPasswordFragment : SecureFragment() {
             R.id.radio_strength_extreme -> SecretStrength.EXTREME
             else -> PASSPHRASE_STRENGTH_DEFAULT // default
         }
-        val spec = PassphraseGeneratorSpec(
+        return PassphraseGeneratorSpec(
             strength = passphraseStrength,
             wordBeginningUpperCase = switchUpperCaseChar.isChecked,
             addDigit = switchAddDigit.isChecked,
-            addSpecialChar = switchAddSpecialChar.isChecked)
-        return spec
+            addSpecialChar = switchAddSpecialChar.isChecked,
+            useExtendedSpecialChars = PreferenceService.getAsBool(PREF_USE_EXTENDED_SPECIAL_CHARS, null),
+        )
     }
 
     private fun buildPasswordGeneratorSpec(): PasswordGeneratorSpec {
@@ -401,12 +405,13 @@ class EditCredentialPasswordFragment : SecureFragment() {
             R.id.radio_strength_extreme -> SecretStrength.EXTREME
             else -> PASSWORD_STRENGTH_DEFAULT // default
         }
-        val spec = PasswordGeneratorSpec(
+        return PasswordGeneratorSpec(
             strength = passwordStrength,
             noUpperCase = !switchUpperCaseChar.isChecked,
             noDigits = !switchAddDigit.isChecked,
-            noSpecialChars = !switchAddSpecialChar.isChecked)
-        return spec
+            noSpecialChars = !switchAddSpecialChar.isChecked,
+            useExtendedSpecialChars = PreferenceService.getAsBool(PREF_USE_EXTENDED_SPECIAL_CHARS, null),
+        )
     }
 
     private fun buildRadioButton(radioButton: RadioButton, passphraseStrength: SecretStrength) {

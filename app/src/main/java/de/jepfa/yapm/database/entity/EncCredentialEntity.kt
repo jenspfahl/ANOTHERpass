@@ -19,6 +19,7 @@ data class EncCredentialEntity (@PrimaryKey(autoGenerate = true) val id: Int?,
                                 var lastPassword: String?,
                                 var website: String,
                                 var labels: String, // encrypted label ids, comma separated
+                                var expiresAt: String?,
                                 var isObfuscated: Boolean,
                                 var isLastPasswordObfuscated: Boolean,
                                 var modifyTimestamp: Long) {
@@ -32,6 +33,7 @@ data class EncCredentialEntity (@PrimaryKey(autoGenerate = true) val id: Int?,
                 lastPassword: Encrypted?,
                 website: Encrypted,
                 labels: Encrypted,
+                expiresAt: Encrypted,
                 isObfuscated: Boolean,
                 isLastPasswordObfuscated: Boolean?,
                 modifyTimestamp: Long
@@ -45,6 +47,7 @@ data class EncCredentialEntity (@PrimaryKey(autoGenerate = true) val id: Int?,
         lastPassword?.toBase64String(),
         website.toBase64String(),
         labels.toBase64String(),
+        expiresAt.toBase64String(),
         isObfuscated,
         isLastPasswordObfuscated?:false,
         modifyTimestamp)

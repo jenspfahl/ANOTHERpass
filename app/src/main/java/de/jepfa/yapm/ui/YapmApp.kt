@@ -19,7 +19,9 @@ class YapmApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        PreferenceService.initDefaults(this.applicationContext)
+
+        PreferenceService.initStorage(this.applicationContext)
+
         val darkMode = PreferenceService.getAsInt(PreferenceService.PREF_DARK_MODE, this.applicationContext)
         AppCompatDelegate.setDefaultNightMode(darkMode)
 

@@ -1,6 +1,8 @@
 package de.jepfa.yapm.ui.settings
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -93,12 +95,14 @@ class SettingsActivity : SecureActivity(),
 
     class HeaderFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            preferenceManager.preferenceDataStore = EncryptedPreferenceDataStore.getInstance(requireContext())
             setPreferencesFromResource(R.xml.header_preferences, rootKey)
         }
     }
 
     class GeneralSettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            preferenceManager.preferenceDataStore = EncryptedPreferenceDataStore.getInstance(requireContext())
             setPreferencesFromResource(R.xml.general_preferences, rootKey)
 
             val darkModePref = findPreference<ListPreference>(
@@ -166,6 +170,7 @@ class SettingsActivity : SecureActivity(),
 
     class LoginSettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            preferenceManager.preferenceDataStore = EncryptedPreferenceDataStore.getInstance(requireContext())
             setPreferencesFromResource(R.xml.login_preferences, rootKey)
 
             val qrcPref = findPreference<SwitchPreferenceCompat>(
@@ -197,6 +202,7 @@ class SettingsActivity : SecureActivity(),
 
     class SecuritySettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            preferenceManager.preferenceDataStore = EncryptedPreferenceDataStore.getInstance(requireContext())
             setPreferencesFromResource(R.xml.security_preferences, rootKey)
 
             findPreference<ListPreference>(PreferenceService.PREF_LOCK_TIMEOUT)?.let {
@@ -221,12 +227,14 @@ class SettingsActivity : SecureActivity(),
 
     class PasswordGeneratorSettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            preferenceManager.preferenceDataStore = EncryptedPreferenceDataStore.getInstance(requireContext())
             setPreferencesFromResource(R.xml.password_generator_preferences, rootKey)
         }
     }
 
     class OverlaySettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            preferenceManager.preferenceDataStore = EncryptedPreferenceDataStore.getInstance(requireContext())
             setPreferencesFromResource(R.xml.overlay_preferences, rootKey)
 
             val enableOverlayPref = findPreference<SwitchPreferenceCompat>(
@@ -243,6 +251,7 @@ class SettingsActivity : SecureActivity(),
 
     class ClipboardSettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            preferenceManager.preferenceDataStore = EncryptedPreferenceDataStore.getInstance(requireContext())
             setPreferencesFromResource(R.xml.clipboard_preferences, rootKey)
 
             val enableCopyPasswdPref = findPreference<SwitchPreferenceCompat>(
@@ -266,6 +275,7 @@ class SettingsActivity : SecureActivity(),
 
     class AutofillSettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            preferenceManager.preferenceDataStore = EncryptedPreferenceDataStore.getInstance(requireContext())
             setPreferencesFromResource(R.xml.autofill_preferences, rootKey)
 
             findPreference<SwitchPreferenceCompat>(PreferenceService.PREF_AUTOFILL_EVERYWHERE)?.let { pref ->
@@ -323,6 +333,7 @@ class SettingsActivity : SecureActivity(),
 
     class ReminderSettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            preferenceManager.preferenceDataStore = EncryptedPreferenceDataStore.getInstance(requireContext())
             setPreferencesFromResource(R.xml.reminder_preferences, rootKey)
 
             findPreference<SwitchPreferenceCompat>(PreferenceService.PREF_SHOW_BIOMETRIC_SMP_REMINDER)?.let { pref ->
@@ -331,4 +342,76 @@ class SettingsActivity : SecureActivity(),
         }
     }
 
+}
+
+
+class EncryptedPreferenceDataStore private constructor(val context: Context) : PreferenceDataStore() {
+    companion object {
+
+        @Volatile private var INSTANCE: EncryptedPreferenceDataStore? = null
+
+        fun getInstance(context: Context): EncryptedPreferenceDataStore =
+            INSTANCE ?: synchronized(this) {
+                INSTANCE ?: EncryptedPreferenceDataStore(context).also { INSTANCE = it }
+            }
+    }
+
+
+    override fun putString(key: String, value: String?) {
+        if (value != null) {
+            PreferenceService.putString(key, value, context)
+        }
+        else {
+            PreferenceService.delete(key, context)
+        }
+    }
+
+    override fun putStringSet(key: String, value: Set<String>?) {
+        if (value != null) {
+            PreferenceService.putStringSet(key, value, context)
+        }
+        else {
+            PreferenceService.delete(key, context)
+        }
+    }
+
+    override fun putInt(key: String, value: Int) {
+        PreferenceService.putInt(key, value, context)
+    }
+
+    override fun putLong(key: String, value: Long) {
+        PreferenceService.putString(key, value.toString(), context)
+    }
+
+    override fun putFloat(key: String, value: Float) {
+        PreferenceService.putString(key, value.toString(), context)
+    }
+
+    override fun putBoolean(key: String, value: Boolean) {
+        PreferenceService.putBoolean(key, value, context)
+    }
+
+    override fun getString(key: String, defValue: String?): String? {
+        return PreferenceService.getAsString(key, context) ?: defValue
+    }
+
+    override fun getStringSet(key: String, defValue: Set<String>?): Set<String>? {
+        return PreferenceService.getAsStringSet(key, context) ?: defValue
+    }
+
+    override fun getInt(key: String, defValue: Int): Int {
+        return PreferenceService.getAsInt(key, context) // no default support!!
+    }
+
+    override fun getLong(key: String, defValue: Long): Long {
+        return PreferenceService.getAsString(key, context)?.toLongOrNull() ?: defValue
+    }
+
+    override fun getFloat(key: String, defValue: Float): Float {
+        return PreferenceService.getAsString(key, context)?.toFloatOrNull() ?: defValue
+    }
+
+    override fun getBoolean(key: String, defValue: Boolean): Boolean {
+        return PreferenceService.getAsBool(key, context)
+    }
 }

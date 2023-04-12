@@ -21,6 +21,11 @@ abstract class SecureActivity : BaseActivity() {
         checkSecret()
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        checkSecret(intent)
+    }
+
     override fun onPause() {
         super.onPause()
         window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
@@ -57,9 +62,14 @@ abstract class SecureActivity : BaseActivity() {
     }
 
     @Synchronized
-    private fun checkSecret() {
+    private fun checkSecret(incomingIntent: Intent? = null) {
         if (checkSession) {
-            SecretChecker.getOrAskForSecret(this)
+            if (incomingIntent != null) {
+                SecretChecker.getOrAskForSecret(this, incomingIntent)
+            }
+            else {
+                SecretChecker.getOrAskForSecret(this)
+            }
         }
     }
 
@@ -69,7 +79,7 @@ abstract class SecureActivity : BaseActivity() {
     object SecretChecker {
 
         const val fromSecretChecker = "fromSecretChecker"
-        const val fromAutofill = "fromAutofill"
+        const val fromAutofillOrNotification = "fromAutofill"
         const val loginRequestCode = 38632
 
         private val DELTA_LOGIN_ACTIVITY_INTENDED = TimeUnit.SECONDS.toMillis(5)
@@ -78,7 +88,7 @@ abstract class SecureActivity : BaseActivity() {
         private var loginActivityIntended: Long = 0
 
         @Synchronized
-        fun getOrAskForSecret(activity: SecureActivity): Session {
+        fun getOrAskForSecret(activity: SecureActivity, incomingIntent: Intent = activity.intent): Session {
             if (Session.isDenied()) {
                 // make all not readable by setting key as invalid
                 if (Session.isOutdated()) {
@@ -95,15 +105,16 @@ abstract class SecureActivity : BaseActivity() {
 
                 if (!isLoginIntended()) {
                     val intent = Intent(activity, LoginActivity::class.java)
-                    intent.putExtras(activity.intent)
+                    intent.putExtras(incomingIntent)
                     intent.putExtra(fromSecretChecker, true)
-                    if (activity.intent.getBooleanExtra(fromAutofill, false)) {
+                    intent.action = activity.intent.action
+                    if (incomingIntent.getBooleanExtra(fromAutofillOrNotification, false)) {
                         activity.startActivityForResult(intent, loginRequestCode)
                         activity.lock()
                     }
                     else {
                         activity.startActivity(intent)
-                        activity.finish()
+                        activity.finish()  // Why? To restart from the main activity.
                     }
 
                     loginIntended(activity)

@@ -2,9 +2,11 @@ package de.jepfa.yapm.util
 
 import androidx.appcompat.app.AlertDialog
 import android.content.ClipData
+import android.content.ClipDescription
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Build
+import android.os.PersistableBundle
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.secret.Key
@@ -46,9 +48,13 @@ object ClipboardUtil {
         }
     }
 
-    fun copy(label: String, text: CharSequence, context: Context) {
+    fun copy(label: String, text: CharSequence, context: Context, isSensible: Boolean = true) {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText(label, text)
+        clip.description.extras = PersistableBundle().apply {
+            putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, isSensible)
+        }
+
         clipboard.setPrimaryClip(clip)
     }
 

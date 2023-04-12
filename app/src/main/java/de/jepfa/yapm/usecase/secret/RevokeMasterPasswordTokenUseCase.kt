@@ -11,6 +11,7 @@ import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.nfc.NfcActivity
@@ -18,9 +19,9 @@ import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.usecase.BasicUseCase
 import de.jepfa.yapm.util.putEncryptedExtra
 
-object RevokeMasterPasswordTokenUseCase: BasicUseCase<SecureActivity>() {
+object RevokeMasterPasswordTokenUseCase: BasicUseCase<BaseActivity>() {
 
-    fun openDialog(activity: SecureActivity, successHandler: () -> Unit) {
+    fun openDialog(activity: BaseActivity, successHandler: () -> Unit) {
         val mptCounter = PreferenceService.getAsInt(
             PreferenceService.STATE_MASTER_PASSWD_TOKEN_COUNTER,
             activity
@@ -40,22 +41,19 @@ object RevokeMasterPasswordTokenUseCase: BasicUseCase<SecureActivity>() {
 
     }
 
-    override fun execute(activity: SecureActivity): Boolean {
-        val key = activity.masterSecretKey
-        if (key != null) {
-            PreferenceService.delete(
-                PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY,
-                activity
-            )
-            PreferenceService.delete(
-                PreferenceService.DATA_MASTER_PASSWORD_TOKEN_NFC_TAG_ID,
-                activity
-            )
+    override fun execute(activity: BaseActivity): Boolean {
 
-            return true
-        }
+        PreferenceService.delete(
+            PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY,
+            activity
+        )
+        PreferenceService.delete(
+            PreferenceService.DATA_MASTER_PASSWORD_TOKEN_NFC_TAG_ID,
+            activity
+        )
 
-        return false
+        return true
+
     }
 
 }

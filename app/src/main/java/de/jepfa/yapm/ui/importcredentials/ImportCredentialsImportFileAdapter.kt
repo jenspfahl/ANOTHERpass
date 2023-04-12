@@ -31,7 +31,8 @@ class ImportCredentialsImportFileAdapter(
         val url: String?,
         val userName: String?,
         val plainPassword: String,
-        val description: String)
+        val description: String,
+    )
 
     private val checkBoxes = ArrayList<CheckBox>()
 

@@ -15,7 +15,7 @@ object LogoutUseCase: BasicUseCase<SecureActivity>() {
         activity.closeOverlayDialogs()
         ClipboardUtil.clearClips(activity)
 
-        activity.finishAndRemoveTask()
+       // activity.finishAndRemoveTask()
         activity.finishAffinity()
 
         return true

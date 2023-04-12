@@ -3,6 +3,7 @@ package de.jepfa.yapm.service.secret
 import android.content.Context
 import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.secret.Password
@@ -11,6 +12,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
+@SmallTest
 class SecretServiceTest {
 
     val TAG = "YAPM/SS"
@@ -27,9 +29,9 @@ class SecretServiceTest {
 
         val masterPin = Password("1234") // given by the user (knowledge)
 
-        val masterPassword = Password("h9w4mlwmaf") // generated and securelly stored by the user (owning)
+        val masterPassword = Password("h9w4mlwmaf") // generated and securely stored by the user (owning)
 
-        // optionally store masterPassword encrypted in the app4
+        // optionally store masterPassword encrypted in the app
         val androidSecretKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_MK, context)
         val encMasterPassword = SecretService.encryptPassword(androidSecretKey, masterPassword)
         Log.i(TAG, "encMasterPassword=${encMasterPassword.debugToString()}")
@@ -61,7 +63,7 @@ class SecretServiceTest {
 
         // Credential enc-/decryption with masterKey --> AES
         val credential = Password("9999")
-        val masterKeySK = SecretService.generateStrongSecretKey(masterKey, salt, cipherAlgorithm)
+        val masterKeySK = SecretService.generateDefaultSecretKey(masterKey, salt, cipherAlgorithm)
         // not needed anymore
         masterKey.clear()
 

@@ -125,7 +125,7 @@ class VerifyActivity : ReadActivityBase() {
             val masterPasswordTokenKey =
                 SecretService.decryptKey(masterPasswordTokenSK, encMasterPasswordTokenKey)
             val cipherAlgorithm = SecretService.getCipherAlgorithm(this)
-            val mptSK = SecretService.generateStrongSecretKey(
+            val mptSK = SecretService.generateDefaultSecretKey(
                 masterPasswordTokenKey,
                 SaltService.getSalt(this),
                 cipherAlgorithm

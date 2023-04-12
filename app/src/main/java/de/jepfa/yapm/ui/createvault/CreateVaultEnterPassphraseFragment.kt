@@ -1,15 +1,12 @@
 package de.jepfa.yapm.ui.createvault
 
 import android.app.Activity.RESULT_OK
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.provider.MediaStore
 import android.text.InputFilter
 import android.text.InputType
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,27 +15,25 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SwitchCompat
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.AndroidKey.ALIAS_KEY_TRANSPORT
-import de.jepfa.yapm.service.secret.SaltService
-import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER_PASSWD
+import de.jepfa.yapm.usecase.credential.ShowPasswordStrengthUseCase
 import de.jepfa.yapm.usecase.secret.GenerateMasterPasswordUseCase
 import de.jepfa.yapm.usecase.secret.SeedRandomGeneratorUseCase
 import de.jepfa.yapm.util.*
-import java.nio.ByteBuffer
 
 
 class CreateVaultEnterPassphraseFragment : BaseFragment() {
 
     private var manuallySeedView: TextView? = null
     private var generatedPassword: Password = Password.empty()
+    private var combinations = 0.0
 
     init {
         enableBack = true
@@ -57,6 +52,19 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
 
         val pseudoPhraseSwitch: SwitchCompat = view.findViewById(R.id.switch_use_pseudo_phrase)
         val generatedPasswdView: TextView = view.findViewById(R.id.generated_passwd)
+
+        getBaseActivity()?.let { baseActivity ->
+            generatedPasswdView.setOnLongClickListener {
+                if (combinations > 0) {
+                    ShowPasswordStrengthUseCase.showPasswordStrength(
+                        combinations,
+                        R.string.password_strength,
+                        baseActivity
+                    )
+                }
+                true
+            }
+        }
 
         manuallySeedView = view.findViewById(R.id.button_seed_manually)
         val hasCamera = requireContext().packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
@@ -106,7 +114,8 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
                UseCaseBackgroundLauncher(GenerateMasterPasswordUseCase)
                    .launch(baseActivity, pseudoPhraseSwitch.isChecked)
                    { output ->
-                       generatedPassword = output.data
+                       generatedPassword = output.data.first
+                       combinations = output.data.second
                        var spannedString = PasswordColorizer.spannableString(generatedPassword, getBaseActivity())
                        generatedPasswdView.text = spannedString
                    }

@@ -13,6 +13,7 @@ import java.text.DecimalFormatSymbols
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.floor
 
 fun Bundle?.getEncrypted(key: String): Encrypted? {
 
@@ -103,6 +104,10 @@ fun Date.yesterday(): Date {
     return addDays(-1)
 }
 
+fun Date.tomorrow(): Date {
+    return addDays(1)
+}
+
 fun Date.addDays(days: Int): Date {
     val cal = Calendar.getInstance()
     cal.time = this
@@ -110,7 +115,19 @@ fun Date.addDays(days: Int): Date {
     return cal.time
 }
 
+fun Date.addMonths(months: Int): Date {
+    val cal = Calendar.getInstance()
+    cal.time = this
+    cal.add(Calendar.MONTH, months)
+    return cal.time
+}
+
 fun Double.toReadableFormat(): String {
+    val f = NumberFormat.getInstance(Locale.getDefault(Locale.Category.FORMAT))
+    return f.format(floor(this))
+}
+
+fun Int.toReadableFormat(): String {
     val f = NumberFormat.getInstance(Locale.getDefault(Locale.Category.FORMAT))
     return f.format(this)
 }
@@ -150,7 +167,7 @@ fun Double.secondsToYear(): Double {
 
 fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
     observe(lifecycleOwner, object : Observer<T> {
-        override fun onChanged(t: T?) {
+        override fun onChanged(t: T) {
             observer.onChanged(t)
             removeObserver(this)
         }

@@ -14,6 +14,8 @@
     <string name="with_upper_case">Mit Großbuchstaben</string>
     <string name="with_digits">Mit Ziffern</string>
     <string name="with_special_chars">Mit Sonderzeichen</string>
+    <string name="title_use_extended_special_chars">Verwende weitere Sonderzeichen</string>
+    <string name="summary_use_extended_special_chars">Wenn mit Sonderzeichen generiert wird, werden weitere Sonderzeichen in Betracht gezogen, die auf den meisten Tastaturen erst auf der zweiten Seite auswählbar sind, wie z.B. diverse Klammern, Tilde, Prozentzeichen etc.</string>
     <string name="credential_passwd_params">Hier kannst du das Passwort generieren. Es wird empfohlen es zu generieren anstatt es manuell einzugeben. \'Pseudophrase\'-Passwörter sind leicht zu lesen und zu tippen aber dennoch zufällig und stark.</string>
     <string name="button_gen_passwd">Generiere</string>
 
@@ -57,10 +59,10 @@
     <string name="text_create_new_vault">Willkommen! Wenn du ANOTHERpass noch nie benutzt hast, solltest du dir die Online-Hilfe durchlesen. Oder du beginnst einfach und erstellst einen neuen Tresor.</string>
     <string name="button_import_new_vault">Tresor importieren</string>
     <string name="text_import_new_vault">Wenn du ANOTHERpass schon verwendet und eine Tresor-Datei hast, kannst du diese hier ganz einfach importieren.</string>
-    <string name="create_vault_explanation_1">Zuerst musst du dein Masterpasswort generieren. Es wird benutzt, um dich in deinen Tresor einzuloggen. Du brauchst dir es nicht zu merken! Später hast du die Gelegenheit, es stattdessen zu exportieren.</string>
+    <string name="create_vault_explanation_1">Zuerst musst du dein Masterpasswort generieren. Es wird benutzt, um dich in deinen Tresor einzuloggen. Du brauchst es dir nicht zu merken! Später hast du die Gelegenheit, es stattdessen zu exportieren.</string>
     <string name="button_next">Weiter</string>
     <string name="create_vault_enter_passphrase_fragment_label" tools:ignore="TypographyFractions">Tresor erstellen 1/3</string>
-    <string name="create_vault_explanation_2">Wähle eine PIN oder ein einprägsames Passwort um den Tresor zu entsperren. Es darf Buchstaben, Zahlen und Sonderzeichen enthalten. Im Vergleich zum Masterpasswort kann es viel kürzer sein (minimal 6 Zeichen) und ist deshalb einfach zu merken. Merke es dir gut und achte darauf dass niemand es erfahren kann!</string>
+    <string name="create_vault_explanation_2">Wähle eine PIN oder ein einprägsames Passwort um den Tresor bei jeder Benutzung zu entsperren. Es darf Buchstaben, Zahlen und Sonderzeichen enthalten. Im Vergleich zum Masterpasswort kann es viel kürzer sein (minimal 6 Zeichen) und ist deshalb einfach zu merken. Du kannst aber auch ein komplexes Passwort wählen, um den Tresor noch besser zu schützen. Merke es dir gut und achte darauf, dass niemand es erfahren kann!</string>
     <string name="pin">PIN eingeben</string>
     <string name="repeat_pin">PIN wiederholen</string>
     <string name="create_vault_enter_pin_fragment_label">Tresor erstellen 2/3</string>
@@ -70,7 +72,7 @@
     <string name="password_not_equal">Wiederholung des Passworts nicht gleich</string>
     <string name="pin_wrong">Falsche PIN</string>
     <string name="button_create_vault">Tresor erstellen</string>
-    <string name="create_vault_explanation_3">Hier siehst du nochmal dein Masterpasswort. Exportiere es als QR-Code oder auf ein NFC-Tag indem du auf das entsprechende Symbol klickst. Wenn du es als QR-Code exportierst, kannst du es entweder als Bild sichern oder du scannst oder fotografierst den QR-Code direkt vom Gerät ab. Verwahre es an einem sicheren Ort! Du wirst es zusammen mit deiner PIN brauchen, um dich einzuloggen. \nFür einen einfacheren und schnelleren Login kannst du das Masterpasswort auch in der App speichern (geschützt mit einem biometrischem Merkmal wenn unterstützt).</string>
+    <string name="create_vault_explanation_3">Hier siehst du nochmal dein Masterpasswort. Exportiere es als QR-Code oder auf ein NFC-Tag, indem du auf das entsprechende Symbol klickst. Wenn du es als QR-Code exportierst, kannst du es entweder als Bild sichern oder du scannst oder fotografierst den QR-Code direkt vom Gerät ab. Verwahre es an einem sicheren Ort! Du wirst es zusammen mit deiner PIN brauchen, um dich einzuloggen. \nFür einen einfacheren und schnelleren Login kannst du das Masterpasswort auch in der App speichern (geschützt mit einem biometrischem Merkmal wenn unterstützt).</string>
     <string name="store_master_password">Speichere Masterpasswort</string>
     <string name="create_vault_summarize_fragment_label">Tresor erstellen 3/3</string>
     <string name="login_explanation_1">Bitte PIN zum Einloggen eingeben</string>
@@ -79,6 +81,9 @@
     <string name="button_login">Login</string>
     <string name="password_required">Passwort erforderlich</string>
     <string name="delete_stored_masterpasswd">Entferne Masterpasswort</string>
+    <string name="revoke_quick_access">Schnellzugriff entfernen</string>
+    <string name="revoke_quick_access_desc">Dies entfernt das gespeicherte Masterpassword sowie das Masterpasswort-Token (MPT) vom Gerät. Um sich einzuloggen wird dann das Exportierte Master Password (EMP) benötigt.</string>
+    <string name="quick_access_revoked">Schnellzugriff wurde entfernt</string>
     <string name="password_wrong">PIN oder Masterpasswort nicht korrekt</string>
     <string name="something_went_wrong">Irgendwas ging leider schief :-(</string>
     <string name="title_new_credential">Erstelle neue Zugangsdaten</string>
@@ -131,6 +136,7 @@
     <string name="drop_vault">Tresor vernichten (alles löschen)</string>
     <string name="chooser_select_file_to_import">Wähle eine Datei zum Importieren aus</string>
     <string name="toast_import_vault_failure">Die ausgewählte Datei kann nicht importiert werden.</string>
+    <string name="toast_import_vault_from_future_app_version">Die ausgewählte Datei wurde von einer zukünftigen App-Version erstellt.</string>
     <string name="toast_import_vault_failure_cipher_not_supported">Die ausgewählte Datei ist mit einem nicht unterstützten Algorithmus verschlüsselt.</string>
     <string name="toast_import_vault_failure_no_vault_match">Die ausgewählte Datei gehört nicht zum aktuellen Tresor.</string>
     <string name="toast_import_vault_failure_not_same_algo">Die ausgewählte Datei verwendet eine andere Verschlüsselung.</string>
@@ -153,6 +159,7 @@
     <string name="change_encryption">Ändere Verschlüsselung</string>
     <string name="title_change_encryption">Ändere Tresorverschlüsselung</string>
     <string name="message_change_encryption">Nach der Änderung der Verschlüsselung und/oder des Masterkeys können alle bisher exportierten Tresor-Dateien nicht mehr gelesen werden. Es wird außerdem empfohlen, ein aktuelles Backup des Tresors und des verschlüsselten Masterkeys für den Notfall zu haben.</string>
+    <string name="message_change_iterations">Nach der Änderung der Login-Iterationen ändert sich der verschlüsselte Masterkey (EMK), d.h. du solltest ihn erneut exportieren.</string>
     <string name="change_master_password_explanation">Ändere dein Masterpasswort, indem du die aktuelle PIN eingibst und ein neues Masterpasswort generierst. Beachte, dass sich der verschlüsselte Masterkey ändert, so dass du ihn erneut exportieren solltest. Das betrifft auch Tresor-Dateien mit verschlüsselten Masterkey.</string>
     <string name="change_encryption_explanation">Ändere den Verschlüsselungsalgorithmus des Tresors, wenn du den Tresor von einem alten Gerät migriert hast und dein neues Gerät zusätzliche Algorithmen unterstützt. Beachte, dass sich der verschlüsselte Masterkey ändert, so dass du ihn erneut exportieren solltest. Das betrifft auch Tresor-Dateien und exportierte Zugangsdaten (ECRs), welche dann nicht mehr gelesen werden können.</string>
     <string name="vault">Tresor</string>
@@ -167,6 +174,8 @@
     <string name="pref_header_login">Login</string>
     <string name="pref_header_passwd">Passwortgenerator</string>
     <string name="max_login_attempts_title">Maximale Loginversuche</string>
+    <string name="notification_channel_paste_title">ANOTHERpass Test-Benachrichtigungen</string>
+    <string name="notification_channel_scheduled_title">ANOTHERpass Ablauf-Benachrichtigungen</string>
     <string name="toast_copied_to_clipboard">Passwort in die Zwischenablage kopiert</string>
     <string name="toast_test_copypaste_password">Testdaten in die Zwischenablage kopiert</string>
     <string name="copy_to_clipboard">Kopiere Passwort in die Zwischenablage</string>
@@ -227,6 +236,7 @@
     <string name="credential_sort_by_recently_modified">Kürzlich geändert (neuste zuerst)</string>
     <string name="credential_sort_by_id">Zugangsdaten-ID</string>
     <string name="show_ids">Zeige Zugangsdaten-IDs</string>
+    <string name="expired_credentials_on_top">Abgelaufene Zugangsdaten ganz oben</string>
     <string name="tab_pseudo_phrase">Pseudophrase</string>
     <string name="tab_ordinary">Normales Passwort</string>
     <string name="drop_to_close">APP SCHLIESSEN</string>
@@ -267,6 +277,7 @@
     <string name="title_drop_vault">Vernichte Tresor</string>
     <string name="message_drop_vault">Du bist dabei ALLE deine Zugangsdaten zu löschen.</string>
     <string name="select_none_all">Keine/Alle</string>
+    <string name="multiple_choice_selection">Erlaube Mehrfachauswahl</string>
     <string name="title_copy_password">Kopiere Passwort</string>
     <string name="message_copy_password">Das Kopieren von Passwörtern in die Zwischenablage kann deine Passwörter preisgeben, da andere Apps ohne Weiters auf Änderungen der Zwischenablage reagieren und diese lesen können. Weiterhin kann das Passwort in der Zwischenablage verbleiben wenn diese eine History-Funktion besitzt (z.B. Samsung Clipboard).\nDu kannst diese Warnung unter \'Einstellungen/Sicherheit\' deaktivieren.</string>
     <string name="head_generate_mpt">Dein Masterpasswort-Token \#%1$d</string>
@@ -297,6 +308,12 @@
     <string name="invalid_emp">Ungültiges exportiertes Masterpasswort</string>
     <string name="invalid_emp_mpt">Dies ist kein exportiertes Masterpasswort oder Token</string>
     <string name="scanning_emp">Scanne Masterpasswort</string>
+
+    <string name="title_delete_selected">Lösche ausgewählte Zugangsdaten</string>
+    <string name="message_delete_selected">Du bist dabei, %1$d Zugangsdaten zu löschen! Bist du sicher?</string>
+    <string name="message_selected_deleted">Ausgewählte Zugangsdaten gelöscht</string>
+    <string name="reset_selection">Auswahl aufheben</string>
+
     <string name="title_reset_all">Alles zurücksetzen</string>
     <string name="message_reset_all">Falls du dich nicht mehr einloggen kannst oder anderweitig feststeckst, kannst du hier alles zurücksetzen. Wenn du fortfährst, werden alle Daten gelöscht. Bist du dir sicher?</string>
     <string name="message_reset_all_double_check">Dein Tresor enthält schon %1$d Zugangsdaten. Soll wirklich alles gelöscht werden?</string>
@@ -312,8 +329,9 @@
     <string name="password_strength_from_generator">Passwortstärke (vom Passwortgenerator)</string>
     <string name="password_strength_guessed">Passwortstärke (vom aktuellen Passwort)</string>
     <string name="combinations">Kombinationen</string>
-    <string name="bruteforce_years_pc">Jahre um das Passwort mit einem gewöhnlichem PC zu erraten</string>
-    <string name="bruteforce_year_supercomp">Jahre um das Passwort mit einem Supercomputer zu erraten</string>
+    <string name="years">Jahre</string>
+    <string name="bruteforce_years_pc">Zeit um das Passwort mit einem gewöhnlichem PC zu brechen (bei %1$s Versuchen pro Sekunde)</string>
+    <string name="bruteforce_year_supercomp">Zeit um das Passwort mit einem Supercomputer zu brechen (bei %1$s Versuchen pro Sekunde)</string>
     <string name="show_vault_info">Zeige Tresorinformationen</string>
     <string name="vault_info">Tresorinformationen</string>
     <string name="vault_id">Tresor Id</string>
@@ -425,6 +443,13 @@
     <string name="summary_show_refresh_mpt_reminder">Erinnerung das Masterpasswort-Token zu erneuern (wenn vorhanden). Dies kann helfen das Risiko zu minimieren, dass ein gestohlenes Token missbräuchlich verwendet wird.</string>
     <string name="show_biometric_smp_reminder">Erinnerung ein biometrisches Merkmal einzurichten (für das gespeicherte Masterpasswort)</string>
     <string name="summary_show_biometric_smp_reminder">Zeige eine Erinnerung wenn das gespeicherte Masterpasswort nicht mit einem biometrischem Merkmal (z.B. Fingerabdruck) geschützt wurde aber dies vom Gerät unterstützt werden würde.</string>
+    <string name="show_expired_passwords_reminder">Erinnerung für abgelaufene Zugangsdaten</string>
+    <string name="summary_show_expired_passwords_reminder">Zeige eine Erinnerung wenn Zugangsdaten abgelaufen sind.</string>
+    <string name="expired_credentials_notification_enabled_title">Erhalte eine Benachrichtigung wenn Zugangsdaten abgelaufen sind</string>
+    <string name="expired_credentials_notification_enabled_summary">Du erhältst eine Benachrichtigung zur rechten Zeit, auch wenn die App geschlossen ist. Ab Android 13 muss du der App erlauben, Benachrichtigungen zu senden.</string>
+
+    <string name="next_reminder">Nächste Erinnerung</string>
+    <string name="last_reminder">Letzte Erinnerung</string>
 
     <string name="export_vault_reminder">Tresor wurde geändert und sollte exportiert werden.</string>
     <string name="export_mk_reminder">Masterkey hat sich geändert und sollte exportiert werden.</string>
@@ -433,6 +458,8 @@
     <string name="show_biometric_smp_howto">Wie?</string>
     <string name="refresh_mpt_reminder">Masterpassword-Token sollte erneuert werden.</string>
     <string name="show_refresh_mpt">Jetzt erneuern</string>
+    <string name="expired_passwords_reminder">Einige Zugangsdaten sind abgelaufen</string>
+    <string name="show_expired_passwords">Anzeigen</string>
     <string name="dont_ask_again">Nicht mehr nerven</string>
     <string name="manage_reminder_settings_hint">Erinnerungen können geändert werden unter \'Einstellungen / Erinnerungen\'</string>
     <string name="no_label">OHNE KATEGORIE</string>
@@ -448,12 +475,13 @@
     <string name="howto_biometrics_for_smp_text">Als erstes muss ein biometrisches Merkmal hinterlegt werden (z.B. Fingerabruck). Danach muss das ggf. schon gespeicherte Masterpasswort aus der App entfernt und wieder angelegt werden. Beim Anlegen erfolgt die Verwendung des biometrischen Merkmals.</string>
     <string name="pref_header_reminder">Erinnerungen</string>
     <string name="reminder_period_title">Wie oft sollen Erinnerungen angezeigt werden?</string>
+    <string name="reminder_duration_title">Wie lange sollen Erinnerungen angezeigt werden?</string>
     <string name="pref_auth_smp_with_biometric_title">Autorisiere gespeichertes Masterpasswort mit biometrischem Merkmal</string>
     <string name="pref_auth_smp_with_biometric_summary">Es wird dringend empfohlen das in der App gespeicherte Massterpasswort mit einem biometrischem Merkmal zu schützen (falls vom Gerät unterstützt). Beachte: Ein bereits gespeichertes Masterpasswort wird nicht geschützt nur weil diese Option aktiviert wurde. Du musst es erst aus der App entfernen und neu speichern.</string>
     <string name="auth_to_decrypt_emp_omit">Scanne Masterpasswort</string>
     <string name="whats_new">Was ist neu</string>
     <string name="whats_new_in_1_7">Was ist neu in Version 1.7</string>
-    <string name="whats_new_in_1_7_subtext">Neben einigen Fehlerkorrekturen und Verbesserungen kommen diese neuen Features hinzu:</string>
+    <string name="whats_new_subtext">Neben einigen Fehlerkorrekturen und Verbesserungen kommen diese neuen Features hinzu:</string>
     <string name="whats_new_in_1_7_bullet_1_head">Importiere und exportiere Zugangsdaten</string>
     <string name="whats_new_in_1_7_bullet_1_text">Du kannst deine Zugangsdaten von Browsern wie Firefox oder Chrome oder von anderen Quellen als CSV importieren und als CSV-Datei exportieren.</string>
     <string name="whats_new_in_1_7_bullet_2_head">Verbessertes Automatisches Ausfüllen</string>
@@ -464,6 +492,17 @@
     <string name="whats_new_in_1_7_bullet_4_text">Jetzt kannst du den Verschlüsselungs-Algorithmus deines Tresors nachträglich ändern, um z.B. einen neueren Algorithmus zu verwenden.</string>
     <string name="whats_new_in_1_7_bullet_5_head">Optimiere Zufallsgenerator</string>
     <string name="whats_new_in_1_7_bullet_5_text">Füge zusätzliche Entropie für den Zufallsgenerator hinzu um eine höhere Zufälligkeit zu erhalten.</string>
+
+    <string name="whats_new_in_1_8">Was ist neu in Version 1.8</string>
+    <string name="whats_new_in_1_8_bullet_1_head">Ablaufdatum für Zugangsdaten</string>
+    <string name="whats_new_in_1_8_bullet_1_text">Setze ein optionales Ablaufdatum und erhalte eine Benachrichtigung wenn Zugangsdaten ablaufen. Abgelaufene Zugangsdaten werden entsprechend markiert.</string>
+    <string name="whats_new_in_1_8_bullet_2_head">Anpassen der Login-Iterationen</string>
+    <string name="whats_new_in_1_8_bullet_2_text">Optimiere die PBKDF-Iterationen deines Verschlüsselten Masterkeys abhängig von der CPU-Power deines Gerätes, um die Sicherheit zu erhöhen.</string>
+    <string name="whats_new_in_1_8_bullet_3_head">Überarbeitete erweiterte Suche</string>
+    <string name="whats_new_in_1_8_bullet_3_text">Verbesserte Suche in diversen Attributen der Zugangsdaten mit dem \'!\'-Kommando. Suche direkt nach abgelaufenen order verschleierten Zugangsdaten.</string>
+    <string name="whats_new_in_1_8_bullet_4_head">Verbesserung einiger UI-Komponenten</string>
+    <string name="whats_new_in_1_8_bullet_4_text">Mehr Platz zum Bearbeiten und Zeigen von Zusatzinformationen, verbessertes Anzeigen von Erinnerungen, Mehrfachauswahl von Zugangsdaten, u.v.m.</string>
+
 
     <string name="intro">Starte Intro</string>
     <string name="intro_1_head">Ein etwas anderer Passwortmanager</string>
@@ -503,6 +542,8 @@
     <string name="last_modified">Zuletzt geändert</string>
     <string name="name">Name</string>
     <string name="source">Quelle</string>
+    <string name="copy_universal_identifier">Uid kopieren</string>
+    <string name="universal_identifier_copied">Uid in die Zwischenablage kopiert</string>
     <string name="source_from_file">aus Datei</string>
     <string name="source_from_record">von QR-Code oder NFC-Tag</string>
     <string name="source_from_the_app">von der App</string>
@@ -555,6 +596,12 @@
     <string name="reminder_period_1_hour">Jede Stunde</string>
     <string name="reminder_period_1_day">Einmal am Tag</string>
     <string name="reminder_period_1_week">Einmal pro Woche</string>
+
+    <string name="reminder_duration_5_sec">5 Sekunden</string>
+    <string name="reminder_duration_10_sec">10 Sekunden</string>
+    <string name="reminder_duration_15_sec">15 Sekunden</string>
+    <string name="reminder_duration_until_swipe">Bis sie weggewischt wird</string>
+
     <string name="colorize_qr_codes">Coloriere QR-Codes</string>
     <string name="print_qr_code_header">Drucke QR-Code Kopfzeile</string>
     <string name="autofill_suggest_everywhere">Vorschläge für Automatisches Ausfüllen überall anzeigen</string>
@@ -583,6 +630,11 @@
     <string name="date_yesterday_at">gestern %1$s</string>
     <string name="date_on_date_at">am %1$s %2$s</string>
 
+    <string name="date_today">heute</string>
+    <string name="date_yesterday">gestern</string>
+    <string name="date_tomorrow">morgen</string>
+    <string name="date_on_date">am %1$s</string>
+
     <string name="pref_show_last_login_state">Zeige letzte Loginereignisse</string>
     <string name="show_last_login_state_denies_and_succeeds">Abgelehnte und erfolgreiche Logins</string>
     <string name="show_last_login_state_denies_only">Nur abgelehnte Loginversuche</string>
@@ -594,7 +646,7 @@
     <string name="used_seed">Zusätzliches Seed: %1$s</string>
     <string name="add_additional_source_of_entropy">Zusätzliche Entropie hinzufügen</string>
     <string name="title_add_user_seed">Füge zusätzliche Entropie für den Zufallsgenerator hinzu</string>
-    <string name="message_add_user_seed">Falls du dem Zufallsgenerator des Betriebssystems nicht traust, welcher normalerweise verschiedene Entropie des Gerätes verwendet, um unvorhersagbare Zufallszahlen zu generieren, kannst du hier eine weitere Entropie hinzufügen: ein Foto von deiner Kamera.\nDas fotografierte Bild wird gehasht und als zusätzliche Entropy verwendet, um die Zufälligkeit weiter zu erhöhen. Das heißt, mache ein zufälliges Foto mit vielen unterschiedlichen Details. Das Foto wird nicht auf dem Gerät gespeichert!</string>
+    <string name="message_add_user_seed">Falls du dem Zufallsgenerator des Betriebssystems nicht traust, welcher normalerweise verschiedene Entropie des Gerätes verwendet, um unvorhersagbare Zufallszahlen zu generieren, kannst du hier eine weitere Entropie hinzufügen: ein Foto von deiner Kamera.\nDas fotografierte Bild wird gehasht und als zusätzliche Entropie verwendet, um die Zufälligkeit weiter zu erhöhen. Das heißt, mache ein zufälliges Foto mit vielen unterschiedlichen Details. Das Foto wird nicht auf dem Gerät gespeichert!</string>
     <string name="message_confirm_add_user_seed">Du hast schon eine eigene Entropie hinzugefügt. Willst du den Vorgang wiederholen?</string>
     <string name="error_add_user_seed">Die Kamera-App konnte nicht geöffnet werden</string>
     <string name="error_picture_too_small_for_user_seed">Das geschossene Foto ist zu klein um es als Entropie zu verwenden</string>
@@ -608,7 +660,7 @@
     <string name="reminder_refresh_mpt_half_a_year">Nach einem halben Jahr</string>
     <string name="reminder_refresh_mpt_year">Nach einem Jahr</string>
 
-    <string name="permission_granted_please_repeat">Berechtigung erteilt, bitte wiederholen sie ihre Aktion.</string>
+    <string name="permission_granted_please_repeat">Berechtigung erteilt, bitte wiederhole die Aktion.</string>
     <string name="permission_denied">Berechtigung nicht erteilt!</string>
 
     <string name="import_credentials_file">Importiere Zugangsdaten aus Datei</string>
@@ -630,5 +682,31 @@
 
     <string name="chooser_select_image_to_scan">Wähle eine Bilddatei zum Scannen aus</string>
     <string name="image_to_scan_failed">Bilddatei konnte nicht gescannt werden!</string>
+
+    <string name="login_iterations_explanation">Wähle die Stärke deiner Login-Verschlüsselung. Je stärker, umso härter ist es deinen Login zu knacken, es benötigt aber auch mehr Loginzeit. Im Zweifel belasse es bei der Voreinstellung.</string>
+    <string name="login_iterations_faster">Schwächer aber schneller</string>
+    <string name="login_iterations">Iterationen</string>
+    <string name="login_iterations_slower">Stärker aber langsamer</string>
+    <string name="benchmark_login_iterations">Loginzeit messen</string>
+    <string name="benchmark_login_iterations_explanation">Der Loginzeit-Benchmark misst die zu erwartende Dauer um den Tresor zu entsperren. Dies kann einige Zeit dauern, von einigen Sekunden bis zu ein paar Minuten, abhängig vom gewählten Wert und der CPU-Leistung deines Gerätes. Teste, wie langsam für dich noch akzeptabel ist, indem du mit einem kleinen Wert startest und diesen langsam erhöhst.</string>
+    <string name="start">Start</string>
+    <string name="result">Ergebnis</string>
+    <string name="elapsed_time">Benötigte Zeit</string>
+
+    <string name="expired">Abgelaufen</string>
+    <string name="expired_since">Abgelaufen seit</string>
+    <string name="expires">Läuft ab</string>
+    <string name="no_expiration">Läuft nie ab</string>
+    <string name="expires_in_1_month">Läuft in einem Monat ab</string>
+    <string name="expires_in_3_months">Läuft in drei Monaten ab</string>
+    <string name="expires_in_6_months">Läuft in einem halben Jahr ab</string>
+    <string name="expires_in_12_months">Läuft in einem Jahr ab</string>
+    <string name="expires_on">Läuft ab am …</string>
+    <string name="error_expired_in_the_past">Ablaufdatum muss in der Zukunft sein!</string>
+
+    <string name="credential_expired_notifiction_title">Abgelaufene Zugangsdaten</string>
+    <string name="credential_expired_notifiction_message">Zugangsdaten laufen am %1$s ab. Drücke hier um sie anzuzeigen.</string>
+    <string name="credential_expired_notifiction_show_all_expired">Zeige alle abgelaufenen Zugangsdaten</string>
+
 
 </resources>

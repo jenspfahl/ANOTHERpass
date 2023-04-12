@@ -121,6 +121,8 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <include layout="@layout/change_login_iterations_slider" />
+
 
             <Button
                 android:id="@+id/button_create_vault"
@@ -132,6 +134,7 @@
                 android:background="@color/colorAccent"
                 android:textColor="@color/buttonLabel"
                 android:textStyle="bold" />
+
 
         </LinearLayout>
     </ScrollView>

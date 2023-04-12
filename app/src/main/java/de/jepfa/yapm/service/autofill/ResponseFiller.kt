@@ -3,6 +3,7 @@ package de.jepfa.yapm.service.autofill
 import android.app.PendingIntent
 import android.app.assist.AssistStructure
 import android.app.assist.AssistStructure.ViewNode
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -29,18 +30,16 @@ import de.jepfa.yapm.service.PreferenceService.STATE_PAUSE_AUTOFILL
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
+import de.jepfa.yapm.util.Constants.ACTION_CLOSE_VAULT
+import de.jepfa.yapm.util.Constants.ACTION_DELIMITER
+import de.jepfa.yapm.util.Constants.ACTION_EXCLUDE_FROM_AUTOFILL
+import de.jepfa.yapm.util.Constants.ACTION_OPEN_VAULT_FOR_AUTOFILL
+import de.jepfa.yapm.util.Constants.ACTION_PAUSE_AUTOFILL
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.getAppNameFromPackage
 import java.util.*
 
-@RequiresApi(Build.VERSION_CODES.O)
 object ResponseFiller {
-
-    const val ACTION_DELIMITER = "$"
-    const val ACTION_OPEN_VAULT = "openVault"
-    const val ACTION_CLOSE_VAULT = "closeVault"
-    const val ACTION_EXCLUDE_FROM_AUTOFILL = "excludeFromAutofill"
-    const val ACTION_PAUSE_AUTOFILL = "pauseAutofill"
 
     private const val VIEW_TO_IDENTIFY = "text"
     private val PASSWORD_INDICATORS = listOf("password", "passwd", "passphrase",
@@ -121,6 +120,9 @@ object ResponseFiller {
         ignoreCurrentApp: Boolean = false,
         context: Context
     ) : FillResponse? {
+        if (!isAutofillSupported()) {
+            return null
+        }
         if (structure.isHomeActivity) {
             Log.i("CFS", "home activity")
             return null
@@ -252,7 +254,7 @@ object ResponseFiller {
         createAuthDataSets(structure, fields.getAllFields(),
             R.drawable.ic_baseline_arrow_back_24_gray,
             context.getString(R.string.go_back_to_app),
-            ACTION_OPEN_VAULT,
+            ACTION_OPEN_VAULT_FOR_AUTOFILL,
             true,
             context)
             .forEach { dataSets.add(it) }
@@ -312,6 +314,7 @@ object ResponseFiller {
         return responseBuilder.build()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createAuthenticationFillResponse(
         fields: Fields,
         structure: AssistStructure,
@@ -326,14 +329,14 @@ object ResponseFiller {
             createAuthDataSets(structure,
                 fields.getAllFields(),
                 R.drawable.ic_lock_open_gray_24dp,
-                context.getString(R.string.login_required_first), ACTION_OPEN_VAULT, true, context)
+                context.getString(R.string.login_required_first), ACTION_OPEN_VAULT_FOR_AUTOFILL, true, context)
                 .forEach { responseBuilder.addDataset(it) }
         }
         else {
             createAuthDataSets(structure,
                 fields.getAllFields(),
                 R.drawable.ic_baseline_list_gray_24,
-                context.getString(R.string.select_credential_for_autofill), ACTION_OPEN_VAULT, true, context)
+                context.getString(R.string.select_credential_for_autofill), ACTION_OPEN_VAULT_FOR_AUTOFILL, true, context)
                 .forEach { responseBuilder.addDataset(it) }
         }
 
@@ -370,6 +373,7 @@ object ResponseFiller {
         return responseBuilder.build()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createDebugDataSet(
         it: ViewNode,
         fields: Fields,
@@ -377,10 +381,10 @@ object ResponseFiller {
     ) = createDataSet(
         it,
         R.drawable.ic_baseline_bug_report_gray_24,
-        "aId: ${it.autofillId}, webScheme: ${it.webScheme}, webDomain: ${it.webDomain}, " +
+        "aId: ${it.autofillId}, webDomain: ${it.webDomain}, " +
                 "aHints: ${Arrays.toString(it.autofillHints)}, hint: ${it.hint}, " +
-                "text: ${it.text}, idEntry: ${it.idEntry}, hintIdEntry: ${it.hintIdEntry}, htmlInfoTag: ${it.htmlInfo?.tag}, " +
-                "htmlInfoAttr: ${it.htmlInfo?.attributes}, type: ${it.autofillType}, important: ${it.importantForAutofill}, " +
+                "text: ${it.text}, idEntry: ${it.idEntry},, htmlInfoTag: ${it.htmlInfo?.tag}, " +
+                "htmlInfoAttr: ${it.htmlInfo?.attributes}, type: ${it.autofillType}, " +
                 "class: ${it.className}, isUserField: ${fields.hasUserField(it)}, " +
                 "isPasswordField: ${fields.hasPasswordField(it)}, isPotentialField: ${fields.hasPotentialField(it)}",
         "debug", context, false
@@ -388,19 +392,20 @@ object ResponseFiller {
 
     private fun createPendingIntent(context: Context, action: String, actionData: String?): PendingIntent {
         val authIntent = Intent(context, ListCredentialsActivity::class.java)
-        authIntent.putExtra(SecureActivity.SecretChecker.fromAutofill, true)
+        authIntent.putExtra(SecureActivity.SecretChecker.fromAutofillOrNotification, true)
         if (actionData != null) {
             authIntent.action = "$action$ACTION_DELIMITER$actionData" // do it as extra doesn't work (extra gets lost)
         }
         else {
             authIntent.action = action
         }
+        authIntent.component = ComponentName(context, ListCredentialsActivity::class.java)  // important when having mutable intents
 
         return PendingIntent.getActivity(
             context,
             1001,
             authIntent,
-            PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_ONE_SHOT
+            PendingIntent.FLAG_MUTABLE // must be immutable to return the selected credential
         )
     }
 
@@ -419,6 +424,7 @@ object ResponseFiller {
         return headerView
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun identifyFields(structure: AssistStructure, suggestEverywhere: Boolean): Fields? {
 
         val fields = Fields()
@@ -438,6 +444,7 @@ object ResponseFiller {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun identifyFields(node: ViewNode, fields: Fields, suggestEverywhere: Boolean) {
 
         /*
@@ -481,6 +488,7 @@ object ResponseFiller {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun inspectNodeAttributes(
         node: ViewNode,
         fields: Fields
@@ -519,6 +527,7 @@ object ResponseFiller {
         return contents.any { s.contains(it) }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createUserDataSets(structure: AssistStructure, fields : Set<ViewNode>, name: String, user: String, context: Context): List<Dataset> {
         var message = context.getString(R.string.paste_user_for_autofill, name)
         var withInlinePresentation = true
@@ -535,6 +544,7 @@ object ResponseFiller {
             context)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createPasswordDataSets(structure: AssistStructure, fields : Set<ViewNode>, name: String, password: Password, context: Context): List<Dataset> {
         return createDataSets(
             fields,
@@ -546,14 +556,17 @@ object ResponseFiller {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createDataSets(fields : Set<ViewNode>, iconId: Int, text: String, content: CharSequence, withInlinePresentation: Boolean, context: Context): List<Dataset> {
         return fields.mapNotNull { createDataSet( it, iconId, text, content, context, withInlinePresentation) }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createAuthDataSets(structure: AssistStructure, fields : Set<ViewNode>, iconId: Int, text: String, action: String, withInlinePresentation: Boolean, context: Context): List<Dataset> {
         return fields.mapNotNull { createAuthDataSet(structure, it, iconId, text, action, context, withInlinePresentation) }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createDataSet(
         field: ViewNode,
         iconId : Int,
@@ -587,12 +600,14 @@ object ResponseFiller {
             .build()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createSearchString(structure: AssistStructure, field: ViewNode, context: Context): String? {
         val appName = structure.activityComponent.packageName.let { getAppNameFromPackage(it, context) }
         val webDomain = field.webDomain?.substringBeforeLast(".")?.substringAfterLast(".")
         return webDomain ?: appName
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createDomainString(structure: AssistStructure, field: ViewNode, context: Context): String? {
         return if (field.webDomain != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -630,6 +645,7 @@ object ResponseFiller {
 
     fun isAutofillSupported() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
 
+    @RequiresApi(Build.VERSION_CODES.R)
     private fun createInlinePresentation(
         autofillId: AutofillId,
         iconId: Int,
@@ -661,6 +677,7 @@ object ResponseFiller {
 
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createUserAndPasswordDataSet(
         userFields: Set<ViewNode>,
         passwordFields: Set<ViewNode>,
@@ -723,6 +740,7 @@ object ResponseFiller {
         return builder.build()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createAuthDataSet(
         structure: AssistStructure,
         field: ViewNode,

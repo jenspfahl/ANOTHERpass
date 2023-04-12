@@ -8,10 +8,14 @@
 
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="BlackGray">#151515</color>
+    <color name="Gray">#646464</color>
 
-<!--label colors-->
+
+    <!--label colors-->
     <color name="Red">#FF0000</color>
     <color name="Maroon">#800000</color>
+    <color name="Brown">#DA3B30</color>
     <color name="Orange">#F39C12</color>
     <color name="Yellow">#DDDD00</color>
     <color name="Olive">#808000</color>
@@ -19,8 +23,11 @@
     <color name="Green">#008000</color>
     <color name="Aqua">#00DDDD</color>
     <color name="Teal">#008080</color>
+    <color name="PowderBlue">#3F51B5</color>
+    <color name="LightBlue">#2196F3</color>
     <color name="Blue">#0000FF</color>
     <color name="Navy">#000080</color>
+    <color name="Pur">#9C27B0</color>
     <color name="Fuchsia">#FF00FF</color>
     <color name="Purple">#800080</color>
     <color name="StoneGray">#354B57</color>

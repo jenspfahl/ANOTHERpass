@@ -3,14 +3,30 @@ package de.jepfa.yapm.service.secretgenerator
 import android.content.Context
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.service.secret.SecretService
 import java.security.SecureRandom
+import java.util.*
 import kotlin.math.log2
 
-abstract class GeneratorBase<T : GeneratorSpec>(val context: Context?) {
+abstract class GeneratorBase<T : GeneratorSpec>(
+    val context: Context?,
+    private val secureRandom: SecureRandom? = null
+) {
 
     companion object {
-        val BRUTEFORCE_ATTEMPTS_PENTIUM = 100_000 // per second
-        val BRUTEFORCE_ATTEMPTS_SUPERCOMP = 1_000_000_000 // per second
+        /*
+         Attention: Changing any of the default sets here can break de-obfuscation!!!!!! See Loop.kt what is actually used.
+         */
+        const val DEFAULT_ALPHA_CHARS_LOWER_CASE = "abcdefghijklmnopqrstuvwxyz"
+        val DEFAULT_ALPHA_CHARS_UPPER_CASE = DEFAULT_ALPHA_CHARS_LOWER_CASE.uppercase()
+        const val DEFAULT_DIGITS = "0123456789"
+        const val DEFAULT_SPECIAL_CHARS = "!?-,.:/$&@#_;+*"
+        const val DEFAULT_OBFUSCATIONABLE_SPECIAL_CHARS  = "!?-,.:/$%&@#"
+
+        const val EXTENDED_SPECIAL_CHARS = "()[]{}<>\"'=%\\~|"
+
+        const val BRUTEFORCE_ATTEMPTS_PENTIUM = 100_000 // per second
+        const val BRUTEFORCE_ATTEMPTS_SUPERCOMP = 1_000_000_000 // per second
     }
 
     abstract fun generate(spec: T): Password
@@ -23,6 +39,13 @@ abstract class GeneratorBase<T : GeneratorSpec>(val context: Context?) {
 
     fun calcBruteForceWaitingSeconds(combinations: Double, tryPerSec: Int): Double {
         return combinations / tryPerSec
+    }
+
+    internal fun random(material: String): Char {
+        val rand = secureRandom ?: SecretService.getSecureRandom(context)
+        val index = rand.nextInt(material.length)
+
+        return material[index]
     }
 
 }

@@ -15,6 +15,7 @@ data class EncExportableCredential(val i: Int?,
                                    val p: Encrypted,
                                    val w: Encrypted,
                                    val l: Encrypted,
+                                   val e: Encrypted,
                                    val o: Boolean,
 ) {
 
@@ -28,6 +29,7 @@ data class EncExportableCredential(val i: Int?,
                 credential.password,
                 credential.website,
                 credential.labels,
+                credential.expiresAt,
                 credential.isObfuscated,
             )
 
@@ -39,6 +41,7 @@ data class EncExportableCredential(val i: Int?,
                 passwordBase64: String,
                 websiteBase64: String,
                 labelsBase64: String,
+                expiresAtBase64: String?,
                 isObfuscated: Boolean) :
             this(id,
                 uidBase64,
@@ -48,6 +51,7 @@ data class EncExportableCredential(val i: Int?,
                 Encrypted.fromBase64String(passwordBase64),
                 Encrypted.fromBase64String(websiteBase64),
                 Encrypted.fromBase64String(labelsBase64),
+                if (expiresAtBase64 != null) Encrypted.fromBase64String(expiresAtBase64) else Encrypted.empty(),
                 isObfuscated
             )
 
@@ -62,6 +66,7 @@ data class EncExportableCredential(val i: Int?,
             null,
             w,
             l,
+            e,
             o,
             null,
             null
@@ -77,6 +82,7 @@ data class EncExportableCredential(val i: Int?,
         const val ATTRIB_PASSWORD = "p"
         const val ATTRIB_WEBSITE = "w"
         const val ATTRIB_LABELS = "l"
+        const val ATTRIB_EXPIRES_AT = "e"
         const val ATTRIB_IS_OBFUSCATED = "o"
 
         fun fromJson(json: JsonElement): EncExportableCredential? {
@@ -91,6 +97,7 @@ data class EncExportableCredential(val i: Int?,
                     jsonObject.get(ATTRIB_PASSWORD).asString,
                     jsonObject.get(ATTRIB_WEBSITE).asString,
                     jsonObject.get(ATTRIB_LABELS).asString,
+                    jsonObject.get(ATTRIB_EXPIRES_AT)?.asString,
                     jsonObject.get(ATTRIB_IS_OBFUSCATED)?.asBoolean ?: false,
                 )
             } catch (e: Exception) {

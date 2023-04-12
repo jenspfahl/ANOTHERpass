@@ -2,20 +2,18 @@ package de.jepfa.yapm.util
 
 import android.app.Dialog
 import android.content.Context
-import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import android.content.pm.ResolveInfo
 import android.content.res.ColorStateList
-import android.content.res.Resources
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.content.res.AppCompatResources
 import com.google.android.material.chip.Chip
 import de.jepfa.yapm.R
 import de.jepfa.yapm.service.PreferenceService
@@ -51,9 +49,11 @@ fun createAndAddLabelChip(
     label: Label,
     container: ViewGroup,
     thinner: Boolean,
-    context: Context?
-): Chip {
-    val chip = createLabelChip(label, thinner, context)
+    context: Context?,
+    outlined: Boolean = false,
+    placedOnAppBar: Boolean = false,
+    ): Chip {
+    val chip = createLabelChip(label, thinner, context, outlined, placedOnAppBar)
     container.addView(chip)
     return chip
 }
@@ -61,7 +61,9 @@ fun createAndAddLabelChip(
 fun createLabelChip(
     label: Label,
     thinner: Boolean,
-    context: Context?
+    context: Context?,
+    outlined: Boolean = false,
+    placedOnAppBar: Boolean = false,
 ): Chip {
     val chip = Chip(context)
     chip.text = label.name
@@ -75,8 +77,44 @@ fun createLabelChip(
         chip.ensureAccessibleTouchTarget(32)
     }
     context?.let {
-        chip.chipBackgroundColor = ColorStateList.valueOf(label.getColor(it))
-        chip.setTextColor(it.getColor(android.R.color.white))
+        if (outlined) {
+            chip.chipStrokeWidth = 1.0F
+            chip.chipStrokeColor = ColorStateList.valueOf(label.getColor(it))
+            chip.setTextColor(label.getColor(it))
+            label.iconResId?.let { iconResId ->
+                chip.chipIcon =
+                    AppCompatResources.getDrawable(context, iconResId)
+                chip.chipIconTint = chip.chipStrokeColor
+                chip.chipEndPadding = 0.0F
+                if (thinner) {
+                    chip.textStartPadding = 0.0F
+                    chip.chipIconSize = 20.0F
+                }
+                else {
+                    chip.textStartPadding = 4.0F
+                    chip.iconStartPadding = 6.0F
+                    chip.chipEndPadding = 4.0F
+                }
+                chip.isChipIconVisible = true
+            }
+
+            if (placedOnAppBar) {
+                chip.chipBackgroundColor = ColorStateList.valueOf(context.getColor(R.color.BlackGray))
+
+            }
+            else {
+                val isDarkMode = context.resources.getBoolean(R.bool.dark_mode)
+                if (!isDarkMode) {
+                    chip.chipBackgroundColor =
+                        ColorStateList.valueOf(context.getColor(android.R.color.background_light))
+                }
+
+            }
+        }
+        else {
+            chip.chipBackgroundColor = ColorStateList.valueOf(label.getColor(it))
+            chip.setTextColor(it.getColor(android.R.color.white))
+        }
     }
     return chip
 }
@@ -98,7 +136,37 @@ fun linkifyDialogMessage(dialog: Dialog) {
     }
 }
 
-fun dateToNiceString(dateTime: Date?, context: Context): String {
+fun dateToNiceString(date: Date?, context: Context, withPreposition: Boolean = true): String {
+    if (date != null) {
+        val date = date.removeTime()
+        val today = Date().removeTime()
+        val yesterday = Date().yesterday().removeTime()
+        val tomorrow = Date().tomorrow().removeTime()
+        if (date == today) {
+            return context.getString(R.string.date_today)
+        }
+        if (date == yesterday) {
+            return context.getString(R.string.date_yesterday)
+        }
+        if (date == tomorrow) {
+            return context.getString(R.string.date_tomorrow)
+        }
+        if (withPreposition) {
+            return context.getString(
+                R.string.date_on_date,
+                date.toSimpleDateFormat()
+            )
+        }
+        else {
+            return date.toSimpleDateFormat()
+        }
+    }
+    else {
+        return "??"
+    }
+}
+
+fun dateTimeToNiceString(dateTime: Date?, context: Context): String {
     if (dateTime != null) {
         val date = dateTime.removeTime()
         val today = Date().removeTime()
@@ -118,11 +186,11 @@ fun dateToNiceString(dateTime: Date?, context: Context): String {
 }
 
 
-fun formatAsDate(s: String?, context: Context): String {
+fun formatAsDateTime(s: String?, context: Context): String {
     if (s != null) {
         val timestamp = s.toLongOrNull()
         if (timestamp != null) {
-            return dateToNiceString(Date(timestamp), context)
+            return dateTimeToNiceString(Date(timestamp), context)
         }
         else {
             return s

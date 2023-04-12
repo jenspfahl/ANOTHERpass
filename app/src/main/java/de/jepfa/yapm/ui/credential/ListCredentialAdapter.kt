@@ -1,6 +1,8 @@
 package de.jepfa.yapm.ui.credential
 
 import android.content.Intent
+import android.net.wifi.hotspot2.pps.Credential
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -8,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -27,17 +28,35 @@ import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
+import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.ui.label.LabelDialogs
 import de.jepfa.yapm.usecase.credential.ExportCredentialUseCase
 import de.jepfa.yapm.util.*
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_END
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_EXTENDED_SEARCH
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_ID
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_IN_ALL
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_LABEL
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_UID
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_USER
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_WEBSITE
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_EXPIRED
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_EXPIRES
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_VEILED
 import java.util.*
+import kotlin.collections.HashSet
 
 
-class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity) :
+class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity, val multipleSelectionCallback: (Set<EncCredential>) -> Unit) :
         ListAdapter<EncCredential, ListCredentialAdapter.CredentialViewHolder>(CredentialsComparator()),
         Filterable {
 
-    private lateinit var originList: List<EncCredential>
+    private var originList: List<EncCredential> = emptyList()
+    private var selectionMode = false
+    private var selected = HashSet<EncCredential>() 
+
+    fun getSelectedCredentials() = HashSet(selected)
+    
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CredentialViewHolder {
         val holder = CredentialViewHolder.create(parent)
@@ -45,6 +64,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         if (Session.isDenied()) {
             return holder
         }
+
         val enableCopyPassword = PreferenceService.getAsBool(PREF_ENABLE_COPY_PASSWORD, listCredentialsActivity)
         if (!enableCopyPassword) {
             holder.hideCopyPasswordIcon()
@@ -81,32 +101,33 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             }
         }
 
-        holder.listenForLongClick { pos, _ ->
-
+        holder.listenForToggleSelection { pos, _ ->
             val current = getItem(pos)
 
-            val sb = StringBuilder()
-
-            current.id?.let { sb.addFormattedLine(listCredentialsActivity.getString(R.string.identifier), it)}
-            current.uid?.let {
-                sb.addFormattedLine(
-                    listCredentialsActivity.getString(R.string.universal_identifier),
-                    shortenBase64String(it.toBase64String()))
+            if (!selected.contains(current)) {
+                selected.add(current)
             }
-
-            listCredentialsActivity.masterSecretKey?.let { key ->
-                val name = SecretService.decryptCommonString(key, current.name)
-                sb.addFormattedLine(listCredentialsActivity.getString(R.string.name), name)
+            else {
+                selected.remove(current)
             }
-            current.modifyTimestamp?.let{
-                if (it > 1000) // modifyTimestamp is the credential Id after running db migration, assume ids are lower than 1000
-                    sb.addFormattedLine(listCredentialsActivity.getString(R.string.last_modified), dateToNiceString(it.toDate(), listCredentialsActivity))
-            }
+            notifyItemChanged(pos)
+            multipleSelectionCallback(selected)
+        }
 
-            AlertDialog.Builder(listCredentialsActivity)
-                .setTitle(R.string.title_credential_details)
-                .setMessage(sb.toString())
-                .show()
+        holder.listenForLongClick { pos, _ ->
+
+
+            if (selectionMode) {
+                resetSelection()
+            }
+            else {
+                selectionMode = true
+                val current = getItem(pos)
+                selected.add(current)
+
+                notifyDataSetChanged()
+                multipleSelectionCallback(selected)
+            }
 
             true
         }
@@ -167,8 +188,8 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                     }
                 }
             })
-
             popup.inflate(R.menu.menu_credential_list)
+            popup.setForceShowIcon(true)
             popup.show()
         }
 
@@ -179,6 +200,18 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
     override fun onBindViewHolder(holder: CredentialViewHolder, position: Int) {
         val current = getItem(position)
         val key = listCredentialsActivity.masterSecretKey
+        if (selectionMode) {
+            holder.credentialSelectionContainerView.visibility = View.VISIBLE
+            if (selected.contains(current)) {
+                holder.credentialSelectedView.setImageDrawable(listCredentialsActivity.getDrawable(R.drawable.outline_check_circle_24))
+            }
+            else {
+                holder.credentialSelectedView.setImageDrawable(listCredentialsActivity.getDrawable(R.drawable.outline_circle_24))
+            }
+        }
+        else {
+            holder.credentialSelectionContainerView.visibility = View.GONE
+        }
         holder.bind(key, current, listCredentialsActivity)
     }
 
@@ -188,9 +221,27 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                 val key = listCredentialsActivity.masterSecretKey
 
                 val filterResults = FilterResults()
-                val filterAll = charSequence.startsWith("!")
-                val charString =
-                    if (filterAll) charSequence.substring(1).lowercase().trimStart()
+                val filterId = charSequence.startsWith(SEARCH_COMMAND_SEARCH_ID)
+                val filterUid = charSequence.startsWith(SEARCH_COMMAND_SEARCH_UID)
+                val filterExpired = charSequence.startsWith(SEARCH_COMMAND_SHOW_EXPIRED)
+                val filterExpires = charSequence.startsWith(SEARCH_COMMAND_SHOW_EXPIRES)
+                val filterVeiled = charSequence.startsWith(SEARCH_COMMAND_SHOW_VEILED)
+                val filterLabel = charSequence.startsWith(SEARCH_COMMAND_SEARCH_LABEL)
+                val filterUser = charSequence.startsWith(SEARCH_COMMAND_SEARCH_USER)
+                val filterWebsite = charSequence.startsWith(SEARCH_COMMAND_SEARCH_WEBSITE)
+                var filterAll = charSequence.startsWith(SEARCH_COMMAND_SEARCH_IN_ALL)
+                val filterExtended = charSequence.startsWith(SEARCH_COMMAND_EXTENDED_SEARCH)
+                var charString =
+                    if (filterLabel) charSequence.substring(SEARCH_COMMAND_SEARCH_LABEL.length).lowercase().trimStart()
+                    else if (filterUser) charSequence.substring(SEARCH_COMMAND_SEARCH_USER.length).lowercase().trimStart()
+                    else if (filterWebsite) charSequence.substring(SEARCH_COMMAND_SEARCH_WEBSITE.length).lowercase().trimStart()
+                    else if (filterId) charSequence.substring(SEARCH_COMMAND_SEARCH_ID.length).lowercase().trimStart()
+                    else if (filterUid) charSequence.substring(SEARCH_COMMAND_SEARCH_UID.length).lowercase().trimStart()
+                    else if (filterAll) charSequence.substring(SEARCH_COMMAND_SEARCH_IN_ALL.length).lowercase().trimStart()
+                    else if (filterExtended) {
+                        filterAll = true // map to filter all
+                        charSequence.substring(SEARCH_COMMAND_EXTENDED_SEARCH.length).lowercase().trimStart()
+                    }
                     else charSequence.toString().lowercase()
 
                 if (charString.isEmpty()) {
@@ -204,23 +255,131 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                             val website = SecretService.decryptCommonString(key, credential.website)
                             val user = SecretService.decryptCommonString(key, credential.user)
                             val addInfo = SecretService.decryptCommonString(key, credential.additionalInfo)
+                            val expiredAt = SecretService.decryptLong(key, credential.expiresAt)
+                            val uid = credential.uid?.toBase64String()
+                            val id = credential.id?.toString()
 
-                            if (name.lowercase().contains(charString)) {
-                                filteredList.add(credential)
+                            if (filterExpired) {
+                                if (credential.isExpired(key)) {
+                                    filteredList.add(credential)
+                                }
                             }
-                            else if (filterAll && website.lowercase().contains(charString)) {
-                                filteredList.add(credential)
+                            else if (filterExpires) {
+                                if ((expiredAt != null) && (expiredAt > 0)) {
+                                    filteredList.add(credential)
+                                }
                             }
-                            else if (filterAll && user.lowercase().contains(charString)) {
-                                filteredList.add(credential)
+                            else if (filterVeiled) {
+                                if (credential.isObfuscated) {
+                                    filteredList.add(credential)
+                                }
                             }
-                            else if (filterAll && addInfo.lowercase().contains(charString)) {
-                                filteredList.add(credential)
+                            else if (filterId) {
+                                val exactMatch = charString.endsWith(SEARCH_COMMAND_END)
+                                if (exactMatch) {
+                                    val searchId = charString.removeSuffix(SEARCH_COMMAND_END)
+                                    if (id != null && id == searchId) {
+                                        filteredList.add(credential)
+                                    }
+                                }
+                                else {
+                                    if (id != null && isFilterValue(id, charString)) {
+                                        filteredList.add(credential)
+                                    }
+                                }
+                            }
+                            else if (filterUid) {
+                                val exactMatch = charString.endsWith(SEARCH_COMMAND_END)
+                                if (exactMatch) {
+                                    val searchUid = charString.removeSuffix(SEARCH_COMMAND_END)
+                                    if (uid != null && uid == searchUid) {
+                                        filteredList.add(credential)
+                                    }
+                                }
+                                else {
+                                    if (uid != null && isFilterValue(uid, charString)) {
+                                        filteredList.add(credential)
+                                    }
+                                }
+                            }
+                            else if (filterUser) {
+                                val exactMatch = charString.endsWith(SEARCH_COMMAND_END)
+                                if (exactMatch) {
+                                    val searchUser = charString.removeSuffix(SEARCH_COMMAND_END)
+                                    if (user == searchUser) {
+                                        filteredList.add(credential)
+                                    }
+                                }
+                                else {
+                                    if (isFilterValue(user, charString)) {
+                                        filteredList.add(credential)
+                                    }
+                                }
+                            }
+                            else if (filterWebsite) {
+                                val exactMatch = charString.endsWith(SEARCH_COMMAND_END)
+                                if (exactMatch) {
+                                    val searchWebsite = charString.removeSuffix(SEARCH_COMMAND_END)
+                                    if (website == searchWebsite) {
+                                        filteredList.add(credential)
+                                    }
+                                }
+                                else {
+                                    if (isFilterValue(website, charString)) {
+                                        filteredList.add(credential)
+                                    }
+                                }
+                            }
+                            else if (filterLabel) {
+                                val labels =
+                                    LabelService.defaultHolder.decryptLabelsForCredential(
+                                        key,
+                                        credential
+                                    )
+                                val exactMatch = charString.endsWith(SEARCH_COMMAND_END)
+                                if (exactMatch) {
+                                    val searchLabel = charString.removeSuffix(SEARCH_COMMAND_END)
+                                    labels
+                                        .filter { it.name.lowercase() == searchLabel }
+                                        .take(1)
+                                        .forEach { filteredList.add(credential)
+                                    }
+                                }
+                                else {
+                                    labels
+                                        .filter { isFilterValue(it.name, charString) }
+                                        .take(1)
+                                        .forEach { filteredList.add(credential)
+                                    }
+                                }
+                            }
+                            else if (filterAll) {
+                                if (isFilterValue(name, charString)) {
+                                    filteredList.add(credential)
+                                }
+                                else if (isFilterValue(website, charString)) {
+                                    filteredList.add(credential)
+                                }
+                                else if (isFilterValue(user, charString)) {
+                                    filteredList.add(credential)
+                                }
+                                else if (isFilterValue(addInfo, charString)) {
+                                    filteredList.add(credential)
+                                }
+                                else if (uid != null && isFilterValue(uid, charString)) {
+                                    filteredList.add(credential)
+                                }
+                            }
+                            else {
+                                // filter only credential name
+                                if (isFilterValue(name, charString)) {
+                                    filteredList.add(credential)
+                                }
                             }
                         }
 
                     }
-                    if (filterAll) {
+                    if (filterExtended) {
                         filterResults.values = filteredList
 
                     }
@@ -238,8 +397,13 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                 }
                 else {
                     // in some cases the filter result is null in Android 13, recreate it
-                    listCredentialsActivity.recreate()
+                    Log.i("LST", "Null in pop search result")
+                    //listCredentialsActivity.recreate() this seems useless in most cases
                 }
+            }
+
+            private fun isFilterValue(value: String, searchString: String): Boolean {
+                return value.lowercase().contains(searchString)
             }
         }
     }
@@ -262,6 +426,15 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             .toList()
     }
 
+    fun resetSelection(withRefresh: Boolean = true) {
+        selectionMode = false
+        selected.clear()
+        multipleSelectionCallback(selected)
+        if (withRefresh) {
+            notifyDataSetChanged()
+        }
+    }
+
     class CredentialViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val credentialContainerView: LinearLayout = itemView.findViewById(R.id.credential_container)
         private val credentialItemView: TextView = itemView.findViewById(R.id.credential_name)
@@ -269,7 +442,8 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         private val credentialCopyImageView: ImageView = itemView.findViewById(R.id.credential_copy)
         private val credentialMenuImageView: ImageView = itemView.findViewById(R.id.credential_menu_popup)
         private val credentialLabelContainerGroup: ChipGroup = itemView.findViewById(R.id.label_container)
-        private val credentialToolbarContainerView: ConstraintLayout = itemView.findViewById(R.id.toolbar_container)
+        val credentialSelectionContainerView: LinearLayout = itemView.findViewById(R.id.selection_container)
+        val credentialSelectedView: ImageView = itemView.findViewById(R.id.selected)
 
         fun hideCopyPasswordIcon() {
             credentialCopyImageView.visibility = View.GONE
@@ -285,6 +459,15 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
 
         fun listenForShowCredential(event: (position: Int, type: Int) -> Unit) {
             credentialContainerView.setOnClickListener {
+                if (adapterPosition == RecyclerView.NO_POSITION) {
+                    return@setOnClickListener
+                }
+                event.invoke(adapterPosition, itemViewType)
+            }
+        }
+
+        fun listenForToggleSelection(event: (position: Int, type: Int) -> Unit) {
+            credentialSelectedView.setOnClickListener {
                 if (adapterPosition == RecyclerView.NO_POSITION) {
                     return@setOnClickListener
                 }
@@ -336,6 +519,17 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             if (key != null) {
                 name = SecretService.decryptCommonString(key, credential.name)
                 name = enrichId(activity, name, credential.id)
+
+                if (credential.isExpired(key)) { // expired
+                    createAndAddLabelChip(
+                        Label(itemView.context.getString(R.string.expired), activity.getColor(R.color.Red), R.drawable.baseline_lock_clock_24),
+                        credentialLabelContainerGroup,
+                        thinner = true,
+                        itemView.context,
+                        outlined = true,
+                    )
+                }
+
 
                 val showLabels = PreferenceService.getAsBool(PREF_SHOW_LABELS_IN_LIST, itemView.context)
                 if (showLabels) {

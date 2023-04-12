@@ -6,6 +6,7 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.label.LabelsHolder
+import de.jepfa.yapm.service.notification.NotificationService
 import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.SecureActivity
@@ -58,6 +59,11 @@ object DropVaultUseCase: BasicUseCase<SecureActivity>() {
 
         LabelService.defaultHolder.clearAll()
         CoroutineScope(Dispatchers.IO).launch {
+            activity.getApp().credentialRepository.getAllSync().forEach { credential ->
+                credential.id?.let { id ->
+                    NotificationService.cancelScheduledNotification(activity, id)
+                }
+            }
             activity.getApp().database?.clearAllTables()
         }
     }

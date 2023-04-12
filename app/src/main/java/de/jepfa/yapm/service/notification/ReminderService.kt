@@ -15,6 +15,8 @@ import de.jepfa.yapm.service.PreferenceService.DATA_MK_EXPORT_NOTIFICATION_SHOWE
 import de.jepfa.yapm.service.PreferenceService.DATA_MK_MODIFIED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_BIOMETRIC_SMP_NOTIFICATION_SHOWED_AS
 import de.jepfa.yapm.service.PreferenceService.DATA_BIOMETRIC_SMP_NOTIFICATION_SHOWED_AT
+import de.jepfa.yapm.service.PreferenceService.DATA_EXPIRED_PASSWORDS_NOTIFICATION_SHOWED_AS
+import de.jepfa.yapm.service.PreferenceService.DATA_EXPIRED_PASSWORDS_NOTIFICATION_SHOWED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_MPT_CREATED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_MP_EXPORTED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_MP_EXPORT_NOTIFICATION_SHOWED_AS
@@ -26,9 +28,11 @@ import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_EXPORTED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_EXPORT_NOTIFICATION_SHOWED_AS
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_EXPORT_NOTIFICATION_SHOWED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_MODIFIED_AT
+import de.jepfa.yapm.service.PreferenceService.PREF_REMINDER_DURATION
 import de.jepfa.yapm.service.PreferenceService.PREF_REMINDER_PERIOD
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_EXPORT_MK_REMINDER
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_BIOMETRIC_SMP_REMINDER
+import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_EXPIRED_PASSWORDS_REMINDER
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_EXPORT_MP_REMINDER
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_EXPORT_VAULT_REMINDER
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_REFRESH_MPT_REMINDER
@@ -36,6 +40,7 @@ import de.jepfa.yapm.service.biometrix.BiometricUtils
 import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
+import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.ui.exportvault.ExportVaultActivity
 import de.jepfa.yapm.usecase.secret.ExportEncMasterKeyUseCase
 import de.jepfa.yapm.usecase.secret.ExportEncMasterPasswordUseCase
@@ -173,47 +178,96 @@ object ReminderService {
         }
     }
 
+    object ExpiredPasswords: ReminderConfig {
+        override val showIt = { activity: SecureActivity ->
+            PreferenceService.getAsBool(PREF_SHOW_EXPIRED_PASSWORDS_REMINDER, activity)
+        }
+        override val doDeactivate: (SecureActivity) -> Unit = { activity: SecureActivity ->
+            PreferenceService.putBoolean(PREF_SHOW_EXPIRED_PASSWORDS_REMINDER, false, activity)
+        }
+        override val dataNotificationShowedAt = DATA_EXPIRED_PASSWORDS_NOTIFICATION_SHOWED_AT
+        override val dataNotificationShowedAs = DATA_EXPIRED_PASSWORDS_NOTIFICATION_SHOWED_AS
+        override val notificationText = R.string.expired_passwords_reminder
+        override val notificationAction = R.string.show_expired_passwords
+        override val condition = { activity: SecureActivity ->
+            if (!Session.isDenied()) {
+                activity.credentialViewModel.hasExpiredCredentials()
+            }
+            else {
+                false
+            }
+        }
+        override val action: (SecureActivity) -> Unit = { activity: SecureActivity ->
+            if (activity is ListCredentialsActivity) {
+                activity.searchForExpiredCredentials()
+            }
+        }
+    }
 
-    fun showReminders(config: ReminderConfig, view: View, activity: SecureActivity): Boolean {
+    private val configs = listOf(
+        ExpiredPasswords,
+        MasterPassword,
+        Vault,
+        MasterKey,
+        StoredMasterPassword ,
+        RefreshMasterPasswordToken)
+
+
+    private fun checkAndShowReminder(config: ReminderConfig, view: View, activity: SecureActivity, showNow: Boolean = false): Boolean {
         val remindEnabled = config.showIt(activity)
         if (!remindEnabled) {
             return false
         }
 
         val notificationShowedAt = PreferenceService.getAsDate(config.dataNotificationShowedAt, activity)
-        val showAfterSeconds = PreferenceService.getAsInt(PREF_REMINDER_PERIOD, activity)
+        val showAfterSeconds = if (showNow) 0 else PreferenceService.getAsInt(PREF_REMINDER_PERIOD, activity)
         if (dateOlderThanSeconds(notificationShowedAt, showAfterSeconds) && config.condition(activity)) {
-            val snackBar = Snackbar.make(
-                view,
-                config.notificationText,
-                7_000
-            )
 
-            snackBar.view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)?.apply {
-                maxLines = 3
-            }
-
-            val notificationShowedAs = PreferenceService.getAsBool(config.dataNotificationShowedAs, activity)
-            if (notificationShowedAs) {
-                snackBar.setAction(R.string.dont_ask_again) {
-                    config.doDeactivate(activity)
-                    toastText(activity, R.string.manage_reminder_settings_hint)
-                }
-            }
-            else {
-                snackBar.setAction(config.notificationAction) {
-                    config.action.invoke(activity)
-                }
-            }
-
-            snackBar.show()
+            showReminder(view, config, activity, showAlwaysRealAction = showNow)
             PreferenceService.putCurrentDate(config.dataNotificationShowedAt, activity)
-            PreferenceService.toggleBoolean(config.dataNotificationShowedAs, activity)
 
             return true
         }
 
         return false
+    }
+
+    private fun showReminder(
+        view: View,
+        config: ReminderConfig,
+        activity: SecureActivity,
+        showAlwaysRealAction: Boolean = false
+    ) {
+        val snackBar = Snackbar.make(
+            view,
+            config.notificationText,
+            PreferenceService.getAsInt(PREF_REMINDER_DURATION, view.context),
+        )
+
+        snackBar.view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+            ?.apply {
+                maxLines = 3
+            }
+
+        val notificationShowedAs =
+            PreferenceService.getAsBool(config.dataNotificationShowedAs, activity)
+        if (notificationShowedAs && !showAlwaysRealAction) {
+            snackBar.setAction(R.string.dont_ask_again) {
+                config.doDeactivate(activity)
+                toastText(activity, R.string.manage_reminder_settings_hint)
+                PreferenceService.putBoolean(config.dataNotificationShowedAs, false, activity)
+            }
+        } else {
+            snackBar.setAction(config.notificationAction) {
+                config.action.invoke(activity)
+            }
+            // next action should be "don't show again", but only if sen multiple times
+            if (!showAlwaysRealAction && Random().nextBoolean()) {
+                PreferenceService.putBoolean(config.dataNotificationShowedAs, true, activity)
+            }
+        }
+
+        snackBar.show()
     }
 
     private fun dateOlderThan(
@@ -245,4 +299,44 @@ object ReminderService {
         val before = System.currentTimeMillis() - (seconds * 1000)
         return date.time < before
     }
+
+    fun showNextReminder(view: View, activity: SecureActivity, showNow: Boolean = false): Boolean {
+        val sorted = configs.sortedBy { PreferenceService.getAsDate(it.dataNotificationShowedAt, activity) }
+        for (config in sorted) {
+            val shown = checkAndShowReminder(config, view, activity, showNow)
+            if (shown) return true
+        }
+        return false
+    }
+
+    fun hasNextReminder(activity: SecureActivity): Boolean {
+        return configs
+            .filter { it.showIt(activity) }
+            .filter { it.condition(activity) }
+            .size > 1
+    }
+
+    fun showLastReminder(view: View, activity: SecureActivity): Boolean {
+
+        val lastShownConfig = getLastReminder(activity)
+
+
+        return if (lastShownConfig != null) {
+            showReminder(view, lastShownConfig, activity, showAlwaysRealAction = true)
+            true
+        } else {
+            false
+        }
+    }
+
+    fun hasLastReminder(activity: SecureActivity) = getLastReminder(activity) != null
+
+    private fun getLastReminder(activity: SecureActivity) = configs
+        .filter { it.showIt(activity) }
+        .filter { it.condition(activity) }
+        .maxByOrNull {
+            PreferenceService.getAsDate(it.dataNotificationShowedAt, activity) ?: Date(0)
+        }
+
+
 }

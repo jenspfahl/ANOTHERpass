@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="de.jepfa.yapm"
     android:installLocation="internalOnly">
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -19,13 +20,16 @@
     <application
         android:name=".ui.YapmApp"
         android:allowBackup="false"
+        android:fullBackupContent="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.YetAnotherPasswordManager"
-        tools:replace="android:allowBackup">
+        tools:replace="android:allowBackup"
+        tools:targetApi="s">
         <activity
             android:name=".ui.intro.LicencesActivity"
             android:exported="false" />
@@ -45,6 +49,20 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
         </provider>
+
+        <receiver android:name=".service.notification.ExpiryNotificationScheduleBootReceiver"
+            android:enabled="true" android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".service.notification.ExpiryAlarmNotificationReceiver"
+            android:enabled="true" android:exported="false">
+            <intent-filter>
+                <action android:name="NOTIFICATION_SERVICE" />
+            </intent-filter>
+        </receiver>
 
         <activity
             android:name=".ui.intro.IntroActivity"
@@ -116,14 +134,11 @@
             android:theme="@style/Theme.YetAnotherPasswordManager.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
-
                 <data android:mimeType="appliation/de.jepfa.yapm" />
             </intent-filter>
         </activity>
@@ -155,6 +170,7 @@
                 <action android:name="android.service.autofill.AutofillService" />
             </intent-filter>
         </service>
+
     </application>
 
     <queries>

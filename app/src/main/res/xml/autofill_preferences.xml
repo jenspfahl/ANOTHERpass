@@ -29,6 +29,7 @@
         app:key="YAPM/pref:autofill_exclusion_list"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
+        app:defaultValue="@array/empty_array"
         app:title="@string/pref_autofill_exclude_apps" />
 
     <ListPreference
