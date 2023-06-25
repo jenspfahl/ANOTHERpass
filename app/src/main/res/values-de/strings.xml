@@ -708,5 +708,8 @@
     <string name="credential_expired_notifiction_message">Zugangsdaten laufen am %1$s ab. Drücke hier um sie anzuzeigen.</string>
     <string name="credential_expired_notifiction_show_all_expired">Zeige alle abgelaufenen Zugangsdaten</string>
 
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+
 
 </resources>

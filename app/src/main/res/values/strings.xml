@@ -716,6 +716,8 @@
     <string name="credential_expired_notifiction_title">Expired credential</string>
     <string name="credential_expired_notifiction_message">A credential is expired on %1$s. Tap here to show.</string>
     <string name="credential_expired_notifiction_show_all_expired">Show all expired credentials</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
 
 </resources>
