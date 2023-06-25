@@ -718,6 +718,9 @@
     <string name="credential_expired_notifiction_show_all_expired">Show all expired credentials</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="export_later">Export later</string>
+    <string name="important_advise">Important advise!!</string>
+    <string name="export_masterpassword_disclaimer" >The master password is required together with the PIN to open the vault. Even if the master password has been saved in the device, it must be exported in order to be able to access the credentials in the future. If the master password or the PIN is lost, the encrypted data cannot be restored under any circumstances!!</string>
 
 
 </resources>

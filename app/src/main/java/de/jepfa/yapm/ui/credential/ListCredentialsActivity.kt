@@ -355,6 +355,32 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         view.postDelayed({
             ReminderService.showNextReminder(view, this)
         }, 500L)
+
+        // wait until ViewModel is fully loaded
+        val disclaimerShowed = PreferenceService.getAsBool(PreferenceService.STATE_DISCLAIMER_SHOWED, this)
+
+        if (!disclaimerShowed) {
+            view.postDelayed({
+                PreferenceService.putBoolean(PreferenceService.STATE_DISCLAIMER_SHOWED, true, this)
+
+                AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.important_advise))
+                    .setMessage(getString(R.string.export_masterpassword_disclaimer))
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(R.string.action_export_masterpasswd) { _, _ ->
+                        val encMasterPasswd = Session.getEncMasterPasswd()
+                        if (encMasterPasswd != null) {
+                            ExportEncMasterPasswordUseCase.startUiFlow(
+                                this,
+                                encMasterPasswd,
+                                noSessionCheck = false
+                            )
+                        }
+                    }
+                    .setNegativeButton(R.string.export_later, null)
+                    .show()
+            }, 2500L)
+        }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

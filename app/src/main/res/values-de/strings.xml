@@ -710,6 +710,10 @@
 
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
+    <string name="export_later">Später exportieren</string>
+    <string name="important_advise">Wichtiger Hinweis!!</string>
+    <string name="export_masterpassword_disclaimer" >Das Masterpasswort wird zusammen mit der PIN benötigt, um den Tresor zu öffnen. Auch wenn das Masterpasswort im Gerät gespeichert wurde, muss es zwingend exportiert werden, um auch zukünftig auf die Zugangsdaten zugreifen zu können. Bei Verlust des Masterpasswortes oder der PIN können die verschlüsselten Daten unter keinen Umständen wiederhergestellt werden!!</string>
+
 
 
 </resources>
