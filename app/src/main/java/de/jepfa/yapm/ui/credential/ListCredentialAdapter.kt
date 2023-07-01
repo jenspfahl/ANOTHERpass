@@ -42,6 +42,7 @@ import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_USER
 import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_WEBSITE
 import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_EXPIRED
 import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_EXPIRES
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_LATEST
 import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_VEILED
 import java.util.*
 import kotlin.collections.HashSet
@@ -225,6 +226,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                 val filterUid = charSequence.startsWith(SEARCH_COMMAND_SEARCH_UID)
                 val filterExpired = charSequence.startsWith(SEARCH_COMMAND_SHOW_EXPIRED)
                 val filterExpires = charSequence.startsWith(SEARCH_COMMAND_SHOW_EXPIRES)
+                val filterLatest = charSequence.startsWith(SEARCH_COMMAND_SHOW_LATEST)
                 val filterVeiled = charSequence.startsWith(SEARCH_COMMAND_SHOW_VEILED)
                 val filterLabel = charSequence.startsWith(SEARCH_COMMAND_SEARCH_LABEL)
                 val filterUser = charSequence.startsWith(SEARCH_COMMAND_SEARCH_USER)
@@ -248,6 +250,12 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                     filterResults.values = filterByLabels(key, originList)
                 } else {
                     val filteredList: MutableList<EncCredential> = ArrayList<EncCredential>()
+
+                    var latestModifyTimestamp: Long ? = null
+                    if (filterLatest) {
+                        latestModifyTimestamp = originList.mapNotNull { it.modifyTimestamp }.maxByOrNull { it }
+                    }
+
                     for (credential in originList) {
                         if (key != null) {
                             var name = SecretService.decryptCommonString(key, credential.name)
@@ -266,6 +274,11 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                             }
                             else if (filterExpires) {
                                 if ((expiredAt != null) && (expiredAt > 0)) {
+                                    filteredList.add(credential)
+                                }
+                            }
+                            else if (filterLatest) {
+                                if (credential.modifyTimestamp == latestModifyTimestamp) {
                                     filteredList.add(credential)
                                 }
                             }

@@ -96,6 +96,7 @@ import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_USER
 import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_WEBSITE
 import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_EXPIRED
 import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_EXPIRES
+import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_LATEST
 import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_VEILED
 import de.jepfa.yapm.util.PermissionChecker.verifyNotificationPermissions
 import kotlinx.coroutines.CoroutineScope
@@ -431,6 +432,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             SEARCH_COMMAND_SEARCH_WEBSITE,
             SEARCH_COMMAND_SHOW_EXPIRED,
             SEARCH_COMMAND_SHOW_EXPIRES,
+            SEARCH_COMMAND_SHOW_LATEST,
             SEARCH_COMMAND_SHOW_VEILED,
         )
 

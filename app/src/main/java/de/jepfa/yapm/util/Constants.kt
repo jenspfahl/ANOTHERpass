@@ -42,6 +42,7 @@ object Constants {
     const val SEARCH_COMMAND_SEARCH_WEBSITE = "!web:"
     const val SEARCH_COMMAND_SHOW_EXPIRED = "!expired"
     const val SEARCH_COMMAND_SHOW_EXPIRES = "!expires"
+    const val SEARCH_COMMAND_SHOW_LATEST = "!latest"
     const val SEARCH_COMMAND_SHOW_VEILED = "!veiled"
 
     const val SEARCH_COMMAND_END = ";"
