@@ -1,5 +1,6 @@
 package de.jepfa.yapm.service.secret
 
+import android.app.KeyguardManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
@@ -290,8 +291,10 @@ object SecretService {
                 .setUnlockedDeviceRequired(true)
 
             if (androidKey.requireUserAuth && BiometricUtils.isFingerprintAvailable(context)) {
+                val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+                val deviceRequiresUserAuth = keyguardManager.isDeviceSecure
                 spec
-                    .setUserAuthenticationRequired(true)
+                    .setUserAuthenticationRequired(deviceRequiresUserAuth)
                     .setInvalidatedByBiometricEnrollment(true)
 
             }

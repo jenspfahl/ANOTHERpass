@@ -1,5 +1,6 @@
 package de.jepfa.yapm.util
 
+import android.app.KeyguardManager
 import android.content.Context
 import android.os.Build
 import de.jepfa.yapm.BuildConfig
@@ -60,7 +61,10 @@ object DebugInfo {
         sb.addFormattedLine("NFC enabled", NfcService.isNfcEnabled(context))
         sb.addFormattedLine("Has StrongBox support", SecretService.hasStrongBoxSupport(context))
         sb.addFormattedLine("Has biometrics support", BiometricUtils.isHardwareSupported(context))
-        sb.addFormattedLine("Is fingerprint enroled", BiometricUtils.isFingerprintAvailable(context))
+        sb.addFormattedLine("Is fingerprint enrolled", BiometricUtils.isFingerprintAvailable(context))
+        val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+        sb.addFormattedLine("Is device lock enabled", keyguardManager.isDeviceSecure)
+
 
         sb.append("\n************ PERMISSIONS ************\n")
         sb.addFormattedLine("Read Storage granted", PermissionChecker.hasReadStoragePermissions(context))
