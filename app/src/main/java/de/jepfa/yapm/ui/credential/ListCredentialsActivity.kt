@@ -363,11 +363,18 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             view.postDelayed({
                 PreferenceService.putBoolean(PreferenceService.STATE_DISCLAIMER_SHOWED, true, this)
 
-                AlertDialog.Builder(this)
+                val dialogBuilder = AlertDialog.Builder(this)
                     .setTitle(getString(R.string.important_advise))
                     .setMessage(getString(R.string.export_masterpassword_disclaimer))
                     .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setPositiveButton(R.string.action_export_masterpasswd) { _, _ ->
+
+
+                val masterPasswordAlreadyExported = !ReminderService.MasterPassword.condition(this)
+                if (masterPasswordAlreadyExported) {
+                    dialogBuilder.setPositiveButton(R.string.got_it, null)
+                }
+                else {
+                    dialogBuilder.setPositiveButton(R.string.export_now) { _, _ ->
                         val encMasterPasswd = Session.getEncMasterPasswd()
                         if (encMasterPasswd != null) {
                             ExportEncMasterPasswordUseCase.startUiFlow(
@@ -376,9 +383,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                                 noSessionCheck = false
                             )
                         }
-                    }
-                    .setNegativeButton(R.string.export_later, null)
-                    .show()
+                    }.setNegativeButton(R.string.export_later, null)
+                }
+
+                dialogBuilder.show()
+
             }, 2500L)
         }
     }
