@@ -723,6 +723,16 @@
     <string name="export_later">Export later</string>
     <string name="important_advise">Important advise!!</string>
     <string name="export_masterpassword_disclaimer" >The master password is required together with the PIN to open the vault. Even if the master password has been saved in the device, it must be exported in order to be able to access the credentials in the future. If the master password or the PIN is lost, the encrypted data cannot be restored under any circumstances!!</string>
+    <string name="command_all">Search in all fields</string>
+    <string name="command_id">Search by credential Id</string>
+    <string name="command_uid">Search by credential Uid</string>
+    <string name="command_tag">Search all with given label</string>
+    <string name="command_user">Search in user field</string>
+    <string name="command_web">Search in website field</string>
+    <string name="command_expired">Filter expired credentials</string>
+    <string name="command_expires">Filter credentials that expire</string>
+    <string name="command_latest">Show latest modified credential</string>
+    <string name="command_veiled">Filter obfuscated credentials</string>
 
 
 </resources>

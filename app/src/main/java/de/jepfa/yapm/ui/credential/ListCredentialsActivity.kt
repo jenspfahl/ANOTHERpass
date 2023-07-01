@@ -88,16 +88,6 @@ import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.usecase.vault.ShowVaultInfoUseCase
 import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.Constants.ACTION_DELIMITER
-import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_ID
-import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_IN_ALL
-import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_LABEL
-import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_UID
-import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_USER
-import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_WEBSITE
-import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_EXPIRED
-import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_EXPIRES
-import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_LATEST
-import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_VEILED
 import de.jepfa.yapm.util.PermissionChecker.verifyNotificationPermissions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -404,12 +394,18 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         Log.i("LST", "onCreateOptionsMenu")
 
         val searchItem: MenuItem = menu.findItem(R.id.action_search)
+
         this.searchItem = searchItem
         val searchView = MenuItemCompat.getActionView(searchItem) as SearchView
 
+        searchView.setOnQueryTextFocusChangeListener { view, focus ->
+            val filterItem: MenuItem = menu.findItem(R.id.menu_filter)
+            filterItem.isVisible = !focus
+        }
+
         val searchPlate = searchView.findViewById(R.id.search_src_text) as AutoCompleteTextView
         searchPlate.threshold = 1
-
+        searchPlate.dropDownWidth = ViewGroup.LayoutParams.MATCH_PARENT
         searchPlate.hint = getString(R.string.search)
         val searchPlateView: View =
             searchView.findViewById(R.id.search_plate)
@@ -420,23 +416,13 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             )
         )
 
-        val from = arrayOf(SearchManager.SUGGEST_COLUMN_TEXT_1)
-        val to = intArrayOf(R.id.search_suggestion)
+        val from = arrayOf(SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_TEXT_2)
+        val to = intArrayOf(R.id.search_suggestion, R.id.search_suggestion_desc)
         val cursorAdapter = androidx.cursoradapter.widget.SimpleCursorAdapter(this, R.layout.content_search_suggestion, null, from, to, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER)
-        val suggestions = listOf(
-            SEARCH_COMMAND_SEARCH_IN_ALL,
-            SEARCH_COMMAND_SEARCH_LABEL,
-            SEARCH_COMMAND_SEARCH_ID,
-            SEARCH_COMMAND_SEARCH_UID,
-            SEARCH_COMMAND_SEARCH_USER,
-            SEARCH_COMMAND_SEARCH_WEBSITE,
-            SEARCH_COMMAND_SHOW_EXPIRED,
-            SEARCH_COMMAND_SHOW_EXPIRES,
-            SEARCH_COMMAND_SHOW_LATEST,
-            SEARCH_COMMAND_SHOW_VEILED,
-        )
 
         searchView.suggestionsAdapter = cursorAdapter
+
+
 
         searchView.setOnSuggestionListener(object: SearchView.OnSuggestionListener {
             override fun onSuggestionSelect(position: Int): Boolean {
@@ -462,11 +448,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             override fun onQueryTextChange(query: String?): Boolean {
                 listCredentialAdapter?.filter?.filter(query)
 
-                val cursor = MatrixCursor(arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1))
-                query?.let {
-                    suggestions.forEachIndexed { index, suggestion ->
-                        if (suggestion.startsWith(it, ignoreCase = true)) {
-                            cursor.addRow(arrayOf(index, suggestion))
+                val cursor = MatrixCursor(arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_TEXT_2))
+                query?.let { q ->
+                    Command.values().forEachIndexed { index, command ->
+                        val cmd = command.getCmd()
+                        if (cmd.startsWith(q, ignoreCase = true)) {
+                            cursor.addRow(arrayOf(index, cmd, command.getDescription(this@ListCredentialsActivity)))
                         }
                     }
                 }
@@ -1326,10 +1313,10 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     }
 
     fun searchForExpiredCredentials() {
-        startSearchFor(SEARCH_COMMAND_SHOW_EXPIRED + " ") // space at the end to not show suggestion menu popup
+        startSearchFor(Command.SEARCH_COMMAND_SHOW_EXPIRED.getCmd() + " ") // space at the end to not show suggestion menu popup
     }
 
-    private fun startSearchFor(searchString: String): Boolean {
+    private fun startSearchFor(searchString: String, commit: Boolean = true): Boolean {
         Log.i("LST", "searchItem=$searchItem")
         searchItem?.let { searchItem ->
             Log.i("LST", "update search text")
@@ -1339,7 +1326,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             val searchPlate =
                 searchView.findViewById(R.id.search_src_text) as EditText
 
-            searchView.setQuery(searchString, true)
+            searchView.setQuery(searchString, commit)
             searchItem.expandActionView()
             searchPlate.text = SpannableStringBuilder(searchString)
             searchPlate.selectAll()

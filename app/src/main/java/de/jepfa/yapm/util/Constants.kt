@@ -33,18 +33,4 @@ object Constants {
     const val ACTION_PAUSE_AUTOFILL = "pauseAutofill"
 
 
-    const val SEARCH_COMMAND_EXTENDED_SEARCH = "!"
-    const val SEARCH_COMMAND_SEARCH_IN_ALL = "!all:"
-    const val SEARCH_COMMAND_SEARCH_ID = "!id:"
-    const val SEARCH_COMMAND_SEARCH_UID = "!uid:"
-    const val SEARCH_COMMAND_SEARCH_LABEL = "!tag:"
-    const val SEARCH_COMMAND_SEARCH_USER = "!user:"
-    const val SEARCH_COMMAND_SEARCH_WEBSITE = "!web:"
-    const val SEARCH_COMMAND_SHOW_EXPIRED = "!expired"
-    const val SEARCH_COMMAND_SHOW_EXPIRES = "!expires"
-    const val SEARCH_COMMAND_SHOW_LATEST = "!latest"
-    const val SEARCH_COMMAND_SHOW_VEILED = "!veiled"
-
-    const val SEARCH_COMMAND_END = ";"
-
 }
