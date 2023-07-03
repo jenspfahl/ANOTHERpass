@@ -150,6 +150,7 @@ object PreferenceService {
 
     const val DATA_USED_LABEL_FILTER = DATA_PREFIX + "used_label_filter"
     const val STATE_INTRO_SHOWED = STATE_PREFIX + "intro_showed"
+    const val STATE_DISCLAIMER_SHOWED = STATE_PREFIX + "disclaimer_showed"
     const val STATE_WHATS_NEW_SHOWED_FOR_VERSION = STATE_PREFIX + "whats_new_showed_for_version"
 
     const val PREF_REMINDER_PERIOD = PREF_PREFIX + "reminder_period"

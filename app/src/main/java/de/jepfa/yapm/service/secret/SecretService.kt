@@ -1,19 +1,21 @@
 package de.jepfa.yapm.service.secret
 
+import android.app.KeyguardManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.SystemClock
 import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyInfo
 import android.security.keystore.KeyProperties
 import android.security.keystore.StrongBoxUnavailableException
 import android.util.Log
-import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.Validable.Companion.FAILED_BYTE_ARRAY
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.encrypted.DEFAULT_CIPHER_ALGORITHM
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.encrypted.EncryptedType
+import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.Session
@@ -22,6 +24,7 @@ import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_SEED
 import de.jepfa.yapm.service.biometrix.BiometricUtils
 import de.jepfa.yapm.service.secret.PbkdfIterationService.getStoredPbkdfIterations
 import java.security.*
+import java.security.spec.InvalidKeySpecException
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
@@ -269,7 +272,26 @@ object SecretService {
         val entry: KeyStore.Entry? = androidKeyStore.getEntry(androidKey.alias, null)
 
         val sk = (entry as? KeyStore.SecretKeyEntry)?.secretKey ?: initAndroidSecretKey(androidKey, context)
+
         return SecretKeyHolder(sk, DEFAULT_CIPHER_ALGORITHM)
+    }
+
+    fun checkKeyRequiresUserAuthOnInsecureDevice(secretKeyHolder: SecretKeyHolder, context: Context): Boolean {
+        val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+        val deviceRequiresUserAuth = keyguardManager.isDeviceSecure
+        val keyInfo = getKeyInfo(secretKeyHolder)
+
+        return keyInfo?.isUserAuthenticationRequired?:false && !deviceRequiresUserAuth
+    }
+
+    private fun getKeyInfo(secretKeyHolder: SecretKeyHolder): KeyInfo? {
+        val factory = SecretKeyFactory.getInstance(secretKeyHolder.cipherAlgorithm.secretKeyAlgorithm)
+        try {
+            return factory.getKeySpec(secretKeyHolder.secretKey, KeyInfo::class.java) as KeyInfo
+        } catch (e: InvalidKeySpecException) {
+            Log.e("SS", "Asking for invalid key spec: ${secretKeyHolder.cipherAlgorithm}", e)
+        }
+        return null
     }
 
     fun removeAndroidSecretKey(androidKey: AndroidKey) {
@@ -290,8 +312,10 @@ object SecretService {
                 .setUnlockedDeviceRequired(true)
 
             if (androidKey.requireUserAuth && BiometricUtils.isFingerprintAvailable(context)) {
+                val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+                val deviceRequiresUserAuth = keyguardManager.isDeviceSecure
                 spec
-                    .setUserAuthenticationRequired(true)
+                    .setUserAuthenticationRequired(deviceRequiresUserAuth)
                     .setInvalidatedByBiometricEnrollment(true)
 
             }

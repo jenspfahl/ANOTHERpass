@@ -46,6 +46,7 @@ import de.jepfa.yapm.usecase.secret.ExportEncMasterKeyUseCase
 import de.jepfa.yapm.usecase.secret.ExportEncMasterPasswordUseCase
 import de.jepfa.yapm.usecase.secret.GenerateMasterPasswordTokenUseCase
 import de.jepfa.yapm.util.addDays
+import de.jepfa.yapm.util.removeSeconds
 import de.jepfa.yapm.util.toastText
 import java.util.*
 
@@ -275,8 +276,8 @@ object ReminderService {
         dataTargetModifiedAtKey: String,
         context: Context)
     : Boolean {
-        val vaultExportedAt = PreferenceService.getAsDate(dataTargetExportedAtKey, context)
-        val vaultModifiedAt = PreferenceService.getAsDate(dataTargetModifiedAtKey, context)
+        val vaultExportedAt = PreferenceService.getAsDate(dataTargetExportedAtKey, context)?.removeSeconds()
+        val vaultModifiedAt = PreferenceService.getAsDate(dataTargetModifiedAtKey, context)?.removeSeconds()
         return dateOlderThan(vaultExportedAt, vaultModifiedAt)
     }
 

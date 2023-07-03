@@ -10,6 +10,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="BlackGray">#151515</color>
     <color name="Gray">#646464</color>
+    <color name="Gray2">#8D8D8D</color>
 
 
     <!--label colors-->

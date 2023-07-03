@@ -454,7 +454,7 @@
     <string name="export_vault_reminder">Tresor wurde geändert und sollte exportiert werden.</string>
     <string name="export_mk_reminder">Masterkey hat sich geändert und sollte exportiert werden.</string>
     <string name="export_mp_reminder">Masterpasswort sollte exportiert werden!</string>
-    <string name="biometric_smp_reminder">Biometrie sollte für Masterpasswort eingerichtet werden.</string>
+    <string name="biometric_smp_reminder">Biometrie sollte für das Masterpasswort eingerichtet werden.</string>
     <string name="show_biometric_smp_howto">Wie?</string>
     <string name="refresh_mpt_reminder">Masterpassword-Token sollte erneuert werden.</string>
     <string name="show_refresh_mpt">Jetzt erneuern</string>
@@ -707,6 +707,24 @@
     <string name="credential_expired_notifiction_title">Abgelaufene Zugangsdaten</string>
     <string name="credential_expired_notifiction_message">Zugangsdaten laufen am %1$s ab. Drücke hier um sie anzuzeigen.</string>
     <string name="credential_expired_notifiction_show_all_expired">Zeige alle abgelaufenen Zugangsdaten</string>
+
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+    <string name="got_it">Verstanden</string>
+    <string name="export_now">Jetzt exportieren</string>
+    <string name="export_later">Später exportieren</string>
+    <string name="important_advise">Wichtiger Hinweis!!</string>
+    <string name="export_masterpassword_disclaimer" >Das Masterpasswort wird zusammen mit der PIN benötigt, um den Tresor zu öffnen. Auch wenn das Masterpasswort im Gerät gespeichert wurde, muss es zwingend exportiert werden, um auch zukünftig auf die Zugangsdaten zugreifen zu können. Bei Verlust des Masterpasswortes oder der PIN können die verschlüsselten Daten unter keinen Umständen wiederhergestellt werden!!</string>
+    <string name="command_all">In allen Feldern suchen</string>
+    <string name="command_id">Suche nach Zugangsdaten Id</string>
+    <string name="command_uid">Suche nach Zugangsdaten Uid</string>
+    <string name="command_tag">Filtere nach Kategorie</string>
+    <string name="command_user">In Benutzer-Feld suchen</string>
+    <string name="command_web">In Webseiten-Feld suchen</string>
+    <string name="command_expired">Filtere abgelaufene Zugangsdaten</string>
+    <string name="command_expires">Filtere Zugangsdaten die ablaufen können</string>
+    <string name="command_latest">Zeige zuletzt bearbeitete Zugangsdaten</string>
+    <string name="command_veiled">Filtere verschleierte Zugangsdaten</string>
 
 
 </resources>

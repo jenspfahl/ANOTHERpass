@@ -171,8 +171,8 @@ object MasterPasswordService {
                     handleNothingStored()
                 }
 
-                override fun onAuthenticationError(errString: CharSequence) {
-                    toastText(context, errString.toString())
+                override fun onAuthenticationError(errString: CharSequence?) {
+                    toastText(context, errString?.toString()?:context.getString(R.string.biometric_not_supported))
                 }
 
             })
@@ -214,8 +214,8 @@ object MasterPasswordService {
                     handleNothingReceived()
                 }
 
-                override fun onAuthenticationError(errString: CharSequence) {
-                    toastText(context, errString.toString())
+                override fun onAuthenticationError(errString: CharSequence?) {
+                    toastText(context, errString?.toString()?:context.getString(R.string.biometric_not_supported))
                 }
 
             })

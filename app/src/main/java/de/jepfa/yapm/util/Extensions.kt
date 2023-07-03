@@ -100,6 +100,14 @@ fun Date.removeTime(): Date {
     return cal.time
 }
 
+fun Date.removeSeconds(): Date {
+    val cal = Calendar.getInstance()
+    cal.time = this
+    cal[Calendar.SECOND] = 0
+    cal[Calendar.MILLISECOND] = 0
+    return cal.time
+}
+
 fun Date.yesterday(): Date {
     return addDays(-1)
 }

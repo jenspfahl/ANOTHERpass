@@ -1,7 +1,6 @@
 package de.jepfa.yapm.ui.credential
 
 import android.content.Intent
-import android.net.wifi.hotspot2.pps.Credential
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -32,17 +31,6 @@ import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.ui.label.LabelDialogs
 import de.jepfa.yapm.usecase.credential.ExportCredentialUseCase
 import de.jepfa.yapm.util.*
-import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_END
-import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_EXTENDED_SEARCH
-import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_ID
-import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_IN_ALL
-import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_LABEL
-import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_UID
-import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_USER
-import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SEARCH_WEBSITE
-import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_EXPIRED
-import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_EXPIRES
-import de.jepfa.yapm.util.Constants.SEARCH_COMMAND_SHOW_VEILED
 import java.util.*
 import kotlin.collections.HashSet
 
@@ -218,36 +206,24 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
     override fun getFilter(): Filter {
         return object : Filter() {
             override fun performFiltering(charSequence: CharSequence): FilterResults {
+
                 val key = listCredentialsActivity.masterSecretKey
-
                 val filterResults = FilterResults()
-                val filterId = charSequence.startsWith(SEARCH_COMMAND_SEARCH_ID)
-                val filterUid = charSequence.startsWith(SEARCH_COMMAND_SEARCH_UID)
-                val filterExpired = charSequence.startsWith(SEARCH_COMMAND_SHOW_EXPIRED)
-                val filterExpires = charSequence.startsWith(SEARCH_COMMAND_SHOW_EXPIRES)
-                val filterVeiled = charSequence.startsWith(SEARCH_COMMAND_SHOW_VEILED)
-                val filterLabel = charSequence.startsWith(SEARCH_COMMAND_SEARCH_LABEL)
-                val filterUser = charSequence.startsWith(SEARCH_COMMAND_SEARCH_USER)
-                val filterWebsite = charSequence.startsWith(SEARCH_COMMAND_SEARCH_WEBSITE)
-                var filterAll = charSequence.startsWith(SEARCH_COMMAND_SEARCH_IN_ALL)
-                val filterExtended = charSequence.startsWith(SEARCH_COMMAND_EXTENDED_SEARCH)
-                var charString =
-                    if (filterLabel) charSequence.substring(SEARCH_COMMAND_SEARCH_LABEL.length).lowercase().trimStart()
-                    else if (filterUser) charSequence.substring(SEARCH_COMMAND_SEARCH_USER.length).lowercase().trimStart()
-                    else if (filterWebsite) charSequence.substring(SEARCH_COMMAND_SEARCH_WEBSITE.length).lowercase().trimStart()
-                    else if (filterId) charSequence.substring(SEARCH_COMMAND_SEARCH_ID.length).lowercase().trimStart()
-                    else if (filterUid) charSequence.substring(SEARCH_COMMAND_SEARCH_UID.length).lowercase().trimStart()
-                    else if (filterAll) charSequence.substring(SEARCH_COMMAND_SEARCH_IN_ALL.length).lowercase().trimStart()
-                    else if (filterExtended) {
-                        filterAll = true // map to filter all
-                        charSequence.substring(SEARCH_COMMAND_EXTENDED_SEARCH.length).lowercase().trimStart()
-                    }
-                    else charSequence.toString().lowercase()
 
-                if (charString.isEmpty()) {
+                if (charSequence.isEmpty()) {
+                    // no search query entered
                     filterResults.values = filterByLabels(key, originList)
                 } else {
                     val filteredList: MutableList<EncCredential> = ArrayList<EncCredential>()
+
+                    val exactMatch = charSequence.endsWith(SEARCH_COMMAND_END)
+                    val filterLatest = Command.SEARCH_COMMAND_SHOW_LATEST.applies(charSequence)
+
+                    var latestModifyTimestamp: Long ? = null
+                    if (filterLatest) {
+                        latestModifyTimestamp = originList.mapNotNull { it.modifyTimestamp }.maxByOrNull { it }
+                    }
+
                     for (credential in originList) {
                         if (key != null) {
                             var name = SecretService.decryptCommonString(key, credential.name)
@@ -259,134 +235,151 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                             val uid = credential.uid?.toBase64String()
                             val id = credential.id?.toString()
 
-                            if (filterExpired) {
+                            if (Command.SEARCH_COMMAND_SHOW_EXPIRED.applies(charSequence)) {
                                 if (credential.isExpired(key)) {
                                     filteredList.add(credential)
                                 }
                             }
-                            else if (filterExpires) {
+                            else if (Command.SEARCH_COMMAND_SHOW_EXPIRES.applies(charSequence)) {
                                 if ((expiredAt != null) && (expiredAt > 0)) {
                                     filteredList.add(credential)
                                 }
                             }
-                            else if (filterVeiled) {
+                            else if (filterLatest) {
+                                if (credential.modifyTimestamp == latestModifyTimestamp) {
+                                    filteredList.add(credential)
+                                }
+                            }
+                            else if (Command.SEARCH_COMMAND_SHOW_VEILED.applies(charSequence)) {
                                 if (credential.isObfuscated) {
                                     filteredList.add(credential)
                                 }
                             }
-                            else if (filterId) {
-                                val exactMatch = charString.endsWith(SEARCH_COMMAND_END)
+                            else if (Command.SEARCH_COMMAND_SEARCH_ID.applies(charSequence)) {
+                                val arg = Command.SEARCH_COMMAND_SEARCH_ID.extractArg(charSequence)
                                 if (exactMatch) {
-                                    val searchId = charString.removeSuffix(SEARCH_COMMAND_END)
-                                    if (id != null && id == searchId) {
+                                    if (id != null && id == arg) {
                                         filteredList.add(credential)
                                     }
                                 }
                                 else {
-                                    if (id != null && isFilterValue(id, charString)) {
+                                    if (id != null && containsValue(id, arg)) {
                                         filteredList.add(credential)
                                     }
                                 }
                             }
-                            else if (filterUid) {
-                                val exactMatch = charString.endsWith(SEARCH_COMMAND_END)
+                            else if (Command.SEARCH_COMMAND_SEARCH_UID.applies(charSequence)) {
+                                val searchUid = Command.SEARCH_COMMAND_SEARCH_UID.extractArg(charSequence)
                                 if (exactMatch) {
-                                    val searchUid = charString.removeSuffix(SEARCH_COMMAND_END)
                                     if (uid != null && uid == searchUid) {
                                         filteredList.add(credential)
                                     }
                                 }
                                 else {
-                                    if (uid != null && isFilterValue(uid, charString)) {
+                                    if (uid != null && containsValue(uid, searchUid)) {
                                         filteredList.add(credential)
                                     }
                                 }
                             }
-                            else if (filterUser) {
-                                val exactMatch = charString.endsWith(SEARCH_COMMAND_END)
+                            else if (Command.SEARCH_COMMAND_SEARCH_USER.applies(charSequence)) {
+                                val searchUser = Command.SEARCH_COMMAND_SEARCH_USER.extractArg(charSequence)
                                 if (exactMatch) {
-                                    val searchUser = charString.removeSuffix(SEARCH_COMMAND_END)
                                     if (user == searchUser) {
                                         filteredList.add(credential)
                                     }
                                 }
                                 else {
-                                    if (isFilterValue(user, charString)) {
+                                    if (containsValue(user, searchUser)) {
                                         filteredList.add(credential)
                                     }
                                 }
                             }
-                            else if (filterWebsite) {
-                                val exactMatch = charString.endsWith(SEARCH_COMMAND_END)
+                            else if (Command.SEARCH_COMMAND_SEARCH_WEBSITE.applies(charSequence)) {
+                                val searchWebsite = Command.SEARCH_COMMAND_SEARCH_WEBSITE.extractArg(charSequence)
                                 if (exactMatch) {
-                                    val searchWebsite = charString.removeSuffix(SEARCH_COMMAND_END)
                                     if (website == searchWebsite) {
                                         filteredList.add(credential)
                                     }
                                 }
                                 else {
-                                    if (isFilterValue(website, charString)) {
+                                    if (containsValue(website, searchWebsite)) {
                                         filteredList.add(credential)
                                     }
                                 }
                             }
-                            else if (filterLabel) {
+                            else if (Command.SEARCH_COMMAND_SEARCH_LABEL.applies(charSequence)) {
+                                val searchLabel = Command.SEARCH_COMMAND_SEARCH_LABEL.extractArg(charSequence)
                                 val labels =
                                     LabelService.defaultHolder.decryptLabelsForCredential(
                                         key,
                                         credential
                                     )
-                                val exactMatch = charString.endsWith(SEARCH_COMMAND_END)
                                 if (exactMatch) {
-                                    val searchLabel = charString.removeSuffix(SEARCH_COMMAND_END)
                                     labels
                                         .filter { it.name.lowercase() == searchLabel }
                                         .take(1)
                                         .forEach { filteredList.add(credential)
-                                    }
+                                        }
                                 }
                                 else {
                                     labels
-                                        .filter { isFilterValue(it.name, charString) }
+                                        .filter { containsValue(it.name, searchLabel) }
                                         .take(1)
                                         .forEach { filteredList.add(credential)
-                                    }
+                                        }
                                 }
                             }
-                            else if (filterAll) {
-                                if (isFilterValue(name, charString)) {
+                            else if (Command.SEARCH_COMMAND_SEARCH_IN_ALL.applies(charSequence)) {
+                                var searchString = Command.SEARCH_COMMAND_SEARCH_IN_ALL.extractArg(charSequence)
+                                if (containsValue(name, searchString)) {
                                     filteredList.add(credential)
                                 }
-                                else if (isFilterValue(website, charString)) {
+                                else if (containsValue(website, searchString)) {
                                     filteredList.add(credential)
                                 }
-                                else if (isFilterValue(user, charString)) {
+                                else if (containsValue(user, searchString)) {
                                     filteredList.add(credential)
                                 }
-                                else if (isFilterValue(addInfo, charString)) {
+                                else if (containsValue(addInfo, searchString)) {
                                     filteredList.add(credential)
                                 }
-                                else if (uid != null && isFilterValue(uid, charString)) {
+                                else if (uid != null && containsValue(uid, searchString)) {
+                                    filteredList.add(credential)
+                                }
+                            }
+                            else if (charSequence.startsWith(SEARCH_COMMAND_START)) {
+                                // filter in all fields
+                                var searchString = charSequence.removePrefix(SEARCH_COMMAND_START).toString()
+                                if (containsValue(name, searchString)) {
+                                    filteredList.add(credential)
+                                }
+                                else if (containsValue(website, searchString)) {
+                                    filteredList.add(credential)
+                                }
+                                else if (containsValue(user, searchString)) {
+                                    filteredList.add(credential)
+                                }
+                                else if (containsValue(addInfo, searchString)) {
+                                    filteredList.add(credential)
+                                }
+                                else if (uid != null && containsValue(uid, searchString)) {
                                     filteredList.add(credential)
                                 }
                             }
                             else {
                                 // filter only credential name
-                                if (isFilterValue(name, charString)) {
+                                if (containsValue(name, charSequence.toString())) {
                                     filteredList.add(credential)
                                 }
                             }
                         }
 
                     }
-                    if (filterExtended) {
-                        filterResults.values = filteredList
 
-                    }
-                    else {
-                        filterResults.values = filterByLabels(key, filteredList)
-                    }
+
+                    filterResults.values = filteredList
                 }
+
                 return filterResults
             }
 
@@ -402,9 +395,10 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                 }
             }
 
-            private fun isFilterValue(value: String, searchString: String): Boolean {
+            private fun containsValue(value: String, searchString: String): Boolean {
                 return value.lowercase().contains(searchString)
             }
+
         }
     }
 

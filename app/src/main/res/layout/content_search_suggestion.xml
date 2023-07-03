@@ -15,12 +15,28 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="12dp"
+            android:layout_marginEnd="0dp"
             android:layout_marginBottom="8dp"
             android:textColor="@android:color/black"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/search_suggestion_desc"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Item" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/search_suggestion_desc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="-20dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="8dp"
+            android:textColor="@color/Gray2"
+            android:textStyle="italic"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/search_suggestion"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Item" />
 

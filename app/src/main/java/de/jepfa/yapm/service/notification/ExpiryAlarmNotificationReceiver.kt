@@ -12,9 +12,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_EXPIRED_CREDENTIALS_NOTIFICA
 import de.jepfa.yapm.service.notification.NotificationService.SCHEDULED_NOTIFICATION_KEY_SEPARATOR
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
-import de.jepfa.yapm.util.Constants
-import de.jepfa.yapm.util.removeTime
-import de.jepfa.yapm.util.toSimpleDateFormat
+import de.jepfa.yapm.util.*
 import java.util.*
 
 class ExpiryAlarmNotificationReceiver : BroadcastReceiver() {
@@ -49,9 +47,9 @@ class ExpiryAlarmNotificationReceiver : BroadcastReceiver() {
 
         if (expiryDateForId != null) {
             val contentIntent = createPendingExpiryIntent(context, id,
-                action = "${Constants.ACTION_OPEN_VAULT_FOR_FILTERING}${Constants.ACTION_DELIMITER}${Constants.SEARCH_COMMAND_SEARCH_ID}$id${Constants.SEARCH_COMMAND_END}" )
+                action = "${Constants.ACTION_OPEN_VAULT_FOR_FILTERING}${Constants.ACTION_DELIMITER}${Command.SEARCH_COMMAND_SEARCH_ID.getCmd()}$id${SEARCH_COMMAND_END}" )
             val actionIntent = createPendingExpiryIntent(context, id,
-                action = "${Constants.ACTION_OPEN_VAULT_FOR_FILTERING}${Constants.ACTION_DELIMITER}${Constants.SEARCH_COMMAND_SHOW_EXPIRED} " ) //tailing whitespace to not open autocomplete
+                action = "${Constants.ACTION_OPEN_VAULT_FOR_FILTERING}${Constants.ACTION_DELIMITER}${Command.SEARCH_COMMAND_SHOW_EXPIRED.getCmd()} " ) //tailing whitespace to not open autocomplete
 
             NotificationService.pushNotification(
                 context,

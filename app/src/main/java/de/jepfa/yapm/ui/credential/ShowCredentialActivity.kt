@@ -16,6 +16,7 @@ import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.MenuCompat
 import androidx.core.view.children
 import androidx.core.view.setPadding
 import com.google.android.material.appbar.AppBarLayout
@@ -143,19 +144,7 @@ class ShowCredentialActivity : SecureActivity() {
         passwordTextView = findViewById(R.id.passwd)
 
         passwordTextView.setOnLongClickListener {
-            if (credential != null) {
-                masterSecretKey?.let { key ->
-                    val password = decryptPassword(key, credential!!.password)
-                    obfuscationKey?.let {
-                        password.deobfuscate(it)
-                    }
-                    val input = ShowPasswordStrengthUseCase.Input(password, R.string.password_strength)
-                    CoroutineScope(Dispatchers.Main).launch {
-                        ShowPasswordStrengthUseCase.execute(input, this@ShowCredentialActivity)
-                        password.clear()
-                    }
-                }
-            }
+            showPasswordStrength()
             return@setOnLongClickListener true
         }
         passwordTextView.setOnClickListener {
@@ -191,6 +180,22 @@ class ShowCredentialActivity : SecureActivity() {
 
     }
 
+    private fun showPasswordStrength() {
+        if (credential != null) {
+            masterSecretKey?.let { key ->
+                val password = decryptPassword(key, credential!!.password)
+                obfuscationKey?.let {
+                    password.deobfuscate(it)
+                }
+                val input = ShowPasswordStrengthUseCase.Input(password, R.string.password_strength)
+                CoroutineScope(Dispatchers.Main).launch {
+                    ShowPasswordStrengthUseCase.execute(input, this@ShowCredentialActivity)
+                    password.clear()
+                }
+            }
+        }
+    }
+
     private fun expandAdditionalInfoView(expandAdditionalInfoImageView: ImageView) {
         appBarLayout.setExpanded(false, true)
         expandAdditionalInfoImageView.visibility = View.GONE
@@ -217,6 +222,7 @@ class ShowCredentialActivity : SecureActivity() {
             R.menu.menu_credential_detail
         }
         inflateActionsMenu(menu, menuId)
+        MenuCompat.setGroupDividerEnabled(menu, true)
 
 
         val enableCopyPassword = PreferenceService.getAsBool(PREF_ENABLE_COPY_PASSWORD, this)
@@ -371,6 +377,11 @@ class ShowCredentialActivity : SecureActivity() {
                 return true
             }
 
+            if (id == R.id.menu_password_strength) {
+                showPasswordStrength()
+                return true
+            }
+
             if (id == R.id.menu_details) {
                 val sb = StringBuilder()
 
@@ -392,6 +403,12 @@ class ShowCredentialActivity : SecureActivity() {
                     Mode.NORMAL_READONLY -> sb.addFormattedLine(getString(R.string.source), getString(R.string.source_from_the_app))
                     else -> {}
                 }
+
+
+                sb.addFormattedLine(getString(R.string.password_obfuscated),
+                    if (credential.isObfuscated) getString(R.string.yes)
+                    else getString(R.string.no))
+
 
                 credential.modifyTimestamp?.let{
                     if (it > 1000) // modifyTimestamp is the credential Id after running db migration, assume ids are lower than 1000
