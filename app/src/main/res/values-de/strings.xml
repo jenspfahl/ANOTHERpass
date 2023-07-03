@@ -454,7 +454,7 @@
     <string name="export_vault_reminder">Tresor wurde geändert und sollte exportiert werden.</string>
     <string name="export_mk_reminder">Masterkey hat sich geändert und sollte exportiert werden.</string>
     <string name="export_mp_reminder">Masterpasswort sollte exportiert werden!</string>
-    <string name="biometric_smp_reminder">Biometrie sollte für Masterpasswort eingerichtet werden.</string>
+    <string name="biometric_smp_reminder">Biometrie sollte für das Masterpasswort eingerichtet werden.</string>
     <string name="show_biometric_smp_howto">Wie?</string>
     <string name="refresh_mpt_reminder">Masterpassword-Token sollte erneuert werden.</string>
     <string name="show_refresh_mpt">Jetzt erneuern</string>

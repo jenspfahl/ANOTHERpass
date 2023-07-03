@@ -17,9 +17,9 @@ class BiometricCallbackV28(private val biometricCallback: BiometricCallback) :
     }
 
 
-    override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+    override fun onAuthenticationError(errorCode: Int, errString: CharSequence?) {
         super.onAuthenticationError(errorCode, errString)
-        biometricCallback.onAuthenticationError(errString)
+        biometricCallback.onAuthenticationError(errString?:"Something is wrong with your biometrics")
     }
 
 }
