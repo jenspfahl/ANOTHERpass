@@ -1,3 +1,4 @@
 * add disclaimer
 * support devices without display lock
 * display short descriptions for extended search
+* bugfixes
