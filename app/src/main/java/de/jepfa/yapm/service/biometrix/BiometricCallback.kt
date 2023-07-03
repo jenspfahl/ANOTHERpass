@@ -8,5 +8,5 @@ Taken and modified from https://github.com/FSecureLABS/android-keystore-audit/tr
 interface BiometricCallback {
     fun onAuthenticationCancelled()
     fun onAuthenticationSuccessful(result: Cipher?)
-    fun onAuthenticationError(errString: CharSequence)
+    fun onAuthenticationError(errString: CharSequence?)
 }
