@@ -90,7 +90,7 @@ class ImportCredentialsImportFileFragment : BaseFragment() {
                                     importCredentialsActivity.createCredentialFromRecord(
                                         key,
                                         it,
-                                        labelEditViewExtender.getCommitedLabelNames()
+                                        labelEditViewExtender.getCommittedLabelNames()
                                     )
                                 }
                                 .toList(), importCredentialsActivity)
@@ -109,7 +109,7 @@ class ImportCredentialsImportFileFragment : BaseFragment() {
         super.onSaveInstanceState(outState)
         outState.putIntArray("records_list", adapter.checkedChildren.map { it.id }.toIntArray())
         outState.putBoolean("records_list_view", expandableListView.isGroupExpanded(0))
-        outState.putStringArray("added_labels", labelEditViewExtender.getCommitedLabelNames().toTypedArray())
+        outState.putStringArray("added_labels", labelEditViewExtender.getCommittedLabelNames().toTypedArray())
 
     }
 

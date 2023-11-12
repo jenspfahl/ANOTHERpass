@@ -193,6 +193,7 @@ class EditCredentialDataFragment : SecureFragment() {
         val buttonNext: Button = view.findViewById(R.id.button_next)
         buttonNext.setOnClickListener {
 
+            labelEditViewExtender.commitStaleInput()
             val now = Date()
             if (selectedExpiryDate?.after(now) == false) {
                 toastText(editCredentialActivity, R.string.error_expired_in_the_past)
@@ -349,7 +350,7 @@ class EditCredentialDataFragment : SecureFragment() {
         val encExpiresAt = encryptLong(key, expiresAt ?: 0L)
         val encLabels = LabelService.defaultHolder.encryptLabelIds(
             key,
-            labelEditViewExtender.getCommitedLabelNames()
+            labelEditViewExtender.getCommittedLabelNames()
         )
 
         // we create the new credential out of a former current if present or else out of the original if present
