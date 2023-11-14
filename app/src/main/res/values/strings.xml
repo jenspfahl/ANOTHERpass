@@ -128,7 +128,7 @@
     <string name="button_load_vault">Load vault file</string>
     <string name="button_import_vault">Import vault</string>
 
-    <string name="import_credentials_load_file_explanation">Select a file which contains the unencrypted credentials to import. Currently only CSV-files are supported. Use this to import your credentials e.g. from browsers like Firefox or Chrome.</string>
+    <string name="import_credentials_load_file_explanation">Select a file which contains the unencrypted credentials to import. Currently only CSV-files are supported. Use this to import your credentials e.g. from browsers like Firefox or Chrome or from Keepass variants.</string>
     <string name="import_credentials_load_file_fragment_label" tools:ignore="TypographyFractions">Import Credentials 1/2</string>
     <string name="import_credentials_import_file_fragment_label">Import Credentials 2/2</string>
     <string name="button_load_credentials_file">Load credentials file</string>

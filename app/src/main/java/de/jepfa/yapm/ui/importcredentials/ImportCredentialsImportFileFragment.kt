@@ -70,6 +70,8 @@ class ImportCredentialsImportFileFragment : BaseFragment() {
 
         importButton.setOnClickListener {
 
+            labelEditViewExtender.commitStaleInput()
+
             val credentialsToImport = adapter.checkedChildren
 
             if (credentialsToImport.isEmpty()) {

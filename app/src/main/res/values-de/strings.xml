@@ -126,7 +126,7 @@
     <string name="button_load_vault">Tresor-Datei laden</string>
     <string name="button_import_vault">Tresor importieren</string>
 
-    <string name="import_credentials_load_file_explanation">Wähle eine Datei mit unverschlüsselten Zugangsdaten aus. Zur Zeit werden nur CSV-Dateien unterstützt. Erkannt werden z.B. Zugangsdaten exportiert aus Browsern wie Firefox oder Chrome.</string>
+    <string name="import_credentials_load_file_explanation">Wähle eine Datei mit unverschlüsselten Zugangsdaten aus. Zur Zeit werden nur CSV-Dateien unterstützt. Erkannt werden z.B. Zugangsdaten exportiert aus Browsern wie Firefox oder Chrome oder aus Keepass-Varianten.</string>
     <string name="import_credentials_load_file_fragment_label" tools:ignore="TypographyFractions">Zugangsdaten importieren 1/2</string>
     <string name="import_credentials_import_file_fragment_label">Zugangsdaten importieren 2/2</string>
     <string name="button_load_credentials_file">Zugangsdatendatei laden</string>
