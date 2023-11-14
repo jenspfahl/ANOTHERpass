@@ -470,7 +470,7 @@
     <string name="unknown_error">Unbekannter Fehler</string>
     <string name="biometric_permission_not_granted">Biometrie Berechtigung nicht erteilt</string>
     <string name="biometric_not_supported">Biometrie nicht verfügbar für dieses Gerät</string>
-    <string name="fingerprint_not_enrolled">Kein Fingerabdruck für dieses Gerät hinterlegt</string>
+    <string name="fingerprint_not_enrolled">Keine Biometrie für dieses Gerät hinterlegt</string>
     <string name="howto_biometrics_for_smp_title">Wie wird das gespeicherte Masterpasswort biometrisch gesichert?</string>
     <string name="howto_biometrics_for_smp_text">Als erstes muss ein biometrisches Merkmal hinterlegt werden (z.B. Fingerabruck). Danach muss das ggf. schon gespeicherte Masterpasswort aus der App entfernt und wieder angelegt werden. Beim Anlegen erfolgt die Verwendung des biometrischen Merkmals.</string>
     <string name="pref_header_reminder">Erinnerungen</string>

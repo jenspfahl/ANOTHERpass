@@ -311,7 +311,7 @@ object SecretService {
                 .setIsStrongBoxBacked(androidKey.boxed && hasStrongBoxSupport(context))
                 .setUnlockedDeviceRequired(true)
 
-            if (androidKey.requireUserAuth && BiometricUtils.isFingerprintAvailable(context)) {
+            if (androidKey.requireUserAuth && BiometricUtils.isBiometricsAvailable(context)) {
                 val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
                 val deviceRequiresUserAuth = keyguardManager.isDeviceSecure
                 spec

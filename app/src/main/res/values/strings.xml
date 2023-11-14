@@ -480,7 +480,7 @@
     <string name="unknown_error">Unknown error</string>
     <string name="biometric_permission_not_granted">Biometric permission not granted</string>
     <string name="biometric_not_supported">Biometric not available on this device</string>
-    <string name="fingerprint_not_enrolled">Fingerprint not enrolled for this device</string>
+    <string name="fingerprint_not_enrolled">Biometric not enrolled for this device</string>
     <string name="howto_biometrics_for_smp_title">How to use biometrics for stored master password</string>
     <string name="howto_biometrics_for_smp_text">First, enrol biometrics (e.g. fingerprints) on your device. Next, remove stored master password and set it again authenticated with your biometric.</string>
     <string name="pref_header_reminder">Reminders</string>

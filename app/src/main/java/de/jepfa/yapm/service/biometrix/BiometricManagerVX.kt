@@ -7,26 +7,26 @@ import android.os.Build
 import android.os.CancellationSignal
 import android.util.Log
 import de.jepfa.yapm.R
-import de.jepfa.yapm.service.biometrix.BiometricUtils.isBiometricPromptEnabled
-import de.jepfa.yapm.service.biometrix.BiometricUtils.isFingerprintAvailable
-import de.jepfa.yapm.service.biometrix.BiometricUtils.isHardwareSupported
+import de.jepfa.yapm.service.biometrix.BiometricUtils.hasBiometricsEnrolled
+import de.jepfa.yapm.service.biometrix.BiometricUtils.isBiometricPromptAvailable
+import de.jepfa.yapm.service.biometrix.BiometricUtils.isBiometricsAvailable
 import de.jepfa.yapm.service.biometrix.BiometricUtils.isPermissionGranted
 import javax.crypto.Cipher
 
 /*
 Taken and modified from https://github.com/FSecureLABS/android-keystore-audit/tree/master/keystorecrypto-app
  */
-class BiometricManager(cipher: Cipher, context: Context): BiometricManagerV23(cipher, context) {
+class BiometricManagerVX(cipher: Cipher, context: Context): BiometricManagerV23(cipher, context) {
 
     fun authenticate(description: String, cancelText: String, biometricCallback: BiometricCallback) {
         try {
             if (!isPermissionGranted(context)) {
                 biometricCallback.onAuthenticationError(context.getString(R.string.biometric_permission_not_granted))
             }
-            else if (!isHardwareSupported(context)) {
+            else if (!isBiometricsAvailable(context)) {
                 biometricCallback.onAuthenticationError(context.getString(R.string.biometric_not_supported))
             }
-            else if (!isFingerprintAvailable(context)) {
+            else if (!hasBiometricsEnrolled(context)) {
                 biometricCallback.onAuthenticationError(context.getString(R.string.fingerprint_not_enrolled))
             }
             else {
@@ -43,7 +43,7 @@ class BiometricManager(cipher: Cipher, context: Context): BiometricManagerV23(ci
         cancelText: String,
         biometricCallback: BiometricCallback
     ) {
-        if (isBiometricPromptEnabled) {
+        if (isBiometricPromptAvailable) {
             displayBiometricPrompt(description, cancelText, biometricCallback)
         } else {
             displayBiometricPromptV23(description, cancelText, biometricCallback)

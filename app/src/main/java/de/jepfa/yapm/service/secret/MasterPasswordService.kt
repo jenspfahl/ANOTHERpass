@@ -14,7 +14,7 @@ import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_MASTER_PASSWORD
 import de.jepfa.yapm.service.PreferenceService.PREF_AUTH_SMP_WITH_BIOMETRIC
 import de.jepfa.yapm.service.biometrix.BiometricCallback
-import de.jepfa.yapm.service.biometrix.BiometricManager
+import de.jepfa.yapm.service.biometrix.BiometricManagerVX
 import de.jepfa.yapm.service.biometrix.BiometricUtils
 import de.jepfa.yapm.util.toastText
 import javax.crypto.Cipher
@@ -139,7 +139,7 @@ object MasterPasswordService {
         try {
             val key = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_MP_WITH_AUTH, context)
             val cipher = createEncryptCipher(key)
-            BiometricManager(cipher, context).authenticate(
+            BiometricManagerVX(cipher, context).authenticate(
                 context.getString(R.string.auth_to_encrypt_emp),
                 context.getString(android.R.string.cancel),
                 object : BiometricCallback {
@@ -193,7 +193,7 @@ object MasterPasswordService {
         try {
             val key = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_MP_WITH_AUTH, context)
             val cipher = createDecryptCipher(key, encStoredMasterPasswd)
-            BiometricManager(cipher, context).authenticate(
+            BiometricManagerVX(cipher, context).authenticate(
                 context.getString(R.string.auth_to_decrypt_emp),
                 context.getString(R.string.auth_to_decrypt_emp_omit),
                 object : BiometricCallback {

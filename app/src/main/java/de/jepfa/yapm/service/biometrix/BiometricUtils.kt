@@ -1,58 +1,41 @@
 package de.jepfa.yapm.service.biometrix
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
 import androidx.core.hardware.fingerprint.FingerprintManagerCompat
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
-import android.hardware.biometrics.BiometricPrompt
+import androidx.biometric.BiometricManager
 
-/*
-Taken and modified from https://github.com/FSecureLABS/android-keystore-audit/tree/master/keystorecrypto-app
- */
-@SuppressLint("MissingPermission")
 object BiometricUtils {
-    val isBiometricPromptEnabled: Boolean
+    val isBiometricPromptAvailable: Boolean
         get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
 
     fun isBiometricsAvailable(context: Context): Boolean {
-        return isHardwareSupported(context)
-                && isFingerprintAvailable(context)
+        return isBiometricsSupported(context)
+                && hasBiometricsEnrolled(context)
                 && isPermissionGranted(context)
     }
 
-    /*
-     * Condition II: Check if the device has fingerprint sensors.
-     * Note: If you marked android.hardware.fingerprint as something that
-     * your app requires (android:required="true"), then you don't need
-     * to perform this check.
-     *
-     * */
-    fun isHardwareSupported(context: Context): Boolean {
-        val fingerprintManager = FingerprintManagerCompat.from(context)
-        return fingerprintManager.isHardwareDetected
+    fun hasBiometricsEnrolled(context: Context): Boolean {
+        val bm = BiometricManager.from(context)
+        val canAuthenticate = bm.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK)
+        return canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS
     }
 
-    /*
-     * Condition III: Fingerprint authentication can be matched with a
-     * registered fingerprint of the user. So we need to perform this check
-     * in order to enable fingerprint authentication
-     *
-     * */
-    fun isFingerprintAvailable(context: Context): Boolean {
-        val fingerprintManager = FingerprintManagerCompat.from(context)
-        return fingerprintManager.hasEnrolledFingerprints()
+    // supported but not enrolled
+    fun isBiometricsSupported(context: Context): Boolean {
+        val bm = BiometricManager.from(context)
+        val canAuthenticate = bm.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK)
+        return canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS || canAuthenticate == BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED
     }
 
-    /*
-     * Condition IV: Check if the permission has been added to
-     * the app. This permission will be granted as soon as the user
-     * installs the app on their device.
-     *
-     * */
     fun isPermissionGranted(context: Context): Boolean {
+        if (isBiometricPromptAvailable) {
+            return ActivityCompat.checkSelfPermission(context, Manifest.permission.USE_BIOMETRIC) ==
+                    PackageManager.PERMISSION_GRANTED
+        }
         return ActivityCompat.checkSelfPermission(context, Manifest.permission.USE_FINGERPRINT) ==
                 PackageManager.PERMISSION_GRANTED
     }

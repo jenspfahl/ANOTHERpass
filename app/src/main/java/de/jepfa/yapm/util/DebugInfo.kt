@@ -60,8 +60,8 @@ object DebugInfo {
         sb.addFormattedLine("NFC available", NfcService.isNfcAvailable(context))
         sb.addFormattedLine("NFC enabled", NfcService.isNfcEnabled(context))
         sb.addFormattedLine("Has StrongBox support", SecretService.hasStrongBoxSupport(context))
-        sb.addFormattedLine("Has biometrics support", BiometricUtils.isHardwareSupported(context))
-        sb.addFormattedLine("Is fingerprint enrolled", BiometricUtils.isFingerprintAvailable(context))
+        sb.addFormattedLine("Has biometrics support", BiometricUtils.isBiometricsSupported(context))
+        sb.addFormattedLine("Has biometrics enrolled", BiometricUtils.hasBiometricsEnrolled(context))
         val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         sb.addFormattedLine("Is device lock enabled", keyguardManager.isDeviceSecure)
 
