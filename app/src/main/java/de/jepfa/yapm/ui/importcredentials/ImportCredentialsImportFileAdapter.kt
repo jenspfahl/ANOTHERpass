@@ -77,7 +77,6 @@ class ImportCredentialsImportFileAdapter(
         parent: ViewGroup?
     ): View {
         val view = getInflater().inflate(R.layout.expandable_group_item, null)
-        val group = getGroup(groupPosition)
         val childrenCount = getChildrenCount(groupPosition)
         val checkedChildrenCount = checkedChildren.count()
         val textView = view.findViewById<TextView>(R.id.expandable_text_view_1)
