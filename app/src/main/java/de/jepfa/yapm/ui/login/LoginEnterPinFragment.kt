@@ -1,6 +1,7 @@
 package de.jepfa.yapm.ui.login
 
 import android.os.Bundle
+import android.security.keystore.UserNotAuthenticatedException
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -111,11 +112,18 @@ class LoginEnterPinFragment : BaseFragment() {
                         login(pinTextView, userPin, masterPasswd, loginActivity)
                     }
                     , {
-                        val encUserPin = SecretService.encryptPassword(keyForTemp, userPin)
-                        val args = Bundle()
-                        args.putEncrypted(CreateVaultActivity.ARG_ENC_PIN, encUserPin)
+                        //try {
+                            val encUserPin = SecretService.encryptPassword(keyForTemp, userPin)
+                            val args = Bundle()
+                            args.putEncrypted(CreateVaultActivity.ARG_ENC_PIN, encUserPin)
 
-                        findNavController().navigate(R.id.action_Login_PinFragment_to_MasterPasswordFragment, args)
+                            findNavController().navigate(
+                                R.id.action_Login_PinFragment_to_MasterPasswordFragment,
+                                args
+                            )
+                        //} catch (e: UserNotAuthenticatedException) {
+                        //    toastText(loginActivity, "User not authenticated, restart your phone")
+                        //}
                     }
                 )
             }

@@ -9,6 +9,7 @@ import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_VERSION
 import de.jepfa.yapm.service.biometrix.BiometricUtils
 import de.jepfa.yapm.service.nfc.NfcService
+import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.util.Constants.INITIAL_VAULT_VERSION
 
@@ -39,6 +40,14 @@ object DebugInfo {
     }
 
     fun getDebugInfo(context: Context): String {
+        val vaultCreatedAt = PreferenceService.getAsDate(
+            PreferenceService.DATA_VAULT_CREATED_AT,
+            context
+        )
+        val vaultImportedAt = PreferenceService.getAsDate(
+            PreferenceService.DATA_VAULT_IMPORTED_AT,
+            context
+        )
         val sb = StringBuilder()
         sb.append("\n************ APP INFORMATION ***********\n")
         sb.addFormattedLine("Version", getVersionName(context))
@@ -46,6 +55,14 @@ object DebugInfo {
         sb.addFormattedLine("Database Version", YapmDatabase.getVersion())
         sb.addFormattedLine("Vault Version", PreferenceService.getAsString(DATA_VAULT_VERSION, context) ?: INITIAL_VAULT_VERSION)
         sb.addFormattedLine("Vault Cipher", SecretService.getCipherAlgorithm(context))
+        if (vaultCreatedAt != null) {
+            sb.addFormattedLine("Vault Created At", dateTimeToNiceString(vaultCreatedAt, context))
+        }
+        if (vaultImportedAt != null) {
+            sb.addFormattedLine("Vault Imported At", dateTimeToNiceString(vaultImportedAt, context))
+        }
+        sb.addFormattedLine("MP stored", MasterPasswordService.isMasterPasswordStored(context))
+        sb.addFormattedLine("MP stored with auth", MasterPasswordService.isMasterPasswordStoredWithAuth(context))
         sb.addFormattedLine("Build Timestamp", BuildConfig.BUILD_TIME.toSimpleDateTimeFormat())
         sb.addFormattedLine("Build Type", BuildConfig.BUILD_TYPE)
 

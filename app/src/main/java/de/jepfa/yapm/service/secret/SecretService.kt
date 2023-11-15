@@ -310,12 +310,14 @@ object SecretService {
             spec
                 .setIsStrongBoxBacked(androidKey.boxed && hasStrongBoxSupport(context))
                 .setUnlockedDeviceRequired(true)
+                .setUserAuthenticationRequired(false)
 
             if (androidKey.requireUserAuth && BiometricUtils.isBiometricsAvailable(context)) {
                 val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
                 val deviceRequiresUserAuth = keyguardManager.isDeviceSecure
                 spec
                     .setUserAuthenticationRequired(deviceRequiresUserAuth)
+                    .setUserAuthenticationValidityDurationSeconds(60) // to avoid UserNotAuthenticatedException this may help
                     .setInvalidatedByBiometricEnrollment(true)
 
             }
