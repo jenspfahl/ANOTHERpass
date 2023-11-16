@@ -473,7 +473,7 @@
     <string name="dont_ask_again">Don\'t nag again</string>
     <string name="manage_reminder_settings_hint">You can manage reminder under Settings / Reminders</string>
     <string name="no_label">WITH NO LABELS</string>
-    <string name="biometric_failed">Cannot authorize biometric</string>
+    <string name="biometric_failed">Cannot authorize biometric Please try again.</string>
     <string name="auth_with_biometrics">Authorize with biometrics</string>
     <string name="auth_to_encrypt_emp">Authentication required to encrypt and store master password.</string>
     <string name="auth_to_decrypt_emp">Authentication required to decrypt stored master password.</string>

@@ -463,7 +463,7 @@
     <string name="dont_ask_again">Nicht mehr nerven</string>
     <string name="manage_reminder_settings_hint">Erinnerungen können geändert werden unter \'Einstellungen / Erinnerungen\'</string>
     <string name="no_label">OHNE KATEGORIE</string>
-    <string name="biometric_failed">Biometrisches Merkmal nicht erkannt</string>
+    <string name="biometric_failed">Biometrisches Merkmal nicht erkannt. Bitte nochmal versuchen</string>
     <string name="auth_with_biometrics">Autorisieren mit biometrischem Merkmal</string>
     <string name="auth_to_encrypt_emp">Autorisierung erfordert um Masterpasswort verschlüsselt zu speichern.</string>
     <string name="auth_to_decrypt_emp">Autorisierung erfordert um gespeichertes Masterpasswort zu lesen.</string>
