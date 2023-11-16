@@ -12,11 +12,11 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
@@ -31,8 +31,6 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
-import de.jepfa.yapm.usecase.secret.RemoveStoredMasterPasswordUseCase
-import de.jepfa.yapm.usecase.secret.RevokeMasterPasswordTokenUseCase
 import de.jepfa.yapm.usecase.session.LoginUseCase
 import de.jepfa.yapm.util.dateTimeToNiceString
 import de.jepfa.yapm.util.putEncrypted
@@ -75,7 +73,7 @@ class LoginEnterPinFragment : BaseFragment() {
 
         nextButton.setOnClickListener {
 
-            val keyForTemp = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, view.context)
+            var keyForTemp = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, view.context)
 
             val userPin = Password(pinTextView.text)
             if (userPin.isEmpty()) {
@@ -112,22 +110,37 @@ class LoginEnterPinFragment : BaseFragment() {
                         login(pinTextView, userPin, masterPasswd, loginActivity)
                     }
                     , {
-                        //try {
-                            val encUserPin = SecretService.encryptPassword(keyForTemp, userPin)
-                            val args = Bundle()
-                            args.putEncrypted(CreateVaultActivity.ARG_ENC_PIN, encUserPin)
+                        try {
+                            moveToEnterMasterPasswordScreen(keyForTemp, userPin)
+                        } catch (e: UserNotAuthenticatedException) {
+                            // this is a hack: since this exception might happen to user-authentication-free keys as well i try to recreate thme here
+                            SecretService.removeAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT)
+                            val keyForTemp = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, view.context)
 
-                            findNavController().navigate(
-                                R.id.action_Login_PinFragment_to_MasterPasswordFragment,
-                                args
-                            )
-                        //} catch (e: UserNotAuthenticatedException) {
-                        //    toastText(loginActivity, "User not authenticated, restart your phone")
-                        //}
+                            try {
+                                moveToEnterMasterPasswordScreen(keyForTemp, userPin)
+                            } catch (e: UserNotAuthenticatedException) {
+                                // toastText(loginActivity, "User not authenticated, lock and unlock your phone")
+                            }
+                        }
                     }
                 )
             }
         }
+    }
+
+    private fun moveToEnterMasterPasswordScreen(
+        keyForTemp: SecretKeyHolder,
+        userPin: Password
+    ) {
+        val encUserPin = SecretService.encryptPassword(keyForTemp, userPin)
+        val args = Bundle()
+        args.putEncrypted(CreateVaultActivity.ARG_ENC_PIN, encUserPin)
+
+        findNavController().navigate(
+            R.id.action_Login_PinFragment_to_MasterPasswordFragment,
+            args
+        )
     }
 
     private fun updateInfoText() {

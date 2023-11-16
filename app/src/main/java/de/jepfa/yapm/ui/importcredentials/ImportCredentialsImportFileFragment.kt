@@ -47,13 +47,6 @@ class ImportCredentialsImportFileFragment : BaseFragment() {
             labelEditViewExtender.addPersistedLabels(labels)
         }
 
-    //    val jsonContent = getImportCredentialsActivity().parsedVault?.content ?: return
-
-  /*      val createdAt = jsonContent.get(VaultExportService.JSON_CREATION_DATE)?.asString
-        val credentialsCount = jsonContent.get(VaultExportService.JSON_CREDENTIALS_COUNT)?.asString ?: 0
-        val labelsCount = jsonContent.get(VaultExportService.JSON_LABELS_COUNT)?.asString ?: 0
-*/
-
         val credentialsToBeImported = importCredentialsActivity.records
 
         loadedFileStatusTextView.text = getString(R.string.credentials_in_file, credentialsToBeImported?.size?:0)
