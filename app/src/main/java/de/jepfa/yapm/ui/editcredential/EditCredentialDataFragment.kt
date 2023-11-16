@@ -5,6 +5,7 @@ package de.jepfa.yapm.ui.editcredential
 import android.app.DatePickerDialog
 import android.content.Context
 import android.os.Bundle
+import android.os.SystemClock
 import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
@@ -194,22 +195,25 @@ class EditCredentialDataFragment : SecureFragment() {
         buttonNext.setOnClickListener {
 
             labelEditViewExtender.commitStaleInput()
-            val now = Date()
-            if (selectedExpiryDate?.after(now) == false) {
-                toastText(editCredentialActivity, R.string.error_expired_in_the_past)
-                editCredentialExpiredAtSpinner.requestFocus()
-            }
-            else if (TextUtils.isEmpty(editCredentialNameView.text)) {
-                editCredentialNameView.error = getString(R.string.error_field_required)
-                editCredentialNameView.requestFocus()
-            }
-            else {
-                masterSecretKey?.let{ key ->
-                    saveCurrentUiData(key)
-
-                    findNavController().navigate(R.id.action_EditCredential_DataFragment_to_PasswordFragment)
+            buttonNext.isActivated = false
+            buttonNext.postDelayed( { // delayed is a hack to give the event loop time to recognise added chips
+                val now = Date()
+                if (selectedExpiryDate?.after(now) == false) {
+                    toastText(editCredentialActivity, R.string.error_expired_in_the_past)
+                    editCredentialExpiredAtSpinner.requestFocus()
                 }
-            }
+                else if (TextUtils.isEmpty(editCredentialNameView.text)) {
+                    editCredentialNameView.error = getString(R.string.error_field_required)
+                    editCredentialNameView.requestFocus()
+                }
+                else {
+                    masterSecretKey?.let{ key ->
+                        saveCurrentUiData(key)
+
+                        findNavController().navigate(R.id.action_EditCredential_DataFragment_to_PasswordFragment)
+                    }
+                }
+            }, 100L)
         }
     }
 
