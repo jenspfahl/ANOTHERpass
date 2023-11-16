@@ -5,6 +5,7 @@ import android.security.keystore.UserNotAuthenticatedException
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -113,15 +114,18 @@ class LoginEnterPinFragment : BaseFragment() {
                         try {
                             moveToEnterMasterPasswordScreen(keyForTemp, userPin)
                         } catch (e: UserNotAuthenticatedException) {
-                            // this is a hack: since this exception might happen to user-authentication-free keys as well i try to recreate thme here
-                            SecretService.removeAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT)
-                            val keyForTemp = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, view.context)
+                            // this is a hack: since this exception might happen to user-authentication-free keys as well i try to recreate them here
 
-                            try {
+                            Log.w("AUTH", "Caught $e, invalidating transport key and retrying ...")
+
+                            SecretService.removeAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT)
+                            keyForTemp = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, view.context)
+
+                            //try {
                                 moveToEnterMasterPasswordScreen(keyForTemp, userPin)
-                            } catch (e: UserNotAuthenticatedException) {
+                            //} catch (e: UserNotAuthenticatedException) {
                                 // toastText(loginActivity, "User not authenticated, lock and unlock your phone")
-                            }
+                            //}
                         }
                     }
                 )
