@@ -321,7 +321,6 @@ object SecretService {
                 val deviceRequiresUserAuth = keyguardManager.isDeviceSecure
                 spec
                     .setUserAuthenticationRequired(deviceRequiresUserAuth)
-                    .setUserAuthenticationValidityDurationSeconds(60) // to avoid UserNotAuthenticatedException this may help
                     .setInvalidatedByBiometricEnrollment(true)
 
             }
