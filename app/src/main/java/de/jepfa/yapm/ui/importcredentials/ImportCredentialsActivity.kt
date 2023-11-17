@@ -54,7 +54,7 @@ class ImportCredentialsActivity : SecureActivity() {
             val userKey = extractKeys(record, listOf("username", "user", "login name", "login"))
             val descriptionKey = extractKeys(record, listOf("description", "desc", "hint", "hints", "comments"))
             val passwordKey = extractKeys(record, listOf("password", "passwd", "codeword", "code", "pin", "passphrase")) ?: return null
-            val expiresOnKey = extractKeys(record, listOf("expiresOn", "expires on", "expiresAt", "expires at", "expires", "valid until", "validUntil")) ?: return null
+            val expiresOnKey = extractKeys(record, listOf("expiresOn", "expires on", "expiresAt", "expires at", "expires", "valid until", "validUntil"))
 
             val password = record.value[passwordKey] ?: return null
 

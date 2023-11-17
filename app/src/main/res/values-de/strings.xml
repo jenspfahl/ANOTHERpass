@@ -287,7 +287,7 @@
     <string name="head_export_emp">Dein exportiertes Masterpasswort</string>
     <string name="sub_export_emp">Verwahre es an einen sicheren Platz, da es dein Masterpasswort enthält.</string>
     <string name="head_export_emk">Der verschlüsselte Masterkey</string>
-    <string name="sub_export_emk">Verwahre ihn an einen sicheren Platz. Zukünftige Tresor-Backups können nun ohne den Masterkey exportiert werden.</string>
+    <string name="sub_export_emk">Verwahre ihn an einen sicheren Platz. Zukünftige Tresor-Backups können nun ohne diesen Masterkey exportiert werden.</string>
 
     <string name="export_plain_passwd">Exportiere Zugangsdaten-Passwort</string>
     <string name="export_enc_credential_record">Exportiere Zugangsdaten verschlüsselt</string>
