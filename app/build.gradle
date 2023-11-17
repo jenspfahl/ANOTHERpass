@@ -24,7 +24,7 @@ android {
         versionCode  108002
         // remove _rc when release
         // e.g. versionName "1.3.0_rc"
-        versionName "1.8.2_rc"
+        versionName "1.8.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
