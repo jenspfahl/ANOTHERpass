@@ -5,6 +5,7 @@ package de.jepfa.yapm.ui.editcredential
 import android.app.DatePickerDialog
 import android.content.Context
 import android.os.Bundle
+import android.os.SystemClock
 import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
@@ -193,22 +194,26 @@ class EditCredentialDataFragment : SecureFragment() {
         val buttonNext: Button = view.findViewById(R.id.button_next)
         buttonNext.setOnClickListener {
 
-            val now = Date()
-            if (selectedExpiryDate?.after(now) == false) {
-                toastText(editCredentialActivity, R.string.error_expired_in_the_past)
-                editCredentialExpiredAtSpinner.requestFocus()
-            }
-            else if (TextUtils.isEmpty(editCredentialNameView.text)) {
-                editCredentialNameView.error = getString(R.string.error_field_required)
-                editCredentialNameView.requestFocus()
-            }
-            else {
-                masterSecretKey?.let{ key ->
-                    saveCurrentUiData(key)
-
-                    findNavController().navigate(R.id.action_EditCredential_DataFragment_to_PasswordFragment)
+            labelEditViewExtender.commitStaleInput()
+            buttonNext.isActivated = false
+            buttonNext.postDelayed( { // delayed is a hack to give the event loop time to recognise added chips
+                val now = Date()
+                if (selectedExpiryDate?.after(now) == false) {
+                    toastText(editCredentialActivity, R.string.error_expired_in_the_past)
+                    editCredentialExpiredAtSpinner.requestFocus()
                 }
-            }
+                else if (TextUtils.isEmpty(editCredentialNameView.text)) {
+                    editCredentialNameView.error = getString(R.string.error_field_required)
+                    editCredentialNameView.requestFocus()
+                }
+                else {
+                    masterSecretKey?.let{ key ->
+                        saveCurrentUiData(key)
+
+                        findNavController().navigate(R.id.action_EditCredential_DataFragment_to_PasswordFragment)
+                    }
+                }
+            }, 100L)
         }
     }
 
@@ -349,7 +354,7 @@ class EditCredentialDataFragment : SecureFragment() {
         val encExpiresAt = encryptLong(key, expiresAt ?: 0L)
         val encLabels = LabelService.defaultHolder.encryptLabelIds(
             key,
-            labelEditViewExtender.getCommitedLabelNames()
+            labelEditViewExtender.getCommittedLabelNames()
         )
 
         // we create the new credential out of a former current if present or else out of the original if present

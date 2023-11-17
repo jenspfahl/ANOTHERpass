@@ -47,13 +47,6 @@ class ImportCredentialsImportFileFragment : BaseFragment() {
             labelEditViewExtender.addPersistedLabels(labels)
         }
 
-    //    val jsonContent = getImportCredentialsActivity().parsedVault?.content ?: return
-
-  /*      val createdAt = jsonContent.get(VaultExportService.JSON_CREATION_DATE)?.asString
-        val credentialsCount = jsonContent.get(VaultExportService.JSON_CREDENTIALS_COUNT)?.asString ?: 0
-        val labelsCount = jsonContent.get(VaultExportService.JSON_LABELS_COUNT)?.asString ?: 0
-*/
-
         val credentialsToBeImported = importCredentialsActivity.records
 
         loadedFileStatusTextView.text = getString(R.string.credentials_in_file, credentialsToBeImported?.size?:0)
@@ -69,6 +62,8 @@ class ImportCredentialsImportFileFragment : BaseFragment() {
         val importButton = view.findViewById<Button>(R.id.button_import_loaded_credentials)
 
         importButton.setOnClickListener {
+
+            labelEditViewExtender.commitStaleInput()
 
             val credentialsToImport = adapter.checkedChildren
 
@@ -90,7 +85,7 @@ class ImportCredentialsImportFileFragment : BaseFragment() {
                                     importCredentialsActivity.createCredentialFromRecord(
                                         key,
                                         it,
-                                        labelEditViewExtender.getCommitedLabelNames()
+                                        labelEditViewExtender.getCommittedLabelNames()
                                     )
                                 }
                                 .toList(), importCredentialsActivity)
@@ -109,7 +104,7 @@ class ImportCredentialsImportFileFragment : BaseFragment() {
         super.onSaveInstanceState(outState)
         outState.putIntArray("records_list", adapter.checkedChildren.map { it.id }.toIntArray())
         outState.putBoolean("records_list_view", expandableListView.isGroupExpanded(0))
-        outState.putStringArray("added_labels", labelEditViewExtender.getCommitedLabelNames().toTypedArray())
+        outState.putStringArray("added_labels", labelEditViewExtender.getCommittedLabelNames().toTypedArray())
 
     }
 

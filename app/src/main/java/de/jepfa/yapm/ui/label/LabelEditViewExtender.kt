@@ -12,6 +12,7 @@ import com.google.android.material.chip.ChipGroup
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.service.secret.SecretService.encryptCommonString
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.util.Constants
@@ -42,13 +43,29 @@ class LabelEditViewExtender(private val activity: SecureActivity,
         }
 
         view.findViewById<ImageView>(R.id.autocomplete_label_icon)?.setOnClickListener {
-            toastText(activity, R.string.start_typing_to_filter_labels)
+            if (LabelService.defaultHolder.isEmpty()) {
+                toastText(activity, R.string.start_typing_to_filter_labels)
+            }
+            else {
+                // Doesn't work: editCredentialLabelsTextView.showDropDown()
+                editCredentialLabelsTextView.requestFocus()
+                editCredentialLabelsTextView.text.append(" ")
+            }
+        }
+
+        editCredentialLabelsTextView.setOnFocusChangeListener { v, hasFocus ->
+            if(!hasFocus){
+                val unfinishedText = editCredentialLabelsTextView.text.toString()
+                addTextToLabelGroup(unfinishedText, silent = false)
+                editCredentialLabelsTextView.text = null
+                editCredentialLabelsTextView.dismissDropDown()
+            }
         }
 
         editCredentialLabelsTextView.setOnEditorActionListener { v, actionId, event ->
             if(actionId == EditorInfo.IME_ACTION_DONE){
                 val unfinishedText = editCredentialLabelsTextView.text.toString()
-                addTextToLabelGroup(unfinishedText)
+                addTextToLabelGroup(unfinishedText, silent = false)
                 editCredentialLabelsTextView.text = null
                 editCredentialLabelsTextView.dismissDropDown()
 
@@ -63,12 +80,20 @@ class LabelEditViewExtender(private val activity: SecureActivity,
             val committedText = it.toString()
             if (isCommittedLabelName(committedText)) {
                 val labelName = clearCommittedLabelName(committedText)
-                addTextToLabelGroup(labelName)
+                addTextToLabelGroup(labelName, silent = false)
                 editCredentialLabelsTextView.text = null
                 editCredentialLabelsTextView.dismissDropDown()
 
             }
         }
+
+    }
+
+    fun commitStaleInput() {
+        val unfinishedText = editCredentialLabelsTextView.text.toString()
+        addTextToLabelGroup(unfinishedText, silent = true)
+        editCredentialLabelsTextView.text = null
+        editCredentialLabelsTextView.dismissDropDown()
 
     }
 
@@ -80,7 +105,7 @@ class LabelEditViewExtender(private val activity: SecureActivity,
 
     }
 
-    fun getCommitedLabelNames(): List<String> {
+    fun getCommittedLabelNames(): List<String> {
         return mapToLabelName(editCredentialLabelsChipGroup)
     }
 
@@ -93,22 +118,25 @@ class LabelEditViewExtender(private val activity: SecureActivity,
         return chipNames.toList()
     }
 
-    private fun addTextToLabelGroup(labelName: String) {
+    private fun addTextToLabelGroup(labelName: String, silent: Boolean) {
         if (labelName.isNotBlank()) {
             val label = LabelService.defaultHolder.lookupByLabelName(labelName) ?: createNewLabel(labelName)
             val maxLabelLength = activity.resources.getInteger(R.integer.max_label_name_length)
             val chipsCount = editCredentialLabelsChipGroup.size
             if (containsLabel(editCredentialLabelsChipGroup, label)) {
+                if (silent) return;
                 toastText(
                     activity,
                     R.string.label_already_in_ist)
             }
             else if (chipsCount >= Constants.MAX_LABELS_PER_CREDENTIAL) {
+                if (silent) return;
                 toastText(
                     activity,
                     activity.getString(R.string.max_labels_reached, Constants.MAX_LABELS_PER_CREDENTIAL)
                 )
             } else if (label.name.length > maxLabelLength) {
+                if (silent) return;
                 toastText(
                     activity,
                     activity.getString(R.string.label_too_long, maxLabelLength)

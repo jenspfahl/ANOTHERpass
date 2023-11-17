@@ -88,6 +88,9 @@ class LabelsHolder {
             .toList()
     }
 
+
+    fun isEmpty() = nameToLabel.isEmpty()
+
     fun decryptLabelsForCredential(key: SecretKeyHolder, credential: EncCredential): List<Label> {
         val labelsString = SecretService.decryptCommonString(key, credential.labels)
         val labels = stringIdsToLabels(labelsString)
@@ -162,5 +165,6 @@ class LabelsHolder {
     private fun idSetToString(ids: Set<Int>): String {
         return ids.joinToString(separator = ID_SEPARATOR)
     }
+
 
 }

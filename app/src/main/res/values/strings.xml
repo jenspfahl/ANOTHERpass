@@ -17,7 +17,7 @@
     <string name="with_special_chars">With special chars</string>
     <string name="title_use_extended_special_chars">Use extended special chars</string>
     <string name="summary_use_extended_special_chars">If generation happens with special chars included, the set of possible characters is extended to characters usually accessible on the second page of keyboards like all kinds of brackets, tilde, percentage sign etc.</string>
-    <string name="credential_passwd_params">Here you generate the password for this credential. It is recommend to generate them instead of creating them manually. \'Pseudo Phrase\' passwords are easier to read and type but still highly random and unpredictable.</string>
+    <string name="credential_passwd_params">Here you generate the password for this credential. It is recommend to generate it instead of creating it manually. \'Pseudo Phrase\' passwords are easier to read and type but still highly random and unpredictable.</string>
     <string name="button_gen_passwd">Generate</string>
 
     <string name="search">Search (!-extended)</string>
@@ -61,10 +61,10 @@
     <string name="text_create_new_vault">Welcome! If you are new on ANOTHERpass it is worth to read the online help. Or just start by creating a new vault.</string>
     <string name="button_import_new_vault">Import vault</string>
     <string name="text_import_new_vault">Import an existing vault, if you already have a vault file exported from another ANOTHERpass app.</string>
-    <string name="create_vault_explanation_1">First you need to generate the master password. This is used to login into your vault. You don\'t need to remember this! Later you will have the chance to export it.</string>
+    <string name="create_vault_explanation_1">First you have to generate the master password. This is used to login into your vault. You don\'t need to remember it! Later you will have the chance to export it.</string>
     <string name="button_next">Next</string>
     <string name="create_vault_enter_passphrase_fragment_label" tools:ignore="TypographyFractions">Create Vault 1/3</string>
-    <string name="create_vault_explanation_2">Create a PIN or a short password used to unlock your vault for every usage. It may contain characters, digits and other chars. In comparison to a master password it can be shorter and is therefore easier to remember (minimum 6 characters). You can also choose a complex password here to protect the vault to a maximum. Memorize it well, don\'t note it somewhere!</string>
+    <string name="create_vault_explanation_2">Create a PIN or a short password used to unlock your vault for every usage. It may contain characters, digits and other chars. In comparison to a master password it can be shorter and is therefore easier to remember (minimum 6 characters). You can also choose a complex password to protect the vault to a maximum. Memorize it well, don\'t note it somewhere!</string>
     <string name="pin">Enter a PIN</string>
     <string name="repeat_pin">Repeat the PIN</string>
     <string name="create_vault_enter_pin_fragment_label">Create Vault 2/3</string>
@@ -107,7 +107,7 @@
     <string name="message_import_credential_records">You are going to import %1$d external credentials. They will be created as new records. Continue?</string>
     <string name="qrc_download_as_img">Save QR code as image</string>
     <string name="download_as_nfc_tag">Push on NFC tag</string>
-    <string name="export_vault_explanation">Here you can share or export your complete encrypted vault into a file for backup purposes. Use this file to import your vault after a fresh new app installation without data or to recover changed data. \nYou may include or exclude the Encrypted Master Key. If you exclude it, export the master key by your own and store it on a safe place. You need it to import the vault file. \nThe separation of Encrypted Master Key and vault file makes the vault file useless for hackers even if they obtain your PIN and master password.</string>
+    <string name="export_vault_explanation">Here you can share or export your complete encrypted vault as a file for backup purposes. Use this file to import your vault after a fresh new app installation without data or to recover changed data. \nYou may include or exclude the Encrypted Master Key. If you exclude it, export the master key by your own and store it on a safe place. You need it to import the vault file. \nThe separation of Encrypted Master Key and vault file makes the vault file useless for hackers even if they obtain your PIN and master password.</string>
     <string name="button_share_vault">Share vault</string>
     <string name="button_export_vault">Save vault</string>
     <string name="include_enc_masterkey">Include Encrypted Master Key</string>
@@ -128,7 +128,7 @@
     <string name="button_load_vault">Load vault file</string>
     <string name="button_import_vault">Import vault</string>
 
-    <string name="import_credentials_load_file_explanation">Select a file which contains the unencrypted credentials to import. Currently only CSV-files are supported. Use this to import your credentials e.g. from browsers like Firefox or Chrome.</string>
+    <string name="import_credentials_load_file_explanation">Select a file which contains the unencrypted credentials to import. Currently only CSV-files are supported. Use this to import your credentials e.g. from browsers like Firefox or Chrome or from Keepass variants.</string>
     <string name="import_credentials_load_file_fragment_label" tools:ignore="TypographyFractions">Import Credentials 1/2</string>
     <string name="import_credentials_import_file_fragment_label">Import Credentials 2/2</string>
     <string name="button_load_credentials_file">Load credentials file</string>
@@ -297,7 +297,7 @@
     <string name="head_export_protected_emp">Your Protected Master Password</string>
     <string name="sub_export_emp">Store this on a safe place since this contains your master password.</string>
     <string name="head_export_emk">The Encrypted Master Key</string>
-    <string name="sub_export_emk">Store this at a safe place. Future backups don\'t need to include that master key.</string>
+    <string name="sub_export_emk">Store this at a safe place. Future vault backups don\'t need to include that master key.</string>
 
     <string name="export_plain_passwd">Export plain password</string>
     <string name="export_enc_credential_record">Export whole encrypted credential</string>
@@ -307,7 +307,7 @@
     <string name="head_export_enc_credential_record">"Encrypted Credential Record (ECR) of '%1$s'</string>
     <string name="sub_export_enc_credential_record">This QR code contains the complete current credential data. It is encrypted with the master key belonging to the current vault and can only be read with the same master key. Use it to backup or outsource specific credentials.</string>
     <string name="head_export_plain_credential_record">"Plain Credential Record (PCR) of '%1$s'</string>
-    <string name="sub_export_plain_credential_record">This QR code contains the complete current credential data. Keep this QR code safe since it contains real plain data and passwords! Use it to share specific credentials with other vaults.</string>
+    <string name="sub_export_plain_credential_record">This QR code contains the complete current credential data. Keep this QR code safe since it contains real plain data and passwords! Use it to share specific credentials with other ANOTHERpass vaults.</string>
 
     <string name="nfc_tag_content">NFC tag content</string>
     <string name="nfc_not_supported">NFC not supported by your device</string>
@@ -473,14 +473,14 @@
     <string name="dont_ask_again">Don\'t nag again</string>
     <string name="manage_reminder_settings_hint">You can manage reminder under Settings / Reminders</string>
     <string name="no_label">WITH NO LABELS</string>
-    <string name="biometric_failed">Cannot authorize biometric</string>
+    <string name="biometric_failed">Cannot authorize biometric Please try again.</string>
     <string name="auth_with_biometrics">Authorize with biometrics</string>
     <string name="auth_to_encrypt_emp">Authentication required to encrypt and store master password.</string>
     <string name="auth_to_decrypt_emp">Authentication required to decrypt stored master password.</string>
     <string name="unknown_error">Unknown error</string>
     <string name="biometric_permission_not_granted">Biometric permission not granted</string>
     <string name="biometric_not_supported">Biometric not available on this device</string>
-    <string name="fingerprint_not_enrolled">Fingerprint not enrolled for this device</string>
+    <string name="fingerprint_not_enrolled">Biometric not enrolled for this device</string>
     <string name="howto_biometrics_for_smp_title">How to use biometrics for stored master password</string>
     <string name="howto_biometrics_for_smp_text">First, enrol biometrics (e.g. fingerprints) on your device. Next, remove stored master password and set it again authenticated with your biometric.</string>
     <string name="pref_header_reminder">Reminders</string>
@@ -569,7 +569,7 @@
     <string name="title_change_language">Change language</string>
     <string name="message_change_language">The selected language will be fully available after restarting the app.</string>
     <string name="hint_edit_credential_user">The credential user</string>
-    <string name="message_protect_masterpasswd">"Do you want to protect the exported master password? You can protect it with a codeword or any else which is needed to access that particular exported master password. So if you login using it you will need that codeword as well (besides your common PIN), but you don't need it if you store the master password on the device or use a Master Password Token. </string>
+    <string name="message_protect_masterpasswd">"Do you want to protect the exported master password? You can protect it with a codeword or any else which will be required to access that particular exported master password. So if you login using it you will need that codeword as well (besides your common PIN), but you don't need it if you store the master password on the device or use a Master Password Token. </string>
     <string name="yes_continue">Yes, continue</string>
     <string name="yes_protect_it">Yes, protect it</string>
     <string name="no_thanks">No, thanks</string>

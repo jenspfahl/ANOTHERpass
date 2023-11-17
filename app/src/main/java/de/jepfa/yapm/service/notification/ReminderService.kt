@@ -138,7 +138,7 @@ object ReminderService {
         override val notificationText = R.string.biometric_smp_reminder
         override val notificationAction = R.string.show_biometric_smp_howto
         override val condition = { activity: SecureActivity ->
-            BiometricUtils.isHardwareSupported(activity)
+            BiometricUtils.isBiometricsSupported(activity)
                     && MasterPasswordService.isMasterPasswordStored(activity)
                     && !MasterPasswordService.isMasterPasswordStoredWithAuth(activity)
         }

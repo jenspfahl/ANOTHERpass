@@ -3,6 +3,7 @@ package de.jepfa.yapm.util
 import android.content.Intent
 import android.os.Bundle
 import android.util.Base64
+import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -80,6 +81,24 @@ fun Date.toSimpleDateFormat(): String {
             SimpleDateFormat.MEDIUM,
             Locale.getDefault(Locale.Category.FORMAT))
     return f.format(this)
+}
+
+fun String.fromSimpleDateFormat(): Date? {
+    val f = SimpleDateFormat("yyyy-MM-dd")
+    return try {
+        f.parse(this)
+    } catch (e: Exception) {
+        val f =
+            SimpleDateFormat.getDateInstance(
+                SimpleDateFormat.MEDIUM,
+                Locale.getDefault(Locale.Category.FORMAT))
+        try {
+            f.parse(this)
+        } catch (e: Exception) {
+            Log.w("PRSE", "Cannot parse $this")
+            null
+        }
+    }
 }
 
 fun Date.toSimpleTimeFormat(): String {

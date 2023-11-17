@@ -9,7 +9,7 @@
     <style name="generated_password">
         <item name="android:textAlignment">center</item>
         <item name="android:textSize">24sp</item>
-        <item name="android:fontFamily">monospace</item>
+        <item name="android:fontFamily">@font/robotomono_bold</item>
         <item name="android:text">@string/nothing_placeholder</item>
         <item name="android:textIsSelectable">false</item>
         <item name="android:textStyle">bold</item>

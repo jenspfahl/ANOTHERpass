@@ -15,6 +15,7 @@ import de.jepfa.yapm.ui.SecureActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import de.jepfa.yapm.ui.ViewRecyclerViewAdapter
 import de.jepfa.yapm.ui.credential.ShowCredentialActivity
+import java.util.Date
 
 
 class ImportCredentialsImportFileAdapter(
@@ -32,6 +33,7 @@ class ImportCredentialsImportFileAdapter(
         val userName: String?,
         val plainPassword: String,
         val description: String,
+        val expiresOn: Date?
     )
 
     private val checkBoxes = ArrayList<CheckBox>()
@@ -75,7 +77,6 @@ class ImportCredentialsImportFileAdapter(
         parent: ViewGroup?
     ): View {
         val view = getInflater().inflate(R.layout.expandable_group_item, null)
-        val group = getGroup(groupPosition)
         val childrenCount = getChildrenCount(groupPosition)
         val checkedChildrenCount = checkedChildren.count()
         val textView = view.findViewById<TextView>(R.id.expandable_text_view_1)

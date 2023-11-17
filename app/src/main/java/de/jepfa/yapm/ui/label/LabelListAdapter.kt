@@ -71,7 +71,7 @@ class LabelListAdapter(context: Context,
 
         var filteredList: MutableList<Label> = ArrayList()
 
-        override fun performFiltering(constraint: CharSequence): FilterResults {
+        override fun performFiltering(constraint: CharSequence?): FilterResults {
             filteredList.clear()
             val results = FilterResults()
             if (constraint == null || constraint.length == 0) {

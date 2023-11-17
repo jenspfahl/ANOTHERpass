@@ -11,7 +11,6 @@ import javax.crypto.Cipher
 /*
 Taken and modified from https://github.com/FSecureLABS/android-keystore-audit/tree/master/keystorecrypto-app
  */
-@TargetApi(Build.VERSION_CODES.M)
 open class BiometricManagerV23(val cipher: Cipher, val context: Context) {
 
 

@@ -2,7 +2,6 @@ package de.jepfa.yapm.ui.settings
 
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -220,7 +219,7 @@ class SettingsActivity : SecureActivity(),
             }
 
             findPreference<SwitchPreferenceCompat>(PreferenceService.PREF_AUTH_SMP_WITH_BIOMETRIC)?.let { pref ->
-                activity?.let { pref.isEnabled = BiometricUtils.isHardwareSupported(it) }
+                activity?.let { pref.isEnabled = BiometricUtils.isBiometricsSupported(it) }
             }
         }
     }
@@ -337,7 +336,7 @@ class SettingsActivity : SecureActivity(),
             setPreferencesFromResource(R.xml.reminder_preferences, rootKey)
 
             findPreference<SwitchPreferenceCompat>(PreferenceService.PREF_SHOW_BIOMETRIC_SMP_REMINDER)?.let { pref ->
-                activity?.let { pref.isEnabled = BiometricUtils.isHardwareSupported(it) }
+                activity?.let { pref.isEnabled = BiometricUtils.isBiometricsSupported(it) }
             }
         }
     }

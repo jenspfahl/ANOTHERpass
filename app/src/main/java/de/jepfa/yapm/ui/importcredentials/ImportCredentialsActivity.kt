@@ -10,6 +10,7 @@ import de.jepfa.yapm.service.io.CsvService
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.util.fromSimpleDateFormat
 
 class ImportCredentialsActivity : SecureActivity() {
 
@@ -48,23 +49,27 @@ class ImportCredentialsActivity : SecureActivity() {
 
     fun readContent(csvRecords: List<Map<String, String>>): List<ImportCredentialsImportFileAdapter.FileRecord>? {
         return csvRecords.withIndex().map { record ->
-            val nameKey = extractKey(record, "name")
-            val urlKey = extractKey(record, "url")
-            val userKey = extractKey(record, "username")
-            val descriptionKey = extractKey(record, "description")
-            val passwordKey = extractKey(record, "password") ?: return null
+            val nameKey = extractKeys(record, listOf("name","account", "title"))
+            val urlKey = extractKeys(record, listOf("url", "website", "web site"))
+            val userKey = extractKeys(record, listOf("username", "user", "login name", "login"))
+            val descriptionKey = extractKeys(record, listOf("description", "desc", "hint", "hints", "comments"))
+            val passwordKey = extractKeys(record, listOf("password", "passwd", "codeword", "code", "pin", "passphrase")) ?: return null
+            val expiresOnKey = extractKeys(record, listOf("expiresOn", "expires on", "expiresAt", "expires at", "expires", "valid until", "validUntil"))
+
+            val password = record.value[passwordKey] ?: return null
 
             val id = record.index
             val url = record.value[urlKey]
             val name = record.value[nameKey]
             val user = record.value[userKey]
             val description = record.value[descriptionKey]
-            val password = record.value[passwordKey] ?: return null
+            val expiresOn = record.value[expiresOnKey]?.fromSimpleDateFormat()
+
             ImportCredentialsImportFileAdapter.FileRecord(id,
                 name ?: url?.let { getDomainAsName(it)} ?: "unknown $id",
-                url, user, password, description ?: "")
+                url, user, password, description ?: "", expiresOn)
 
-        }
+        }.filter { it.plainPassword.isNotEmpty() }
 
     }
 
@@ -80,8 +85,11 @@ class ImportCredentialsActivity : SecureActivity() {
 
     }
 
+    private fun extractKeys(record: IndexedValue<Map<String, String>>, keyAliases: List<String>) =
+        keyAliases.firstNotNullOfOrNull { extractKey(record, it) }
+
     private fun extractKey(record: IndexedValue<Map<String, String>>, key: String) =
-        record.value.keys.map { it.lowercase().trim() }.firstOrNull { it == key }
+        record.value.keys.firstOrNull { it.lowercase().trim() == key.lowercase() }
 
     fun createCredentialFromRecord(
         key: SecretKeyHolder,
@@ -93,12 +101,12 @@ class ImportCredentialsActivity : SecureActivity() {
         val encUser = SecretService.encryptCommonString(key, record.userName ?: "")
         val encPassword = SecretService.encryptPassword(key, Password(record.plainPassword))
         val encWebsite = SecretService.encryptCommonString(key, record.url ?: "")
-        val encExpiresAt = SecretService.encryptLong(key, 0L)
+        val encExpiresAt = SecretService.encryptLong(key, record.expiresOn?.time ?: 0L)
         val encLabels = LabelService.defaultHolder.encryptLabelIds(
             key,
             labelNames
         )
-        val credential = EncCredential(
+        return EncCredential(
             null, null,
             encName,
             encAddInfo,
@@ -112,7 +120,6 @@ class ImportCredentialsActivity : SecureActivity() {
             null,
             null
         )
-        return credential
     }
 
 }

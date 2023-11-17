@@ -296,7 +296,11 @@ object SecretService {
 
     fun removeAndroidSecretKey(androidKey: AndroidKey) {
         androidKeyStore.load(null)
-        androidKeyStore.deleteEntry(androidKey.alias)
+        try {
+            androidKeyStore.deleteEntry(androidKey.alias)
+        } catch (e: Exception) {
+            // do nothing
+        }
     }
 
     private fun initAndroidSecretKey(androidKey: AndroidKey, context: Context): SecretKey {
@@ -310,8 +314,9 @@ object SecretService {
             spec
                 .setIsStrongBoxBacked(androidKey.boxed && hasStrongBoxSupport(context))
                 .setUnlockedDeviceRequired(true)
+                .setUserAuthenticationRequired(false)
 
-            if (androidKey.requireUserAuth && BiometricUtils.isFingerprintAvailable(context)) {
+            if (androidKey.requireUserAuth && BiometricUtils.isBiometricsAvailable(context)) {
                 val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
                 val deviceRequiresUserAuth = keyguardManager.isDeviceSecure
                 spec

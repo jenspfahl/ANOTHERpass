@@ -45,7 +45,7 @@
                         android:paddingHorizontal="4dp"
                         android:clickable="true"
                         android:layout_gravity="center"
-                        android:src="@drawable/ic_baseline_qr_code_36"
+                        android:src="@drawable/ic_baseline_qr_code_48"
                         android:focusable="true" />
 
                     <ImageView
@@ -55,7 +55,7 @@
                         android:paddingHorizontal="4dp"
                         android:clickable="true"
                         android:layout_gravity="center"
-                        android:src="@drawable/ic_baseline_nfc_36"
+                        android:src="@drawable/ic_baseline_nfc_48"
                         android:focusable="true" />
 
                 </LinearLayout>
@@ -74,10 +74,10 @@
                 android:id="@+id/switch_store_master_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
-                android:layout_marginBottom="4dp"
+                android:layout_marginBottom="8dp"
                 android:text="@string/store_master_password" />
 
 
@@ -87,7 +87,7 @@
                 android:gravity="center"
                 android:orientation="vertical"
                 android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="20dp">
 
                 <TextView
                     android:layout_width="match_parent"
