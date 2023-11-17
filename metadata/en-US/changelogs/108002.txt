@@ -1,2 +1,3 @@
+* import CSV files from Keepass databases
+* improve UI adding labels to credentials
 * bugfixes
-* improve adding labels / categories
