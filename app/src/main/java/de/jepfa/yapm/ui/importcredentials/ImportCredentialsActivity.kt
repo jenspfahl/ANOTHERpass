@@ -50,10 +50,10 @@ class ImportCredentialsActivity : SecureActivity() {
     fun readContent(csvRecords: List<Map<String, String>>): List<ImportCredentialsImportFileAdapter.FileRecord>? {
         return csvRecords.withIndex().map { record ->
             val nameKey = extractKeys(record, listOf("name","account", "title"))
-            val urlKey = extractKeys(record, listOf("url", "website", "web site"))
-            val userKey = extractKeys(record, listOf("username", "user", "login name", "login"))
-            val descriptionKey = extractKeys(record, listOf("description", "desc", "hint", "hints", "comments"))
-            val passwordKey = extractKeys(record, listOf("password", "passwd", "codeword", "code", "pin", "passphrase")) ?: return null
+            val urlKey = extractKeys(record, listOf("url", "website", "web site", "login_uri"))
+            val userKey = extractKeys(record, listOf("username", "user", "login name", "login", "login_username"))
+            val descriptionKey = extractKeys(record, listOf("description", "desc", "hint", "hints", "comments", "notes"))
+            val passwordKey = extractKeys(record, listOf("password", "passwd", "codeword", "code", "pin", "passphrase", "login_password")) ?: return null
             val expiresOnKey = extractKeys(record, listOf("expiresOn", "expires on", "expiresAt", "expires at", "expires", "valid until", "validUntil"))
 
             val password = record.value[passwordKey] ?: return null
