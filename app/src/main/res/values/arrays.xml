@@ -140,12 +140,14 @@
         <item>@string/language_default</item>
         <item>@string/language_en</item>
         <item>@string/language_de</item>
+        <item>@string/language_nl</item>
     </string-array>
 
     <string-array name="language_values">
         <item>default</item>
         <item>en</item>
         <item>de</item>
+        <item>nl</item>
     </string-array>
 
 

@@ -564,6 +564,7 @@
     <string name="title_label_details">Kategorie-Details</string>
     <string name="language_en">Englisch</string>
     <string name="language_de">Deutsch</string>
+    <string name="language_nl">Niederländisch</string>
     <string name="title_missing_overlay_permission">Fehlende Berechtigung</string>
     <string name="head_export_protected_emp">Dein geschütztes Masterpasswort</string>
     <string name="message_protect_masterpasswd">Möchtest du das exportierte Masterpasswort absichern? Du kannst es mit einem eigens gewähltem Codeword schützen, welches immer dann benötigt wird, wenn du das Masterpasswort verwendest.  D.h. wenn du dich damit einloggen willst, brauchst du auch dieses Codeword (neben deiner PIN), aber du brauchst es nicht, wenn du das Masterpasswort in der App speicherst oder ein Masterpasswort-Token verwendest.</string>

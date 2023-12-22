@@ -581,6 +581,7 @@
     <string name="language_default">System default</string>
     <string name="language_en">English</string>
     <string name="language_de">German</string>
+    <string name="language_nl">Dutch</string>
     <string name="small">Small</string>
     <string name="medium">Medium</string>
     <string name="big">Big</string>
