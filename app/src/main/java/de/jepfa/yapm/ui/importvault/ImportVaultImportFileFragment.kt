@@ -65,6 +65,7 @@ class ImportVaultImportFileFragment : BaseFragment() {
         val createdAt = jsonContent.get(VaultExportService.JSON_CREATION_DATE)?.asString
         val credentialsCount = jsonContent.get(VaultExportService.JSON_CREDENTIALS_COUNT)?.asString
         val labelsCount = jsonContent.get(VaultExportService.JSON_LABELS_COUNT)?.asString
+        val usernameTemplatesCount = jsonContent.get(VaultExportService.JSON_USERNAME_TEMPLATES_COUNT)?.asString
         val salt = jsonContent.get(VaultExportService.JSON_VAULT_ID)
         val vaultId = if (salt != null) shortenBase64String(salt.asString) else R.string.unknown_placeholder
         encMasterKey = jsonContent.get(VaultExportService.JSON_ENC_MK)?.asString
