@@ -150,6 +150,7 @@
     <string name="master_password_not_changed">Master password has not been changed.</string>
     <string name="use_pseudo_phrase">Use pseudo phrases to generate master password</string>
     <string name="generate_new_masterkey">Generate new master key (the internal key to en-/decrypt all vault data will be renewed)</string>
+
     <string name="help">Online help</string>
     <string name="about">About</string>
     <string name="title_about_the_app">About the app</string>
@@ -745,5 +746,8 @@
     <string name="command_latest">Show latest modified credential</string>
     <string name="command_veiled">Filter obfuscated credentials</string>
 
+    <string name="with_email_alias">Declare the username as email with a generic alias part</string>
+    <string name="title_username_email_alias">What is an email alias part?</string>
+    <string name="message_username_email_alias">Some email providers like Gmail provide generic aliases using the plus notation. So the same email account can have various aliases by adding \'+ALIAS\' before the \'@\' (e.g. test+alias1@example.org). You can use these aliases as usernames of credentials to benefit from having separate email addresses per account.</string>
 
 </resources>

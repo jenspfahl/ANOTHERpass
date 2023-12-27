@@ -98,9 +98,10 @@ class ListUsernameTemplatesAdapter(private val listUsernameTemplatesActivity: Li
 
         private fun translateType(generatorType: EncUsernameTemplate.GeneratorType): String {
             return when (generatorType) {
-                EncUsernameTemplate.GeneratorType.EMAIL_EXTENSION_CREDENTIAL_NAME_BASED -> "email extension"
-                EncUsernameTemplate.GeneratorType.EMAIL_EXTENSION_CREDENTIAL_RANDOM_BASED -> "email extension"
-                else -> "email extension" // "" //TODO mockup
+                EncUsernameTemplate.GeneratorType.EMAIL_EXTENSION_CREDENTIAL_NAME_BASED -> "with email alias"
+                EncUsernameTemplate.GeneratorType.EMAIL_EXTENSION_RANDOM_BASED -> "with email alias"
+                EncUsernameTemplate.GeneratorType.EMAIL_EXTENSION_BOTH -> "with email alias"
+                else -> ""
             }
         }
 
