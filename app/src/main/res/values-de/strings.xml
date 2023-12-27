@@ -740,5 +740,9 @@
     <string name="command_latest">Zeige zuletzt bearbeitete Zugangsdaten</string>
     <string name="command_veiled">Filtere verschleierte Zugangsdaten</string>
 
+    <string name="with_email_alias">Deklariere den Benutzernamen als Email mit einem generischen Alias-Teil</string>
+    <string name="title_username_email_alias">Was ist ein Email-Alias?</string>
+    <string name="message_username_email_alias">Einige Email-Anbieter wie Gmail erlauben generische Aliase mithilfe des Plus-Zeichens. D.h. derselbe Email-Account kann verschiedenste Aliase verwenden, indem man diesem nach einem Pluszeichen und vor dem \'@\' anfügt, z.B. \'test+alias1@example.org\'. Sie können diese Aliase als Benutzernamen für Zugangsdaten verwenden, um von separaten Email-Adressen pro Konto zu profitieren.</string>
+
 
 </resources>

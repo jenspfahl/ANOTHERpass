@@ -4,8 +4,13 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Button
+import android.widget.ImageView
+import android.widget.RadioGroup
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.SwitchCompat
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncUsernameTemplate
 import de.jepfa.yapm.model.session.Session
@@ -20,6 +25,9 @@ class EditUsernameTemplateActivity : SecureActivity() {
     private var usernameTemplate: EncUsernameTemplate? = null
     private lateinit var templateUsernameTextView: TextView
     private lateinit var templateDescriptionTextView: TextView
+    private lateinit var templateTypeSwitchView: SwitchCompat
+    private lateinit var templateGeneratorTypeGroup: RadioGroup
+    private var generatorType: EncUsernameTemplate.GeneratorType = EncUsernameTemplate.GeneratorType.NONE
 
     init {
         enableBack = true
@@ -31,15 +39,54 @@ class EditUsernameTemplateActivity : SecureActivity() {
 
         templateUsernameTextView = findViewById(R.id.edit_username_template_username)
         templateDescriptionTextView = findViewById(R.id.edit_username_template_description)
+        templateTypeSwitchView = findViewById(R.id.switch_use_email_alias)
+        templateGeneratorTypeGroup = findViewById(R.id.radio_generator_type)
+
+        findViewById<ImageView>(R.id.imageview_use_email_alias_help).setOnClickListener{
+            AlertDialog.Builder(this)
+                .setTitle(R.string.title_username_email_alias)
+                .setMessage(R.string.message_username_email_alias)
+                .show()
+        }
+
+        templateTypeSwitchView.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                templateGeneratorTypeGroup.visibility = View.VISIBLE
+                if (generatorType == EncUsernameTemplate.GeneratorType.NONE) {
+                    generatorType = EncUsernameTemplate.GeneratorType.EMAIL_EXTENSION_CREDENTIAL_NAME_BASED
+                }
+                getRadioGroupIndex(generatorType)?.let {
+                    templateGeneratorTypeGroup.check(it)
+                }
+            }
+            else {
+                templateGeneratorTypeGroup.visibility = View.INVISIBLE
+                generatorType = EncUsernameTemplate.GeneratorType.NONE
+            }
+        }
+
+        templateGeneratorTypeGroup.setOnCheckedChangeListener { _, checkedId ->
+            when (checkedId) {
+                R.id.radio_generator_type_from_credential -> generatorType = EncUsernameTemplate.GeneratorType.EMAIL_EXTENSION_CREDENTIAL_NAME_BASED
+                R.id.radio_generator_type_with_random_word -> generatorType = EncUsernameTemplate.GeneratorType.EMAIL_EXTENSION_RANDOM_BASED
+                R.id.radio_generator_type_both -> generatorType = EncUsernameTemplate.GeneratorType.EMAIL_EXTENSION_BOTH
+            }
+        }
 
 
         val usernameTemplateId = intent.getIntExtra(EncUsernameTemplate.EXTRA_USERNAME_TEMPLATE_ID)
         if (usernameTemplateId != null) {
-            usernameTemplateViewModel.getById(usernameTemplateId).observe(this) {
-                usernameTemplate = it
+            usernameTemplateViewModel.getById(usernameTemplateId).observe(this) { encUsernameTemplate ->
+                usernameTemplate = encUsernameTemplate
                 masterSecretKey?.let { key ->
-                    templateUsernameTextView.text = SecretService.decryptCommonString(key, it.username)
-                    templateDescriptionTextView.text = SecretService.decryptCommonString(key, it.description)
+                    templateUsernameTextView.text = SecretService.decryptCommonString(key, encUsernameTemplate.username)
+                    templateDescriptionTextView.text = SecretService.decryptCommonString(key, encUsernameTemplate.description)
+                    val generatorTypeIdx = SecretService.decryptLong(key, encUsernameTemplate.generatorType) ?: 0
+                    generatorType = EncUsernameTemplate.GeneratorType.values()[generatorTypeIdx.toInt()]
+                    templateTypeSwitchView.isChecked = generatorType != EncUsernameTemplate.GeneratorType.NONE
+                    getRadioGroupIndex(generatorType)?.let {
+                        templateGeneratorTypeGroup.check(it)
+                    }
 
                 }
             }
@@ -63,7 +110,7 @@ class EditUsernameTemplateActivity : SecureActivity() {
                 val usernameTemplate = EncUsernameTemplate(usernameTemplateId,
                     SecretService.encryptCommonString(key, templateUsernameTextView.text.toString()),
                     SecretService.encryptCommonString(key, templateDescriptionTextView.text.toString()),
-                    SecretService.encryptLong(key, EncUsernameTemplate.GeneratorType.NONE.ordinal.toLong()))
+                    SecretService.encryptLong(key, generatorType.ordinal.toLong()))
 
                 if (usernameTemplate.isPersistent()) {
                     usernameTemplateViewModel.update(usernameTemplate, this)
@@ -116,5 +163,13 @@ class EditUsernameTemplateActivity : SecureActivity() {
         finish()
     }
 
+    private fun getRadioGroupIndex(generatorType: EncUsernameTemplate.GeneratorType): Int? {
+        return when (generatorType) {
+            EncUsernameTemplate.GeneratorType.EMAIL_EXTENSION_CREDENTIAL_NAME_BASED -> R.id.radio_generator_type_from_credential
+            EncUsernameTemplate.GeneratorType.EMAIL_EXTENSION_RANDOM_BASED -> R.id.radio_generator_type_with_random_word
+            EncUsernameTemplate.GeneratorType.EMAIL_EXTENSION_BOTH -> R.id.radio_generator_type_both
+            EncUsernameTemplate.GeneratorType.NONE -> null
+        }
+    }
 
 }

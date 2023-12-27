@@ -13,7 +13,8 @@ data class EncUsernameTemplate(val id: Int?,
     enum class GeneratorType {
         NONE,
         EMAIL_EXTENSION_CREDENTIAL_NAME_BASED,
-        EMAIL_EXTENSION_CREDENTIAL_RANDOM_BASED,
+        EMAIL_EXTENSION_RANDOM_BASED,
+        EMAIL_EXTENSION_BOTH,
     }
 
     constructor(id: Int?, usernameBase64: String, descriptionBase64: String, generatorTypeBase64: String) :

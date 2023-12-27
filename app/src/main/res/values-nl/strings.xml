@@ -693,4 +693,8 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="command_expires">Filter inloggegevens die mogelijk verlopen</string>
   <string name="command_latest">Laat recent gewijzigde toegangsgegevens zien</string>
   <string name="command_veiled">Filter verborgen inloggegevens</string>
+
+  <string name="with_email_alias">Declare the username as email with a generic alias part</string>
+  <string name="title_username_email_alias">What is an email alias part?</string>
+  <string name="message_username_email_alias">Some email providers like Gmail provide generic aliases using the plus notation. So the same email account can have various aliases by adding \'+ALIAS\' before the \'@\' (e.g. test+alias1@example.org). You can use these aliases as usernames of credentials to benefit from having separate email addresses per account.</string>
 </resources>
