@@ -79,6 +79,7 @@ import de.jepfa.yapm.ui.importvault.ImportVaultActivity
 import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.ui.label.ListLabelsActivity
 import de.jepfa.yapm.ui.settings.SettingsActivity
+import de.jepfa.yapm.ui.usernametemplate.ListUsernameTemplatesActivity
 import de.jepfa.yapm.usecase.app.ShowInfoUseCase
 import de.jepfa.yapm.usecase.credential.DeleteMultipleCredentialsUseCase
 import de.jepfa.yapm.usecase.secret.*
@@ -1021,6 +1022,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
             R.id.menu_labels -> {
                 val intent = Intent(this, ListLabelsActivity::class.java)
+                startActivity(intent)
+                return true
+            }
+
+            R.id.menu_username_templates -> {
+                val intent = Intent(this, ListUsernameTemplatesActivity::class.java)
                 startActivity(intent)
                 return true
             }

@@ -52,6 +52,10 @@
     <string name="title_delete_label">Lösche Kategorie</string>
     <string name="message_delete_label">Kategorie \'%1$s\' wirklich löschen? Sie wird auch von allen Zugangsdaten entfernt, die diese verwenden.</string>
 
+    <string name="title_delete_username_template">Benutzernamenvorlage löschen</string>
+    <string name="message_delete_username_template">Benutzernamenvorlage \'%1$s\' wirklich löschen? Sie wird in den Benutzernaenvorschlägen nicht mehr sichbar sein.</string>
+
+
     <string name="lock_items">Tresor sperren</string>
     <string name="logout">Ausloggen und beenden</string>
     <string name="login_help">Hilfe</string>
@@ -193,13 +197,22 @@
     <string name="hint_edit_credential_labels">Füge Kategorien hinzu</string>
     <string name="filter">Nach Kategorien filtern</string>
     <string name="pref_header_autofill">Unterstützung für Automatisches Ausfüllen</string>
+
+    <string name="title_activity_list_username_templates">Vorlagen für Benutzernamen</string>
+    <string name="action_username_templates">Benutzernamenvorlagen</string>
+    <string name="username_template_data_params">Gib der Vorlage einen Benutzernamen und eine optionale Beschreibung. Der Benutzername wird als Vorschlag für die Zugangsdaten verwendet.</string>
+    <string name="hint_edit_username_template_username">Benutzername</string>
+    <string name="hint_edit_username_template_description">Zusatzinformationen</string>
+
     <string name="title_activity_list_label">Kategorien verwalten</string>
-    <string name="action_labels">Verwalte Kategorien</string>
+    <string name="action_labels">Kategorien</string>
     <string name="label_data_params">Gib der Kategorie einen Namen, eine Beschreibung und eine Farbe.</string>
     <string name="choose_color">Wähle eine Farbe</string>
     <string name="error_labelname_in_use">Dieser Name wird schon von einer anderen Kategorie verwendet</string>
     <string name="title_new_label">Neue Kategorie</string>
     <string name="title_change_label">Kategorie bearbeiten</string>
+    <string name="title_new_username_template">Neue Benutzernamenvorlage</string>
+    <string name="title_change_username_template">Benutzernamenvorlage ändern</string>
     <string name="reset_vault">Alles zurücksetzen</string>
     <string name="reset_vault_and_delete">Alles löschen und zurücksetzen</string>
     <string name="button_report_bug">Fehler melden</string>

@@ -42,6 +42,10 @@
   <string name="message_delete_credential">Inloggegevens \'%1$s\' echt verwijderen?</string>
   <string name="title_delete_label">Categorie verwijderen</string>
   <string name="message_delete_label">Categorie \'%1$s\' echt verwijderen?  Het wordt ook verwijderd uit alle inloggegevens die er gebruik van maken.</string>
+
+  <string name="title_delete_username_template">Delete Username Template</string>
+  <string name="message_delete_username_template">Are you sure deleting username template \'%1$s\'? It wont be visible anymore in the username suggestions.</string>
+
   <string name="lock_items">Vergrendel veilig</string>
   <string name="logout">Uitloggen en afsluiten</string>
   <string name="login_help">Hulp</string>
@@ -167,6 +171,7 @@ Het scheiden van de gecodeerde hoofdsleutel van het kluisbestand maakt het besta
   <string name="toast_copied_to_clipboard">Wachtwoord gekopieerd naar klembord</string>
   <string name="toast_test_copypaste_password">Testgegevens gekopieerd naar het klembord</string>
   <string name="copy_to_clipboard">Kopieer wachtwoord naar klembord</string>
+  <string name="test_copypaste_password"><![CDATA[Test C&P password]]></string>
   <string name="navigation_drawer_open">Navigatiemenu openen</string>
   <string name="navigation_drawer_close">Navigatiemenu sluiten</string>
   <string name="nav_header_desc">Navigatiebalk</string>
@@ -180,12 +185,20 @@ Het scheiden van de gecodeerde hoofdsleutel van het kluisbestand maakt het besta
   <string name="filter">Filter op categorieën</string>
   <string name="pref_header_autofill">Ondersteuning voor automatisch aanvullen</string>
   <string name="title_activity_list_label">Beheer Categorieën</string>
-  <string name="action_labels">Beheer Categorieën</string>
+  <string name="title_activity_list_username_templates">Templates for usernames</string>
+  <string name="action_labels">Categorieën</string>
+  <string name="action_username_templates">Username templates</string>
+  <string name="username_template_data_params">Define the username of a template and an optional description. The username is used to present suggestions for usernames when editing credentials.</string>
+  <string name="hint_edit_username_template_username">Username</string>
+  <string name="hint_edit_username_template_description">Additional description</string>
+
   <string name="label_data_params">Geef de categorie een naam, beschrijving en kleur.</string>
   <string name="choose_color">Kies een kleur</string>
   <string name="error_labelname_in_use">Deze naam wordt al door een andere categorie gebruikt</string>
   <string name="title_new_label">Nieuwe categorie</string>
   <string name="title_change_label">Categorie bewerken</string>
+  <string name="title_new_username_template">New username template</string>
+  <string name="title_change_username_template">Edit username template</string>
   <string name="reset_vault">Alles resetten</string>
   <string name="reset_vault_and_delete">Verwijder en reset alles</string>
   <string name="button_report_bug">Rapporteer een fout</string>

@@ -13,10 +13,11 @@ import java.util.*
 data class EncUsernameTemplateEntity(
     @PrimaryKey(autoGenerate = true) val id: Int?,
     var username: String,
+    var description: String,
     var generatorType: String
 ) {
 
-    constructor(id: Int?, username: Encrypted, generatorType: Encrypted)
-            : this(id, username.toBase64String(), generatorType.toBase64String())
+    constructor(id: Int?, username: Encrypted, description: Encrypted, generatorType: Encrypted)
+            : this(id, username.toBase64String(), description.toBase64String(), generatorType.toBase64String())
 
 }

@@ -6,6 +6,7 @@ import java.util.*
 
 data class EncUsernameTemplate(val id: Int?,
                                var username: Encrypted,
+                               var description: Encrypted,
                                var generatorType: Encrypted,
                                ) {
 
@@ -15,9 +16,10 @@ data class EncUsernameTemplate(val id: Int?,
         EMAIL_EXTENSION_CREDENTIAL_RANDOM_BASED,
     }
 
-    constructor(id: Int?, usernameBase64: String, generatorTypeBase64: String) :
+    constructor(id: Int?, usernameBase64: String, descriptionBase64: String, generatorTypeBase64: String) :
             this(id,
                 Encrypted.fromBase64String(usernameBase64),
+                Encrypted.fromBase64String(descriptionBase64),
                 Encrypted.fromBase64String(generatorTypeBase64))
 
     fun isPersistent(): Boolean {
@@ -29,6 +31,7 @@ data class EncUsernameTemplate(val id: Int?,
 
         const val ATTRIB_ID = "id"
         const val ATTRIB_USERNAME = "username"
+        const val ATTRIB_DESCRIPTION = "description"
         const val ATTRIB_GENERATOR_TYPE = "generatorType"
 
         fun fromJson(json: JsonElement): EncUsernameTemplate? {
@@ -37,6 +40,7 @@ data class EncUsernameTemplate(val id: Int?,
                 EncUsernameTemplate(
                     jsonObject.get(ATTRIB_ID).asInt,
                     jsonObject.get(ATTRIB_USERNAME).asString,
+                    jsonObject.get(ATTRIB_DESCRIPTION).asString,
                     jsonObject.get(ATTRIB_GENERATOR_TYPE).asString,
                 )
             } catch (e: Exception) {

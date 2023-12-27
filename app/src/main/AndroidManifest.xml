@@ -119,6 +119,12 @@
             android:name=".ui.editcredential.EditCredentialActivity"
             android:noHistory="false" />
         <activity
+            android:name=".ui.usernametemplate.ListUsernameTemplatesActivity"
+            android:label="@string/title_activity_list_username_templates" />
+        <activity
+            android:name=".ui.usernametemplate.EditUsernameTemplateActivity"
+            android:noHistory="true" />
+        <activity
             android:name=".ui.label.ListLabelsActivity"
             android:label="@string/title_activity_list_label" />
         <activity

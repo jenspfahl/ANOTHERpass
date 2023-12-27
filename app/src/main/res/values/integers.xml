@@ -7,5 +7,7 @@
     <integer name="max_credential_additional_info_length">1000</integer>
     <integer name="max_label_name_length">20</integer>
     <integer name="max_label_description_length">200</integer>
+    <integer name="max_template_username_length">50</integer>
+    <integer name="max_template_description_length">200</integer>
     <integer name="max_master_password_length">50</integer>
 </resources>

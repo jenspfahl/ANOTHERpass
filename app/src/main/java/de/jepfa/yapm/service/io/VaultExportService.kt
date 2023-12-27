@@ -42,7 +42,7 @@ object VaultExportService {
     const val JSON_LABELS = "labels"
     const val JSON_LABELS_COUNT = "labelsCount"
     const val JSON_USERNAME_TEMPLATES = "usernameTemplates"
-    const val JSON_USERNAME_TEMPLATES_COUNT = "usernameTemplates"
+    const val JSON_USERNAME_TEMPLATES_COUNT = "usernameTemplateCount"
     const val JSON_APP_SETTINGS = "appSettings"
 
     val CREDENTIALS_TYPE: Type = object : TypeToken<List<EncCredential>>() {}.type
@@ -179,7 +179,7 @@ object VaultExportService {
 
         val usernameTemplates = app.usernameTemplateRepository.getAllSync()
 
-        val usernameTemplatesAsJson = GSON.toJsonTree(labels, USERNAME_TEMPLATES_TYPE)
+        val usernameTemplatesAsJson = GSON.toJsonTree(usernameTemplates, USERNAME_TEMPLATES_TYPE)
         val encUsernameTemplates = SecretService.encryptCommonString(
             masterKeySK,
             usernameTemplatesAsJson.toString())

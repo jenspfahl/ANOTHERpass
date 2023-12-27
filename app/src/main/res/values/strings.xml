@@ -53,6 +53,8 @@
 
     <string name="title_delete_label">Delete Label</string>
     <string name="message_delete_label">Are you sure deleting label \'%1$s\'? It will be removed from all credentials where it is assigned to.</string>
+    <string name="title_delete_username_template">Delete Username Template</string>
+    <string name="message_delete_username_template">Are you sure deleting username template \'%1$s\'? It wont be visible anymore in the username suggestions.</string>
 
     <string name="lock_items">Lock vault</string>
     <string name="logout">Logout and exit</string>
@@ -196,13 +198,21 @@
     <string name="credential_data_params">Edit your credential here. The name is mandatory. Use labels to categorize them.</string>
     <string name="filter">Filter by labels</string>
     <string name="pref_header_autofill">Auto fill support</string>
-    <string name="title_activity_list_label">Manage Labels</string>
+    <string name="title_activity_list_label">Labels</string>
+    <string name="title_activity_list_username_templates">Templates for usernames</string>
     <string name="action_labels">Manage labels</string>
+    <string name="action_username_templates">Username templates</string>
+    <string name="username_template_data_params">Define the username of a template and an optional description. The username is used to present suggestions for usernames when editing credentials.</string>
+    <string name="hint_edit_username_template_username">Username</string>
+    <string name="hint_edit_username_template_description">Additional description</string>
+
     <string name="label_data_params">Set the label name and description and color here</string>
     <string name="choose_color">Choose a color</string>
     <string name="error_labelname_in_use">This label name is already in use by another label</string>
     <string name="title_new_label">New label</string>
     <string name="title_change_label">Edit label</string>
+    <string name="title_new_username_template">New username template</string>
+    <string name="title_change_username_template">Edit username template</string>
     <string name="reset_vault">Reset all</string>
     <string name="reset_vault_and_delete">Reset and delete all</string>
     <string name="button_report_bug">Report bug</string>

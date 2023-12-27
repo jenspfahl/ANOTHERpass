@@ -1,0 +1,43 @@
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/big_padding"
+    android:orientation="horizontal">
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:paddingHorizontal="@dimen/big_padding"
+        >
+
+        <TextView
+            android:id="@+id/username_template_username"
+            android:textIsSelectable="false"
+            android:textSize="16sp"
+            android:gravity="start"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.6"/>
+
+        <TextView
+            android:id="@+id/username_template_type"
+            android:textIsSelectable="false"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:textStyle="italic"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.4"/>
+
+        <ImageView
+            android:id="@+id/username_template_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:foregroundGravity="right"
+            android:layout_gravity="end"
+            android:paddingStart="16dp"
+            android:paddingEnd="1dp"
+            android:src="@drawable/ic_baseline_delete_24"
+            android:focusable="true" />
+    </TableRow>
+</TableLayout>

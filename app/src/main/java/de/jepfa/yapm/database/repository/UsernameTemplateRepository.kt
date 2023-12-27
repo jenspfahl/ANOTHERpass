@@ -59,6 +59,7 @@ class UsernameTemplateRepository(private val encUsernameTemplateDao: EncUsername
     private fun mapToModel(entity: EncUsernameTemplateEntity): EncUsernameTemplate {
         return EncUsernameTemplate(entity.id,
                 entity.username,
+                entity.description,
                 entity.generatorType,
         )
     }
@@ -67,6 +68,7 @@ class UsernameTemplateRepository(private val encUsernameTemplateDao: EncUsername
         return EncUsernameTemplateEntity(
             encUsernameTemplate.id,
             encUsernameTemplate.username,
+            encUsernameTemplate.description,
             encUsernameTemplate.generatorType,
         )
     }

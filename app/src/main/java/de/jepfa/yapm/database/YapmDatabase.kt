@@ -76,7 +76,7 @@ abstract class YapmDatabase : RoomDatabase() {
                         }
                         val migration6to7 = object : Migration(6, 7) {
                             override fun migrate(database: SupportSQLiteDatabase) {
-                                database.execSQL("CREATE TABLE IF NOT EXISTS `EncUsernameTemplateEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `username` TEXT NOT NULL, `generatorType` TEXT NOT NULL)");
+                                database.execSQL("CREATE TABLE IF NOT EXISTS `EncUsernameTemplateEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `username` TEXT NOT NULL, `description` TEXT NOT NULL, `generatorType` TEXT NOT NULL)");
                             }
                         }
 

@@ -202,6 +202,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
 
         val stagedEncCredentials = PreferenceService.getAsString(PreferenceService.TEMP_BLOB_CREDENTIALS, activity)
         val stagedEncLabels = PreferenceService.getAsString(PreferenceService.TEMP_BLOB_LABELS, activity)
+        val stagedEncUsernameTemplates = PreferenceService.getAsString(PreferenceService.TEMP_BLOB_USERNAME_TEMPLATES, activity)
         val stagedEncAppSettings = PreferenceService.getAsString(PreferenceService.TEMP_BLOB_SETTINGS, activity)
 
         if (stagedEncCredentials != null) {
@@ -223,7 +224,17 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
             }
             PreferenceService.delete(PreferenceService.TEMP_BLOB_LABELS, activity)
         }
-        
+
+        if (stagedEncUsernameTemplates != null) {
+            val encUsernameTemplates = Encrypted.fromBase64String(stagedEncUsernameTemplates)
+            val jsonUsernameTemplatesAsString = SecretService.decryptCommonString(masterSecretKey, encUsernameTemplates)
+            if (jsonUsernameTemplatesAsString != Validable.FAILED_STRING) {
+                val jsonUsernameTemplates = JsonParser.parseString(jsonUsernameTemplatesAsString).asJsonArray
+                persistUsernameTemplates(jsonUsernameTemplates, activity)
+            }
+            PreferenceService.delete(PreferenceService.TEMP_BLOB_USERNAME_TEMPLATES, activity)
+        }
+
         if (stagedEncAppSettings != null) {
             val encAppSettings = Encrypted.fromBase64String(stagedEncAppSettings)
             val jsonAppSettingsAsString = SecretService.decryptCommonString(masterSecretKey, encAppSettings)
@@ -463,9 +474,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             labelsJson
-                .filterNotNull()
-                .map { json -> EncLabel.fromJson(json) }
-                .filterNotNull()
+                .filterNotNull().mapNotNull { json -> EncLabel.fromJson(json) }
                 .forEach { c -> activity.getApp().labelRepository.insert(c) }
         }
     }
@@ -476,9 +485,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             usernameTemplatesJson
-                .filterNotNull()
-                .map { json -> EncUsernameTemplate.fromJson(json) }
-                .filterNotNull()
+                .filterNotNull().mapNotNull { json -> EncUsernameTemplate.fromJson(json) }
                 .forEach { c -> activity.getApp().usernameTemplateRepository.insert(c) }
         }
     }
