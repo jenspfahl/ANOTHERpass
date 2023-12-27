@@ -100,18 +100,18 @@
                 <RadioButton android:id="@+id/radio_generator_type_from_credential"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="alias from credential name (e.g. test+github@example.org)"
+                    android:text="@string/username_template_type_desc_from_credential_name"
                     />
                 <RadioButton android:id="@+id/radio_generator_type_with_random_word"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="alias from a random word (e.g. test+hiaw@example.org)"
+                    android:text="@string/username_template_type_desc_random_word"
 
                     />
                 <RadioButton android:id="@+id/radio_generator_type_both"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="both"
+                    android:text="@string/username_template_type_desc_both"
 
                     />
             </RadioGroup>

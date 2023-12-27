@@ -697,4 +697,8 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="with_email_alias">Declare the username as email with a generic alias part</string>
   <string name="title_username_email_alias">What is an email alias part?</string>
   <string name="message_username_email_alias">Some email providers like Gmail provide generic aliases using the plus notation. So the same email account can have various aliases by adding \'+ALIAS\' before the \'@\' (e.g. test+alias1@example.org). You can use these aliases as usernames of credentials to benefit from having separate email addresses per account.</string>
+  <string name="username_template_list_type">with email alias</string>
+  <string name="username_template_type_desc_from_credential_name">alias from credential name (e.g. test+github@example.org)</string>
+  <string name="username_template_type_desc_random_word">alias from a random word (e.g. test+hiaw@example.org)</string>
+  <string name="username_template_type_desc_both">both</string>
 </resources>

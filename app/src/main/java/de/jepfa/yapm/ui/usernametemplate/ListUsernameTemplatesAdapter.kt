@@ -1,5 +1,6 @@
 package de.jepfa.yapm.ui.usernametemplate
 
+import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
@@ -13,7 +14,6 @@ import de.jepfa.yapm.model.encrypted.EncUsernameTemplate
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.secret.SecretService
-import de.jepfa.yapm.util.*
 
 
 class ListUsernameTemplatesAdapter(private val listUsernameTemplatesActivity: ListUsernameTemplatesActivity) :
@@ -51,7 +51,7 @@ class ListUsernameTemplatesAdapter(private val listUsernameTemplatesActivity: Li
     override fun onBindViewHolder(holder: UsernameTemplateViewHolder, position: Int) {
         val current = getItem(position)
         val key = listUsernameTemplatesActivity.masterSecretKey
-        holder.bind(key, current)
+        holder.bind(key, current, listUsernameTemplatesActivity)
     }
 
     class UsernameTemplateViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -84,24 +84,28 @@ class ListUsernameTemplatesAdapter(private val listUsernameTemplatesActivity: Li
             }
         }
 
-        fun bind(key: SecretKeyHolder?, usernameTemplate: EncUsernameTemplate) {
+        fun bind(
+            key: SecretKeyHolder?,
+            usernameTemplate: EncUsernameTemplate,
+            context: Context
+        ) {
             var name = itemView.context.getString(R.string.unknown_placeholder)
             var type = itemView.context.getString(R.string.unknown_placeholder)
             if (key != null) {
                 name = SecretService.decryptCommonString(key, usernameTemplate.username)
                 val typeAsInt = SecretService.decryptLong(key, usernameTemplate.generatorType) ?: 0
-                type = translateType(EncUsernameTemplate.GeneratorType.values()[typeAsInt.toInt()])
+                type = translateType(EncUsernameTemplate.GeneratorType.values()[typeAsInt.toInt()], context)
             }
             usernameTemplateUsernameTextView.text = name
             usernameTemplateGeneratorTypeTextView.text = type
         }
 
-        private fun translateType(generatorType: EncUsernameTemplate.GeneratorType): String {
-            return when (generatorType) {
-                EncUsernameTemplate.GeneratorType.EMAIL_EXTENSION_CREDENTIAL_NAME_BASED -> "with email alias"
-                EncUsernameTemplate.GeneratorType.EMAIL_EXTENSION_RANDOM_BASED -> "with email alias"
-                EncUsernameTemplate.GeneratorType.EMAIL_EXTENSION_BOTH -> "with email alias"
-                else -> ""
+        private fun translateType(generatorType: EncUsernameTemplate.GeneratorType, context: Context): String {
+            return if (generatorType != EncUsernameTemplate.GeneratorType.NONE) {
+                context.getString(R.string.username_template_list_type)
+            }
+            else {
+                ""
             }
         }
 
