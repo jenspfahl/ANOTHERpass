@@ -35,7 +35,7 @@ object UsernameTemplateService {
     }
 
     private fun nameBased(username: String, credentialName: String): String {
-        val alias = credentialName.substringBefore(" ").lowercase()
+        val alias = credentialName.substringBefore(" ")
         return insertAlias(username, alias)
     }
 
@@ -44,7 +44,8 @@ object UsernameTemplateService {
         if (splitted.size != 2) {
             return username
         }
-        val shortenedAlias = if (alias.length > 6) alias.substring(0, 6) else alias
+        val normalizedAlias = alias.replace(Regex("\\W"), "").lowercase()
+        val shortenedAlias = if (normalizedAlias.length > 6) normalizedAlias.substring(0, 6) else normalizedAlias
 
         return "${splitted[0]}+$shortenedAlias@${splitted[1]}"
     }
