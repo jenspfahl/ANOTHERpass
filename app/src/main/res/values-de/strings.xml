@@ -748,6 +748,7 @@
     <string name="username_template_type_desc_from_credential_name">Alias vom Name der Zugangsdaten (z.B. test+github@example.org)</string>
     <string name="username_template_type_desc_random_word">Alias als zufälliges Wort (e.g. test+hiaw@example.org)</string>
     <string name="username_template_type_desc_both">Beides vorschlagen</string>
+    <string name="open_vault">Tresor öffnen</string>
 
 
 </resources>

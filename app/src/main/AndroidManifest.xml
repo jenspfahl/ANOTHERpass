@@ -176,8 +176,19 @@
                 <action android:name="android.service.autofill.AutofillService" />
             </intent-filter>
         </service>
+        <service
+            android:name=".service.quicksettings.QuickTileService"
+            android:exported="true"
+            android:label="@string/open_vault"
+            android:icon="@drawable/ic_keywithqrcode_normal"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
 
-    </application>
+
+</application>
 
     <queries>
         <intent>

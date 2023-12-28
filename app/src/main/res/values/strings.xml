@@ -754,5 +754,6 @@
     <string name="username_template_type_desc_from_credential_name">alias from credential name (e.g. test+github@example.org)</string>
     <string name="username_template_type_desc_random_word">alias from a random word (e.g. test+hiaw@example.org)</string>
     <string name="username_template_type_desc_both">provide both</string>
+    <string name="open_vault">Open vault</string>
 
 </resources>
