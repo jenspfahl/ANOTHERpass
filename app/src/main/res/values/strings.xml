@@ -12,6 +12,7 @@
     <string name="hint_edit_credential_additional_info">Some optional info</string>
     <string name="button_save">Save</string>
     <string name="error_field_required">This field is required.</string>
+    <string name="error_not_an_email_address">This field does not contain a valid email address.</string>
     <string name="with_upper_case">With upper case chars</string>
     <string name="with_digits">With digits</string>
     <string name="with_special_chars">With special chars</string>
@@ -752,6 +753,6 @@
     <string name="username_template_list_type">with email alias</string>
     <string name="username_template_type_desc_from_credential_name">alias from credential name (e.g. test+github@example.org)</string>
     <string name="username_template_type_desc_random_word">alias from a random word (e.g. test+hiaw@example.org)</string>
-    <string name="username_template_type_desc_both">both</string>
+    <string name="username_template_type_desc_both">provide both</string>
 
 </resources>

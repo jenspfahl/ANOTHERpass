@@ -42,7 +42,6 @@ object VaultExportService {
     const val JSON_LABELS = "labels"
     const val JSON_LABELS_COUNT = "labelsCount"
     const val JSON_USERNAME_TEMPLATES = "usernameTemplates"
-    const val JSON_USERNAME_TEMPLATES_COUNT = "usernameTemplateCount"
     const val JSON_APP_SETTINGS = "appSettings"
 
     val CREDENTIALS_TYPE: Type = object : TypeToken<List<EncCredential>>() {}.type
@@ -185,7 +184,6 @@ object VaultExportService {
             usernameTemplatesAsJson.toString())
 
         root.addProperty(JSON_USERNAME_TEMPLATES, encUsernameTemplates.toBase64String())
-        root.addProperty(JSON_USERNAME_TEMPLATES_COUNT, usernameTemplates.size)
 
         if (includePreferences) {
             val allPrefs = PreferenceService.getAllPrefs(context)

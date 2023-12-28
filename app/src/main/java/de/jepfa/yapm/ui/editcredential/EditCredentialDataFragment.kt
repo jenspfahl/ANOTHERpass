@@ -16,6 +16,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.encrypted.EncUsernameTemplate
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.Session
@@ -25,6 +26,7 @@ import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.decryptLong
 import de.jepfa.yapm.service.secret.SecretService.encryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.encryptLong
+import de.jepfa.yapm.service.usernametemplate.UsernameTemplateService
 import de.jepfa.yapm.ui.DropDownList
 import de.jepfa.yapm.ui.SecureFragment
 import de.jepfa.yapm.ui.label.LabelEditViewExtender
@@ -44,11 +46,12 @@ class EditCredentialDataFragment : SecureFragment() {
         EXPIRES_ON_CUSTOM(R.string.expires_on),
     }
 
+    private var plainUsernameTemplates: List<EncUsernameTemplate> = emptyList()
     private lateinit var editCredentialActivity: EditCredentialActivity
     private lateinit var labelEditViewExtender: LabelEditViewExtender
 
     private lateinit var editCredentialNameView: EditText
-    private lateinit var editCredentialUserView: EditText
+    private lateinit var editCredentialUserView: AutoCompleteTextView
     private lateinit var editCredentialWebsiteView: EditText
     private lateinit var editCredentialChooseExpiredAtImageView: ImageView
     private lateinit var editCredentialRemoveExpiredAtImageView: ImageView
@@ -88,6 +91,23 @@ class EditCredentialDataFragment : SecureFragment() {
         editCredentialAdditionalInfoView = view.findViewById(R.id.edit_credential_additional_info)
         expandAdditionalInfoImageView = view.findViewById(R.id.imageview_expand_additional_info)
 
+        editCredentialNameView.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                updateUsernameTemplateSuggestions()
+            }
+        }
+
+        editCredentialActivity.usernameTemplateViewModel.allUsernameTemplates.observe(editCredentialActivity) { usernameTemplates ->
+            plainUsernameTemplates = usernameTemplates
+            updateUsernameTemplateSuggestions()
+        }
+
+        view.findViewById<ImageView>(R.id.icon_credential_user)?.let {
+            it.setOnClickListener {
+                updateUsernameTemplateSuggestions()
+                editCredentialUserView.showDropDown()
+            }
+        }
 
         editCredentialExpiredAtAdapter = ArrayAdapter(editCredentialActivity, android.R.layout.simple_spinner_dropdown_item, mutableListOf<String>())
         editCredentialExpiredAtSpinner.adapter = editCredentialExpiredAtAdapter
@@ -214,6 +234,23 @@ class EditCredentialDataFragment : SecureFragment() {
                     }
                 }
             }, 100L)
+        }
+    }
+
+    private fun updateUsernameTemplateSuggestions() {
+        masterSecretKey?.let { key ->
+            val list = UsernameTemplateService.getUsernamesWithGeneratedAliases(
+                key,
+                plainUsernameTemplates,
+                editCredentialNameView.text.toString()
+            )
+            editCredentialUserView.setAdapter(
+                ArrayAdapter(
+                    editCredentialActivity,
+                    android.R.layout.simple_spinner_dropdown_item,
+                    list
+                )
+            )
         }
     }
 

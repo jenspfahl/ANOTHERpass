@@ -105,6 +105,11 @@ class EditUsernameTemplateActivity : SecureActivity() {
                 templateUsernameTextView.requestFocus()
                 return@setOnClickListener
             }
+            if (generatorType != EncUsernameTemplate.GeneratorType.NONE && !isEmailAddress(templateUsernameTextView.text)) {
+                templateUsernameTextView.error = getString(R.string.error_not_an_email_address)
+                templateUsernameTextView.requestFocus()
+                return@setOnClickListener
+            }
 
             masterSecretKey?.let { key ->
                 val usernameTemplate = EncUsernameTemplate(usernameTemplateId,
@@ -123,6 +128,14 @@ class EditUsernameTemplateActivity : SecureActivity() {
 
         }
 
+    }
+
+    private fun isEmailAddress(text: CharSequence?): Boolean {
+        return if (TextUtils.isEmpty(text)) {
+            false;
+        } else {
+            android.util.Patterns.EMAIL_ADDRESS.matcher(text).matches();
+        }
     }
 
 
