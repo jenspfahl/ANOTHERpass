@@ -6,6 +6,7 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.CsvService
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
@@ -48,13 +49,49 @@ class ImportCredentialsActivity : SecureActivity() {
     }
 
     fun readContent(csvRecords: List<Map<String, String>>): List<ImportCredentialsImportFileAdapter.FileRecord>? {
+        val nameKeyAliases = mutableListOf("name", "account", "title")
+        val urlKeyAliases = mutableListOf("url", "website", "web site", "login_uri")
+        val userKeyAliases = mutableListOf("username", "user", "login name", "login", "login_username")
+        val descriptionKeyAliases = mutableListOf("description", "desc", "hint", "hints", "comments", "notes")
+        val passwordKeyAliases =
+            mutableListOf("password", "passwd", "codeword", "code", "pin", "passphrase", "login_password")
+        val expiresOnKeyAliases = mutableListOf(
+            "expiresOn",
+            "expires on",
+            "expiresAt",
+            "expires at",
+            "expires",
+            "valid until",
+            "validUntil"
+        )
+
+        PreferenceService.getAsString(PreferenceService.DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_NAME, this)?.let {
+            addToListIfNotEmpty(it, nameKeyAliases)
+        }
+        PreferenceService.getAsString(PreferenceService.DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_WEBSITE, this)?.let {
+            addToListIfNotEmpty(it, urlKeyAliases)
+        }
+        PreferenceService.getAsString(PreferenceService.DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_USERNAME, this)?.let {
+            addToListIfNotEmpty(it, userKeyAliases)
+        }
+        PreferenceService.getAsString(PreferenceService.DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_ADDITIONAL_INFO, this)?.let {
+            addToListIfNotEmpty(it, descriptionKeyAliases)
+        }
+        PreferenceService.getAsString(PreferenceService.DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_PASSWORD, this)?.let {
+            addToListIfNotEmpty(it, passwordKeyAliases)
+        }
+        PreferenceService.getAsString(PreferenceService.DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_EXPIRY_DATE, this)?.let {
+            addToListIfNotEmpty(it, expiresOnKeyAliases)
+        }
+
+
         return csvRecords.withIndex().map { record ->
-            val nameKey = extractKeys(record, listOf("name","account", "title"))
-            val urlKey = extractKeys(record, listOf("url", "website", "web site", "login_uri"))
-            val userKey = extractKeys(record, listOf("username", "user", "login name", "login", "login_username"))
-            val descriptionKey = extractKeys(record, listOf("description", "desc", "hint", "hints", "comments", "notes"))
-            val passwordKey = extractKeys(record, listOf("password", "passwd", "codeword", "code", "pin", "passphrase", "login_password")) ?: return null
-            val expiresOnKey = extractKeys(record, listOf("expiresOn", "expires on", "expiresAt", "expires at", "expires", "valid until", "validUntil"))
+            val nameKey = extractKeys(record, nameKeyAliases)
+            val urlKey = extractKeys(record, urlKeyAliases)
+            val userKey = extractKeys(record, userKeyAliases)
+            val descriptionKey = extractKeys(record, descriptionKeyAliases)
+            val passwordKey = extractKeys(record, passwordKeyAliases) ?: return null
+            val expiresOnKey = extractKeys(record, expiresOnKeyAliases)
 
             val password = record.value[passwordKey] ?: return null
 
@@ -71,6 +108,12 @@ class ImportCredentialsActivity : SecureActivity() {
 
         }.filter { it.plainPassword.isNotEmpty() }
 
+    }
+
+    private fun addToListIfNotEmpty(prefKey: String, keyAliases: MutableList<String>) {
+        if (prefKey.isNotBlank()) {
+            keyAliases.add(0, prefKey)
+        }
     }
 
     private fun getDomainAsName(url: String): String {

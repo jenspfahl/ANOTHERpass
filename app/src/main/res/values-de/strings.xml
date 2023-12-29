@@ -750,5 +750,15 @@
     <string name="username_template_type_desc_both">Beides vorschlagen</string>
     <string name="open_vault">Tresor öffnen</string>
 
+    <string name="define_columns_of_csv_file">Datei kann nicht geladen werden oder einge Felder fehlen? Gib die Spaltennamen der CSV-Datei manuell ein.</string>
+    <string name="not_a_csv_column">Nur Buchstaben, Ziffern, Binde- und Unterstrich erlaubt</string>
+    <string name="csv_column_title">CSV-Spaltennamen</string>
+    <string name="csv_column_message">Öffne die CSV-Datei welche importiert werden soll und gib hier die Spaltennamen der entsprechenden Zugangsdaten-Felder ein.</string>
+    <string name="csv_column_credential_name">Spaltenname für Zugangsdatenname</string>
+    <string name="csv_column_credential_username">Spaltenname für Benutzername</string>
+    <string name="csv_column_credential_website">Spaltenname für Webseite</string>
+    <string name="csv_column_credential_password">Spaltenname für Passwort</string>
+    <string name="csv_column_credential_expiry_date">Spaltenname für Ablaufdatum</string>
+    <string name="csv_column_credential_additional_info">Spaltenname für Zusatzinformationen</string>
 
 </resources>

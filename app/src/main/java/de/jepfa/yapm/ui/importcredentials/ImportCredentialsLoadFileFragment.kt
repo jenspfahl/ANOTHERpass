@@ -1,18 +1,22 @@
 package de.jepfa.yapm.ui.importcredentials
 
 import android.app.Activity.RESULT_OK
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
+import androidx.core.view.setPadding
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.CsvService
 import de.jepfa.yapm.ui.BaseFragment
-import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.FileUtil
+import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.toastText
 
 class ImportCredentialsLoadFileFragment : BaseFragment() {
@@ -48,6 +52,111 @@ class ImportCredentialsLoadFileFragment : BaseFragment() {
                 startActivityForResult(chooserIntent, importCredentialsFile)
             }
         }
+
+        view.findViewById<TextView>(R.id.button_csv_columns_manually)?.setOnClickListener {
+
+            val dialogBuilder = AlertDialog.Builder(importCredentialsActivity)
+
+            val columnsContainer = LinearLayout(dialogBuilder.context)
+            columnsContainer.orientation = LinearLayout.VERTICAL
+            columnsContainer.setPadding(24)
+
+            val scrollView = ScrollView(dialogBuilder.context)
+            val height = (resources.displayMetrics.heightPixels * 0.55).toInt()
+            scrollView.layoutParams =
+                ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height)
+            scrollView.setPadding(0, 24, 0, 24)
+
+            scrollView.addView(columnsContainer)
+
+            val container = LinearLayout(dialogBuilder.context)
+            container.orientation = LinearLayout.VERTICAL
+            container.addView(scrollView)
+
+            val nameField = addInputField(importCredentialsActivity, columnsContainer, getString(R.string.csv_column_credential_name), PreferenceService.DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_NAME, importCredentialsActivity)
+            val usernameField = addInputField(importCredentialsActivity, columnsContainer, getString(
+                            R.string.csv_column_credential_username), PreferenceService.DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_USERNAME, importCredentialsActivity)
+            val websiteField = addInputField(importCredentialsActivity, columnsContainer, getString(
+                            R.string.csv_column_credential_website), PreferenceService.DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_WEBSITE, importCredentialsActivity)
+            val passwordField = addInputField(importCredentialsActivity, columnsContainer, getString(
+                            R.string.csv_column_credential_password), PreferenceService.DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_PASSWORD, importCredentialsActivity)
+            val expiryField = addInputField(importCredentialsActivity, columnsContainer, getString(R.string.csv_column_credential_expiry_date), PreferenceService.DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_EXPIRY_DATE, importCredentialsActivity)
+            val addInfoField = addInputField(importCredentialsActivity, columnsContainer, getString(
+                            R.string.csv_column_credential_additional_info), PreferenceService.DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_ADDITIONAL_INFO, importCredentialsActivity)
+
+            val dialog = dialogBuilder
+                .setTitle(getString(R.string.csv_column_title))
+                .setMessage(getString(R.string.csv_column_message))
+                .setView(container)
+                .setPositiveButton(android.R.string.ok, null)
+                .setNegativeButton(android.R.string.cancel, null)
+                .create()
+
+
+            dialog.setOnShowListener {
+                val buttonPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                buttonPositive.setOnClickListener {
+                    val nameColumn = validateAndNormalize(nameField) ?: return@setOnClickListener
+                    val usernameColumn = validateAndNormalize(usernameField) ?: return@setOnClickListener
+                    val websiteColumn = validateAndNormalize(websiteField) ?: return@setOnClickListener
+                    val passwordColumn = validateAndNormalize(passwordField) ?: return@setOnClickListener
+                    val expiryDateColumn = validateAndNormalize(expiryField) ?: return@setOnClickListener
+                    val addInfoColumn = validateAndNormalize(addInfoField) ?: return@setOnClickListener
+
+                    PreferenceService.putString(PreferenceService.DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_NAME, nameColumn, importCredentialsActivity)
+                    PreferenceService.putString(PreferenceService.DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_ADDITIONAL_INFO, addInfoColumn, importCredentialsActivity)
+                    PreferenceService.putString(PreferenceService.DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_USERNAME, usernameColumn, importCredentialsActivity)
+                    PreferenceService.putString(PreferenceService.DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_WEBSITE, websiteColumn, importCredentialsActivity)
+                    PreferenceService.putString(PreferenceService.DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_PASSWORD, passwordColumn, importCredentialsActivity)
+                    PreferenceService.putString(PreferenceService.DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_EXPIRY_DATE, expiryDateColumn, importCredentialsActivity)
+                    dialog.dismiss()
+                }
+
+                val buttonNegative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                buttonNegative.setOnClickListener {
+                    dialog.dismiss()
+                }
+            }
+
+            dialog.show()
+        }
+    }
+
+    private fun validateAndNormalize(field: EditText): String? {
+        val text = field.text.toString().trim().lowercase()
+        if (text.isNotEmpty() && !text.matches(Regex("[a-z\\d_-]+"))) {
+            field.error = getString(R.string.not_a_csv_column)
+            field.requestFocus()
+            return null
+        }
+        return text
+    }
+
+    private fun addInputField(
+        importCredentialsActivity: ImportCredentialsActivity,
+        columnsContainer: LinearLayout,
+        label: String,
+        prefKey: String,
+        context: Context
+    ): EditText {
+        val container = LinearLayout(context)
+        container.orientation = LinearLayout.VERTICAL
+        container.setPadding(0, 0, 0, 32)
+
+        val textView = TextView(importCredentialsActivity)
+        textView.text = label
+        container.addView(textView)
+
+        val editView = EditText(importCredentialsActivity)
+        editView.setSingleLine()
+        PreferenceService.getAsString(prefKey, context)?.let {
+            editView.setText(it)
+        }
+        container.addView(editView)
+
+        columnsContainer.addView(container)
+
+        return editView
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
