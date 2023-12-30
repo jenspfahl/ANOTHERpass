@@ -1,9 +1,12 @@
 package de.jepfa.yapm.ui.importcredentials
 
+import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.OpenableColumns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -62,7 +65,7 @@ class ImportCredentialsLoadFileFragment : BaseFragment() {
             columnsContainer.setPadding(24)
 
             val scrollView = ScrollView(dialogBuilder.context)
-            val height = (resources.displayMetrics.heightPixels * 0.55).toInt()
+            val height = (resources.displayMetrics.heightPixels * 0.45).toInt()
             scrollView.layoutParams =
                 ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height)
             scrollView.setPadding(0, 24, 0, 24)
@@ -71,6 +74,28 @@ class ImportCredentialsLoadFileFragment : BaseFragment() {
 
             val container = LinearLayout(dialogBuilder.context)
             container.orientation = LinearLayout.VERTICAL
+
+            var message = getString(R.string.csv_column_message)
+            if (!importCredentialsActivity.firstRecord.isNullOrEmpty()) {
+
+                message = getString(R.string.csv_column_message_suggested_columns, importCredentialsActivity.fileName)
+
+                val csvColumnsContainer = LinearLayout(context)
+                csvColumnsContainer.orientation = LinearLayout.VERTICAL
+                csvColumnsContainer.setPadding(32)
+
+                val textView = TextView(importCredentialsActivity)
+                textView.text = getString(R.string.current_csv_columns)
+                csvColumnsContainer.addView(textView)
+
+                val editView = EditText(importCredentialsActivity)
+                editView.setSingleLine()
+                editView.setText(importCredentialsActivity.firstRecord?.keys?.joinToString(separator = ", "))
+                csvColumnsContainer.addView(editView)
+
+                container.addView(csvColumnsContainer)
+            }
+
             container.addView(scrollView)
 
             val nameField = addInputField(importCredentialsActivity, columnsContainer, getString(R.string.csv_column_credential_name), PreferenceService.DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_NAME, importCredentialsActivity)
@@ -84,9 +109,10 @@ class ImportCredentialsLoadFileFragment : BaseFragment() {
             val addInfoField = addInputField(importCredentialsActivity, columnsContainer, getString(
                             R.string.csv_column_credential_additional_info), PreferenceService.DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_ADDITIONAL_INFO, importCredentialsActivity)
 
+
             val dialog = dialogBuilder
                 .setTitle(getString(R.string.csv_column_title))
-                .setMessage(getString(R.string.csv_column_message))
+                .setMessage(message)
                 .setView(container)
                 .setPositiveButton(android.R.string.ok, null)
                 .setNegativeButton(android.R.string.cancel, null)
@@ -110,6 +136,11 @@ class ImportCredentialsLoadFileFragment : BaseFragment() {
                     PreferenceService.putString(PreferenceService.DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_PASSWORD, passwordColumn, importCredentialsActivity)
                     PreferenceService.putString(PreferenceService.DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_EXPIRY_DATE, expiryDateColumn, importCredentialsActivity)
                     dialog.dismiss()
+
+                    if (importCredentialsActivity.csvContent != null) {
+                        // automatically process next step
+                        processCsvContentAndMoveForward(importCredentialsActivity)
+                    }
                 }
 
                 val buttonNegative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
@@ -168,6 +199,7 @@ class ImportCredentialsLoadFileFragment : BaseFragment() {
                 val selectedFile = data.data
 
                 if (selectedFile != null && FileUtil.isExternalStorageReadable()) {
+                    importCredentialsActivity.fileName = getFileName(importCredentialsActivity, selectedFile)
                     val content = FileUtil.readFile(importCredentialsActivity, selectedFile)
                     if (content == null) {
                         toastText(importCredentialsActivity, R.string.cannot_parse_csv_credentials)
@@ -175,21 +207,38 @@ class ImportCredentialsLoadFileFragment : BaseFragment() {
                     }
                     val csv = CsvService.parseCsv(content)
                     if (csv == null || csv.isEmpty()) {
-                        toastText(importCredentialsActivity, R.string.cannot_parse_csv_credentials)
+                        toastText(importCredentialsActivity, R.string.empty_csv_credentials)
                         return
                     }
                     else {
-                        val records = importCredentialsActivity.readContent(csv)
-                        if (records == null || records.isEmpty()) {
-                            toastText(importCredentialsActivity, R.string.cannot_parse_csv_credentials)
-                            return
-                        }
+                        importCredentialsActivity.csvContent = csv
                         importCredentialsActivity.content = content
-                        importCredentialsActivity.records = records
-                        findNavController().navigate(R.id.action_importCredentials_LoadFileFragment_to_ImportFileFragment)
+
+                        processCsvContentAndMoveForward(importCredentialsActivity)
                     }
                 }
             }
+        }
+    }
+
+    @SuppressLint("Range")
+    private fun getFileName(context: Context, uri: Uri): String {
+        val fileName: String?
+        val cursor = context.contentResolver.query(uri, null, null, null, null)
+        cursor?.moveToFirst()
+        fileName = cursor?.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+        cursor?.close()
+        return fileName?:"?"
+    }
+
+    private fun processCsvContentAndMoveForward(importCredentialsActivity: ImportCredentialsActivity) {
+        val records = importCredentialsActivity.readContent(importCredentialsActivity.csvContent)
+        if (records == null || records.isEmpty()) {
+            toastText(importCredentialsActivity, R.string.cannot_parse_csv_credentials)
+        }
+        else {
+            importCredentialsActivity.records = records
+            findNavController().navigate(R.id.action_importCredentials_LoadFileFragment_to_ImportFileFragment)
         }
     }
 

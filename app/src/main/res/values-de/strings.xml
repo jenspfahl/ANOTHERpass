@@ -684,6 +684,7 @@
     <string name="credentials_in_file">%1$d Zugangsdaten in Datei gefunden</string>
 
     <string name="cannot_parse_csv_credentials">Zugangsdaten konnten nicht gelesen werden</string>
+    <string name="empty_csv_credentials">Diese CSV-Datei sheint leer zu sein oder ist keine CSV-Datei</string>
     <string name="go_back_to_app">Zurück zur App</string>
     <string name="no_autofill_for_app">Kein Ausfüllen für \'%1$s\'</string>
     <string name="no_autofill_for_current_app">Kein Ausfüllen für diese App</string>
@@ -754,6 +755,8 @@
     <string name="not_a_csv_column">Nur Buchstaben, Ziffern, Binde- und Unterstrich erlaubt</string>
     <string name="csv_column_title">CSV-Spaltennamen</string>
     <string name="csv_column_message">Öffne die CSV-Datei welche importiert werden soll und gib hier die Spaltennamen der entsprechenden Zugangsdaten-Felder ein.</string>
+    <string name="csv_column_message_suggested_columns">Überprüfe die extrahierten CSV-Spalten von \'%1$s\' und kopiere sie in die entsprechenden Zugangsdaten-Felder.</string>
+    <string name="current_csv_columns">Extrahierte CSV-Spalten</string>
     <string name="csv_column_credential_name">Spaltenname für Zugangsdatenname</string>
     <string name="csv_column_credential_username">Spaltenname für Benutzername</string>
     <string name="csv_column_credential_website">Spaltenname für Webseite</string>

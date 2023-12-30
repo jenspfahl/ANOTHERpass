@@ -15,6 +15,9 @@ import de.jepfa.yapm.util.fromSimpleDateFormat
 
 class ImportCredentialsActivity : SecureActivity() {
 
+    var firstRecord: Map<String, String>? = null
+    var fileName: String? = null
+    var csvContent: List<Map<String, String>>? = null
     var content: String? = null
     var records: List<ImportCredentialsImportFileAdapter.FileRecord>? = null
 
@@ -48,7 +51,13 @@ class ImportCredentialsActivity : SecureActivity() {
         recreate()
     }
 
-    fun readContent(csvRecords: List<Map<String, String>>): List<ImportCredentialsImportFileAdapter.FileRecord>? {
+    fun readContent(csvRecords: List<Map<String, String>>?): List<ImportCredentialsImportFileAdapter.FileRecord>? {
+
+        if (csvRecords == null) {
+            return null
+        }
+
+        firstRecord = csvRecords.firstOrNull()
         val nameKeyAliases = mutableListOf("name", "account", "title")
         val urlKeyAliases = mutableListOf("url", "website", "web site", "login_uri")
         val userKeyAliases = mutableListOf("username", "user", "login name", "login", "login_username")

@@ -644,6 +644,7 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="start_typing_to_filter_labels">Begin met typen of druk op de spatiebalk om op categorie te zoeken</string>
   <string name="credentials_in_file">%1$d Referenties gevonden in bestand</string>
   <string name="cannot_parse_csv_credentials">Toegangsgegevens konden niet worden gelezen</string>
+  <string name="empty_csv_credentials">This CSV file seems empty or is not in CSV format</string>
   <string name="go_back_to_app">Terug naar de app</string>
   <string name="no_autofill_for_app">Geen vulling voor \'%1$s\'</string>
   <string name="no_autofill_for_current_app">Geen invullen voor deze app</string>
@@ -708,6 +709,8 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="not_a_csv_column">only letters, digits, dash and stroke are allowed</string>
   <string name="csv_column_title">CSV columns</string>
   <string name="csv_column_message">Open the CSV file to be imported and input the column names of the corresponding credential fields.</string>
+  <string name="csv_column_message_suggested_columns">Check the extracted CSV columns of \'%1$s\' and copy them to the corresponding credential fields.</string>
+  <string name="current_csv_columns">Extracted CSV columns</string>
   <string name="csv_column_credential_name">column for credential name</string>
   <string name="csv_column_credential_username">column for username</string>
   <string name="csv_column_credential_website">column for website url</string>
