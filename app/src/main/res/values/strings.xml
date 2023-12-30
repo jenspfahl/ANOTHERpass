@@ -691,6 +691,7 @@
     <string name="import_credentials_explanation_labels">You can use labels to find your imported credentials easier.</string>
     <string name="start_typing_to_filter_labels">Start typing or press space to see existing labels</string>
     <string name="credentials_in_file">%1$d credentials found in file</string>
+    <string name="cannot_read_file">Cannot read this file</string>
     <string name="cannot_parse_csv_credentials">Cannot read credentials from CSV file</string>
     <string name="empty_csv_credentials">This CSV file seems empty or is not in CSV format</string>
     <string name="go_back_to_app">Back to the app</string>

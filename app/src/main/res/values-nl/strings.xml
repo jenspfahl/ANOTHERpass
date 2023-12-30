@@ -643,6 +643,7 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="import_credentials_explanation_labels">U kunt uw geïmporteerde inloggegevens categoriseren, zodat u ze gemakkelijker kunt terugvinden.</string>
   <string name="start_typing_to_filter_labels">Begin met typen of druk op de spatiebalk om op categorie te zoeken</string>
   <string name="credentials_in_file">%1$d Referenties gevonden in bestand</string>
+  <string name="cannot_read_file">Cannot read this file</string>
   <string name="cannot_parse_csv_credentials">Toegangsgegevens konden niet worden gelezen</string>
   <string name="empty_csv_credentials">This CSV file seems empty or is not in CSV format</string>
   <string name="go_back_to_app">Terug naar de app</string>

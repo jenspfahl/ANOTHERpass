@@ -19,6 +19,7 @@ import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.CsvService
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.util.FileUtil
+import de.jepfa.yapm.util.FileUtil.getFileName
 import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.toastText
 
@@ -202,7 +203,7 @@ class ImportCredentialsLoadFileFragment : BaseFragment() {
                     importCredentialsActivity.fileName = getFileName(importCredentialsActivity, selectedFile)
                     val content = FileUtil.readFile(importCredentialsActivity, selectedFile)
                     if (content == null) {
-                        toastText(importCredentialsActivity, R.string.cannot_parse_csv_credentials)
+                        toastText(importCredentialsActivity, R.string.cannot_read_file)
                         return
                     }
                     val csv = CsvService.parseCsv(content)
@@ -221,15 +222,6 @@ class ImportCredentialsLoadFileFragment : BaseFragment() {
         }
     }
 
-    @SuppressLint("Range")
-    private fun getFileName(context: Context, uri: Uri): String {
-        val fileName: String?
-        val cursor = context.contentResolver.query(uri, null, null, null, null)
-        cursor?.moveToFirst()
-        fileName = cursor?.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
-        cursor?.close()
-        return fileName?:"?"
-    }
 
     private fun processCsvContentAndMoveForward(importCredentialsActivity: ImportCredentialsActivity) {
         val records = importCredentialsActivity.readContent(importCredentialsActivity.csvContent)
