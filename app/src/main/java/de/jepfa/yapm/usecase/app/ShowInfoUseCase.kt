@@ -17,7 +17,7 @@ object ShowInfoUseCase: BasicUseCase<BaseActivity>() {
 
     override fun execute(activity: BaseActivity): Boolean {
         val builder: AlertDialog.Builder = AlertDialog.Builder(activity)
-        val icon: Drawable = activity.applicationInfo.loadIcon(activity.packageManager)
+        val icon: Drawable = activity.resources.getDrawable(R.mipmap.ic_logo)
 
         val message = activity.getString(R.string.app_name) + ", Version " + DebugInfo.getVersionName(
             activity

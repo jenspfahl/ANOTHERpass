@@ -194,7 +194,7 @@ class LoginActivity : NfcBaseActivity() {
         }
         if (id == R.id.menu_debug) {
             val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-            val icon: Drawable = applicationInfo.loadIcon(packageManager)
+            val icon: Drawable = resources.getDrawable(R.mipmap.ic_logo)
             val message = DebugInfo.getDebugInfo(this)
             builder.setTitle(R.string.debug)
                 .setMessage(message)
