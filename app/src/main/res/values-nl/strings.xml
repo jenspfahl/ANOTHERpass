@@ -489,6 +489,17 @@ Deze waarschuwing kunt u deactiveren onder \'Instellingen/Beveiliging\'.</string
   <string name="whats_new_in_1_8_bullet_3_text">Verbeterd zoeken in verschillende attributen van de toegangsgegevens met het commando \'!\'.  Zoek direct naar verlopen of verborgen toegangsgegevens.</string>
   <string name="whats_new_in_1_8_bullet_4_head">Verbetering van enkele UI-componenten</string>
   <string name="whats_new_in_1_8_bullet_4_text">Meer ruimte voor het bewerken en weergeven van aanvullende informatie, verbeterde weergave van herinneringen, meervoudige selectie van toegangsgegevens en nog veel meer.</string>
+
+  <string name="whats_new_in_1_9">What\'s new in version 1.9</string>
+  <string name="whats_new_in_1_9_bullet_1_head">Templates for frequent usernames</string>
+  <string name="whats_new_in_1_9_bullet_1_text">With this new feature you can define your most used usernames being auto-suggested when creating new credentials. It also supports usernames as generic email aliases, if you want to use different aliases for your accounts.</string>
+  <string name="whats_new_in_1_9_bullet_2_head">Custom CSV credential importer</string>
+  <string name="whats_new_in_1_9_bullet_2_text">Although the \'Import Credentials From File\' - option supports a variety of CSV formats, like for Keepass and Bitwarden, you might encounter unsupported CSV formats. If so, you can define a custom format by assigning the CSV columns to the right credential field.</string>
+  <string name="whats_new_in_1_9_bullet_3_head">Quick Settings Tile to open the vault</string>
+  <string name="whats_new_in_1_9_bullet_3_text">Now you can open the app directly from the Android Quick Settings panel. Just add the ANOTHERpass tile to the panel in the Android Settings.</string>
+  <string name="whats_new_in_1_9_bullet_4_head">Adaptive launcher icon</string>
+  <string name="whats_new_in_1_9_bullet_4_text">The launcher icon has been polished to support any scale and, even more important, support monochrone themes.</string>
+
   <string name="intro">Begin met inleiden</string>
   <string name="intro_1_head">Een iets andere wachtwoordbeheerder</string>
   <string name="intro_1_subtext">ANOTHERpass biedt een iets andere aanpak.  Lees hier wat dat betekent:</string>

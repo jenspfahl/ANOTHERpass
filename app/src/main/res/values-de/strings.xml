@@ -517,6 +517,15 @@
     <string name="whats_new_in_1_8_bullet_4_head">Verbesserung einiger UI-Komponenten</string>
     <string name="whats_new_in_1_8_bullet_4_text">Mehr Platz zum Bearbeiten und Zeigen von Zusatzinformationen, verbessertes Anzeigen von Erinnerungen, Mehrfachauswahl von Zugangsdaten, u.v.m.</string>
 
+    <string name="whats_new_in_1_9">Was ist neu in Version 1.9</string>
+    <string name="whats_new_in_1_9_bullet_1_head">Vorlagen für Benutzernamen</string>
+    <string name="whats_new_in_1_9_bullet_1_text">Mit dieser neuen Funktion können Sie festlegen, dass Ihre am häufigsten verwendeten Benutzernamen beim Erstellen neuer Zugangsinformationen automatisch vorgeschlagen werden. Es unterstützt auch Benutzernamen als generische E-Mail-Aliase, wenn Sie unterschiedliche Aliase für Ihre Konten verwenden möchten.</string>
+    <string name="whats_new_in_1_9_bullet_2_head">Anpassbarer CSV-Datei-Import</string>
+    <string name="whats_new_in_1_9_bullet_2_text">Obwohl die Option \'Importiere Zugangsdaten aus Datei\' eine Vielzahl von CSV-Formaten unterstützt, z. B. für Keepass und Bitwarden, kann es vorkommen, dass einige CSV-Formate nicht erkannt werden. In diesen Fall können Sie ein benutzerdefiniertes Format definieren, indem Sie die CSV-Spalten dem korrekten Zugangsinformationsfeldern zuweisen.</string>
+    <string name="whats_new_in_1_9_bullet_3_head">Schnelleinstellung um den Tresor zu öffnen</string>
+    <string name="whats_new_in_1_9_bullet_3_text">Jetzt können Sie die App direkt über die Android-Schnelleinstellung öffnen. Fügen Sie einfach die ANOTHERpass-Kachel zum Panel in den Android-Einstellungen hinzu.</string>
+    <string name="whats_new_in_1_9_bullet_4_head">Adaptives Start-Symbol</string>
+    <string name="whats_new_in_1_9_bullet_4_text">Das Start-Symbol wurde verbessert um jede mögliche Auflösung zu unterstützen und um einfarbige Farbthemen zu unterstützen.</string>
 
     <string name="intro">Starte Intro</string>
     <string name="intro_1_head">Ein etwas anderer Passwortmanager</string>
