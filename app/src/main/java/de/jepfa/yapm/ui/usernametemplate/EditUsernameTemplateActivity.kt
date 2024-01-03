@@ -43,6 +43,9 @@ class EditUsernameTemplateActivity : SecureActivity() {
         templateGeneratorTypeGroup = findViewById(R.id.radio_generator_type)
 
         findViewById<ImageView>(R.id.imageview_use_email_alias_help).setOnClickListener{
+            hideKeyboard(templateUsernameTextView)
+            hideKeyboard(templateDescriptionTextView)
+
             AlertDialog.Builder(this)
                 .setTitle(R.string.title_username_email_alias)
                 .setMessage(R.string.message_username_email_alias)
@@ -71,6 +74,7 @@ class EditUsernameTemplateActivity : SecureActivity() {
         templateGeneratorTypeGroup.setOnCheckedChangeListener { _, checkedId ->
             hideKeyboard(templateUsernameTextView)
             hideKeyboard(templateDescriptionTextView)
+
             when (checkedId) {
                 R.id.radio_generator_type_from_credential -> generatorType = EncUsernameTemplate.GeneratorType.EMAIL_EXTENSION_CREDENTIAL_NAME_BASED
                 R.id.radio_generator_type_with_random_word -> generatorType = EncUsernameTemplate.GeneratorType.EMAIL_EXTENSION_RANDOM_BASED
