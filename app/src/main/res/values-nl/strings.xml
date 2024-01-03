@@ -724,6 +724,7 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="open_vault">Open kluis</string>
 
   <string name="define_columns_of_csv_file">Kan bestand niet laden of ontbreken er velden? Definieer de kolommen van het bestand handmatig.</string>
+  <string name="define_columns_of_given_csv_file">Kan bestand \'%1$s\' niet laden of ontbreken er velden? Definieer de kolommen van het bestand handmatig.</string>
   <string name="not_a_csv_column">alleen letters, cijfers, streepjes en strepen zijn toegestaan</string>
   <string name="csv_column_title">CSV-kolommen</string>
   <string name="csv_column_message">Open het CSV-bestand dat geïmporteerd moet worden en voer de kolomnamen van de overeenkomstige referentievelden in.</string>

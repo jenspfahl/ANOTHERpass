@@ -1,12 +1,9 @@
 package de.jepfa.yapm.ui.importcredentials
 
-import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.provider.OpenableColumns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,6 +23,7 @@ import de.jepfa.yapm.util.toastText
 class ImportCredentialsLoadFileFragment : BaseFragment() {
 
     private val importCredentialsFile = 1
+    private lateinit var setColumnsLink: TextView
 
     init {
         enableBack = true
@@ -57,7 +55,13 @@ class ImportCredentialsLoadFileFragment : BaseFragment() {
             }
         }
 
-        view.findViewById<TextView>(R.id.button_csv_columns_manually)?.setOnClickListener {
+        setColumnsLink = view.findViewById<TextView>(R.id.button_csv_columns_manually)
+
+        importCredentialsActivity.fileName?.let {
+            setColumnsLink.text = getString(R.string.define_columns_of_given_csv_file, it)
+        }
+
+        setColumnsLink.setOnClickListener {
 
             val dialogBuilder = AlertDialog.Builder(importCredentialsActivity)
 
@@ -195,12 +199,18 @@ class ImportCredentialsLoadFileFragment : BaseFragment() {
         super.onActivityResult(requestCode, resultCode, data)
         val importCredentialsActivity = getImportCredentialsActivity()
 
+        importCredentialsActivity.fileName = null
+        importCredentialsActivity.csvContent = null
+        importCredentialsActivity.content = null
+        setColumnsLink.text = getString(R.string.define_columns_of_csv_file)
+
         if (resultCode == RESULT_OK && requestCode == importCredentialsFile) {
             data?.let {
                 val selectedFile = data.data
 
                 if (selectedFile != null && FileUtil.isExternalStorageReadable()) {
                     importCredentialsActivity.fileName = getFileName(importCredentialsActivity, selectedFile)
+
                     val content = FileUtil.readFile(importCredentialsActivity, selectedFile)
                     if (content == null) {
                         toastText(importCredentialsActivity, R.string.cannot_read_file)
@@ -226,6 +236,9 @@ class ImportCredentialsLoadFileFragment : BaseFragment() {
     private fun processCsvContentAndMoveForward(importCredentialsActivity: ImportCredentialsActivity) {
         val records = importCredentialsActivity.readContent(importCredentialsActivity.csvContent)
         if (records == null || records.isEmpty()) {
+            importCredentialsActivity.fileName?.let {
+                setColumnsLink.text = getString(R.string.define_columns_of_given_csv_file, it)
+            }
             toastText(importCredentialsActivity, R.string.cannot_parse_csv_credentials)
         }
         else {

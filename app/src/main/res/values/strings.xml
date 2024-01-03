@@ -769,6 +769,7 @@
     <string name="open_vault">Open vault</string>
 
     <string name="define_columns_of_csv_file">Cannot load file or fields are missing? Define columns of the file manually.</string>
+    <string name="define_columns_of_given_csv_file">Cannot load file \'%1$s\' or fields are missing? Define columns of the file manually.</string>
     <string name="not_a_csv_column">only letters, digits, dash and stroke are allowed</string>
     <string name="csv_column_title">CSV columns</string>
     <string name="csv_column_message">Open the CSV file to be imported and input the column names of the corresponding credential fields.</string>
