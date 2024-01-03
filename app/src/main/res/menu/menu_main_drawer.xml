@@ -122,11 +122,16 @@
             android:icon="@drawable/ic_baseline_label_24"
             android:orderInCategory="100"
             android:title="@string/action_labels" />
+        <item
+            android:id="@+id/menu_username_templates"
+            android:icon="@drawable/ic_baseline_person_24"
+            android:orderInCategory="120"
+            android:title="@string/action_username_templates" />
 
         <item
             android:id="@+id/menu_settings"
             android:icon="@drawable/ic_settings_black_24dp"
-            android:orderInCategory="100"
+            android:orderInCategory="160"
             android:title="@string/action_settings" />
 
         <item

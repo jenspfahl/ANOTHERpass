@@ -11,6 +11,7 @@
     <string name="hint_edit_credential_additional_info">Zusatzinformationen</string>
     <string name="button_save">Speichern</string>
     <string name="error_field_required">Eingabe erforderlich</string>
+    <string name="error_not_an_email_address">Dieses Feld enthält keine gültige Emailadresse.</string>
     <string name="with_upper_case">Mit Großbuchstaben</string>
     <string name="with_digits">Mit Ziffern</string>
     <string name="with_special_chars">Mit Sonderzeichen</string>
@@ -51,6 +52,10 @@
 
     <string name="title_delete_label">Lösche Kategorie</string>
     <string name="message_delete_label">Kategorie \'%1$s\' wirklich löschen? Sie wird auch von allen Zugangsdaten entfernt, die diese verwenden.</string>
+
+    <string name="title_delete_username_template">Benutzernamenvorlage löschen</string>
+    <string name="message_delete_username_template">Benutzernamenvorlage \'%1$s\' wirklich löschen? Sie wird in den Benutzernaenvorschlägen nicht mehr sichbar sein.</string>
+
 
     <string name="lock_items">Tresor sperren</string>
     <string name="logout">Ausloggen und beenden</string>
@@ -193,13 +198,22 @@
     <string name="hint_edit_credential_labels">Füge Kategorien hinzu</string>
     <string name="filter">Nach Kategorien filtern</string>
     <string name="pref_header_autofill">Unterstützung für Automatisches Ausfüllen</string>
+
+    <string name="title_activity_list_username_templates">Vorlagen für Benutzernamen</string>
+    <string name="action_username_templates">Benutzernamenvorlagen</string>
+    <string name="username_template_data_params">Gib der Vorlage einen Benutzernamen und eine optionale Beschreibung. Der Benutzername wird als Vorschlag für die Zugangsdaten verwendet.</string>
+    <string name="hint_edit_username_template_username">Benutzername</string>
+    <string name="hint_edit_username_template_description">Zusatzinformationen</string>
+
     <string name="title_activity_list_label">Kategorien verwalten</string>
-    <string name="action_labels">Verwalte Kategorien</string>
+    <string name="action_labels">Kategorien</string>
     <string name="label_data_params">Gib der Kategorie einen Namen, eine Beschreibung und eine Farbe.</string>
     <string name="choose_color">Wähle eine Farbe</string>
     <string name="error_labelname_in_use">Dieser Name wird schon von einer anderen Kategorie verwendet</string>
     <string name="title_new_label">Neue Kategorie</string>
     <string name="title_change_label">Kategorie bearbeiten</string>
+    <string name="title_new_username_template">Neue Benutzernamenvorlage</string>
+    <string name="title_change_username_template">Benutzernamenvorlage ändern</string>
     <string name="reset_vault">Alles zurücksetzen</string>
     <string name="reset_vault_and_delete">Alles löschen und zurücksetzen</string>
     <string name="button_report_bug">Fehler melden</string>
@@ -446,7 +460,7 @@
     <string name="show_expired_passwords_reminder">Erinnerung für abgelaufene Zugangsdaten</string>
     <string name="summary_show_expired_passwords_reminder">Zeige eine Erinnerung wenn Zugangsdaten abgelaufen sind.</string>
     <string name="expired_credentials_notification_enabled_title">Erhalte eine Benachrichtigung wenn Zugangsdaten abgelaufen sind</string>
-    <string name="expired_credentials_notification_enabled_summary">Du erhältst eine Benachrichtigung zur rechten Zeit, auch wenn die App geschlossen ist. Ab Android 13 muss du der App erlauben, Benachrichtigungen zu senden.</string>
+    <string name="expired_credentials_notification_enabled_summary">Du erhältst eine Benachrichtigung zur rechten Zeit, auch wenn die App geschlossen ist. Ab Android 13 musst du der App erlauben, Benachrichtigungen zu senden.</string>
 
     <string name="next_reminder">Nächste Erinnerung</string>
     <string name="last_reminder">Letzte Erinnerung</string>
@@ -503,6 +517,15 @@
     <string name="whats_new_in_1_8_bullet_4_head">Verbesserung einiger UI-Komponenten</string>
     <string name="whats_new_in_1_8_bullet_4_text">Mehr Platz zum Bearbeiten und Zeigen von Zusatzinformationen, verbessertes Anzeigen von Erinnerungen, Mehrfachauswahl von Zugangsdaten, u.v.m.</string>
 
+    <string name="whats_new_in_1_9">Was ist neu in Version 1.9</string>
+    <string name="whats_new_in_1_9_bullet_1_head">Vorlagen für Benutzernamen</string>
+    <string name="whats_new_in_1_9_bullet_1_text">Mit dieser neuen Funktion kann man festlegen, welche Benutzernamen beim Erstellen neuer Zugangsinformationen automatisch vorgeschlagen werden sollen. Es werden auch generische E-Mail-Aliase unterstützt, um unterschiedliche Aliase für Ihre Konten verwenden zu können.</string>
+    <string name="whats_new_in_1_9_bullet_2_head">Anpassbarer CSV-Datei-Import</string>
+    <string name="whats_new_in_1_9_bullet_2_text">Obwohl die Option \'Importiere Zugangsdaten aus Datei\' eine Vielzahl von CSV-Formaten unterstützt, z. B. für Keepass und Bitwarden, kann es vorkommen, dass einige CSV-Formate nicht erkannt werden. In diesen Fall können Sie ein benutzerdefiniertes Format definieren, indem Sie die CSV-Spalten dem korrekten Zugangsinformationsfeldern zuweisen.</string>
+    <string name="whats_new_in_1_9_bullet_3_head">Schnelleinstellung um den Tresor zu öffnen</string>
+    <string name="whats_new_in_1_9_bullet_3_text">Jetzt können Sie die App direkt über die Android-Schnelleinstellung öffnen. Fügen Sie einfach die ANOTHERpass-Kachel zum Panel in den Android-Einstellungen hinzu.</string>
+    <string name="whats_new_in_1_9_bullet_4_head">Adaptives Start-Symbol</string>
+    <string name="whats_new_in_1_9_bullet_4_text">Das Start-Symbol wurde verbessert um jede mögliche Auflösung zu unterstützen und um einfarbige Farbthemen zu unterstützen.</string>
 
     <string name="intro">Starte Intro</string>
     <string name="intro_1_head">Ein etwas anderer Passwortmanager</string>
@@ -564,6 +587,7 @@
     <string name="title_label_details">Kategorie-Details</string>
     <string name="language_en">Englisch</string>
     <string name="language_de">Deutsch</string>
+    <string name="language_nl">Niederländisch</string>
     <string name="title_missing_overlay_permission">Fehlende Berechtigung</string>
     <string name="head_export_protected_emp">Dein geschütztes Masterpasswort</string>
     <string name="message_protect_masterpasswd">Möchtest du das exportierte Masterpasswort absichern? Du kannst es mit einem eigens gewähltem Codeword schützen, welches immer dann benötigt wird, wenn du das Masterpasswort verwendest.  D.h. wenn du dich damit einloggen willst, brauchst du auch dieses Codeword (neben deiner PIN), aber du brauchst es nicht, wenn du das Masterpasswort in der App speicherst oder ein Masterpasswort-Token verwendest.</string>
@@ -667,8 +691,9 @@
     <string name="import_credentials_explanation_labels">Du kannst deine importierten Zugangsdaten kategorisieren um sie leichter wiederzufinden,</string>
     <string name="start_typing_to_filter_labels">Beginne zu tippen oder drücke die Leertaste um nach Kategorien zu suchen</string>
     <string name="credentials_in_file">%1$d Zugangsdaten in Datei gefunden</string>
-
+    <string name="cannot_read_file">Datei kann nicht gelesen werden</string>
     <string name="cannot_parse_csv_credentials">Zugangsdaten konnten nicht gelesen werden</string>
+    <string name="empty_csv_credentials">Diese CSV-Datei sheint leer zu sein oder ist keine CSV-Datei</string>
     <string name="go_back_to_app">Zurück zur App</string>
     <string name="no_autofill_for_app">Kein Ausfüllen für \'%1$s\'</string>
     <string name="no_autofill_for_current_app">Kein Ausfüllen für diese App</string>
@@ -726,5 +751,27 @@
     <string name="command_latest">Zeige zuletzt bearbeitete Zugangsdaten</string>
     <string name="command_veiled">Filtere verschleierte Zugangsdaten</string>
 
+    <string name="with_email_alias">Deklariere den Benutzernamen als Emailadresse mit einem generischen Alias-Teil</string>
+    <string name="title_username_email_alias">Was ist ein Email-Alias?</string>
+    <string name="message_username_email_alias">Einige Email-Anbieter wie Gmail erlauben generische Aliase mithilfe des Plus-Zeichens. D.h. derselbe Email-Account kann verschiedenste Aliase verwenden, indem man diesem nach einem Pluszeichen und vor dem \'@\' anfügt, z.B. \'test+alias1@example.org\'. Sie können diese Aliase als Benutzernamen für Zugangsdaten verwenden, um von separaten Email-Adressen pro Konto zu profitieren.</string>
+    <string name="username_template_list_type">mit Email-Alias</string>
+    <string name="username_template_type_desc_from_credential_name">Alias vom Name der Zugangsdaten (z.B. test+github@example.org)</string>
+    <string name="username_template_type_desc_random_word">Alias als zufälliges Wort (e.g. test+hiaw@example.org)</string>
+    <string name="username_template_type_desc_both">Beides vorschlagen</string>
+    <string name="open_vault">Tresor öffnen</string>
+
+    <string name="define_columns_of_csv_file">Datei kann nicht geladen werden oder einge Felder fehlen? Gib die Spaltennamen der CSV-Datei manuell ein.</string>
+    <string name="define_columns_of_given_csv_file">Datei \'%1$s\' kann nicht geladen werden oder einge Felder fehlen? Gib die Spaltennamen der CSV-Datei manuell ein.</string>
+    <string name="not_a_csv_column">Nur Buchstaben, Ziffern, Binde- und Unterstrich erlaubt</string>
+    <string name="csv_column_title">CSV-Spaltennamen</string>
+    <string name="csv_column_message">Öffne die CSV-Datei welche importiert werden soll und gib hier die Spaltennamen der entsprechenden Zugangsdaten-Felder ein.</string>
+    <string name="csv_column_message_suggested_columns">Überprüfe die extrahierten CSV-Spalten von \'%1$s\' und kopiere sie in die entsprechenden Zugangsdaten-Felder.</string>
+    <string name="current_csv_columns">Extrahierte CSV-Spalten</string>
+    <string name="csv_column_credential_name">Spaltenname für Zugangsdatenname</string>
+    <string name="csv_column_credential_username">Spaltenname für Benutzername</string>
+    <string name="csv_column_credential_website">Spaltenname für Webseite</string>
+    <string name="csv_column_credential_password">Spaltenname für Passwort</string>
+    <string name="csv_column_credential_expiry_date">Spaltenname für Ablaufdatum</string>
+    <string name="csv_column_credential_additional_info">Spaltenname für Zusatzinformationen</string>
 
 </resources>

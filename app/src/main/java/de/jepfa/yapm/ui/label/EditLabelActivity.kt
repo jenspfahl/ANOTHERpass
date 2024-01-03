@@ -70,7 +70,7 @@ class EditLabelActivity : SecureActivity() {
                             .observeOnce(this) { encLabel ->
                                 val builder: AlertDialog.Builder =
                                     AlertDialog.Builder(this)
-                                val icon = applicationInfo.loadIcon(packageManager)
+                                val icon = resources.getDrawable(R.mipmap.ic_logo)
                                 val message = encLabel.toString()
                                 builder.setTitle(R.string.debug)
                                     .setMessage(message)

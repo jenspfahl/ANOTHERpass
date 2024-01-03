@@ -128,7 +128,36 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
                     }
                 }
             }
+            
+            // username templates
+            val jsonUsernameTemplates = rawJson.get(VaultExportService.JSON_USERNAME_TEMPLATES)
+            if (jsonUsernameTemplates != null) {
+                if (handleBlob && jsonUsernameTemplates.isJsonPrimitive) {
+                    val encJsonUsernameTemplatesAsPrimitive = jsonUsernameTemplates.asJsonPrimitive
+                    if (encJsonUsernameTemplatesAsPrimitive.isString) {
+                        val encJsonUsernameTemplatesAsString = encJsonUsernameTemplatesAsPrimitive.asString
+                        if (masterKeySK != null) {
+                            val encJsonUsernameTemplates =
+                                Encrypted.fromBase64String(encJsonUsernameTemplatesAsString)
+                            val jsonUsernameTemplatesAsString =
+                                SecretService.decryptCommonString(masterKeySK, encJsonUsernameTemplates)
 
+                            if (jsonUsernameTemplatesAsString == Validable.FAILED_STRING) {
+                                return ParsedVault(appVersionCode, vaultId, cipherAlgorithm, null)
+                            }
+
+                            val jsonUsernameTemplates = JsonParser.parseString(jsonUsernameTemplatesAsString).asJsonArray
+                            rawJson.add(VaultExportService.JSON_USERNAME_TEMPLATES, jsonUsernameTemplates)
+                        }
+                        else {
+                            // remove blob from json content
+                            rawJson.remove(VaultExportService.JSON_USERNAME_TEMPLATES)
+                            //stage blob instead to get imported after login with masterkey
+                            PreferenceService.putString(PreferenceService.TEMP_BLOB_USERNAME_TEMPLATES, encJsonUsernameTemplatesAsString, context)
+                        }
+                    }
+                }
+            }
 
             // app settings
             val jsonAppSettings = rawJson.get(VaultExportService.JSON_APP_SETTINGS)
@@ -173,6 +202,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
 
         val stagedEncCredentials = PreferenceService.getAsString(PreferenceService.TEMP_BLOB_CREDENTIALS, activity)
         val stagedEncLabels = PreferenceService.getAsString(PreferenceService.TEMP_BLOB_LABELS, activity)
+        val stagedEncUsernameTemplates = PreferenceService.getAsString(PreferenceService.TEMP_BLOB_USERNAME_TEMPLATES, activity)
         val stagedEncAppSettings = PreferenceService.getAsString(PreferenceService.TEMP_BLOB_SETTINGS, activity)
 
         if (stagedEncCredentials != null) {
@@ -194,7 +224,17 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
             }
             PreferenceService.delete(PreferenceService.TEMP_BLOB_LABELS, activity)
         }
-        
+
+        if (stagedEncUsernameTemplates != null) {
+            val encUsernameTemplates = Encrypted.fromBase64String(stagedEncUsernameTemplates)
+            val jsonUsernameTemplatesAsString = SecretService.decryptCommonString(masterSecretKey, encUsernameTemplates)
+            if (jsonUsernameTemplatesAsString != Validable.FAILED_STRING) {
+                val jsonUsernameTemplates = JsonParser.parseString(jsonUsernameTemplatesAsString).asJsonArray
+                persistUsernameTemplates(jsonUsernameTemplates, activity)
+            }
+            PreferenceService.delete(PreferenceService.TEMP_BLOB_USERNAME_TEMPLATES, activity)
+        }
+
         if (stagedEncAppSettings != null) {
             val encAppSettings = Encrypted.fromBase64String(stagedEncAppSettings)
             val jsonAppSettingsAsString = SecretService.decryptCommonString(masterSecretKey, encAppSettings)
@@ -286,6 +326,11 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
             persistLabels(labelsJson, activity)
         }
 
+        val usernameTemplatesJson = jsonContent.get(VaultExportService.JSON_USERNAME_TEMPLATES)?.asJsonArray
+        if (usernameTemplatesJson != null) {
+            persistUsernameTemplates(usernameTemplatesJson, activity)
+        }
+
         val appSettings = jsonContent.get(VaultExportService.JSON_APP_SETTINGS)?.asJsonObject
         if (appSettings != null) {
             persistAppSettings(appSettings, activity)
@@ -358,6 +403,23 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
                     }
             }
         }
+        
+        val usernameTemplatesJson = jsonContent.get(VaultExportService.JSON_USERNAME_TEMPLATES)?.asJsonArray
+        if (usernameTemplatesJson != null) {
+            CoroutineScope(Dispatchers.IO).launch {
+                usernameTemplatesJson
+                    .filterNotNull()
+                    .mapNotNull { json -> EncUsernameTemplate.fromJson(json) }
+                    .forEach { l ->
+                        val existingU = app.usernameTemplateRepository.findByIdSync(l.id!!)
+                        if (existingU == null) {
+                            app.usernameTemplateRepository.insert(l)
+                        } else {
+                            app.usernameTemplateRepository.update(l)
+                        }
+                    }
+            }
+        }
 
         return true
     }
@@ -412,10 +474,19 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             labelsJson
-                .filterNotNull()
-                .map { json -> EncLabel.fromJson(json) }
-                .filterNotNull()
+                .filterNotNull().mapNotNull { json -> EncLabel.fromJson(json) }
                 .forEach { c -> activity.getApp().labelRepository.insert(c) }
+        }
+    }
+
+    private fun persistUsernameTemplates(
+        usernameTemplatesJson: JsonArray,
+        activity: BaseActivity
+    ) {
+        CoroutineScope(Dispatchers.IO).launch {
+            usernameTemplatesJson
+                .filterNotNull().mapNotNull { json -> EncUsernameTemplate.fromJson(json) }
+                .forEach { c -> activity.getApp().usernameTemplateRepository.insert(c) }
         }
     }
 

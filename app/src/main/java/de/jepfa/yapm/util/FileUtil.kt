@@ -15,6 +15,9 @@ import java.io.*
  */
 object FileUtil {
 
+    private const val MAX_FILE_SIZE_MB = 1024 * 1024 * 50
+
+
     /** Checks if external storage is available for read and write  */
     fun isExternalStorageWritable(): Boolean  {
         val state = Environment.getExternalStorageState()
@@ -28,6 +31,13 @@ object FileUtil {
     }
 
     fun readFile(context: Context, uri: Uri): String? {
+
+        val size = getFileSize(context, uri)?:0
+        if (size > MAX_FILE_SIZE_MB) {
+            Log.e("READFILE", "File too big for $uri")
+            return null
+        }
+
         //Read text from file
         val text = StringBuilder()
 
@@ -53,6 +63,28 @@ object FileUtil {
         }
 
         return text.toString()
+    }
+
+    fun getFileSize(context: Context, uri: Uri): Long? {
+        val fileDescriptor = context.contentResolver.openAssetFileDescriptor(uri, "r")
+        val fileSize = fileDescriptor?.length
+        fileDescriptor?.close()
+        return fileSize
+    }
+
+
+    fun getFileName(context: Context, uri: Uri): String? {
+        val fileName: String?
+        val cursor = context.contentResolver.query(uri, null, null, null, null)
+        cursor?.moveToFirst()
+        val idx = cursor?.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+        if (idx == null || idx == -1) {
+            return null
+        }
+        fileName = cursor.getString(idx)
+        cursor.close()
+
+        return fileName
     }
 
     fun readBinaryFile(context: Context, uri: Uri): ByteArray? {

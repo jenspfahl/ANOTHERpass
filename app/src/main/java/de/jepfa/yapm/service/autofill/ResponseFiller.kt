@@ -346,6 +346,15 @@ object ResponseFiller {
             }.forEach { responseBuilder.addDataset(it) }
         }
 
+        val pauseDurationInSec = PreferenceService.getAsString(PreferenceService.PREF_AUTOFILL_DEACTIVATION_DURATION, context)
+        if (pauseDurationInSec != null && pauseDurationInSec != "0" && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            createAuthDataSets(
+                structure,
+                fields.getAllFields(), R.drawable.ic_baseline_pause_gray_24,
+                context.getString(R.string.temp_deact_autofill), ACTION_PAUSE_AUTOFILL, true, context
+            ).forEach { responseBuilder.addDataset(it) }
+        }
+
         val appName = getAppNameFromPackage(structure.activityComponent.packageName, context)
         val message =
             if (appName != null) context.getString(R.string.no_autofill_for_app, appName)
@@ -358,15 +367,6 @@ object ResponseFiller {
             context)
             .forEach { responseBuilder.addDataset(it) }
 
-        val pauseDurationInSec = PreferenceService.getAsString(PreferenceService.PREF_AUTOFILL_DEACTIVATION_DURATION, context)
-
-        if (pauseDurationInSec != null && pauseDurationInSec != "0" && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            createAuthDataSets(
-                structure,
-                fields.getAllFields(), R.drawable.ic_baseline_pause_gray_24,
-                context.getString(R.string.temp_deact_autofill), ACTION_PAUSE_AUTOFILL, true, context
-            ).forEach { responseBuilder.addDataset(it) }
-        }
 
         Log.d("CFS", "auth response finished")
 

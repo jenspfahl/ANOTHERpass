@@ -12,6 +12,7 @@
     <string name="hint_edit_credential_additional_info">Some optional info</string>
     <string name="button_save">Save</string>
     <string name="error_field_required">This field is required.</string>
+    <string name="error_not_an_email_address">This field does not contain a valid email address.</string>
     <string name="with_upper_case">With upper case chars</string>
     <string name="with_digits">With digits</string>
     <string name="with_special_chars">With special chars</string>
@@ -53,6 +54,8 @@
 
     <string name="title_delete_label">Delete Label</string>
     <string name="message_delete_label">Are you sure deleting label \'%1$s\'? It will be removed from all credentials where it is assigned to.</string>
+    <string name="title_delete_username_template">Delete Username Template</string>
+    <string name="message_delete_username_template">Are you sure deleting username template \'%1$s\'? It wont be visible anymore in the username suggestions.</string>
 
     <string name="lock_items">Lock vault</string>
     <string name="logout">Logout and exit</string>
@@ -148,6 +151,7 @@
     <string name="master_password_not_changed">Master password has not been changed.</string>
     <string name="use_pseudo_phrase">Use pseudo phrases to generate master password</string>
     <string name="generate_new_masterkey">Generate new master key (the internal key to en-/decrypt all vault data will be renewed)</string>
+
     <string name="help">Online help</string>
     <string name="about">About</string>
     <string name="title_about_the_app">About the app</string>
@@ -196,13 +200,21 @@
     <string name="credential_data_params">Edit your credential here. The name is mandatory. Use labels to categorize them.</string>
     <string name="filter">Filter by labels</string>
     <string name="pref_header_autofill">Auto fill support</string>
-    <string name="title_activity_list_label">Manage Labels</string>
+    <string name="title_activity_list_label">Labels</string>
+    <string name="title_activity_list_username_templates">Templates for usernames</string>
     <string name="action_labels">Manage labels</string>
+    <string name="action_username_templates">Username templates</string>
+    <string name="username_template_data_params">Define the username of a template and an optional description. The username is used to present suggestions for usernames when editing credentials.</string>
+    <string name="hint_edit_username_template_username">Username</string>
+    <string name="hint_edit_username_template_description">Additional description</string>
+
     <string name="label_data_params">Set the label name and description and color here</string>
     <string name="choose_color">Choose a color</string>
     <string name="error_labelname_in_use">This label name is already in use by another label</string>
     <string name="title_new_label">New label</string>
     <string name="title_change_label">Edit label</string>
+    <string name="title_new_username_template">New username template</string>
+    <string name="title_change_username_template">Edit username template</string>
     <string name="reset_vault">Reset all</string>
     <string name="reset_vault_and_delete">Reset and delete all</string>
     <string name="button_report_bug">Report bug</string>
@@ -513,6 +525,16 @@
     <string name="whats_new_in_1_8_bullet_4_head">Improvement of some UI-components</string>
     <string name="whats_new_in_1_8_bullet_4_text">More space in displaying and editing additional information for credentials, improved reminders, multiple selection of credentials, etc…</string>
 
+    <string name="whats_new_in_1_9">What\'s new in version 1.9</string>
+    <string name="whats_new_in_1_9_bullet_1_head">Templates for frequent usernames</string>
+    <string name="whats_new_in_1_9_bullet_1_text">With this new feature you can predefine your most used usernames being auto-suggested when creating new credentials. It also supports usernames as generic email aliases, if you want to use different aliases for your accounts.</string>
+    <string name="whats_new_in_1_9_bullet_2_head">Custom CSV credential importer</string>
+    <string name="whats_new_in_1_9_bullet_2_text">Although the \'Import Credentials From File\' - option supports a variety of CSV formats, like for Keepass and Bitwarden, you might encounter unsupported CSV formats. If so, you can define a custom format by assigning the CSV columns to the right credential field.</string>
+    <string name="whats_new_in_1_9_bullet_3_head">Quick Settings Tile to open the vault</string>
+    <string name="whats_new_in_1_9_bullet_3_text">Now you can open the app directly from the Android Quick Settings panel. Just add the ANOTHERpass tile to the panel in the Android Settings.</string>
+    <string name="whats_new_in_1_9_bullet_4_head">Adaptive launcher icon</string>
+    <string name="whats_new_in_1_9_bullet_4_text">The launcher icon has been polished to support any scale and, even more important, support monochrone themes.</string>
+
     <string name="intro">Show intro</string>
     <string name="intro_1_head">Another way to manage passwords</string>
     <string name="intro_1_subtext">ANOTHERpass is another approach of a password manager. See what it means:</string>
@@ -581,6 +603,7 @@
     <string name="language_default">System default</string>
     <string name="language_en">English</string>
     <string name="language_de">German</string>
+    <string name="language_nl">Dutch</string>
     <string name="small">Small</string>
     <string name="medium">Medium</string>
     <string name="big">Big</string>
@@ -678,7 +701,9 @@
     <string name="import_credentials_explanation_labels">You can use labels to find your imported credentials easier.</string>
     <string name="start_typing_to_filter_labels">Start typing or press space to see existing labels</string>
     <string name="credentials_in_file">%1$d credentials found in file</string>
+    <string name="cannot_read_file">Cannot read this file</string>
     <string name="cannot_parse_csv_credentials">Cannot read credentials from CSV file</string>
+    <string name="empty_csv_credentials">This CSV file seems empty or is not in CSV format</string>
     <string name="go_back_to_app">Back to the app</string>
     <string name="no_autofill_for_app">No Autofill for \'%1$s\'</string>
     <string name="no_autofill_for_current_app">No Autofill for this app</string>
@@ -734,5 +759,27 @@
     <string name="command_latest">Show latest modified credential</string>
     <string name="command_veiled">Filter obfuscated credentials</string>
 
+    <string name="with_email_alias">Declare the username as email address with a generic alias part</string>
+    <string name="title_username_email_alias">What is an email alias part?</string>
+    <string name="message_username_email_alias">Some email providers like Gmail provide generic aliases using the plus notation. So the same email account can have various aliases by adding \'+ALIAS\' before the \'@\' (e.g. test+alias1@example.org). You can use these aliases as usernames of credentials to benefit from having separate email addresses per account.</string>
+    <string name="username_template_list_type">with email alias</string>
+    <string name="username_template_type_desc_from_credential_name">alias from credential name (e.g. test+github@example.org)</string>
+    <string name="username_template_type_desc_random_word">alias from a random word (e.g. test+hiaw@example.org)</string>
+    <string name="username_template_type_desc_both">provide both</string>
+    <string name="open_vault">Open vault</string>
+
+    <string name="define_columns_of_csv_file">Cannot load file or fields are missing? Define columns of the file manually.</string>
+    <string name="define_columns_of_given_csv_file">Cannot load file \'%1$s\' or fields are missing? Define columns of the file manually.</string>
+    <string name="not_a_csv_column">only letters, digits, dash and stroke are allowed</string>
+    <string name="csv_column_title">CSV columns</string>
+    <string name="csv_column_message">Open the CSV file to be imported and input the column names of the corresponding credential fields.</string>
+    <string name="csv_column_message_suggested_columns">Check the extracted CSV columns of \'%1$s\' and copy them to the corresponding credential fields.</string>
+    <string name="current_csv_columns">Extracted CSV columns</string>
+    <string name="csv_column_credential_name">column for credential name</string>
+    <string name="csv_column_credential_username">column for username</string>
+    <string name="csv_column_credential_website">column for website url</string>
+    <string name="csv_column_credential_password">column for password</string>
+    <string name="csv_column_credential_expiry_date">column for expiry date</string>
+    <string name="csv_column_credential_additional_info">column for additional information</string>
 
 </resources>

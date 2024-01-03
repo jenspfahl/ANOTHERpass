@@ -26,7 +26,7 @@ object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActi
     override suspend fun doExecute(input: Input, activity: SecureActivity): Boolean {
 
         val builder: AlertDialog.Builder = AlertDialog.Builder(activity)
-        val icon: Drawable = activity.applicationInfo.loadIcon(activity.packageManager)
+        val icon: Drawable = activity.resources.getDrawable(R.mipmap.ic_logo)
 
         val vaultId = SaltService.getVaultId(activity)
         val vaultVersion = PreferenceService.getAsString(

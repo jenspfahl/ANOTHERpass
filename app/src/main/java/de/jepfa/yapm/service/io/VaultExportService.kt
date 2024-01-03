@@ -9,6 +9,7 @@ import com.google.gson.*
 import com.google.gson.reflect.TypeToken
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncLabel
+import de.jepfa.yapm.model.encrypted.EncUsernameTemplate
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.export.*
 import de.jepfa.yapm.model.secret.Password
@@ -40,10 +41,12 @@ object VaultExportService {
     const val JSON_CREDENTIALS_COUNT = "credentialsCount"
     const val JSON_LABELS = "labels"
     const val JSON_LABELS_COUNT = "labelsCount"
+    const val JSON_USERNAME_TEMPLATES = "usernameTemplates"
     const val JSON_APP_SETTINGS = "appSettings"
 
     val CREDENTIALS_TYPE: Type = object : TypeToken<List<EncCredential>>() {}.type
     val LABELS_TYPE: Type = object : TypeToken<List<EncLabel>>() {}.type
+    val USERNAME_TEMPLATES_TYPE: Type = object : TypeToken<List<EncUsernameTemplate>>() {}.type
 
     class EncryptedSerializer : JsonSerializer<Encrypted> {
         override fun serialize(src: Encrypted?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
@@ -172,6 +175,15 @@ object VaultExportService {
 
         root.addProperty(JSON_LABELS, encLabels.toBase64String())
         root.addProperty(JSON_LABELS_COUNT, labels.size)
+
+        val usernameTemplates = app.usernameTemplateRepository.getAllSync()
+
+        val usernameTemplatesAsJson = GSON.toJsonTree(usernameTemplates, USERNAME_TEMPLATES_TYPE)
+        val encUsernameTemplates = SecretService.encryptCommonString(
+            masterKeySK,
+            usernameTemplatesAsJson.toString())
+
+        root.addProperty(JSON_USERNAME_TEMPLATES, encUsernameTemplates.toBase64String())
 
         if (includePreferences) {
             val allPrefs = PreferenceService.getAllPrefs(context)

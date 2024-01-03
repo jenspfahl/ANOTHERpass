@@ -63,6 +63,13 @@ object PreferenceService {
     const val DATA_MPT_CREATED_AT = DATA_PREFIX + "mpt_created_at"
     const val DATA_EXPIRY_DATES = DATA_PREFIX + "expiry_dates"
 
+    const val DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_NAME = DATA_PREFIX + "custom_csv_column_credential_name"
+    const val DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_ADDITIONAL_INFO = DATA_PREFIX + "custom_csv_column_credential_additional_info"
+    const val DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_USERNAME = DATA_PREFIX + "custom_csv_column_credential_username"
+    const val DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_WEBSITE = DATA_PREFIX + "custom_csv_column_credential_website"
+    const val DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_PASSWORD = DATA_PREFIX + "custom_csv_column_credential_password"
+    const val DATA_CUSTOM_CSV_COLUMN_CREDENTIAL_EXPIRY_DATE = DATA_PREFIX + "custom_csv_column_credential_expiry_date"
+
     const val DATA_NAV_MENU_QUICK_ACCESS_EXPANDED = DATA_PREFIX + "nav_menu_quick_access_expanded"
     const val DATA_NAV_MENU_EXPORT_EXPANDED = DATA_PREFIX + "nav_menu_export_expanded"
     const val DATA_NAV_MENU_IMPORT_EXPANDED = DATA_PREFIX + "nav_menu_import_expanded"
@@ -164,6 +171,7 @@ object PreferenceService {
 
     const val TEMP_BLOB_CREDENTIALS = TEMP_PREFIX + "blob_credentials"
     const val TEMP_BLOB_LABELS = TEMP_PREFIX + "blob_labels"
+    const val TEMP_BLOB_USERNAME_TEMPLATES = TEMP_PREFIX + "blob_username_templates"
     const val TEMP_BLOB_SETTINGS = TEMP_PREFIX + "blob_settings"
 
     private lateinit var prefs: SharedPreferences

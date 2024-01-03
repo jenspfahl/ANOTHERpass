@@ -8,20 +8,23 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import de.jepfa.yapm.database.dao.EncCredentialDao
 import de.jepfa.yapm.database.dao.EncLabelDao
+import de.jepfa.yapm.database.dao.EncUsernameTemplateDao
 import de.jepfa.yapm.database.entity.EncCredentialEntity
 import de.jepfa.yapm.database.entity.EncLabelEntity
+import de.jepfa.yapm.database.entity.EncUsernameTemplateEntity
 import java.util.*
 
-const val DB_VERSION = 6
+const val DB_VERSION = 7
 
 @Database(
-    entities = [EncCredentialEntity::class, EncLabelEntity::class],
+    entities = [EncCredentialEntity::class, EncLabelEntity::class, EncUsernameTemplateEntity::class],
     version = DB_VERSION,
     exportSchema = false
 )
 abstract class YapmDatabase : RoomDatabase() {
     abstract fun credentialDao(): EncCredentialDao
     abstract fun labelDao(): EncLabelDao
+    abstract fun usernameTemplateDao(): EncUsernameTemplateDao
 
     companion object {
 
@@ -71,12 +74,17 @@ abstract class YapmDatabase : RoomDatabase() {
                                 updateUuid(database, EncLabelEntity::class.simpleName!!)
                             }
                         }
+                        val migration6to7 = object : Migration(6, 7) {
+                            override fun migrate(database: SupportSQLiteDatabase) {
+                                database.execSQL("CREATE TABLE IF NOT EXISTS `EncUsernameTemplateEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `username` TEXT NOT NULL, `description` TEXT NOT NULL, `generatorType` TEXT NOT NULL)");
+                            }
+                        }
 
                         INSTANCE = Room.databaseBuilder(
                             context.applicationContext,
                             YapmDatabase::class.java, "yapm_database"
                         )
-                        .addMigrations(migration1to2, migration2to3, migration3to4, migration4to5, migration5to6)
+                        .addMigrations(migration1to2, migration2to3, migration3to4, migration4to5, migration5to6, migration6to7)
                         .build()
                     }
                 }

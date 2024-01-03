@@ -22,10 +22,7 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.ui.errorhandling.ExceptionHandler
 import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.toastText
-import de.jepfa.yapm.viewmodel.CredentialViewModel
-import de.jepfa.yapm.viewmodel.CredentialViewModelFactory
-import de.jepfa.yapm.viewmodel.LabelViewModel
-import de.jepfa.yapm.viewmodel.LabelViewModelFactory
+import de.jepfa.yapm.viewmodel.*
 
 open class BaseActivity : AppCompatActivity() {
 
@@ -39,6 +36,10 @@ open class BaseActivity : AppCompatActivity() {
 
     val labelViewModel: LabelViewModel by viewModels {
         LabelViewModelFactory(getApp())
+    }
+
+    val usernameTemplateViewModel: UsernameTemplateViewModel by viewModels {
+        UsernameTemplateViewModelFactory(getApp())
     }
 
     fun getProgressBar(): ProgressBar? {

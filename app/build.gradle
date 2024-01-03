@@ -21,10 +21,10 @@ android {
         // YY=minor (new features)
         // ZZZ=micro (just bugfixes)
     //  versionCode XXYYZZZ
-        versionCode  108002
+        versionCode  109000
         // remove _rc when release
         // e.g. versionName "1.3.0_rc"
-        versionName "1.8.2"
+        versionName "1.9.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
@@ -87,9 +87,9 @@ dependencies {
     androidTestImplementation 'androidx.test:core-ktx:1.5.0'
 
     // Lifecycle components
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
-    implementation 'androidx.lifecycle:lifecycle-common-java8:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.2'
+    implementation 'androidx.lifecycle:lifecycle-common-java8:2.6.2'
 
     // Kotlin components
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -100,7 +100,7 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:2.1.4"
     implementation "com.google.android.material:material:1.8.0"
 
-    implementation "androidx.preference:preference-ktx:1.2.0"
+    implementation "androidx.preference:preference-ktx:1.2.1"
 
     implementation 'com.google.zxing:core:3.4.1'
     implementation 'com.journeyapps:zxing-android-embedded:3.6.0'

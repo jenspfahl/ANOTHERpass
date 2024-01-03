@@ -17,12 +17,12 @@ object ShowInfoUseCase: BasicUseCase<BaseActivity>() {
 
     override fun execute(activity: BaseActivity): Boolean {
         val builder: AlertDialog.Builder = AlertDialog.Builder(activity)
-        val icon: Drawable = activity.applicationInfo.loadIcon(activity.packageManager)
+        val icon: Drawable = activity.resources.getDrawable(R.mipmap.ic_logo)
 
         val message = activity.getString(R.string.app_name) + ", Version " + DebugInfo.getVersionName(
             activity
         ) +
-                System.lineSeparator() + " \u00A9 Jens Pfahl 2023" +
+                System.lineSeparator() + " \u00A9 Jens Pfahl 2024" +
                 System.lineSeparator() + System.lineSeparator() +
                 activity.getString(R.string.this_app_is_foss) +
                 System.lineSeparator() + activity.getString(

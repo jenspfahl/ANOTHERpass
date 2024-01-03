@@ -585,7 +585,7 @@ class ShowCredentialActivity : SecureActivity() {
             if (DebugInfo.isDebug) {
                 titleLayout.setOnLongClickListener {
                     val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-                    val icon: Drawable = applicationInfo.loadIcon(packageManager)
+                    val icon: Drawable = resources.getDrawable(R.mipmap.ic_logo)
                     val labelIds = toolbarChipGroup.children
                         .mapNotNull { it as? Chip }
                         .mapNotNull { it.tag as? Int }
