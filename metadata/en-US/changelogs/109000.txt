@@ -1,0 +1,7 @@
+* new feature to predefine templates for frequent usernames (supports generic email aliases)
+* custom CSV credential importer for unknown CSV files
+* import CSV files from Bitwarden databases (https://github.com/jenspfahl/ANOTHERpass/issues/58)
+* provide Quick Settings Tile to open the vault (https://github.com/jenspfahl/ANOTHERpass/issues/57)
+* Dutch translations (thanks to https://github.com/ruditimmermans)
+* adaptive app launcher icon to support monochrome icon themes (https://github.com/jenspfahl/ANOTHERpass/issues/54)
+* small bugfixes and UI improvements
