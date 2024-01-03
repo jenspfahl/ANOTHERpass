@@ -50,6 +50,9 @@ class EditUsernameTemplateActivity : SecureActivity() {
         }
 
         templateTypeSwitchView.setOnCheckedChangeListener { _, isChecked ->
+            hideKeyboard(templateUsernameTextView)
+            hideKeyboard(templateDescriptionTextView)
+
             if (isChecked) {
                 templateGeneratorTypeGroup.visibility = View.VISIBLE
                 if (generatorType == EncUsernameTemplate.GeneratorType.NONE) {
@@ -66,6 +69,8 @@ class EditUsernameTemplateActivity : SecureActivity() {
         }
 
         templateGeneratorTypeGroup.setOnCheckedChangeListener { _, checkedId ->
+            hideKeyboard(templateUsernameTextView)
+            hideKeyboard(templateDescriptionTextView)
             when (checkedId) {
                 R.id.radio_generator_type_from_credential -> generatorType = EncUsernameTemplate.GeneratorType.EMAIL_EXTENSION_CREDENTIAL_NAME_BASED
                 R.id.radio_generator_type_with_random_word -> generatorType = EncUsernameTemplate.GeneratorType.EMAIL_EXTENSION_RANDOM_BASED
