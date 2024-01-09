@@ -159,7 +159,7 @@ Het scheiden van de gecodeerde hoofdsleutel van het kluisbestand maakt het besta
   <string name="change_encryption_explanation">Wijzig het versleutelingsalgoritme van de kluis als u de kluis vanaf een oud apparaat hebt gemigreerd en uw nieuwe apparaat aanvullende algoritmen ondersteunt.  Houd er rekening mee dat de gecodeerde hoofdsleutel verandert, dus u moet deze opnieuw exporteren.  Dit heeft ook gevolgen voor kluisbestanden en geëxporteerde toegangsgegevens (ECR\'s), die vervolgens niet meer kunnen worden gelezen.</string>
   <string name="vault">veilig</string>
   <string name="delete_stored_masterpasswd_confirmation">Wilt u het opgeslagen hoofdwachtwoord van het apparaat verwijderen?  Voor toekomstige logins heeft u dan het (geëxporteerde) hoofdwachtwoord of een hoofdwachtwoordtoken nodig.</string>
-  <string name="pref_header_general">Over het algemeen</string>
+  <string name="pref_header_general">Gebruikersinterface</string>
   <string name="pref_header_security">Beveiliging</string>
   <string name="title_activity_settings">Instellingen</string>
   <string name="lock_timeout_title">Vergrendel de kluis wanneer deze inactief is</string>
@@ -381,7 +381,7 @@ Deze waarschuwing kunt u deactiveren onder \'Instellingen/Beveiliging\'.</string
   <string name="visit_foss_site">Bezoek %1$s om de licentie en broncode te bekijken, of om bugs te melden.</string>
   <string name="credential_duplicated">Inloggegevens gedupliceerd</string>
   <string name="credential_deleted">Toegangsgegevens verwijderd</string>
-  <string name="dark_mode_auto">Systeemfout</string>
+  <string name="dark_mode_auto">Systeemstandaard</string>
   <string name="dark_mode_on">Donker</string>
   <string name="dark_mode_off">Helder</string>
   <string name="pref_general_theme">Thema</string>
@@ -550,10 +550,10 @@ Deze waarschuwing kunt u deactiveren onder \'Instellingen/Beveiliging\'.</string
   <string name="message_make_nfc_tag_write_protected">Moet de NFC-tag echt alleen-lezen zijn?  Dit is niet meer terug te draaien, d.w.z. de geschreven gegevens kunnen niet meer van de NFC-tag worden verwijderd.</string>
   <string name="write_protected_nfc_detected">Alleen-lezen NFC-tag gedetecteerd</string>
   <string name="cannot_write_protected_nfc_tag">Er kan niet naar de alleen-lezen NFC-tag worden geschreven</string>
-  <string name="language_default">Systeem standaard</string>
+  <string name="language_default">Systeemstandaard</string>
   <string name="credential_data_params">Bewerk hier de inloggegevens.  De naam is een verplicht veld.  Met categorieën kunt u verschillende toegangsgegevens groeperen.</string>
   <string name="message_write_nfc_tag">De NFC-tag is al beschreven.  Overschrijven?</string>
-  <string name="drop_to_remove">DOE HET RAAM DICHT</string>
+  <string name="drop_to_remove">VERWIJDEREN</string>
   <string name="duplicate">Duplicaat</string>
   <string name="message_change_language">Pas na het herstarten van de app wordt de geselecteerde taal correct weergegeven.</string>
   <string name="title_change_language">taal veranderen</string>
