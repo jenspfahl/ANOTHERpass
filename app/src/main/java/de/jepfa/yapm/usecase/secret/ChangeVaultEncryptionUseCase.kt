@@ -15,17 +15,13 @@ import de.jepfa.yapm.service.secret.MasterKeyService
 import de.jepfa.yapm.service.secret.PbkdfIterationService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
-import de.jepfa.yapm.ui.BaseActivity
-import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.usecase.InputUseCase
 import de.jepfa.yapm.usecase.UseCaseOutput
 import de.jepfa.yapm.usecase.session.LoginUseCase
 import de.jepfa.yapm.util.Constants
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 
 object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.Input, SecureActivity>() {
 
@@ -101,18 +97,19 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
             loginData.pin,
             loginData.masterPassword,
             salt,
-            cipherAlgorithm
+            cipherAlgorithm,
+            activity,
         )
         val encEncryptedMasterKey =
             PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, activity)
         if (encEncryptedMasterKey == null) {
-            Log.e("VaultEnc", "master key not on device")
+            Log.e(LOG_PREFIX + "VaultEnc", "master key not on device")
             return null
         }
 
         val masterKey = MasterKeyService.getMasterKey(masterPassphraseSK, encEncryptedMasterKey, activity)
         if (masterKey == null) {
-            Log.e("VaultEnc", "cannot decrypt master key, pin wrong?")
+            Log.e(LOG_PREFIX + "VaultEnc", "cannot decrypt master key, pin wrong?")
             return null
         }
         masterKey.clear()
@@ -195,7 +192,7 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
         val encEncryptedMasterKey =
             PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, activity)
         if (encEncryptedMasterKey == null) {
-            Log.e("VaultEnc", "master key not on device")
+            Log.e(LOG_PREFIX + "VaultEnc", "master key not on device")
             return null
         }
 
@@ -212,12 +209,12 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
             MasterKeyService.getMasterKey(masterPassphraseSK, encEncryptedMasterKey, activity)
         }
         if (masterKey == null) {
-            Log.e("VaultEnc", "stored master key not valid")
+            Log.e(LOG_PREFIX + "VaultEnc", "stored master key not valid")
             return null
         }
 
         PbkdfIterationService.storePbkdfIterations(input.pbkdfIterations)
-        Log.d("ITERATIONS", "store changed iterations=${input.pbkdfIterations}")
+        Log.d(LOG_PREFIX + "ITERATIONS", "store changed iterations=${input.pbkdfIterations}")
 
         val newEncryptedMasterKey = MasterKeyService.encryptAndStoreMasterKey(
             masterKey,
@@ -234,7 +231,7 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
 
         val newMasterPassphraseSK =
             MasterKeyService.getMasterPassPhraseSK(
-                input.loginData.pin, input.loginData.masterPassword, salt, input.newCipherAlgorithm)
+                input.loginData.pin, input.loginData.masterPassword, salt, input.newCipherAlgorithm, activity)
 
         val vaultVersion = PreferenceService.getAsInt(PreferenceService.DATA_VAULT_VERSION, activity)
         val useLegacyGeneration = vaultVersion < Constants.FAST_KEYGEN_VAULT_VERSION

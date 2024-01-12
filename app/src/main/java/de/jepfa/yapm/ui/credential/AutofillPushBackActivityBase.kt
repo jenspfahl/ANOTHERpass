@@ -3,7 +3,6 @@ package de.jepfa.yapm.ui.credential
 import android.app.Activity
 import android.app.assist.AssistStructure
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.autofill.AutofillManager
 import android.view.autofill.AutofillManager.EXTRA_AUTHENTICATION_RESULT

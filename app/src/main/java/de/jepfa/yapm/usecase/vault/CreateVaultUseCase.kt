@@ -11,6 +11,7 @@ import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.usecase.InputUseCase
 import de.jepfa.yapm.usecase.session.LoginUseCase
 import de.jepfa.yapm.util.Constants
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 
 object CreateVaultUseCase: InputUseCase<CreateVaultUseCase.Input, BaseActivity>() {
 
@@ -21,7 +22,7 @@ object CreateVaultUseCase: InputUseCase<CreateVaultUseCase.Input, BaseActivity>(
     override suspend fun doExecute(input: Input, activity: BaseActivity): Boolean {
 
         PbkdfIterationService.storePbkdfIterations(input.pbkdfIterations) // before mk encryption!
-        Log.d("ITERATIONS", "store iterations=${input.pbkdfIterations}")
+        Log.d(LOG_PREFIX + "ITERATIONS", "store iterations=${input.pbkdfIterations}")
 
         val salt = SaltService.getSalt(activity)
         val masterKey = MasterKeyService.generateMasterKey(activity)

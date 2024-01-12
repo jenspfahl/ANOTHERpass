@@ -5,11 +5,12 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
 import android.view.WindowManager
-import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.secret.SecretKeyHolder
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.overlay.OverlayShowingService
 import de.jepfa.yapm.ui.login.LoginActivity
 import de.jepfa.yapm.util.ClipboardUtil
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import java.util.concurrent.TimeUnit
 
 abstract class SecureActivity : BaseActivity() {
@@ -132,7 +133,7 @@ abstract class SecureActivity : BaseActivity() {
 
         private fun loginIntended(activity: SecureActivity) {
             loginActivityIntended = System.currentTimeMillis()
-            Log.i("CS", "login intended at $loginActivityIntended from $activity")
+            Log.i(LOG_PREFIX + "CS", "login intended at $loginActivityIntended from $activity")
         }
     }
 }

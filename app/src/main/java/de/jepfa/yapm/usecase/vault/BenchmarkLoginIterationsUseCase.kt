@@ -24,7 +24,8 @@ object BenchmarkLoginIterationsUseCase: UseCase<BenchmarkLoginIterationsUseCase.
             Password("dummydummydummydummydummydummy"),
             Key("saltysaltysaltysaltysaltysalty".toByteArray()),
             input.iterations,
-            input.cipherAlgorithm
+            input.cipherAlgorithm,
+            activity
         )
 
         return UseCaseOutput(System.currentTimeMillis() - startMillis)

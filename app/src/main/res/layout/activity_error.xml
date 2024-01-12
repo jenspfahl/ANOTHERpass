@@ -9,28 +9,62 @@
     android:fitsSystemWindows="true"
     tools:context=".ui.errorhandling.ErrorActivity">
 
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/error_header"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="6dp"
-            android:text="@string/bug_explanation" />
+            android:text="@string/bug_explanation"
+            style="@android:style/TextAppearance.Material.Headline"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
+            android:text="@string/describe_a_bug"
+            />
+
+        <EditText
+            android:id="@+id/error_user_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/bug_description_hint"
+            android:singleLine="true"
+            android:maxLength="200"
+            android:layout_marginBottom="12dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
+            android:text="@string/captured_error_details"
+            android:layout_marginBottom="6dp"
+            />
 
         <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="340dp">
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight = "8"
+            >
             <TextView
                 android:id="@+id/bug_report"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="30dp"
-                android:maxLines="100"
                 android:textIsSelectable="true"
+                android:scrollHorizontally="true"
+                android:fontFamily="monospace"
+                android:textSize="10sp"
                 android:singleLine="false" />
         </ScrollView>
 

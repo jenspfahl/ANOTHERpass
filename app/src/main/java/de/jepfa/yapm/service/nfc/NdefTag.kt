@@ -7,6 +7,7 @@ import android.nfc.tech.Ndef
 import android.nfc.tech.NdefFormatable
 import android.util.Log
 import de.jepfa.yapm.model.secret.Key
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import java.io.IOException
 import java.util.*
 
@@ -34,11 +35,11 @@ class NdefTag @Throws(FormatException::class) constructor(val tag: Tag, val data
         val technologies = tag.techList
         val tagTechs = Arrays.asList(*technologies)
         if (tagTechs.contains(NDEF)) {
-            Log.i("WritableTag", "contains ndef")
+            Log.i(LOG_PREFIX + "WritableTag", "contains ndef")
             ndef = Ndef.get(tag)
             ndefFormatable = null
         } else if (tagTechs.contains(NDEF_FORMATABLE)) {
-            Log.i("WritableTag", "contains ndef_formatable")
+            Log.i(LOG_PREFIX + "WritableTag", "contains ndef_formatable")
             ndefFormatable = NdefFormatable.get(tag)
             ndef = null
         } else {
@@ -98,7 +99,7 @@ class NdefTag @Throws(FormatException::class) constructor(val tag: Tag, val data
         try {
             ndef?.close() ?: ndefFormatable?.close()
         } catch (e: Exception) {
-            Log.e("NFC", "cannot close", e)
+            Log.e(LOG_PREFIX + "NFC", "cannot close", e)
         }
     }
 

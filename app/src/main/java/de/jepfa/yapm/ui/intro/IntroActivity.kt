@@ -2,7 +2,6 @@ package de.jepfa.yapm.ui.intro
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import com.github.appintro.AppIntro
 import com.github.appintro.AppIntroCustomLayoutFragment
 import de.jepfa.yapm.R
 import de.jepfa.yapm.service.PreferenceService

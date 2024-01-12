@@ -10,7 +10,9 @@ import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SwitchCompat
 import androidx.navigation.fragment.findNavController
@@ -18,6 +20,7 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.AndroidKey.ALIAS_KEY_TRANSPORT
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.ui.BaseFragment
@@ -129,14 +132,18 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
             }
             else {
                 val transSK = getAndroidSecretKey(ALIAS_KEY_TRANSPORT, view.context)
-                val encPassword = encryptPassword(transSK, generatedPassword)
-                generatedPassword.clear()
+                try {
+                    val encPassword = encryptPassword(transSK, generatedPassword)
+                    generatedPassword.clear()
 
-                PreferenceService.putCurrentDate(PreferenceService.DATA_MP_MODIFIED_AT, button.context)
+                    PreferenceService.putCurrentDate(PreferenceService.DATA_MP_MODIFIED_AT, button.context)
 
-                val args = Bundle()
-                args.putEncrypted(ARG_ENC_MASTER_PASSWD, encPassword)
-                findNavController().navigate(R.id.action_Create_Vault_FirstFragment_to_SecondFragment, args)
+                    val args = Bundle()
+                    args.putEncrypted(ARG_ENC_MASTER_PASSWD, encPassword)
+                    findNavController().navigate(R.id.action_Create_Vault_FirstFragment_to_SecondFragment, args)
+                } catch (e: SecretService.KeyStoreNotReadyException) {
+                    toastText(it.context, R.string.keystore_not_ready)
+                }
             }
         }
     }

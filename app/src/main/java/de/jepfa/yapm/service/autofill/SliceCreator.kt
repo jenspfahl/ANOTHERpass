@@ -1,17 +1,16 @@
 package de.jepfa.yapm.service.autofill
 
 import android.annotation.SuppressLint
-import androidx.annotation.RequiresApi
-import android.os.Build
-import android.widget.inline.InlinePresentationSpec
 import android.app.PendingIntent
 import android.app.slice.Slice
 import android.graphics.BlendMode
 import android.graphics.drawable.Icon
-import android.os.Bundle
-import androidx.autofill.inline.v1.InlineSuggestionUi
+import android.os.Build
 import android.text.TextUtils
+import android.widget.inline.InlinePresentationSpec
+import androidx.annotation.RequiresApi
 import androidx.autofill.inline.UiVersions
+import androidx.autofill.inline.v1.InlineSuggestionUi
 
 object SliceCreator {
 

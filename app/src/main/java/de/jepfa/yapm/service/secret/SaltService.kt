@@ -12,7 +12,6 @@ import de.jepfa.yapm.service.secret.SecretService.generateRandomKey
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.shortenBase64String
-import java.util.*
 
 object SaltService {
 
@@ -54,6 +53,11 @@ object SaltService {
         storeSalt(salt, context)
 
         return salt
+    }
+
+    fun getAnonymizedVaultId(context: Context): String {
+        val anonymousVaultIdHash = SecretService.fastHash(getVaultId(context).toByteArray(), getSalt(context))
+        return shortenBase64String(anonymousVaultIdHash.toBase64String(),6)
     }
 
 }

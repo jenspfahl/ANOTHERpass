@@ -8,8 +8,6 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Handler
 import android.util.Log
-import androidx.core.net.toFile
-import androidx.core.net.toUri
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.session.Session
@@ -18,6 +16,7 @@ import de.jepfa.yapm.service.io.VaultExportService.createVaultFile
 import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.YapmApp
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.FileUtil
 import de.jepfa.yapm.util.QRCodeUtil
 import de.jepfa.yapm.util.getEncryptedExtra
@@ -47,7 +46,7 @@ class FileIOService: IntentService("FileIOService") {
                 val fileOutStream = contentResolver.openOutputStream(destUri)
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fileOutStream)
             } catch (e: IOException) {
-                Log.e("TS", "cannot create file", e)
+                Log.e(LOG_PREFIX + "TS", "cannot create file", e)
                 false
             }
         }

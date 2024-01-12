@@ -1,0 +1,3 @@
+* fix UserNotAuthenticatedException
+* add report bug functionality
+* fix Dutch translations

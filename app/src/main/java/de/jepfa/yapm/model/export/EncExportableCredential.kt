@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.gson.JsonElement
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.toBase64String
 import de.jepfa.yapm.util.toUUIDFromBase64String
 
@@ -101,7 +102,7 @@ data class EncExportableCredential(val i: Int?,
                     jsonObject.get(ATTRIB_IS_OBFUSCATED)?.asBoolean ?: false,
                 )
             } catch (e: Exception) {
-                Log.e("ECR", "cannot parse json container", e)
+                Log.e(LOG_PREFIX + "ECR", "cannot parse json container", e)
                 null
             }
         }

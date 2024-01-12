@@ -4,15 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.ExpandableListView
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.ui.BaseFragment
-import de.jepfa.yapm.ui.label.LabelEditViewExtender
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
+import de.jepfa.yapm.ui.label.LabelEditViewExtender
 import de.jepfa.yapm.usecase.credential.ImportCredentialsUseCase
 import de.jepfa.yapm.util.toastText
 

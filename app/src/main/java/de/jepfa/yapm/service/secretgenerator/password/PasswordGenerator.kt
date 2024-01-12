@@ -2,10 +2,8 @@ package de.jepfa.yapm.service.secretgenerator.password
 
 import android.content.Context
 import de.jepfa.yapm.model.secret.Password
-import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secretgenerator.GeneratorBase
 import java.security.SecureRandom
-import java.util.*
 
 class PasswordGenerator(
     val upperCase: String = DEFAULT_ALPHA_CHARS_UPPER_CASE,

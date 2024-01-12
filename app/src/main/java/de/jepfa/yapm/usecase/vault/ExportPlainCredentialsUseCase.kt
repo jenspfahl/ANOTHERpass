@@ -6,17 +6,14 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
-import androidx.core.net.toFile
 import androidx.core.net.toUri
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.io.CsvService
 import de.jepfa.yapm.service.io.TempFileService
-import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.OutputUseCase
-import de.jepfa.yapm.usecase.UseCase
 import de.jepfa.yapm.usecase.UseCaseOutput
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.toastText

@@ -3,7 +3,8 @@ package de.jepfa.yapm.ui.label
 
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.*
+import android.widget.AutoCompleteTextView
+import android.widget.ImageView
 import androidx.core.view.iterator
 import androidx.core.view.size
 import androidx.core.widget.doAfterTextChanged
@@ -12,7 +13,6 @@ import com.google.android.material.chip.ChipGroup
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.service.label.LabelService
-import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.service.secret.SecretService.encryptCommonString
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.util.Constants

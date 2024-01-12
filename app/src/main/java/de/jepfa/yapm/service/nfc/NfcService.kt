@@ -8,6 +8,7 @@ import android.util.Log
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.nfc.NfcActivity
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 
 /**
  * Inspired by https://proandroiddev.com/working-with-nfc-tags-on-android-c1e5af47a3db
@@ -38,7 +39,7 @@ object NfcService {
             val data = messages?.run { getData(this) }
             return NdefTag(tagFromIntent, data)
         } catch (e: FormatException) {
-            Log.e("NFC", "Unsupported tag tapped", e)
+            Log.e(LOG_PREFIX + "NFC", "Unsupported tag tapped", e)
             return null
         }
     }

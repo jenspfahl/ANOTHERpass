@@ -1,0 +1,30 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.createvault.CreateVaultActivity">
+
+    <item
+        android:id="@+id/action_login_help"
+        android:icon="@drawable/ic_baseline_help_outline_24_white"
+        app:showAsAction="never"
+        android:title="@string/login_help">
+    </item>
+
+    <item
+        android:id="@+id/menu_about"
+        android:icon="@drawable/ic_baseline_info_24"
+        app:showAsAction="never"
+        android:title="@string/about">
+    </item>
+
+
+    <item
+        android:id="@+id/menu_report_bug"
+        android:icon="@drawable/baseline_bug_report_24"
+        app:showAsAction="never"
+        android:title="@string/report_a_bug">
+    </item>
+
+
+
+</menu>

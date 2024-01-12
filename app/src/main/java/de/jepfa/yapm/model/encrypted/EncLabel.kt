@@ -2,6 +2,7 @@ package de.jepfa.yapm.model.encrypted
 
 import android.util.Log
 import com.google.gson.JsonElement
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import java.util.*
 
 data class EncLabel(val id: Int?,
@@ -40,7 +41,7 @@ data class EncLabel(val id: Int?,
                     jsonObject.get(ATTRIB_COLOR)?.asInt
                 )
             } catch (e: Exception) {
-                Log.e("ENCL", "cannot parse json container", e)
+                Log.e(LOG_PREFIX + "ENCL", "cannot parse json container", e)
                 null
             }
         }

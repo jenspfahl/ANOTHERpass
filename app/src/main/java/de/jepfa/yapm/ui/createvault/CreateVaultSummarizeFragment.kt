@@ -33,6 +33,7 @@ import de.jepfa.yapm.usecase.secret.ExportEncMasterPasswordUseCase
 import de.jepfa.yapm.usecase.vault.BenchmarkLoginIterationsUseCase
 import de.jepfa.yapm.usecase.vault.CreateVaultUseCase
 import de.jepfa.yapm.util.*
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 
 class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedListener {
 
@@ -57,7 +58,7 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
 
         val encMasterPasswd = arguments?.getEncrypted(ARG_ENC_MASTER_PASSWD)
         if (encMasterPasswd == null) {
-            Log.e("CV", "No master passwd in extra")
+            Log.e(LOG_PREFIX + "CV", "No master passwd in extra")
             toastText(context, R.string.something_went_wrong)
             return
         }
@@ -147,14 +148,14 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
 
                 val encPin = arguments?.getEncrypted(CreateVaultActivity.ARG_ENC_PIN)
                 if (encPin == null) {
-                    Log.e("CV", "No pin in extra")
+                    Log.e(LOG_PREFIX + "CV", "No pin in extra")
                     toastText(it, R.string.something_went_wrong)
                     return@setOnClickListener
                 }
 
                 val pin = decryptPassword(transSK, encPin)
                 val iterations = PbkdfIterationService.mapPercentageToIterations(iterationsSlider.value)
-                Log.d("ITERATIONS", "final iterations=$iterations")
+                Log.d(LOG_PREFIX + "ITERATIONS", "final iterations=$iterations")
 
                 getBaseActivity()?.let { baseActivity ->
 

@@ -20,6 +20,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_QRCODES_WITH_HEADER
 import de.jepfa.yapm.ui.qrcode.CaptureActivity
 import de.jepfa.yapm.ui.qrcode.CaptureActivity.Companion.DATA_FROM_IMAGE_FILE
 import de.jepfa.yapm.ui.qrcode.CaptureActivity.Companion.RESULT_FROM_IMAGE_FILE
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 
 
 object QRCodeUtil {
@@ -54,7 +55,7 @@ object QRCodeUtil {
                 }
             }
         } catch (e: WriterException) {
-            Log.d("QrCodeActivity", "generateQRCode: ${e.message}")
+            Log.d(LOG_PREFIX + "QrCodeActivity", "generateQRCode: ${e.message}")
         }
 
         if (showHeader) {

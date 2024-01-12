@@ -4,7 +4,9 @@ import androidx.annotation.WorkerThread
 import de.jepfa.yapm.database.dao.EncUsernameTemplateDao
 import de.jepfa.yapm.database.entity.EncUsernameTemplateEntity
 import de.jepfa.yapm.model.encrypted.EncUsernameTemplate
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 
 class UsernameTemplateRepository(private val encUsernameTemplateDao: EncUsernameTemplateDao) {
 

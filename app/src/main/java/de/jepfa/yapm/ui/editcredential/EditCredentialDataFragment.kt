@@ -5,7 +5,6 @@ package de.jepfa.yapm.ui.editcredential
 import android.app.DatePickerDialog
 import android.content.Context
 import android.os.Bundle
-import android.os.SystemClock
 import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
@@ -32,6 +31,7 @@ import de.jepfa.yapm.ui.SecureFragment
 import de.jepfa.yapm.ui.label.LabelEditViewExtender
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.*
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import java.util.*
 
 
@@ -126,7 +126,7 @@ class EditCredentialDataFragment : SecureFragment() {
                 position: Int,
                 id: Long
             ) {
-                Log.d("EXP", "pos=$position id=$id selectedExpiryDate=$selectedExpiryDate")
+                Log.d(LOG_PREFIX + "EXP", "pos=$position id=$id selectedExpiryDate=$selectedExpiryDate")
 
                 if (position == ExpiryOptions.EXPIRES_IN_EXACT.ordinal) {
                     // explicitly nothing!

@@ -1,17 +1,14 @@
 package de.jepfa.yapm.ui.label
 
-import android.app.ActionBar
 import android.content.Context
 import android.view.Gravity
 import android.view.View
-import de.jepfa.yapm.util.createLabelChip
-import android.widget.ArrayAdapter
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.Filter
 import android.widget.LinearLayout
-import android.widget.TextView
 import de.jepfa.yapm.R
-
+import de.jepfa.yapm.util.createLabelChip
 import java.util.*
 
 class LabelListAdapter(context: Context,

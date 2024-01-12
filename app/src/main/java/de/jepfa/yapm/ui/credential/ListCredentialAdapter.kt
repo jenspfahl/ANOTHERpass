@@ -31,8 +31,8 @@ import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.ui.label.LabelDialogs
 import de.jepfa.yapm.usecase.credential.ExportCredentialUseCase
 import de.jepfa.yapm.util.*
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import java.util.*
-import kotlin.collections.HashSet
 
 
 class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity, val multipleSelectionCallback: (Set<EncCredential>) -> Unit) :
@@ -390,7 +390,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                 }
                 else {
                     // in some cases the filter result is null in Android 13, recreate it
-                    Log.i("LST", "Null in pop search result")
+                    Log.i(LOG_PREFIX + "LST", "Null in pop search result")
                     //listCredentialsActivity.recreate() this seems useless in most cases
                 }
             }

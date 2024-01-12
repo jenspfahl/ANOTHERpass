@@ -3,6 +3,7 @@ package de.jepfa.yapm.service.secret
 import android.util.Base64
 import android.util.Log
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import java.nio.ByteBuffer
 import kotlin.math.roundToInt
 
@@ -16,7 +17,7 @@ object PbkdfIterationService {
 
     fun getStoredPbkdfIterations(): Int {
         val i = PreferenceService.getAsInt(PreferenceService.DATA_PBKDF_ITERATIONS, null)
-        Log.d("ITERATIONS", "found iterations=$i")
+        Log.d(LOG_PREFIX + "ITERATIONS", "found iterations=$i")
 
         return if (i > 0) i else LEGACY_PBKDF_ITERATIONS
     }

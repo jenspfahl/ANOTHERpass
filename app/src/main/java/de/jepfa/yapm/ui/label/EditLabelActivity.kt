@@ -14,16 +14,18 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.chip.Chip
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.model.secret.SecretKeyHolder
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.ui.label.Label.Companion.DEFAULT_CHIP_COLOR_ID
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
-import de.jepfa.yapm.util.*
+import de.jepfa.yapm.util.DebugInfo
+import de.jepfa.yapm.util.createLabelChip
+import de.jepfa.yapm.util.getIntExtra
+import de.jepfa.yapm.util.observeOnce
 import java.util.*
 
 

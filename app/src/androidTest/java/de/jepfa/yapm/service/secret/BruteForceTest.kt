@@ -14,6 +14,7 @@ import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.login.LoginActivity
 import de.jepfa.yapm.usecase.session.LoginUseCase
 import de.jepfa.yapm.usecase.vault.CreateVaultUseCase
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -24,7 +25,7 @@ import org.junit.runner.RunWith
 @LargeTest
 class BruteForceTest {
 
-    val TAG = "YAPM/BF"
+    val TAG = LOG_PREFIX + "BF"
 
     val maxPins = 10 // 10_000_000
     var currentAttempt = 0

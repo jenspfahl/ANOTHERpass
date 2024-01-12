@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Environment
 import android.provider.OpenableColumns
 import android.util.Log
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import java.io.*
 
 
@@ -34,7 +35,7 @@ object FileUtil {
 
         val size = getFileSize(context, uri)?:0
         if (size > MAX_FILE_SIZE_MB) {
-            Log.e("READFILE", "File too big for $uri")
+            Log.e(LOG_PREFIX + "READFILE", "File too big for $uri")
             return null
         }
 
@@ -58,7 +59,7 @@ object FileUtil {
                 }
             }
         } catch (e: IOException) {
-            Log.e("READFILE", "Cannot read $uri", e)
+            Log.e(LOG_PREFIX + "READFILE", "Cannot read $uri", e)
             return null
         }
 
@@ -102,7 +103,7 @@ object FileUtil {
                 return buffer.toByteArray()
             }
         } catch (e: IOException) {
-            Log.e("READFILE", "Cannot read $uri", e)
+            Log.e(LOG_PREFIX + "READFILE", "Cannot read $uri", e)
             return null
         }
 
@@ -118,7 +119,7 @@ object FileUtil {
                 }
             }
         } catch (e: IOException) {
-            Log.e("READFILE", "Cannot read $uri", e)
+            Log.e(LOG_PREFIX + "READFILE", "Cannot read $uri", e)
             return false
         }
 

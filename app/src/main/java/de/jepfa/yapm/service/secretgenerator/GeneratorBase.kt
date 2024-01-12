@@ -1,11 +1,9 @@
 package de.jepfa.yapm.service.secretgenerator
 
 import android.content.Context
-import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.secret.SecretService
 import java.security.SecureRandom
-import java.util.*
 import kotlin.math.log2
 
 abstract class GeneratorBase<T : GeneratorSpec>(

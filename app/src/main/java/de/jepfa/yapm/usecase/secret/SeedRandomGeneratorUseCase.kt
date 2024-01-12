@@ -16,6 +16,7 @@ import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.usecase.UseCase
 import de.jepfa.yapm.usecase.UseCaseOutput
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.toHex
 import de.jepfa.yapm.util.toastText
@@ -89,12 +90,12 @@ object SeedRandomGeneratorUseCase: UseCase<Bitmap, String, BaseActivity> {
 
     private fun extractSeedFromImage(imageBitmap: Bitmap, context: Context): Key? {
 
-        Log.i("SEED byte count", imageBitmap.byteCount.toString())
-        Log.i("SEED x", imageBitmap.width.toString())
-        Log.i("SEED y", imageBitmap.height.toString())
+        Log.i(LOG_PREFIX + "SEED byte count", imageBitmap.byteCount.toString())
+        Log.i(LOG_PREFIX + "SEED x", imageBitmap.width.toString())
+        Log.i(LOG_PREFIX + "SEED y", imageBitmap.height.toString())
 
         if (imageBitmap.width < 32 || imageBitmap.height < 32) {
-            Log.i("SEED", "thumbnail image too small to extract a random seed")
+            Log.i(LOG_PREFIX + "SEED", "thumbnail image too small to extract a random seed")
             toastText(context, R.string.error_picture_too_small_for_user_seed)
             return null
         }

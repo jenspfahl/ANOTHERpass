@@ -2,18 +2,15 @@ package de.jepfa.yapm.ui.intro
 
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.fragment.app.Fragment
 import de.jepfa.yapm.R
 import de.jepfa.yapm.service.secretgenerator.SecretStrength
 import de.jepfa.yapm.service.secretgenerator.passphrase.PassphraseGenerator
 import de.jepfa.yapm.service.secretgenerator.passphrase.PassphraseGeneratorSpec
-import de.jepfa.yapm.service.secretgenerator.password.PasswordGenerator
-import de.jepfa.yapm.ui.BaseFragment
-import de.jepfa.yapm.usecase.secret.GenerateMasterPasswordUseCase
 import de.jepfa.yapm.util.PasswordColorizer
 
 

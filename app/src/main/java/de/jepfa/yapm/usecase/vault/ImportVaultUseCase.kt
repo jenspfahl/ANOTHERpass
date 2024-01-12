@@ -20,10 +20,10 @@ import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.InputUseCase
 import de.jepfa.yapm.util.Constants
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.lang.IllegalStateException
 import java.util.*
 
 object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity>() {
@@ -52,7 +52,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
 
             return success
         } catch (e: Exception) {
-            Log.e("IMP", "cannot read json", e)
+            Log.e(LOG_PREFIX + "IMP", "cannot read json", e)
             return false
         }
     }
@@ -191,7 +191,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
 
             return ParsedVault(appVersionCode, vaultId, cipherAlgorithm, rawJson)
         } catch (e: Exception) {
-            Log.e("JSON", "cannot parse JSON", e)
+            Log.e(LOG_PREFIX + "JSON", "cannot parse JSON", e)
             return ParsedVault(null, null, null, null)
         }
     }
@@ -264,14 +264,14 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
         val cipherAlgorithm = extractCipherAlgorithm(jsonContent)
 
         if (Build.VERSION.SDK_INT < cipherAlgorithm.supportedSdkVersion) {
-            Log.e("IMPV", "Unsupported cipher algorithm $cipherAlgorithm")
+            Log.e(LOG_PREFIX + "IMPV", "Unsupported cipher algorithm $cipherAlgorithm")
             return false
         }
 
         val vaultVersion = jsonContent.get(VaultExportService.JSON_VAULT_VERSION)?.asInt
             ?: Constants.INITIAL_VAULT_VERSION
         if (vaultVersion > Constants.CURRENT_VERSION) {
-            Log.e("IMPV", "Unsupported vault version $vaultVersion")
+            Log.e(LOG_PREFIX + "IMPV", "Unsupported vault version $vaultVersion")
             return false
         }
         PreferenceService.putString(PreferenceService.DATA_VAULT_VERSION, vaultVersion.toString(), activity)
@@ -296,7 +296,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
                     PbkdfIterationService.storePbkdfIterations(pbkdfIterations)
                 }
                 else {
-                    Log.w("IMP", "Cannot parse login iterations: $payload")
+                    Log.w(LOG_PREFIX + "IMP", "Cannot parse login iterations: $payload")
                 }
             }
 

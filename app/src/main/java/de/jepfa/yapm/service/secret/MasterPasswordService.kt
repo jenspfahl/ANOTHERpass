@@ -16,6 +16,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_AUTH_SMP_WITH_BIOMETRIC
 import de.jepfa.yapm.service.biometrix.BiometricCallback
 import de.jepfa.yapm.service.biometrix.BiometricManagerVX
 import de.jepfa.yapm.service.biometrix.BiometricUtils
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.toastText
 import javax.crypto.Cipher
 import javax.crypto.spec.GCMParameterSpec
@@ -78,7 +79,7 @@ object MasterPasswordService {
                 handlePasswordReceived(masterPassword)
             }
             else {
-                Log.w("MPS", "stored master password not valid")
+                Log.w(LOG_PREFIX + "MPS", "stored master password not valid")
                 deleteStoredMasterPassword(context)
                 handleNothingReceived()
             }
@@ -124,7 +125,7 @@ object MasterPasswordService {
      */
     fun generateEncMasterPasswdSKForExport(context: Context): SecretKeyHolder {
         val saltAsPasswd = Password(SaltService.getSalt(context))
-        val empSK = SecretService.generateNormalSecretKey(saltAsPasswd, EMP_SALT, DEFAULT_CIPHER_ALGORITHM)
+        val empSK = SecretService.generateNormalSecretKey(saltAsPasswd, EMP_SALT, DEFAULT_CIPHER_ALGORITHM, context)
 
         saltAsPasswd.clear()
         return empSK
@@ -177,7 +178,7 @@ object MasterPasswordService {
 
             })
         } catch (e: Exception) {
-            Log.e("MPS", "cannot encrypt with biometric", e)
+            Log.e(LOG_PREFIX + "MPS", "cannot encrypt with biometric", e)
             toastText(context, R.string.biometric_failed)
             deleteStoredMasterPassword(context)
             handleNothingStored()
@@ -220,7 +221,7 @@ object MasterPasswordService {
 
             })
         } catch (e: Exception) {
-            Log.e("MPS", "cannot decrypt with biometric", e)
+            Log.e(LOG_PREFIX + "MPS", "cannot decrypt with biometric", e)
             toastText(context, R.string.biometric_failed)
             deleteStoredMasterPassword(context)
             handleNothingReceived()
@@ -249,7 +250,7 @@ object MasterPasswordService {
                 encryptedData,
                 DEFAULT_CIPHER_ALGORITHM)
         } catch (e: Exception) {
-            Log.e("EMPS", "unable to encrypt stored EMP")
+            Log.e(LOG_PREFIX + "EMPS", "unable to encrypt stored EMP")
             return null
         }
     }
@@ -259,7 +260,7 @@ object MasterPasswordService {
             val decrypted = cipher.doFinal(encrypted.data)
             return Password(decrypted)
         } catch (e: Exception) {
-            Log.e("EMPS", "unable to decrypt stored EMP")
+            Log.e(LOG_PREFIX + "EMPS", "unable to decrypt stored EMP")
             return null
         }
     }

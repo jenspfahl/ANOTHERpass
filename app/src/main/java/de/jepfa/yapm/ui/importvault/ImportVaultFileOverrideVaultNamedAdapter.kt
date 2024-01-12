@@ -6,25 +6,27 @@ import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.BaseExpandableListAdapter
+import android.widget.CheckBox
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.chip.Chip
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.model.encrypted.EncNamed
+import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.util.enrichId
-import kotlin.collections.HashMap
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.chip.Chip
-import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.ui.ViewRecyclerViewAdapter
 import de.jepfa.yapm.ui.credential.ShowCredentialActivity
 import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.ui.label.LabelDialogs
 import de.jepfa.yapm.util.createLabelChip
+import de.jepfa.yapm.util.enrichId
 
 
 class ImportVaultFileOverrideVaultNamedAdapter(

@@ -2,6 +2,7 @@ package de.jepfa.yapm.ui.changelogin
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -13,6 +14,7 @@ import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.usecase.secret.ChangePinUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.Constants
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.toastText
 
@@ -39,6 +41,7 @@ class ChangePinActivity : SecureActivity() {
         val explanationView: TextView = findViewById(R.id.change_pin_explanation)
         explanationView.setOnLongClickListener {
             if (DebugInfo.isDebug) {
+                Log.w(LOG_PREFIX + "TEST", "trigger report")
                 throw RuntimeException("test bug report")
             }
             true

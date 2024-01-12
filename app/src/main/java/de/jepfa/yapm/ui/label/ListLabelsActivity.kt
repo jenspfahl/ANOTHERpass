@@ -1,23 +1,22 @@
 package de.jepfa.yapm.ui.label
 
 import android.annotation.SuppressLint
-import androidx.appcompat.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.label.LabelService
-import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
-import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.usecase.label.DeleteUnusedLabelUseCase
+import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.toastText
 
 class ListLabelsActivity : SecureActivity() {

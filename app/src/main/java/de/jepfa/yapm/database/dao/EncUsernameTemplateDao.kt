@@ -1,8 +1,6 @@
 package de.jepfa.yapm.database.dao
 
 import androidx.room.*
-import de.jepfa.yapm.database.entity.EncCredentialEntity
-import de.jepfa.yapm.database.entity.EncLabelEntity
 import de.jepfa.yapm.database.entity.EncUsernameTemplateEntity
 import kotlinx.coroutines.flow.Flow
 

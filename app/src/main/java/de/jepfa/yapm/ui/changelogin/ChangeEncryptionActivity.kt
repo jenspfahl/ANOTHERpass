@@ -22,6 +22,7 @@ import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.usecase.secret.ChangeVaultEncryptionUseCase
 import de.jepfa.yapm.usecase.vault.BenchmarkLoginIterationsUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.toReadableFormat
 import de.jepfa.yapm.util.toastText
 
@@ -106,7 +107,7 @@ class ChangeEncryptionActivity : SecureActivity(), AdapterView.OnItemSelectedLis
         changeButton.setOnClickListener {
 
             val newIterations = PbkdfIterationService.mapPercentageToIterations(iterationsSlider.value)
-            Log.d("ITERATIONS", "final iterations=$newIterations")
+            Log.d(LOG_PREFIX + "ITERATIONS", "final iterations=$newIterations")
             val currentPin = Password(currentPinTextView.text)
 
             if (currentPin.isEmpty()) {

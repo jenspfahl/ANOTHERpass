@@ -21,7 +21,10 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
-import de.jepfa.yapm.util.*
+import de.jepfa.yapm.util.QRCodeUtil
+import de.jepfa.yapm.util.formatAsDateTime
+import de.jepfa.yapm.util.shortenBase64String
+import de.jepfa.yapm.util.toastText
 
 class ImportVaultImportFileFragment : BaseFragment() {
 

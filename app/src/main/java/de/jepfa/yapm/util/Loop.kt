@@ -6,8 +6,6 @@ import de.jepfa.yapm.service.secretgenerator.GeneratorBase.Companion.DEFAULT_DIG
 import de.jepfa.yapm.service.secretgenerator.GeneratorBase.Companion.DEFAULT_OBFUSCATIONABLE_SPECIAL_CHARS
 import de.jepfa.yapm.service.secretgenerator.passphrase.DEFAULT_CONSONANTS
 import de.jepfa.yapm.service.secretgenerator.passphrase.DEFAULT_VOCALS
-import java.util.ArrayList
-import java.util.HashMap
 
 /**
  * Loops through a data set. Imagine a wheel of fortune, where the data stands for all possible

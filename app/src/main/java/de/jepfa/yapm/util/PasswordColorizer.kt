@@ -8,10 +8,10 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
-import de.jepfa.yapm.model.secret.Password.FormattingStyle as PresentationMode
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_COLORED_PASSWORD
 import java.lang.Integer.min
+import de.jepfa.yapm.model.secret.Password.FormattingStyle as PresentationMode
 
 object PasswordColorizer {
 

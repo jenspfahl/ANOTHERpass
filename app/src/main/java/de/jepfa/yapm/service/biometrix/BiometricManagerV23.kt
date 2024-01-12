@@ -1,8 +1,6 @@
 package de.jepfa.yapm.service.biometrix
 
-import android.annotation.TargetApi
 import android.content.Context
-import android.os.Build
 import androidx.core.hardware.fingerprint.FingerprintManagerCompat
 import androidx.core.os.CancellationSignal
 import de.jepfa.yapm.R

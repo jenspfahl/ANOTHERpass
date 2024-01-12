@@ -70,6 +70,7 @@ import de.jepfa.yapm.ui.changelogin.ChangeEncryptionActivity
 import de.jepfa.yapm.ui.changelogin.ChangeMasterPasswordActivity
 import de.jepfa.yapm.ui.changelogin.ChangePinActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
+import de.jepfa.yapm.ui.errorhandling.ErrorActivity
 import de.jepfa.yapm.ui.exportvault.ExportPlainCredentialsActivity
 import de.jepfa.yapm.ui.exportvault.ExportVaultActivity
 import de.jepfa.yapm.ui.importcredentials.ImportCredentialsActivity
@@ -89,6 +90,7 @@ import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.usecase.vault.ShowVaultInfoUseCase
 import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.Constants.ACTION_DELIMITER
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.PermissionChecker.verifyNotificationPermissions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -134,10 +136,10 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         // session check would bring LoginActivity to front when action is invoked
         checkSession = false
-        Log.i("LST", "onCreate")
+        Log.i(LOG_PREFIX + "LST", "onCreate")
         super.onCreate(savedInstanceState)
         intent?.action?.let { action ->
-            Log.i("LST", "action=$action")
+            Log.i(LOG_PREFIX + "LST", "action=$action")
             if (action.startsWith(Constants.ACTION_CLOSE_VAULT)) {
                 Session.lock()
                 pushBackAutofill(allowCreateAuthentication = true)
@@ -312,7 +314,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     override fun onResume() {
         super.onResume()
-        Log.i("LST", "onResume")
+        Log.i(LOG_PREFIX + "LST", "onResume")
         updateSearchFieldWithAutofillSuggestion(intent)
 
         val navMenuAlwaysCollapsed = PreferenceService.getAsBool(
@@ -332,12 +334,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             PreferenceService.delete(STATE_REQUEST_CREDENTIAL_LIST_RELOAD, applicationContext)
 
             if (requestHardReload) {
-                Log.d("LST", "hard reload")
+                Log.d(LOG_PREFIX + "LST", "hard reload")
                 recreate()
             }
             else {
                 listCredentialAdapter?.notifyDataSetChanged()
-                Log.d("LST", "soft reload")
+                Log.d(LOG_PREFIX + "LST", "soft reload")
             }
         }
 
@@ -392,7 +394,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         inflateActionsMenu(menu, R.menu.menu_main)
-        Log.i("LST", "onCreateOptionsMenu")
+        Log.i(LOG_PREFIX + "LST", "onCreateOptionsMenu")
 
         val searchItem: MenuItem = menu.findItem(R.id.action_search)
 
@@ -515,12 +517,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        Log.i("LST", "onNewIntent: action=${intent?.action}")
+        Log.i(LOG_PREFIX + "LST", "onNewIntent: action=${intent?.action}")
         updateSearchFieldWithAutofillSuggestion(intent)
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        Log.i("LST", "onPrepareOptionsMenu")
+        Log.i(LOG_PREFIX + "LST", "onPrepareOptionsMenu")
         updateSearchFieldWithAutofillSuggestion(intent)  //somehow important for autofill
         return super.onPrepareOptionsMenu(menu)
     }
@@ -528,7 +530,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private fun updateSearchFieldWithAutofillSuggestion(intent: Intent?) {
         if (!Session.isDenied()) {
             intent?.action?.let { action ->
-                Log.i("LST", "action2=$action")
+                Log.i(LOG_PREFIX + "LST", "action2=$action")
                 if (action.startsWith(Constants.ACTION_OPEN_VAULT_FOR_AUTOFILL)) {
                     val suggestCredentials =
                         PreferenceService.getAsBool(PREF_AUTOFILL_SUGGEST_CREDENTIALS, true, this)
@@ -541,7 +543,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 }
                 else if (action.startsWith(Constants.ACTION_OPEN_VAULT_FOR_FILTERING)) {
                     val searchString = action.substringAfter(ACTION_DELIMITER).substringBeforeLast(ACTION_DELIMITER).lowercase()
-                    Log.i("LST", "extracted search string=$searchString")
+                    Log.i(LOG_PREFIX + "LST", "extracted search string=$searchString")
 
                     if (searchString.isNotBlank()) {
                         val success = startSearchFor("$searchString")
@@ -744,7 +746,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         if (data?.hasExtra(AutofillManager.EXTRA_AUTHENTICATION_RESULT) == true) {
             setResult(Activity.RESULT_OK, data)
-            Log.i("CFS", "disable forwarded")
+            Log.i(LOG_PREFIX + "CFS", "disable forwarded")
             finish()
             return
         }
@@ -786,7 +788,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
         else if (requestCode == SecretChecker.loginRequestCode) {
             if (intent.getBooleanExtra(SecretChecker.fromAutofillOrNotification, false)) {
-                Log.i("LST", "onActivityResult")
+                Log.i(LOG_PREFIX + "LST", "onActivityResult")
                 updateSearchFieldWithAutofillSuggestion(intent)
             }
         }
@@ -1042,6 +1044,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 ShowInfoUseCase.execute(this)
                 return true
             }
+            R.id.menu_report_bug-> {
+                val intent = Intent(this, ErrorActivity::class.java)
+                intent.putExtra(ErrorActivity.EXTRA_FROM_ERROR_CATCHER, false)
+                startActivity(intent)
+                return true
+            }
             R.id.menu_debug -> {
                 val builder: AlertDialog.Builder = AlertDialog.Builder(this)
                 val icon: Drawable = resources.getDrawable(R.mipmap.ic_logo)
@@ -1273,7 +1281,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             putExtra(AutofillManager.EXTRA_AUTHENTICATION_RESULT, pauseResponse)
         }
         setResult(Activity.RESULT_OK, replyIntent)
-        Log.i("CFS", "disable clicked")
+        Log.i(LOG_PREFIX + "CFS", "disable clicked")
         val entries = resources.getStringArray(R.array.autofill_deactivation_duration_entries)
         val values = resources.getStringArray(R.array.autofill_deactivation_duration_values)
         values.indexOf(pauseDurationInSec).let {
@@ -1324,9 +1332,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     }
 
     private fun startSearchFor(searchString: String, commit: Boolean = true): Boolean {
-        Log.i("LST", "searchItem=$searchItem")
+        Log.i(LOG_PREFIX + "LST", "searchItem=$searchItem")
         searchItem?.let { searchItem ->
-            Log.i("LST", "update search text")
+            Log.i(LOG_PREFIX + "LST", "update search text")
 
             val searchView =
                 MenuItemCompat.getActionView(searchItem) as SearchView

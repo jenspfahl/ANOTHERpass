@@ -20,8 +20,8 @@ import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_MAX_LOGIN_ATTEMPTS
 import de.jepfa.yapm.service.PreferenceService.PREF_SELF_DESTRUCTION
 import de.jepfa.yapm.service.PreferenceService.STATE_INTRO_SHOWED
-import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_DENIED_AT
 import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_ATTEMPTS
+import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_DENIED_AT
 import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_SUCCEEDED_AT
 import de.jepfa.yapm.service.PreferenceService.STATE_PREVIOUS_LOGIN_ATTEMPTS
 import de.jepfa.yapm.service.PreferenceService.STATE_PREVIOUS_LOGIN_SUCCEEDED_AT
@@ -32,6 +32,7 @@ import de.jepfa.yapm.service.secret.*
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.ui.credential.DeobfuscationDialog
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
+import de.jepfa.yapm.ui.errorhandling.ErrorActivity
 import de.jepfa.yapm.ui.importvault.ImportVaultActivity
 import de.jepfa.yapm.ui.intro.IntroActivity
 import de.jepfa.yapm.ui.intro.WhatsNewActivity
@@ -41,6 +42,7 @@ import de.jepfa.yapm.usecase.secret.RemoveStoredMasterPasswordUseCase
 import de.jepfa.yapm.usecase.secret.RevokeMasterPasswordTokenUseCase
 import de.jepfa.yapm.usecase.vault.DropVaultUseCase
 import de.jepfa.yapm.util.Constants
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.toastText
 
@@ -192,6 +194,12 @@ class LoginActivity : NfcBaseActivity() {
             ShowInfoUseCase.execute(this)
             return true
         }
+        if (id == R.id.menu_report_bug) {
+            val intent = Intent(this, ErrorActivity::class.java)
+            intent.putExtra(ErrorActivity.EXTRA_FROM_ERROR_CATCHER, false)
+            startActivity(intent)
+            return true
+        }
         if (id == R.id.menu_debug) {
             val builder: AlertDialog.Builder = AlertDialog.Builder(this)
             val icon: Drawable = resources.getDrawable(R.mipmap.ic_logo)
@@ -244,7 +252,7 @@ class LoginActivity : NfcBaseActivity() {
     }
 
     override fun handleTag() {
-        Log.i("LOGIN", "tag detected " + ndefTag?.tagId)
+        Log.i(LOG_PREFIX + "LOGIN", "tag detected " + ndefTag?.tagId)
         if (ndefTag != null && showTagDetectedMessage) {
             toastText(this, R.string.nfc_tag_for_login_detected)
         }
@@ -278,7 +286,7 @@ class LoginActivity : NfcBaseActivity() {
         PreferenceService.delete(STATE_LOGIN_ATTEMPTS, this)
 
         val isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofillOrNotification, false)
-        Log.i("LST", "login done, fromAutofill=$isFromAutofill")
+        Log.i(LOG_PREFIX + "LST", "login done, fromAutofill=$isFromAutofill")
         if (isFromAutofill) {
             setResult(SecretChecker.loginRequestCode, intent)
         }
@@ -355,7 +363,7 @@ class LoginActivity : NfcBaseActivity() {
         val storedTagId = PreferenceService.getAsString(PreferenceService.DATA_MASTER_PASSWORD_TOKEN_NFC_TAG_ID, this)
         if (storedTagId != null) {
             if (isFromQRScan) {
-                Log.i("nfc", "mpt qr code scan not allowed for copy-protected nfc tokens")
+                Log.i(LOG_PREFIX + "nfc", "mpt qr code scan not allowed for copy-protected nfc tokens")
                 toastText(this, R.string.mpt_qrcode_scan_not_allowed)
                 return
             }
@@ -364,7 +372,7 @@ class LoginActivity : NfcBaseActivity() {
                 return
             }
             else if (tagId != storedTagId) {
-                Log.i("nfc", "mpt tag id missmatch: tagId = $tagId <> storedTagId=$storedTagId")
+                Log.i(LOG_PREFIX + "nfc", "mpt tag id missmatch: tagId = $tagId <> storedTagId=$storedTagId")
                 toastText(this, R.string.not_a_original_mpt_nfc_token)
 
                 return
@@ -385,7 +393,7 @@ class LoginActivity : NfcBaseActivity() {
             val cipherAlgorithm = SecretService.getCipherAlgorithm(this)
 
             val mptSK =
-                SecretService.generateDefaultSecretKey(masterPasswordTokenKey, salt, cipherAlgorithm)
+                SecretService.generateDefaultSecretKey(masterPasswordTokenKey, salt, cipherAlgorithm, this)
 
             val masterPassword =
                 SecretService.decryptPassword(mptSK, mpt)

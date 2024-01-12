@@ -35,6 +35,7 @@ import de.jepfa.yapm.util.Constants.ACTION_DELIMITER
 import de.jepfa.yapm.util.Constants.ACTION_EXCLUDE_FROM_AUTOFILL
 import de.jepfa.yapm.util.Constants.ACTION_OPEN_VAULT_FOR_AUTOFILL
 import de.jepfa.yapm.util.Constants.ACTION_PAUSE_AUTOFILL
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.getAppNameFromPackage
 import java.util.*
@@ -124,10 +125,10 @@ object ResponseFiller {
             return null
         }
         if (structure.isHomeActivity) {
-            Log.i("CFS", "home activity")
+            Log.i(LOG_PREFIX + "CFS", "home activity")
             return null
         }
-        Log.i("CFS", "isDecativatedSince $isDeactivatedSinceWhen")
+        Log.i(LOG_PREFIX + "CFS", "isDecativatedSince $isDeactivatedSinceWhen")
 
         val pauseDurationInSec = PreferenceService.getAsString(PreferenceService.PREF_AUTOFILL_DEACTIVATION_DURATION, context)
 
@@ -142,7 +143,7 @@ object ResponseFiller {
             isDeactivatedSinceWhen?.let {
                 val border = System.currentTimeMillis() - (pauseDurationInSec.toLong() * 1000)
                 if (it > border) {
-                    Log.i("CFS", "temporary deactivated")
+                    Log.i(LOG_PREFIX + "CFS", "temporary deactivated")
                     return null
                 } else {
                     resumeAutofill(context)
@@ -151,38 +152,38 @@ object ResponseFiller {
         }
 
         if (structure.activityComponent?.packageName.equals(context.packageName)) {
-            Log.i("CFS", "myself")
+            Log.i(LOG_PREFIX + "CFS", "myself")
             return null
         }
 
         if (getExcludedAppList(context).contains(structure.activityComponent?.packageName)) {
-            Log.i("CFS", "excluded: " + structure.activityComponent?.packageName)
+            Log.i(LOG_PREFIX + "CFS", "excluded: " + structure.activityComponent?.packageName)
             return null
         }
 
         val vaultPresent =
             PreferenceService.isPresent(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, context)
         if (!vaultPresent) {
-            Log.i("CFS", "No vault created or imported")
+            Log.i(LOG_PREFIX + "CFS", "No vault created or imported")
             return null
         }
 
         val suggestEverywhere = PreferenceService.getAsBool(PREF_AUTOFILL_EVERYWHERE, context)
         val fields = identifyFields(structure, suggestEverywhere) ?: return null
         if (fields.getAllFields().isEmpty()) {
-            Log.i("CFS", "No fields to autofill found")
+            Log.i(LOG_PREFIX + "CFS", "No fields to autofill found")
             return null
         }
 
-        Log.d("CFS", "found fields: ${fields.getAllFields().size}")
+        Log.d(LOG_PREFIX + "CFS", "found fields: ${fields.getAllFields().size}")
         fields.getAllFields().forEach {
-            Log.d("CFS", "field: ${it}")
+            Log.d(LOG_PREFIX + "CFS", "field: ${it}")
         }
 
 
         if (ignoreCurrentApp) {
             val currentApp = structure.activityComponent.packageName
-            Log.i("CFS", "Ignore $currentApp")
+            Log.i(LOG_PREFIX + "CFS", "Ignore $currentApp")
             val excludedApps = PreferenceService.getAsStringSet(
                 PREF_AUTOFILL_EXCLUSION_LIST, context) ?: emptySet()
             val newExcludedApps = HashSet(excludedApps)
@@ -200,7 +201,7 @@ object ResponseFiller {
                 return createAuthenticationFillResponse(fields, structure, suggestEverywhere, context)
             }
 
-            Log.i("CFS", "Not logged in or no credential selected")
+            Log.i(LOG_PREFIX + "CFS", "Not logged in or no credential selected")
             return null
         }
 
@@ -213,10 +214,10 @@ object ResponseFiller {
 
         val dataSets = ArrayList<Dataset>()
 
-        Log.d("CFS", "userfields size: ${fields.getUserFields().size}")
-        Log.d("CFS", "passwordfields size: ${fields.getPasswordFields().size}")
-        Log.d("CFS", "potentialfields size: ${fields.getPotentialFields().size}")
-        Log.d("CFS", "allfields size: ${fields.getAllFields().size}")
+        Log.d(LOG_PREFIX + "CFS", "userfields size: ${fields.getUserFields().size}")
+        Log.d(LOG_PREFIX + "CFS", "passwordfields size: ${fields.getPasswordFields().size}")
+        Log.d(LOG_PREFIX + "CFS", "potentialfields size: ${fields.getPotentialFields().size}")
+        Log.d(LOG_PREFIX + "CFS", "allfields size: ${fields.getAllFields().size}")
 
         if (fields.getUserFields().isNotEmpty() && fields.getPasswordFields().isNotEmpty()) {
             val dataset = createUserAndPasswordDataSet(
@@ -233,12 +234,12 @@ object ResponseFiller {
 
         }
         else {
-            Log.d("CFS", "create data sets for user fields: ${fields.getUserFields().size}")
+            Log.d(LOG_PREFIX + "CFS", "create data sets for user fields: ${fields.getUserFields().size}")
 
             createUserDataSets(structure, fields.getUserFields(), name, user, context)
                 .forEach { dataSets.add(it) }
 
-            Log.d("CFS", "create data sets for password fields: ${fields.getPasswordFields().size}")
+            Log.d(LOG_PREFIX + "CFS", "create data sets for password fields: ${fields.getPasswordFields().size}")
 
             createPasswordDataSets(structure, fields.getPasswordFields(), name, password, context)
                 .forEach { dataSets.add(it) }
@@ -276,7 +277,7 @@ object ResponseFiller {
 
         password.clear()
 
-        Log.d("CFS", "datasets empty?: ${dataSets.size}")
+        Log.d(LOG_PREFIX + "CFS", "datasets empty?: ${dataSets.size}")
         if (dataSets.isEmpty()) return null
 
         val responseBuilder = FillResponse.Builder()
@@ -285,7 +286,7 @@ object ResponseFiller {
 
         dataSets.forEach { responseBuilder.addDataset(it) }
 
-        Log.d("CFS", "datasets to add to response: ${dataSets.size}")
+        Log.d(LOG_PREFIX + "CFS", "datasets to add to response: ${dataSets.size}")
 
         return responseBuilder.build()
 
@@ -368,7 +369,7 @@ object ResponseFiller {
             .forEach { responseBuilder.addDataset(it) }
 
 
-        Log.d("CFS", "auth response finished")
+        Log.d(LOG_PREFIX + "CFS", "auth response finished")
 
         return responseBuilder.build()
     }
@@ -453,7 +454,7 @@ object ResponseFiller {
         if (!suggestEverywhere && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             if (node.importantForAutofill == View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS) {
                 // don't traverse anything
-                Log.i("CFS", "No autofill for current node and children")
+                Log.i(LOG_PREFIX + "CFS", "No autofill for current node and children")
                 return
             }
         }
@@ -473,7 +474,7 @@ object ResponseFiller {
         if (!suggestEverywhere && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             if (node.importantForAutofill == View.IMPORTANT_FOR_AUTOFILL_YES_EXCLUDE_DESCENDANTS) {
                 // don't traverse children
-                Log.i("CFS", "No autofill for current nodes children only")
+                Log.i(LOG_PREFIX + "CFS", "No autofill for current nodes children only")
                 return
             }
         }
@@ -576,7 +577,7 @@ object ResponseFiller {
         withInlinePresentation: Boolean
     ): Dataset? {
 
-        Log.d("CFS", "fields ${field.hint} autofillId: ${field.autofillId}")
+        Log.d(LOG_PREFIX + "CFS", "fields ${field.hint} autofillId: ${field.autofillId}")
 
         val autofillId = field.autofillId ?: return null
         val remoteView = createRemoteView(iconId, text, context)

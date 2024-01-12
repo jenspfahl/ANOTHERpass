@@ -1,11 +1,11 @@
 package de.jepfa.yapm.ui.credential
 
-import androidx.appcompat.app.AlertDialog
 import android.content.Context
 import android.text.InputFilter
 import android.text.InputType
 import android.widget.EditText
 import android.widget.LinearLayout
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.setPadding
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Key
@@ -159,7 +159,7 @@ object DeobfuscationDialog {
         val salt = SaltService.getSalt(context)
         val cipherAlgorithm = SecretService.getCipherAlgorithm(context)
         val obfuscationSK =
-            SecretService.generateNormalSecretKey(obfusPasswd, salt, cipherAlgorithm)
+            SecretService.generateNormalSecretKey(obfusPasswd, salt, cipherAlgorithm, context)
         return SecretService.secretKeyToKey(obfuscationSK, salt)
     }
 

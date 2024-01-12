@@ -1,7 +1,5 @@
 package de.jepfa.yapm.usecase.session
 
-import de.jepfa.yapm.model.encrypted.Encrypted
-import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
@@ -26,7 +24,7 @@ object LoginUseCase: InputUseCase<LoginData, BaseActivity>() {
             PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, baseActivity)
                 ?: return false
         val masterPassPhraseSK =
-            MasterKeyService.getMasterPassPhraseSK(loginData.pin, loginData.masterPassword, salt, cipherAlgorithm)
+            MasterKeyService.getMasterPassPhraseSK(loginData.pin, loginData.masterPassword, salt, cipherAlgorithm, baseActivity)
         val vaultVersion = PreferenceService.getAsInt(PreferenceService.DATA_VAULT_VERSION, baseActivity)
         val useLegacyGeneration = vaultVersion < Constants.FAST_KEYGEN_VAULT_VERSION
         val masterSecretKey = MasterKeyService.getMasterSK(

@@ -1,17 +1,13 @@
 package de.jepfa.yapm.ui.importread
 
 import android.content.Intent
-import android.widget.*
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.export.EncExportableCredential
 import de.jepfa.yapm.model.export.ExportContainer
 import de.jepfa.yapm.model.export.PlainShareableCredential
-import de.jepfa.yapm.service.io.VaultExportService
-import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.credential.ShowCredentialActivity
 import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
-import de.jepfa.yapm.util.toUUIDFromBase64String
 import de.jepfa.yapm.util.toastText
 
 

@@ -9,6 +9,7 @@ object Constants {
     val FOSS_SITE = "https://github.com/jenspfahl/anotherpass"
     val BUG_REPORT_SITE = FOSS_SITE + "/issues/new?title=%s&body=%s"
 
+    val LOG_PREFIX = "ANOSS/"
     val MIN_PIN_LENGTH = 6
     val MAX_LABELS_PER_CREDENTIAL = 5
     val MAX_CREDENTIAL_PASSWD_LENGTH = 50

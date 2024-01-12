@@ -3,9 +3,10 @@ package de.jepfa.yapm.database.repository
 import androidx.annotation.WorkerThread
 import de.jepfa.yapm.database.dao.EncLabelDao
 import de.jepfa.yapm.database.entity.EncLabelEntity
-import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncLabel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import java.util.*
 
 class LabelRepository(private val encLabelDao: EncLabelDao) {

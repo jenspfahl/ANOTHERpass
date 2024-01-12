@@ -5,10 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.SystemClock
-import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyInfo
-import android.security.keystore.KeyProperties
-import android.security.keystore.StrongBoxUnavailableException
+import android.security.keystore.*
 import android.util.Log
 import de.jepfa.yapm.model.Validable.Companion.FAILED_BYTE_ARRAY
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm
@@ -23,6 +20,7 @@ import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_SEED
 import de.jepfa.yapm.service.biometrix.BiometricUtils
 import de.jepfa.yapm.service.secret.PbkdfIterationService.getStoredPbkdfIterations
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import java.security.*
 import java.security.spec.InvalidKeySpecException
 import javax.crypto.Cipher
@@ -39,6 +37,11 @@ import javax.crypto.spec.SecretKeySpec
  */
 object SecretService {
 
+    /**
+     * See https://github.com/jenspfahl/ANOTHERpass/issues/52
+     */
+    class KeyStoreNotReadyException : Exception()
+
     private val ANDROID_KEY_STORE = "AndroidKeyStore"
 
     private var userSeed: Key? = null
@@ -49,16 +52,16 @@ object SecretService {
     @Synchronized
     fun getSecureRandom(context: Context?): SecureRandom {
         if (random == null || random!!.nextInt(100) <= 0) {
-            Log.d("SEED", "init PRNG")
+            Log.d(LOG_PREFIX + "SEED", "init PRNG")
             random = SecureRandom()
         }
         else {
-            Log.d("SEED", "return current PRNG")
+            Log.d(LOG_PREFIX + "SEED", "return current PRNG")
         }
         loadUserSeed(context)
         if (!userSeedUsed) {
             userSeed?.let { seed ->
-                Log.d("SEED", "add user seed to PRNG")
+                Log.d(LOG_PREFIX + "SEED", "add user seed to PRNG")
                 random?.setSeed(seed.data)
                 userSeedUsed = true
             }
@@ -97,28 +100,28 @@ object SecretService {
         return Key(bytes)
     }
 
-    fun createSecretKey(data: Key, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
+    fun createSecretKey(data: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
         val sk = SecretKeySpec(data.data.copyOf(cipherAlgorithm.keyLength/8), cipherAlgorithm.secretKeyAlgorithm)
-        return SecretKeyHolder(sk, cipherAlgorithm)
+        return SecretKeyHolder(sk, cipherAlgorithm, null, context)
     }
 
-    fun generateDefaultSecretKey(data: Key, salt: Key, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
-        return generatePBESecretKey(Password(data), salt, PbkdfIterationService.LEGACY_PBKDF_ITERATIONS, cipherAlgorithm)
+    fun generateDefaultSecretKey(data: Key, salt: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
+        return generatePBESecretKey(Password(data), salt, PbkdfIterationService.LEGACY_PBKDF_ITERATIONS, cipherAlgorithm, context)
     }
 
-    fun generateStrongSecretKey(password: Password, salt: Key, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
-        return generatePBESecretKey(password, salt, getStoredPbkdfIterations(), cipherAlgorithm)
+    fun generateStrongSecretKey(password: Password, salt: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
+        return generatePBESecretKey(password, salt, getStoredPbkdfIterations(), cipherAlgorithm, context)
     }
 
-    fun generateNormalSecretKey(password: Password, salt: Key, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
-        return generatePBESecretKey(password, salt, 1000, cipherAlgorithm)
+    fun generateNormalSecretKey(password: Password, salt: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
+        return generatePBESecretKey(password, salt, 1000, cipherAlgorithm, context)
     }
 
-    fun generatePBESecretKey(password: Password, salt: Key, iterations: Int, cipherAlgorithm: CipherAlgorithm): SecretKeyHolder {
+    fun generatePBESecretKey(password: Password, salt: Key, iterations: Int, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
         val keySpec = PBEKeySpec(password.toEncodedCharArray(), salt.data, iterations, cipherAlgorithm.keyLength)
         val factory = SecretKeyFactory.getInstance(cipherAlgorithm.secretKeyAlgorithm)
         try {
-            return SecretKeyHolder(factory.generateSecret(keySpec), cipherAlgorithm)
+            return SecretKeyHolder(factory.generateSecret(keySpec), cipherAlgorithm, null, context)
         }
         finally {
             keySpec.clearPassword()
@@ -209,27 +212,57 @@ object SecretService {
     private fun encryptData(type: EncryptedType?, secretKeyHolder: SecretKeyHolder, data: ByteArray): Encrypted {
         return try {
             encrypt(secretKeyHolder, type, data)
-        } catch (e: Exception) {
-            Log.e("SS", "Encryption failed, trying again", e)
-            SystemClock.sleep(100) // artificial wait before retry
-            encrypt(secretKeyHolder, type, data)
+        } catch (e: KeyStoreNotReadyException) {
+            Log.e(LOG_PREFIX + "SS", "KeyStore not ready, trying again", e)
+            SystemClock.sleep(3000) // artificial wait before retry
+            return try {
+                encrypt(secretKeyHolder, type, data)
+            } catch (e: KeyStoreNotReadyException) {
+                Log.e(LOG_PREFIX + "SS", "KeyStore still not ready, trying again", e)
+                SystemClock.sleep(5000) // artificial wait before last retry
+                encrypt(secretKeyHolder, type, data)
+            }
         }
     }
 
     private fun encrypt(
         secretKeyHolder: SecretKeyHolder,
         type: EncryptedType?,
-        data: ByteArray
+        data: ByteArray,
     ): Encrypted {
         val cipher: Cipher = Cipher.getInstance(secretKeyHolder.cipherAlgorithm.cipherName)
+        try {
+            if (secretKeyHolder.cipherAlgorithm.integratedIvSupport) {
+                cipher.init(Cipher.ENCRYPT_MODE, secretKeyHolder.secretKey)
+            } else {
+                val iv = ByteArray(cipher.blockSize)
+                getSecureRandom(null).nextBytes(iv)
+                val ivParams = IvParameterSpec(iv)
+                cipher.init(Cipher.ENCRYPT_MODE, secretKeyHolder.secretKey, ivParams)
+            }
+        } catch (e: UserNotAuthenticatedException) {
+            if (secretKeyHolder.androidKey?.requireUserAuth == false || !checkKeyRequiresUserAuthOnInsecureDevice(secretKeyHolder, secretKeyHolder.context)) {
+                /*
+                Seems to be a bug in KeyStoreCryptoOperationUtils.getInvalidKeyException.
+                See https://github.com/jenspfahl/ANOTHERpass/issues/61
+                This exception might be a wrong exception indicating something else. Here the code of getInvalidKeyException:
 
-        if (secretKeyHolder.cipherAlgorithm.integratedIvSupport) {
-            cipher.init(Cipher.ENCRYPT_MODE, secretKeyHolder.secretKey)
-        } else {
-            val iv = ByteArray(cipher.blockSize)
-            getSecureRandom(null).nextBytes(iv)
-            val ivParams = IvParameterSpec(iv)
-            cipher.init(Cipher.ENCRYPT_MODE, secretKeyHolder.secretKey, ivParams)
+                case ResponseCode.LOCKED:
+                case ResponseCode.UNINITIALIZED:
+                case KeymasterDefs.KM_ERROR_KEY_USER_NOT_AUTHENTICATED:
+                    // TODO b/173111727 remove response codes LOCKED and UNINITIALIZED
+                    return new UserNotAuthenticatedException();
+
+                The comment indicates that the reason could also be a LOCKED or UNINITIALIZED
+                 */
+                Log.w(LOG_PREFIX + "SS", "UserNotAuthenticatedException caught but not handled", e)
+                throw KeyStoreNotReadyException()
+            }
+            else {
+                // it seems correct to forward UserNotAuthenticatedException
+                Log.w(LOG_PREFIX + "SS", "UserNotAuthenticatedException caught and forwarded", e)
+                throw e
+            }
         }
 
         return Encrypted(type, cipher.iv, cipher.doFinal(data), secretKeyHolder.cipherAlgorithm)
@@ -237,11 +270,11 @@ object SecretService {
 
     private fun decryptData(secretKeyHolder: SecretKeyHolder, encrypted: Encrypted): ByteArray {
         if (encrypted.isEmpty()) {
-            Log.e("SS", "empty encrypted")
+            Log.e(LOG_PREFIX + "SS", "empty encrypted")
             return FAILED_BYTE_ARRAY
         }
         if (secretKeyHolder.cipherAlgorithm != encrypted.cipherAlgorithm) {
-            Log.e("SS", "cipher algorithm mismatch")
+            Log.e(LOG_PREFIX + "SS", "cipher algorithm mismatch")
             return FAILED_BYTE_ARRAY
         }
 
@@ -259,7 +292,7 @@ object SecretService {
             }
             return cipher.doFinal(encryptedData)
         } catch (e: GeneralSecurityException) {
-            Log.e("SS", "unable to decrypt")
+            Log.e(LOG_PREFIX + "SS", "unable to decrypt")
             return FAILED_BYTE_ARRAY
         }
     }
@@ -273,7 +306,7 @@ object SecretService {
 
         val sk = (entry as? KeyStore.SecretKeyEntry)?.secretKey ?: initAndroidSecretKey(androidKey, context)
 
-        return SecretKeyHolder(sk, DEFAULT_CIPHER_ALGORITHM)
+        return SecretKeyHolder(sk, DEFAULT_CIPHER_ALGORITHM, androidKey, context)
     }
 
     fun checkKeyRequiresUserAuthOnInsecureDevice(secretKeyHolder: SecretKeyHolder, context: Context): Boolean {
@@ -289,7 +322,7 @@ object SecretService {
         try {
             return factory.getKeySpec(secretKeyHolder.secretKey, KeyInfo::class.java) as KeyInfo
         } catch (e: InvalidKeySpecException) {
-            Log.e("SS", "Asking for invalid key spec: ${secretKeyHolder.cipherAlgorithm}", e)
+            Log.e(LOG_PREFIX + "SS", "Asking for invalid key spec: ${secretKeyHolder.cipherAlgorithm}", e)
         }
         return null
     }
@@ -337,12 +370,12 @@ object SecretService {
                 keyGenerator.init(spec.build())
                 return keyGenerator.generateKey()
             } catch (e: StrongBoxUnavailableException) {
-                Log.w("SS", "Strong box not supported, falling back to without it", e)
+                Log.w(LOG_PREFIX + "SS", "Strong box not supported, falling back to without it", e)
                 spec.setIsStrongBoxBacked(false)
                 return initSecretKey(keyGenerator, spec.build())
             }
             catch (e: Exception) {
-                Log.w("SS", "Unknown exception, just retry", e)
+                Log.w(LOG_PREFIX + "SS", "Unknown exception, just retry", e)
                 return initSecretKey(keyGenerator, spec.build())
             }
         }
@@ -354,7 +387,7 @@ object SecretService {
             keyGenerator.init(spec)
             keyGenerator.generateKey()
         } catch (e: Exception) {
-            Log.w("SS", "Unknown exception, just retry", e)
+            Log.w(LOG_PREFIX + "SS", "Unknown exception, just retry", e)
             SystemClock.sleep(100) // artificial wait before retry
             keyGenerator.init(spec)
             keyGenerator.generateKey()
@@ -364,7 +397,7 @@ object SecretService {
     fun setUserSeed(seed: Key?, context: Context) {
         userSeed = seed
         userSeedUsed = false
-        Log.d("SEED", "update user seed")
+        Log.d(LOG_PREFIX + "SEED", "update user seed")
         persistUserSeed(context)
     }
 
@@ -373,7 +406,7 @@ object SecretService {
             Session.getMasterKeySK()?.let { key ->
                 val encSeed = encryptKey(key, seed)
                 PreferenceService.putEncrypted(DATA_ENCRYPTED_SEED, encSeed, context)
-                Log.d("SEED", "persist user seed")
+                Log.d(LOG_PREFIX + "SEED", "persist user seed")
             }
         }
     }
