@@ -31,8 +31,6 @@ class ErrorActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler(this))
-
         setContentView(R.layout.activity_error)
         var errorHeaderView = findViewById<TextView>(R.id.error_header)
         var errorTraceView = findViewById<TextView>(R.id.bug_report)
@@ -65,7 +63,7 @@ class ErrorActivity : AppCompatActivity() {
                     ClipboardUtil.copy("bug report", errorText, this)
                     val errorTextUrlSafe = URLEncoder.encode(errorText.toString(), "UTF-8")
                     val anonymizedVaultId = SaltService.getAnonymizedVaultId(this)
-                    val bugReportUrl = Constants.BUG_REPORT_SITE.format("Error report from user [#$anonymizedVaultId]", errorTextUrlSafe)
+                    val bugReportUrl = Constants.BUG_REPORT_SITE.format("Error report from user ($anonymizedVaultId)", errorTextUrlSafe)
                     val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(bugReportUrl))
                     startActivity(browserIntent)
 
