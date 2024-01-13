@@ -2,13 +2,12 @@ package de.jepfa.yapm.model.export
 
 import android.util.Log
 import com.google.gson.JsonElement
-import com.google.gson.JsonObject
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.toUUIDFromBase64String
-import java.util.*
 
 
 data class PlainShareableCredential(val ui: String?,
@@ -68,7 +67,7 @@ data class PlainShareableCredential(val ui: String?,
                     jsonObject.get(ATTRIB_EXPIRES_AT)?.asLong,
                 )
             } catch (e: Exception) {
-                Log.e("PCR", "cannot parse json container", e)
+                Log.e(LOG_PREFIX + "PCR", "cannot parse json container", e)
                 return null
             }
         }

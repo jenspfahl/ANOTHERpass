@@ -2,11 +2,10 @@ package de.jepfa.yapm.service.biometrix
 
 import android.Manifest
 import android.content.Context
-import android.os.Build
-import androidx.core.hardware.fingerprint.FingerprintManagerCompat
-import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.biometric.BiometricManager
+import androidx.core.app.ActivityCompat
 
 object BiometricUtils {
     val isBiometricPromptAvailable: Boolean

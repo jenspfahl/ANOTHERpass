@@ -2,8 +2,8 @@ package de.jepfa.yapm.viewmodel
 
 import android.content.Context
 import androidx.lifecycle.*
-import de.jepfa.yapm.model.encrypted.EncUsernameTemplate
 import de.jepfa.yapm.database.repository.UsernameTemplateRepository
+import de.jepfa.yapm.model.encrypted.EncUsernameTemplate
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.ui.YapmApp
 import kotlinx.coroutines.launch

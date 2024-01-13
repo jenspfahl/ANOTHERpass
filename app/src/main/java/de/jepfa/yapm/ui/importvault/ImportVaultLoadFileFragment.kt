@@ -18,9 +18,10 @@ import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.DebugInfo
-import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.FileUtil
+import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.toastText
 
 class ImportVaultLoadFileFragment : BaseFragment() {
@@ -80,7 +81,7 @@ class ImportVaultLoadFileFragment : BaseFragment() {
                                 content, importVaultActivity, handleBlob = true)
                         }
                     } catch (e: Exception) {
-                        Log.e("RESTORE", "cannot import file $selectedFile", e)
+                        Log.e(LOG_PREFIX + "RESTORE", "cannot import file $selectedFile", e)
                     }
                 }
             }

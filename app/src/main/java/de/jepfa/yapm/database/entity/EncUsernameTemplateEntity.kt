@@ -1,10 +1,8 @@
 package de.jepfa.yapm.database.entity
 
 import androidx.room.Entity
-import androidx.room.Index
 import androidx.room.PrimaryKey
 import de.jepfa.yapm.model.encrypted.Encrypted
-import java.util.*
 
 /**
  * Encrypted templates for usernames

@@ -3,6 +3,7 @@ package de.jepfa.yapm.util
 import android.app.KeyguardManager
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import de.jepfa.yapm.BuildConfig
 import de.jepfa.yapm.database.YapmDatabase
 import de.jepfa.yapm.service.PreferenceService
@@ -10,8 +11,11 @@ import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_VERSION
 import de.jepfa.yapm.service.biometrix.BiometricUtils
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.MasterPasswordService
+import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.util.Constants.INITIAL_VAULT_VERSION
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import java.io.*
 
 object DebugInfo {
 
@@ -48,11 +52,15 @@ object DebugInfo {
             PreferenceService.DATA_VAULT_IMPORTED_AT,
             context
         )
+
+        val anonymizedVaultId = SaltService.getAnonymizedVaultId(context)
+
         val sb = StringBuilder()
         sb.append("\n************ APP INFORMATION ***********\n")
         sb.addFormattedLine("Version", getVersionName(context))
         sb.addFormattedLine("Version Code", getVersionCode(context))
         sb.addFormattedLine("Database Version", YapmDatabase.getVersion())
+        sb.addFormattedLine("Vault Id (anonymized)", anonymizedVaultId)
         sb.addFormattedLine("Vault Version", PreferenceService.getAsString(DATA_VAULT_VERSION, context) ?: INITIAL_VAULT_VERSION)
         sb.addFormattedLine("Vault Cipher", SecretService.getCipherAlgorithm(context))
         if (vaultCreatedAt != null) {
@@ -65,6 +73,7 @@ object DebugInfo {
         sb.addFormattedLine("MP stored with auth", MasterPasswordService.isMasterPasswordStoredWithAuth(context))
         sb.addFormattedLine("Build Timestamp", BuildConfig.BUILD_TIME.toSimpleDateTimeFormat())
         sb.addFormattedLine("Build Type", BuildConfig.BUILD_TYPE)
+        sb.addFormattedLine("Debug Mode", isDebug)
 
         sb.append("\n************ DEVICE INFORMATION ***********\n")
         sb.addFormattedLine("Brand", Build.BRAND)
@@ -98,6 +107,44 @@ object DebugInfo {
         sb.addFormattedLine("Codename", Build.VERSION.CODENAME)
         sb.addFormattedLine("Security patch", Build.VERSION.SECURITY_PATCH)
 
+        sb.append("\n************ APP-LOG ************\n")
+        val logs = getLogcat(LOG_PREFIX)?.takeLast(1024)
+        sb.append(logs)
+
         return sb.toString()
+    }
+
+    fun getDebugLog(context: Context): String {
+        return getLogcat("", command = "-b all *:D")?:"no logs available"
+    }
+
+    private fun getLogcat(filter: String, command: String = "-v time *:I"): String? {
+        try {
+            val p = Runtime.getRuntime().exec("logcat -d $command") // only errors
+            BufferedReader(InputStreamReader(p.inputStream)).use { bais ->
+                StringWriter().use { sw ->
+                    PrintWriter(sw).use { pw ->
+                        var line: String?
+                        while (bais.readLine().also { line = it } != null) {
+                            if (line?.contains(filter) == true) {
+                                pw.println(line)
+                            }
+                        }
+                        return sw.toString()
+                    }
+                }
+            }
+        } catch (e: IOException) {
+            Log.e(LOG_PREFIX + "Debug","cannot gather logs", e)
+        }
+        return null
+    }
+
+    fun clearLogs() {
+        try {
+            Runtime.getRuntime().exec("logcat -b all -c") // clear logs
+        } catch (e: IOException) {
+            Log.e(LOG_PREFIX + "Debug","cannot clear logs", e)
+        }
     }
 }

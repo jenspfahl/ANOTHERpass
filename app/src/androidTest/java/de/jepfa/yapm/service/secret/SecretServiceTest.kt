@@ -7,6 +7,7 @@ import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.util.Constants
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -15,7 +16,7 @@ import org.junit.runner.RunWith
 @SmallTest
 class SecretServiceTest {
 
-    val TAG = "YAPM/SS"
+    val TAG = Constants.LOG_PREFIX + "SS"
 
     lateinit var context: Context
 
@@ -51,7 +52,7 @@ class SecretServiceTest {
         Log.i(TAG, "masterKey=${masterKey.debugToString()}")
 
         // store masterKey encrypted with masterPassPhrase --> AES
-        val masterPassPhraseSK = SecretService.generateStrongSecretKey(masterPassPhrase, salt, cipherAlgorithm)
+        val masterPassPhraseSK = SecretService.generateStrongSecretKey(masterPassPhrase, salt, cipherAlgorithm, context)
         Log.i(TAG, "masterPassPhraseSK=${masterPassPhraseSK.secretKey.encoded.contentToString()}")
 
         val encMasterKey = SecretService.encryptKey(masterPassPhraseSK, masterKey)
@@ -63,7 +64,7 @@ class SecretServiceTest {
 
         // Credential enc-/decryption with masterKey --> AES
         val credential = Password("9999")
-        val masterKeySK = SecretService.generateDefaultSecretKey(masterKey, salt, cipherAlgorithm)
+        val masterKeySK = SecretService.generateDefaultSecretKey(masterKey, salt, cipherAlgorithm, context)
         // not needed anymore
         masterKey.clear()
 

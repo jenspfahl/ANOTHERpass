@@ -10,6 +10,7 @@ import androidx.security.crypto.MasterKeys
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.util.Constants
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import java.text.ParsePosition
 import java.util.*
 
@@ -193,7 +194,7 @@ object PreferenceService {
                         prefs.copyTo(encPrefs)
                         prefs.clear()
                     } catch (e: Exception) {
-                        Log.e("PREFS", "could not migrate to enc prefs", e)
+                        Log.e(LOG_PREFIX + "PREFS", "could not migrate to enc prefs", e)
                         return
                     }
                 }
@@ -226,7 +227,7 @@ object PreferenceService {
             Also do so when adding new prefs in existing files
              */
             systemPreferences.set(STATE_DEFAULT_INIT_DONE, STATE_DEFAULT_INIT_DONE_VERSION)
-            Log.i("PREFS", "default values set with version $STATE_DEFAULT_INIT_DONE_VERSION")
+            Log.i(LOG_PREFIX + "PREFS", "default values set with version $STATE_DEFAULT_INIT_DONE_VERSION")
         }
     }
 
@@ -244,13 +245,13 @@ object PreferenceService {
             val date: Date? = Constants.SDF_DT_MEDIUM.parse(timestampAsString, ParsePosition(0))
             if (date != null) {
                 // migrate to the new format
-                Log.i("PS", "migrate date $timestamp for key $prefKey to Long.")
+                Log.i(LOG_PREFIX + "PS", "migrate date $timestamp for key $prefKey to Long.")
                 putDate(prefKey, date, context)
                 return date
             }
             else {
                 // cannot parse it anymore, just delete it
-                Log.w("PS", "cannot parse date $timestamp for key $prefKey. Deleting it.")
+                Log.w(LOG_PREFIX + "PS", "cannot parse date $timestamp for key $prefKey. Deleting it.")
                 delete(prefKey, context)
                 return null
             }
@@ -369,7 +370,7 @@ object PreferenceService {
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             )
         } catch (e: Exception) {
-            Log.e("PREFS", "cannot create encrypted shared preferences", e)
+            Log.e(LOG_PREFIX + "PREFS", "cannot create encrypted shared preferences", e)
             null
         }
     }
@@ -397,7 +398,7 @@ fun SharedPreferences.set(key: String, value: Any?) {
         is Set<*>? -> edit { it.putStringSet(key, value?.map { it.toString() }?.toSet()) }
         is Boolean -> edit { it.putBoolean(key, value) }
         else -> {
-            Log.e("PREFS", "Unsupported Type: $value")
+            Log.e(LOG_PREFIX + "PREFS", "Unsupported Type: $value")
         }
     }
 }

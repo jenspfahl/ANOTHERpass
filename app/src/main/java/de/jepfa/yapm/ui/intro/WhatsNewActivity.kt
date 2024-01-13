@@ -6,7 +6,6 @@ import com.github.appintro.AppIntroCustomLayoutFragment
 import de.jepfa.yapm.R
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.STATE_WHATS_NEW_SHOWED_FOR_VERSION
-import de.jepfa.yapm.util.DebugInfo.getVersionCode
 import de.jepfa.yapm.util.DebugInfo.getVersionCodeForWhatsNew
 
 // Taken from https://github.com/AppIntro/AppIntro

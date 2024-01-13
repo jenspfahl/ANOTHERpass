@@ -4,16 +4,19 @@ import android.content.Context
 import android.net.Uri
 import android.text.TextUtils
 import android.util.Log
-import com.google.gson.JsonObject
 import com.opencsv.CSVReaderHeaderAware
 import com.opencsv.CSVWriter
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.FileUtil
 import de.jepfa.yapm.util.toSimpleDateFormat
-import java.io.*
+import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.io.OutputStreamWriter
+import java.io.StringReader
 import java.util.*
 
 
@@ -31,7 +34,7 @@ object CsvService {
                 line = reader.readMap()
             }
         } catch (e: Exception) {
-            Log.e("CSV", "cannot parse csvfile", e)
+            Log.e(LOG_PREFIX + "CSV", "cannot parse csvfile", e)
             return null
         }
         return resultList
@@ -44,11 +47,11 @@ object CsvService {
             val content: String? = FileUtil.readFile(context, uri)
             if (TextUtils.isEmpty(content)) {
                 //TODO this check seems not to work from time to time
-                Log.e("BACKUP", "Empty file created: $uri")
+                Log.e(LOG_PREFIX + "BACKUP", "Empty file created: $uri")
                 success = false
             }
         } catch (e: Exception) {
-            Log.e("BACKUP", "Cannot write file $uri", e)
+            Log.e(LOG_PREFIX + "BACKUP", "Cannot write file $uri", e)
         }
         return success
     }

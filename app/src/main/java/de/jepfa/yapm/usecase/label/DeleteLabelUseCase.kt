@@ -2,11 +2,9 @@ package de.jepfa.yapm.usecase.label
 
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
-import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.usecase.InputUseCase
-import de.jepfa.yapm.util.observeOnce
 
 
 object DeleteLabelUseCase: InputUseCase<Label, SecureActivity>() {

@@ -8,9 +8,9 @@ import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.label.LabelService.createLabel
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.label.Label
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.HashSet
 
 class LabelsHolder {
 
@@ -157,7 +157,7 @@ class LabelsHolder {
                 .filterNotNull()
                 .toSet()
         } catch (e: NumberFormatException) {
-            Log.e("LIS", "cannot parse $ids ", e)
+            Log.e(LOG_PREFIX + "LIS", "cannot parse $ids ", e)
             return Collections.emptySet()
         }
     }

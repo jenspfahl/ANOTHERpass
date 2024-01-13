@@ -149,9 +149,17 @@
         </item>
 
         <item
+            android:id="@+id/menu_report_bug"
+            android:icon="@drawable/baseline_bug_report_24"
+            android:orderInCategory="350"
+            android:title="@string/report_a_bug">
+        </item>
+
+
+        <item
             android:id="@+id/menu_debug"
             android:icon="@drawable/ic_baseline_memory_24"
-            android:orderInCategory="300"
+            android:orderInCategory="400"
             android:title="@string/debug"
             android:visible="false">
         </item>

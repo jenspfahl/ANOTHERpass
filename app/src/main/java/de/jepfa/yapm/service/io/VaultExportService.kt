@@ -20,9 +20,9 @@ import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.util.Constants
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.FileUtil
-import java.lang.IllegalStateException
 import java.lang.reflect.Type
 import java.util.*
 
@@ -92,7 +92,7 @@ object VaultExportService {
             val success = writeExportFile(context, uri, jsonData)
             return success
         } catch (e: Exception) {
-            Log.e("JSON", "cannot create JSON", e)
+            Log.e(LOG_PREFIX + "JSON", "cannot create JSON", e)
             return false
         }
     }
@@ -105,11 +105,11 @@ object VaultExportService {
             val content: String? = FileUtil.readFile(context, uri)
             if (TextUtils.isEmpty(content)) {
                 //TODO this check seems not to work from time to time
-                Log.e("BACKUP", "Empty file created: $uri")
+                Log.e(LOG_PREFIX + "BACKUP", "Empty file created: $uri")
                 success = false
             }
         } catch (e: Exception) {
-            Log.e("BACKUP", "Cannot write file $uri", e)
+            Log.e(LOG_PREFIX + "BACKUP", "Cannot write file $uri", e)
         }
         return success
     }
@@ -123,7 +123,7 @@ object VaultExportService {
             root.addProperty(JSON_APP_VERSION_CODE, DebugInfo.getVersionCode(context))
             root.addProperty(JSON_APP_VERSION_NAME, DebugInfo.getVersionName(context))
         } catch (e: PackageManager.NameNotFoundException) {
-            Log.e("BACKUPALL", "cannot get version code", e)
+            Log.e(LOG_PREFIX + "BACKUPALL", "cannot get version code", e)
         }
 
         root.addProperty(JSON_CREATION_DATE, Date().time)

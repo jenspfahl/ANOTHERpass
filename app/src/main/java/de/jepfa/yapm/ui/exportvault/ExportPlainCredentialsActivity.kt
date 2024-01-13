@@ -2,17 +2,12 @@ package de.jepfa.yapm.ui.exportvault
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.EditText
-import androidx.appcompat.widget.SwitchCompat
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
-import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.service.PreferenceService.PREF_INCLUDE_MASTER_KEY_IN_BACKUP_FILE
-import de.jepfa.yapm.service.PreferenceService.PREF_INCLUDE_SETTINGS_IN_BACKUP_FILE
 import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.service.secret.MasterKeyService
 import de.jepfa.yapm.service.secret.MasterPasswordService
@@ -21,13 +16,9 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
-import de.jepfa.yapm.usecase.secret.ChangeMasterPasswordUseCase
-import de.jepfa.yapm.usecase.secret.ChangeVaultEncryptionUseCase
 import de.jepfa.yapm.usecase.vault.ExportPlainCredentialsUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
-import de.jepfa.yapm.usecase.vault.ShareVaultUseCase
 import de.jepfa.yapm.util.PermissionChecker
-import de.jepfa.yapm.util.toastText
 
 class ExportPlainCredentialsActivity : SecureActivity() {
 
@@ -107,7 +98,8 @@ class ExportPlainCredentialsActivity : SecureActivity() {
             currentPin,
             currentMasterPassword,
             salt,
-            cipherAlgorithm
+            cipherAlgorithm,
+            this,
         )
 
         val masterKey =

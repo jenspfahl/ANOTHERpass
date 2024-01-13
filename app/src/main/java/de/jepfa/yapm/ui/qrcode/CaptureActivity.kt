@@ -1,6 +1,5 @@
 package de.jepfa.yapm.ui.qrcode
 
-import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -8,7 +7,6 @@ import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
-import com.google.zxing.Result
 import com.google.zxing.BinaryBitmap
 import com.google.zxing.MultiFormatReader
 import com.google.zxing.RGBLuminanceSource
@@ -16,6 +14,7 @@ import com.google.zxing.common.HybridBinarizer
 import com.journeyapps.barcodescanner.*
 import com.journeyapps.barcodescanner.CaptureActivity
 import de.jepfa.yapm.R
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.FileUtil
 import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.toastText
@@ -94,7 +93,7 @@ class CaptureActivity: CaptureActivity() {
                             }
                         }
                     } catch (e: Exception) {
-                        Log.e("SCAN_QR", "cannot import file $selectedFile", e)
+                        Log.e(LOG_PREFIX + "SCAN_QR", "cannot import file $selectedFile", e)
                     }
                 }
             }
@@ -112,7 +111,7 @@ class CaptureActivity: CaptureActivity() {
         try {
             return reader.decode(bitmap)?.text
         } catch (e: Exception) {
-            Log.e("SCAN_QR", "Error scanning file: ${e.message}", e)
+            Log.e(LOG_PREFIX + "SCAN_QR", "Error scanning file: ${e.message}", e)
         }
         return null
     }

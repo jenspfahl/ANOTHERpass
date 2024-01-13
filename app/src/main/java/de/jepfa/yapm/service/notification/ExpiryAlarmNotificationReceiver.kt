@@ -13,6 +13,7 @@ import de.jepfa.yapm.service.notification.NotificationService.SCHEDULED_NOTIFICA
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.util.*
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import java.util.*
 
 class ExpiryAlarmNotificationReceiver : BroadcastReceiver() {
@@ -21,13 +22,13 @@ class ExpiryAlarmNotificationReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
 
         val id = intent.getIntExtra("ID", 0)
-        Log.d("NOTIF", "scheduled notification with id=$id alarm received")
+        Log.d(LOG_PREFIX + "NOTIF", "scheduled notification with id=$id alarm received")
 
         PreferenceService.initStorage(context)
 
         val enabled = PreferenceService.getAsBool(PREF_EXPIRED_CREDENTIALS_NOTIFICATION_ENABLED, context)
         if (!enabled) {
-            Log.d("NOTIF", "scheduled notifications disabled")
+            Log.d(LOG_PREFIX + "NOTIF", "scheduled notifications disabled")
             return
         }
 
@@ -43,7 +44,7 @@ class ExpiryAlarmNotificationReceiver : BroadcastReceiver() {
                 .map { it.removeTime() }
                 .firstOrNull { it == today || it.before(today) }
 
-        Log.d("NOTIF", "scheduled notification with id=$id alarm received having expiryDate=$expiryDateForId")
+        Log.d(LOG_PREFIX + "NOTIF", "scheduled notification with id=$id alarm received having expiryDate=$expiryDateForId")
 
         if (expiryDateForId != null) {
             val contentIntent = createPendingExpiryIntent(context, id,

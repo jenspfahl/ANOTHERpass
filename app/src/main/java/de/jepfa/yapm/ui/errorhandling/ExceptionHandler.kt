@@ -4,7 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Process
 import android.util.Log
-import de.jepfa.yapm.util.DebugInfo.getDebugInfo
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import java.io.PrintWriter
 import java.io.StringWriter
 
@@ -16,18 +16,17 @@ class ExceptionHandler(private val context: Activity) : Thread.UncaughtException
     override fun uncaughtException(thread: Thread, exception: Throwable) {
         val stackTrace = StringWriter()
         exception.printStackTrace(PrintWriter(stackTrace))
-        Log.e("EXH", "caught exception", exception)
+        Log.d(LOG_PREFIX + "EXH", "caught exception", exception)
         val errorReport = StringBuilder()
         errorReport.append("************ CAUSE OF ERROR ************\n\n")
         errorReport.append(stackTrace.toString())
 
-        errorReport.append(getDebugInfo(context))
-
         val intent = Intent(context, ErrorActivity::class.java)
-        intent.putExtra("error", errorReport.toString())
+        intent.putExtra(ErrorActivity.EXTRA_EXCEPTION, errorReport.toString())
+        intent.putExtra(ErrorActivity.EXTRA_FROM_ERROR_CATCHER, true)
         context.startActivity(intent)
-        Process.killProcess(Process.myPid())
 
+        Process.killProcess(Process.myPid())
         System.exit(10)
     }
 

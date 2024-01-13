@@ -1,11 +1,9 @@
 package de.jepfa.yapm.ui.login
 
 import android.os.Bundle
-import android.security.keystore.UserNotAuthenticatedException
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -113,19 +111,8 @@ class LoginEnterPinFragment : BaseFragment() {
                     , {
                         try {
                             moveToEnterMasterPasswordScreen(keyForTemp, userPin)
-                        } catch (e: UserNotAuthenticatedException) {
-                            // this is a hack: since this exception might happen to user-authentication-free keys as well i try to recreate them here
-
-                            Log.w("AUTH", "Caught $e, invalidating transport key and retrying ...")
-
-                            SecretService.removeAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT)
-                            keyForTemp = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, view.context)
-
-                            //try {
-                                moveToEnterMasterPasswordScreen(keyForTemp, userPin)
-                            //} catch (e: UserNotAuthenticatedException) {
-                                // toastText(loginActivity, "User not authenticated, lock and unlock your phone")
-                            //}
+                        } catch (e: SecretService.KeyStoreNotReadyException) {
+                            toastText(it.context, R.string.keystore_not_ready)
                         }
                     }
                 )

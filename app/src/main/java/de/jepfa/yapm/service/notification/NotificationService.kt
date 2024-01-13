@@ -1,6 +1,5 @@
 package de.jepfa.yapm.service.notification
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.NotificationChannel
@@ -8,13 +7,12 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
-import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import de.jepfa.yapm.R
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.PermissionChecker.hasNotificationPermission
 import java.util.*
 
@@ -59,7 +57,7 @@ object NotificationService {
         }
 
         if (!hasNotificationPermission(context)) {
-            Log.w("NOTIF", "notification permission not granted")
+            Log.w(LOG_PREFIX + "NOTIF", "notification permission not granted")
             return
         }
         else {
@@ -93,7 +91,7 @@ object NotificationService {
             alarmIntent
         )
 
-        Log.d("NOTIF", "scheduling notification with id=$id and date=$date")
+        Log.d(LOG_PREFIX + "NOTIF", "scheduling notification with id=$id and date=$date")
     }
 
     fun cancelScheduledNotification(context: Context, id: Int) {
@@ -103,7 +101,7 @@ object NotificationService {
 
         alarmManager.cancel(alarmIntent)
 
-        Log.d("NOTIF", "cancelling notification with id=$id")
+        Log.d(LOG_PREFIX + "NOTIF", "cancelling notification with id=$id")
 
     }
 

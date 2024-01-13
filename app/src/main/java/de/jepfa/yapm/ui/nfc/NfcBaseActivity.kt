@@ -6,8 +6,9 @@ import android.nfc.NfcAdapter
 import android.os.Bundle
 import android.util.Log
 import de.jepfa.yapm.service.nfc.NdefTag
-import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.service.nfc.NfcService
+import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 
 
 /**
@@ -59,7 +60,7 @@ abstract class NfcBaseActivity : SecureActivity() {
             val nfcPendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_MUTABLE) // PendingIntent.FLAG_IMMUTABLE doesn't work, NFC dispatch changes it
             nfcAdapter?.enableForegroundDispatch(this, nfcPendingIntent, null, null)
         } catch (ex: IllegalStateException) {
-            Log.e("NFC", "Error enabling NFC foreground dispatch", ex)
+            Log.e(LOG_PREFIX + "NFC", "Error enabling NFC foreground dispatch", ex)
         }
     }
 
@@ -67,7 +68,7 @@ abstract class NfcBaseActivity : SecureActivity() {
         try {
             nfcAdapter?.disableForegroundDispatch(this)
         } catch (ex: IllegalStateException) {
-            Log.e("NFC", "Error disabling NFC foreground dispatch", ex)
+            Log.e(LOG_PREFIX + "NFC", "Error disabling NFC foreground dispatch", ex)
         }
     }
 

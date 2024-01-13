@@ -4,6 +4,7 @@ import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.ProgressBar
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -33,7 +34,7 @@ class AsyncWithProgressBar(
             }
         }
         else {
-            Log.w("ASYNC", "no progressbar, invoke in UI thread")
+            Log.w(LOG_PREFIX + "ASYNC", "no progressbar, invoke in UI thread")
             val result = runBlocking {
                 return@runBlocking backgroundHandler()
             }

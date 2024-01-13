@@ -157,7 +157,7 @@
     <string name="change_pin">Ändere PIN</string>
     <string name="change_pin_explanation">Ändere deine PIN, indem du die aktuelle und die neue PIN eingibst. Beachte, dass sich der verschlüsselte Masterkey ändert, so dass du ihn erneut exportieren solltest. Das betrifft auch Tresor-Dateien mit verschlüsselten Masterkey.</string>
     <string name="button_change">Ändern</string>
-    <string name="new_pin">Neue PiN</string>
+    <string name="new_pin">Neue PIN</string>
     <string name="repeat_new_pin">Neue PIN wiederholen</string>
     <string name="current_pin">Aktuelle PIN</string>
     <string name="change_master_password">Ändere Masterpasswort</string>
@@ -629,7 +629,7 @@
     <string name="colorize_qr_codes">Coloriere QR-Codes</string>
     <string name="print_qr_code_header">Drucke QR-Code Kopfzeile</string>
     <string name="autofill_suggest_everywhere">Vorschläge für Automatisches Ausfüllen überall anzeigen</string>
-    <string name="report_a_bug">Der Fehlerbericht wird nun zu einer Bug-Tracking-Website (Github) gesendet. Dafür brauchst du ein Github-Konto. Außerdem wurde der Bericht in die Zwischenablage kopiert. Danke für deine Hilfe.</string>
+    <string name="report_a_bug_desc">Der Fehlerbericht wird nun zu einer Bug-Tracking-Website (Github) gesendet. Dafür brauchst du ein Github-Konto. Außerdem wurde der Bericht in die Zwischenablage kopiert. Danke für deine Hilfe.</string>
     <string name="autofill_deactivation_duration_title">Auf Aufforderung Automatisches Ausfüllen temporär pausieren</string>
     <string name="temp_deact_autofill">Ausfüllen pausieren</string>
     <string name="temp_deact_autofill_never">Nie</string>
@@ -773,5 +773,11 @@
     <string name="csv_column_credential_password">Spaltenname für Passwort</string>
     <string name="csv_column_credential_expiry_date">Spaltenname für Ablaufdatum</string>
     <string name="csv_column_credential_additional_info">Spaltenname für Zusatzinformationen</string>
+
+    <string name="keystore_not_ready">KeyStore nicht bereit, bitte warten und erneut probieren</string>
+    <string name="describe_a_bug">Hier kannst du den Fehler kurz beschreiben und melden.</string>
+    <string name="bug_description_hint">Eine kurze Beschreibung</string>
+    <string name="captured_error_details">Aufgezeichnete Fehler-Details:</string>
+    <string name="report_a_bug">Fehler melden</string>
 
 </resources>

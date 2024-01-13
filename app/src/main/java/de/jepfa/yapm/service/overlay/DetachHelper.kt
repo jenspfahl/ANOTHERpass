@@ -1,9 +1,9 @@
 package de.jepfa.yapm.service.overlay
 
-import androidx.appcompat.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.secret.Key

@@ -1,23 +1,24 @@
 package de.jepfa.yapm.ui.nfc
 
 import android.nfc.NfcAdapter
-import androidx.appcompat.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SwitchCompat
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_MASTER_PASSWORD_TOKEN_NFC_TAG_ID
 import de.jepfa.yapm.service.nfc.NdefTag
-import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.AndroidKey
+import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.getEncryptedExtra
 import de.jepfa.yapm.util.toastText
 
@@ -221,7 +222,7 @@ class NfcActivity : NfcBaseActivity() {
             toastText(this, R.string.nfc_successfully_written)
             nfcStatusTextView.text = getString(R.string.nfc_tap_again)
         } catch (e: Exception) {
-            Log.e("NFC", "Cannot write tag", e)
+            Log.e(LOG_PREFIX + "NFC", "Cannot write tag", e)
             toastText(this, R.string.nfc_cannot_write)
         } finally {
             data.clear()

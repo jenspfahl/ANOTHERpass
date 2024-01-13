@@ -1,23 +1,10 @@
 package de.jepfa.yapm.usecase.secret
 
 import androidx.appcompat.app.AlertDialog
-import android.content.Intent
-import android.graphics.Color
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.encrypted.EncryptedType
-import de.jepfa.yapm.model.encrypted.EncryptedType.Types.MASTER_PASSWD_TOKEN
-import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.service.secret.AndroidKey
-import de.jepfa.yapm.service.secret.SaltService
-import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
-import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
-import de.jepfa.yapm.ui.nfc.NfcActivity
-import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.usecase.BasicUseCase
-import de.jepfa.yapm.util.putEncryptedExtra
 
 object RevokeMasterPasswordTokenUseCase: BasicUseCase<BaseActivity>() {
 

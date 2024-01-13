@@ -7,6 +7,7 @@ import de.jepfa.yapm.service.secret.*
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.InputUseCase
 import de.jepfa.yapm.usecase.session.LoginUseCase
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 
 object ChangeMasterPasswordUseCase:
     InputUseCase<LoginData, SecureActivity>() {
@@ -18,7 +19,7 @@ object ChangeMasterPasswordUseCase:
         val salt = SaltService.getSalt(activity)
         val currentMasterPassword = MasterPasswordService.getMasterPasswordFromSession(activity)
         if (currentMasterPassword == null) {
-            Log.e(TAG, "master password not at Session")
+            Log.e(LOG_PREFIX + TAG, "master password not at Session")
             return false
         }
         val cipherAlgorithm = SecretService.getCipherAlgorithm(activity)
@@ -26,19 +27,20 @@ object ChangeMasterPasswordUseCase:
             loginData.pin,
             currentMasterPassword,
             salt,
-            cipherAlgorithm
+            cipherAlgorithm,
+            activity,
         )
 
         val encEncryptedMasterKey =
             PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, activity)
         if (encEncryptedMasterKey == null) {
-            Log.e(TAG, "master key not on device")
+            Log.e(LOG_PREFIX + TAG, "master key not on device")
             return false
         }
 
         val masterKey = MasterKeyService.getMasterKey(oldMasterPassphraseSK, encEncryptedMasterKey, activity)
         if (masterKey == null) {
-            Log.e(TAG, "cannot decrypt master key, pin wrong?")
+            Log.e(LOG_PREFIX + TAG, "cannot decrypt master key, pin wrong?")
             return false
         }
 

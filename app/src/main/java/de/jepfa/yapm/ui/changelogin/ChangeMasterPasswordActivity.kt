@@ -14,7 +14,6 @@ import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.secret.MasterPasswordService
-import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.usecase.credential.ShowPasswordStrengthUseCase
@@ -25,9 +24,6 @@ import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.toastText
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class ChangeMasterPasswordActivity : SecureActivity() {
 

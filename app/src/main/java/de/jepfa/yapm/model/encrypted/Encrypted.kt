@@ -2,6 +2,7 @@ package de.jepfa.yapm.model.encrypted
 
 import android.util.Base64
 import android.util.Log
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 
 data class Encrypted(val type: EncryptedType?, val iv: ByteArray, val data: ByteArray, val cipherAlgorithm: CipherAlgorithm) {
 
@@ -73,7 +74,7 @@ data class Encrypted(val type: EncryptedType?, val iv: ByteArray, val data: Byte
             try {
                 return fromBase64String(string)
             } catch (e: Exception) {
-                Log.w("ENC", "cannot read Encrypted", e)
+                Log.w(LOG_PREFIX + "ENC", "cannot read Encrypted", e)
                 return null
             }
         }

@@ -8,6 +8,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import java.nio.ByteBuffer
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
@@ -95,7 +96,7 @@ fun String.fromSimpleDateFormat(): Date? {
         try {
             f.parse(this)
         } catch (e: Exception) {
-            Log.w("PRSE", "Cannot parse $this")
+            Log.w(LOG_PREFIX + "PRSE", "Cannot parse $this")
             null
         }
     }

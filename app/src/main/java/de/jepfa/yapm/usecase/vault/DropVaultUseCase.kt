@@ -5,7 +5,6 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.label.LabelService
-import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.service.notification.NotificationService
 import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.ui.BaseActivity

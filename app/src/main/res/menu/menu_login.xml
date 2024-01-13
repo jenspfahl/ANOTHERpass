@@ -39,6 +39,14 @@
         android:title="@string/about">
     </item>
 
+
+    <item
+        android:id="@+id/menu_report_bug"
+        android:icon="@drawable/baseline_bug_report_24"
+        app:showAsAction="never"
+        android:title="@string/report_a_bug">
+    </item>
+
     <item
         android:id="@+id/action_reset_vault"
         android:icon="@drawable/ic_baseline_replay_24"

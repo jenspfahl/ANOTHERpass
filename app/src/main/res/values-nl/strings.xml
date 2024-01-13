@@ -601,7 +601,7 @@ Deze waarschuwing kunt u deactiveren onder \'Instellingen/Beveiliging\'.</string
   <string name="colorize_qr_codes">Kleur QR-codes</string>
   <string name="print_qr_code_header">Print de koptekst van de QR-code</string>
   <string name="autofill_suggest_everywhere">Bekijk overal suggesties voor automatisch aanvullen</string>
-  <string name="report_a_bug">Het bugrapport wordt nu verzonden naar een bugtrackingwebsite (Github).  Hiervoor heb je een Github-account nodig.  Het rapport is ook naar het klembord gekopieerd.  Bedankt voor je hulp.</string>
+  <string name="report_a_bug_desc">Het bugrapport wordt nu verzonden naar een bugtrackingwebsite (Github).  Hiervoor heb je een Github-account nodig.  Het rapport is ook naar het klembord gekopieerd.  Bedankt voor je hulp.</string>
   <string name="autofill_deactivation_duration_title">Pauzeer tijdelijk het automatisch aanvullen wanneer daarom wordt gevraagd</string>
   <string name="temp_deact_autofill">Pauzeer het vullen</string>
   <string name="temp_deact_autofill_never">Nooit</string>
@@ -736,4 +736,10 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="csv_column_credential_password">kolom voor wachtwoord</string>
   <string name="csv_column_credential_expiry_date">kolom voor vervaldatum</string>
   <string name="csv_column_credential_additional_info">kolom voor aanvullende informatie</string>
+
+    <string name="keystore_not_ready">KeyStore not ready, please wait a bit and try again</string>
+    <string name="describe_a_bug">You can shortly describe and report the error here.</string>
+  <string name="bug_description_hint">Provide a short description</string>
+  <string name="captured_error_details">Captured error details:</string>
+  <string name="report_a_bug">Report a bug</string>
 </resources>

@@ -2,7 +2,6 @@ package de.jepfa.yapm.service.secretgenerator.passphrase
 
 import android.content.Context
 import de.jepfa.yapm.model.secret.Password
-import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secretgenerator.GeneratorBase
 import de.jepfa.yapm.service.secretgenerator.SecretStrength
 import java.lang.Math.*

@@ -23,6 +23,7 @@ import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.usecase.session.LoginUseCase
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.QRCodeUtil
 import de.jepfa.yapm.util.QRCodeUtil.extractContentFromIntent
 import de.jepfa.yapm.util.toastText
@@ -122,7 +123,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
 
         val scannedNdefTag = loginActivity.ndefTag?.data
         if (scannedNdefTag != null) {
-            Log.i("LOGIN", "Tag available")
+            Log.i(LOG_PREFIX + "LOGIN", "Tag available")
             isFromQRScan = false
             readAndUpdateMasterPassword(scannedNdefTag, loginActivity, loginActivity.isFastLoginWithNfcTag())
 
@@ -156,7 +157,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
 
         val scannedNdefTag = loginActivity.ndefTag?.data
         if (scannedNdefTag != null) {
-            Log.i("LOGIN", "Tag available")
+            Log.i(LOG_PREFIX + "LOGIN", "Tag available")
             isFromQRScan = false
             readAndUpdateMasterPassword(scannedNdefTag, loginActivity, loginActivity.isFastLoginWithNfcTag())
         }

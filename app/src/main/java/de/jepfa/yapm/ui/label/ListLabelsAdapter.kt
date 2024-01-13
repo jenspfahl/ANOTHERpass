@@ -1,24 +1,26 @@
 package de.jepfa.yapm.ui.label
 
-import androidx.appcompat.app.AlertDialog
 import android.content.Intent
 import android.content.res.ColorStateList
-import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncLabel
-import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.secret.SecretKeyHolder
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.label.LabelService
-import de.jepfa.yapm.service.label.LabelsHolder
-import de.jepfa.yapm.util.*
+import de.jepfa.yapm.util.addFormattedLine
+import de.jepfa.yapm.util.observeOnce
+import de.jepfa.yapm.util.shortenBase64String
+import de.jepfa.yapm.util.toBase64String
 
 
 class ListLabelsAdapter(private val listLabelsActivity: ListLabelsActivity) :

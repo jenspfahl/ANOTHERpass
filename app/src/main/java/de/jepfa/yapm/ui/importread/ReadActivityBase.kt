@@ -13,6 +13,7 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.ui.nfc.NfcBaseActivity
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.QRCodeUtil
 import de.jepfa.yapm.util.enrichId
 import de.jepfa.yapm.util.toastText
@@ -52,7 +53,7 @@ abstract class ReadActivityBase : NfcBaseActivity() {
     }
 
     override fun handleTag() {
-        Log.i("VERIFY", "tag detected " + ndefTag?.tagId)
+        Log.i(LOG_PREFIX + "VERIFY", "tag detected " + ndefTag?.tagId)
         if (ndefTag != null) {
             toastText(this, R.string.nfc_tag_detected)
             ndefTag?.let {

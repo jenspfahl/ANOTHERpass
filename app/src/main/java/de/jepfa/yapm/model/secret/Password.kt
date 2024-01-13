@@ -2,8 +2,8 @@ package de.jepfa.yapm.model.secret
 
 import android.text.Editable
 import android.util.Base64
-import de.jepfa.yapm.util.Loop
 import de.jepfa.yapm.model.Clearable
+import de.jepfa.yapm.util.Loop
 import java.nio.ByteBuffer
 import java.nio.CharBuffer
 import java.nio.charset.Charset

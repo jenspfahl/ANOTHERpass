@@ -639,7 +639,7 @@
     <string name="colorize_qr_codes">Colorize QR codes</string>
     <string name="print_qr_code_header">Print QR code header</string>
     <string name="autofill_suggest_everywhere">Autofill suggestion everywhere</string>
-    <string name="report_a_bug">The bug report will be sent to a bug report tracker website (Github). You need a Github account for doing this. Additionally the report is copied to the clipboard. Thanks for helping.</string>
+    <string name="report_a_bug_desc">The bug report will be sent to a bug report tracker website (Github). You need a Github account for doing this. Additionally the report is copied to the clipboard. Thanks for helping.</string>
     <string name="autofill_deactivation_duration_title">On demand temporary pause Autofill</string>
     <string name="temp_deact_autofill">Pause autofill</string>
     <string name="temp_deact_autofill_never">Never</string>
@@ -781,5 +781,11 @@
     <string name="csv_column_credential_password">column for password</string>
     <string name="csv_column_credential_expiry_date">column for expiry date</string>
     <string name="csv_column_credential_additional_info">column for additional information</string>
+
+    <string name="keystore_not_ready">KeyStore not ready, please wait a bit and try again</string>
+    <string name="describe_a_bug">You can shortly describe and report the error here.</string>
+    <string name="bug_description_hint">Provide a short description</string>
+    <string name="captured_error_details">Captured error details:</string>
+    <string name="report_a_bug">Report a bug</string>
 
 </resources>

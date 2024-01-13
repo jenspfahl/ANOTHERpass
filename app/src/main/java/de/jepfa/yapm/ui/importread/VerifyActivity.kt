@@ -19,6 +19,7 @@ import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.credential.DeobfuscationDialog
 import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
+import de.jepfa.yapm.util.Constants.LOG_PREFIX
 
 
 class VerifyActivity : ReadActivityBase() {
@@ -104,13 +105,13 @@ class VerifyActivity : ReadActivityBase() {
         val tagId = ndefTag?.tagId
         val storedTagId = PreferenceService.getAsString(PreferenceService.DATA_MASTER_PASSWORD_TOKEN_NFC_TAG_ID, this)
         if (isFromQRScan && storedTagId != null) {
-            Log.i("nfc", "mpt qr code scan not allowed for copy-protected nfc tokens")
+            Log.i(LOG_PREFIX + "nfc", "mpt qr code scan not allowed for copy-protected nfc tokens")
             verifyResultText.text = getString(R.string.mpt_qr_scan_forbidden)
 
             return
         }
         if (tagId != null && storedTagId != null && tagId != storedTagId) {
-            Log.i("nfc", "mpt tag id missmatch: tagId = $tagId <> storedTagId=$storedTagId")
+            Log.i(LOG_PREFIX + "nfc", "mpt tag id missmatch: tagId = $tagId <> storedTagId=$storedTagId")
             verifyResultText.text = "\u274C " + getString(R.string.not_a_original_mpt_nfc_token)
 
             return
@@ -128,7 +129,8 @@ class VerifyActivity : ReadActivityBase() {
             val mptSK = SecretService.generateDefaultSecretKey(
                 masterPasswordTokenKey,
                 SaltService.getSalt(this),
-                cipherAlgorithm
+                cipherAlgorithm,
+                this,
             )
 
             val decMPT =

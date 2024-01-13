@@ -1,8 +1,8 @@
 package de.jepfa.yapm.usecase.secret
 
-import androidx.appcompat.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
+import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncryptedType
 import de.jepfa.yapm.model.encrypted.EncryptedType.Types.MASTER_PASSWD_TOKEN
@@ -65,7 +65,8 @@ object GenerateMasterPasswordTokenUseCase: BasicUseCase<SecureActivity>() {
             val masterPasswordTokenSK = SecretService.generateDefaultSecretKey(
                 masterPasswordTokenKey,
                 SaltService.getSalt(activity),
-                cipherAlgorithm
+                cipherAlgorithm,
+                activity,
             )
             val type = EncryptedType(MASTER_PASSWD_TOKEN, nextMptNumber.toString())
             val tokenizedMasterPassword =

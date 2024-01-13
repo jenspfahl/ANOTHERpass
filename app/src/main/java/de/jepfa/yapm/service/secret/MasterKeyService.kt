@@ -21,10 +21,11 @@ object MasterKeyService {
         masterPin: Password,
         masterPassword: Password,
         salt: Key,
-        cipherAlgorithm: CipherAlgorithm
+        cipherAlgorithm: CipherAlgorithm,
+        context: Context
     ): SecretKeyHolder {
         val masterPassPhrase = SecretService.conjunctPasswords(masterPin, masterPassword, salt)
-        val masterPassPhraseSK = SecretService.generateStrongSecretKey(masterPassPhrase, salt, cipherAlgorithm)
+        val masterPassPhraseSK = SecretService.generateStrongSecretKey(masterPassPhrase, salt, cipherAlgorithm, context)
         masterPassPhrase.clear()
 
         return masterPassPhraseSK
@@ -42,8 +43,8 @@ object MasterKeyService {
     ): SecretKeyHolder? {
         val masterKey = getMasterKey(masterPassPhraseSK, storedEncMasterKey, context) ?: return null
         val masterSK =
-            if (useLegacyGeneration) SecretService.generateDefaultSecretKey(masterKey, salt, masterPassPhraseSK.cipherAlgorithm)
-            else SecretService.createSecretKey(masterKey, masterPassPhraseSK.cipherAlgorithm)
+            if (useLegacyGeneration) SecretService.generateDefaultSecretKey(masterKey, salt, masterPassPhraseSK.cipherAlgorithm, context)
+            else SecretService.createSecretKey(masterKey, masterPassPhraseSK.cipherAlgorithm, context)
         masterKey.clear()
 
         return masterSK
@@ -79,7 +80,7 @@ object MasterKeyService {
 
         val mkSK = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_MK, context)
         val masterPassphrase = SecretService.conjunctPasswords(pin, masterPasswd, salt)
-        val masterPassphraseSK = SecretService.generateStrongSecretKey(masterPassphrase, salt, cipherAlgorithm)
+        val masterPassphraseSK = SecretService.generateStrongSecretKey(masterPassphrase, salt, cipherAlgorithm, context)
         masterPassphrase.clear()
 
         val pdkdfIterationsAsBase64String = PbkdfIterationService.toBase64String(pdkdfIterations)

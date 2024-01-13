@@ -12,7 +12,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.content.res.AppCompatResources
 import com.google.android.material.chip.Chip
 import de.jepfa.yapm.R
@@ -38,11 +37,11 @@ fun enrichId(context: Context, name: String, id: Int?): String {
     return if (showIds) "$name [:${id?:"?"}]" else name
 }
 
-fun shortenBase64String(base64String: String): String {
+fun shortenBase64String(base64String: String, length: Int = 8): String {
     return base64String
         .toLowerCase(Locale.ROOT)
         .replace(Regex("[^0-9a-z]"),"")
-        .take(8)
+        .take(length)
 }
 
 fun createAndAddLabelChip(

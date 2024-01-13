@@ -3,6 +3,7 @@ Thanks to BjornQ: https://gist.github.com/bjoernQ/6975256
  */
 package de.jepfa.yapm.service.overlay
 
+import android.app.ActivityManager
 import android.app.Service
 import android.content.Intent
 import android.graphics.PixelFormat
@@ -10,13 +11,18 @@ import android.graphics.Typeface
 import android.os.Build
 import android.os.IBinder
 import android.text.SpannableStringBuilder
-import android.view.*
+import android.view.Gravity
+import android.view.MotionEvent
+import android.view.View
 import android.view.View.OnTouchListener
+import android.view.WindowManager
 import android.widget.Button
+import androidx.core.view.setPadding
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.PREF_OVERLAY_CLOSE_ALL
 import de.jepfa.yapm.service.PreferenceService.PREF_OVERLAY_SHOW_USER
 import de.jepfa.yapm.service.PreferenceService.PREF_OVERLAY_SIZE
 import de.jepfa.yapm.service.PreferenceService.PREF_TRANSPARENT_OVERLAY
@@ -24,10 +30,6 @@ import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.getEncryptedExtra
-
-import android.app.ActivityManager
-import androidx.core.view.setPadding
-import de.jepfa.yapm.service.PreferenceService.PREF_OVERLAY_CLOSE_ALL
 
 
 class OverlayShowingService : Service(), OnTouchListener {
