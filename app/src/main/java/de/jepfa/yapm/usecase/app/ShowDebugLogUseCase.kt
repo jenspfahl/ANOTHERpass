@@ -9,6 +9,7 @@ import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.intro.LicencesActivity
 import de.jepfa.yapm.usecase.BasicUseCase
 import de.jepfa.yapm.util.*
+import java.util.*
 
 object ShowDebugLogUseCase: BasicUseCase<BaseActivity>() {
 
@@ -16,7 +17,7 @@ object ShowDebugLogUseCase: BasicUseCase<BaseActivity>() {
         val builder: AlertDialog.Builder = AlertDialog.Builder(activity)
         val icon: Drawable = activity.resources.getDrawable(R.mipmap.ic_logo)
         val logs = DebugInfo.getDebugLog(activity)
-        val message = "Size:${logs.length} chars\n\n$logs"
+        val message = "Log length: ${logs.length} chars\nCapture time: ${Date()}\n\n$logs"
         builder.setTitle(R.string.debug)
             .setMessage(message)
             .setIcon(icon)

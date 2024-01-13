@@ -1,3 +1,5 @@
 * fix UserNotAuthenticatedException
 * add report bug functionality
+* reinforce debug info
 * fix Dutch translations
+* small bugfixes
