@@ -3,6 +3,7 @@ package de.jepfa.yapm.util
 import android.app.KeyguardManager
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import de.jepfa.yapm.BuildConfig
 import de.jepfa.yapm.database.YapmDatabase
 import de.jepfa.yapm.service.PreferenceService
@@ -54,7 +55,6 @@ object DebugInfo {
 
         val anonymizedVaultId = SaltService.getAnonymizedVaultId(context)
 
-
         val sb = StringBuilder()
         sb.append("\n************ APP INFORMATION ***********\n")
         sb.addFormattedLine("Version", getVersionName(context))
@@ -73,6 +73,7 @@ object DebugInfo {
         sb.addFormattedLine("MP stored with auth", MasterPasswordService.isMasterPasswordStoredWithAuth(context))
         sb.addFormattedLine("Build Timestamp", BuildConfig.BUILD_TIME.toSimpleDateTimeFormat())
         sb.addFormattedLine("Build Type", BuildConfig.BUILD_TYPE)
+        sb.addFormattedLine("Debug Mode", isDebug)
 
         sb.append("\n************ DEVICE INFORMATION ***********\n")
         sb.addFormattedLine("Brand", Build.BRAND)
@@ -113,9 +114,13 @@ object DebugInfo {
         return sb.toString()
     }
 
-    private fun getLogcat(filter: String): String? {
+    fun getDebugLog(context: Context): String {
+        return getLogcat("", command = "-b all *:D")?:"no logs available"
+    }
+
+    private fun getLogcat(filter: String, command: String = "-v time *:I"): String? {
         try {
-            val p = Runtime.getRuntime().exec("logcat -d -v time *:I") // only errors
+            val p = Runtime.getRuntime().exec("logcat -d $command") // only errors
             BufferedReader(InputStreamReader(p.inputStream)).use { bais ->
                 StringWriter().use { sw ->
                     PrintWriter(sw).use { pw ->
@@ -130,8 +135,16 @@ object DebugInfo {
                 }
             }
         } catch (e: IOException) {
-            e.printStackTrace()
+            Log.e(LOG_PREFIX + "Debug","cannot gather logs", e)
         }
         return null
+    }
+
+    fun clearLogs() {
+        try {
+            Runtime.getRuntime().exec("logcat -b all -c") // clear logs
+        } catch (e: IOException) {
+            Log.e(LOG_PREFIX + "Debug","cannot clear logs", e)
+        }
     }
 }

@@ -37,6 +37,7 @@ import de.jepfa.yapm.ui.importvault.ImportVaultActivity
 import de.jepfa.yapm.ui.intro.IntroActivity
 import de.jepfa.yapm.ui.intro.WhatsNewActivity
 import de.jepfa.yapm.ui.nfc.NfcBaseActivity
+import de.jepfa.yapm.usecase.app.ShowDebugLogUseCase
 import de.jepfa.yapm.usecase.app.ShowInfoUseCase
 import de.jepfa.yapm.usecase.secret.RemoveStoredMasterPasswordUseCase
 import de.jepfa.yapm.usecase.secret.RevokeMasterPasswordTokenUseCase
@@ -201,13 +202,7 @@ class LoginActivity : NfcBaseActivity() {
             return true
         }
         if (id == R.id.menu_debug) {
-            val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-            val icon: Drawable = resources.getDrawable(R.mipmap.ic_logo)
-            val message = DebugInfo.getDebugInfo(this)
-            builder.setTitle(R.string.debug)
-                .setMessage(message)
-                .setIcon(icon)
-                .show()
+            ShowDebugLogUseCase.execute(this)
             return true
         }
 

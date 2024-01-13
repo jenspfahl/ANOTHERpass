@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Process
 import android.util.Log
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
-import de.jepfa.yapm.util.DebugInfo.getDebugInfo
 import java.io.PrintWriter
 import java.io.StringWriter
 

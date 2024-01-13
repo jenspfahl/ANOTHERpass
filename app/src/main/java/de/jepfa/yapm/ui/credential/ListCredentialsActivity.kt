@@ -81,6 +81,7 @@ import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.ui.label.ListLabelsActivity
 import de.jepfa.yapm.ui.settings.SettingsActivity
 import de.jepfa.yapm.ui.usernametemplate.ListUsernameTemplatesActivity
+import de.jepfa.yapm.usecase.app.ShowDebugLogUseCase
 import de.jepfa.yapm.usecase.app.ShowInfoUseCase
 import de.jepfa.yapm.usecase.credential.DeleteMultipleCredentialsUseCase
 import de.jepfa.yapm.usecase.secret.*
@@ -1051,13 +1052,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 return true
             }
             R.id.menu_debug -> {
-                val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-                val icon: Drawable = resources.getDrawable(R.mipmap.ic_logo)
-                val message = DebugInfo.getDebugInfo(this)
-                builder.setTitle(R.string.debug)
-                    .setMessage(message)
-                    .setIcon(icon)
-                    .show()
+                ShowDebugLogUseCase.execute(this)
                 return true
             }
 
