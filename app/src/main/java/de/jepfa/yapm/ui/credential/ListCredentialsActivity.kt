@@ -184,6 +184,39 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         val toolbar: Toolbar = findViewById(R.id.list_credentials_toolbar)
         setSupportActionBar(toolbar)
 
+        val serverView = findViewById<LinearLayout>(R.id.server_view)
+        val serverViewState = findViewById<TextView>(R.id.server_view_status)
+        val serverViewSwitch = findViewById<SwitchCompat>(R.id.server_view_switch)
+
+        serverViewSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                toastText(this, "Starting ...")
+
+                val success = startServers()
+                if (!success) {
+                    serverViewSwitch.isChecked = false
+                    toastText(this, "Failed to start server")
+                }
+                else {
+                    val wifiManager = getSystemService(WIFI_SERVICE) as WifiManager
+                    val ipAddress = Formatter.formatIpAddress(wifiManager.connectionInfo.ipAddress)
+                    val deviceName = getDeviceName()
+                    toastText(this, "Server started"
+                    )
+                    serverViewState.text = "Listening from $ipAddress ($deviceName) ..."
+                    serverView.setBackgroundColor(getColor(R.color.colorAltAccent))
+                }
+            }
+            else {
+                toastText(this, "Stopping ...")
+
+                HttpServer.shutdownAll()
+                serverViewState.text = "Stopped"
+                serverView.background = null
+                toastText(this, "Server stopped")
+            }
+        }
+
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
         val fab = findViewById<FloatingActionButton>(R.id.fab)
 
@@ -322,17 +355,16 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     }
 
-    private fun startServers() {
-        HttpServer.startWebServer(8000, this)
-        HttpServer.startApiServer(8001)
-
-
-        val wifiManager = getSystemService(WIFI_SERVICE) as WifiManager
-        val ipAddress = wifiManager.connectionInfo.ipAddress
-        toastText(
-            this,
-            Formatter.formatIpAddress(ipAddress) + "/ possible hostname: ${getDeviceName()}"
-        )
+    private fun startServers(): Boolean {
+        HttpServer.shutdownAll()
+        try {
+            HttpServer.startWebServer(8000, this)
+            HttpServer.startApiServer(8001)
+        } catch (e: Exception) {
+            Log.w("HTTP", e.cause)
+            return false
+        }
+        return true
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
