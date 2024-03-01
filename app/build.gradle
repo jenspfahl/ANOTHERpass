@@ -10,6 +10,11 @@ apply plugin: 'com.jaredsburrows.license'
 
 
 android {
+    packagingOptions {
+        exclude("META-INF/INDEX.LIST")
+        exclude("META-INF/io.netty.versions.properties")
+    }
+
     compileSdkVersion 33
 
     defaultConfig {
@@ -21,10 +26,10 @@ android {
         // YY=minor (new features)
         // ZZZ=micro (just bugfixes)
     //  versionCode XXYYZZZ
-        versionCode  109001
+        versionCode  200000
         // remove _rc when release
         // e.g. versionName "1.3.0_rc"
-        versionName "1.9.1"
+        versionName "2.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
@@ -126,4 +131,11 @@ dependencies {
       //  exclude group: 'com.android.support', module: 'support-annotations'
     })
     androidTestImplementation "androidx.test.ext:junit:1.1.5"
+
+    implementation("io.ktor:ktor-server-core-jvm:2.3.8")
+    implementation("io.ktor:ktor-server-netty-jvm:2.3.8")
+    implementation("io.ktor:ktor-server-status-pages-jvm:2.3.8")
+    implementation("io.ktor:ktor-server-default-headers-jvm:2.3.8")
+    implementation("io.ktor:ktor-network-tls-certificates:2.3.8")
+
 }

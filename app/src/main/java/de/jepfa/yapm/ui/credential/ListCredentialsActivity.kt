@@ -10,12 +10,14 @@ import android.database.Cursor
 import android.database.MatrixCursor
 import android.graphics.Bitmap
 import android.graphics.Typeface
-import android.graphics.drawable.Drawable
+import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.BaseColumns
+import android.provider.Settings
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
+import android.text.format.Formatter
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.util.Log
@@ -60,6 +62,7 @@ import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelFilter.WITH_NO_LABELS_ID
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.net.HttpServer
 import de.jepfa.yapm.service.notification.NotificationService
 import de.jepfa.yapm.service.notification.ReminderService
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
@@ -125,6 +128,17 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     private var jumpToUuid: UUID? = null
     private var jumpToItemPosition: Int? = null
+
+
+
+    private fun getDeviceName(): String? {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            return Settings.Global.getString(contentResolver, Settings.Global.DEVICE_NAME)
+        }
+        return null
+
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -306,6 +320,19 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
 
+    }
+
+    private fun startServers() {
+        HttpServer.startWebServer(8000, this)
+        HttpServer.startApiServer(8001)
+
+
+        val wifiManager = getSystemService(WIFI_SERVICE) as WifiManager
+        val ipAddress = wifiManager.connectionInfo.ipAddress
+        toastText(
+            this,
+            Formatter.formatIpAddress(ipAddress) + "/ possible hostname: ${getDeviceName()}"
+        )
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -511,7 +538,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
         refreshNavigationMenu()
 
-
         return true
     }
 
@@ -526,6 +552,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         Log.i(LOG_PREFIX + "LST", "onPrepareOptionsMenu")
         updateSearchFieldWithAutofillSuggestion(intent)  //somehow important for autofill
         return super.onPrepareOptionsMenu(menu)
+    }
+
+    override fun onDestroy() {
+        HttpServer.shutdownAll()
+        super.onDestroy()
     }
 
     private fun updateSearchFieldWithAutofillSuggestion(intent: Intent?) {
