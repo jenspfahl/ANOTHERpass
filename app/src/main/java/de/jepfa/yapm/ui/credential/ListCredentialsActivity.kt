@@ -62,7 +62,8 @@ import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelFilter.WITH_NO_LABELS_ID
 import de.jepfa.yapm.service.label.LabelService
-import de.jepfa.yapm.service.net.HttpServer
+import de.jepfa.yapm.service.net.HttpServer.shutdownAllAsync
+import de.jepfa.yapm.service.net.HttpServer.startAllServersAsync
 import de.jepfa.yapm.service.notification.NotificationService
 import de.jepfa.yapm.service.notification.ReminderService
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
@@ -98,8 +99,10 @@ import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.PermissionChecker.verifyNotificationPermissions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.future.asCompletableFuture
 import kotlinx.coroutines.launch
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 
 
 /**
@@ -190,30 +193,60 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         serverViewSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                toastText(this, "Starting ...")
+                serverViewState.text = "Starting ..."
+                serverViewSwitch.isEnabled = false
+                startAllServersAsync(this).asCompletableFuture().whenComplete { success, e ->
+                    Log.i("HTTP", "async start=$success")
 
-                val success = startServers()
-                if (!success) {
-                    serverViewSwitch.isChecked = false
-                    toastText(this, "Failed to start server")
-                }
-                else {
-                    val wifiManager = getSystemService(WIFI_SERVICE) as WifiManager
-                    val ipAddress = Formatter.formatIpAddress(wifiManager.connectionInfo.ipAddress)
-                    val deviceName = getDeviceName()
-                    toastText(this, "Server started"
-                    )
-                    serverViewState.text = "Listening from $ipAddress ($deviceName) ..."
-                    serverView.setBackgroundColor(getColor(R.color.colorAltAccent))
+                    CoroutineScope(Dispatchers.Main).launch {
+
+
+                        serverViewSwitch.isEnabled = true
+
+                        if (e != null) {
+                            Log.w("HTTP", e)
+                        }
+
+                        if (!success) {
+                            serverViewSwitch.isChecked = false
+                            serverViewState.text = "Stopped"
+                            toastText(this@ListCredentialsActivity, "Failed to start server")
+                        } else {
+                            val wifiManager = getSystemService(WIFI_SERVICE) as WifiManager
+                            val ipAddress =
+                                Formatter.formatIpAddress(wifiManager.connectionInfo.ipAddress)
+                            val deviceName = getDeviceName()
+                            serverViewState.text = "Listening from $ipAddress ($deviceName) ..."
+                            serverView.setBackgroundColor(getColor(R.color.colorAltAccent))
+                            toastText(this@ListCredentialsActivity, "Server started")
+                        }
+                    }
                 }
             }
             else {
-                toastText(this, "Stopping ...")
+                serverViewState.text = "Stopping ..."
+                serverViewSwitch.isEnabled = false
 
-                HttpServer.shutdownAll()
-                serverViewState.text = "Stopped"
-                serverView.background = null
-                toastText(this, "Server stopped")
+                shutdownAllAsync().asCompletableFuture().whenComplete { success, e ->
+                    Log.i("HTTP", "async stop=$success")
+
+                    CoroutineScope(Dispatchers.Main).launch {
+                        serverViewSwitch.isEnabled = true
+
+                        if (e != null) {
+                            Log.w("HTTP", e)
+                        }
+                        if (!success) {
+                            serverViewSwitch.isChecked = true
+                            serverViewState.text = "Still running"
+                            toastText(this@ListCredentialsActivity, "Failed to stop server")
+                        } else {
+                            serverViewState.text = "Stopped"
+                            serverView.background = null
+                            toastText(this@ListCredentialsActivity, "Server stopped")
+                        }
+                    }
+                }
             }
         }
 
@@ -353,18 +386,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
 
-    }
-
-    private fun startServers(): Boolean {
-        HttpServer.shutdownAll()
-        try {
-            HttpServer.startWebServer(8000, this)
-            HttpServer.startApiServer(8001)
-        } catch (e: Exception) {
-            Log.w("HTTP", e.cause)
-            return false
-        }
-        return true
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -587,7 +608,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     }
 
     override fun onDestroy() {
-        HttpServer.shutdownAll()
+        shutdownAllAsync()
         super.onDestroy()
     }
 
