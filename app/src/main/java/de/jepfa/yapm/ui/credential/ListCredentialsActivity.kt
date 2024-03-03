@@ -189,6 +189,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         val serverView = findViewById<LinearLayout>(R.id.server_view)
         val serverViewState = findViewById<TextView>(R.id.server_view_status)
+        val serverViewDetails = findViewById<TextView>(R.id.server_view_details)
         val serverViewSwitch = findViewById<SwitchCompat>(R.id.server_view_switch)
 
         serverViewSwitch.setOnCheckedChangeListener { _, isChecked ->
@@ -199,8 +200,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     Log.i("HTTP", "async start=$success")
 
                     CoroutineScope(Dispatchers.Main).launch {
-
-
                         serverViewSwitch.isEnabled = true
 
                         if (e != null) {
@@ -209,15 +208,17 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
                         if (!success) {
                             serverViewSwitch.isChecked = false
-                            serverViewState.text = "Stopped"
                             toastText(this@ListCredentialsActivity, "Failed to start server")
                         } else {
                             val wifiManager = getSystemService(WIFI_SERVICE) as WifiManager
                             val ipAddress =
                                 Formatter.formatIpAddress(wifiManager.connectionInfo.ipAddress)
                             val deviceName = getDeviceName()
-                            serverViewState.text = "Listening from $ipAddress ($deviceName) ..."
-                            serverView.setBackgroundColor(getColor(R.color.colorAltAccent))
+                            serverViewState.text = "Listening ..."
+                            serverViewState.setTypeface(null, Typeface.BOLD)
+                            serverViewDetails.visibility = ViewGroup.VISIBLE
+                            serverViewDetails.text = "$ipAddress ($deviceName)"
+                            serverView.setBackgroundColor(getColor(R.color.colorServer))
                             toastText(this@ListCredentialsActivity, "Server started")
                         }
                     }
@@ -238,11 +239,13 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         }
                         if (!success) {
                             serverViewSwitch.isChecked = true
-                            serverViewState.text = "Still running"
                             toastText(this@ListCredentialsActivity, "Failed to stop server")
                         } else {
                             serverViewState.text = "Stopped"
                             serverView.background = null
+                            serverViewDetails.text = ""
+                            serverViewState.setTypeface(null, Typeface.NORMAL)
+                            serverViewDetails.visibility = ViewGroup.GONE
                             toastText(this@ListCredentialsActivity, "Server stopped")
                         }
                     }

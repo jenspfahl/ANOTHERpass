@@ -15,4 +15,8 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="ServerColorSwitchStyle">
+        <item name="colorControlActivated">@color/Yellow</item>
+    </style>
+
 </resources>
