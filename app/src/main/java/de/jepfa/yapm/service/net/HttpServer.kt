@@ -3,7 +3,6 @@ package de.jepfa.yapm.service.net
 import android.content.Context
 import android.util.Log
 import de.jepfa.yapm.service.secret.SecretService
-import de.jepfa.yapm.usecase.UseCaseOutput
 import io.ktor.http.*
 import io.ktor.network.tls.certificates.*
 import io.ktor.server.application.*
@@ -19,7 +18,6 @@ import java.security.NoSuchAlgorithmException
 import java.security.PublicKey
 import java.security.cert.CertificateEncodingException
 import java.util.*
-import java.util.concurrent.atomic.AtomicInteger
 import javax.security.auth.x500.X500Principal
 
 
@@ -90,7 +88,7 @@ object HttpServer {
         }
     }
 
-    fun startApiServerAsync(port: Int, context: Context): Deferred<Boolean> {
+    fun startApiServerAsync(port: Int, context: Context, callHandler: () -> Unit): Deferred<Boolean> {
         return CoroutineScope(Dispatchers.IO).async {
 
             Log.i("HTTP", "start API server")
@@ -98,6 +96,7 @@ object HttpServer {
                 httpServer = embeddedServer(Netty, port = port) {
                     routing {
                         get ("/") {
+                            callHandler()
                             call.response.header(
                                 "Access-Control-Allow-Origin",
                                 "*"
@@ -108,6 +107,8 @@ object HttpServer {
                             )
                         }
                         options {
+                            callHandler()
+
                             call.response.header(
                                 "Access-Control-Allow-Origin",
                                 "*"
@@ -123,6 +124,8 @@ object HttpServer {
                             )
                         }
                         post ("/") {
+                            callHandler()
+
                             call.response.header(
                                 "Access-Control-Allow-Origin",
                                 "*"
@@ -135,6 +138,7 @@ object HttpServer {
                                 contentType = ContentType("text", "json"),
                             )
                         }
+                        
                     }
                 }
 
@@ -150,7 +154,7 @@ object HttpServer {
     }
 
 
-    fun startAllServersAsync(context: Context): Deferred<Boolean> {
+    fun startAllServersAsync(context: Context, ping: () -> Unit): Deferred<Boolean> {
 
         return CoroutineScope(Dispatchers.IO).async {
             Log.i("HTTP", "ensure shut down")
@@ -159,7 +163,7 @@ object HttpServer {
             Log.i("HTTP", "shutdownOk=$shutdownOk")
 
             val startWebServerAsync = startWebServerAsync(8000, context)
-            val startApiServerAsync = startApiServerAsync(8001, context)
+            val startApiServerAsync = startApiServerAsync(8001, context, ping)
 
             Log.i("HTTP", "awaiting start")
 

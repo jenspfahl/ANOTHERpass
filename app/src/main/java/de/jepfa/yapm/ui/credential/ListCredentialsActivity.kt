@@ -13,6 +13,7 @@ import android.graphics.Typeface
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.provider.BaseColumns
 import android.provider.Settings
 import android.text.SpannableString
@@ -102,13 +103,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.asCompletableFuture
 import kotlinx.coroutines.launch
 import java.util.*
-import java.util.concurrent.atomic.AtomicInteger
 
 
 /**
  * This is the main activity
  */
 class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.OnNavigationItemSelectedListener  {
+
+    private var serverViewStateText: String = ""
+    private lateinit var serverViewSwitch: SwitchCompat
+    private lateinit var serverViewDetails: TextView
+    private lateinit var serverViewState: TextView
+    private lateinit var serverView: LinearLayout
 
     private var navMenuQuickAccessVisible = true
     private var navMenuExportVisible = false
@@ -187,16 +193,26 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         val toolbar: Toolbar = findViewById(R.id.list_credentials_toolbar)
         setSupportActionBar(toolbar)
 
-        val serverView = findViewById<LinearLayout>(R.id.server_view)
-        val serverViewState = findViewById<TextView>(R.id.server_view_status)
-        val serverViewDetails = findViewById<TextView>(R.id.server_view_details)
-        val serverViewSwitch = findViewById<SwitchCompat>(R.id.server_view_switch)
+        serverView = findViewById(R.id.server_view)
+        serverViewState = findViewById(R.id.server_view_status)
+        serverViewDetails = findViewById(R.id.server_view_details)
+        serverViewSwitch = findViewById(R.id.server_view_switch)
 
+        reflectServerStopped()
         serverViewSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                serverViewState.text = "Starting ..."
+                serverViewStateText = "Starting ..."
+                serverViewState.text = serverViewStateText
                 serverViewSwitch.isEnabled = false
-                startAllServersAsync(this).asCompletableFuture().whenComplete { success, e ->
+                startAllServersAsync(this) {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        serverViewState.text = "Responding ..."
+                        Handler().postDelayed({
+                            serverViewState.text = serverViewStateText
+
+                        }, 1000)
+                    }
+                }.asCompletableFuture().whenComplete { success, e ->
                     Log.i("HTTP", "async start=$success")
 
                     CoroutineScope(Dispatchers.Main).launch {
@@ -210,22 +226,15 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                             serverViewSwitch.isChecked = false
                             toastText(this@ListCredentialsActivity, "Failed to start server")
                         } else {
-                            val wifiManager = getSystemService(WIFI_SERVICE) as WifiManager
-                            val ipAddress =
-                                Formatter.formatIpAddress(wifiManager.connectionInfo.ipAddress)
-                            val deviceName = getDeviceName()
-                            serverViewState.text = "Listening ..."
-                            serverViewState.setTypeface(null, Typeface.BOLD)
-                            serverViewDetails.visibility = ViewGroup.VISIBLE
-                            serverViewDetails.text = "$ipAddress ($deviceName)"
-                            serverView.setBackgroundColor(getColor(R.color.colorServer))
+                            reflectServerStarted()
                             toastText(this@ListCredentialsActivity, "Server started")
                         }
                     }
                 }
             }
             else {
-                serverViewState.text = "Stopping ..."
+                serverViewStateText = "Stopping ..."
+                serverViewState.text = serverViewStateText
                 serverViewSwitch.isEnabled = false
 
                 shutdownAllAsync().asCompletableFuture().whenComplete { success, e ->
@@ -241,11 +250,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                             serverViewSwitch.isChecked = true
                             toastText(this@ListCredentialsActivity, "Failed to stop server")
                         } else {
-                            serverViewState.text = "Stopped"
-                            serverView.background = null
-                            serverViewDetails.text = ""
-                            serverViewState.setTypeface(null, Typeface.NORMAL)
-                            serverViewDetails.visibility = ViewGroup.GONE
+                            reflectServerStopped()
                             toastText(this@ListCredentialsActivity, "Server stopped")
                         }
                     }
@@ -389,6 +394,30 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
 
+    }
+
+    private fun reflectServerStarted(
+    ) {
+        val wifiManager = getSystemService(WIFI_SERVICE) as WifiManager
+        val ipAddress =
+            Formatter.formatIpAddress(wifiManager.connectionInfo.ipAddress)
+        val deviceName = getDeviceName()
+        serverViewStateText = "Listening ..."
+        serverViewState.text = serverViewStateText
+        serverViewState.setTypeface(null, Typeface.BOLD)
+        serverViewDetails.visibility = ViewGroup.VISIBLE
+        serverViewDetails.text = "$ipAddress ($deviceName)"
+        serverView.setBackgroundColor(getColor(R.color.colorServer))
+    }
+
+    private fun reflectServerStopped(
+    ) {
+        serverViewStateText = "Stopped"
+        serverViewState.text = serverViewStateText
+        serverView.background = null
+        serverViewDetails.text = ""
+        serverViewState.setTypeface(null, Typeface.NORMAL)
+        serverViewDetails.visibility = ViewGroup.GONE
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
