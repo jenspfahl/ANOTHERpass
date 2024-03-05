@@ -28,6 +28,7 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
@@ -89,6 +90,7 @@ import de.jepfa.yapm.ui.usernametemplate.ListUsernameTemplatesActivity
 import de.jepfa.yapm.usecase.app.ShowDebugLogUseCase
 import de.jepfa.yapm.usecase.app.ShowInfoUseCase
 import de.jepfa.yapm.usecase.credential.DeleteMultipleCredentialsUseCase
+import de.jepfa.yapm.usecase.credential.ExportCredentialUseCase
 import de.jepfa.yapm.usecase.secret.*
 import de.jepfa.yapm.usecase.session.LogoutUseCase
 import de.jepfa.yapm.usecase.vault.DropVaultUseCase
@@ -98,6 +100,7 @@ import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.Constants.ACTION_DELIMITER
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.PermissionChecker.verifyNotificationPermissions
+import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.asCompletableFuture
@@ -197,6 +200,26 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         serverViewState = findViewById(R.id.server_view_status)
         serverViewDetails = findViewById(R.id.server_view_details)
         serverViewSwitch = findViewById(R.id.server_view_switch)
+        val serverViewLink = findViewById<ImageView>(R.id.server_link)
+        val serverViewSettings = findViewById<ImageView>(R.id.server_settings)
+
+        serverViewLink.setOnClickListener {
+            val popup = PopupMenu(this, it)
+            popup.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.menu_server_link_add -> {
+                        true
+                    }
+                    R.id.menu_server_link_manage -> {
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popup.inflate(R.menu.menu_server_link)
+            popup.setForceShowIcon(true)
+            popup.show()
+        }
 
         reflectServerStopped()
         serverViewSwitch.setOnCheckedChangeListener { _, isChecked ->
@@ -204,14 +227,16 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 serverViewStateText = "Starting ..."
                 serverViewState.text = serverViewStateText
                 serverViewSwitch.isEnabled = false
-                startAllServersAsync(this) {
+                startAllServersAsync(this) { webClientId, body ->
                     CoroutineScope(Dispatchers.Main).launch {
-                        serverViewState.text = "Responding ..."
+                        serverViewState.text = "Responding to $webClientId ..."
                         Handler().postDelayed({
                             serverViewState.text = serverViewStateText
 
-                        }, 1000)
+                        }, 2000)
                     }
+                    return@startAllServersAsync Pair(HttpStatusCode.OK, "{\"passwd\":\"${SecretService.getSecureRandom(null).nextLong()}\"}")
+
                 }.asCompletableFuture().whenComplete { success, e ->
                     Log.i("HTTP", "async start=$success")
 

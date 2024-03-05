@@ -88,7 +88,7 @@ object HttpServer {
         }
     }
 
-    fun startApiServerAsync(port: Int, context: Context, callHandler: () -> Unit): Deferred<Boolean> {
+    fun startApiServerAsync(port: Int, context: Context, callHandler: (String, String) -> Pair<HttpStatusCode, String>): Deferred<Boolean> {
         return CoroutineScope(Dispatchers.IO).async {
 
             Log.i("HTTP", "start API server")
@@ -96,7 +96,6 @@ object HttpServer {
                 httpServer = embeddedServer(Netty, port = port) {
                     routing {
                         get ("/") {
-                            callHandler()
                             call.response.header(
                                 "Access-Control-Allow-Origin",
                                 "*"
@@ -107,8 +106,6 @@ object HttpServer {
                             )
                         }
                         options {
-                            callHandler()
-
                             call.response.header(
                                 "Access-Control-Allow-Origin",
                                 "*"
@@ -124,21 +121,31 @@ object HttpServer {
                             )
                         }
                         post ("/") {
-                            callHandler()
-
                             call.response.header(
                                 "Access-Control-Allow-Origin",
                                 "*"
                             )
-                            Log.d("HTTP", "requesting web extension: ${call.request.headers["X-WebClientId"]}")
-                            Log.d("HTTP", "payload: ${call.receive<String>()}")
+                            val webClientId = call.request.headers["X-WebClientId"]
+                            if (webClientId == null) {
+                                //fail
+                                call.respond(HttpStatusCode.BadRequest, "X-WebClientId header missing")
+                            }
+                            else {
+                                val body = call.receive<String>()
 
-                            call.respondText(
-                                text = "{\"passwd\":\"${SecretService.getSecureRandom(null).nextLong()}\"}",
-                                contentType = ContentType("text", "json"),
-                            )
+                                Log.d("HTTP", "requesting web extension: $webClientId")
+                                Log.d("HTTP", "payload: $body")
+
+                                val response = callHandler(webClientId, body)
+
+                                call.respondText(
+                                    text = response.second,
+                                    contentType = ContentType("text", "json"),
+                                    status = response.first
+                                )
+                            }
                         }
-                        
+
                     }
                 }
 
@@ -154,7 +161,7 @@ object HttpServer {
     }
 
 
-    fun startAllServersAsync(context: Context, ping: () -> Unit): Deferred<Boolean> {
+    fun startAllServersAsync(context: Context, callHandler: (String, String) -> Pair<HttpStatusCode, String>): Deferred<Boolean> {
 
         return CoroutineScope(Dispatchers.IO).async {
             Log.i("HTTP", "ensure shut down")
@@ -163,7 +170,7 @@ object HttpServer {
             Log.i("HTTP", "shutdownOk=$shutdownOk")
 
             val startWebServerAsync = startWebServerAsync(8000, context)
-            val startApiServerAsync = startApiServerAsync(8001, context, ping)
+            val startApiServerAsync = startApiServerAsync(8001, context, callHandler)
 
             Log.i("HTTP", "awaiting start")
 
