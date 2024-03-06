@@ -87,6 +87,7 @@ import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.ui.label.ListLabelsActivity
 import de.jepfa.yapm.ui.settings.SettingsActivity
 import de.jepfa.yapm.ui.usernametemplate.ListUsernameTemplatesActivity
+import de.jepfa.yapm.ui.webextension.ListWebExtensionsActivity
 import de.jepfa.yapm.usecase.app.ShowDebugLogUseCase
 import de.jepfa.yapm.usecase.app.ShowInfoUseCase
 import de.jepfa.yapm.usecase.credential.DeleteMultipleCredentialsUseCase
@@ -204,21 +205,31 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         val serverViewSettings = findViewById<ImageView>(R.id.server_settings)
 
         serverViewLink.setOnClickListener {
-            val popup = PopupMenu(this, it)
-            popup.setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    R.id.menu_server_link_add -> {
-                        true
+            if (serverViewSwitch.isEnabled) {
+                val popup = PopupMenu(this, it)
+                popup.setOnMenuItemClickListener { item ->
+                    when (item.itemId) {
+                        R.id.menu_server_link_add -> {
+                            if (!serverViewSwitch.isChecked) {
+                                toastText(this, "Please start the server first")
+                            }
+                            else {
+                                //TODO
+                            }
+                            true
+                        }
+                        R.id.menu_server_link_manage -> {
+                            val intent = Intent(this, ListWebExtensionsActivity::class.java)
+                            startActivity(intent)
+                            true
+                        }
+                        else -> false
                     }
-                    R.id.menu_server_link_manage -> {
-                        true
-                    }
-                    else -> false
                 }
+                popup.inflate(R.menu.menu_server_link)
+                popup.setForceShowIcon(true)
+                popup.show()
             }
-            popup.inflate(R.menu.menu_server_link)
-            popup.setForceShowIcon(true)
-            popup.show()
         }
 
         reflectServerStopped()

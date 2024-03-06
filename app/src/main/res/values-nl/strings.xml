@@ -187,6 +187,7 @@ Het scheiden van de gecodeerde hoofdsleutel van het kluisbestand maakt het besta
   <string name="pref_header_autofill">Ondersteuning voor automatisch aanvullen</string>
   <string name="title_activity_list_label">Beheer Categorieën</string>
   <string name="title_activity_list_username_templates">Sjablonen voor gebruikersnamen</string>
+  <string name="title_activity_list_web_extensions">Linked devices</string>
   <string name="action_labels">Categorieën</string>
 
   <string name="action_username_templates">Gebruikersnaam sjablonen</string>

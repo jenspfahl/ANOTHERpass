@@ -41,6 +41,10 @@ open class BaseActivity : AppCompatActivity() {
         UsernameTemplateViewModelFactory(getApp())
     }
 
+    val webExtensionViewModel: WebExtensionViewModel by viewModels {
+        WebExtensionViewModelFactory(getApp())
+    }
+
     fun getProgressBar(): ProgressBar? {
         if (viewProgressBar == null) {
             viewProgressBar = findViewById(R.id.progressBar)

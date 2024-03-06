@@ -202,6 +202,7 @@
     <string name="pref_header_autofill">Auto fill support</string>
     <string name="title_activity_list_label">Labels</string>
     <string name="title_activity_list_username_templates">Templates for usernames</string>
+    <string name="title_activity_list_web_extensions">Linked devices</string>
     <string name="action_labels">Manage labels</string>
     <string name="action_username_templates">Username templates</string>
     <string name="username_template_data_params">Define the username of a template and an optional description. The username is used to present suggestions for usernames when editing credentials.</string>

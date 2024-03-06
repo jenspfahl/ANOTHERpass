@@ -7,6 +7,7 @@ import de.jepfa.yapm.database.YapmDatabase
 import de.jepfa.yapm.database.repository.CredentialRepository
 import de.jepfa.yapm.database.repository.LabelRepository
 import de.jepfa.yapm.database.repository.UsernameTemplateRepository
+import de.jepfa.yapm.database.repository.WebExtensionRepository
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SecretService
@@ -18,6 +19,7 @@ class YapmApp : Application() {
     val credentialRepository by lazy { CredentialRepository(database!!.credentialDao()) }
     val labelRepository by lazy { LabelRepository(database!!.labelDao()) }
     val usernameTemplateRepository by lazy { UsernameTemplateRepository(database!!.usernameTemplateDao()) }
+    val webExtensionRepository by lazy { WebExtensionRepository(database!!.webExtensionDao()) }
 
     override fun onCreate() {
         super.onCreate()

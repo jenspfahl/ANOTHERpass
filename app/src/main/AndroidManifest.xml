@@ -128,6 +128,12 @@
             android:name=".ui.usernametemplate.EditUsernameTemplateActivity"
             android:noHistory="true" />
         <activity
+            android:name=".ui.webextension.ListWebExtensionsActivity"
+            android:label="@string/title_activity_list_web_extensions" />
+        <activity
+            android:name=".ui.webextension.EditWebExtensionActivity"
+            android:noHistory="true" />
+        <activity
             android:name=".ui.label.ListLabelsActivity"
             android:label="@string/title_activity_list_label" />
         <activity
