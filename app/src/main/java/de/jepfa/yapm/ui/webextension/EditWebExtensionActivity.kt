@@ -1,6 +1,7 @@
 package de.jepfa.yapm.ui.webextension
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
@@ -41,8 +42,6 @@ class EditWebExtensionActivity : SecureActivity() {
 
         }
 
-
-
         val webExtensionId = intent.getIntExtra(EncWebExtension.EXTRA_WEB_EXTENSION_ID)
         if (webExtensionId != null) {
             webExtensionViewModel.getById(webExtensionId).observe(this) { encWebExtension ->
@@ -54,16 +53,17 @@ class EditWebExtensionActivity : SecureActivity() {
 
                 }
             }
-            setTitle(R.string.title_change_username_template) //TODO
         }
-        else {
-            setTitle(R.string.title_new_username_template) // TODO
-        }
-
 
 
         val saveButton: Button = findViewById(R.id.button_save)
         saveButton.setOnClickListener {
+
+            if (TextUtils.isEmpty(titleTextView.text)) {
+                titleTextView.error = getString(R.string.error_field_required)
+                titleTextView.requestFocus()
+                return@setOnClickListener
+            }
 
             masterSecretKey?.let { key ->
 
@@ -92,7 +92,7 @@ class EditWebExtensionActivity : SecureActivity() {
         }
 
         if (webExtension != null) {
-            menuInflater.inflate(R.menu.menu_username_template_edit, menu) //TODO
+            menuInflater.inflate(R.menu.menu_web_extension_edit, menu)
         }
 
         return super.onCreateOptionsMenu(menu)
@@ -106,9 +106,9 @@ class EditWebExtensionActivity : SecureActivity() {
             return false
         }
 
-        if (id == R.id.menu_delete_username_template) {
+        if (id == R.id.menu_delete_web_extension) {
             webExtension?.let { current ->
-               //TODO WebExtensionDialogs.openDeleteWebExtension(current, this, finishActivityAfterDelete = true)
+               WebExtensionDialogs.openDeleteWebExtension(current, this, finishActivityAfterDelete = true)
             }
 
             return true

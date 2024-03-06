@@ -55,6 +55,8 @@
 
     <string name="title_delete_username_template">Benutzernamenvorlage löschen</string>
     <string name="message_delete_username_template">Benutzernamenvorlage \'%1$s\' wirklich löschen? Sie wird in den Benutzernaenvorschlägen nicht mehr sichbar sein.</string>
+    <string name="title_delete_web_extension">Geräteverknüpfung lösen</string>
+    <string name="message_delete_web_extension">Möchtest du wirklich die Geräteverknüpfug für \'%1$s\' lösen?</string>
 
 
     <string name="lock_items">Tresor sperren</string>
@@ -201,6 +203,7 @@
 
     <string name="title_activity_list_username_templates">Vorlagen für Benutzernamen</string>
     <string name="title_activity_list_web_extensions">Verknüpfte Geräte</string>
+    <string name="title_activity_add_web_extensions">Verknüpfe ein Gerät</string>
     <string name="action_username_templates">Benutzernamenvorlagen</string>
     <string name="username_template_data_params">Gib der Vorlage einen Benutzernamen und eine optionale Beschreibung. Der Benutzername wird als Vorschlag für die Zugangsdaten verwendet.</string>
     <string name="hint_edit_username_template_username">Benutzername</string>
@@ -215,6 +218,7 @@
     <string name="title_change_label">Kategorie bearbeiten</string>
     <string name="title_new_username_template">Neue Benutzernamenvorlage</string>
     <string name="title_change_username_template">Benutzernamenvorlage ändern</string>
+    <string name="title_change_web_extension">Verknüpftes Gerät ändern</string>
     <string name="reset_vault">Alles zurücksetzen</string>
     <string name="reset_vault_and_delete">Alles löschen und zurücksetzen</string>
     <string name="button_report_bug">Fehler melden</string>

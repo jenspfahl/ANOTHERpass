@@ -2,6 +2,7 @@ package de.jepfa.yapm.ui.webextension
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -94,14 +95,14 @@ class ListWebExtensionsAdapter(private val listWebExtensionsActivity: ListWebExt
             var clientId = itemView.context.getString(R.string.unknown_placeholder)
             if (key != null) {
                 clientId = SecretService.decryptCommonString(key, webExtension.webClientId)
-                if (webExtension.title != null) {
-                    name = SecretService.decryptCommonString(key, webExtension.title!!)
-                }
-                else {
-                    name = "Untitled"
-                }
+                name = SecretService.decryptCommonString(key, webExtension.title)
+
             }
             webExtensionTitleTextView.text = name
+            if (!webExtension.enabled) {
+                webExtensionTitleTextView.paintFlags =
+                    webExtensionTitleTextView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+            }
             webExtensionClientIdTextView.text = clientId
         }
 

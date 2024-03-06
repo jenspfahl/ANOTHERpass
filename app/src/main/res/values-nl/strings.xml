@@ -46,6 +46,8 @@
 
   <string name="title_delete_username_template">Gebruikersnaamsjabloon verwijderen</string>
   <string name="message_delete_username_template">Weet je zeker dat je het gebruikersnaam sjabloon \'%1$s\' verwijdert? Het zal niet meer zichtbaar zijn in de gebruikersnaam suggesties.</string>
+  <string name="title_delete_web_extension">Unlink device</string>
+  <string name="message_delete_web_extension">Do you really want to unlink the linked device \'%1$s\' by deleting it?</string>
 
   <string name="lock_items">Vergrendel veilig</string>
   <string name="logout">Uitloggen en afsluiten</string>
@@ -188,6 +190,7 @@ Het scheiden van de gecodeerde hoofdsleutel van het kluisbestand maakt het besta
   <string name="title_activity_list_label">Beheer Categorieën</string>
   <string name="title_activity_list_username_templates">Sjablonen voor gebruikersnamen</string>
   <string name="title_activity_list_web_extensions">Linked devices</string>
+  <string name="title_activity_add_web_extensions">Link a devices</string>
   <string name="action_labels">Categorieën</string>
 
   <string name="action_username_templates">Gebruikersnaam sjablonen</string>
@@ -204,6 +207,7 @@ Het scheiden van de gecodeerde hoofdsleutel van het kluisbestand maakt het besta
 
   <string name="title_new_username_template">Nieuw gebruikersnaam sjabloon</string>
   <string name="title_change_username_template">Gebruikersnaam sjabloon bewerken</string>
+  <string name="title_change_web_extension">Change linked device</string>
 
   <string name="reset_vault">Alles resetten</string>
   <string name="reset_vault_and_delete">Verwijder en reset alles</string>

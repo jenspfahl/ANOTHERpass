@@ -132,6 +132,11 @@
             android:label="@string/title_activity_list_web_extensions" />
         <activity
             android:name=".ui.webextension.EditWebExtensionActivity"
+            android:label="@string/title_change_web_extension"
+            android:noHistory="true" />
+        <activity
+            android:name=".ui.webextension.AddWebExtensionActivity"
+            android:label="@string/title_activity_add_web_extensions"
             android:noHistory="true" />
         <activity
             android:name=".ui.label.ListLabelsActivity"

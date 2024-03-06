@@ -87,6 +87,7 @@ import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.ui.label.ListLabelsActivity
 import de.jepfa.yapm.ui.settings.SettingsActivity
 import de.jepfa.yapm.ui.usernametemplate.ListUsernameTemplatesActivity
+import de.jepfa.yapm.ui.webextension.AddWebExtensionActivity
 import de.jepfa.yapm.ui.webextension.ListWebExtensionsActivity
 import de.jepfa.yapm.usecase.app.ShowDebugLogUseCase
 import de.jepfa.yapm.usecase.app.ShowInfoUseCase
@@ -149,7 +150,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             return Settings.Global.getString(contentResolver, Settings.Global.DEVICE_NAME)
         }
         return null
-
     }
 
 
@@ -214,7 +214,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                                 toastText(this, "Please start the server first")
                             }
                             else {
-                                //TODO
+                                val intent = Intent(this, AddWebExtensionActivity::class.java)
+                                startActivity(intent)
                             }
                             true
                         }
@@ -442,7 +443,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         serverViewState.text = serverViewStateText
         serverViewState.setTypeface(null, Typeface.BOLD)
         serverViewDetails.visibility = ViewGroup.VISIBLE
-        serverViewDetails.text = "$ipAddress ($deviceName)"
+        if (deviceName != null) {
+            serverViewDetails.text = "$ipAddress ($deviceName)"
+        }
+        else {
+            serverViewDetails.text = "$ipAddress"
+        }
         serverView.setBackgroundColor(getColor(R.color.colorServer))
     }
 

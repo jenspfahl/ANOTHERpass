@@ -22,8 +22,8 @@ object WebExtensionDialogs {
             name
 
             AlertDialog.Builder(activity)
-                .setTitle(R.string.title_delete_username_template)//TODO
-                .setMessage(activity.getString(R.string.message_delete_username_template, name))
+                .setTitle(R.string.title_delete_web_extension)
+                .setMessage(activity.getString(R.string.message_delete_web_extension, name))
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
                     UseCaseBackgroundLauncher(DeleteWebExtensionUseCase)

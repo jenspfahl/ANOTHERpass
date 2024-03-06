@@ -28,15 +28,10 @@ class ListWebExtensionsActivity : SecureActivity() {
 
         webExtensionViewModel.allWebExtensions.observe(this) { webExtensions ->
             masterSecretKey?.let { key ->
-                val sorted = webExtensions.sortedBy {
-                    val name = if (it.title != null) {
-                        SecretService.decryptCommonString(key, it.title!!)
-                    }
-                    else {
-                        SecretService.decryptCommonString(key, it.webClientId)
-                    }
-                    name.lowercase()
-                }
+                val sorted = webExtensions
+                    .filter { it.linked }
+                    .sortedBy { SecretService.decryptCommonString(key, it.title).lowercase() }
+
                 listWebExtensionsAdapter.submitList(sorted)
             }
         }

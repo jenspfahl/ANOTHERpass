@@ -56,6 +56,8 @@
     <string name="message_delete_label">Are you sure deleting label \'%1$s\'? It will be removed from all credentials where it is assigned to.</string>
     <string name="title_delete_username_template">Delete Username Template</string>
     <string name="message_delete_username_template">Are you sure deleting username template \'%1$s\'? It wont be visible anymore in the username suggestions.</string>
+    <string name="title_delete_web_extension">Unlink device</string>
+    <string name="message_delete_web_extension">Do you really want to unlink the linked device \'%1$s\' by deleting it?</string>
 
     <string name="lock_items">Lock vault</string>
     <string name="logout">Logout and exit</string>
@@ -203,6 +205,7 @@
     <string name="title_activity_list_label">Labels</string>
     <string name="title_activity_list_username_templates">Templates for usernames</string>
     <string name="title_activity_list_web_extensions">Linked devices</string>
+    <string name="title_activity_add_web_extensions">Link a devices</string>
     <string name="action_labels">Manage labels</string>
     <string name="action_username_templates">Username templates</string>
     <string name="username_template_data_params">Define the username of a template and an optional description. The username is used to present suggestions for usernames when editing credentials.</string>
@@ -216,6 +219,7 @@
     <string name="title_change_label">Edit label</string>
     <string name="title_new_username_template">New username template</string>
     <string name="title_change_username_template">Edit username template</string>
+    <string name="title_change_web_extension">Change linked device</string>
     <string name="reset_vault">Reset all</string>
     <string name="reset_vault_and_delete">Reset and delete all</string>
     <string name="button_report_bug">Report bug</string>
