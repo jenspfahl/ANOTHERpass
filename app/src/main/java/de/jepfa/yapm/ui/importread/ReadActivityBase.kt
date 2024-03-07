@@ -22,6 +22,7 @@ import de.jepfa.yapm.util.toastText
 abstract class ReadActivityBase : NfcBaseActivity() {
 
     protected var isFromQRScan = false
+    protected var onlyQrCodeScan = false
 
     init {
         enableBack = true
@@ -42,12 +43,14 @@ abstract class ReadActivityBase : NfcBaseActivity() {
             QRCodeUtil.scanQRCode(this, getString(R.string.scanning_qrcode))
         }
 
-        val scanNfcImageView: ImageView = findViewById(R.id.imageview_scan_nfc)
-        if (!NfcService.isNfcAvailable(this)) {
-            scanNfcImageView.visibility = View.GONE
-        }
-        scanNfcImageView.setOnClickListener {
-            NfcService.scanNfcTag(this)
+        if (!onlyQrCodeScan) {
+            val scanNfcImageView: ImageView = findViewById(R.id.imageview_scan_nfc)
+            if (!NfcService.isNfcAvailable(this)) {
+                scanNfcImageView.visibility = View.GONE
+            }
+            scanNfcImageView.setOnClickListener {
+                NfcService.scanNfcTag(this)
+            }
         }
 
     }

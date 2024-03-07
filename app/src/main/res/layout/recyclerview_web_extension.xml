@@ -24,6 +24,8 @@
             android:textSize="12sp"
             android:gravity="center"
             android:layout_width="0dp"
+            android:typeface="monospace"
+            android:textStyle="bold"
             android:layout_height="match_parent"
             android:layout_weight="0.3"/>
 

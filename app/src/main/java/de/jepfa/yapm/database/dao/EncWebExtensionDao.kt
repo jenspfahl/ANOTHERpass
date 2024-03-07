@@ -21,7 +21,7 @@ interface EncWebExtensionDao {
     @Query("SELECT * FROM EncWebExtensionEntity WHERE id = :id")
     fun getById(id: Int): Flow<EncWebExtensionEntity>
 
-   @Query("SELECT * FROM EncWebExtensionEntity")
+    @Query("SELECT * FROM EncWebExtensionEntity")
     fun getAll(): Flow<List<EncWebExtensionEntity>>
 
 }

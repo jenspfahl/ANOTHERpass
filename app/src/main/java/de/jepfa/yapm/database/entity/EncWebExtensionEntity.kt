@@ -1,13 +1,14 @@
 package de.jepfa.yapm.database.entity
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import de.jepfa.yapm.model.encrypted.Encrypted
 
 /**
  * Encrypted linked web extensions
  */
-@Entity
+@Entity(indices = arrayOf(Index("webClientId", unique = true)))
 data class EncWebExtensionEntity(
     @PrimaryKey(autoGenerate = true) val id: Int?,
     var webClientId: String,

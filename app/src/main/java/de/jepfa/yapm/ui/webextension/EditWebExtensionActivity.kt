@@ -71,11 +71,8 @@ class EditWebExtensionActivity : SecureActivity() {
                 webExtension?.enabled = enabledSwitchView.isChecked
 
                 webExtension?.let { webExtension ->
-                    if (webExtension.isPersistent()) {
-                        webExtensionViewModel.update(webExtension, this)
-                    } else {
-                        webExtensionViewModel.insert(webExtension, this)
-                    }
+                    webExtensionViewModel.save(webExtension, this)
+
                 }
             }
 

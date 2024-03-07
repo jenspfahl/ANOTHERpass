@@ -60,7 +60,7 @@
 
 
             <ImageView
-                android:id="@+id/web_extension_scan_qrcode"
+                android:id="@+id/imageview_scan_qrcode"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:clickable="true"
@@ -75,6 +75,8 @@
                 android:layout_marginBottom="10dp"
                 android:textSize="24sp"
                 android:textAlignment="center"
+                android:typeface="monospace"
+                android:textStyle="bold"
                 android:visibility="gone"
                 android:textIsSelectable="true"
                 android:text="@string/nothing_placeholder"/>

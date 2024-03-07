@@ -137,7 +137,7 @@
         <activity
             android:name=".ui.webextension.AddWebExtensionActivity"
             android:label="@string/title_activity_add_web_extensions"
-            android:noHistory="true" />
+            android:noHistory="false" />
         <activity
             android:name=".ui.label.ListLabelsActivity"
             android:label="@string/title_activity_list_label" />

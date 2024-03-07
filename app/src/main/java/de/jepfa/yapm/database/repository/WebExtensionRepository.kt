@@ -7,6 +7,7 @@ import de.jepfa.yapm.model.encrypted.EncWebExtension
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 
 class WebExtensionRepository(private val encWebExtensionDao: EncWebExtensionDao) {
 
@@ -19,6 +20,18 @@ class WebExtensionRepository(private val encWebExtensionDao: EncWebExtensionDao)
     suspend fun update(encWebExtension: EncWebExtension) {
         encWebExtensionDao.update(mapToEntity(encWebExtension))
     }
+
+
+    @WorkerThread
+    suspend fun save(encWebExtension: EncWebExtension) {
+        if (encWebExtension.isPersistent()) {
+            update(encWebExtension)
+        }
+        else {
+            insert(encWebExtension)
+        }
+    }
+
 
     @WorkerThread
     suspend fun delete(encWebExtension: EncWebExtension) {

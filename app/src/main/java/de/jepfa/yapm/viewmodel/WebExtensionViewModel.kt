@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import de.jepfa.yapm.database.repository.WebExtensionRepository
 import de.jepfa.yapm.model.encrypted.EncWebExtension
 import de.jepfa.yapm.ui.YapmApp
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 
 class WebExtensionViewModel(private val repository: WebExtensionRepository) : ViewModel() {
@@ -15,12 +16,8 @@ class WebExtensionViewModel(private val repository: WebExtensionRepository) : Vi
         return repository.getById(id).asLiveData()
     }
 
-    fun insert(WebExtension: EncWebExtension, context: Context) = viewModelScope.launch {
-        repository.insert(WebExtension)
-    }
-
-    fun update(WebExtension: EncWebExtension, context: Context) = viewModelScope.launch {
-        repository.update(WebExtension)
+    fun save(WebExtension: EncWebExtension, context: Context) = viewModelScope.launch {
+        repository.save(WebExtension)
     }
 
     fun delete(WebExtension: EncWebExtension)  = viewModelScope.launch {

@@ -35,6 +35,8 @@
                 android:textSize="24sp"
                 android:textAlignment="center"
                 android:textIsSelectable="true"
+                android:typeface="monospace"
+                android:textStyle="bold"
                 android:text="@string/nothing_placeholder"/>
 
 
