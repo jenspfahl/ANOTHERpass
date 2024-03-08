@@ -107,6 +107,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.asCompletableFuture
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import java.util.*
 
 
@@ -239,15 +240,25 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 serverViewStateText = "Starting ..."
                 serverViewState.text = serverViewStateText
                 serverViewSwitch.isEnabled = false
-                startAllServersAsync(this) { webClientId, body ->
+                startAllServersAsync(this) { webClientId, request ->
                     CoroutineScope(Dispatchers.Main).launch {
+                        // this code wil lbe executed on ALL activities!
+
+                        AlertDialog.Builder(this@ListCredentialsActivity)
+                            .setTitle("Incoming password request")
+                            .setMessage("Accept?")
+                            .show()
+
+                        startSearchFor("test", commit = true)
                         serverViewState.text = "Responding to $webClientId ..."
                         Handler().postDelayed({
                             serverViewState.text = serverViewStateText
 
                         }, 2000)
                     }
-                    return@startAllServersAsync Pair(HttpStatusCode.OK, "{\"passwd\":\"${SecretService.getSecureRandom(null).nextLong()}\"}")
+                    val response = JSONObject()
+                    response.put("passwd", SecretService.getSecureRandom(null).nextLong())
+                    return@startAllServersAsync Pair(HttpStatusCode.OK, response)
 
                 }.asCompletableFuture().whenComplete { success, e ->
                     Log.i("HTTP", "async start=$success")

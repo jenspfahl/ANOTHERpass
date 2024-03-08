@@ -16,6 +16,7 @@ import de.jepfa.yapm.model.encrypted.EncWebExtension
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.util.toastText
 
 
 class ListWebExtensionsAdapter(private val listWebExtensionsActivity: ListWebExtensionsActivity) :
@@ -35,6 +36,24 @@ class ListWebExtensionsAdapter(private val listWebExtensionsActivity: ListWebExt
             intent.putExtra(EncWebExtension.EXTRA_WEB_EXTENSION_ID, current.id)
             listWebExtensionsActivity.startActivity(intent)
 
+        }
+
+        holder.listenForUnlinkWebExtension { pos, _ ->
+
+            if (!Session.isDenied()) {
+                val current = getItem(pos)
+                listWebExtensionsActivity.masterSecretKey?.let { key ->
+                    val webClientId = SecretService.decryptCommonString(key, current.webClientId)
+                    current.enabled = !current.enabled
+                    listWebExtensionsActivity.webExtensionViewModel.save(current,listWebExtensionsActivity)
+                    if (current.enabled) {
+                        toastText(listWebExtensionsActivity, "Device '$webClientId' linked")
+                    }
+                    else {
+                        toastText(listWebExtensionsActivity, "Device '$webClientId' unlinked")
+                    }
+                }
+            }
         }
 
         holder.listenForDeleteWebExtension { pos, _ ->
@@ -59,6 +78,7 @@ class ListWebExtensionsAdapter(private val listWebExtensionsActivity: ListWebExt
     class WebExtensionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val webExtensionTitleTextView: TextView = itemView.findViewById(R.id.web_extension_title)
         private val webExtensionClientIdTextView: TextView = itemView.findViewById(R.id.web_extension_client_id)
+        private val webExtensionUnlinkImageView: ImageView = itemView.findViewById(R.id.web_extension_unlink)
         private val webExtensionDeleteImageView: ImageView = itemView.findViewById(R.id.web_extension_delete)
 
         fun listenForEditWebExtension(event: (position: Int, type: Int) -> Unit) {
@@ -76,6 +96,15 @@ class ListWebExtensionsAdapter(private val listWebExtensionsActivity: ListWebExt
             }
         }
 
+
+        fun listenForUnlinkWebExtension(event: (position: Int, type: Int) -> Unit) {
+            webExtensionUnlinkImageView.setOnClickListener {
+                if (adapterPosition == RecyclerView.NO_POSITION) {
+                    return@setOnClickListener
+                }
+                event.invoke(adapterPosition, itemViewType)
+            }
+        }
 
         fun listenForDeleteWebExtension(event: (position: Int, type: Int) -> Unit) {
             webExtensionDeleteImageView.setOnClickListener {
@@ -100,8 +129,13 @@ class ListWebExtensionsAdapter(private val listWebExtensionsActivity: ListWebExt
             }
             webExtensionTitleTextView.text = name
             if (!webExtension.enabled) {
-                webExtensionTitleTextView.paintFlags =
-                    webExtensionTitleTextView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                webExtensionUnlinkImageView.setImageDrawable(context.getDrawable(R.drawable.baseline_phonelink_off_24))
+                webExtensionClientIdTextView.paintFlags =
+                    webExtensionClientIdTextView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+
+            }
+            else {
+                webExtensionUnlinkImageView.setImageDrawable(context.getDrawable(R.drawable.baseline_phonelink_24))
             }
             webExtensionClientIdTextView.text = clientId
         }

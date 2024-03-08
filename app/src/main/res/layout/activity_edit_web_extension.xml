@@ -47,7 +47,7 @@
                 <EditText
                     android:id="@+id/edit_web_extension_title"
                     android:layout_width="match_parent"
-                    android:layout_height="65dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginBottom="30dp"
                     android:hint="A name of the link"
                     android:inputType="text"
@@ -62,16 +62,26 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
                 <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/switch_web_extension_enabled"
                     android:checked="false"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.6"
                     android:paddingHorizontal="4pt"
+                    android:paddingVertical="16dp"
                     android:text="Enable this link"/>
+
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/switch_web_extension_bypass"
+                    android:checked="false"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="4pt"
+                    android:paddingVertical="16dp"
+                    android:text="Allow unconfirmed password requests"/>
 
 
             </LinearLayout>

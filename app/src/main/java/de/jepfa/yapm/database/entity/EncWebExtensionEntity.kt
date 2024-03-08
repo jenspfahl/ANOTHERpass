@@ -14,9 +14,9 @@ data class EncWebExtensionEntity(
     var webClientId: String,
     var title: String,
     var extensionPublicKeyAlias: String?,
-    var serverKeyPairAlias: String?,
     var linked: Boolean,
     var enabled: Boolean,
+    var bypassIncomingRequests: Boolean,
     var lastUsedTimestamp: Long?
 ) {
 
@@ -25,18 +25,18 @@ data class EncWebExtensionEntity(
         webClientId: Encrypted,
         title: Encrypted,
         extensionPublicKey: Encrypted?,
-        serverDomainName: Encrypted?,
         linked: Boolean,
         enabled: Boolean,
+        bypassIncomingRequests: Boolean,
         lastUsedTimestamp: Long?
     ) : this(
         id,
         webClientId.toBase64String(),
         title.toBase64String(),
         extensionPublicKey?.toBase64String(),
-        serverDomainName?.toBase64String(),
         linked,
         enabled,
+        bypassIncomingRequests,
         lastUsedTimestamp
     )
 

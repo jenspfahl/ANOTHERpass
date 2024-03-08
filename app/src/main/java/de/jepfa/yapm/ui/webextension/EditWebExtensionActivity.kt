@@ -22,6 +22,7 @@ class EditWebExtensionActivity : SecureActivity() {
     private lateinit var webClientIdTextView: TextView
     private lateinit var titleTextView: TextView
     private lateinit var enabledSwitchView: SwitchCompat
+    private lateinit var bypassSwitchView: SwitchCompat
 
     init {
         enableBack = true
@@ -34,6 +35,7 @@ class EditWebExtensionActivity : SecureActivity() {
         webClientIdTextView = findViewById(R.id.web_extension_client_id)
         titleTextView = findViewById(R.id.edit_web_extension_title)
         enabledSwitchView = findViewById(R.id.switch_web_extension_enabled)
+        bypassSwitchView = findViewById(R.id.switch_web_extension_bypass)
 
 
         enabledSwitchView.setOnCheckedChangeListener { _, isChecked ->
@@ -50,6 +52,7 @@ class EditWebExtensionActivity : SecureActivity() {
                     webClientIdTextView.text = SecretService.decryptCommonString(key, encWebExtension.webClientId)
                     titleTextView.text = encWebExtension.title?.let { SecretService.decryptCommonString(key, it) } ?: ""
                     enabledSwitchView.isChecked = encWebExtension.enabled
+                    bypassSwitchView.isChecked = encWebExtension.bypassIncomingRequests
 
                 }
             }
@@ -69,6 +72,7 @@ class EditWebExtensionActivity : SecureActivity() {
 
                 webExtension?.title = SecretService.encryptCommonString(key, titleTextView.text.toString())
                 webExtension?.enabled = enabledSwitchView.isChecked
+                webExtension?.bypassIncomingRequests = bypassSwitchView.isChecked
 
                 webExtension?.let { webExtension ->
                     webExtensionViewModel.save(webExtension, this)

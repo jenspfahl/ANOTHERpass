@@ -147,9 +147,9 @@ class AddWebExtensionActivity : ReadActivityBase() {
                         encWebClientId,
                         title,
                         encClientPublicKey,
-                        serverDomainName = null,
                         linked = false,
                         enabled = true,
+                        bypassIncomingRequests = false,
                         lastUsedTimestamp = null
                     )
 

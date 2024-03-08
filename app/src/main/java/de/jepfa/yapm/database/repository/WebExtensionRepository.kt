@@ -7,7 +7,6 @@ import de.jepfa.yapm.model.encrypted.EncWebExtension
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 
 class WebExtensionRepository(private val encWebExtensionDao: EncWebExtensionDao) {
 
@@ -62,9 +61,9 @@ class WebExtensionRepository(private val encWebExtensionDao: EncWebExtensionDao)
             entity.webClientId,
             entity.title,
             entity.extensionPublicKeyAlias,
-            entity.serverKeyPairAlias,
             entity.linked,
             entity.enabled,
+            entity.bypassIncomingRequests,
             entity.lastUsedTimestamp,
         )
     }
@@ -75,9 +74,9 @@ class WebExtensionRepository(private val encWebExtensionDao: EncWebExtensionDao)
             encWebExtension.webClientId,
             encWebExtension.title,
             encWebExtension.extensionPublicKey,
-            encWebExtension.serverDomainName,
             encWebExtension.linked,
             encWebExtension.enabled,
+            encWebExtension.bypassIncomingRequests,
             encWebExtension.lastUsedTimestamp,
         )
     }

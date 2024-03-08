@@ -12,6 +12,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.*
+import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
@@ -88,7 +89,7 @@ object HttpServer {
         }
     }
 
-    fun startApiServerAsync(port: Int, context: Context, callHandler: (String, String) -> Pair<HttpStatusCode, String>): Deferred<Boolean> {
+    fun startApiServerAsync(port: Int, context: Context, callHandler: (String, JSONObject) -> Pair<HttpStatusCode, JSONObject>): Deferred<Boolean> {
         return CoroutineScope(Dispatchers.IO).async {
 
             Log.i("HTTP", "start API server")
@@ -96,6 +97,7 @@ object HttpServer {
                 httpServer = embeddedServer(Netty, port = port) {
                     routing {
                         get ("/") {
+
                             call.response.header(
                                 "Access-Control-Allow-Origin",
                                 "*"
@@ -136,10 +138,11 @@ object HttpServer {
                                 Log.d("HTTP", "requesting web extension: $webClientId")
                                 Log.d("HTTP", "payload: $body")
 
-                                val response = callHandler(webClientId, body)
+                                val message = unwrapBody(webClientId, body)
+                                val response = handleAction(webClientId, message, callHandler)
 
                                 call.respondText(
-                                    text = response.second,
+                                    text = wrapBody(webClientId, response.second),
                                     contentType = ContentType("text", "json"),
                                     status = response.first
                                 )
@@ -160,8 +163,7 @@ object HttpServer {
         }
     }
 
-
-    fun startAllServersAsync(context: Context, callHandler: (String, String) -> Pair<HttpStatusCode, String>): Deferred<Boolean> {
+    fun startAllServersAsync(context: Context, callHandler: (String, JSONObject) -> Pair<HttpStatusCode, JSONObject>): Deferred<Boolean> {
 
         return CoroutineScope(Dispatchers.IO).async {
             Log.i("HTTP", "ensure shut down")
@@ -202,6 +204,42 @@ object HttpServer {
         }
     }
 
+    private fun unwrapBody(webClientId: String, body: String): JSONObject {
+        //TODO encrypt body with either the temporary session key or the server private key
+        return JSONObject()
+    }
+
+
+    private fun wrapBody(webClientId: String, message: JSONObject): String {
+        //TODO decrypt body with either the temporary session key or the server private key
+        return message.toString()
+    }
+
+
+
+    private fun handleAction(
+        webClientId: String,
+        message: JSONObject,
+        callHandler: (String, JSONObject) -> Pair<HttpStatusCode, JSONObject>
+    ): Pair<HttpStatusCode, JSONObject> {
+        return when (message.get("action")) {
+            "link" -> handleLinking(webClientId, message)
+            "request_credential" -> handleRequestCredential(webClientId, message, callHandler)
+            else -> Pair(HttpStatusCode.BadRequest, JSONObject())
+        }
+    }
+
+    private fun handleLinking(webClientId: String, message: JSONObject): Pair<HttpStatusCode, JSONObject> {
+        return Pair(HttpStatusCode.OK, JSONObject())
+    }
+
+    private fun handleRequestCredential(
+        webClientId: String,
+        message: JSONObject,
+        callHandler: (String, JSONObject) -> Pair<HttpStatusCode, JSONObject>
+    ): Pair<HttpStatusCode, JSONObject> {
+        return callHandler(webClientId, message)
+    }
 
     // doesn't work like browser fingerprints ...
     private fun getSHA256Fingerprint(publicKey: PublicKey): String? {
