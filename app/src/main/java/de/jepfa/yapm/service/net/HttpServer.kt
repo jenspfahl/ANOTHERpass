@@ -1,17 +1,15 @@
 package de.jepfa.yapm.service.net
 
-import android.app.IntentService
 import android.content.Context
-import android.content.Intent
 import android.util.Base64
 import android.util.Log
+import de.jepfa.yapm.model.Validable.Companion.FAILED_STRING
 import de.jepfa.yapm.model.encrypted.EncWebExtension
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.ui.YapmApp
 import io.ktor.http.*
 import io.ktor.network.tls.certificates.*
 import io.ktor.server.application.*
@@ -136,26 +134,26 @@ object HttpServer {
                                 val webClientId = call.request.headers["X-WebClientId"]
                                 if (webClientId == null) {
                                     //fail
-                                    call.respond(HttpStatusCode.BadRequest, "X-WebClientId header missing")
+                                    call.respond(HttpStatusCode.BadRequest, toErrorJson("X-WebClientId header missing"))
                                     return@post
                                 }
 
                                 val key = activity.masterSecretKey
                                 if (key == null) {
-                                    call.respond(HttpStatusCode.Unauthorized, "Locked")
+                                    call.respond(HttpStatusCode.Unauthorized, toErrorJson("Locked"))
                                     return@post
                                 }
 
                                 val webExtension = activity.getApp().webExtensionRepository.getAllSync()
                                     .find { SecretService.decryptCommonString(key, it.webClientId) == webClientId }
                                 if (webExtension == null) {
-                                    call.respond(HttpStatusCode.NotFound, "$webClientId is unknown")
+                                    call.respond(HttpStatusCode.NotFound, toErrorJson("$webClientId is unknown"))
                                     return@post
                                 }
                                 Log.d("HTTP", "checking WebExtensionId: ${webExtension.id}")
 
                                 if (!webExtension.enabled) {
-                                    call.respond(HttpStatusCode.Forbidden, "$webClientId is blocked")
+                                    call.respond(HttpStatusCode.Forbidden, toErrorJson("$webClientId is blocked"))
                                     return@post
                                 }
                                 Log.d("HTTP", "handling WebExtensionId: ${webExtension.id}")
@@ -172,7 +170,7 @@ object HttpServer {
 
                                 val message = unwrapBody(key, webExtension, webClientId, JSONObject(body), activity)
                                 if (message == null) {
-                                    call.respond(HttpStatusCode.BadRequest, "Cannot parse message")
+                                    call.respond(HttpStatusCode.BadRequest, toErrorJson("Cannot parse message"))
                                     return@post
                                 }
 
@@ -186,7 +184,8 @@ object HttpServer {
                                 )
                             } catch (e: Exception) {
                                 Log.e("HTTP", "Something went wrong!!!", e)
-                                throw e
+                                call.respond(HttpStatusCode.InternalServerError, toErrorJson(e.message?:e.toString()))
+                                return@post
                             }
                         }
                     }
@@ -259,7 +258,7 @@ object HttpServer {
             Log.d("HTTP", "using sessionKeyBase64=$sessionKeyBase64")
             Log.d("HTTP", "using clientPubKeyFingerprintBase64=$clientPubKeyFingerprintBase64")
 
-            val sessionKey =  Key(Base64.decode(sessionKeyBase64, 0))
+            val sessionKey =  Key(Base64.decode(sessionKeyBase64, Base64.DEFAULT))
             if (!sessionKey.isValid()) {
                 Log.w("HTTP", "Invalid session key")
                 return null
@@ -272,8 +271,16 @@ object HttpServer {
             val encEnvelope = Encrypted.fromBase64String(envelope)
 
             // decrypt envelope with AES key 'secret'
+            Log.d("HTTP", "sessionKey.array=${sessionKey.debugToString()}")
+            Log.d("HTTP", "sessionKey.length=${sessionKey.data.size}")
+
             val secretKey = SecretService.generateAesKey(sessionKey, context)
-            return JSONObject(SecretService.decryptCommonString(secretKey, encEnvelope))
+            val decryptedEnvelope = SecretService.decryptCommonString(secretKey, encEnvelope)
+            if (decryptedEnvelope == FAILED_STRING) {
+                Log.w("HTTP", "Invalid envelope")
+                return null
+            }
+            return JSONObject(decryptedEnvelope)
         }
         else {
             val clientPublicKey = SecretService.decryptKey(key, webExtension.extensionPublicKey)
@@ -290,6 +297,11 @@ object HttpServer {
         return message.toString()
     }
 
+    private fun toErrorJson(msg: String): JSONObject {
+        val errorJson = JSONObject()
+        errorJson.put("error", msg)
+        return errorJson
+    }
 
 
     private fun handleAction(
@@ -299,10 +311,11 @@ object HttpServer {
         message: JSONObject,
         callHandler: (String, JSONObject) -> Pair<HttpStatusCode, JSONObject>
     ): Pair<HttpStatusCode, JSONObject> {
-        return when (message.get("action")) {
-            "link" -> handleLinking(webClientId, message)
+        val action = message.get("action")
+        return when (action) {
+            "link_app" -> handleLinking(webClientId, message)
             "request_credential" -> handleRequestCredential(webClientId, message, callHandler)
-            else -> Pair(HttpStatusCode.BadRequest, JSONObject())
+            else -> Pair(HttpStatusCode.BadRequest, toErrorJson("unknown action: $action"))
         }
     }
 

@@ -129,23 +129,12 @@ object SecretService {
     }
 
     fun generateAesKey(key: Key, context: Context): SecretKeyHolder {
-        val keySpec = SecretKeySpec(key.data, "AES")
-        val factory = SecretKeyFactory.getInstance(CipherAlgorithm.AES_128.secretKeyAlgorithm) //TODO doesn't work
-        try {
-            return SecretKeyHolder(
-                factory.generateSecret(keySpec),
-                CipherAlgorithm.AES_128,
-                null,
-                context
-            )
-        } finally {
-            try {
-                keySpec.destroy()
-            } catch (e: Exception) {
-                // ignore
-            }
-        }
-
+        return SecretKeyHolder(
+            SecretKeySpec(key.data, "AES"),
+            CipherAlgorithm.AES_128,
+            null,
+            context
+        )
     }
 
     fun conjunctPasswords(password1: Password, password2: Password, salt: Key): Password {
@@ -312,7 +301,7 @@ object SecretService {
             }
             return cipher.doFinal(encryptedData)
         } catch (e: GeneralSecurityException) {
-            Log.e(LOG_PREFIX + "SS", "unable to decrypt")
+            Log.e(LOG_PREFIX + "SS", "unable to decrypt", e)
             return FAILED_BYTE_ARRAY
         }
     }
