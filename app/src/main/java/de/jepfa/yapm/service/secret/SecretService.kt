@@ -128,6 +128,26 @@ object SecretService {
         }
     }
 
+    fun generateAesKey(key: Key, context: Context): SecretKeyHolder {
+        val keySpec = SecretKeySpec(key.data, "AES")
+        val factory = SecretKeyFactory.getInstance(CipherAlgorithm.AES_128.secretKeyAlgorithm) //TODO doesn't work
+        try {
+            return SecretKeyHolder(
+                factory.generateSecret(keySpec),
+                CipherAlgorithm.AES_128,
+                null,
+                context
+            )
+        } finally {
+            try {
+                keySpec.destroy()
+            } catch (e: Exception) {
+                // ignore
+            }
+        }
+
+    }
+
     fun conjunctPasswords(password1: Password, password2: Password, salt: Key): Password {
         val message = MessageDigest.getInstance("SHA-256")
         message.update(salt.data)

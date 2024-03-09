@@ -6,7 +6,9 @@ data class EncryptedType(val type: Types, val payload: String? = null) {
         MASTER_PASSWD_TOKEN("MPT", hiddenPayload = false),
         ENC_MASTER_PASSWD("EMP", hiddenPayload = false),
         ENC_MASTER_KEY("EMK", hiddenPayload = true),
-        ENC_SALT("SLT", hiddenPayload = false);
+        ENC_SALT("SLT", hiddenPayload = false),
+        ENC_WEB_MESSAGE("EWM", hiddenPayload = false),
+        ;
 
         companion object {
             fun of(type: String): Types? {
@@ -46,10 +48,7 @@ data class EncryptedType(val type: Types, val payload: String? = null) {
             val splitted = typeAndPayload.split(ADD_ON_SEPARATOR)
             val typeValue = splitted[0]
             val payload = if (splitted.size > 1) splitted[1] else null
-            val type = Types.of(typeValue)
-            if (type == null) {
-                return null
-            }
+            val type = Types.of(typeValue) ?: return null
             return EncryptedType(type, payload)
         }
     }

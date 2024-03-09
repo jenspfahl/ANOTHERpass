@@ -24,4 +24,8 @@ interface EncWebExtensionDao {
     @Query("SELECT * FROM EncWebExtensionEntity")
     fun getAll(): Flow<List<EncWebExtensionEntity>>
 
+    @Query("SELECT * FROM EncWebExtensionEntity")
+    fun getAllSync(): List<EncWebExtensionEntity>
+
+
 }

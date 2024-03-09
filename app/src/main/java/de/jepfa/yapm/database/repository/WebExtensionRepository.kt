@@ -51,6 +51,9 @@ class WebExtensionRepository(private val encWebExtensionDao: EncWebExtensionDao)
         return encWebExtensionDao.getAll().filterNotNull().map { mapToModels(it)}
     }
 
+    fun getAllSync(): List<EncWebExtension> {
+        return encWebExtensionDao.getAllSync().map { mapToModel(it)}
+    }
 
     private fun mapToModels(entities: List<EncWebExtensionEntity>): List<EncWebExtension> {
         return entities.map { mapToModel(it) }.toList()

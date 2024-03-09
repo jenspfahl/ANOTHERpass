@@ -1,8 +1,17 @@
 package de.jepfa.yapm.service.net
 
+import android.app.IntentService
 import android.content.Context
+import android.content.Intent
+import android.util.Base64
 import android.util.Log
+import de.jepfa.yapm.model.encrypted.EncWebExtension
+import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.secret.Key
+import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.ui.YapmApp
 import io.ktor.http.*
 import io.ktor.network.tls.certificates.*
 import io.ktor.server.application.*
@@ -28,13 +37,13 @@ object HttpServer {
     private var httpsServer: NettyApplicationEngine? = null
     private var httpServer: NettyApplicationEngine? = null
 
-    fun startWebServerAsync(_port: Int, context: Context): Deferred<Boolean> {
+    fun startWebServerAsync(_port: Int, activity: SecureActivity): Deferred<Boolean> {
 
         val inMemoryOTP =
-            SecretService.getSecureRandom(context).nextLong().toString() +
-            SecretService.getSecureRandom(context).nextLong().toString()
+            SecretService.getSecureRandom(activity).nextLong().toString() +
+            SecretService.getSecureRandom(activity).nextLong().toString()
 
-        val certId = SecretService.getSecureRandom(context).nextInt(10000)
+        val certId = SecretService.getSecureRandom(activity).nextInt(10000)
         return CoroutineScope(Dispatchers.IO).async {
             Log.i("HTTP", "start TLS server")
             try {
@@ -89,7 +98,7 @@ object HttpServer {
         }
     }
 
-    fun startApiServerAsync(port: Int, context: Context, callHandler: (String, JSONObject) -> Pair<HttpStatusCode, JSONObject>): Deferred<Boolean> {
+    fun startApiServerAsync(port: Int, activity: SecureActivity, callHandler: (String, JSONObject) -> Pair<HttpStatusCode, JSONObject>): Deferred<Boolean> {
         return CoroutineScope(Dispatchers.IO).async {
 
             Log.i("HTTP", "start API server")
@@ -123,32 +132,63 @@ object HttpServer {
                             )
                         }
                         post ("/") {
-                            call.response.header(
-                                "Access-Control-Allow-Origin",
-                                "*"
-                            )
-                            val webClientId = call.request.headers["X-WebClientId"]
-                            if (webClientId == null) {
-                                //fail
-                                call.respond(HttpStatusCode.BadRequest, "X-WebClientId header missing")
-                            }
-                            else {
+                            try {
+                                val webClientId = call.request.headers["X-WebClientId"]
+                                if (webClientId == null) {
+                                    //fail
+                                    call.respond(HttpStatusCode.BadRequest, "X-WebClientId header missing")
+                                    return@post
+                                }
+
+                                val key = activity.masterSecretKey
+                                if (key == null) {
+                                    call.respond(HttpStatusCode.Unauthorized, "Locked")
+                                    return@post
+                                }
+
+                                val webExtension = activity.getApp().webExtensionRepository.getAllSync()
+                                    .find { SecretService.decryptCommonString(key, it.webClientId) == webClientId }
+                                if (webExtension == null) {
+                                    call.respond(HttpStatusCode.NotFound, "$webClientId is unknown")
+                                    return@post
+                                }
+                                Log.d("HTTP", "checking WebExtensionId: ${webExtension.id}")
+
+                                if (!webExtension.enabled) {
+                                    call.respond(HttpStatusCode.Forbidden, "$webClientId is blocked")
+                                    return@post
+                                }
+                                Log.d("HTTP", "handling WebExtensionId: ${webExtension.id}")
+
+                                call.response.header(
+                                    "Access-Control-Allow-Origin",
+                                    "*"
+                                )
+
                                 val body = call.receive<String>()
 
                                 Log.d("HTTP", "requesting web extension: $webClientId")
                                 Log.d("HTTP", "payload: $body")
 
-                                val message = unwrapBody(webClientId, body)
-                                val response = handleAction(webClientId, message, callHandler)
+                                val message = unwrapBody(key, webExtension, webClientId, JSONObject(body), activity)
+                                if (message == null) {
+                                    call.respond(HttpStatusCode.BadRequest, "Cannot parse message")
+                                    return@post
+                                }
+
+                                val response = handleAction(key, webExtension, webClientId, message, callHandler)
+                                val text = wrapBody(webClientId, response.second)
 
                                 call.respondText(
-                                    text = wrapBody(webClientId, response.second),
+                                    text = text,
                                     contentType = ContentType("text", "json"),
                                     status = response.first
                                 )
+                            } catch (e: Exception) {
+                                Log.e("HTTP", "Something went wrong!!!", e)
+                                throw e
                             }
                         }
-
                     }
                 }
 
@@ -163,7 +203,7 @@ object HttpServer {
         }
     }
 
-    fun startAllServersAsync(context: Context, callHandler: (String, JSONObject) -> Pair<HttpStatusCode, JSONObject>): Deferred<Boolean> {
+    fun startAllServersAsync(activity: SecureActivity, callHandler: (String, JSONObject) -> Pair<HttpStatusCode, JSONObject>): Deferred<Boolean> {
 
         return CoroutineScope(Dispatchers.IO).async {
             Log.i("HTTP", "ensure shut down")
@@ -171,8 +211,8 @@ object HttpServer {
             val shutdownOk = shutdownAllAsync().await()
             Log.i("HTTP", "shutdownOk=$shutdownOk")
 
-            val startWebServerAsync = startWebServerAsync(8000, context)
-            val startApiServerAsync = startApiServerAsync(8001, context, callHandler)
+            val startWebServerAsync = startWebServerAsync(8000, activity)
+            val startApiServerAsync = startApiServerAsync(8001, activity, callHandler)
 
             Log.i("HTTP", "awaiting start")
 
@@ -204,7 +244,42 @@ object HttpServer {
         }
     }
 
-    private fun unwrapBody(webClientId: String, body: String): JSONObject {
+    private fun unwrapBody(key: SecretKeyHolder, webExtension: EncWebExtension, webClientId: String, body: JSONObject, context: Context): JSONObject? {
+        val isLinking = !webExtension.linked
+        if (isLinking) {
+            val sessionKeyAndPubKeyFingerprint = SecretService.decryptCommonString(key, webExtension.extensionPublicKey)
+
+            val splitted = sessionKeyAndPubKeyFingerprint.split(":")
+            if (splitted.size != 2) {
+                Log.w("HTTP", "Invalid stored link data")
+                return null
+            }
+            val sessionKeyBase64 = splitted[0]
+            val clientPubKeyFingerprintBase64 = splitted[1]
+            Log.d("HTTP", "using sessionKeyBase64=$sessionKeyBase64")
+            Log.d("HTTP", "using clientPubKeyFingerprintBase64=$clientPubKeyFingerprintBase64")
+
+            val sessionKey =  Key(Base64.decode(sessionKeyBase64, 0))
+            if (!sessionKey.isValid()) {
+                Log.w("HTTP", "Invalid session key")
+                return null
+            }
+            val clientPubKeyFingerprint =  Base64.decode(clientPubKeyFingerprintBase64, 0)
+            // use AES to decrypt the encrypted body
+            val envelope = body.getString("envelope")
+
+            Log.d("HTTP", "envelope=$envelope")
+            val encEnvelope = Encrypted.fromBase64String(envelope)
+
+            // decrypt envelope with AES key 'secret'
+            val secretKey = SecretService.generateAesKey(sessionKey, context)
+            return JSONObject(SecretService.decryptCommonString(secretKey, encEnvelope))
+        }
+        else {
+            val clientPublicKey = SecretService.decryptKey(key, webExtension.extensionPublicKey)
+
+            // use server private key to decrypt session key and then use that to decrypt body
+        }
         //TODO encrypt body with either the temporary session key or the server private key
         return JSONObject()
     }
@@ -218,6 +293,8 @@ object HttpServer {
 
 
     private fun handleAction(
+        key: SecretKeyHolder,
+        webExtension: EncWebExtension,
         webClientId: String,
         message: JSONObject,
         callHandler: (String, JSONObject) -> Pair<HttpStatusCode, JSONObject>
