@@ -2,7 +2,9 @@ package de.jepfa.yapm.ui.credential
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ActivityManager
 import android.app.SearchManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -64,6 +66,7 @@ import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelFilter.WITH_NO_LABELS_ID
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.net.HttpServer
 import de.jepfa.yapm.service.net.HttpServer.shutdownAllAsync
 import de.jepfa.yapm.service.net.HttpServer.startAllServersAsync
 import de.jepfa.yapm.service.notification.NotificationService
@@ -92,7 +95,6 @@ import de.jepfa.yapm.ui.webextension.ListWebExtensionsActivity
 import de.jepfa.yapm.usecase.app.ShowDebugLogUseCase
 import de.jepfa.yapm.usecase.app.ShowInfoUseCase
 import de.jepfa.yapm.usecase.credential.DeleteMultipleCredentialsUseCase
-import de.jepfa.yapm.usecase.credential.ExportCredentialUseCase
 import de.jepfa.yapm.usecase.secret.*
 import de.jepfa.yapm.usecase.session.LogoutUseCase
 import de.jepfa.yapm.usecase.vault.DropVaultUseCase
@@ -240,25 +242,42 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 serverViewStateText = "Starting ..."
                 serverViewState.text = serverViewStateText
                 serverViewSwitch.isEnabled = false
-                startAllServersAsync(this) { webClientId, request ->
+                startAllServersAsync(this, pingHandler = { webClientId ->
                     CoroutineScope(Dispatchers.Main).launch {
                         // this code wil lbe executed on ALL activities!
-
-                        AlertDialog.Builder(this@ListCredentialsActivity)
-                            .setTitle("Incoming password request")
-                            .setMessage("Accept?")
-                            .show()
-
-                        startSearchFor("test", commit = true)
                         serverViewState.text = "Responding to $webClientId ..."
                         Handler().postDelayed({
                             serverViewState.text = serverViewStateText
-
                         }, 2000)
                     }
-                    val response = JSONObject()
-                    response.put("passwd", SecretService.getSecureRandom(null).nextLong())
-                    return@startAllServersAsync Pair(HttpStatusCode.OK, response)
+                }) { action, webClientId, request ->
+                    when (action) {
+                        HttpServer.Action.LINKING -> {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                val am: ActivityManager = this@ListCredentialsActivity.getSystemService(
+                                    ACTIVITY_SERVICE
+                                ) as ActivityManager
+                                val cn = am.getRunningTasks(1)[0].topActivity
+                                toastText(this@ListCredentialsActivity, "Client has been linked. Click save to continue.")
+                            }
+                            return@startAllServersAsync Pair(HttpStatusCode.OK, JSONObject())
+                        }
+                        HttpServer.Action.REQUEST_CREDENTIAL -> {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                // this code wil lbe executed on ALL activities!
+
+                                AlertDialog.Builder(this@ListCredentialsActivity)
+                                    .setTitle("Incoming password request")
+                                    .setMessage("Accept?")
+                                    .show()
+
+                                startSearchFor("test", commit = true)
+                            }
+                            val response = JSONObject()
+                            response.put("passwd", SecretService.getSecureRandom(null).nextLong())
+                            return@startAllServersAsync Pair(HttpStatusCode.OK, response)
+                        }
+                    }
 
                 }.asCompletableFuture().whenComplete { success, e ->
                     Log.i("HTTP", "async start=$success")
