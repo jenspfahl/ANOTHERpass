@@ -1,5 +1,6 @@
 package de.jepfa.yapm.ui.webextension
 
+import android.app.ActivityManager
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
@@ -11,15 +12,22 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncWebExtension
+import de.jepfa.yapm.service.net.HttpServer
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.importread.ReadActivityBase
 import de.jepfa.yapm.util.observeOnce
 import de.jepfa.yapm.util.toastText
+import io.ktor.http.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 
-class AddWebExtensionActivity : ReadActivityBase() {
+class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
 
     private var webClientId: String? = null
     private lateinit var saveButton: Button
@@ -90,11 +98,27 @@ class AddWebExtensionActivity : ReadActivityBase() {
                 }
             }
         }
+
+        HttpServer.linkListener = this
     }
 
+    override fun isAllowedToScanQrCode(): Boolean {
+        hideKeyboard(titleTextView)
+        if (TextUtils.isEmpty(titleTextView.text)) {
+            titleTextView.error = getString(R.string.error_field_required)
+            titleTextView.requestFocus()
+            return false
+        }
+        return true
+    }
 
     override fun lock() {
         finish()
+    }
+
+    override fun onDestroy() {
+        HttpServer.linkListener = null
+        super.onDestroy()
     }
 
     override fun getLayoutId(): Int {
@@ -178,6 +202,23 @@ class AddWebExtensionActivity : ReadActivityBase() {
             return Settings.Global.getString(contentResolver, Settings.Global.DEVICE_NAME)
         }
         return null
+    }
+
+    override fun callHandler(
+        action: HttpServer.Action,
+        webClientId: String,
+        webExtension: EncWebExtension,
+        message: JSONObject
+    ): Pair<HttpStatusCode, JSONObject> {
+        CoroutineScope(Dispatchers.Main).launch {
+            AlertDialog.Builder(this@AddWebExtensionActivity)
+                .setTitle("Link device $webClientId")
+                .setMessage("A device has been linked. Accept?")
+                .setPositiveButton("Accept", null)
+                .setNegativeButton("Deny", null)
+                .show()
+        }
+        return Pair(HttpStatusCode.OK, JSONObject())
     }
 
 }

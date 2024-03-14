@@ -46,6 +46,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.encrypted.EncWebExtension
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
@@ -116,7 +117,8 @@ import java.util.*
 /**
  * This is the main activity
  */
-class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.OnNavigationItemSelectedListener  {
+class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.OnNavigationItemSelectedListener,
+    HttpServer.Listener {
 
     private var serverViewStateText: String = ""
     private lateinit var serverViewSwitch: SwitchCompat
@@ -207,6 +209,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         val serverViewLink = findViewById<ImageView>(R.id.server_link)
         val serverViewSettings = findViewById<ImageView>(R.id.server_settings)
 
+        HttpServer.requestCredentialListener = this
+
+
         serverViewLink.setOnClickListener {
             if (serverViewSwitch.isEnabled) {
                 val popup = PopupMenu(this, it)
@@ -242,7 +247,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 serverViewStateText = "Starting ..."
                 serverViewState.text = serverViewStateText
                 serverViewSwitch.isEnabled = false
-                startAllServersAsync(this, pingHandler = { webClientId ->
+                startAllServersAsync(this) { webClientId ->
                     CoroutineScope(Dispatchers.Main).launch {
                         // this code wil lbe executed on ALL activities!
                         serverViewState.text = "Responding to $webClientId ..."
@@ -250,35 +255,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                             serverViewState.text = serverViewStateText
                         }, 2000)
                     }
-                }) { action, webClientId, request ->
-                    when (action) {
-                        HttpServer.Action.LINKING -> {
-                            CoroutineScope(Dispatchers.Main).launch {
-                                val am: ActivityManager = this@ListCredentialsActivity.getSystemService(
-                                    ACTIVITY_SERVICE
-                                ) as ActivityManager
-                                val cn = am.getRunningTasks(1)[0].topActivity
-                                toastText(this@ListCredentialsActivity, "Client has been linked. Click save to continue.")
-                            }
-                            return@startAllServersAsync Pair(HttpStatusCode.OK, JSONObject())
-                        }
-                        HttpServer.Action.REQUEST_CREDENTIAL -> {
-                            CoroutineScope(Dispatchers.Main).launch {
-                                // this code wil lbe executed on ALL activities!
-
-                                AlertDialog.Builder(this@ListCredentialsActivity)
-                                    .setTitle("Incoming password request")
-                                    .setMessage("Accept?")
-                                    .show()
-
-                                startSearchFor("test", commit = true)
-                            }
-                            val response = JSONObject()
-                            response.put("passwd", SecretService.getSecureRandom(null).nextLong())
-                            return@startAllServersAsync Pair(HttpStatusCode.OK, response)
-                        }
-                    }
-
                 }.asCompletableFuture().whenComplete { success, e ->
                     Log.i("HTTP", "async start=$success")
 
@@ -461,6 +437,28 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
 
+    }
+
+    override fun callHandler(
+        action: HttpServer.Action,
+        webClientId: String,
+        webExtension: EncWebExtension,
+        message: JSONObject
+    ): Pair<HttpStatusCode, JSONObject> {
+        CoroutineScope(Dispatchers.Main).launch {
+
+            AlertDialog.Builder(this@ListCredentialsActivity)
+                .setTitle("Incoming password request")
+                .setMessage("Accept?")
+                .setPositiveButton("Accept", null)
+                .setNegativeButton("Deny", null)
+                .show()
+
+            startSearchFor("test", commit = true)
+        }
+        val response = JSONObject()
+        response.put("passwd", SecretService.getSecureRandom(null).nextLong())
+        return Pair(HttpStatusCode.OK, response)
     }
 
     private fun reflectServerStarted(
@@ -1532,5 +1530,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
         return false
     }
+
 }
 

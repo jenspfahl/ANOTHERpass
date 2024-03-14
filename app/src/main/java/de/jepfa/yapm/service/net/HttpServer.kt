@@ -35,8 +35,15 @@ object HttpServer {
 
     enum class Action {LINKING, REQUEST_CREDENTIAL}
 
+    interface Listener {
+        fun callHandler(action: Action, webClientId: String, webExtension: EncWebExtension, message: JSONObject): Pair<HttpStatusCode, JSONObject>
+    }
+
     private var httpsServer: NettyApplicationEngine? = null
     private var httpServer: NettyApplicationEngine? = null
+
+    var linkListener: Listener? = null
+    var requestCredentialListener: Listener? = null
 
     fun startWebServerAsync(_port: Int, activity: SecureActivity): Deferred<Boolean> {
 
@@ -101,7 +108,6 @@ object HttpServer {
 
     fun startApiServerAsync(port: Int, activity: SecureActivity,
                             pingHandler: (String) -> Unit,
-                            callHandler: (Action, String, JSONObject) -> Pair<HttpStatusCode, JSONObject>,
     ): Deferred<Boolean> {
         return CoroutineScope(Dispatchers.IO).async {
 
@@ -182,7 +188,12 @@ object HttpServer {
                                     return@post
                                 }
 
-                                val response = handleAction(key, webExtension, webClientId, message, callHandler)
+                                val response = handleAction(webExtension, webClientId, message)
+                                if (response == null) {
+                                    respondError(HttpStatusCode.InternalServerError, "Missing action listener")
+                                    return@post
+                                }
+
                                 val text = wrapBody(webClientId, response.second)
 
                                 respond(text, response)
@@ -209,7 +220,6 @@ object HttpServer {
     fun startAllServersAsync(
         activity: SecureActivity,
         pingHandler: (String) -> Unit,
-        callHandler: (Action, String, JSONObject) -> Pair<HttpStatusCode, JSONObject>,
     ): Deferred<Boolean> {
 
         return CoroutineScope(Dispatchers.IO).async {
@@ -219,7 +229,7 @@ object HttpServer {
             Log.i("HTTP", "shutdownOk=$shutdownOk")
 
             val startWebServerAsync = startWebServerAsync(8000, activity)
-            val startApiServerAsync = startApiServerAsync(8001, activity, pingHandler, callHandler)
+            val startApiServerAsync = startApiServerAsync(8001, activity, pingHandler)
 
             Log.i("HTTP", "awaiting start")
 
@@ -235,6 +245,8 @@ object HttpServer {
     }
 
     fun shutdownAllAsync() : Deferred<Boolean> {
+        linkListener = null
+        requestCredentialListener = null
         return CoroutineScope(Dispatchers.IO).async {
             try {
                 Log.i("HTTP", "shutdown all")
@@ -313,16 +325,13 @@ object HttpServer {
 
 
     private fun handleAction(
-        key: SecretKeyHolder,
         webExtension: EncWebExtension,
         webClientId: String,
         message: JSONObject,
-        callHandler: (Action, String, JSONObject) -> Pair<HttpStatusCode, JSONObject>
-    ): Pair<HttpStatusCode, JSONObject> {
-        val action = message.get("action")
-        return when (action) {
-            "link_app" -> handleLinking(Action.LINKING, webClientId, message, callHandler)
-            "request_credential" -> handleRequestCredential(Action.REQUEST_CREDENTIAL, webClientId, message, callHandler)
+    ): Pair<HttpStatusCode, JSONObject>? {
+        return when (val action = message.get("action")) {
+            "link_app" -> handleLinking(Action.LINKING, webClientId, webExtension, message)
+            "request_credential" -> handleRequestCredential(Action.REQUEST_CREDENTIAL, webClientId, webExtension, message)
             else -> Pair(HttpStatusCode.BadRequest, toErrorJson("unknown action: $action"))
         }
     }
@@ -330,20 +339,21 @@ object HttpServer {
     private fun handleLinking(
         action: Action,
         webClientId: String,
+        webExtension: EncWebExtension,
         message: JSONObject,
-        callHandler: (Action, String, JSONObject) -> Pair<HttpStatusCode, JSONObject>
-    ): Pair<HttpStatusCode, JSONObject> {
+    ): Pair<HttpStatusCode, JSONObject>? {
         Log.d("HTTP", "linking ...")
-        return callHandler(action, webClientId, message)
+        return linkListener?.callHandler(action, webClientId, webExtension, message)
     }
 
     private fun handleRequestCredential(
         action: Action,
         webClientId: String,
+        webExtension: EncWebExtension,
         message: JSONObject,
-        callHandler: (Action, String, JSONObject) -> Pair<HttpStatusCode, JSONObject>
-    ): Pair<HttpStatusCode, JSONObject> {
-        return callHandler(action, webClientId, message)
+    ): Pair<HttpStatusCode, JSONObject>? {
+        Log.d("HTTP", "linking ...")
+        return requestCredentialListener?.callHandler(action, webClientId, webExtension, message)
     }
 
     // doesn't work like browser fingerprints ...

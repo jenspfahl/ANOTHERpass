@@ -40,7 +40,9 @@ abstract class ReadActivityBase : NfcBaseActivity() {
 
         val scanQrCodeImageView = findViewById<ImageView>(R.id.imageview_scan_qrcode)
         scanQrCodeImageView.setOnClickListener {
-            QRCodeUtil.scanQRCode(this, getString(R.string.scanning_qrcode))
+            if (isAllowedToScanQrCode()) {
+                QRCodeUtil.scanQRCode(this, getString(R.string.scanning_qrcode))
+            }
         }
 
         if (!onlyQrCodeScan) {
@@ -54,6 +56,8 @@ abstract class ReadActivityBase : NfcBaseActivity() {
         }
 
     }
+
+    open fun isAllowedToScanQrCode(): Boolean = true
 
     override fun handleTag() {
         Log.i(LOG_PREFIX + "VERIFY", "tag detected " + ndefTag?.tagId)
