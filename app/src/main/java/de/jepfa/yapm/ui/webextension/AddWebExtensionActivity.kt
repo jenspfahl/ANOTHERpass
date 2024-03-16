@@ -1,13 +1,15 @@
 package de.jepfa.yapm.ui.webextension
 
-import android.app.ActivityManager
+import android.content.Intent
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.text.TextUtils
 import android.text.format.Formatter
+import android.util.Base64
 import android.util.Log
+import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
@@ -18,8 +20,7 @@ import de.jepfa.yapm.model.encrypted.EncWebExtension
 import de.jepfa.yapm.service.net.HttpServer
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.importread.ReadActivityBase
-import de.jepfa.yapm.util.observeOnce
-import de.jepfa.yapm.util.toastText
+import de.jepfa.yapm.util.*
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -61,7 +62,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
                 return@setOnClickListener
             }
 
-            if (webClientId == null) {
+            if (!hasQrCodeScanned()) {
                 toastText(this, "Please scan the QR code first to proceed")
                 return@setOnClickListener
             }
@@ -100,6 +101,53 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
         }
 
         HttpServer.linkListener = this
+    }
+
+    private fun hasQrCodeScanned() = webClientId != null
+
+
+    override fun onBackPressed() {
+        if (hasQrCodeScanned()) {
+            AlertDialog.Builder(this)
+                .setTitle("Cancel linking device $webClientId")
+                .setMessage("Going back will cancel the current linking, sure?")
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    //TODO remove WebExtension
+
+                    super.onBackPressed()
+                }
+                .setNegativeButton(android.R.string.cancel) { _, _ -> }
+                .show()
+        }
+        else {
+            super.onBackPressed()
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        if (id == android.R.id.home) {
+            if (hasQrCodeScanned()) {
+                AlertDialog.Builder(this)
+                    .setTitle("Cancel linking device $webClientId")
+                    .setMessage("Going back will cancel the current linking, sure?")
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+
+                        //TODO remove WebExtension
+                        val upIntent = Intent(this.intent)
+                        navigateUpTo(upIntent)
+                    }
+                    .setNegativeButton(android.R.string.cancel) { _, _ -> }
+                    .show()
+            }
+            else {
+                super.onOptionsItemSelected(item)
+            }
+
+            return true
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     override fun isAllowedToScanQrCode(): Boolean {
@@ -204,21 +252,75 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
         return null
     }
 
-    override fun callHandler(
+    override fun callHttpRequestHandler(
         action: HttpServer.Action,
         webClientId: String,
         webExtension: EncWebExtension,
         message: JSONObject
     ): Pair<HttpStatusCode, JSONObject> {
-        CoroutineScope(Dispatchers.Main).launch {
-            AlertDialog.Builder(this@AddWebExtensionActivity)
-                .setTitle("Link device $webClientId")
-                .setMessage("A device has been linked. Accept?")
-                .setPositiveButton("Accept", null)
-                .setNegativeButton("Deny", null)
-                .show()
+
+        masterSecretKey?.let { key ->
+            val providedWebClientId = SecretService.decryptCommonString(key, webExtension.webClientId)
+            if (providedWebClientId != webClientId || action != HttpServer.Action.LINKING) {
+                Log.e("HTTP", "Programming error")
+                toastText(this, R.string.something_went_wrong)
+                return Pair(HttpStatusCode.InternalServerError, JSONObject())
+            }
+            else{
+                Log.d("HTTP", "Validate client pubkey")
+
+                /*
+                action: "link_app",
+                clientPublicKey: clientPublicKeyAsPEM,
+                configuredServer: server
+                */
+                val clientPubKeyAsJWK= message.getString("clientPublicKey")
+                val serverName= message.getString("configuredServer") //TODO check and store this later
+
+                val clientPubKeyAsJSON = JSONObject(clientPubKeyAsJWK)
+                val nBase64 = clientPubKeyAsJSON.getString("n")
+                Log.d("HTTP", "clientPubKey.n=$nBase64")
+                val n = Base64.decode(nBase64, Base64.URL_SAFE)
+
+                val nHashed = nBase64.toByteArray().sha256()
+                val fingerprintToHex = nHashed.toHex()
+                Log.d("HTTP", "fingerprintToHex=$fingerprintToHex")
+
+                val sessionKeyAndPubKeyFingerprint = SecretService.decryptCommonString(key, webExtension.extensionPublicKey)
+
+                val splitted = sessionKeyAndPubKeyFingerprint.split(":")
+                val knownClientPubKeyFingerprintHex = splitted[1]
+                Log.d("HTTP", "knownClientPubKeyFingerprintHex=$knownClientPubKeyFingerprintHex")
+
+                if (fingerprintToHex != knownClientPubKeyFingerprintHex) {
+                    //TODO
+                    return Pair(HttpStatusCode.BadRequest, JSONObject())
+
+                }
+                //  return bytesToBase64(new Uint8Array(digest)).replace(/[^a-z]/gi, '').substring(0, 6).toLocaleLowerCase();
+                //TODO do this with the server pubkey sent back
+                val f = Base64.encodeToString(nHashed, Base64.DEFAULT)
+                    .replace(Regex("[^a-zA-Z0-9]"), "")
+                    .substring(0, 6)
+                    .lowercase()
+
+                val shortenedFingerprint = f.substring(0, 2) + "-" + f.substring(2, 4) + "-" + f.substring(4, 6)
+
+                CoroutineScope(Dispatchers.Main).launch {
+                    AlertDialog.Builder(this@AddWebExtensionActivity)
+                        .setTitle("Linking device $webClientId")
+                        .setMessage("Ensure that the fingerprint shown here is the same as displayed in the linked browser: " + shortenedFingerprint)
+                        .setPositiveButton("Yes, same!", null)
+                        .setNegativeButton("No, different!", null)
+                        .show()
+                }
+
+
+                return Pair(HttpStatusCode.OK, JSONObject())
+            }
         }
-        return Pair(HttpStatusCode.OK, JSONObject())
+        // no key / logged out
+        return Pair(HttpStatusCode.Forbidden, JSONObject())
     }
 
 }

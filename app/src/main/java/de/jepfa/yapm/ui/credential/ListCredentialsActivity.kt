@@ -439,7 +439,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     }
 
-    override fun callHandler(
+    override fun callHttpRequestHandler(
         action: HttpServer.Action,
         webClientId: String,
         webExtension: EncWebExtension,

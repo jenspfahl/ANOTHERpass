@@ -10,6 +10,8 @@ import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.util.sha256
+import de.jepfa.yapm.util.toHex
 import io.ktor.http.*
 import io.ktor.network.tls.certificates.*
 import io.ktor.server.application.*
@@ -36,7 +38,7 @@ object HttpServer {
     enum class Action {LINKING, REQUEST_CREDENTIAL}
 
     interface Listener {
-        fun callHandler(action: Action, webClientId: String, webExtension: EncWebExtension, message: JSONObject): Pair<HttpStatusCode, JSONObject>
+        fun callHttpRequestHandler(action: Action, webClientId: String, webExtension: EncWebExtension, message: JSONObject): Pair<HttpStatusCode, JSONObject>
     }
 
     private var httpsServer: NettyApplicationEngine? = null
@@ -274,16 +276,13 @@ object HttpServer {
                 return null
             }
             val sessionKeyBase64 = splitted[0]
-            val clientPubKeyFingerprintBase64 = splitted[1]
             Log.d("HTTP", "using sessionKeyBase64=$sessionKeyBase64")
-            Log.d("HTTP", "using clientPubKeyFingerprintBase64=$clientPubKeyFingerprintBase64")
 
-            val sessionKey =  Key(Base64.decode(sessionKeyBase64, Base64.DEFAULT))
+            val sessionKey = Key(Base64.decode(sessionKeyBase64, Base64.DEFAULT))
             if (!sessionKey.isValid()) {
                 Log.w("HTTP", "Invalid session key")
                 return null
             }
-            val clientPubKeyFingerprint =  Base64.decode(clientPubKeyFingerprintBase64, 0)
             // use AES to decrypt the encrypted body
             val envelope = body.getString("envelope")
 
@@ -343,7 +342,7 @@ object HttpServer {
         message: JSONObject,
     ): Pair<HttpStatusCode, JSONObject>? {
         Log.d("HTTP", "linking ...")
-        return linkListener?.callHandler(action, webClientId, webExtension, message)
+        return linkListener?.callHttpRequestHandler(action, webClientId, webExtension, message)
     }
 
     private fun handleRequestCredential(
@@ -353,7 +352,7 @@ object HttpServer {
         message: JSONObject,
     ): Pair<HttpStatusCode, JSONObject>? {
         Log.d("HTTP", "linking ...")
-        return requestCredentialListener?.callHandler(action, webClientId, webExtension, message)
+        return requestCredentialListener?.callHttpRequestHandler(action, webClientId, webExtension, message)
     }
 
     // doesn't work like browser fingerprints ...
@@ -367,28 +366,13 @@ object HttpServer {
 
             val encoded: ByteArray = tag + pK
 
-            val md = MessageDigest.getInstance("SHA-256")
-            val publicKey = md.digest(encoded)
-            hexString = byte2HexFormatted(publicKey)
+            hexString = encoded.sha256().toHex()
         } catch (e1: NoSuchAlgorithmException) {
             Log.e("HTTP", e1.toString())
         } catch (e: CertificateEncodingException) {
             Log.e("HTTP", e.toString())
         }
         return hexString
-    }
-
-    private fun byte2HexFormatted(arr: ByteArray): String {
-        val str = StringBuilder(arr.size * 2)
-        for (i in arr.indices) {
-            var h = Integer.toHexString(arr[i].toInt())
-            val l = h.length
-            if (l == 1) h = "0${h}"
-            if (l > 2) h = h.substring(l - 2, l)
-            str.append(h.uppercase(Locale.getDefault()))
-            if (i < arr.size - 1) str.append(':')
-        }
-        return str.toString()
     }
 
     private suspend fun PipelineContext<Unit, ApplicationCall>.respond(

@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import java.nio.ByteBuffer
+import java.security.MessageDigest
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.text.NumberFormat
@@ -202,7 +203,12 @@ fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observ
     })
 }
 
-fun ByteArray.toHex(): String = joinToString(separator = "") { eachByte ->
-    "%02x".format(eachByte)
+fun ByteArray.sha256(): ByteArray {
+    val md = MessageDigest.getInstance("SHA-256")
+    return md.digest(this)
 }
 
+
+fun ByteArray.toHex(separator: String = ""): String = joinToString(separator) { eachByte ->
+    "%02x".format(eachByte)
+}
