@@ -213,6 +213,10 @@ object SecretService {
         return Password(decryptData(secretKeyHolder, encrypted))
     }
 
+    fun encryptCommonString(type: EncryptedType, secretKeyHolder:  SecretKeyHolder, string: String): Encrypted {
+        return encryptData(type, secretKeyHolder, string.toByteArray())
+    }
+
     fun encryptCommonString(secretKeyHolder:  SecretKeyHolder, string: String): Encrypted {
         return encryptData(null, secretKeyHolder, string.toByteArray())
     }

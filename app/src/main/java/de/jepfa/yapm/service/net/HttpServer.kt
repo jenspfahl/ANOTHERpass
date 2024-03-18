@@ -6,6 +6,7 @@ import android.util.Log
 import de.jepfa.yapm.model.Validable.Companion.FAILED_STRING
 import de.jepfa.yapm.model.encrypted.EncWebExtension
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.encrypted.EncryptedType
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.secret.SecretService
@@ -326,12 +327,12 @@ object HttpServer {
             Log.d("HTTP", "encrypting message: $serialized")
 
             val secretKey = SecretService.buildAesKey(sessionKey, context)
-            val encryptedEnvelope = SecretService.encryptCommonString(secretKey, serialized)
+            val encryptedEnvelope = SecretService.encryptCommonString(EncryptedType(EncryptedType.Types.ENC_WEB_MESSAGE), secretKey, serialized)
             sessionKey.clear()
 
             val envelope = JSONObject()
-            envelope.put("envelope", encryptedEnvelope)
-
+            envelope.put("envelope", encryptedEnvelope.toBase64String())
+            Log.d("HTTP","wrapped response: " + envelope.toString(4))
             return envelope.toString()
         }
         else {

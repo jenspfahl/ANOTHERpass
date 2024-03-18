@@ -17,7 +17,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncWebExtension
-import de.jepfa.yapm.model.encrypted.EncWebExtension.Companion.CLIENT_PUB_KEY_ALIAS_PREFIX
 import de.jepfa.yapm.service.net.HttpServer
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
@@ -305,16 +304,18 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
                 webExtensionViewModel.save(webExtension, this)
 
 
-                // generate and store server pubkey
+                // generate and store server pubkey //TODO block ui since it takes time ...
                 val serverKeyPair = SecretService.generateRsaKeyPair(webExtension.getClientPubKeyAlias(), this)
                 val kf = KeyFactory.getInstance("RSA")
-                val ks = kf.getKeySpec(serverKeyPair.public, RSAPublicKeySpec::class.java)
-                val modulus = ks.modulus
-                val exponent = ks.publicExponent
+                val serverPublicKey = kf.getKeySpec(serverKeyPair.public, RSAPublicKeySpec::class.java)
+                val modulus = serverPublicKey.modulus
+                val exponent = serverPublicKey.publicExponent
 
-                val nServerBase64 = Base64.encodeToString(modulus.toByteArray(), Base64.URL_SAFE)
-                val eServerBase64 = Base64.encodeToString(exponent.toByteArray(), Base64.URL_SAFE)
-                val sharedBaseKeyBase64 = Base64.encodeToString(sharedBaseKey.toByteArray(), Base64.DEFAULT)
+                val nServerBase64 = Base64.encodeToString(modulus.toByteArray(), Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
+                val eServerBase64 = Base64.encodeToString(exponent.toByteArray(), Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
+                val sharedBaseKeyBase64 = Base64.encodeToString(sharedBaseKey.toByteArray(), Base64.DEFAULT or Base64.NO_WRAP or Base64.NO_PADDING)
+
+                Log.d("HTTP", "sharedBaseKeyBase64=$sharedBaseKeyBase64")
 
                 val jwk = JSONObject()
                 jwk.put("n", nServerBase64)
@@ -342,6 +343,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
                         .show()
                 }
 
+                Log.d("HTTP", "link response=" + response.toString(4))
 
                 return Pair(HttpStatusCode.OK, response)
             }
