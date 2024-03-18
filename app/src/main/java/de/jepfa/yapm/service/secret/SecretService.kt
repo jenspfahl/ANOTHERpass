@@ -21,8 +21,10 @@ import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_SEED
 import de.jepfa.yapm.service.biometrix.BiometricUtils
 import de.jepfa.yapm.service.secret.PbkdfIterationService.getStoredPbkdfIterations
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import java.math.BigInteger
 import java.security.*
 import java.security.spec.InvalidKeySpecException
+import java.security.spec.RSAPublicKeySpec
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
@@ -128,13 +130,39 @@ object SecretService {
         }
     }
 
-    fun generateAesKey(key: Key, context: Context): SecretKeyHolder {
+    fun buildAesKey(key: Key, context: Context): SecretKeyHolder {
         return SecretKeyHolder(
             SecretKeySpec(key.data, "AES"),
             CipherAlgorithm.AES_128,
             null,
             context
         )
+    }
+
+    fun buildRsaPublicKey(modulus: BigInteger, exponent: BigInteger): PublicKey {
+        val spec = RSAPublicKeySpec(modulus, exponent)
+        return KeyFactory.getInstance(KeyProperties.KEY_ALGORITHM_RSA).generatePublic(spec);
+    }
+
+    fun generateRsaKeyPair(alias: String, context: Context): KeyPair {
+        val keyGen = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, ANDROID_KEY_STORE)
+        val spec = KeyGenParameterSpec.Builder(
+            alias,
+            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+        )
+        .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_OAEP)
+        .setDigests(KeyProperties.DIGEST_SHA256)
+        .setKeySize(4096)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            spec
+                .setIsStrongBoxBacked(hasStrongBoxSupport(context))
+                .setUnlockedDeviceRequired(true)
+                .setUserAuthenticationRequired(false)
+        }
+        keyGen.initialize(spec.build())
+
+        return keyGen.generateKeyPair()
     }
 
     fun conjunctPasswords(password1: Password, password2: Password, salt: Key): Password {
@@ -336,13 +364,17 @@ object SecretService {
         return null
     }
 
-    fun removeAndroidSecretKey(androidKey: AndroidKey) {
+    fun removeAndroidSecretKey(alias: String) {
         androidKeyStore.load(null)
         try {
-            androidKeyStore.deleteEntry(androidKey.alias)
+            androidKeyStore.deleteEntry(alias)
         } catch (e: Exception) {
             // do nothing
         }
+    }
+
+    fun removeAndroidSecretKey(androidKey: AndroidKey) {
+        removeAndroidSecretKey(androidKey.alias)
     }
 
     private fun initAndroidSecretKey(androidKey: AndroidKey, context: Context): SecretKey {

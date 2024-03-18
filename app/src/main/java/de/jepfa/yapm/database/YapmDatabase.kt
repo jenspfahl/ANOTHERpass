@@ -84,7 +84,7 @@ abstract class YapmDatabase : RoomDatabase() {
                         }
                         val migration7to8 = object : Migration(7, 8) {
                             override fun migrate(database: SupportSQLiteDatabase) {
-                                database.execSQL("CREATE TABLE IF NOT EXISTS `EncWebExtensionEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `webClientId` TEXT NOT NULL, `title` TEXT NOT NULL, `extensionPublicKey` TEXT NOT NULL, `linked` INTEGER NOT NULL, `enabled` INTEGER NOT NULL, `bypassIncomingRequests` INTEGER NOT NULL, `lastUsedTimestamp` INTEGER)");
+                                database.execSQL("CREATE TABLE IF NOT EXISTS `EncWebExtensionEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `webClientId` TEXT NOT NULL, `title` TEXT NOT NULL, `extensionPublicKey` TEXT NOT NULL, `sharedBaseKey` TEXT NOT NULL, `linked` INTEGER NOT NULL, `enabled` INTEGER NOT NULL, `bypassIncomingRequests` INTEGER NOT NULL, `lastUsedTimestamp` INTEGER)");
                             }
                         }
 

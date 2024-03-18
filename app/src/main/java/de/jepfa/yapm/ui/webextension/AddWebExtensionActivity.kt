@@ -17,19 +17,25 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncWebExtension
+import de.jepfa.yapm.model.encrypted.EncWebExtension.Companion.CLIENT_PUB_KEY_ALIAS_PREFIX
 import de.jepfa.yapm.service.net.HttpServer
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.importread.ReadActivityBase
+import de.jepfa.yapm.usecase.webextension.DeleteWebExtensionUseCase
 import de.jepfa.yapm.util.*
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import java.security.KeyFactory
+import java.security.spec.RSAPublicKeySpec
 
 
 class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
 
+    private var webExtension: EncWebExtension? = null
     private var webClientId: String? = null
     private lateinit var saveButton: Button
     private lateinit var titleTextView: TextView
@@ -67,37 +73,19 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
                 return@setOnClickListener
             }
 
-
-            // await link confirmation
-            masterSecretKey?.let { key ->
-
-                val title = SecretService.encryptCommonString(key, titleTextView.text.toString())
-
-                webExtensionViewModel.allWebExtensions.observeOnce(this) { webExtensions ->
-
-                    val existingWebExtension = webExtensions
-                        .find { SecretService.decryptCommonString(key, it.webClientId) == webClientId }
-
-                    if (existingWebExtension == null) {
-                        toastText(this, "Something went wrong")
-                        return@observeOnce
-                    }
-                    if (!existingWebExtension.linked)  {
-                        toastText(this, "Please proceed on the extension first!")
-                        return@observeOnce
-                    }
-
-                    // update title if changed meanwhile by the user
-                    existingWebExtension.title = title
-
-
-                    webExtensionViewModel.save(existingWebExtension, this)
-
-                    toastText(this, "Device linked")
-
-                    finish()
-                }
+            if (webExtension == null) {
+                toastText(this, "Something went wrong")
+                return@setOnClickListener
             }
+            else if (!webExtension!!.linked)  {
+                toastText(this, "Please proceed on the extension first!")
+                return@setOnClickListener
+            }
+
+            toastText(this, "Device linked")
+
+            finish()
+
         }
 
         HttpServer.linkListener = this
@@ -112,7 +100,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
                 .setTitle("Cancel linking device $webClientId")
                 .setMessage("Going back will cancel the current linking, sure?")
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-                    //TODO remove WebExtension
+                    removeWebExtension()
 
                     super.onBackPressed()
                 }
@@ -132,8 +120,8 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
                     .setTitle("Cancel linking device $webClientId")
                     .setMessage("Going back will cancel the current linking, sure?")
                     .setPositiveButton(android.R.string.ok) { _, _ ->
+                        removeWebExtension()
 
-                        //TODO remove WebExtension
                         val upIntent = Intent(this.intent)
                         navigateUpTo(upIntent)
                     }
@@ -148,6 +136,13 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun removeWebExtension() {
+        webExtension?.let { current ->
+            UseCaseBackgroundLauncher(DeleteWebExtensionUseCase)
+                .launch(this, current)
+        }
     }
 
     override fun isAllowedToScanQrCode(): Boolean {
@@ -183,10 +178,11 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
             val sessionKeyBase64 = splitted[1]
             val clientPubKeyFingerprint = splitted[2]
 
-            //Log.i("HTTP", "received sessionKeyBase64=$sessionKeyBase64")
             Log.i("HTTP", "received clientPubKeyFingerprint=$clientPubKeyFingerprint")
+            Log.i("HTTP", "received sessionKeyBase64=$sessionKeyBase64")
 
             if (webClientId.isNullOrBlank() || sessionKeyBase64.isNullOrBlank() || clientPubKeyFingerprint.isNullOrBlank()) {
+                webClientId = null
                 toastText(this, "Wrong QR code")
                 return
             }
@@ -200,7 +196,8 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
                 val title = SecretService.encryptCommonString(key, titleTextView.text.toString())
                 val encWebClientId = SecretService.encryptCommonString(key, webClientId!!)
                 // this field contains the QR code payload in this phase
-                val encClientPublicKey = SecretService.encryptCommonString(key, "$sessionKeyBase64:$clientPubKeyFingerprint")
+                val encTempSessionKey = SecretService.encryptCommonString(key, sessionKeyBase64)
+                val encClientPublicKey = SecretService.encryptCommonString(key, clientPubKeyFingerprint)
 
                 // save unlinked extension, the HttpServer will complete it once the user proceeds in the extension ...
                 webExtensionViewModel.allWebExtensions.observeOnce(this) { webExtensions ->
@@ -214,18 +211,19 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
                         id = existingWebExtension.id
                     }
 
-                    val webExtension = EncWebExtension(
+                    webExtension = EncWebExtension(
                         id,
                         encWebClientId,
                         title,
                         encClientPublicKey,
+                        encTempSessionKey, // we borrow this field in the linking phase
                         linked = false,
                         enabled = true,
                         bypassIncomingRequests = false,
                         lastUsedTimestamp = null
                     )
 
-                    webExtensionViewModel.save(webExtension, this)
+                    webExtensionViewModel.save(webExtension!!, this)
                 }
             }
         }
@@ -264,7 +262,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
             if (providedWebClientId != webClientId || action != HttpServer.Action.LINKING) {
                 Log.e("HTTP", "Programming error")
                 toastText(this, R.string.something_went_wrong)
-                return Pair(HttpStatusCode.InternalServerError, JSONObject())
+                return Pair(HttpStatusCode.InternalServerError, HttpServer.toErrorJson("invalid action"))
             }
             else{
                 Log.d("HTTP", "Validate client pubkey")
@@ -279,48 +277,77 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
 
                 val clientPubKeyAsJSON = JSONObject(clientPubKeyAsJWK)
                 val nBase64 = clientPubKeyAsJSON.getString("n")
+                val eBase64 = clientPubKeyAsJSON.getString("e")
                 Log.d("HTTP", "clientPubKey.n=$nBase64")
-                val n = Base64.decode(nBase64, Base64.URL_SAFE)
+                Log.d("HTTP", "clientPubKey.e=$eBase64")
+                //val n = Base64.decode(nBase64, Base64.URL_SAFE)
 
                 val nHashed = nBase64.toByteArray().sha256()
                 val fingerprintToHex = nHashed.toHex()
                 Log.d("HTTP", "fingerprintToHex=$fingerprintToHex")
 
-                val sessionKeyAndPubKeyFingerprint = SecretService.decryptCommonString(key, webExtension.extensionPublicKey)
+                val knownClientPubKeyFingerprintHex = SecretService.decryptCommonString(key, webExtension.extensionPublicKey)
 
-                val splitted = sessionKeyAndPubKeyFingerprint.split(":")
-                val knownClientPubKeyFingerprintHex = splitted[1]
                 Log.d("HTTP", "knownClientPubKeyFingerprintHex=$knownClientPubKeyFingerprintHex")
 
                 if (fingerprintToHex != knownClientPubKeyFingerprintHex) {
-                    //TODO
-                    return Pair(HttpStatusCode.BadRequest, JSONObject())
-
+                    Log.e("HTTP", "wrong fingerprint")
+                    return Pair(HttpStatusCode.BadRequest, HttpServer.toErrorJson("fingerprint missmatch"))
                 }
-                //  return bytesToBase64(new Uint8Array(digest)).replace(/[^a-z]/gi, '').substring(0, 6).toLocaleLowerCase();
-                //TODO do this with the server pubkey sent back
-                val f = Base64.encodeToString(nHashed, Base64.DEFAULT)
+                Log.i("HTTP", "client pubkey approved")
+
+
+                // generate shared base key
+                val sharedBaseKey = SecretService.generateRandomKey(16, this)
+
+                webExtension.sharedBaseKey = SecretService.encryptKey(key, sharedBaseKey)
+                webExtension.extensionPublicKey = SecretService.encryptCommonString(key, clientPubKeyAsJWK)
+                webExtensionViewModel.save(webExtension, this)
+
+
+                // generate and store server pubkey
+                val serverKeyPair = SecretService.generateRsaKeyPair(webExtension.getClientPubKeyAlias(), this)
+                val kf = KeyFactory.getInstance("RSA")
+                val ks = kf.getKeySpec(serverKeyPair.public, RSAPublicKeySpec::class.java)
+                val modulus = ks.modulus
+                val exponent = ks.publicExponent
+
+                val nServerBase64 = Base64.encodeToString(modulus.toByteArray(), Base64.URL_SAFE)
+                val eServerBase64 = Base64.encodeToString(exponent.toByteArray(), Base64.URL_SAFE)
+                val sharedBaseKeyBase64 = Base64.encodeToString(sharedBaseKey.toByteArray(), Base64.DEFAULT)
+
+                val jwk = JSONObject()
+                jwk.put("n", nServerBase64)
+                jwk.put("e", eServerBase64)
+
+                val nServerHashed = nServerBase64.toByteArray().sha256()
+                val serverPubKeyFingerprint = Base64.encodeToString(nServerHashed, Base64.DEFAULT)
                     .replace(Regex("[^a-zA-Z0-9]"), "")
                     .substring(0, 6)
                     .lowercase()
 
-                val shortenedFingerprint = f.substring(0, 2) + "-" + f.substring(2, 4) + "-" + f.substring(4, 6)
+                val shortenedServerPubKeyFingerprint = serverPubKeyFingerprint.substring(0, 2) + "-" + serverPubKeyFingerprint.substring(2, 4) + "-" + serverPubKeyFingerprint.substring(4, 6)
+
+                val response = JSONObject()
+                response.put("serverPubKey", jwk)
+                response.put("sharedBaseKey", sharedBaseKeyBase64)
+
 
                 CoroutineScope(Dispatchers.Main).launch {
                     AlertDialog.Builder(this@AddWebExtensionActivity)
                         .setTitle("Linking device $webClientId")
-                        .setMessage("Ensure that the fingerprint shown here is the same as displayed in the linked browser: " + shortenedFingerprint)
+                        .setMessage("Ensure that the fingerprint shown here is the same as displayed in the linked browser: " + shortenedServerPubKeyFingerprint)
                         .setPositiveButton("Yes, same!", null)
                         .setNegativeButton("No, different!", null)
                         .show()
                 }
 
 
-                return Pair(HttpStatusCode.OK, JSONObject())
+                return Pair(HttpStatusCode.OK, response)
             }
         }
         // no key / logged out
-        return Pair(HttpStatusCode.Forbidden, JSONObject())
+        return Pair(HttpStatusCode.Forbidden, HttpServer.toErrorJson("locked"))
     }
 
 }

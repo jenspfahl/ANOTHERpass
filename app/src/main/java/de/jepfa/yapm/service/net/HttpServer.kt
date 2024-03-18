@@ -24,11 +24,10 @@ import io.ktor.util.pipeline.*
 import kotlinx.coroutines.*
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
-import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.security.PublicKey
 import java.security.cert.CertificateEncodingException
-import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import javax.security.auth.x500.X500Principal
 
 
@@ -41,6 +40,7 @@ object HttpServer {
         fun callHttpRequestHandler(action: Action, webClientId: String, webExtension: EncWebExtension, message: JSONObject): Pair<HttpStatusCode, JSONObject>
     }
 
+    private val sessionKeys = ConcurrentHashMap<String, Key>()
     private var httpsServer: NettyApplicationEngine? = null
     private var httpServer: NettyApplicationEngine? = null
 
@@ -184,7 +184,7 @@ object HttpServer {
                                 Log.d("HTTP", "requesting web extension: $webClientId")
                                 Log.d("HTTP", "payload: $body")
 
-                                val message = unwrapBody(key, webExtension, webClientId, JSONObject(body), activity)
+                                val message = unwrapBody(key, webClientId, webExtension, JSONObject(body), activity)
                                 if (message == null) {
                                     respondError(HttpStatusCode.BadRequest, "Cannot parse message")
                                     return@post
@@ -196,8 +196,11 @@ object HttpServer {
                                     return@post
                                 }
 
-                                val text = wrapBody(webClientId, response.second)
-
+                                val text = wrapBody(key, webClientId, webExtension, response.second, activity)
+                                if (text == null) {
+                                    respondError(HttpStatusCode.InternalServerError, "Cannot provide a valid response")
+                                    return@post
+                                }
                                 respond(text, response)
                             } catch (e: Exception) {
                                 Log.e("HTTP", "Something went wrong!!!", e)
@@ -247,6 +250,9 @@ object HttpServer {
     }
 
     fun shutdownAllAsync() : Deferred<Boolean> {
+        sessionKeys.forEach { it.value.clear() }
+        sessionKeys.clear()
+
         linkListener = null
         requestCredentialListener = null
         return CoroutineScope(Dispatchers.IO).async {
@@ -265,24 +271,19 @@ object HttpServer {
         }
     }
 
-    private fun unwrapBody(key: SecretKeyHolder, webExtension: EncWebExtension, webClientId: String, body: JSONObject, context: Context): JSONObject? {
+    private fun unwrapBody(key: SecretKeyHolder, webClientId: String, webExtension: EncWebExtension, body: JSONObject, context: Context): JSONObject? {
         val isLinking = !webExtension.linked
         if (isLinking) {
-            val sessionKeyAndPubKeyFingerprint = SecretService.decryptCommonString(key, webExtension.extensionPublicKey)
-
-            val splitted = sessionKeyAndPubKeyFingerprint.split(":")
-            if (splitted.size != 2) {
-                Log.w("HTTP", "Invalid stored link data")
-                return null
-            }
-            val sessionKeyBase64 = splitted[0]
-            Log.d("HTTP", "using sessionKeyBase64=$sessionKeyBase64")
+            val sessionKeyBase64 = SecretService.decryptCommonString(key, webExtension.sharedBaseKey) // contains borrowed session key
+            Log.d("HTTP", "using for unwrapping sessionKeyBase64=$sessionKeyBase64")
 
             val sessionKey = Key(Base64.decode(sessionKeyBase64, Base64.DEFAULT))
             if (!sessionKey.isValid()) {
                 Log.w("HTTP", "Invalid session key")
                 return null
             }
+            sessionKeys[webClientId] = sessionKey
+
             // use AES to decrypt the encrypted body
             val envelope = body.getString("envelope")
 
@@ -293,7 +294,7 @@ object HttpServer {
             Log.d("HTTP", "sessionKey.array=${sessionKey.debugToString()}")
             Log.d("HTTP", "sessionKey.length=${sessionKey.data.size}")
 
-            val secretKey = SecretService.generateAesKey(sessionKey, context)
+            val secretKey = SecretService.buildAesKey(sessionKey, context)
             val decryptedEnvelope = SecretService.decryptCommonString(secretKey, encEnvelope)
             if (decryptedEnvelope == FAILED_STRING) {
                 Log.w("HTTP", "Invalid envelope")
@@ -311,12 +312,38 @@ object HttpServer {
     }
 
 
-    private fun wrapBody(webClientId: String, message: JSONObject): String {
-        //TODO decrypt body with either the temporary session key or the server private key
-        return message.toString()
+    private fun wrapBody(key: SecretKeyHolder, webClientId: String, webExtension: EncWebExtension, message: JSONObject, context: Context): String? {
+        val sessionKey = sessionKeys[webClientId]
+        if (sessionKey == null) {
+            Log.e("HTTP", "Missing session key for $webClientId")
+            return null
+        }
+
+        val isLinking = !webExtension.linked
+        if (isLinking) {
+
+            val serialized = message.toString()
+            Log.d("HTTP", "encrypting message: $serialized")
+
+            val secretKey = SecretService.buildAesKey(sessionKey, context)
+            val encryptedEnvelope = SecretService.encryptCommonString(secretKey, serialized)
+            sessionKey.clear()
+
+            val envelope = JSONObject()
+            envelope.put("envelope", encryptedEnvelope)
+
+            return envelope.toString()
+        }
+        else {
+            val clientPublicKey = SecretService.decryptKey(key, webExtension.extensionPublicKey)
+
+            // use server private key to decrypt session key and then use that to decrypt body
+            //TODO encrypt body with either the temporary session key or the server private key
+            return message.toString()
+        }
     }
 
-    private fun toErrorJson(msg: String): JSONObject {
+    fun toErrorJson(msg: String): JSONObject {
         val errorJson = JSONObject()
         errorJson.put("error", msg)
         return errorJson
