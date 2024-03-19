@@ -311,8 +311,8 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
                 val modulus = serverPublicKey.modulus
                 val exponent = serverPublicKey.publicExponent
 
-                val nServerBase64 = Base64.encodeToString(modulus.toByteArray(), Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
-                val eServerBase64 = Base64.encodeToString(exponent.toByteArray(), Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
+                val nServerBase64 = Base64.encodeToString(normalizeToLength(modulus.toByteArray(), 512), Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
+                val eServerBase64 = Base64.encodeToString(normalizeToLength(exponent.toByteArray(), 512), Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
                 val sharedBaseKeyBase64 = Base64.encodeToString(sharedBaseKey.toByteArray(), Base64.DEFAULT or Base64.NO_WRAP or Base64.NO_PADDING)
 
                 Log.d("HTTP", "sharedBaseKeyBase64=$sharedBaseKeyBase64")
@@ -350,6 +350,16 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
         }
         // no key / logged out
         return Pair(HttpStatusCode.Forbidden, HttpServer.toErrorJson("locked"))
+    }
+
+    private fun normalizeToLength(bytes: ByteArray, length: Int): ByteArray {
+        val offset = bytes.size - length
+        if (offset > 0) {
+            return bytes.copyOfRange(offset, bytes.size)
+        }
+        else {
+            return bytes
+        }
     }
 
 }
