@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory
 import java.security.NoSuchAlgorithmException
 import java.security.PublicKey
 import java.security.cert.CertificateEncodingException
-import java.util.concurrent.ConcurrentHashMap
 import javax.security.auth.x500.X500Principal
 
 
@@ -38,10 +37,9 @@ object HttpServer {
     enum class Action {LINKING, REQUEST_CREDENTIAL}
 
     interface Listener {
-        fun callHttpRequestHandler(action: Action, webClientId: String, webExtension: EncWebExtension, message: JSONObject): Pair<HttpStatusCode, JSONObject>
+        fun handleHttpRequest(action: Action, webClientId: String, webExtension: EncWebExtension, message: JSONObject): Pair<HttpStatusCode, JSONObject>
     }
 
-    private val sessionKeys = ConcurrentHashMap<String, Key>()
     private var httpsServer: NettyApplicationEngine? = null
     private var httpServer: NettyApplicationEngine? = null
 
@@ -185,7 +183,13 @@ object HttpServer {
                                 Log.d("HTTP", "requesting web extension: $webClientId")
                                 Log.d("HTTP", "payload: $body")
 
-                                val message = unwrapBody(key, webClientId, webExtension, JSONObject(body), activity)
+                                val requestTransportKey = extractRequestTransportKey(key, webExtension)
+                                if (requestTransportKey == null) {
+                                    respondError(HttpStatusCode.BadRequest, "No request transport key")
+                                    return@post
+                                }
+
+                                val message = unwrapBody(requestTransportKey, key, webClientId, webExtension, JSONObject(body), activity)
                                 if (message == null) {
                                     respondError(HttpStatusCode.BadRequest, "Cannot parse message")
                                     return@post
@@ -197,11 +201,19 @@ object HttpServer {
                                     return@post
                                 }
 
-                                val text = wrapBody(key, webClientId, webExtension, response.second, activity)
-                                if (text == null) {
-                                    respondError(HttpStatusCode.InternalServerError, "Cannot provide a valid response")
+                                if (!response.first.isSuccess()) {
+                                    respondError(response.first, response.second)
                                     return@post
                                 }
+
+                                val responseKeys = extractResponseTransportKey(key, webExtension, activity)
+                                if (responseKeys == null) {
+                                    respondError(HttpStatusCode.BadRequest, "Cannot provide a valid response")
+                                    return@post
+                                }
+
+                                val text = wrapBody(responseKeys, response.second, activity)
+
                                 respond(text, response)
                             } catch (e: Exception) {
                                 Log.e("HTTP", "Something went wrong!!!", e)
@@ -239,7 +251,7 @@ object HttpServer {
 
             Log.i("HTTP", "awaiting start")
 
-            val successList = awaitAll(startWebServerAsync, startWebServerAsync)
+            val successList = awaitAll(startWebServerAsync, startApiServerAsync)
             val successWebServer = successList.first()
             val successApiServer = successList.last()
             Log.i("HTTP", "successWebServer = $successWebServer")
@@ -251,9 +263,6 @@ object HttpServer {
     }
 
     fun shutdownAllAsync() : Deferred<Boolean> {
-        sessionKeys.forEach { it.value.clear() }
-        sessionKeys.clear()
-
         linkListener = null
         requestCredentialListener = null
         return CoroutineScope(Dispatchers.IO).async {
@@ -272,84 +281,99 @@ object HttpServer {
         }
     }
 
-    private fun unwrapBody(key: SecretKeyHolder, webClientId: String, webExtension: EncWebExtension, body: JSONObject, context: Context): JSONObject? {
-        val isLinking = !webExtension.linked
-        if (isLinking) {
-            val sessionKeyBase64 = SecretService.decryptCommonString(key, webExtension.sharedBaseKey) // contains borrowed session key
-            Log.d("HTTP", "using for unwrapping sessionKeyBase64=$sessionKeyBase64")
+    private fun extractRequestTransportKey(key: SecretKeyHolder, webExtension: EncWebExtension): Key? {
+        val sharedBaseKeyBase64 = SecretService.decryptCommonString(key, webExtension.sharedBaseKey)
 
-            val sessionKey = Key(Base64.decode(sessionKeyBase64, Base64.DEFAULT))
-            if (!sessionKey.isValid()) {
-                Log.w("HTTP", "Invalid session key")
-                return null
-            }
-            sessionKeys[webClientId] = sessionKey
-
-            // use AES to decrypt the encrypted body
-            val envelope = body.getString("envelope")
-
-            Log.d("HTTP", "envelope=$envelope")
-            val encEnvelope = Encrypted.fromBase64String(envelope)
-
-            // decrypt envelope with AES key 'secret'
-            Log.d("HTTP", "sessionKey.array=${sessionKey.debugToString()}")
-            Log.d("HTTP", "sessionKey.length=${sessionKey.data.size}")
-
-            val secretKey = SecretService.buildAesKey(sessionKey, context)
-            val decryptedEnvelope = SecretService.decryptCommonString(secretKey, encEnvelope)
-            if (decryptedEnvelope == FAILED_STRING) {
-                Log.w("HTTP", "Invalid envelope")
-                return null
-            }
-            return JSONObject(decryptedEnvelope)
-        }
-        else {
-            val clientPublicKey = SecretService.decryptKey(key, webExtension.extensionPublicKey)
-
-            // use server private key to decrypt session key and then use that to decrypt body
-            //TODO encrypt body with either the temporary session key or the server private key
-            return JSONObject()
-        }
-    }
-
-
-    private fun wrapBody(key: SecretKeyHolder, webClientId: String, webExtension: EncWebExtension, message: JSONObject, context: Context): String? {
-        val sessionKey = sessionKeys[webClientId]
-        if (sessionKey == null) {
-            Log.e("HTTP", "Missing session key for $webClientId")
+        val sharedBaseKey = Key(Base64.decode(sharedBaseKeyBase64, Base64.DEFAULT))
+        if (!sharedBaseKey.isValid()) {
+            Log.w("HTTP", "No configured base key")
             return null
         }
 
         val isLinking = !webExtension.linked
         if (isLinking) {
-
-            val serialized = message.toString()
-            Log.d("HTTP", "encrypting message: $serialized")
-
-            val secretKey = SecretService.buildAesKey(sessionKey, context)
-            val encryptedEnvelope = SecretService.encryptCommonString(EncryptedType(EncryptedType.Types.ENC_WEB_MESSAGE), secretKey, serialized)
-            sessionKey.clear()
-
-            val envelope = JSONObject()
-            envelope.put("envelope", encryptedEnvelope.toBase64String())
-            Log.d("HTTP","wrapped response: " + envelope.toString(4))
-            return envelope.toString()
+            // During linking phase the stored sharedBaseKey is the only symetric key (previously scanned from QR code)
+            return sharedBaseKey
         }
         else {
             val clientPublicKey = SecretService.decryptKey(key, webExtension.extensionPublicKey)
-
-            // use server private key to decrypt session key and then use that to decrypt body
-            //TODO encrypt body with either the temporary session key or the server private key
-            return message.toString()
+            val serverKeyPair = SecretService.getRsaKeyPair(webExtension.getClientPubKeyAlias())
+            // TODO use serverKeyPair.public to decrypt tempSesssionKey and use sharedBaseKey and hash both together to derive the current transport key
+            return null
         }
     }
 
-    fun toErrorJson(msg: String): JSONObject {
+    /**
+     * Returns first the responseTranportKey second the one-time key as base64
+     */
+    private fun extractResponseTransportKey(key: SecretKeyHolder, webExtension: EncWebExtension, context: Context): Pair<Key, String>? {
+        val sharedBaseKeyBase64 = SecretService.decryptCommonString(key, webExtension.sharedBaseKey)
+
+        val sharedBaseKey = Key(Base64.decode(sharedBaseKeyBase64, Base64.DEFAULT))
+        if (!sharedBaseKey.isValid()) {
+            Log.w("HTTP", "No configured base key")
+            return null
+        }
+
+        val oneTimeKey = SecretService.generateRandomKey(16, context)
+
+        val responseTransportKey = SecretService.conjunctKeys(sharedBaseKey, oneTimeKey)
+        sharedBaseKey.clear()
+        oneTimeKey.clear()
+
+        return Pair(responseTransportKey, oneTimeKey.toBase64String())
+    }
+
+    private fun unwrapBody(transportKey: Key, key: SecretKeyHolder, webClientId: String, webExtension: EncWebExtension, body: JSONObject, context: Context): JSONObject? {
+        val envelope = body.getString("envelope")
+        Log.d("HTTP", "envelope=$envelope")
+        val encEnvelope = Encrypted.fromBase64String(envelope)
+
+        Log.d("HTTP", "transportKey.array=${transportKey.debugToString()}")
+        Log.d("HTTP", "transportKey.length=${transportKey.data.size}")
+
+        val secretKey = SecretService.buildAesKey(transportKey, context)
+        val decryptedEnvelope = SecretService.decryptCommonString(secretKey, encEnvelope)
+        if (decryptedEnvelope == FAILED_STRING) {
+            Log.w("HTTP", "Invalid envelope")
+            return null
+        }
+        val jsonBody = JSONObject(decryptedEnvelope)
+
+        val serverNameFromClientPerspective = jsonBody.optString("configuredServer")
+        if (serverNameFromClientPerspective.isNotBlank()) {
+            //TODO store it in the prefs
+        }
+
+        return jsonBody
+    }
+
+
+    private fun wrapBody(responseKeys: Pair<Key, String>, message: JSONObject, context: Context): String {
+        val serialized = message.toString()
+        Log.d("HTTP", "encrypting message: $serialized")
+
+        val responseTransportKey = responseKeys.first
+        val oneTimeKeyBase64 = responseKeys.second
+        val secretKey = SecretService.buildAesKey(responseTransportKey, context)
+        val encryptedEnvelope = SecretService.encryptCommonString(EncryptedType(EncryptedType.Types.ENC_WEB_MESSAGE), secretKey, serialized)
+        responseTransportKey.clear()
+
+        val envelope = JSONObject()
+        envelope.put("encOneTimeKey", oneTimeKeyBase64)
+        envelope.put("envelope", encryptedEnvelope.toBase64String())
+        Log.d("HTTP","wrapped response: " + envelope.toString(4))
+        return envelope.toString()
+    }
+
+    private fun toErrorJson(msg: String): JSONObject {
         val errorJson = JSONObject()
         errorJson.put("error", msg)
         return errorJson
     }
 
+    fun toErrorResponse(httStatusCode: HttpStatusCode, msg: String): Pair<HttpStatusCode, JSONObject> =
+        Pair(httStatusCode, toErrorJson(msg))
 
     private fun handleAction(
         webExtension: EncWebExtension,
@@ -370,7 +394,7 @@ object HttpServer {
         message: JSONObject,
     ): Pair<HttpStatusCode, JSONObject>? {
         Log.d("HTTP", "linking ...")
-        return linkListener?.callHttpRequestHandler(action, webClientId, webExtension, message)
+        return linkListener?.handleHttpRequest(action, webClientId, webExtension, message)
     }
 
     private fun handleRequestCredential(
@@ -380,7 +404,7 @@ object HttpServer {
         message: JSONObject,
     ): Pair<HttpStatusCode, JSONObject>? {
         Log.d("HTTP", "linking ...")
-        return requestCredentialListener?.callHttpRequestHandler(action, webClientId, webExtension, message)
+        return requestCredentialListener?.handleHttpRequest(action, webClientId, webExtension, message)
     }
 
     // doesn't work like browser fingerprints ...
@@ -411,6 +435,17 @@ object HttpServer {
             text = text,
             contentType = ContentType("application", "json"),
             status = response.first
+        )
+    }
+
+    private suspend fun PipelineContext<Unit, ApplicationCall>.respondError(
+        code: HttpStatusCode,
+        json: JSONObject
+    ) {
+        call.respondText(
+            text = json.toString(4),
+            contentType = ContentType("application", "json"),
+            status = code
         )
     }
 

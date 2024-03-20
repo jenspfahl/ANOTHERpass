@@ -18,6 +18,7 @@ import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncWebExtension
 import de.jepfa.yapm.service.net.HttpServer
+import de.jepfa.yapm.service.net.HttpServer.toErrorResponse
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.importread.ReadActivityBase
@@ -28,8 +29,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONObject
-import java.security.KeyFactory
-import java.security.spec.RSAPublicKeySpec
 
 
 class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
@@ -174,13 +173,13 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
         }
         else {
             webClientId = splitted[0]
-            val sessionKeyBase64 = splitted[1]
+            val baseKeyBase64 = splitted[1]
             val clientPubKeyFingerprint = splitted[2]
 
             Log.i("HTTP", "received clientPubKeyFingerprint=$clientPubKeyFingerprint")
-            Log.i("HTTP", "received sessionKeyBase64=$sessionKeyBase64")
+            Log.i("HTTP", "received BaseKeyBase64=$baseKeyBase64")
 
-            if (webClientId.isNullOrBlank() || sessionKeyBase64.isNullOrBlank() || clientPubKeyFingerprint.isNullOrBlank()) {
+            if (webClientId.isNullOrBlank() || baseKeyBase64.isNullOrBlank() || clientPubKeyFingerprint.isNullOrBlank()) {
                 webClientId = null
                 toastText(this, "Wrong QR code")
                 return
@@ -195,7 +194,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
                 val title = SecretService.encryptCommonString(key, titleTextView.text.toString())
                 val encWebClientId = SecretService.encryptCommonString(key, webClientId!!)
                 // this field contains the QR code payload in this phase
-                val encTempSessionKey = SecretService.encryptCommonString(key, sessionKeyBase64)
+                val encBaseKey = SecretService.encryptCommonString(key, baseKeyBase64)
                 val encClientPublicKey = SecretService.encryptCommonString(key, clientPubKeyFingerprint)
 
                 // save unlinked extension, the HttpServer will complete it once the user proceeds in the extension ...
@@ -215,7 +214,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
                         encWebClientId,
                         title,
                         encClientPublicKey,
-                        encTempSessionKey, // we borrow this field in the linking phase
+                        encBaseKey, // we borrow this field in the linking phase
                         linked = false,
                         enabled = true,
                         bypassIncomingRequests = false,
@@ -249,7 +248,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
         return null
     }
 
-    override fun callHttpRequestHandler(
+    override fun handleHttpRequest(
         action: HttpServer.Action,
         webClientId: String,
         webExtension: EncWebExtension,
@@ -261,59 +260,48 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
             if (providedWebClientId != webClientId || action != HttpServer.Action.LINKING) {
                 Log.e("HTTP", "Programming error")
                 toastText(this, R.string.something_went_wrong)
-                return Pair(HttpStatusCode.InternalServerError, HttpServer.toErrorJson("invalid action"))
+                return toErrorResponse(HttpStatusCode.InternalServerError, "invalid action or unexpected web client")
             }
             else{
                 Log.d("HTTP", "Validate client pubkey")
 
-                /*
-                action: "link_app",
-                clientPublicKey: clientPublicKeyAsPEM,
-                configuredServer: server
-                */
-                val clientPubKeyAsJWK= message.getString("clientPublicKey")
-                val serverName= message.getString("configuredServer") //TODO check and store this later
+                val clientPubKeyAsJWK = message.getJSONObject("clientPublicKey")
 
-                val clientPubKeyAsJSON = JSONObject(clientPubKeyAsJWK)
-                val nBase64 = clientPubKeyAsJSON.getString("n")
-                val eBase64 = clientPubKeyAsJSON.getString("e")
+                val nBase64 = clientPubKeyAsJWK.getString("n")
+                val eBase64 = clientPubKeyAsJWK.getString("e")
                 Log.d("HTTP", "clientPubKey.n=$nBase64")
                 Log.d("HTTP", "clientPubKey.e=$eBase64")
-                //val n = Base64.decode(nBase64, Base64.URL_SAFE)
 
                 val nHashed = nBase64.toByteArray().sha256()
                 val fingerprintToHex = nHashed.toHex()
-                Log.d("HTTP", "fingerprintToHex=$fingerprintToHex")
 
                 val knownClientPubKeyFingerprintHex = SecretService.decryptCommonString(key, webExtension.extensionPublicKey)
-
+                Log.d("HTTP", "fingerprintToHex=$fingerprintToHex")
                 Log.d("HTTP", "knownClientPubKeyFingerprintHex=$knownClientPubKeyFingerprintHex")
 
                 if (fingerprintToHex != knownClientPubKeyFingerprintHex) {
                     Log.e("HTTP", "wrong fingerprint")
-                    return Pair(HttpStatusCode.BadRequest, HttpServer.toErrorJson("fingerprint missmatch"))
+                    return toErrorResponse(HttpStatusCode.BadRequest,"fingerprint missmatch")
                 }
-                Log.i("HTTP", "client pubkey approved")
+                Log.i("HTTP", "client public key approved")
 
 
                 // generate shared base key
                 val sharedBaseKey = SecretService.generateRandomKey(16, this)
 
                 webExtension.sharedBaseKey = SecretService.encryptKey(key, sharedBaseKey)
-                webExtension.extensionPublicKey = SecretService.encryptCommonString(key, clientPubKeyAsJWK)
+                webExtension.extensionPublicKey = SecretService.encryptCommonString(key, clientPubKeyAsJWK.toString())
                 webExtensionViewModel.save(webExtension, this)
 
 
-                // generate and store server pubkey //TODO block ui since it takes time ...
+                // generate and store server pubkey //TODO block ui since it takes time ... --> move thid into a UseCase
                 val serverKeyPair = SecretService.generateRsaKeyPair(webExtension.getClientPubKeyAlias(), this)
-                val kf = KeyFactory.getInstance("RSA")
-                val serverPublicKey = kf.getKeySpec(serverKeyPair.public, RSAPublicKeySpec::class.java)
-                val modulus = serverPublicKey.modulus
-                val exponent = serverPublicKey.publicExponent
+                val serverPublicKeyData = SecretService.getRsaPublicKeyData(serverKeyPair.public)
 
-                val nServerBase64 = Base64.encodeToString(normalizeToLength(modulus.toByteArray(), 512), Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
-                val eServerBase64 = Base64.encodeToString(normalizeToLength(exponent.toByteArray(), 512), Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
+                val nServerBase64 = Base64.encodeToString(serverPublicKeyData.first, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
+                val eServerBase64 = Base64.encodeToString(serverPublicKeyData.second, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
                 val sharedBaseKeyBase64 = Base64.encodeToString(sharedBaseKey.toByteArray(), Base64.DEFAULT or Base64.NO_WRAP or Base64.NO_PADDING)
+                sharedBaseKey.clear()
 
                 Log.d("HTTP", "sharedBaseKeyBase64=$sharedBaseKeyBase64")
 
@@ -349,17 +337,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
             }
         }
         // no key / logged out
-        return Pair(HttpStatusCode.Forbidden, HttpServer.toErrorJson("locked"))
-    }
-
-    private fun normalizeToLength(bytes: ByteArray, length: Int): ByteArray {
-        val offset = bytes.size - length
-        if (offset > 0) {
-            return bytes.copyOfRange(offset, bytes.size)
-        }
-        else {
-            return bytes
-        }
+        return toErrorResponse(HttpStatusCode.Forbidden, "locked")
     }
 
 }

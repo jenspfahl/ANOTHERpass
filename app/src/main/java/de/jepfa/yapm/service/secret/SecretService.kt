@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.SystemClock
 import android.security.keystore.*
+import android.util.Base64
 import android.util.Log
 import de.jepfa.yapm.model.Validable.Companion.FAILED_BYTE_ARRAY
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm
@@ -165,6 +166,28 @@ object SecretService {
         return keyGen.generateKeyPair()
     }
 
+    fun getRsaKeyPair(alias: String): KeyPair? {
+        androidKeyStore.load(null)
+        val entry: KeyStore.Entry? = androidKeyStore.getEntry(alias, null)
+
+        return entry as KeyPair
+    }
+
+    /**
+     * Returns first modulus, second public exponent
+     */
+    fun getRsaPublicKeyData(publicKey: PublicKey): Pair<ByteArray, ByteArray> {
+        val kf = KeyFactory.getInstance("RSA")
+        val serverPublicKey = kf.getKeySpec(publicKey, RSAPublicKeySpec::class.java)
+        val modulus = serverPublicKey.modulus
+        val exponent = serverPublicKey.publicExponent
+
+        val m = cutToLength(modulus.toByteArray(), 512)
+        val e = exponent.toByteArray()
+
+        return Pair(m, e)
+    }
+
     fun conjunctPasswords(password1: Password, password2: Password, salt: Key): Password {
         val message = MessageDigest.getInstance("SHA-256")
         message.update(salt.data)
@@ -174,6 +197,12 @@ object SecretService {
         val result = digest.map { it.toChar() }.toCharArray()
 
         return Password(result)
+    }
+
+    fun conjunctKeys(key1: Key, key2: Key): Key {
+        val key = key1.toByteArray() + key2.toByteArray()
+        val message = MessageDigest.getInstance("SHA-256")
+        return Key(message.digest(key))
     }
 
     fun secretKeyToKey(secretKeyHolder:  SecretKeyHolder, salt: Key) : Key {
@@ -457,4 +486,13 @@ object SecretService {
     }
 
 
+    private fun cutToLength(bytes: ByteArray, length: Int): ByteArray {
+        val offset = bytes.size - length
+        if (offset > 0) {
+            return bytes.copyOfRange(offset, bytes.size)
+        }
+        else {
+            return bytes
+        }
+    }
 }
