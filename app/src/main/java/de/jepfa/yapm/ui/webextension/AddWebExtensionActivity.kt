@@ -17,6 +17,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncWebExtension
+import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.service.net.HttpServer
 import de.jepfa.yapm.service.net.HttpServer.toErrorResponse
 import de.jepfa.yapm.service.secret.SecretService
@@ -173,17 +174,20 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
         }
         else {
             webClientId = splitted[0]
-            val baseKeyBase64 = splitted[1]
+            val sessionKeyBase64 = splitted[1]
             val clientPubKeyFingerprint = splitted[2]
 
             Log.i("HTTP", "received clientPubKeyFingerprint=$clientPubKeyFingerprint")
-            Log.i("HTTP", "received BaseKeyBase64=$baseKeyBase64")
+            Log.i("HTTP", "received sessionKeyBase64=$sessionKeyBase64")
 
-            if (webClientId.isNullOrBlank() || baseKeyBase64.isNullOrBlank() || clientPubKeyFingerprint.isNullOrBlank()) {
+            if (webClientId.isNullOrBlank() || sessionKeyBase64.isNullOrBlank() || clientPubKeyFingerprint.isNullOrBlank()) {
                 webClientId = null
                 toastText(this, "Wrong QR code")
                 return
             }
+
+            val sessionKey = Key(Base64.decode(sessionKeyBase64, Base64.DEFAULT))
+            Log.i("HTTP", "received sessionKey=${sessionKey.debugToString()}")
 
             qrCodeScannerImageView.visibility = ViewGroup.GONE
             webClientIdTextView.visibility = ViewGroup.VISIBLE
@@ -194,7 +198,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
                 val title = SecretService.encryptCommonString(key, titleTextView.text.toString())
                 val encWebClientId = SecretService.encryptCommonString(key, webClientId!!)
                 // this field contains the QR code payload in this phase
-                val encBaseKey = SecretService.encryptCommonString(key, baseKeyBase64)
+                val encSessionKey = SecretService.encryptKey(key, sessionKey)
                 val encClientPublicKey = SecretService.encryptCommonString(key, clientPubKeyFingerprint)
 
                 // save unlinked extension, the HttpServer will complete it once the user proceeds in the extension ...
@@ -214,7 +218,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
                         encWebClientId,
                         title,
                         encClientPublicKey,
-                        encBaseKey, // we borrow this field in the linking phase
+                        encSessionKey, // we borrow this field in the linking phase
                         linked = false,
                         enabled = true,
                         bypassIncomingRequests = false,
@@ -271,6 +275,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
                 val eBase64 = clientPubKeyAsJWK.getString("e")
                 Log.d("HTTP", "clientPubKey.n=$nBase64")
                 Log.d("HTTP", "clientPubKey.e=$eBase64")
+                Log.d("HTTP", "clientPubKey as bytes=${Base64.decode(nBase64, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING).contentToString()}")
 
                 val nHashed = nBase64.toByteArray().sha256()
                 val fingerprintToHex = nHashed.toHex()

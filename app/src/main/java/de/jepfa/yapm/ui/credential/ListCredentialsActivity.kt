@@ -256,7 +256,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         }, 2000)
                     }
                 }.asCompletableFuture().whenComplete { success, e ->
-                    Log.i("HTTP", "async start=$success")
+                    Log.i("HTTP", "async server start success: $success")
 
                     CoroutineScope(Dispatchers.Main).launch {
                         serverViewSwitch.isEnabled = true

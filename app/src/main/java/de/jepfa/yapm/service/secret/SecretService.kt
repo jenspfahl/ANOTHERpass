@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.SystemClock
 import android.security.keystore.*
-import android.util.Base64
 import android.util.Log
 import de.jepfa.yapm.model.Validable.Companion.FAILED_BYTE_ARRAY
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm
@@ -188,6 +187,20 @@ object SecretService {
         return Pair(m, e)
     }
 
+    fun encryptKeyWithPublicKey(publicKey: PublicKey, key: Key): ByteArray {
+        val cipher = Cipher.getInstance("RSA/ECB/OAEPwithSHA-256andMGF1Padding") //or try with "/None/"
+
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey)
+        return cipher.doFinal(key.data)
+    }
+
+    fun decryptKeyWithPrivateKey(privateKey: PrivateKey, key: Key): ByteArray {
+        val cipher = Cipher.getInstance("RSA/ECB/OAEPwithSHA-256andMGF1Padding") //or try with "/None/"
+
+        cipher.init(Cipher.DECRYPT_MODE, privateKey)
+        return cipher.doFinal(key.data)
+    }
+
     fun conjunctPasswords(password1: Password, password2: Password, salt: Key): Password {
         val message = MessageDigest.getInstance("SHA-256")
         message.update(salt.data)
@@ -202,7 +215,12 @@ object SecretService {
     fun conjunctKeys(key1: Key, key2: Key): Key {
         val key = key1.toByteArray() + key2.toByteArray()
         val message = MessageDigest.getInstance("SHA-256")
-        return Key(message.digest(key))
+        val hashed = Key(message.digest(key))
+        Log.d("HTTP", "hashed key=" + key.contentToString())
+        Log.d("HTTP", "hashed key1=" + key1.toBase64String())
+        Log.d("HTTP", "hashed key2=" + key2.toBase64String())
+        Log.d("HTTP", "hashed keys=" + hashed.toBase64String())
+        return hashed
     }
 
     fun secretKeyToKey(secretKeyHolder:  SecretKeyHolder, salt: Key) : Key {

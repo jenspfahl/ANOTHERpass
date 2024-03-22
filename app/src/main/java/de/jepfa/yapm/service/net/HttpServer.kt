@@ -25,6 +25,7 @@ import io.ktor.util.pipeline.*
 import kotlinx.coroutines.*
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
+import java.math.BigInteger
 import java.security.NoSuchAlgorithmException
 import java.security.PublicKey
 import java.security.cert.CertificateEncodingException
@@ -107,124 +108,178 @@ object HttpServer {
         }
     }
 
-    fun startApiServerAsync(port: Int, activity: SecureActivity,
+    fun startApiServerAsync(_port: Int, activity: SecureActivity,
                             pingHandler: (String) -> Unit,
     ): Deferred<Boolean> {
         return CoroutineScope(Dispatchers.IO).async {
 
             Log.i("HTTP", "start API server")
             try {
-                httpServer = embeddedServer(Netty, port = port) {
-                    routing {
-                        get ("/") {
+                val environment = applicationEngineEnvironment {
+                    connector {
+                        port = _port
+                    }
+                    module {
+                        routing {
+                            get("/") {
 
-                            call.response.header(
-                                "Access-Control-Allow-Origin",
-                                "*"
-                            )
-                            call.respondText(
-                                text = "Use the ANOTHERpass browser extension to use the app as a credential server.",
-                                contentType = ContentType("text", "html"),
-                            )
-                        }
-                        options {
-                            call.response.header(
-                                "Access-Control-Allow-Origin",
-                                "*"
-                            )
-                            call.response.header(
-                                "Access-Control-Allow-Headers",
-                                "X-WebClientId,Content-Type"
-                            )
-
-                            call.respond(
-                                status = HttpStatusCode.OK,
-                                message = ""
-                            )
-                        }
-                        post ("/") {
-                            try {
                                 call.response.header(
                                     "Access-Control-Allow-Origin",
                                     "*"
                                 )
+                                call.respondText(
+                                    text = "Use the ANOTHERpass browser extension to use the app as a credential server.",
+                                    contentType = ContentType("text", "html"),
+                                )
+                            }
+                            options {
+                                call.response.header(
+                                    "Access-Control-Allow-Origin",
+                                    "*"
+                                )
+                                call.response.header(
+                                    "Access-Control-Allow-Headers",
+                                    "X-WebClientId,Content-Type"
+                                )
 
-                                val webClientId = call.request.headers["X-WebClientId"]
-                                pingHandler(webClientId?:"Unknown")
+                                call.respond(
+                                    status = HttpStatusCode.OK,
+                                    message = ""
+                                )
+                            }
+                            post("/") {
+                                try {
+                                    call.response.header(
+                                        "Access-Control-Allow-Origin",
+                                        "*"
+                                    )
 
-                                if (webClientId == null) {
-                                    //fail
-                                    respondError(HttpStatusCode.BadRequest, "X-WebClientId header missing")
+                                    val webClientId = call.request.headers["X-WebClientId"]
+                                    pingHandler(webClientId ?: "Unknown")
+
+                                    if (webClientId == null) {
+                                        //fail
+                                        respondError(
+                                            HttpStatusCode.BadRequest,
+                                            "X-WebClientId header missing"
+                                        )
+                                        return@post
+                                    }
+
+                                    val key = activity.masterSecretKey
+                                    if (key == null) {
+                                        respondError(HttpStatusCode.Unauthorized, "Locked")
+                                        return@post
+                                    }
+
+                                    val webExtension =
+                                        activity.getApp().webExtensionRepository.getAllSync()
+                                            .find {
+                                                SecretService.decryptCommonString(
+                                                    key,
+                                                    it.webClientId
+                                                ) == webClientId
+                                            }
+                                    if (webExtension == null) {
+                                        respondError(
+                                            HttpStatusCode.NotFound,
+                                            "$webClientId is unknown"
+                                        )
+                                        return@post
+                                    }
+                                    Log.d("HTTP", "checking WebExtensionId: ${webExtension.id}")
+
+                                    if (!webExtension.enabled) {
+                                        respondError(
+                                            HttpStatusCode.Forbidden,
+                                            "$webClientId is blocked"
+                                        )
+                                        return@post
+                                    }
+                                    Log.d("HTTP", "handling WebExtensionId: ${webExtension.id}")
+
+                                    val body = call.receive<String>()
+
+                                    Log.d("HTTP", "requesting web extension: $webClientId")
+                                    Log.d("HTTP", "payload: $body")
+
+                                    val sharedBaseOrLinkingSessionKey = SecretService.decryptKey(key, webExtension.sharedBaseKey)
+                                    if (!sharedBaseOrLinkingSessionKey.isValid()) {
+                                        Log.w("HTTP", "No configured base key")
+                                        respondError(
+                                            HttpStatusCode.BadRequest,
+                                            "No base key"
+                                        )
+                                        return@post                                    }
+
+                                    val requestTransportKey = extractRequestTransportKey(sharedBaseOrLinkingSessionKey, webExtension)
+                                    if (requestTransportKey == null) {
+                                        respondError(
+                                            HttpStatusCode.BadRequest,
+                                            "No request transport key"
+                                        )
+                                        return@post
+                                    }
+
+                                    val message = unwrapBody(
+                                        requestTransportKey,
+                                        JSONObject(body),
+                                        activity
+                                    )
+                                    if (message == null) {
+                                        respondError(
+                                            HttpStatusCode.BadRequest,
+                                            "Cannot parse message"
+                                        )
+                                        return@post
+                                    }
+
+                                    val response = handleAction(webExtension, webClientId, message)
+                                    if (response == null) {
+                                        respondError(
+                                            HttpStatusCode.InternalServerError,
+                                            "Missing action listener"
+                                        )
+                                        return@post
+                                    }
+
+                                    if (!response.first.isSuccess()) {
+                                        respondError(response.first, response.second)
+                                        return@post
+                                    }
+
+                                    val responseKeys = extractResponseTransportKey(sharedBaseOrLinkingSessionKey, key, webExtension, activity)
+                                    if (responseKeys == null) {
+                                        respondError(
+                                            HttpStatusCode.BadRequest,
+                                            "Cannot provide a valid response"
+                                        )
+                                        return@post
+                                    }
+
+                                    val text = wrapBody(
+                                        responseKeys,
+                                        key,
+                                        webExtension,
+                                        response.second,
+                                        activity)
+
+                                    respond(text, response)
+                                } catch (e: Exception) {
+                                    Log.e("HTTP", "Something went wrong!!!", e)
+                                    respondError(
+                                        HttpStatusCode.InternalServerError,
+                                        e.message ?: e.toString()
+                                    )
                                     return@post
                                 }
-
-                                val key = activity.masterSecretKey
-                                if (key == null) {
-                                    respondError(HttpStatusCode.Unauthorized, "Locked")
-                                    return@post
-                                }
-
-                                val webExtension = activity.getApp().webExtensionRepository.getAllSync()
-                                    .find { SecretService.decryptCommonString(key, it.webClientId) == webClientId }
-                                if (webExtension == null) {
-                                    respondError(HttpStatusCode.NotFound, "$webClientId is unknown")
-                                    return@post
-                                }
-                                Log.d("HTTP", "checking WebExtensionId: ${webExtension.id}")
-
-                                if (!webExtension.enabled) {
-                                    respondError(HttpStatusCode.Forbidden, "$webClientId is blocked")
-                                    return@post
-                                }
-                                Log.d("HTTP", "handling WebExtensionId: ${webExtension.id}")
-
-                                val body = call.receive<String>()
-
-                                Log.d("HTTP", "requesting web extension: $webClientId")
-                                Log.d("HTTP", "payload: $body")
-
-                                val requestTransportKey = extractRequestTransportKey(key, webExtension)
-                                if (requestTransportKey == null) {
-                                    respondError(HttpStatusCode.BadRequest, "No request transport key")
-                                    return@post
-                                }
-
-                                val message = unwrapBody(requestTransportKey, key, webClientId, webExtension, JSONObject(body), activity)
-                                if (message == null) {
-                                    respondError(HttpStatusCode.BadRequest, "Cannot parse message")
-                                    return@post
-                                }
-
-                                val response = handleAction(webExtension, webClientId, message)
-                                if (response == null) {
-                                    respondError(HttpStatusCode.InternalServerError, "Missing action listener")
-                                    return@post
-                                }
-
-                                if (!response.first.isSuccess()) {
-                                    respondError(response.first, response.second)
-                                    return@post
-                                }
-
-                                val responseKeys = extractResponseTransportKey(key, webExtension, activity)
-                                if (responseKeys == null) {
-                                    respondError(HttpStatusCode.BadRequest, "Cannot provide a valid response")
-                                    return@post
-                                }
-
-                                val text = wrapBody(responseKeys, response.second, activity)
-
-                                respond(text, response)
-                            } catch (e: Exception) {
-                                Log.e("HTTP", "Something went wrong!!!", e)
-                                respondError(HttpStatusCode.InternalServerError, e.message?:e.toString())
-                                return@post
                             }
                         }
                     }
                 }
 
                 Log.i("HTTP", "launch API server")
+                httpServer = embeddedServer(Netty, environment)
                 httpServer?.start(wait = false)
                 Log.i("HTTP", "API server started")
                 true
@@ -248,12 +303,9 @@ object HttpServer {
 
             val startWebServerAsync = startWebServerAsync(8000, activity)
             val startApiServerAsync = startApiServerAsync(8001, activity, pingHandler)
-
             Log.i("HTTP", "awaiting start")
 
-            val successList = awaitAll(startWebServerAsync, startApiServerAsync)
-            val successWebServer = successList.first()
-            val successApiServer = successList.last()
+            val (successWebServer, successApiServer) = awaitAll(startWebServerAsync, startApiServerAsync)
             Log.i("HTTP", "successWebServer = $successWebServer")
             Log.i("HTTP", "successApiServer = $successApiServer")
 
@@ -281,50 +333,45 @@ object HttpServer {
         }
     }
 
-    private fun extractRequestTransportKey(key: SecretKeyHolder, webExtension: EncWebExtension): Key? {
-        val sharedBaseKeyBase64 = SecretService.decryptCommonString(key, webExtension.sharedBaseKey)
-
-        val sharedBaseKey = Key(Base64.decode(sharedBaseKeyBase64, Base64.DEFAULT))
-        if (!sharedBaseKey.isValid()) {
-            Log.w("HTTP", "No configured base key")
-            return null
-        }
+    private fun extractRequestTransportKey(sharedBaseKey: Key, webExtension: EncWebExtension): Key? {
 
         val isLinking = !webExtension.linked
         if (isLinking) {
-            // During linking phase the stored sharedBaseKey is the only symetric key (previously scanned from QR code)
+            // During linking phase the stored sharedBaseKey contains the linking session key(previously scanned from QR code)
             return sharedBaseKey
         }
         else {
-            val clientPublicKey = SecretService.decryptKey(key, webExtension.extensionPublicKey)
             val serverKeyPair = SecretService.getRsaKeyPair(webExtension.getClientPubKeyAlias())
-            // TODO use serverKeyPair.public to decrypt tempSesssionKey and use sharedBaseKey and hash both together to derive the current transport key
+            //val decOneTimeKey = SecretService.decryptKeyWithPrivateKey(serverKeyPair.private, encOneTimeKey)
+            // TODO use PrivKapp and BK to derrive TKreq
             return null
         }
     }
 
     /**
-     * Returns first the responseTranportKey second the one-time key as base64
+     * Returns first the responseTransportKey second the one-time key as base64
      */
-    private fun extractResponseTransportKey(key: SecretKeyHolder, webExtension: EncWebExtension, context: Context): Pair<Key, String>? {
-        val sharedBaseKeyBase64 = SecretService.decryptCommonString(key, webExtension.sharedBaseKey)
-
-        val sharedBaseKey = Key(Base64.decode(sharedBaseKeyBase64, Base64.DEFAULT))
-        if (!sharedBaseKey.isValid()) {
-            Log.w("HTTP", "No configured base key")
-            return null
-        }
-
+    private fun extractResponseTransportKey(linkingSessionKey: Key, key: SecretKeyHolder, webExtension: EncWebExtension, context: Context): Pair<Key, Key>? {
         val oneTimeKey = SecretService.generateRandomKey(16, context)
 
-        val responseTransportKey = SecretService.conjunctKeys(sharedBaseKey, oneTimeKey)
-        sharedBaseKey.clear()
-        oneTimeKey.clear()
+        val isLinking = !webExtension.linked
+        val responseTransportKey = if (isLinking) {
+            // During linking sharedBaseKey contains the previously scanned session key
+            SecretService.conjunctKeys(linkingSessionKey, oneTimeKey)
+        }
+        else {
+            val sharedBaseKey = SecretService.decryptKey(key, webExtension.sharedBaseKey)
+            if (!sharedBaseKey.isValid()) {
+                Log.w("HTTP", "No configured base key")
+                return null
+            }
+            SecretService.conjunctKeys(sharedBaseKey, oneTimeKey)
+        }
 
-        return Pair(responseTransportKey, oneTimeKey.toBase64String())
+        return Pair(responseTransportKey, oneTimeKey)
     }
 
-    private fun unwrapBody(transportKey: Key, key: SecretKeyHolder, webClientId: String, webExtension: EncWebExtension, body: JSONObject, context: Context): JSONObject? {
+    private fun unwrapBody(transportKey: Key, body: JSONObject, context: Context): JSONObject? {
         val envelope = body.getString("envelope")
         Log.d("HTTP", "envelope=$envelope")
         val encEnvelope = Encrypted.fromBase64String(envelope)
@@ -344,25 +391,46 @@ object HttpServer {
         if (serverNameFromClientPerspective.isNotBlank()) {
             //TODO store it in the prefs
         }
+        Log.d("HTTP","unwrapped request: " + jsonBody.toString(4))
 
         return jsonBody
     }
 
 
-    private fun wrapBody(responseKeys: Pair<Key, String>, message: JSONObject, context: Context): String {
-        val serialized = message.toString()
-        Log.d("HTTP", "encrypting message: $serialized")
-
+    private fun wrapBody(responseKeys: Pair<Key, Key>, key: SecretKeyHolder, webExtension: EncWebExtension, message: JSONObject, context: Context): String {
         val responseTransportKey = responseKeys.first
-        val oneTimeKeyBase64 = responseKeys.second
+        val oneTimeKey = responseKeys.second
         val secretKey = SecretService.buildAesKey(responseTransportKey, context)
-        val encryptedEnvelope = SecretService.encryptCommonString(EncryptedType(EncryptedType.Types.ENC_WEB_MESSAGE), secretKey, serialized)
+        val encryptedEnvelope = SecretService.encryptCommonString(EncryptedType(EncryptedType.Types.ENC_WEB_MESSAGE), secretKey, message.toString())
         responseTransportKey.clear()
 
+        val clientPubKeyAsJWK = JSONObject(SecretService.decryptCommonString(key, webExtension.extensionPublicKey))
+
+        val nBase64 = clientPubKeyAsJWK.getString("n")
+        val eBase64 = clientPubKeyAsJWK.getString("e")
+        val nBytes = Base64.decode(nBase64, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
+        val eBytes = Base64.decode(eBase64, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
+
+        val modulus = BigInteger(1, nBytes)
+        val exponent = BigInteger(1, eBytes)
+        Log.d("HTTP","client nB.s: " + nBytes.size)
+        Log.d("HTTP","client nB: " + nBytes.contentToString())
+        Log.d("HTTP","client modulus: " + modulus)
+        Log.d("HTTP","client exponent: " + exponent)
+
+        val clientPublicKey = SecretService.buildRsaPublicKey(modulus, exponent)
+        val encOneTimeKey = SecretService.encryptKeyWithPublicKey(clientPublicKey, oneTimeKey)
+        val encOneTimeKeyBase64 = Base64.encodeToString(encOneTimeKey, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
+
         val envelope = JSONObject()
-        envelope.put("encOneTimeKey", oneTimeKeyBase64)
+        envelope.put("encOneTimeKey", encOneTimeKeyBase64)
         envelope.put("envelope", encryptedEnvelope.toBase64String())
         Log.d("HTTP","wrapped response: " + envelope.toString(4))
+
+        oneTimeKey.clear()
+        responseTransportKey.clear()
+        secretKey.destroy()
+
         return envelope.toString()
     }
 
