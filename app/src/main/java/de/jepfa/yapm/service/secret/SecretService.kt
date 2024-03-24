@@ -23,6 +23,7 @@ import de.jepfa.yapm.service.secret.PbkdfIterationService.getStoredPbkdfIteratio
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import java.math.BigInteger
 import java.security.*
+import java.security.KeyStore.PrivateKeyEntry
 import java.security.spec.InvalidKeySpecException
 import java.security.spec.RSAPublicKeySpec
 import javax.crypto.Cipher
@@ -144,14 +145,19 @@ object SecretService {
         return KeyFactory.getInstance(KeyProperties.KEY_ALGORITHM_RSA).generatePublic(spec);
     }
 
-    fun generateRsaKeyPair(alias: String, context: Context): KeyPair {
+    /**
+     * Flag workaround see IllegalBlockSizeException for SHA256 decrypt: https://issuetracker.google.com/issues/36708951
+     */
+    fun generateRsaKeyPair(alias: String, context: Context, workaroundMode: Boolean = false): KeyPair {
+        androidKeyStore.load(null)
+
         val keyGen = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, ANDROID_KEY_STORE)
         val spec = KeyGenParameterSpec.Builder(
             alias,
-            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT or KeyProperties.PURPOSE_VERIFY
         )
-        .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_OAEP)
-        .setDigests(KeyProperties.DIGEST_SHA256)
+        .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_OAEP) // ENCRYPTION_PADDING_RSA_OAEP with SHA-256 does not work, see  https://issuetracker.google.com/issues/36708951
+        .setDigests(if (workaroundMode) KeyProperties.DIGEST_SHA1 else KeyProperties.DIGEST_SHA256)
         .setKeySize(4096)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -165,11 +171,26 @@ object SecretService {
         return keyGen.generateKeyPair()
     }
 
-    fun getRsaKeyPair(alias: String): KeyPair? {
+    fun getServerPrivateKey(alias: String): PrivateKey? {
         androidKeyStore.load(null)
-        val entry: KeyStore.Entry? = androidKeyStore.getEntry(alias, null)
 
-        return entry as KeyPair
+        if (!androidKeyStore.containsAlias(alias)) {
+            Log.i("SS", "RSA key $alias doesn't exist")
+            return null
+        }
+        return androidKeyStore.getKey(alias, null) as PrivateKey
+    }
+
+    fun getServerPublicKey(alias: String): PublicKey? {
+        androidKeyStore.load(null)
+
+        if (!androidKeyStore.containsAlias(alias)) {
+            Log.i("SS", "RSA key $alias doesn't exist")
+            return null
+        }
+        val entry = androidKeyStore.getCertificate(alias)
+
+        return entry.publicKey
     }
 
     /**
@@ -187,18 +208,26 @@ object SecretService {
         return Pair(m, e)
     }
 
-    fun encryptKeyWithPublicKey(publicKey: PublicKey, key: Key): ByteArray {
-        val cipher = Cipher.getInstance("RSA/ECB/OAEPwithSHA-256andMGF1Padding") //or try with "/None/"
+    /**
+     * Flag workaround see IllegalBlockSizeException for SHA256 decrypt: https://issuetracker.google.com/issues/36708951
+     */
+    fun encryptKeyWithPublicKey(publicKey: PublicKey, key: Key, workaroundMode: Boolean = false): ByteArray {
+        val cipher = if (workaroundMode) Cipher.getInstance("RSA/None/OAEPwithSHA-1andMGF1Padding")
+            else Cipher.getInstance("RSA/None/OAEPwithSHA-256andMGF1Padding")
 
         cipher.init(Cipher.ENCRYPT_MODE, publicKey)
         return cipher.doFinal(key.data)
     }
 
-    fun decryptKeyWithPrivateKey(privateKey: PrivateKey, key: Key): ByteArray {
-        val cipher = Cipher.getInstance("RSA/ECB/OAEPwithSHA-256andMGF1Padding") //or try with "/None/"
+    /**
+     * Flag workaround see IllegalBlockSizeException for SHA256 decrypt: https://issuetracker.google.com/issues/36708951
+     */
+    fun decryptKeyWithPrivateKey(privateKey: PrivateKey, data: ByteArray, workaroundMode: Boolean = false): Key {
+        val cipher = if (workaroundMode) Cipher.getInstance("RSA/None/OAEPwithSHA-1andMGF1Padding")
+        else Cipher.getInstance("RSA/None/OAEPwithSHA-256andMGF1Padding")
 
         cipher.init(Cipher.DECRYPT_MODE, privateKey)
-        return cipher.doFinal(key.data)
+        return Key(cipher.doFinal(data))
     }
 
     fun conjunctPasswords(password1: Password, password2: Password, salt: Key): Password {

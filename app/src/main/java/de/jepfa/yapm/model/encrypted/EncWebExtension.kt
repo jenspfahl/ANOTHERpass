@@ -37,11 +37,11 @@ data class EncWebExtension(val id: Int?,
         return id != null
     }
 
-    fun getClientPubKeyAlias(): String = "$CLIENT_PUB_KEY_ALIAS_PREFIX$id"
+    fun getServerKeyPairAlias(): String = "$SERVER_KEY_PAIR_ALIAS_PREFIX$id"
 
     companion object {
         const val EXTRA_WEB_EXTENSION_ID = "de.jepfa.yapm.ui.web_extension.id"
-        const val CLIENT_PUB_KEY_ALIAS_PREFIX = "webExt/curr/"
+        const val SERVER_KEY_PAIR_ALIAS_PREFIX = "webExt/curr/"
 
     }
 }

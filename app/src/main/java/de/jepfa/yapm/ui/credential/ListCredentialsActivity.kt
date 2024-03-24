@@ -209,8 +209,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         val serverViewLink = findViewById<ImageView>(R.id.server_link)
         val serverViewSettings = findViewById<ImageView>(R.id.server_settings)
 
-        HttpServer.requestCredentialListener = this
-
 
         serverViewLink.setOnClickListener {
             if (serverViewSwitch.isEnabled) {
@@ -271,6 +269,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         } else {
                             reflectServerStarted()
                             toastText(this@ListCredentialsActivity, "Server started")
+                            HttpServer.requestCredentialListener = this@ListCredentialsActivity
                         }
                     }
                 }
@@ -445,6 +444,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         webExtension: EncWebExtension,
         message: JSONObject
     ): Pair<HttpStatusCode, JSONObject> {
+        Log.d("HTTP", "credential request callback")
         CoroutineScope(Dispatchers.Main).launch {
 
             AlertDialog.Builder(this@ListCredentialsActivity)
@@ -457,7 +457,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             startSearchFor("test", commit = true)
         }
         val response = JSONObject()
-        response.put("passwd", SecretService.getSecureRandom(null).nextLong())
+        response.put("passwd", "Fake_passwd-"+ SecretService.getSecureRandom(null).nextLong())
         return Pair(HttpStatusCode.OK, response)
     }
 

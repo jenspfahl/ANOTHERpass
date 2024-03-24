@@ -300,12 +300,12 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
 
 
                 // generate and store server pubkey //TODO block ui since it takes time ... --> move thid into a UseCase
-                val serverKeyPair = SecretService.generateRsaKeyPair(webExtension.getClientPubKeyAlias(), this)
+                val serverKeyPair = SecretService.generateRsaKeyPair(webExtension.getServerKeyPairAlias(), this, workaroundMode = true)
                 val serverPublicKeyData = SecretService.getRsaPublicKeyData(serverKeyPair.public)
 
                 val nServerBase64 = Base64.encodeToString(serverPublicKeyData.first, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
                 val eServerBase64 = Base64.encodeToString(serverPublicKeyData.second, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
-                val sharedBaseKeyBase64 = Base64.encodeToString(sharedBaseKey.toByteArray(), Base64.DEFAULT or Base64.NO_WRAP or Base64.NO_PADDING)
+                val sharedBaseKeyBase64 = Base64.encodeToString(sharedBaseKey.toByteArray(), Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
                 sharedBaseKey.clear()
 
                 Log.d("HTTP", "sharedBaseKeyBase64=$sharedBaseKeyBase64")
@@ -331,8 +331,23 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
                     AlertDialog.Builder(this@AddWebExtensionActivity)
                         .setTitle("Linking device $webClientId")
                         .setMessage("Ensure that the fingerprint shown here is the same as displayed in the linked browser: " + shortenedServerPubKeyFingerprint)
-                        .setPositiveButton("Yes, same!", null)
-                        .setNegativeButton("No, different!", null)
+                        .setPositiveButton("Yes, same!") { _, _ ->
+
+                            webExtension.linked = true
+                            webExtensionViewModel.save(webExtension!!, this@AddWebExtensionActivity)
+
+                            val upIntent = Intent(this@AddWebExtensionActivity.intent)
+                            navigateUpTo(upIntent)
+
+                            toastText(this@AddWebExtensionActivity, "Device linked!")
+                        }
+                        .setNegativeButton("No, different!") {_, _ ->
+                            removeWebExtension()
+                            val upIntent = Intent(this@AddWebExtensionActivity.intent)
+                            navigateUpTo(upIntent)
+
+                            toastText(this@AddWebExtensionActivity, "Not linked!")
+                        }
                         .show()
                 }
 

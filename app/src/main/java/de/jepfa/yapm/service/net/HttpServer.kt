@@ -10,6 +10,7 @@ import de.jepfa.yapm.model.encrypted.EncryptedType
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.service.secret.SecretService.getServerPublicKey
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.util.sha256
 import de.jepfa.yapm.util.toHex
@@ -210,20 +211,28 @@ object HttpServer {
                                             HttpStatusCode.BadRequest,
                                             "No base key"
                                         )
-                                        return@post                                    }
+                                        return@post
+                                    }
 
-                                    val requestTransportKey = extractRequestTransportKey(sharedBaseOrLinkingSessionKey, webExtension)
+                                    val payload = JSONObject(body)
+
+
+                                    val requestTransportKey = extractRequestTransportKey(
+                                        sharedBaseOrLinkingSessionKey,
+                                        webExtension,
+                                        payload.optString("encOneTimeKey")
+                                    )
                                     if (requestTransportKey == null) {
                                         respondError(
                                             HttpStatusCode.BadRequest,
-                                            "No request transport key"
+                                            "Cannot derive request transport key"
                                         )
                                         return@post
                                     }
 
                                     val message = unwrapBody(
                                         requestTransportKey,
-                                        JSONObject(body),
+                                        payload,
                                         activity
                                     )
                                     if (message == null) {
@@ -333,7 +342,7 @@ object HttpServer {
         }
     }
 
-    private fun extractRequestTransportKey(sharedBaseKey: Key, webExtension: EncWebExtension): Key? {
+    private fun extractRequestTransportKey(sharedBaseKey: Key, webExtension: EncWebExtension, encOneTimeKeyBase64: String): Key? {
 
         val isLinking = !webExtension.linked
         if (isLinking) {
@@ -341,10 +350,15 @@ object HttpServer {
             return sharedBaseKey
         }
         else {
-            val serverKeyPair = SecretService.getRsaKeyPair(webExtension.getClientPubKeyAlias())
-            //val decOneTimeKey = SecretService.decryptKeyWithPrivateKey(serverKeyPair.private, encOneTimeKey)
-            // TODO use PrivKapp and BK to derrive TKreq
-            return null
+            val encOneTimeKey = Base64.decode(encOneTimeKeyBase64, Base64.DEFAULT)
+            val serverPrivateKey = SecretService.getServerPrivateKey(webExtension.getServerKeyPairAlias()) ?: return null
+            Log.d("HTTP", "encOneTimeKey=" + encOneTimeKey.contentToString())
+
+            val decOneTimeKey = SecretService.decryptKeyWithPrivateKey(serverPrivateKey, encOneTimeKey, workaroundMode = true)
+            Log.d("HTTP", "sharedBaseKeyBase64=" + sharedBaseKey.toBase64String())
+            Log.d("HTTP", "reqOneTimeKeyBase64=" + decOneTimeKey.toBase64String())
+
+            return SecretService.conjunctKeys(sharedBaseKey, decOneTimeKey)
         }
     }
 
@@ -376,8 +390,9 @@ object HttpServer {
         Log.d("HTTP", "envelope=$envelope")
         val encEnvelope = Encrypted.fromBase64String(envelope)
 
-        Log.d("HTTP", "transportKey.array=${transportKey.debugToString()}")
-        Log.d("HTTP", "transportKey.length=${transportKey.data.size}")
+        Log.d("HTTP", "reqTransportKey.array=${transportKey.debugToString()}")
+        Log.d("HTTP", "reqTransportKey.length=${transportKey.data.size}")
+        Log.d("HTTP", "reqTransportKey.base64=${transportKey.toBase64String()}")
 
         val secretKey = SecretService.buildAesKey(transportKey, context)
         val decryptedEnvelope = SecretService.decryptCommonString(secretKey, encEnvelope)
@@ -471,7 +486,7 @@ object HttpServer {
         webExtension: EncWebExtension,
         message: JSONObject,
     ): Pair<HttpStatusCode, JSONObject>? {
-        Log.d("HTTP", "linking ...")
+        Log.d("HTTP", "credential request ...")
         return requestCredentialListener?.handleHttpRequest(action, webClientId, webExtension, message)
     }
 

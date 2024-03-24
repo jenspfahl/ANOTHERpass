@@ -13,7 +13,7 @@ object DeleteWebExtensionUseCase: InputUseCase<EncWebExtension, SecureActivity>(
         val id = webExtension.id
         if (key != null && id != null) {
             activity.webExtensionViewModel.deleteById(id)
-            SecretService.removeAndroidSecretKey(webExtension.getClientPubKeyAlias())
+            SecretService.removeAndroidSecretKey(webExtension.getServerKeyPairAlias())
         }
 
         return true
