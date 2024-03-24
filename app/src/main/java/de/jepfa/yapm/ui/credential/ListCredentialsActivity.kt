@@ -2,9 +2,7 @@ package de.jepfa.yapm.ui.credential
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.ActivityManager
 import android.app.SearchManager
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -23,6 +21,7 @@ import android.text.SpannableStringBuilder
 import android.text.format.Formatter
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
+import android.util.Base64
 import android.util.Log
 import android.view.*
 import android.view.autofill.AutofillManager
@@ -47,6 +46,7 @@ import com.google.android.material.navigation.NavigationView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncWebExtension
+import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
@@ -63,6 +63,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_NAV_MENU_ALWAYS_COLLAPSED
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_CREDENTIAL_IDS
 import de.jepfa.yapm.service.PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD
 import de.jepfa.yapm.service.PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_RELOAD
+import de.jepfa.yapm.service.autofill.AutofillCredentialHolder
 import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelFilter.WITH_NO_LABELS_ID
@@ -70,6 +71,7 @@ import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.net.HttpServer
 import de.jepfa.yapm.service.net.HttpServer.shutdownAllAsync
 import de.jepfa.yapm.service.net.HttpServer.startAllServersAsync
+import de.jepfa.yapm.service.net.HttpServer.toErrorResponse
 import de.jepfa.yapm.service.notification.NotificationService
 import de.jepfa.yapm.service.notification.ReminderService
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
@@ -120,6 +122,8 @@ import java.util.*
 class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.OnNavigationItemSelectedListener,
     HttpServer.Listener {
 
+    enum class CredentialRequestState {nothing, requesting, accepted, denied, fulfilled}
+
     private var serverViewStateText: String = ""
     private lateinit var serverViewSwitch: SwitchCompat
     private lateinit var serverViewDetails: TextView
@@ -148,7 +152,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private var jumpToUuid: UUID? = null
     private var jumpToItemPosition: Int? = null
 
-
+    private var webClientCredentialRequestState = CredentialRequestState.nothing
+    private var webClientRequestIdentifier: String? = null
 
     private fun getDeviceName(): String? {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
@@ -445,20 +450,86 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         message: JSONObject
     ): Pair<HttpStatusCode, JSONObject> {
         Log.d("HTTP", "credential request callback")
-        CoroutineScope(Dispatchers.Main).launch {
 
-            AlertDialog.Builder(this@ListCredentialsActivity)
-                .setTitle("Incoming password request")
-                .setMessage("Accept?")
-                .setPositiveButton("Accept", null)
-                .setNegativeButton("Deny", null)
-                .show()
+        val requestIdentifier = message.getString("requestIdentifier")
+        val website = message.getString("website")
 
-            startSearchFor("test", commit = true)
+        if (webClientCredentialRequestState == CredentialRequestState.nothing
+            || webClientCredentialRequestState == CredentialRequestState.fulfilled
+            || (webClientRequestIdentifier != requestIdentifier)) {
+            webClientCredentialRequestState = CredentialRequestState.requesting
+            webClientRequestIdentifier = requestIdentifier
+
+            val key = masterSecretKey
+
+            if (key == null) {
+                return toErrorResponse(HttpStatusCode.Unauthorized, "locked")
+            }
+            else {
+                CoroutineScope(Dispatchers.Main).launch {
+
+                    val sharedBaseKey = SecretService.decryptKey(key, webExtension.sharedBaseKey)
+                    val requestIdentifierKey = Key(Base64.decode(webClientRequestIdentifier, 0))
+                    val fingerprintAsKey = SecretService.conjunctKeys(sharedBaseKey, requestIdentifierKey)
+
+                    val fingerprint = fingerprintAsKey.toBase64String()
+                        .replace(Regex("[^a-zA-Z0-9]"), "")
+                        .substring(0, 6)
+                        .lowercase()
+
+                    val shortenedFingerprint = fingerprint.substring(0, 2) + "-" + fingerprint.substring(2, 4) + "-" + fingerprint.substring(4, 6)
+
+
+                    AlertDialog.Builder(this@ListCredentialsActivity)
+                        .setTitle("Incoming password request")
+                        .setMessage("Fingerprint: $shortenedFingerprint. Accept?")
+                        .setPositiveButton("Accept") { _, _ ->
+                            webClientCredentialRequestState = CredentialRequestState.accepted
+                            startSearchFor(website, commit = true)
+
+                        }
+                        .setNegativeButton("Deny") { _, _ ->
+                            webClientCredentialRequestState = CredentialRequestState.denied
+                        }.show()
+                }
+
+                return toErrorResponse(HttpStatusCode.NotFound, "no user acknowledge")
+            }
         }
-        val response = JSONObject()
-        response.put("passwd", "Fake_passwd-"+ SecretService.getSecureRandom(null).nextLong())
-        return Pair(HttpStatusCode.OK, response)
+        else if (webClientCredentialRequestState == CredentialRequestState.denied) {
+            webClientRequestIdentifier = null
+            // TODO send something back to indicate the web client to stop polling
+
+            return toErrorResponse(HttpStatusCode.Forbidden, "denied by user")
+        }
+        else if (webClientCredentialRequestState == CredentialRequestState.accepted) {
+           // if a new holder holds a selected cred like AutofillCredentialHolder
+            if (!true) {
+                if (webClientRequestIdentifier != requestIdentifier) {
+                    return toErrorResponse(HttpStatusCode.BadRequest, "wrong request identifier")
+                }
+                webClientRequestIdentifier = null
+                webClientCredentialRequestState = CredentialRequestState.fulfilled
+
+                //TODO send credentials back
+                val response = JSONObject()
+                response.put("password", "test-password")
+
+                return Pair(HttpStatusCode.OK, response)
+            }
+            else {
+                // waiting for user s selection
+                return toErrorResponse(HttpStatusCode.NotFound, "no user selection")
+            }
+        }
+        else if (webClientCredentialRequestState == CredentialRequestState.fulfilled) {
+            webClientRequestIdentifier = null
+            // TODO send something back to indicate the web client to stop polling
+            return toErrorResponse(HttpStatusCode.BadRequest, "still provided")
+        }
+        else {
+            return toErrorResponse(HttpStatusCode.InternalServerError, "unhandled request state: $webClientCredentialRequestState")
+        }
     }
 
     private fun reflectServerStarted(
