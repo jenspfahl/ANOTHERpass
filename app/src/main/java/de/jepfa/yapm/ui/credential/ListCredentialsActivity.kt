@@ -113,6 +113,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.asCompletableFuture
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import java.net.MalformedURLException
+import java.net.URL
 import java.util.*
 
 
@@ -122,7 +124,11 @@ import java.util.*
 class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.OnNavigationItemSelectedListener,
     HttpServer.Listener {
 
-    enum class CredentialRequestState {nothing, requesting, accepted, denied, fulfilled}
+    /**
+     * Incoming -> Requesting -> Accepted -> Fulfilled
+     *                        -> Denied
+     */
+    enum class CredentialRequestState {Incoming, Requesting, Accepted, Denied, Fulfilled}
 
     private var serverViewStateText: String = ""
     private lateinit var serverViewSwitch: SwitchCompat
@@ -152,7 +158,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private var jumpToUuid: UUID? = null
     private var jumpToItemPosition: Int? = null
 
-    private var webClientCredentialRequestState = CredentialRequestState.nothing
+    private var webClientCredentialRequestState = CredentialRequestState.Incoming
     private var webClientRequestIdentifier: String? = null
 
     private fun getDeviceName(): String? {
@@ -289,6 +295,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
                     CoroutineScope(Dispatchers.Main).launch {
                         serverViewSwitch.isEnabled = true
+
+                        webClientRequestIdentifier = null
+                        webClientCredentialRequestState = CredentialRequestState.Incoming
 
                         if (e != null) {
                             Log.w("HTTP", e)
@@ -451,69 +460,77 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     ): Pair<HttpStatusCode, JSONObject> {
         Log.d("HTTP", "credential request callback")
 
+        val key = masterSecretKey ?: return toErrorResponse(HttpStatusCode.Unauthorized, "locked")
+
         val requestIdentifier = message.getString("requestIdentifier")
         val website = message.getString("website")
 
-        if (webClientCredentialRequestState == CredentialRequestState.nothing
-            || webClientCredentialRequestState == CredentialRequestState.fulfilled
-            || (webClientRequestIdentifier != requestIdentifier)) {
-            webClientCredentialRequestState = CredentialRequestState.requesting
+        if (webClientRequestIdentifier != requestIdentifier
+            && webClientCredentialRequestState != CredentialRequestState.Requesting) {
+            Log.i("HTTP", "new credential request $requestIdentifier for $webClientId")
+            webClientCredentialRequestState = CredentialRequestState.Incoming
             webClientRequestIdentifier = requestIdentifier
 
-            val key = masterSecretKey
-
-            if (key == null) {
-                return toErrorResponse(HttpStatusCode.Unauthorized, "locked")
-            }
-            else {
-                CoroutineScope(Dispatchers.Main).launch {
-
-                    val sharedBaseKey = SecretService.decryptKey(key, webExtension.sharedBaseKey)
-                    val requestIdentifierKey = Key(Base64.decode(webClientRequestIdentifier, 0))
-                    val fingerprintAsKey = SecretService.conjunctKeys(sharedBaseKey, requestIdentifierKey)
-
-                    val fingerprint = fingerprintAsKey.toBase64String()
-                        .replace(Regex("[^a-zA-Z0-9]"), "")
-                        .substring(0, 6)
-                        .lowercase()
-
-                    val shortenedFingerprint = fingerprint.substring(0, 2) + "-" + fingerprint.substring(2, 4) + "-" + fingerprint.substring(4, 6)
-
-
-                    AlertDialog.Builder(this@ListCredentialsActivity)
-                        .setTitle("Incoming password request")
-                        .setMessage("Fingerprint: $shortenedFingerprint. Accept?")
-                        .setPositiveButton("Accept") { _, _ ->
-                            webClientCredentialRequestState = CredentialRequestState.accepted
-                            startSearchFor(website, commit = true)
-
-                        }
-                        .setNegativeButton("Deny") { _, _ ->
-                            webClientCredentialRequestState = CredentialRequestState.denied
-                        }.show()
-                }
-
-                return toErrorResponse(HttpStatusCode.NotFound, "no user acknowledge")
-            }
         }
-        else if (webClientCredentialRequestState == CredentialRequestState.denied) {
+
+        if (webClientCredentialRequestState == CredentialRequestState.Incoming) {
+            webClientCredentialRequestState = CredentialRequestState.Requesting
+
+            CoroutineScope(Dispatchers.Main).launch {
+
+                val sharedBaseKey = SecretService.decryptKey(key, webExtension.sharedBaseKey)
+                val requestIdentifierKey = Key(Base64.decode(webClientRequestIdentifier, 0))
+                val fingerprintAsKey = SecretService.conjunctKeys(sharedBaseKey, requestIdentifierKey)
+
+                val shortenedFingerprint = fingerprintAsKey.toShortenedFingerprint()
+
+                AlertDialog.Builder(this@ListCredentialsActivity)
+                    .setTitle("Incoming credential request")
+                    .setMessage("There is an incoming credential request from '$webClientId'. Request fingerprint displayed in the extension should be the same as: $shortenedFingerprint. Accept?")
+                    .setPositiveButton("Accept") { v, _ ->
+                        webClientCredentialRequestState = CredentialRequestState.Accepted
+                        startSearchFor(extractDomain(website), commit = true)
+                        v.dismiss()
+                    }
+                    .setNegativeButton("Deny") { v, _ ->
+                        webClientCredentialRequestState = CredentialRequestState.Denied
+                        v.dismiss()
+                    }.show()
+            }
+
+            return toErrorResponse(HttpStatusCode.NotFound, "no user acknowledge")
+        }
+        else if (webClientCredentialRequestState == CredentialRequestState.Requesting) {
+            return toErrorResponse(HttpStatusCode.NotFound, "pending request")
+        }
+        else if (webClientCredentialRequestState == CredentialRequestState.Denied) {
             webClientRequestIdentifier = null
-            // TODO send something back to indicate the web client to stop polling
 
             return toErrorResponse(HttpStatusCode.Forbidden, "denied by user")
         }
-        else if (webClientCredentialRequestState == CredentialRequestState.accepted) {
+        else if (webClientCredentialRequestState == CredentialRequestState.Accepted) {
            // if a new holder holds a selected cred like AutofillCredentialHolder
-            if (!true) {
+            val currCredential = AutofillCredentialHolder.currentCredential
+            if (currCredential != null) {
                 if (webClientRequestIdentifier != requestIdentifier) {
                     return toErrorResponse(HttpStatusCode.BadRequest, "wrong request identifier")
                 }
-                webClientRequestIdentifier = null
-                webClientCredentialRequestState = CredentialRequestState.fulfilled
+                val password = SecretService.decryptPassword(key, currCredential.password)
+                val name = SecretService.decryptCommonString(key, currCredential.name)
+                AutofillCredentialHolder.obfuscationKey?.let {
+                    password.deobfuscate(it)
+                }
 
-                //TODO send credentials back
                 val response = JSONObject()
-                response.put("password", "test-password")
+                response.put("password", password.toRawFormattedPassword())
+                password.clear()
+
+                webClientRequestIdentifier = null
+                webClientCredentialRequestState = CredentialRequestState.Fulfilled
+
+                CoroutineScope(Dispatchers.Main).launch {
+                    toastText(this@ListCredentialsActivity, "Credential '$name' posted")
+                }
 
                 return Pair(HttpStatusCode.OK, response)
             }
@@ -522,13 +539,22 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 return toErrorResponse(HttpStatusCode.NotFound, "no user selection")
             }
         }
-        else if (webClientCredentialRequestState == CredentialRequestState.fulfilled) {
+        else if (webClientCredentialRequestState == CredentialRequestState.Fulfilled) {
             webClientRequestIdentifier = null
             // TODO send something back to indicate the web client to stop polling
             return toErrorResponse(HttpStatusCode.BadRequest, "still provided")
         }
         else {
             return toErrorResponse(HttpStatusCode.InternalServerError, "unhandled request state: $webClientCredentialRequestState")
+        }
+    }
+
+    private fun extractDomain(website: String): String {
+        try {
+            val host = URL(website).host.lowercase()
+            return host.substringBeforeLast(".").substringAfterLast(".")
+        } catch (e: MalformedURLException) {
+            return website.lowercase()
         }
     }
 

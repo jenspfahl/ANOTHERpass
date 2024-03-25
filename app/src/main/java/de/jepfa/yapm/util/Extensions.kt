@@ -212,3 +212,4 @@ fun ByteArray.sha256(): ByteArray {
 fun ByteArray.toHex(separator: String = ""): String = joinToString(separator) { eachByte ->
     "%02x".format(eachByte)
 }
+

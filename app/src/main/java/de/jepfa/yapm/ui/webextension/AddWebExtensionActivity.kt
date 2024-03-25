@@ -315,12 +315,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
                 jwk.put("e", eServerBase64)
 
                 val nServerHashed = nServerBase64.toByteArray().sha256()
-                val serverPubKeyFingerprint = Base64.encodeToString(nServerHashed, Base64.DEFAULT)
-                    .replace(Regex("[^a-zA-Z0-9]"), "")
-                    .substring(0, 6)
-                    .lowercase()
-
-                val shortenedServerPubKeyFingerprint = serverPubKeyFingerprint.substring(0, 2) + "-" + serverPubKeyFingerprint.substring(2, 4) + "-" + serverPubKeyFingerprint.substring(4, 6)
+                val shortenedServerPubKeyFingerprint = Key(nServerHashed).toShortenedFingerprint()
 
                 val response = JSONObject()
                 response.put("serverPubKey", jwk)

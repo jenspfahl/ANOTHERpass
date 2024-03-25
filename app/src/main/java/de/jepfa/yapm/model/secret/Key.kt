@@ -17,4 +17,13 @@ class Key : Secret {
     fun toBase64String(): String {
         return Base64.encodeToString(this.data, 0)
     }
+
+    fun toShortenedFingerprint(): String {
+        val f = toBase64String()
+        .replace(Regex("[^a-z]", RegexOption.IGNORE_CASE), "")
+        .substring(0, 6)
+        .lowercase()
+
+        return f.substring(0, 3) + "-" + f.substring(3, 6)
+    }
 }
