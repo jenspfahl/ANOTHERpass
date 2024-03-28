@@ -10,9 +10,12 @@ import android.text.format.Formatter
 import android.util.Base64
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
@@ -21,6 +24,7 @@ import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.service.net.HttpServer
 import de.jepfa.yapm.service.net.HttpServer.toErrorResponse
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.ui.AsyncWithProgressBar
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.importread.ReadActivityBase
 import de.jepfa.yapm.usecase.webextension.DeleteWebExtensionUseCase
@@ -34,6 +38,7 @@ import org.json.JSONObject
 
 class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
 
+    private lateinit var progressBar: ProgressBar
     private var webExtension: EncWebExtension? = null
     private var webClientId: String? = null
     private lateinit var saveButton: Button
@@ -55,8 +60,10 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
         webClientIdTextView = findViewById(R.id.web_extension_client_id)
         serverAddressTextView = findViewById(R.id.web_extension_server_address)
 
+        serverAddressTextView.text = HttpServer.getHostAddress(this)
 
-        serverAddressTextView.text = getHostAddress()
+        progressBar = getProgressBar()!!
+
 
         saveButton = findViewById(R.id.button_save)
         saveButton.setOnClickListener {
@@ -231,27 +238,6 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
         }
     }
 
-    private fun getHostAddress(): String {
-        val wifiManager = getSystemService(WIFI_SERVICE) as WifiManager
-        val ipAddress =
-            Formatter.formatIpAddress(wifiManager.connectionInfo.ipAddress)
-        val deviceName = getDeviceName()
-
-        return if (deviceName != null) {
-            "$ipAddress ($deviceName)"
-        } else {
-            "$ipAddress"
-        }
-    }
-
-
-    private fun getDeviceName(): String? {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            return Settings.Global.getString(contentResolver, Settings.Global.DEVICE_NAME)
-        }
-        return null
-    }
-
     override fun handleHttpRequest(
         action: HttpServer.Action,
         webClientId: String,
@@ -299,7 +285,11 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
                 webExtensionViewModel.save(webExtension, this)
 
 
-                // generate and store server pubkey //TODO block ui since it takes time ... --> move thid into a UseCase
+                // generate and store server RSA key pair
+                CoroutineScope(Dispatchers.Main).launch {
+                    showProgressBar()
+                }
+
                 val serverKeyPair = SecretService.generateRsaKeyPair(webExtension.getServerKeyPairAlias(), this, workaroundMode = true)
                 val serverPublicKeyData = SecretService.getRsaPublicKeyData(serverKeyPair.public)
 
@@ -321,8 +311,10 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
                 response.put("serverPubKey", jwk)
                 response.put("sharedBaseKey", sharedBaseKeyBase64)
 
-
+            
                 CoroutineScope(Dispatchers.Main).launch {
+                    hideProgressBar()
+
                     AlertDialog.Builder(this@AddWebExtensionActivity)
                         .setTitle("Linking device $webClientId")
                         .setMessage("Ensure that the fingerprint shown here is the same as displayed in the linked browser: " + shortenedServerPubKeyFingerprint)
@@ -353,6 +345,20 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
         }
         // no key / logged out
         return toErrorResponse(HttpStatusCode.Forbidden, "locked")
+    }
+
+    private fun showProgressBar() {
+        progressBar.visibility = View.VISIBLE
+        window?.setFlags(
+            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+    }
+
+
+    private fun hideProgressBar() {
+        progressBar.visibility = View.INVISIBLE
+        window?.clearFlags(
+            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
     }
 
 }

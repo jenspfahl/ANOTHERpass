@@ -1,14 +1,21 @@
 package de.jepfa.yapm.service.net
 
 import android.content.Context
+import android.net.wifi.WifiManager
+import android.os.Build
+import android.provider.Settings
+import android.text.format.Formatter
 import android.util.Base64
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.getSystemService
 import de.jepfa.yapm.model.Validable.Companion.FAILED_STRING
 import de.jepfa.yapm.model.encrypted.EncWebExtension
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.encrypted.EncryptedType
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.SecretKeyHolder
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.getServerPublicKey
 import de.jepfa.yapm.ui.SecureActivity
@@ -404,11 +411,32 @@ object HttpServer {
 
         val serverNameFromClientPerspective = jsonBody.optString("configuredServer")
         if (serverNameFromClientPerspective.isNotBlank()) {
-            //TODO store it in the prefs
+            PreferenceService.putString(PreferenceService.DATA_HOST_NAME, serverNameFromClientPerspective, context)
         }
         Log.d("HTTP","unwrapped request: " + jsonBody.toString(4))
 
         return jsonBody
+    }
+
+    fun getHostAddress(context: Context): String {
+        val wifiManager = context.getSystemService(AppCompatActivity.WIFI_SERVICE) as WifiManager
+        val ipAddress =
+            Formatter.formatIpAddress(wifiManager.connectionInfo.ipAddress)
+        val deviceName = getDeviceName(context)
+
+        return if (deviceName != null) {
+            "$ipAddress ($deviceName)"
+        } else {
+            "$ipAddress"
+        }
+    }
+
+    fun getDeviceName(context: Context): String? {
+        var deviceName = PreferenceService.getAsString(PreferenceService.DATA_HOST_NAME, context)
+        if (deviceName == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            return Settings.Global.getString(context.contentResolver, Settings.Global.DEVICE_NAME)
+        }
+        return deviceName
     }
 
 

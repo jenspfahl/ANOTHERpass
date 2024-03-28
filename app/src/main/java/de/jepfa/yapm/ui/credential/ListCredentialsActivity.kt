@@ -558,27 +558,16 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
     }
 
-    private fun reflectServerStarted(
-    ) {
-        val wifiManager = getSystemService(WIFI_SERVICE) as WifiManager
-        val ipAddress =
-            Formatter.formatIpAddress(wifiManager.connectionInfo.ipAddress)
-        val deviceName = getDeviceName()
+    private fun reflectServerStarted() {
         serverViewStateText = "Listening ..."
         serverViewState.text = serverViewStateText
         serverViewState.setTypeface(null, Typeface.BOLD)
         serverViewDetails.visibility = ViewGroup.VISIBLE
-        if (deviceName != null) {
-            serverViewDetails.text = "$ipAddress ($deviceName)"
-        }
-        else {
-            serverViewDetails.text = "$ipAddress"
-        }
+        serverViewDetails.text = HttpServer.getHostAddress(this)
         serverView.setBackgroundColor(getColor(R.color.colorServer))
     }
 
-    private fun reflectServerStopped(
-    ) {
+    private fun reflectServerStopped() {
         serverViewStateText = "Stopped"
         serverViewState.text = serverViewStateText
         serverView.background = null
