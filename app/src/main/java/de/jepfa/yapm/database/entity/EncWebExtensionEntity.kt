@@ -13,7 +13,7 @@ data class EncWebExtensionEntity(
     @PrimaryKey(autoGenerate = true) val id: Int?,
     var webClientId: String,
     var title: String,
-    var extensionPublicKeyAlias: String,
+    var extensionPublicKey: String,
     var sharedBaseKey: String,
     var linked: Boolean,
     var enabled: Boolean,

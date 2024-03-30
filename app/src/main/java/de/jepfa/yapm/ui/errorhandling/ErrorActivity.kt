@@ -61,7 +61,7 @@ class ErrorActivity : AppCompatActivity() {
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.ok) { dialog, whichButton ->
                     ClipboardUtil.copy("bug report", errorText, this)
-                    val errorTextUrlSafe = URLEncoder.encode(errorText.toString(), "UTF-8")
+                    val errorTextUrlSafe = URLEncoder.encode(errorText, "UTF-8").take(6000)
                     val anonymizedVaultId = SaltService.getAnonymizedVaultId(this)
                     val bugReportUrl = Constants.BUG_REPORT_SITE.format("Error report from user ($anonymizedVaultId)", errorTextUrlSafe)
                     val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(bugReportUrl))

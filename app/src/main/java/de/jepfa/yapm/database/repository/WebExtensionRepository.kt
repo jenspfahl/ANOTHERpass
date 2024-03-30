@@ -63,7 +63,7 @@ class WebExtensionRepository(private val encWebExtensionDao: EncWebExtensionDao)
         return EncWebExtension(entity.id,
             entity.webClientId,
             entity.title,
-            entity.extensionPublicKeyAlias,
+            entity.extensionPublicKey,
             entity.sharedBaseKey,
             entity.linked,
             entity.enabled,
