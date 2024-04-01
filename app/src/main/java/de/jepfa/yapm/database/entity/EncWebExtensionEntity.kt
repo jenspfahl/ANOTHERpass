@@ -8,7 +8,7 @@ import de.jepfa.yapm.model.encrypted.Encrypted
 /**
  * Encrypted linked web extensions
  */
-@Entity(indices = arrayOf(Index("webClientId", unique = true)))
+@Entity
 data class EncWebExtensionEntity(
     @PrimaryKey(autoGenerate = true) val id: Int?,
     var webClientId: String,
