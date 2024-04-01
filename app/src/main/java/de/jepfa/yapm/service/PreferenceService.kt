@@ -175,8 +175,6 @@ object PreferenceService {
     const val TEMP_BLOB_USERNAME_TEMPLATES = TEMP_PREFIX + "blob_username_templates"
     const val TEMP_BLOB_SETTINGS = TEMP_PREFIX + "blob_settings"
 
-    const val DATA_HOST_NAME = DATA_PREFIX + "host_name"
-
 
     private lateinit var prefs: SharedPreferences
 

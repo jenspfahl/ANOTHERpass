@@ -1,12 +1,8 @@
 package de.jepfa.yapm.ui.webextension
 
 import android.content.Intent
-import android.net.wifi.WifiManager
-import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.text.TextUtils
-import android.text.format.Formatter
 import android.util.Base64
 import android.util.Log
 import android.view.MenuItem
@@ -24,7 +20,6 @@ import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.service.net.HttpServer
 import de.jepfa.yapm.service.net.HttpServer.toErrorResponse
 import de.jepfa.yapm.service.secret.SecretService
-import de.jepfa.yapm.ui.AsyncWithProgressBar
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.importread.ReadActivityBase
 import de.jepfa.yapm.usecase.webextension.DeleteWebExtensionUseCase
@@ -60,7 +55,9 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
         webClientIdTextView = findViewById(R.id.web_extension_client_id)
         serverAddressTextView = findViewById(R.id.web_extension_server_address)
 
-        serverAddressTextView.text = HttpServer.getHostAddress(this)
+        serverAddressTextView.text = HttpServer.getHostNameOrIp(this) {
+            serverAddressTextView.text = it
+        }
 
         progressBar = getProgressBar()!!
 

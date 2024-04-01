@@ -10,7 +10,6 @@ import android.database.Cursor
 import android.database.MatrixCursor
 import android.graphics.Bitmap
 import android.graphics.Typeface
-import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -18,7 +17,6 @@ import android.provider.BaseColumns
 import android.provider.Settings
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
-import android.text.format.Formatter
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.util.Base64
@@ -563,7 +561,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         serverViewState.text = serverViewStateText
         serverViewState.setTypeface(null, Typeface.BOLD)
         serverViewDetails.visibility = ViewGroup.VISIBLE
-        serverViewDetails.text = HttpServer.getHostAddress(this)
+        serverViewDetails.text = HttpServer.getHostNameOrIp(this) {
+            serverViewDetails.text = it
+        }
         serverView.setBackgroundColor(getColor(R.color.colorServer))
     }
 
