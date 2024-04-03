@@ -1,18 +1,22 @@
 package de.jepfa.yapm.service.net
 
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.net.wifi.WifiManager
 import android.text.format.Formatter
 import android.util.Base64
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.getSystemService
 import de.jepfa.yapm.model.Validable.Companion.FAILED_STRING
 import de.jepfa.yapm.model.encrypted.EncWebExtension
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.encrypted.EncryptedType
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.SecretKeyHolder
-import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.util.sha256
@@ -42,15 +46,25 @@ object HttpServer {
 
     enum class Action {LINKING, REQUEST_CREDENTIAL}
 
-    interface Listener {
+    interface HttpServerCallback {
+        fun handleOnWifiEstablished()
+        fun handleOnWifiUnavailable()
+        fun handleOnIncomingRequest(webClientId: String?)
+    }
+
+    interface HttpCallback {
         fun handleHttpRequest(action: Action, webClientId: String, webExtension: EncWebExtension, message: JSONObject): Pair<HttpStatusCode, JSONObject>
     }
+
 
     private var httpsServer: NettyApplicationEngine? = null
     private var httpServer: NettyApplicationEngine? = null
 
-    var linkListener: Listener? = null
-    var requestCredentialListener: Listener? = null
+    private var isHttpsServerRunning = false
+    private var isHttpServerRunning = false
+
+    var linkHttpCallback: HttpCallback? = null
+    var requestCredentialHttpCallback: HttpCallback? = null
 
     fun startWebServerAsync(_port: Int, activity: SecureActivity): Deferred<Boolean> {
 
@@ -105,16 +119,19 @@ object HttpServer {
                 Log.i("HTTP", "launch Web server")
                 httpsServer?.start(wait = false)
                 Log.i("HTTP", "TLS server started")
+                isHttpsServerRunning = true
                 true
             } catch (e: Exception) {
                 Log.e("HTTP", e.toString())
+                isHttpsServerRunning = false
                 false
             }
         }
     }
 
-    fun startApiServerAsync(_port: Int, activity: SecureActivity,
-                            pingHandler: (String) -> Unit,
+    fun startApiServerAsync(
+        _port: Int, activity: SecureActivity,
+        httpServerCallback: HttpServerCallback,
     ): Deferred<Boolean> {
         return CoroutineScope(Dispatchers.IO).async {
 
@@ -160,7 +177,7 @@ object HttpServer {
                                     )
 
                                     val webClientId = call.request.headers["X-WebClientId"]
-                                    pingHandler(webClientId ?: "Unknown")
+                                    httpServerCallback.handleOnIncomingRequest(webClientId)
 
                                     if (webClientId == null) {
                                         //fail
@@ -295,9 +312,11 @@ object HttpServer {
                 httpServer = embeddedServer(Netty, environment)
                 httpServer?.start(wait = false)
                 Log.i("HTTP", "API server started")
+                isHttpServerRunning = true
                 true
             } catch (e: Exception) {
                 Log.e("HTTP", e.toString())
+                isHttpServerRunning = false
                 false
             }
         }
@@ -305,7 +324,7 @@ object HttpServer {
 
     fun startAllServersAsync(
         activity: SecureActivity,
-        pingHandler: (String) -> Unit,
+        httpServerCallback: HttpServerCallback,
     ): Deferred<Boolean> {
 
         return CoroutineScope(Dispatchers.IO).async {
@@ -314,28 +333,96 @@ object HttpServer {
             val shutdownOk = shutdownAllAsync().await()
             Log.i("HTTP", "shutdownOk=$shutdownOk")
 
+            if (!isWifiEnabled(activity)) {
+                Log.w("HTTP", "Wifi not enabled")
+                return@async false
+            }
+
             val startWebServerAsync = startWebServerAsync(8000, activity)
-            val startApiServerAsync = startApiServerAsync(8001, activity, pingHandler)
+            val startApiServerAsync = startApiServerAsync(8001, activity, httpServerCallback)
             Log.i("HTTP", "awaiting start")
 
             val (successWebServer, successApiServer) = awaitAll(startWebServerAsync, startApiServerAsync)
             Log.i("HTTP", "successWebServer = $successWebServer")
             Log.i("HTTP", "successApiServer = $successApiServer")
 
+            monitorWifiEnablement(activity, httpServerCallback)
+
             successWebServer && successApiServer
         }
 
     }
 
+    fun isWifiEnabled(activity: SecureActivity): Boolean {
+        val wifi = activity.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        return wifi.isWifiEnabled
+    }
+
+    private fun monitorWifiEnablement(
+        activity: SecureActivity,
+        httpServerCallback: HttpServerCallback
+    ) {
+        val networkRequest = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED) // with trusted, we exclude unknown wifi AP
+            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+            .build()
+
+        val networkCallback = object : ConnectivityManager.NetworkCallback() {
+            // network is available for use
+            override fun onAvailable(network: Network) {
+                super.onAvailable(network)
+                if (isRunning()) {
+                    httpServerCallback.handleOnWifiEstablished()
+                }
+            }
+
+            // Network capabilities have changed for the network
+            override fun onCapabilitiesChanged(
+                network: Network,
+                networkCapabilities: NetworkCapabilities
+            ) {
+                super.onCapabilitiesChanged(network, networkCapabilities)
+                val unmetered =
+                    networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
+            }
+
+            // lost network connection
+            override fun onLost(network: Network) {
+                super.onLost(network)
+                if (isRunning()) {
+                    httpServerCallback.handleOnWifiUnavailable()
+                }
+            }
+
+            override fun onUnavailable() {
+                super.onUnavailable()
+                if (isRunning()) {
+                    httpServerCallback.handleOnWifiUnavailable()
+                }
+            }
+        }
+
+
+        val connectivityManager =
+            activity.getSystemService(ConnectivityManager::class.java) as ConnectivityManager
+        connectivityManager.requestNetwork(networkRequest, networkCallback)
+    }
+
+    fun isRunning(): Boolean {
+        return isHttpsServerRunning && isHttpServerRunning
+    }
+
     fun shutdownAllAsync() : Deferred<Boolean> {
-        linkListener = null
-        requestCredentialListener = null
+        linkHttpCallback = null
+        requestCredentialHttpCallback = null
         return CoroutineScope(Dispatchers.IO).async {
             try {
                 Log.i("HTTP", "shutdown all")
 
                 httpsServer?.stop()
+                isHttpsServerRunning = false
                 httpServer?.stop()
+                isHttpServerRunning = false
                 Log.i("HTTP", "shutdown done")
 
                 true
@@ -416,7 +503,7 @@ object HttpServer {
             Formatter.formatIpAddress(wifiManager.connectionInfo.ipAddress)
         getHostName(ipAddress) { hostName ->
             CoroutineScope(Dispatchers.Main).launch {
-                if (hostName != null) {
+                if (hostName != null && hostName != ipAddress) {
                     getHostNameCallback("${hostName.lowercase()} ($ipAddress)")
                 } else {
                     getHostNameCallback("$ipAddress")
@@ -506,7 +593,7 @@ object HttpServer {
         message: JSONObject,
     ): Pair<HttpStatusCode, JSONObject>? {
         Log.d("HTTP", "linking ...")
-        return linkListener?.handleHttpRequest(action, webClientId, webExtension, message)
+        return linkHttpCallback?.handleHttpRequest(action, webClientId, webExtension, message)
     }
 
     private fun handleRequestCredential(
@@ -516,7 +603,7 @@ object HttpServer {
         message: JSONObject,
     ): Pair<HttpStatusCode, JSONObject>? {
         Log.d("HTTP", "credential request ...")
-        return requestCredentialListener?.handleHttpRequest(action, webClientId, webExtension, message)
+        return requestCredentialHttpCallback?.handleHttpRequest(action, webClientId, webExtension, message)
     }
 
     // doesn't work like browser fingerprints ...

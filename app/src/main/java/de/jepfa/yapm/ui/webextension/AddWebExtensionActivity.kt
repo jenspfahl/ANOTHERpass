@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 
-class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
+class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
 
     private lateinit var progressBar: ProgressBar
     private var webExtension: EncWebExtension? = null
@@ -91,7 +91,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
 
         }
 
-        HttpServer.linkListener = this
+        HttpServer.linkHttpCallback = this
     }
 
     private fun hasQrCodeScanned() = webClientId != null
@@ -163,7 +163,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.Listener {
     }
 
     override fun onDestroy() {
-        HttpServer.linkListener = null
+        HttpServer.linkHttpCallback = null
         super.onDestroy()
     }
 

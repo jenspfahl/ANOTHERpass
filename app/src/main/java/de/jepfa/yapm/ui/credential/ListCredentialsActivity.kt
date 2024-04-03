@@ -120,7 +120,7 @@ import java.util.*
  * This is the main activity
  */
 class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.OnNavigationItemSelectedListener,
-    HttpServer.Listener {
+    HttpServer.HttpCallback, HttpServer.HttpServerCallback {
 
     /**
      * Incoming -> Requesting -> Accepted -> Fulfilled
@@ -133,6 +133,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private lateinit var serverViewDetails: TextView
     private lateinit var serverViewState: TextView
     private lateinit var serverView: LinearLayout
+    private var wasWifiLost = false
 
     private var navMenuQuickAccessVisible = true
     private var navMenuExportVisible = false
@@ -158,13 +159,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     private var webClientCredentialRequestState = CredentialRequestState.Incoming
     private var webClientRequestIdentifier: String? = null
-
-    private fun getDeviceName(): String? {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            return Settings.Global.getString(contentResolver, Settings.Global.DEVICE_NAME)
-        }
-        return null
-    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -225,8 +219,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 popup.setOnMenuItemClickListener { item ->
                     when (item.itemId) {
                         R.id.menu_server_link_add -> {
-                            if (!serverViewSwitch.isChecked) {
+                            if (!HttpServer.isRunning()) {
                                 toastText(this, "Please start the server first")
+                            }
+                            else if (!HttpServer.isWifiEnabled(this)) {
+                                toastText(this, "Please enable Wifi first")
                             }
                             else {
                                 val intent = Intent(this, AddWebExtensionActivity::class.java)
@@ -254,15 +251,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 serverViewStateText = "Starting ..."
                 serverViewState.text = serverViewStateText
                 serverViewSwitch.isEnabled = false
-                startAllServersAsync(this) { webClientId ->
-                    CoroutineScope(Dispatchers.Main).launch {
-                        // this code wil lbe executed on ALL activities!
-                        serverViewState.text = "Responding to $webClientId ..."
-                        Handler().postDelayed({
-                            serverViewState.text = serverViewStateText
-                        }, 2000)
-                    }
-                }.asCompletableFuture().whenComplete { success, e ->
+                startAllServersAsync(this, this).asCompletableFuture().whenComplete { success, e ->
                     Log.i("HTTP", "async server start success: $success")
 
                     CoroutineScope(Dispatchers.Main).launch {
@@ -272,42 +261,48 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                             Log.w("HTTP", e)
                         }
 
-                        if (!success) {
+                        if (success == null || !success) {
                             serverViewSwitch.isChecked = false
-                            toastText(this@ListCredentialsActivity, "Failed to start server")
+                            toastText(this@ListCredentialsActivity, "Failed to start server. Is Wifi enabled?")
                         } else {
                             reflectServerStarted()
                             toastText(this@ListCredentialsActivity, "Server started")
-                            HttpServer.requestCredentialListener = this@ListCredentialsActivity
+                            HttpServer.requestCredentialHttpCallback = this@ListCredentialsActivity
                         }
                     }
                 }
             }
             else {
-                serverViewStateText = "Stopping ..."
-                serverViewState.text = serverViewStateText
-                serverViewSwitch.isEnabled = false
+                if (HttpServer.isRunning()) { // otherwise it is already stopped
+                    serverViewStateText = "Stopping ..."
+                    serverViewState.text = serverViewStateText
+                    serverViewSwitch.isEnabled = false
+                    wasWifiLost = false
 
-                shutdownAllAsync().asCompletableFuture().whenComplete { success, e ->
-                    Log.i("HTTP", "async stop=$success")
+                    shutdownAllAsync().asCompletableFuture().whenComplete { success, e ->
+                        Log.i("HTTP", "async stop=$success")
 
-                    CoroutineScope(Dispatchers.Main).launch {
-                        serverViewSwitch.isEnabled = true
+                        CoroutineScope(Dispatchers.Main).launch {
+                            serverViewSwitch.isEnabled = true
 
-                        webClientRequestIdentifier = null
-                        webClientCredentialRequestState = CredentialRequestState.Incoming
+                            webClientRequestIdentifier = null
+                            webClientCredentialRequestState = CredentialRequestState.Incoming
 
-                        if (e != null) {
-                            Log.w("HTTP", e)
-                        }
-                        if (!success) {
-                            serverViewSwitch.isChecked = true
-                            toastText(this@ListCredentialsActivity, "Failed to stop server")
-                        } else {
-                            reflectServerStopped()
-                            toastText(this@ListCredentialsActivity, "Server stopped")
+                            if (e != null) {
+                                Log.w("HTTP", e)
+                            }
+                            if (success == null || !success) {
+                                serverViewSwitch.isChecked = true
+                                toastText(this@ListCredentialsActivity, "Failed to stop server")
+                            } else {
+                                reflectServerStopped()
+                                toastText(this@ListCredentialsActivity, "Server stopped")
+                            }
                         }
                     }
+                }
+                else {
+                    reflectServerStopped()
                 }
             }
         }
@@ -556,24 +551,39 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
     }
 
-    private fun reflectServerStarted() {
-        serverViewStateText = "Listening ..."
+    private fun reflectServerStarted(msg: String? = null, showIp: Boolean = true) {
+        serverViewStateText = msg?: "Listening ..."
         serverViewState.text = serverViewStateText
         serverViewState.setTypeface(null, Typeface.BOLD)
-        serverViewDetails.visibility = ViewGroup.VISIBLE
-        serverViewDetails.text = HttpServer.getHostNameOrIp(this) {
-            serverViewDetails.text = it
+        if (showIp) {
+            serverViewDetails.visibility = ViewGroup.VISIBLE
+            serverViewDetails.text = HttpServer.getHostNameOrIp(this) {
+                serverViewDetails.text = it
+            }
+        }
+        else {
+            serverViewDetails.text = ""
+            serverViewDetails.visibility = ViewGroup.GONE
         }
         serverView.setBackgroundColor(getColor(R.color.colorServer))
     }
 
-    private fun reflectServerStopped() {
-        serverViewStateText = "Stopped"
+    private fun reflectServerStopped(msg: String? = null) {
+        serverViewStateText = msg ?: "Stopped"
         serverViewState.text = serverViewStateText
         serverView.background = null
         serverViewDetails.text = ""
         serverViewState.setTypeface(null, Typeface.NORMAL)
         serverViewDetails.visibility = ViewGroup.GONE
+    }
+
+    private fun reflectServerState(msg: String? = null, showIp: Boolean = true) {
+        if (serverViewSwitch.isEnabled) {
+            reflectServerStarted(msg, showIp)
+        }
+        else {
+            reflectServerStopped(msg)
+        }
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -1615,6 +1625,36 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             return true
         }
         return false
+    }
+
+    override fun handleOnWifiEstablished() {
+        CoroutineScope(Dispatchers.Main).launch {
+            if (wasWifiLost) {
+                toastText(this@ListCredentialsActivity, "Wifi reconnected")
+            }
+            reflectServerState()
+            wasWifiLost = false
+        }
+    }
+
+    override fun handleOnWifiUnavailable() {
+        CoroutineScope(Dispatchers.Main).launch {
+            if (!wasWifiLost) {
+                toastText(this@ListCredentialsActivity, "Wifi lost or unavailable")
+                wasWifiLost = true
+            }
+            reflectServerState("No Wifi!", showIp = false)
+        }
+    }
+
+    override fun handleOnIncomingRequest(webClientId: String?) {
+        CoroutineScope(Dispatchers.Main).launch {
+            // this code wil lbe executed on ALL activities!
+            reflectServerState("Responding to ${webClientId ?: "Unknown"} ...")
+            Handler().postDelayed({
+                reflectServerState()
+            }, 2000)
+        }
     }
 
 }
