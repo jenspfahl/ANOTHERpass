@@ -1,0 +1,1 @@
+* fix autofill issue (NPE) #67
