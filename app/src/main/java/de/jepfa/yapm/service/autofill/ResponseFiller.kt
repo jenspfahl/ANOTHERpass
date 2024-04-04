@@ -501,7 +501,7 @@ object ResponseFiller {
             node.hintIdEntry?.let { identifyField(it, node, fields) }
         }
         node.htmlInfo?.let { identifyField(it.tag, node, fields) }
-        node.autofillHints?.map { identifyField(it, node, fields) }
+        node.autofillHints?.mapNotNull { identifyField(it, node, fields) }
         node.htmlInfo?.attributes?.mapNotNull {
             if (it.second != null) {
                 identifyField(it.second, node, fields) // this is the value
