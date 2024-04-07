@@ -22,7 +22,7 @@ android {
         minSdkVersion 24
         targetSdkVersion 33
         // format: <XXYYZZZ>
-        // XX=major (breaks compatibility to old apps)
+        // XX=major (breaks compatibility to old apps or includes significant changes)
         // YY=minor (new features)
         // ZZZ=micro (just bugfixes)
     //  versionCode XXYYZZZ

@@ -480,6 +480,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 AlertDialog.Builder(this@ListCredentialsActivity)
                     .setTitle("Incoming credential request")
                     .setMessage("There is an incoming credential request from '$webClientId'. Request fingerprint displayed in the extension should be the same as: $shortenedFingerprint. Accept?")
+                    .setCancelable(false)
                     .setPositiveButton("Accept") { v, _ ->
                         webClientCredentialRequestState = CredentialRequestState.Accepted
                         startSearchFor(extractDomain(website), commit = true)

@@ -10,7 +10,6 @@ import android.text.format.Formatter
 import android.util.Base64
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat.getSystemService
 import de.jepfa.yapm.model.Validable.Companion.FAILED_STRING
 import de.jepfa.yapm.model.encrypted.EncWebExtension
 import de.jepfa.yapm.model.encrypted.Encrypted

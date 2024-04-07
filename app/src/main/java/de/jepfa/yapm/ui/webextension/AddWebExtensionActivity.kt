@@ -17,8 +17,11 @@ import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncWebExtension
 import de.jepfa.yapm.model.secret.Key
+import de.jepfa.yapm.model.session.Session
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.net.HttpServer
 import de.jepfa.yapm.service.net.HttpServer.toErrorResponse
+import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.importread.ReadActivityBase
@@ -33,6 +36,8 @@ import org.json.JSONObject
 
 class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
 
+    private var currentLockTimeout: Int = 0
+    private var currentLogoutTimeout: Int = 0
     private lateinit var progressBar: ProgressBar
     private var webExtension: EncWebExtension? = null
     private var webClientId: String? = null
@@ -49,6 +54,15 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        currentLockTimeout = PreferenceService.getAsInt(PreferenceService.PREF_LOCK_TIMEOUT, this)
+        currentLogoutTimeout = PreferenceService.getAsInt(PreferenceService.PREF_LOGOUT_TIMEOUT, this)
+
+        // give the user at max 15 minutes to hassle with the extension
+        Session.setTimeouts(
+            currentLockTimeout.coerceAtLeast(15),
+            currentLogoutTimeout.coerceAtLeast(15),
+        )
 
         titleTextView = findViewById(R.id.edit_web_extension_title)
         qrCodeScannerImageView = findViewById(R.id.imageview_scan_qrcode)
@@ -102,6 +116,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
             AlertDialog.Builder(this)
                 .setTitle("Cancel linking device $webClientId")
                 .setMessage("Going back will cancel the current linking, sure?")
+                .setCancelable(false)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     removeWebExtension()
 
@@ -164,6 +179,10 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
 
     override fun onDestroy() {
         HttpServer.linkHttpCallback = null
+        Session.setTimeouts(
+            currentLockTimeout,
+            currentLogoutTimeout,
+        )
         super.onDestroy()
     }
 
@@ -307,6 +326,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
                 val response = JSONObject()
                 response.put("serverPubKey", jwk)
                 response.put("sharedBaseKey", sharedBaseKeyBase64)
+                response.put("linkedVaultId", SaltService.getVaultId(this))
 
             
                 CoroutineScope(Dispatchers.Main).launch {
