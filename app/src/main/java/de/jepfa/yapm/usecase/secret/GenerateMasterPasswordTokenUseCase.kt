@@ -105,6 +105,8 @@ object GenerateMasterPasswordTokenUseCase: BasicUseCase<SecureActivity>() {
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE_HEADER, encQrcHeader)
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE, encQrc)
             intent.putExtra(QrCodeActivity.EXTRA_COLOR, Color.BLUE)
+
+            // will be bypassed to NfcActivity
             intent.putExtra(NfcActivity.EXTRA_WITH_APP_RECORD, true)
             intent.putExtra(NfcActivity.EXTRA_PROTECT_COPYING_MPT, true)
 
