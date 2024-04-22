@@ -411,6 +411,7 @@ Deze waarschuwing kunt u deactiveren onder \'Instellingen/Beveiliging\'.</string
   <string name="pref_login_scan_nfctag">Lees het hoofdwachtwoord NFC-tag direct bij het inloggen</string>
   <string name="pref_login_summary_off_scan_nfctag">Het hoofdwachtwoord kan worden gescand/gelezen of handmatig worden ingevoerd</string>
   <string name="pref_login_summary_on_scan_nfc_tag">Opent onmiddellijk de NFC-taglezer als er geen hoofdwachtwoord in de app is opgeslagen en logt u onmiddellijk in nadat het succesvol is gelezen.</string>
+  <string name="pref_hide_number_pad_for_login_title">Don\'t provide an option numeric keyboard for PIN login</string>
   <string name="pref_overlay_enable">Schakel Wachtwoorden tonen boven andere apps in</string>
   <string name="pref_overlay_summary_enable">Boven alle apps wordt een verplaatsbaar wachtwoordvenster weergegeven, zodat het wachtwoord eenvoudig in andere apps kan worden getypt.</string>
   <string name="pref_overlay_transparent_overlay">Transparant wachtwoordvenster</string>

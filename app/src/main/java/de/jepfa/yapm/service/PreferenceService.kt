@@ -102,6 +102,8 @@ object PreferenceService {
     const val PREF_LOCK_TIMEOUT = PREF_PREFIX + "lock_timeout"
     const val PREF_LOGOUT_TIMEOUT = PREF_PREFIX + "logout_timeout"
     const val PREF_WARN_BEFORE_COPY_TO_CB = PREF_PREFIX + "warn_copy_password"
+    const val PREF_SHOW_NUMBER_PAD_FOR_PIN = PREF_PREFIX + "show_number_pad_for_login"
+    const val PREF_HIDE_NUMBER_PAD_FOR_PIN = PREF_PREFIX + "hide_number_pad_for_login"
 
     const val PREF_USE_PREUDO_PHRASE = PREF_PREFIX + "use_pseudo_prase_all_time"
     const val PREF_PASSWD_STRENGTH = PREF_PREFIX + "default_passwd_strength"

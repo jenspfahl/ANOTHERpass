@@ -48,4 +48,11 @@
         app:singleLineTitle="false"
         app:title="@string/pref_login_scan_nfctag"/>
 
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:hide_number_pad_for_login"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:title="@string/pref_hide_number_pad_for_login_title"
+        app:allowDividerAbove="true"/>
+
 </PreferenceScreen>

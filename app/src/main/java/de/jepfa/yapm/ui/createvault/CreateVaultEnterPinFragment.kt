@@ -1,11 +1,16 @@
 package de.jepfa.yapm.ui.createvault
 
+import android.content.Context
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
@@ -25,6 +30,8 @@ class CreateVaultEnterPinFragment : BaseFragment() {
         backToPreviousFragment = true
     }
 
+    private var showNumberPad = false
+
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
@@ -34,10 +41,35 @@ class CreateVaultEnterPinFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val createVaultActivity = getBaseActivity() as CreateVaultActivity
+
+
         setTitle(R.string.create_vault_enter_pin_fragment_label)
 
         val pin1TextView: EditText = view.findViewById(R.id.first_pin)
         val pin2TextView: EditText = view.findViewById(R.id.second_pin)
+
+        val changeImeiButton = view.findViewById<ImageView>(R.id.imageview_change_imei)
+        changeImeiButton.setOnClickListener {
+            showNumberPad = !showNumberPad
+            if (showNumberPad) {
+                pin1TextView.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
+                pin2TextView.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
+                changeImeiButton.setImageDrawable(createVaultActivity.getDrawable(R.drawable.baseline_abc_24))
+            } else {
+                pin1TextView.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                pin2TextView.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                changeImeiButton.setImageDrawable(createVaultActivity.getDrawable(R.drawable.baseline_123_24))
+            }
+            pin1TextView.typeface = Typeface.DEFAULT
+            pin2TextView.typeface = Typeface.DEFAULT
+
+            pin1TextView.requestFocus()
+
+            val imm = createVaultActivity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.showSoftInput(pin1TextView, 0)
+            imm.showSoftInput(pin2TextView, 0)
+        }
 
         view.findViewById<Button>(R.id.button_next).setOnClickListener {
 
