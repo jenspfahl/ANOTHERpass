@@ -73,7 +73,7 @@ class LoginEnterPinFragment : BaseFragment() {
                 PreferenceService.putBoolean(
                     PreferenceService.PREF_SHOW_NUMBER_PAD_FOR_PIN,
                     showNumberPad,
-                    activity
+                    loginActivity
                 )
             }
         }

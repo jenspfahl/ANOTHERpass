@@ -14,6 +14,7 @@ import android.widget.ImageView
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.AndroidKey.ALIAS_KEY_TRANSPORT
 import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
@@ -69,6 +70,12 @@ class CreateVaultEnterPinFragment : BaseFragment() {
             val imm = createVaultActivity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.showSoftInput(pin1TextView, 0)
             imm.showSoftInput(pin2TextView, 0)
+
+            PreferenceService.putBoolean(
+                PreferenceService.PREF_SHOW_NUMBER_PAD_FOR_PIN,
+                showNumberPad,
+                createVaultActivity
+            )
         }
 
         view.findViewById<Button>(R.id.button_next).setOnClickListener {
