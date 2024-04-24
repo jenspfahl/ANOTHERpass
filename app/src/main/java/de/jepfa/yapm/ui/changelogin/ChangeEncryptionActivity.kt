@@ -17,6 +17,7 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.service.secret.PbkdfIterationService
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.ui.ChangeKeyboardForPinManager
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.usecase.secret.ChangeVaultEncryptionUseCase
@@ -49,6 +50,10 @@ class ChangeEncryptionActivity : SecureActivity(), AdapterView.OnItemSelectedLis
         val currentPinTextView: EditText = findViewById(R.id.current_pin)
         val currentEncryptionTextView: TextView = findViewById(R.id.current_encryption_text)
         val newMasterKeySwitch: SwitchCompat = findViewById(R.id.switch_generate_new_masterkey)
+
+        val pinImeiManager = ChangeKeyboardForPinManager(this, listOf(currentPinTextView))
+        pinImeiManager.create(findViewById(R.id.imageview_change_imei))
+
 
         originCipherAlgorithm = SecretService.getCipherAlgorithm(this)
         currentEncryptionTextView.text = getString(R.string.update_vault_cipher_explanation,

@@ -15,24 +15,45 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/login_explanation_1"
-            app:layout_constraintBottom_toTopOf="@id/edittext_enter_pin"
+            app:layout_constraintBottom_toTopOf="@id/view_enter_pin"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
 
-        <EditText
-            android:id="@+id/edittext_enter_pin"
-            android:inputType="textPassword"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/view_enter_pin"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
             app:layout_constraintBottom_toTopOf="@id/button_container"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/textview_login_vault"
-            android:maxLength="@integer/max_pin_length"
-            android:hint="@string/pin"
-            tools:ignore="TextFields" />
+            >
+
+            <ImageView
+                android:id="@+id/imageview_change_imei"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:clickable="true"
+                android:layout_marginStart="-30dp"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/baseline_123_24"
+                android:focusable="true" />
+
+            <EditText
+                android:id="@+id/edittext_enter_pin"
+                android:inputType="textPassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLength="@integer/max_pin_length"
+                android:hint="@string/pin"
+                tools:ignore="TextFields" />
+
+        </LinearLayout>
+
 
 
         <LinearLayout
@@ -43,7 +64,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/edittext_enter_pin">
+            app:layout_constraintTop_toTopOf="@id/view_enter_pin">
 
 
             <Button

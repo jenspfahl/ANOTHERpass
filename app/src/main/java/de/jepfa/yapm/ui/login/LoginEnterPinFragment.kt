@@ -28,6 +28,7 @@ import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseFragment
+import de.jepfa.yapm.ui.ChangeKeyboardForPinManager
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.usecase.session.LoginUseCase
@@ -37,6 +38,7 @@ import de.jepfa.yapm.util.toastText
 
 
 class LoginEnterPinFragment : BaseFragment() {
+
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -54,6 +56,10 @@ class LoginEnterPinFragment : BaseFragment() {
         val pinTextView: EditText = view.findViewById(R.id.edittext_enter_pin)
         val nextButton = view.findViewById<Button>(R.id.button_login_next)
 
+        val pinImeiManager = ChangeKeyboardForPinManager(loginActivity, listOf(pinTextView))
+        pinImeiManager.create(view.findViewById(R.id.imageview_change_imei))
+        pinTextView.requestFocus()
+
         updateInfoText()
 
         // this is to perform next step out of the keyboard
@@ -63,8 +69,6 @@ class LoginEnterPinFragment : BaseFragment() {
             true
         }
 
-        pinTextView.requestFocus()
-
         nextButton.setOnLongClickListener{
             loginActivity.showRevokeQuickAccessDialog()
             true
@@ -72,7 +76,7 @@ class LoginEnterPinFragment : BaseFragment() {
 
         nextButton.setOnClickListener {
 
-            var keyForTemp = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, view.context)
+            val keyForTemp = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, view.context)
 
             val userPin = Password(pinTextView.text)
             if (userPin.isEmpty()) {

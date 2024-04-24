@@ -206,7 +206,6 @@ class NfcActivity : NfcBaseActivity() {
 
     private fun checkAndWriteTag(encrypted: Encrypted, t: NdefTag, withAppRecord: Boolean, setWriteProtection: Boolean) {
 
-
         val tempKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, this)
         val data = SecretService.decryptPassword(tempKey, encrypted)
 

@@ -443,6 +443,7 @@
     <string name="pref_login_scan_nfctag">Read master password NFC tag and login immediately</string>
     <string name="pref_login_summary_off_scan_nfctag">Master password can also be read from NFC tag</string>
     <string name="pref_login_summary_on_scan_nfc_tag">Opens the NFC tag reader immediately if master password is not stored on device and logs in afterwards</string>
+    <string name="pref_hide_number_pad_for_login_title">Don\'t provide an option for numeric keyboard for PIN login</string>
     <string name="pref_overlay_enable">Enable password overlay dialog feature</string>
     <string name="pref_overlay_summary_enable">Password overlay dialog is shown on top of all apps to easily read and copy-type passwords</string>
     <string name="pref_overlay_transparent_overlay">Transparent password overlay</string>

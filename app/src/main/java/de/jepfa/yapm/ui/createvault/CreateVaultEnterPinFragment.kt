@@ -13,6 +13,7 @@ import de.jepfa.yapm.service.secret.AndroidKey.ALIAS_KEY_TRANSPORT
 import de.jepfa.yapm.service.secret.SecretService.encryptPassword
 import de.jepfa.yapm.service.secret.SecretService.getAndroidSecretKey
 import de.jepfa.yapm.ui.BaseFragment
+import de.jepfa.yapm.ui.ChangeKeyboardForPinManager
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER_PASSWD
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_PIN
 import de.jepfa.yapm.util.Constants
@@ -34,10 +35,17 @@ class CreateVaultEnterPinFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val createVaultActivity = getBaseActivity() as CreateVaultActivity
+
+
         setTitle(R.string.create_vault_enter_pin_fragment_label)
 
         val pin1TextView: EditText = view.findViewById(R.id.first_pin)
         val pin2TextView: EditText = view.findViewById(R.id.second_pin)
+
+        val pinImeiManager = ChangeKeyboardForPinManager(createVaultActivity,
+            listOf(pin1TextView, pin2TextView))
+        pinImeiManager.create(view.findViewById(R.id.imageview_change_imei))
 
         view.findViewById<Button>(R.id.button_next).setOnClickListener {
 

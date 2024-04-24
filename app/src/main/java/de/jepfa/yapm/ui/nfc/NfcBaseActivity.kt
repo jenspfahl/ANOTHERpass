@@ -42,7 +42,7 @@ abstract class NfcBaseActivity : SecureActivity() {
 
     fun readTagFromIntent(intent: Intent?) {
         intent?.let {
-            ndefTag = NfcService.getNdefTag(intent)
+            ndefTag = NfcService.getNdefTag(intent, this)
             handleTag()
         }
     }

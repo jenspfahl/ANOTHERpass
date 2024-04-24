@@ -31,12 +31,12 @@ object NfcService {
         return adapter != null && adapter.isEnabled
     }
 
-    fun getNdefTag(intent: Intent): NdefTag? {
+    fun getNdefTag(intent: Intent, activity: BaseActivity): NdefTag? {
         val tagFromIntent: Tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG) ?: return null
 
         try {
             val messages = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
-            val data = messages?.run { getData(this) }
+            val data = messages?.run { getData(this, activity) }
             return NdefTag(tagFromIntent, data)
         } catch (e: FormatException) {
             Log.e(LOG_PREFIX + "NFC", "Unsupported tag tapped", e)
@@ -47,7 +47,7 @@ object NfcService {
     fun createNdefMessage(activity: BaseActivity, payload: ByteArray, withAppRecord: Boolean) : NdefMessage {
         val typeBytes = (
                 if (withAppRecord)
-                    "appliation/${activity.getApp().packageName}"
+                    getMimeType(activity)
                 else
                     "text/plain")
             .toByteArray()
@@ -57,20 +57,31 @@ object NfcService {
 
     }
 
-    private fun getData(rawMessages: Array<Parcelable>): String {
+    private fun getData(rawMessages: Array<Parcelable>, activity: BaseActivity): String {
         val sb = StringBuilder()
         for (i in rawMessages.indices) {
             val message = rawMessages[i] as NdefMessage
             message.records.forEach { record ->
                 if (record.tnf == NdefRecord.TNF_MIME_MEDIA) {
-                    val data = String(record.payload)
-                    sb.append(data)
+                    // only consider own mime types
+                    if (record.toMimeType() == getMimeType(activity) || record.toMimeType() == getLegacyMimeType(activity)) {
+                        val data = String(record.payload)
+                        sb.append(data)
+                    }
                 }
             }
         }
 
         return sb.toString()
     }
+
+
+    private fun getMimeType(activity: BaseActivity) =
+        "application/${activity.getApp().packageName}"
+
+    private fun getLegacyMimeType(activity: BaseActivity) =
+        "appliation/${activity.getApp().packageName}"
+
 
     fun scanNfcTag(fragment: BaseFragment) {
         fragment.getBaseActivity()?.let {

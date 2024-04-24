@@ -436,6 +436,7 @@
     <string name="pref_login_scan_nfctag">Lese Masterpasswort NFC-Tag direkt beim Einloggen</string>
     <string name="pref_login_summary_off_scan_nfctag">Masterpasswort kann gescannt/gelesen werden oder manuell eingegeben werden</string>
     <string name="pref_login_summary_on_scan_nfc_tag">Öffnet sofort den NFC-Tag-Leser wenn kein Masterpasswort in der App gespeichert ist und loggt dich nach erfolgreichem Lesen sofort ein.</string>
+    <string name="pref_hide_number_pad_for_login_title">Keine nummerische Tastatur-Option für PIN-Eingabe</string>
     <string name="pref_overlay_enable">Aktiviere Passwörter über anderen Apps einblenden</string>
     <string name="pref_overlay_summary_enable">Ein verschiebbares Passwort-Fenster wird über allen Apps dargestellt, um das Passwort einfach in andere Apps abtippen zu können.</string>
     <string name="pref_overlay_transparent_overlay">Transparentes Passwort-Fenster</string>

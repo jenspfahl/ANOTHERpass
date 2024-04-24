@@ -33,7 +33,7 @@ class NdefTag @Throws(FormatException::class) constructor(val tag: Tag, val data
 
     init {
         val technologies = tag.techList
-        val tagTechs = Arrays.asList(*technologies)
+        val tagTechs = listOf(*technologies)
         if (tagTechs.contains(NDEF)) {
             Log.i(LOG_PREFIX + "WritableTag", "contains ndef")
             ndef = Ndef.get(tag)
@@ -45,10 +45,6 @@ class NdefTag @Throws(FormatException::class) constructor(val tag: Tag, val data
         } else {
             throw FormatException("Tag doesn't support ndef")
         }
-    }
-
-    fun getUID(): Key {
-        return Key(tag.id)
     }
 
     fun getMaxSize(): Int? {
