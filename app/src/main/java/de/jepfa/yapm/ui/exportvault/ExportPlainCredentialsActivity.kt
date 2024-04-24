@@ -13,6 +13,7 @@ import de.jepfa.yapm.service.secret.MasterKeyService
 import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.ui.ChangeKeyboardForPinManager
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
@@ -39,6 +40,10 @@ class ExportPlainCredentialsActivity : SecureActivity() {
         setContentView(R.layout.activity_export_plain_credentials)
 
         val currentPinTextView: EditText = findViewById(R.id.current_pin)
+
+        val pinImeiManager = ChangeKeyboardForPinManager(this, listOf(currentPinTextView))
+        pinImeiManager.create(findViewById(R.id.imageview_change_imei))
+
 
         findViewById<Button>(R.id.button_export_plain_credentials).setOnClickListener {
 

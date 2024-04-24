@@ -9,6 +9,7 @@ import android.widget.TextView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.Session
+import de.jepfa.yapm.ui.ChangeKeyboardForPinManager
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.usecase.secret.ChangePinUseCase
@@ -23,7 +24,9 @@ class ChangePinActivity : SecureActivity() {
     init {
         enableBack = true
     }
-    
+
+    private var showNumberPad = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -37,6 +40,10 @@ class ChangePinActivity : SecureActivity() {
         val currentPinTextView: EditText = findViewById(R.id.current_pin)
         val newPin1TextView: EditText = findViewById(R.id.first_new_pin)
         val newPin2TextView: EditText = findViewById(R.id.second_new_pin)
+
+        val pinImeiManager = ChangeKeyboardForPinManager(this,
+            listOf(currentPinTextView, newPin1TextView, newPin2TextView))
+        pinImeiManager.create(findViewById(R.id.imageview_change_imei))
 
         val explanationView: TextView = findViewById(R.id.change_pin_explanation)
         explanationView.setOnLongClickListener {

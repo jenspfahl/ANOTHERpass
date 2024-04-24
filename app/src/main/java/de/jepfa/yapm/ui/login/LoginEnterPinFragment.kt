@@ -1,9 +1,6 @@
 package de.jepfa.yapm.ui.login
 
-import android.content.Context
-import android.graphics.Typeface
 import android.os.Bundle
-import android.text.InputType
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -11,10 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
@@ -33,6 +28,7 @@ import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseFragment
+import de.jepfa.yapm.ui.ChangeKeyboardForPinManager
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.createvault.CreateVaultActivity
 import de.jepfa.yapm.usecase.session.LoginUseCase
@@ -43,7 +39,6 @@ import de.jepfa.yapm.util.toastText
 
 class LoginEnterPinFragment : BaseFragment() {
 
-    private var showNumberPad = false
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -61,22 +56,9 @@ class LoginEnterPinFragment : BaseFragment() {
         val pinTextView: EditText = view.findViewById(R.id.edittext_enter_pin)
         val nextButton = view.findViewById<Button>(R.id.button_login_next)
 
-        val changeImeiButton = view.findViewById<ImageView>(R.id.imageview_change_imei)
-        val hideNumberPad = PreferenceService.getAsBool(PreferenceService.PREF_HIDE_NUMBER_PAD_FOR_PIN, activity)
-        if (hideNumberPad) {
-            changeImeiButton.visibility = View.GONE
-        }
-        else {
-            changeImeiButton.setOnClickListener {
-                showNumberPad = !showNumberPad
-                updateShowNumberPad(pinTextView, changeImeiButton, loginActivity)
-                PreferenceService.putBoolean(
-                    PreferenceService.PREF_SHOW_NUMBER_PAD_FOR_PIN,
-                    showNumberPad,
-                    loginActivity
-                )
-            }
-        }
+        val pinImeiManager = ChangeKeyboardForPinManager(loginActivity, listOf(pinTextView))
+        pinImeiManager.create(view.findViewById(R.id.imageview_change_imei))
+        pinTextView.requestFocus()
 
         updateInfoText()
 
@@ -86,12 +68,6 @@ class LoginEnterPinFragment : BaseFragment() {
             nextButton.performClick()
             true
         }
-
-        if (!hideNumberPad) {
-            showNumberPad = PreferenceService.getAsBool(PreferenceService.PREF_SHOW_NUMBER_PAD_FOR_PIN, activity)
-            updateShowNumberPad(pinTextView, changeImeiButton, loginActivity)
-        }
-        pinTextView.requestFocus()
 
         nextButton.setOnLongClickListener{
             loginActivity.showRevokeQuickAccessDialog()
@@ -146,23 +122,6 @@ class LoginEnterPinFragment : BaseFragment() {
                 )
             }
         }
-    }
-
-    private fun updateShowNumberPad(
-        pinTextView: EditText,
-        changeImeiButton: ImageView,
-        loginActivity: LoginActivity
-    ) {
-        if (showNumberPad) {
-            pinTextView.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
-            changeImeiButton.setImageDrawable(loginActivity.getDrawable(R.drawable.baseline_abc_24))
-        } else {
-            pinTextView.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-            changeImeiButton.setImageDrawable(loginActivity.getDrawable(R.drawable.baseline_123_24))
-        }
-        pinTextView.typeface = Typeface.DEFAULT
-        val imm = loginActivity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(pinTextView, 0)
     }
 
     private fun moveToEnterMasterPasswordScreen(
