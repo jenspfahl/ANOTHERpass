@@ -1,0 +1,2 @@
+* fix NFC read error when reading from tag with multiple records
+* add number keyboard option to PIN field

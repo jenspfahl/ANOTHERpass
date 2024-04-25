@@ -14,6 +14,7 @@ import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.secret.MasterPasswordService
+import de.jepfa.yapm.ui.ChangeKeyboardForPinManager
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.usecase.credential.ShowPasswordStrengthUseCase
@@ -49,6 +50,9 @@ class ChangeMasterPasswordActivity : SecureActivity() {
         val pseudoPhraseSwitch: SwitchCompat = findViewById(R.id.switch_use_pseudo_phrase)
         val switchStorePasswd: SwitchCompat = findViewById(R.id.switch_store_master_password)
         val generatedPasswdView: TextView = findViewById(R.id.generated_passwd)
+
+        val pinImeiManager = ChangeKeyboardForPinManager(this, listOf(currentPinTextView))
+        pinImeiManager.create(findViewById(R.id.imageview_change_imei))
 
         switchStorePasswd.isChecked = MasterPasswordService.isMasterPasswordStored(this)
 
