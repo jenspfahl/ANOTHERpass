@@ -400,7 +400,7 @@
     <string name="message_delete_unused_labels">Sollen wirklich alle ungenutzten Kategorien gelöscht werden?</string>
     <string name="no_unused_labels_to_delete">Keine ungenutzten Kategorien gefunden</string>
     <string name="unused_labels_deleted">%1$d ungenutzte Kategorien gelöscht</string>
-    <string name="this_app_is_foss">Diese App ist Open Source und wurde unter der MIT Lizenz veröffentlicht.</string>
+    <string name="this_app_is_foss">Diese App ist Open Source und wurde unter der GPL3-Lizenz veröffentlicht.</string>
     <string name="visit_foss_site">Besuche %1$s um die Lizenz und den Quellcode zu sehen, oder um Fehler zu melden.</string>
     <string name="credential_duplicated">Zugangsdaten dupliziert</string>
     <string name="credential_deleted">Zugangsdaten gelöscht</string>
