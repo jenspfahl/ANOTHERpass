@@ -1,0 +1,1 @@
+* Use app as a local server to connect to ANOTHERpass web extension (https://github.com/jenspfahl/anotherpass-webext)
