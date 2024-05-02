@@ -377,7 +377,7 @@ Deze waarschuwing kunt u deactiveren onder \'Instellingen/Beveiliging\'.</string
   <string name="message_delete_unused_labels">Moeten alle ongebruikte categorieën echt worden verwijderd?</string>
   <string name="no_unused_labels_to_delete">Geen ongebruikte categorieën gevonden</string>
   <string name="unused_labels_deleted">%1$d ongebruikte categorieën verwijderd</string>
-  <string name="this_app_is_foss">Deze app is open source en vrijgegeven onder de MIT-licentie.</string>
+  <string name="this_app_is_foss">Deze app is open source en vrijgegeven onder de GPL3-licentie.</string>
   <string name="visit_foss_site">Bezoek %1$s om de licentie en broncode te bekijken, of om bugs te melden.</string>
   <string name="credential_duplicated">Inloggegevens gedupliceerd</string>
   <string name="credential_deleted">Toegangsgegevens verwijderd</string>
