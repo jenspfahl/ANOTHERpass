@@ -458,8 +458,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         val requestIdentifier = message.getString("requestIdentifier")
         val website = message.getString("website")
 
-        if (webClientRequestIdentifier != requestIdentifier
-            && webClientCredentialRequestState != CredentialRequestState.Requesting) {
+        if (webClientRequestIdentifier != requestIdentifier/*
+            && webClientCredentialRequestState != CredentialRequestState.Requesting*/) {
             Log.i("HTTP", "new credential request $requestIdentifier for $webClientId")
             webClientCredentialRequestState = CredentialRequestState.Incoming
             webClientRequestIdentifier = requestIdentifier
@@ -469,7 +469,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         if (webClientCredentialRequestState == CredentialRequestState.Incoming) {
             webClientCredentialRequestState = CredentialRequestState.Requesting
 
+
             CoroutineScope(Dispatchers.Main).launch {
+
+                AutofillCredentialHolder.clear()
+                searchItem?.collapseActionView()
 
                 val sharedBaseKey = SecretService.decryptKey(key, webExtension.sharedBaseKey)
                 val requestIdentifierKey = Key(Base64.decode(webClientRequestIdentifier, 0))
@@ -510,13 +514,17 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     return toErrorResponse(HttpStatusCode.BadRequest, "wrong request identifier")
                 }
                 val password = SecretService.decryptPassword(key, currCredential.password)
+                val user = SecretService.decryptCommonString(key, currCredential.user)
                 val name = SecretService.decryptCommonString(key, currCredential.name)
+                val uid = currCredential.uid
                 AutofillCredentialHolder.obfuscationKey?.let {
                     password.deobfuscate(it)
                 }
 
                 val response = JSONObject()
+                response.put("uid", uid)
                 response.put("password", password.toRawFormattedPassword())
+                response.put("user", user)
                 password.clear()
 
                 webClientRequestIdentifier = null
