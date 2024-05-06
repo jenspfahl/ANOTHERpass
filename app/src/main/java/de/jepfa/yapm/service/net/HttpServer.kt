@@ -298,7 +298,7 @@ object HttpServer {
                                     Log.e("HTTP", "Something went wrong!!!", e)
                                     respondError(
                                         HttpStatusCode.InternalServerError,
-                                        e.message ?: e.toString()
+                                        "Unexpected error during handling post request: ${e.stackTraceToString() ?: e.toString()}"
                                     )
                                     return@post
                                 }

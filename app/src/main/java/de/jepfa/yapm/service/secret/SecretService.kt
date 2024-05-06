@@ -162,7 +162,15 @@ object SecretService {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             spec
-                .setIsStrongBoxBacked(hasStrongBoxSupport(context))
+                //.setIsStrongBoxBacked(hasStrongBoxSupport(context)) TODO failed if StrongBox is used with:
+                    /*
+                    Caused by:
+                                                                                                        0: While generating Key without explicit attestation key.
+                                                                                                        1: Error::Km(ErrorCode(-6))) (public error code: 12 internal Keystore code: -6)
+                                                                                                    	at android.security.KeyStore2.getKeyStoreException(KeyStore2.java:369)
+                                                                                                    	at android.security.KeyStoreSecurityLevel.handleExceptions(KeyStoreSecurityLevel.java:57)
+                                                                                                    	at android.security.KeyStoreSecurityLevel.generateKey(KeyStoreSecurityLevel.java:145)
+                     */
                 .setUnlockedDeviceRequired(true)
                 .setUserAuthenticationRequired(false)
         }
