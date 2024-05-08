@@ -162,14 +162,23 @@ object SecretService {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             spec
-                //.setIsStrongBoxBacked(hasStrongBoxSupport(context)) TODO failed if StrongBox is used with:
+                //.setIsStrongBoxBacked(hasStrongBoxSupport(context)) //TODO failed if StrongBox is used with:
                     /*
+                    java.security.ProviderException: Failed to generate key pair.
+                        at android.security.keystore2.AndroidKeyStoreKeyPairGeneratorSpi.generateKeyPairHelper(AndroidKeyStoreKeyPairGeneratorSpi.java:717)
+                        at android.security.keystore2.AndroidKeyStoreKeyPairGeneratorSpi.generateKeyPair(AndroidKeyStoreKeyPairGeneratorSpi.java:627)
+                        at java.security.KeyPairGenerator$Delegate.generateKeyPair(KeyPairGenerator.java:746)
+                        at de.jepfa.yapm.service.secret.SecretService.generateRsaKeyPair(SecretService.kt:171)
+                    [...]
                     Caused by:
-                                                                                                        0: While generating Key without explicit attestation key.
-                                                                                                        1: Error::Km(ErrorCode(-6))) (public error code: 12 internal Keystore code: -6)
-                                                                                                    	at android.security.KeyStore2.getKeyStoreException(KeyStore2.java:369)
-                                                                                                    	at android.security.KeyStoreSecurityLevel.handleExceptions(KeyStoreSecurityLevel.java:57)
-                                                                                                    	at android.security.KeyStoreSecurityLevel.generateKey(KeyStoreSecurityLevel.java:145)
+                        0: While generating Key without explicit attestation key.
+                        1: Error::Km(ErrorCode(-6))) (public error code: 12 internal Keystore code: -6)
+                        at android.security.KeyStore2.getKeyStoreException(KeyStore2.java:369)
+                        at android.security.KeyStoreSecurityLevel.handleExceptions(KeyStoreSecurityLevel.java:57)
+                        at android.security.KeyStoreSecurityLevel.generateKey(KeyStoreSecurityLevel.java:145)
+                        at android.security.keystore2.AndroidKeyStoreKeyPairGeneratorSpi.generateKeyPairHelper(AndroidKeyStoreKeyPairGeneratorSpi.java:690)
+
+                       No attestion key found if StringBox is used, see https://android.googlesource.com/platform/system/security/+/main/keystore2/src/security_level.rs
                      */
                 .setUnlockedDeviceRequired(true)
                 .setUserAuthenticationRequired(false)

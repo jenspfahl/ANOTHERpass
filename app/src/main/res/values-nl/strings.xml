@@ -510,6 +510,12 @@ Deze waarschuwing kunt u deactiveren onder \'Instellingen/Beveiliging\'.</string
   <string name="whats_new_in_1_9_bullet_4_head">Pictogram voor adaptieve launcher</string>
   <string name="whats_new_in_1_9_bullet_4_text">De launcherpictogram is aangepast zodat het elke schaal ondersteunt en, nog belangrijker, monochrone thema\'s ondersteunt.</string>
 
+  <string name="whats_new_in_2_0">What\'s new in version 2.0</string>
+  <string name="whats_new_subtext_2_0">This new version is a breaking change since the app can act as a server, which requires internet connection.</string>
+  <string name="whats_new_in_2_0_bullet_1_head">Link the app to a remote device</string>
+  <string name="whats_new_in_2_0_bullet_1_text">The app can act as server in a local network. With the new ANOTHERpass browser extension (see here) you can link the app to several browsers running on remote devices, e.g. your laptop. You can fully disable this if you don\'t like this.</string>
+
+
   <string name="intro">Begin met inleiden</string>
   <string name="intro_1_head">Een iets andere wachtwoordbeheerder</string>
   <string name="intro_1_subtext">ANOTHERpass biedt een iets andere aanpak.  Lees hier wat dat betekent:</string>

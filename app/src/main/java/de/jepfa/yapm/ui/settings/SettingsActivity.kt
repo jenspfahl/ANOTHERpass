@@ -5,6 +5,8 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.text.InputFilter
+import android.text.InputType
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.*
@@ -22,6 +24,7 @@ import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.ClipboardUtil
 import java.util.*
 
+
 private const val TITLE_TAG = "settingsActivityTitle"
 
 class SettingsActivity : SecureActivity(),
@@ -36,7 +39,16 @@ class SettingsActivity : SecureActivity(),
         }
 
         setContentView(R.layout.settings_activity)
-        if (savedInstanceState == null) {
+
+        val openServerSettings = intent.getBooleanExtra("OpenServerSettings", false)
+
+        if (openServerSettings) {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.settings, ServerSettingsFragment())
+                .commit()
+        }
+        else if (savedInstanceState == null) {
             supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.settings, HeaderFragment())
@@ -50,6 +62,7 @@ class SettingsActivity : SecureActivity(),
             }
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
     }
 
     override fun lock() {
@@ -337,6 +350,30 @@ class SettingsActivity : SecureActivity(),
 
             findPreference<SwitchPreferenceCompat>(PreferenceService.PREF_SHOW_BIOMETRIC_SMP_REMINDER)?.let { pref ->
                 activity?.let { pref.isEnabled = BiometricUtils.isBiometricsSupported(it) }
+            }
+        }
+    }
+
+    class ServerSettingsFragment : PreferenceFragmentCompat() {
+        override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            preferenceManager.preferenceDataStore = EncryptedPreferenceDataStore.getInstance(requireContext())
+            setPreferencesFromResource(R.xml.server_preferences, rootKey)
+
+            val serverEnabled = PreferenceService.getAsBool(PreferenceService.PREF_SERVER_CAPABILITIES_ENABLED, context)
+
+            findPreference<EditTextPreference>(PreferenceService.PREF_SERVER_PORT)?.let { pref ->
+                if (serverEnabled) {
+                    pref.setOnBindEditTextListener { editText ->
+                        editText.inputType = InputType.TYPE_CLASS_NUMBER
+                        editText.filters = arrayOf(InputFilter.LengthFilter(5))
+                    }
+                    val port =
+                        PreferenceService.getAsString(PreferenceService.PREF_SERVER_PORT, context)
+                    pref.text = if (port == null || port == "" || port == "0") 8001.toString() else port.toString()
+                }
+                else {
+                    pref.isEnabled = false
+                }
             }
         }
     }

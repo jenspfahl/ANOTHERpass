@@ -541,6 +541,11 @@
     <string name="whats_new_in_1_9_bullet_4_head">Adaptive launcher icon</string>
     <string name="whats_new_in_1_9_bullet_4_text">The launcher icon has been polished to support any scale and, even more important, support monochrone themes.</string>
 
+    <string name="whats_new_in_2_0">What\'s new in version 2.0</string>
+    <string name="whats_new_subtext_2_0">This new version is a breaking change since the app can act as a server, which requires internet connection.</string>
+    <string name="whats_new_in_2_0_bullet_1_head">Link the app to a remote device</string>
+    <string name="whats_new_in_2_0_bullet_1_text">The app can act as server in a local network. With the new ANOTHERpass browser extension (see here) you can link the app to several browsers running on remote devices, e.g. your laptop. You can fully disable this if you don\'t like this.</string>
+
     <string name="intro">Show intro</string>
     <string name="intro_1_head">Another way to manage passwords</string>
     <string name="intro_1_subtext">ANOTHERpass is another approach of a password manager. See what it means:</string>

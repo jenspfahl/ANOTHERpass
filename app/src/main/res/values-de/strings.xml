@@ -533,6 +533,12 @@
     <string name="whats_new_in_1_9_bullet_4_head">Adaptives Start-Symbol</string>
     <string name="whats_new_in_1_9_bullet_4_text">Das Start-Symbol wurde verbessert um jede mögliche Auflösung zu unterstützen und um einfarbige Farbthemen zu unterstützen.</string>
 
+    <string name="whats_new_in_2_0">What\'s new in version 2.0</string>
+    <string name="whats_new_subtext_2_0">This new version is a breaking change since the app can act as a server, which requires internet connection.</string>
+    <string name="whats_new_in_2_0_bullet_1_head">Link the app to a remote device</string>
+    <string name="whats_new_in_2_0_bullet_1_text">The app can act as server in a local network. With the new ANOTHERpass browser extension (see here) you can link the app to several browsers running on remote devices, e.g. your laptop. You can fully disable this if you don\'t like this.</string>
+
+
     <string name="intro">Starte Intro</string>
     <string name="intro_1_head">Ein etwas anderer Passwortmanager</string>
     <string name="intro_1_subtext">ANOTHERpass bietet eine etwas andere Herangehensweise. Lies hier was das heißt:</string>

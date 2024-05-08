@@ -211,7 +211,28 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         serverViewSwitch = findViewById(R.id.server_view_switch)
         val serverViewLink = findViewById<ImageView>(R.id.server_link)
         val serverViewSettings = findViewById<ImageView>(R.id.server_settings)
+        serverViewSettings.setOnClickListener {
+            val popup = PopupMenu(this, it)
+            popup.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.menu_server_settings_hide -> {
+                        //TODO
+                        true
+                    }
+                    R.id.menu_server_settings_open_settings -> {
+                        val intent = Intent(this, SettingsActivity::class.java)
+                        intent.putExtra("OpenServerSettings", true)
+                        startActivity(intent)
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popup.inflate(R.menu.menu_server_settings)
+            popup.setForceShowIcon(true)
+            popup.show()
 
+        }
 
         serverViewLink.setOnClickListener {
             if (serverViewSwitch.isEnabled) {
@@ -246,6 +267,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
 
         reflectServerStopped()
+        //TODO server restart when orientation changes should be denied
         serverViewSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 serverViewStateText = "Starting ..."

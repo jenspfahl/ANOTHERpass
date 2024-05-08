@@ -86,6 +86,10 @@ object PreferenceService {
     const val DATA_BIOMETRIC_SMP_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "biometric_smp_notification_showed_as"
     const val PREF_SHOW_BIOMETRIC_SMP_REMINDER = PREF_PREFIX + "show_biometric_smp_reminder"
 
+    const val PREF_SERVER_CAPABILITIES_ENABLED = PREF_PREFIX + "enable_server_capability"
+    const val PREF_SERVER_PORT = PREF_PREFIX + "server_listening_port"
+
+
     const val DATA_REFRESH_MPT_NOTIFICATION_SHOWED_AT = DATA_PREFIX + "refresh_mpt_notification_showed_at"
     const val DATA_REFRESH_MPT_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "refresh_mpt_notification_showed_as"
     const val PREF_SHOW_REFRESH_MPT_REMINDER = PREF_PREFIX + "show_refresh_mpt_reminder"

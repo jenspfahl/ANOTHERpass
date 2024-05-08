@@ -30,6 +30,9 @@ The motivation of developing this app was curiosity of how cryptography works, h
 >* self destruction mode
 >* Dark Theme support ;-)
 
+
+With version 2, the app is able to act as a credential server in a local network. With [this browser extension](https://github.com/jenspfahl/anotherpass-webext) you can fetch certain credentials directly from a browser on different devices (e.g. your laptop) .
+
 For more information see [https://anotherpass.jepfa.de](https://anotherpass.jepfa.de)
 
 You can download the latest release version [here](https://anotherpass.jepfa.de/download/).

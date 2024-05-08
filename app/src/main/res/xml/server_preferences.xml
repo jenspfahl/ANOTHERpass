@@ -1,0 +1,26 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:enable_server_capability"
+        app:title="Enable server capability"
+        app:summary="If enabled, the server UI is displayed and you can turn on and off the server. Disable it if you don\'t want any server capabilities at all (as before version 2)."
+        app:allowDividerAbove="true"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:defaultValue="true"/>
+
+    <EditTextPreference
+        app:defaultValue="8001"
+        app:key="YAPM/pref:server_listening_port"
+        app:title="Port where the server listens"
+        app:dialogTitle="Port where the server listens"
+        app:dialogMessage="Ensure the same value is configured in the extension."
+        app:singleLine="true"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:useSimpleSummaryProvider="true"/>
+
+
+
+
+</PreferenceScreen>
