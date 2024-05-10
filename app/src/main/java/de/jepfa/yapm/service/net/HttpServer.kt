@@ -114,6 +114,9 @@ object HttpServer {
                     }
                 }
 
+                if (httpsServer != null) {
+                    httpsServer?.stop()
+                }
                 httpsServer = embeddedServer(Netty, environment)
                 Log.i("HTTP", "launch Web server")
                 httpsServer?.start(wait = false)
@@ -308,6 +311,9 @@ object HttpServer {
                 }
 
                 Log.i("HTTP", "launch API server")
+                if (httpServer != null) {
+                    httpServer?.stop()
+                }
                 httpServer = embeddedServer(Netty, environment)
                 httpServer?.start(wait = false)
                 Log.i("HTTP", "API server started")
