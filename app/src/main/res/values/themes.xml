@@ -4,6 +4,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
     </style>
 
     <style name="Theme.YetAnotherPasswordManager.NoActionBar">
@@ -17,6 +18,9 @@
     </style>
 
     <style name="Theme.YetAnotherPasswordManager.MaterialComponents" parent="@style/ThemeOverlay.MaterialComponents.Light">
+    </style>
+
+    <style name="BottomSheetDialog" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
     </style>
 
 </resources>

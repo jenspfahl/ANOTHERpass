@@ -38,6 +38,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.chip.Chip
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
@@ -503,7 +504,30 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
                 val shortenedFingerprint = fingerprintAsKey.toShortenedFingerprint()
 
-                AlertDialog.Builder(this@ListCredentialsActivity)
+
+                val dialog = BottomSheetDialog(this@ListCredentialsActivity)
+                val bottomSheet = layoutInflater.inflate(R.layout.server_bottom_sheet, null)
+                dialog.setTitle("sdsdgsdg")
+                dialog.setCanceledOnTouchOutside(false)
+                dialog.setCancelable(false)
+
+                bottomSheet.findViewById<TextView>(R.id.text_webclient_id).text = webClientId
+                bottomSheet.findViewById<TextView>(R.id.text_fingerprint).text = shortenedFingerprint
+
+                bottomSheet.findViewById<Button>(R.id.button_server_call_deny).setOnClickListener {
+                    webClientCredentialRequestState = CredentialRequestState.Denied
+                    dialog.dismiss()
+                }
+                bottomSheet.findViewById<Button>(R.id.button_server_call_accept).setOnClickListener {
+                    webClientCredentialRequestState = CredentialRequestState.Accepted
+                    startSearchFor(extractDomain(website), commit = true)
+                    dialog.dismiss()
+                }
+
+                dialog.setContentView(bottomSheet)
+                dialog.show()
+
+                /*AlertDialog.Builder(this@ListCredentialsActivity)
                     .setTitle("Incoming credential request")
                     .setMessage("There is an incoming credential request from '$webClientId'. Request fingerprint displayed in the extension should be the same as: $shortenedFingerprint. Accept?")
                     .setCancelable(false)
@@ -515,7 +539,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     .setNegativeButton("Deny") { v, _ ->
                         webClientCredentialRequestState = CredentialRequestState.Denied
                         v.dismiss()
-                    }.show()
+                    }.show()*/
             }
 
             return toErrorResponse(HttpStatusCode.NotFound, "no user acknowledge")
