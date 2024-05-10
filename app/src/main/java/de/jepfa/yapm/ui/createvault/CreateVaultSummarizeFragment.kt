@@ -13,7 +13,9 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.slider.Slider
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm
+import de.jepfa.yapm.model.encrypted.CipherAlgorithm.Companion.getPreferredCipher
 import de.jepfa.yapm.model.encrypted.DEFAULT_CIPHER_ALGORITHM
+import de.jepfa.yapm.model.encrypted.PREFERRED_CIPHER_ALGORITHM
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.service.nfc.NfcService
@@ -37,7 +39,7 @@ import de.jepfa.yapm.util.Constants.LOG_PREFIX
 
 class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedListener {
 
-    private var cipherAlgorithm = DEFAULT_CIPHER_ALGORITHM
+    private var cipherAlgorithm = getPreferredCipher()
     private var askForBenchmarking = true
 
     init {
@@ -215,7 +217,7 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
     }
 
     override fun onNothingSelected(p0: AdapterView<*>?) {
-        cipherAlgorithm = DEFAULT_CIPHER_ALGORITHM
+        cipherAlgorithm = getPreferredCipher()
     }
 }
 

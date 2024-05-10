@@ -4,6 +4,7 @@ import android.os.Build
 import de.jepfa.yapm.R
 
 val DEFAULT_CIPHER_ALGORITHM = CipherAlgorithm.AES_128
+val PREFERRED_CIPHER_ALGORITHM = CipherAlgorithm.AES_256
 
 enum class CipherAlgorithm(
     val keyLength: Int,
@@ -20,10 +21,15 @@ enum class CipherAlgorithm(
     BLOWFISH_256(256, "BLOWFISH/CBC/PKCS5Padding", "PBKDF2WithHmacSHA1", false, false, R.string.CIPHER_BLOWFISH_256, R.string.CIPHER_BLOWFISH_256_desc, Build.VERSION_CODES.GINGERBREAD_MR1),
     CHACHACHA20(256, "ChaCha20/Poly1305/NoPadding", "PBKDF2WithHmacSHA256", false, true, R.string.CIPHER_CHACHACHA20_256, R.string.CIPHER_CHACHACHA20_256_desc, Build.VERSION_CODES.P),
     ;
+
+    fun isSupported(): Boolean = Build.VERSION.SDK_INT >= supportedSdkVersion
+
     companion object {
         fun supportedValues(): List<CipherAlgorithm> {
             return values()
-                .filter { Build.VERSION.SDK_INT >= it.supportedSdkVersion }
+                .filter { it.isSupported() }
         }
+
+        fun getPreferredCipher() = if (PREFERRED_CIPHER_ALGORITHM.isSupported()) PREFERRED_CIPHER_ALGORITHM else DEFAULT_CIPHER_ALGORITHM
     }
 }
