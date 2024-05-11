@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -23,7 +24,9 @@ import de.jepfa.yapm.service.net.HttpServer
 import de.jepfa.yapm.service.net.HttpServer.toErrorResponse
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.ui.ServerRequestBottomSheet
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
+import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.ui.importread.ReadActivityBase
 import de.jepfa.yapm.usecase.webextension.DeleteWebExtensionUseCase
 import de.jepfa.yapm.util.*
@@ -42,7 +45,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
     private var webExtension: EncWebExtension? = null
     private var webClientId: String? = null
     private lateinit var saveButton: Button
-    private lateinit var titleTextView: TextView
+    private lateinit var titleTextView: EditText
     private lateinit var qrCodeScannerImageView: ImageView
     private lateinit var webClientIdTextView: TextView
     private lateinit var serverAddressTextView: TextView
@@ -79,7 +82,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
         saveButton = findViewById(R.id.button_save)
         saveButton.setOnClickListener {
 
-            if (TextUtils.isEmpty(titleTextView.text)) {
+            if (TextUtils.isEmpty(titleTextView.text) || titleTextView.text.isBlank()) {
                 titleTextView.error = getString(R.string.error_field_required)
                 titleTextView.requestFocus()
                 return@setOnClickListener
@@ -165,7 +168,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
 
     override fun isAllowedToScanQrCode(): Boolean {
         hideKeyboard(titleTextView)
-        if (TextUtils.isEmpty(titleTextView.text)) {
+        if (TextUtils.isEmpty(titleTextView.text) || titleTextView.text.isBlank()) {
             titleTextView.error = getString(R.string.error_field_required)
             titleTextView.requestFocus()
             return false
@@ -215,6 +218,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
             qrCodeScannerImageView.visibility = ViewGroup.GONE
             webClientIdTextView.visibility = ViewGroup.VISIBLE
             webClientIdTextView.text = webClientId
+            titleTextView.isEnabled = false
 
             masterSecretKey?.let { key ->
 
@@ -328,15 +332,27 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
                 response.put("sharedBaseKey", sharedBaseKeyBase64)
                 response.put("linkedVaultId", SaltService.getVaultId(this))
 
-            
+                val webClientTitle = SecretService.decryptCommonString(key, webExtension.title)
+
+
                 CoroutineScope(Dispatchers.Main).launch {
                     hideProgressBar()
 
-                    AlertDialog.Builder(this@AddWebExtensionActivity)
-                        .setTitle("Linking device $webClientId")
-                        .setMessage("Ensure that the fingerprint shown here is the same as displayed in the linked browser: " + shortenedServerPubKeyFingerprint)
-                        .setPositiveButton("Yes, same!") { _, _ ->
 
+                    ServerRequestBottomSheet(
+                        this@AddWebExtensionActivity,
+                        webClientTitle = webClientTitle,
+                        webClientId = webClientId,
+                        webRequestDetails = "wants to establish a permanent link with this device. Please verify the fingerprint before accepting!",
+                        fingerprint = shortenedServerPubKeyFingerprint,
+                        denyHandler = {
+                            removeWebExtension()
+                            val upIntent = Intent(this@AddWebExtensionActivity.intent)
+                            navigateUpTo(upIntent)
+
+                            toastText(this@AddWebExtensionActivity, "Not linked!")
+                        },
+                        acceptHandler = {
                             webExtension.linked = true
                             webExtensionViewModel.save(webExtension!!, this@AddWebExtensionActivity)
 
@@ -345,14 +361,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
 
                             toastText(this@AddWebExtensionActivity, "Device linked!")
                         }
-                        .setNegativeButton("No, different!") {_, _ ->
-                            removeWebExtension()
-                            val upIntent = Intent(this@AddWebExtensionActivity.intent)
-                            navigateUpTo(upIntent)
-
-                            toastText(this@AddWebExtensionActivity, "Not linked!")
-                        }
-                        .show()
+                    ).show()
                 }
 
                 Log.d("HTTP", "link response=" + response.toString(4))

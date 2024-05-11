@@ -14,7 +14,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.provider.BaseColumns
-import android.provider.Settings
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
@@ -38,7 +37,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.chip.Chip
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
@@ -76,6 +74,7 @@ import de.jepfa.yapm.service.notification.ReminderService
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
 import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.ui.ServerRequestBottomSheet
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.changelogin.ChangeEncryptionActivity
 import de.jepfa.yapm.ui.changelogin.ChangeMasterPasswordActivity
@@ -478,6 +477,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         val key = masterSecretKey ?: return toErrorResponse(HttpStatusCode.Unauthorized, "locked")
 
+        val webClientTitle = SecretService.decryptCommonString(key, webExtension.title)
+
         val requestIdentifier = message.getString("requestIdentifier")
         val website = message.getString("website")
 
@@ -505,41 +506,21 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 val shortenedFingerprint = fingerprintAsKey.toShortenedFingerprint()
 
 
-                val dialog = BottomSheetDialog(this@ListCredentialsActivity)
-                val bottomSheet = layoutInflater.inflate(R.layout.server_bottom_sheet, null)
-                dialog.setTitle("sdsdgsdg")
-                dialog.setCanceledOnTouchOutside(false)
-                dialog.setCancelable(false)
-
-                bottomSheet.findViewById<TextView>(R.id.text_webclient_id).text = webClientId
-                bottomSheet.findViewById<TextView>(R.id.text_fingerprint).text = shortenedFingerprint
-
-                bottomSheet.findViewById<Button>(R.id.button_server_call_deny).setOnClickListener {
-                    webClientCredentialRequestState = CredentialRequestState.Denied
-                    dialog.dismiss()
-                }
-                bottomSheet.findViewById<Button>(R.id.button_server_call_accept).setOnClickListener {
-                    webClientCredentialRequestState = CredentialRequestState.Accepted
-                    startSearchFor(extractDomain(website), commit = true)
-                    dialog.dismiss()
-                }
-
-                dialog.setContentView(bottomSheet)
-                dialog.show()
-
-                /*AlertDialog.Builder(this@ListCredentialsActivity)
-                    .setTitle("Incoming credential request")
-                    .setMessage("There is an incoming credential request from '$webClientId'. Request fingerprint displayed in the extension should be the same as: $shortenedFingerprint. Accept?")
-                    .setCancelable(false)
-                    .setPositiveButton("Accept") { v, _ ->
+                ServerRequestBottomSheet(
+                    this@ListCredentialsActivity,
+                    webClientTitle = webClientTitle,
+                    webClientId = webClientId,
+                    webRequestDetails = "wants to fetch credential for '${extractDomain(website, withTld = true)}'.",
+                    fingerprint = shortenedFingerprint,
+                    denyHandler = {
+                        webClientCredentialRequestState = CredentialRequestState.Denied
+                        toastText(this@ListCredentialsActivity, "Request denied")
+                    },
+                    acceptHandler = {
                         webClientCredentialRequestState = CredentialRequestState.Accepted
                         startSearchFor(extractDomain(website), commit = true)
-                        v.dismiss()
                     }
-                    .setNegativeButton("Deny") { v, _ ->
-                        webClientCredentialRequestState = CredentialRequestState.Denied
-                        v.dismiss()
-                    }.show()*/
+                ).show()
             }
 
             return toErrorResponse(HttpStatusCode.NotFound, "no user acknowledge")
@@ -597,10 +578,14 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
     }
 
-    private fun extractDomain(website: String): String {
+    private fun extractDomain(website: String, withTld: Boolean = false): String {
         try {
             val host = URL(website).host.lowercase()
-            return host.substringBeforeLast(".").substringAfterLast(".")
+            return if (withTld) {
+                host
+            } else {
+                host.substringBeforeLast(".").substringAfterLast(".")
+            }
         } catch (e: MalformedURLException) {
             return website.lowercase()
         }

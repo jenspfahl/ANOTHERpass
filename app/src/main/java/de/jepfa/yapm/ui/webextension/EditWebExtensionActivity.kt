@@ -62,7 +62,7 @@ class EditWebExtensionActivity : SecureActivity() {
         val saveButton: Button = findViewById(R.id.button_save)
         saveButton.setOnClickListener {
 
-            if (TextUtils.isEmpty(titleTextView.text)) {
+            if (TextUtils.isEmpty(titleTextView.text) || titleTextView.text.isBlank()) {
                 titleTextView.error = getString(R.string.error_field_required)
                 titleTextView.requestFocus()
                 return@setOnClickListener
