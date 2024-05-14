@@ -217,6 +217,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 when (item.itemId) {
                     R.id.menu_server_settings_hide -> {
                         //TODO
+                        toastText(this, "Not yet implemented")
+                        true
+                    }
+                    R.id.menu_server_settings_show_server_log -> {
+                        //TODO
+                        toastText(this, "Not yet implemented")
                         true
                     }
                     R.id.menu_server_settings_open_settings -> {
@@ -480,10 +486,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         val webClientTitle = SecretService.decryptCommonString(key, webExtension.title)
 
         val requestIdentifier = message.getString("requestIdentifier")
-        val website = message.getString("website")
+        val website = message.optString("website")
 
-        if (webClientRequestIdentifier != requestIdentifier/*
-            && webClientCredentialRequestState != CredentialRequestState.Requesting*/) {
+        if (webClientRequestIdentifier != requestIdentifier) {
             Log.i("HTTP", "new credential request $requestIdentifier for $webClientId")
             webClientCredentialRequestState = CredentialRequestState.Incoming
             webClientRequestIdentifier = requestIdentifier
@@ -506,11 +511,17 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 val shortenedFingerprint = fingerprintAsKey.toShortenedFingerprint()
 
 
+                val details = if (website.isNotBlank()) {
+                    "wants to fetch credential for '${extractDomain(website, withTld = true)}'."
+                }
+                else {
+                    "wants to ask for any credential. Please select one."
+                }
                 ServerRequestBottomSheet(
                     this@ListCredentialsActivity,
                     webClientTitle = webClientTitle,
                     webClientId = webClientId,
-                    webRequestDetails = "wants to fetch credential for '${extractDomain(website, withTld = true)}'.",
+                    webRequestDetails = details,
                     fingerprint = shortenedFingerprint,
                     denyHandler = {
                         webClientCredentialRequestState = CredentialRequestState.Denied
@@ -518,7 +529,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     },
                     acceptHandler = {
                         webClientCredentialRequestState = CredentialRequestState.Accepted
-                        startSearchFor(extractDomain(website), commit = true)
+                        if (website.isNotBlank()) {
+                            startSearchFor(extractDomain(website), commit = true)
+                        }
                     }
                 ).show()
             }
@@ -543,6 +556,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 val password = SecretService.decryptPassword(key, currCredential.password)
                 val user = SecretService.decryptCommonString(key, currCredential.user)
                 val name = SecretService.decryptCommonString(key, currCredential.name)
+                val website = SecretService.decryptCommonString(key, currCredential.website)
                 val uid = currCredential.uid
                 AutofillCredentialHolder.obfuscationKey?.let {
                     password.deobfuscate(it)
@@ -550,8 +564,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
                 val response = JSONObject()
                 response.put("uid", uid)
+                response.put("name", name)
                 response.put("password", password.toRawFormattedPassword())
                 response.put("user", user)
+                response.put("website", website)
+
                 password.clear()
 
                 webClientRequestIdentifier = null

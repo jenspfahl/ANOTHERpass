@@ -21,9 +21,9 @@ class Key : Secret {
     fun toShortenedFingerprint(): String {
         val f = toBase64String()
         .replace(Regex("[^a-z]", RegexOption.IGNORE_CASE), "")
-        .substring(0, 6)
-        .lowercase()
+        .substring(0, 7)
+        .uppercase()
 
-        return f.substring(0, 3) + "-" + f.substring(3, 6)
+        return f.substring(0, 2) + "-" + f.substring(2, 5) + "-" + f.substring(5, 7)
     }
 }
