@@ -38,6 +38,7 @@
         app:entryValues="@array/overlay_size_values"
         app:key="YAPM/pref:overlay_size"
         app:title="@string/pref_overlay_size_title"
+        app:dependency="YAPM/pref:enable_overlay_feature"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
         app:useSimpleSummaryProvider="true"/>

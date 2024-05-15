@@ -209,130 +209,94 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         serverViewState = findViewById(R.id.server_view_status)
         serverViewDetails = findViewById(R.id.server_view_details)
         serverViewSwitch = findViewById(R.id.server_view_switch)
-        val serverViewLink = findViewById<ImageView>(R.id.server_link)
-        val serverViewSettings = findViewById<ImageView>(R.id.server_settings)
-        serverViewSettings.setOnClickListener {
-            val popup = PopupMenu(this, it)
-            popup.setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    R.id.menu_server_settings_hide -> {
-                        //TODO
-                        toastText(this, "Not yet implemented")
-                        true
-                    }
-                    R.id.menu_server_settings_show_server_log -> {
-                        //TODO
-                        toastText(this, "Not yet implemented")
-                        true
-                    }
-                    R.id.menu_server_settings_open_settings -> {
-                        val intent = Intent(this, SettingsActivity::class.java)
-                        intent.putExtra("OpenServerSettings", true)
-                        startActivity(intent)
-                        true
-                    }
-                    else -> false
-                }
-            }
-            popup.inflate(R.menu.menu_server_settings)
-            popup.setForceShowIcon(true)
-            popup.show()
 
+        val serverCapabilityEnabled= PreferenceService.getAsBool(PreferenceService.PREF_SERVER_CAPABILITIES_ENABLED, true, this)
+        if (!serverCapabilityEnabled) {
+            serverView.visibility = View.GONE
+            //serverViewSwitch.isChecked = false
+            //reflectServerStopped()
         }
+        else {
 
-        serverViewLink.setOnClickListener {
-            if (serverViewSwitch.isEnabled) {
+            val serverViewLink = findViewById<ImageView>(R.id.server_link)
+            val serverViewSettings = findViewById<ImageView>(R.id.server_settings)
+            serverViewSettings.setOnClickListener {
                 val popup = PopupMenu(this, it)
                 popup.setOnMenuItemClickListener { item ->
                     when (item.itemId) {
-                        R.id.menu_server_link_add -> {
-                            if (!HttpServer.isRunning()) {
-                                toastText(this, "Please start the server first")
-                            }
-                            else if (!HttpServer.isWifiEnabled(this)) {
-                                toastText(this, "Please enable Wifi first")
-                            }
-                            else {
-                                val intent = Intent(this, AddWebExtensionActivity::class.java)
-                                startActivity(intent)
-                            }
+                        R.id.menu_server_settings_hide -> {
+                            //TODO
+                            toastText(this, "Not yet implemented")
                             true
                         }
-                        R.id.menu_server_link_manage -> {
-                            val intent = Intent(this, ListWebExtensionsActivity::class.java)
+                        R.id.menu_server_settings_show_server_log -> {
+                            //TODO
+                            toastText(this, "Not yet implemented")
+                            true
+                        }
+                        R.id.menu_server_settings_open_settings -> {
+                            val intent = Intent(this, SettingsActivity::class.java)
+                            intent.putExtra("OpenServerSettings", true)
                             startActivity(intent)
                             true
                         }
                         else -> false
                     }
                 }
-                popup.inflate(R.menu.menu_server_link)
+                popup.inflate(R.menu.menu_server_settings)
                 popup.setForceShowIcon(true)
                 popup.show()
+
             }
-        }
 
-        reflectServerStopped()
-        //TODO server restart when orientation changes should be denied
-        serverViewSwitch.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                serverViewStateText = "Starting ..."
-                serverViewState.text = serverViewStateText
-                serverViewSwitch.isEnabled = false
-                startAllServersAsync(this, this).asCompletableFuture().whenComplete { success, e ->
-                    Log.i("HTTP", "async server start success: $success")
-
-                    CoroutineScope(Dispatchers.Main).launch {
-                        serverViewSwitch.isEnabled = true
-
-                        if (e != null) {
-                            Log.w("HTTP", e)
-                        }
-
-                        if (success == null || !success) {
-                            serverViewSwitch.isChecked = false
-                            toastText(this@ListCredentialsActivity, "Failed to start server. Is Wifi enabled?")
-                        } else {
-                            reflectServerStarted()
-                            toastText(this@ListCredentialsActivity, "Server started")
-                            HttpServer.requestCredentialHttpCallback = this@ListCredentialsActivity
+            serverViewLink.setOnClickListener {
+                if (serverViewSwitch.isEnabled) {
+                    val popup = PopupMenu(this, it)
+                    popup.setOnMenuItemClickListener { item ->
+                        when (item.itemId) {
+                            R.id.menu_server_link_add -> {
+                                if (!HttpServer.isRunning()) {
+                                    toastText(this, "Please start the server first")
+                                } else if (!HttpServer.isWifiEnabled(this)) {
+                                    toastText(this, "Please enable Wifi first")
+                                } else {
+                                    val intent = Intent(this, AddWebExtensionActivity::class.java)
+                                    startActivity(intent)
+                                }
+                                true
+                            }
+                            R.id.menu_server_link_manage -> {
+                                val intent = Intent(this, ListWebExtensionsActivity::class.java)
+                                startActivity(intent)
+                                true
+                            }
+                            else -> false
                         }
                     }
+                    popup.inflate(R.menu.menu_server_link)
+                    popup.setForceShowIcon(true)
+                    popup.show()
                 }
+            }
+
+            //TODO server restart when orientation changes should be denied
+            serverViewSwitch.setOnCheckedChangeListener { _, isChecked ->
+                startStopServer(isChecked)
+            }
+
+            val serverAutostartEnabled = PreferenceService.getAsBool(PreferenceService.PREF_SERVER_AUTOSTART, false, this)
+            if (!Session.isDenied() && serverAutostartEnabled) {
+               // serverViewSwitch.setOnCheckedChangeListener(null)
+                serverViewSwitch.performClick()
+                //startStopServer(start = true)
+                //reflectServerState()
+
             }
             else {
-                if (HttpServer.isRunning()) { // otherwise it is already stopped
-                    serverViewStateText = "Stopping ..."
-                    serverViewState.text = serverViewStateText
-                    serverViewSwitch.isEnabled = false
-                    wasWifiLost = false
-
-                    shutdownAllAsync().asCompletableFuture().whenComplete { success, e ->
-                        Log.i("HTTP", "async stop=$success")
-
-                        CoroutineScope(Dispatchers.Main).launch {
-                            serverViewSwitch.isEnabled = true
-
-                            webClientRequestIdentifier = null
-                            webClientCredentialRequestState = CredentialRequestState.Incoming
-
-                            if (e != null) {
-                                Log.w("HTTP", e)
-                            }
-                            if (success == null || !success) {
-                                serverViewSwitch.isChecked = true
-                                toastText(this@ListCredentialsActivity, "Failed to stop server")
-                            } else {
-                                reflectServerStopped()
-                                toastText(this@ListCredentialsActivity, "Server stopped")
-                            }
-                        }
-                    }
-                }
-                else {
-                    reflectServerStopped()
-                }
+                reflectServerState()
             }
+
+
         }
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
@@ -473,6 +437,70 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     }
 
+    private fun startStopServer(start: Boolean) {
+        if (start) {
+            serverViewStateText = "Starting ..."
+            serverViewState.text = serverViewStateText
+            serverViewSwitch.isEnabled = false
+            startAllServersAsync(this, this).asCompletableFuture()
+                .whenComplete { success, e ->
+                    Log.i("HTTP", "async server start success: $success")
+
+                    CoroutineScope(Dispatchers.Main).launch {
+                        serverViewSwitch.isEnabled = true
+
+                        if (e != null) {
+                            Log.w("HTTP", e)
+                        }
+
+                        if (success == null || !success) {
+                            serverViewSwitch.isChecked = false
+                            toastText(
+                                this@ListCredentialsActivity,
+                                "Failed to start server. Is Wifi enabled?"
+                            )
+                        } else {
+                            reflectServerStarted()
+                            toastText(this@ListCredentialsActivity, "Server started")
+                            HttpServer.requestCredentialHttpCallback =
+                                this@ListCredentialsActivity
+                        }
+                    }
+                }
+        } else {
+            if (HttpServer.isRunning()) { // otherwise it is already stopped
+                serverViewStateText = "Stopping ..."
+                serverViewState.text = serverViewStateText
+                serverViewSwitch.isEnabled = false
+                wasWifiLost = false
+
+                shutdownAllAsync().asCompletableFuture().whenComplete { success, e ->
+                    Log.i("HTTP", "async stop=$success")
+
+                    CoroutineScope(Dispatchers.Main).launch {
+                        serverViewSwitch.isEnabled = true
+
+                        webClientRequestIdentifier = null
+                        webClientCredentialRequestState = CredentialRequestState.Incoming
+
+                        if (e != null) {
+                            Log.w("HTTP", e)
+                        }
+                        if (success == null || !success) {
+                            serverViewSwitch.isChecked = true
+                            toastText(this@ListCredentialsActivity, "Failed to stop server")
+                        } else {
+                            reflectServerStopped()
+                            toastText(this@ListCredentialsActivity, "Server stopped")
+                        }
+                    }
+                }
+            } else {
+                reflectServerStopped()
+            }
+        }
+    }
+
     override fun handleHttpRequest(
         action: HttpServer.Action,
         webClientId: String,
@@ -609,6 +637,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     }
 
     private fun reflectServerStarted(msg: String? = null, showIp: Boolean = true) {
+        serverViewSwitch.isChecked = true
         serverViewStateText = msg?: "Listening ..."
         serverViewState.text = serverViewStateText
         serverViewState.setTypeface(null, Typeface.BOLD)
@@ -626,16 +655,19 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     }
 
     private fun reflectServerStopped(msg: String? = null) {
-        serverViewStateText = msg ?: "Stopped"
-        serverViewState.text = serverViewStateText
-        serverView.background = null
-        serverViewDetails.text = ""
-        serverViewState.setTypeface(null, Typeface.NORMAL)
-        serverViewDetails.visibility = ViewGroup.GONE
+        if (!HttpServer.isRunning()) {
+            serverViewSwitch.isChecked = false
+            serverViewStateText = msg ?: "Stopped"
+            serverViewState.text = serverViewStateText
+            serverView.background = null
+            serverViewDetails.text = ""
+            serverViewState.setTypeface(null, Typeface.NORMAL)
+            serverViewDetails.visibility = ViewGroup.GONE
+        }
     }
 
     private fun reflectServerState(msg: String? = null, showIp: Boolean = true) {
-        if (serverViewSwitch.isEnabled) {
+        if (serverViewSwitch.isChecked /*&& HttpServer.isRunning()*/) {
             reflectServerStarted(msg, showIp)
         }
         else {

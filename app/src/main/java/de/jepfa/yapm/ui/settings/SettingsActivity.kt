@@ -16,6 +16,8 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.service.biometrix.BiometricUtils
+import de.jepfa.yapm.service.net.HttpServer
+import de.jepfa.yapm.service.net.HttpServer.DEFAULT_HTTPS_SERVER_PORT
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.login.LoginActivity
@@ -359,21 +361,29 @@ class SettingsActivity : SecureActivity(),
             preferenceManager.preferenceDataStore = EncryptedPreferenceDataStore.getInstance(requireContext())
             setPreferencesFromResource(R.xml.server_preferences, rootKey)
 
-            val serverEnabled = PreferenceService.getAsBool(PreferenceService.PREF_SERVER_CAPABILITIES_ENABLED, context)
+            val prefServerCapabilityEnabled = findPreference<SwitchPreferenceCompat>(
+                PreferenceService.PREF_SERVER_CAPABILITIES_ENABLED)
+
+            prefServerCapabilityEnabled?.let {
+                it.setOnPreferenceChangeListener { preference, newValue ->
+                    if (newValue == false) {
+                        HttpServer.shutdownAllAsync()
+                    }
+                    PreferenceService.putBoolean(PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD, true, preference.context)
+                    true
+                }
+            }
 
             findPreference<EditTextPreference>(PreferenceService.PREF_SERVER_PORT)?.let { pref ->
-                if (serverEnabled) {
-                    pref.setOnBindEditTextListener { editText ->
-                        editText.inputType = InputType.TYPE_CLASS_NUMBER
-                        editText.filters = arrayOf(InputFilter.LengthFilter(5))
-                    }
-                    val port =
-                        PreferenceService.getAsString(PreferenceService.PREF_SERVER_PORT, context)
-                    pref.text = if (port == null || port == "" || port == "0") 8001.toString() else port.toString()
+                pref.setOnBindEditTextListener { editText ->
+                    editText.inputType = InputType.TYPE_CLASS_NUMBER
+                    editText.filters = arrayOf(InputFilter.LengthFilter(5))
                 }
-                else {
-                    pref.isEnabled = false
-                }
+
+                val port =
+                    PreferenceService.getAsString(PreferenceService.PREF_SERVER_PORT, context)
+                pref.text = if (port == null || port == "" || port == "0") DEFAULT_HTTPS_SERVER_PORT.toString() else port.toString()
+
             }
         }
     }

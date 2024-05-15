@@ -16,6 +16,7 @@ import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.encrypted.EncryptedType
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.SecretKeyHolder
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.util.sha256
@@ -42,6 +43,8 @@ import javax.security.auth.x500.X500Principal
 
 object HttpServer {
 
+    val DEFAULT_HTTPS_SERVER_PORT = 8000
+    val DEFAULT_HTTP_SERVER_PORT = 8001
 
     enum class Action {LINKING, REQUEST_CREDENTIAL}
 
@@ -343,8 +346,11 @@ object HttpServer {
                 return@async false
             }
 
-            val startWebServerAsync = startWebServerAsync(8000, activity)
-            val startApiServerAsync = startApiServerAsync(8001, activity, httpServerCallback)
+            val startWebServerAsync = startWebServerAsync(DEFAULT_HTTPS_SERVER_PORT, activity)
+
+            var httpServerPort = PreferenceService.getAsInt(PreferenceService.PREF_SERVER_PORT, activity)
+            if (httpServerPort <= 0) httpServerPort = DEFAULT_HTTP_SERVER_PORT
+            val startApiServerAsync = startApiServerAsync(httpServerPort, activity, httpServerCallback)
             Log.i("HTTP", "awaiting start")
 
             val (successWebServer, successApiServer) = awaitAll(startWebServerAsync, startApiServerAsync)
