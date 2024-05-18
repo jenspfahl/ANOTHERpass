@@ -14,10 +14,12 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.provider.BaseColumns
+import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
+import android.text.style.TypefaceSpan
 import android.util.Base64
 import android.util.Log
 import android.view.*
@@ -30,6 +32,7 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.MenuItemCompat
@@ -40,6 +43,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncWebExtension
@@ -545,23 +549,67 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 else {
                     "wants to ask for any credential. Please select one."
                 }
-                ServerRequestBottomSheet(
-                    this@ListCredentialsActivity,
-                    webClientTitle = webClientTitle,
-                    webClientId = webClientId,
-                    webRequestDetails = details,
-                    fingerprint = shortenedFingerprint,
-                    denyHandler = {
-                        webClientCredentialRequestState = CredentialRequestState.Denied
-                        toastText(this@ListCredentialsActivity, "Request denied")
-                    },
-                    acceptHandler = {
-                        webClientCredentialRequestState = CredentialRequestState.Accepted
-                        if (website.isNotBlank()) {
-                            startSearchFor(extractDomain(website), commit = true)
-                        }
+                if (webExtension.bypassIncomingRequests) {
+                    webClientCredentialRequestState = CredentialRequestState.Accepted
+                    if (website.isNotBlank()) {
+                        startSearchFor(extractDomain(website), commit = true)
                     }
-                ).show()
+
+                    val span = SpannableString("$webClientTitle ($webClientId) $details Fingerprint: $shortenedFingerprint")
+
+                    span.setSpan(ForegroundColorSpan(getColor(R.color.colorAltAccent)),
+                        0, webClientTitle.length + webClientId.length + 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    span.setSpan(StyleSpan(Typeface.BOLD),
+                        0, webClientTitle.length + webClientId.length + 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        span.setSpan(
+                            TypefaceSpan(Typeface.MONOSPACE),
+                            span.length - shortenedFingerprint.length,
+                            span.length,
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                        )
+                    }
+                    span.setSpan(
+                        StyleSpan(Typeface.BOLD),
+                        span.length - shortenedFingerprint.length,
+                        span.length,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+
+                    val snackbar = Snackbar.make(
+                        serverView,
+                        span,
+                        15_000
+                    )
+                        .setAction("Deny and revoke") {
+                            webClientCredentialRequestState = CredentialRequestState.Denied
+                            toastText(this@ListCredentialsActivity, "Automatic bypass revoked")
+                            webExtension.bypassIncomingRequests = false
+                            webExtensionViewModel.save(webExtension, this@ListCredentialsActivity)
+                        }
+
+                    snackbar.show()
+                }
+                else {
+                    ServerRequestBottomSheet(
+                        this@ListCredentialsActivity,
+                        webClientTitle = webClientTitle,
+                        webClientId = webClientId,
+                        webRequestDetails = details,
+                        fingerprint = shortenedFingerprint,
+                        denyHandler = {
+                            webClientCredentialRequestState = CredentialRequestState.Denied
+                            toastText(this@ListCredentialsActivity, "Request denied")
+                        },
+                        acceptHandler = {
+                            webClientCredentialRequestState = CredentialRequestState.Accepted
+                            if (website.isNotBlank()) {
+                                startSearchFor(extractDomain(website), commit = true)
+                            }
+                        }
+                    ).show()
+                }
             }
 
             return toErrorResponse(HttpStatusCode.NotFound, "no user acknowledge")
