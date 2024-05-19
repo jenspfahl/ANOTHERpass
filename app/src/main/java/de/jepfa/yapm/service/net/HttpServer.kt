@@ -44,7 +44,6 @@ import javax.security.auth.x500.X500Principal
 
 object HttpServer {
 
-    val DEFAULT_HTTPS_SERVER_PORT = 8000
     val DEFAULT_HTTP_SERVER_PORT = 8001
     val SERVER_LOG_PREFIX = Constants.LOG_PREFIX + "HttpServer"
 
@@ -61,80 +60,11 @@ object HttpServer {
     }
 
 
-    private var httpsServer: NettyApplicationEngine? = null
     private var httpServer: NettyApplicationEngine? = null
-
-    private var isHttpsServerRunning = false
     private var isHttpServerRunning = false
 
     var linkHttpCallback: HttpCallback? = null
     var requestCredentialHttpCallback: HttpCallback? = null
-
-    fun startWebServerAsync(_port: Int, activity: SecureActivity): Deferred<Boolean> {
-
-        val inMemoryOTP =
-            SecretService.getSecureRandom(activity).nextLong().toString() +
-            SecretService.getSecureRandom(activity).nextLong().toString()
-
-        val certId = SecretService.getSecureRandom(activity).nextInt(10000)
-        return CoroutineScope(Dispatchers.IO).async {
-            Log.i("HTTP", "start TLS server")
-            try {
-                val alias = "anotherpass_https_cert"
-                val keyStore = buildKeyStore {
-                    certificate(alias) {
-                        daysValid = 365
-                        subject = X500Principal("CN=ID$certId, OU=ANOTHERpass, O=jepfa, C=DE")
-                        password = inMemoryOTP
-                    }
-                }
-
-                val publicKey = keyStore.getCertificate(alias).publicKey
-                val fingerprint = getSHA256Fingerprint(publicKey)
-
-                val environment = applicationEngineEnvironment {
-                    log = LoggerFactory.getLogger("ktor.application")
-                    sslConnector(
-                        keyStore = keyStore,
-                        keyAlias = alias,
-                        keyStorePassword = { CharArray(0) },
-                        privateKeyPassword = { inMemoryOTP.toCharArray() }
-                    )
-                    {
-                        port = _port
-                    }
-                    module {
-                        routing {
-                            get("/") {
-                                call.response.header(
-                                    "Access-Control-Allow-Origin",
-                                    "*"
-                                )
-                                call.respondText(
-                                    text = "<h1>Hello, this is ANOTHERpass on TLS! Current certificate id is $certId and fingerprint is <pre>$fingerprint</pre></h1>",
-                                    contentType = ContentType("text", "html"),
-                                )
-                            }
-                        }
-                    }
-                }
-
-                if (httpsServer != null) {
-                    httpsServer?.stop()
-                }
-                httpsServer = embeddedServer(Netty, environment)
-                Log.i("HTTP", "launch Web server")
-                httpsServer?.start(wait = false)
-                Log.i("HTTP", "TLS server started")
-                isHttpsServerRunning = true
-                true
-            } catch (e: Exception) {
-                Log.e("HTTP", e.toString())
-                isHttpsServerRunning = false
-                false
-            }
-        }
-    }
 
     fun startApiServerAsync(
         _port: Int, activity: SecureActivity,
@@ -381,20 +311,18 @@ object HttpServer {
                 return@async false
             }
 
-            val startWebServerAsync = startWebServerAsync(DEFAULT_HTTPS_SERVER_PORT, activity)
 
             var httpServerPort = PreferenceService.getAsInt(PreferenceService.PREF_SERVER_PORT, activity)
             if (httpServerPort <= 0) httpServerPort = DEFAULT_HTTP_SERVER_PORT
             val startApiServerAsync = startApiServerAsync(httpServerPort, activity, httpServerCallback)
             Log.i("HTTP", "awaiting start")
 
-            val (successWebServer, successApiServer) = awaitAll(startWebServerAsync, startApiServerAsync)
-            Log.i("HTTP", "successWebServer = $successWebServer")
+            val (successApiServer) = awaitAll(startApiServerAsync)
             Log.i("HTTP", "successApiServer = $successApiServer")
 
             monitorWifiEnablement(activity, httpServerCallback)
 
-            val success = successWebServer && successApiServer
+            val success = successApiServer
             if (success) {
                 serverLog(
                     webClientId = null,
@@ -463,7 +391,7 @@ object HttpServer {
     }
 
     fun isRunning(): Boolean {
-        return isHttpsServerRunning && isHttpServerRunning
+        return isHttpServerRunning
     }
 
     fun shutdownAllAsync() : Deferred<Boolean> {
@@ -473,19 +401,16 @@ object HttpServer {
             try {
                 Log.i("HTTP", "shutdown all")
 
-                httpsServer?.stop()
-                isHttpsServerRunning = false
                 httpServer?.stop()
                 isHttpServerRunning = false
                 Log.i("HTTP", "shutdown done")
 
-                if (httpsServer != null && httpServer != null) { //server ran before
+                if (httpServer != null) { //server ran before
                     serverLog(
                         webClientId = null,
                         msg = "Server stopped",
                     )
                 }
-                httpsServer = null
                 httpServer = null
 
                 true

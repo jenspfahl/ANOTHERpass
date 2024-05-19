@@ -17,7 +17,7 @@ import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.service.biometrix.BiometricUtils
 import de.jepfa.yapm.service.net.HttpServer
-import de.jepfa.yapm.service.net.HttpServer.DEFAULT_HTTPS_SERVER_PORT
+import de.jepfa.yapm.service.net.HttpServer.DEFAULT_HTTP_SERVER_PORT
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.login.LoginActivity
@@ -382,7 +382,7 @@ class SettingsActivity : SecureActivity(),
 
                 val port =
                     PreferenceService.getAsString(PreferenceService.PREF_SERVER_PORT, context)
-                pref.text = if (port == null || port == "" || port == "0") DEFAULT_HTTPS_SERVER_PORT.toString() else port.toString()
+                pref.text = if (port == null || port == "" || port == "0") DEFAULT_HTTP_SERVER_PORT.toString() else port.toString()
 
             }
         }
