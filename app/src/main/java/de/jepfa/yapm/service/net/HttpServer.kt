@@ -19,13 +19,13 @@ import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.util.sha256
-import de.jepfa.yapm.util.toHex
+import de.jepfa.yapm.util.*
 import io.ktor.http.*
 import io.ktor.network.tls.certificates.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -38,6 +38,7 @@ import java.net.InetAddress
 import java.security.NoSuchAlgorithmException
 import java.security.PublicKey
 import java.security.cert.CertificateEncodingException
+import java.util.*
 import javax.security.auth.x500.X500Principal
 
 
@@ -45,6 +46,7 @@ object HttpServer {
 
     val DEFAULT_HTTPS_SERVER_PORT = 8000
     val DEFAULT_HTTP_SERVER_PORT = 8001
+    val SERVER_LOG_PREFIX = Constants.LOG_PREFIX + "HttpServer"
 
     enum class Action {LINKING, REQUEST_CREDENTIAL}
 
@@ -154,6 +156,12 @@ object HttpServer {
                                     "Access-Control-Allow-Origin",
                                     "*"
                                 )
+
+                                serverLog(
+                                    origin = call.request.origin,
+                                    msg = "GET received",
+                                )
+
                                 call.respondText(
                                     text = "Use the ANOTHERpass browser extension to use the app as a credential server.",
                                     contentType = ContentType("text", "html"),
@@ -169,33 +177,47 @@ object HttpServer {
                                     "X-WebClientId,Content-Type"
                                 )
 
+                                serverLog(origin = call.request.origin, msg = "OPTIONS received")
+
                                 call.respond(
                                     status = HttpStatusCode.OK,
                                     message = ""
                                 )
                             }
                             post("/") {
+                                var webClientId: String? = null
                                 try {
                                     call.response.header(
                                         "Access-Control-Allow-Origin",
                                         "*"
                                     )
 
-                                    val webClientId = call.request.headers["X-WebClientId"]
+                                    serverLog(
+                                        origin = call.request.origin,
+                                        msg = "POST received",
+                                    )
+
+
+                                    webClientId = call.request.headers["X-WebClientId"]
                                     httpServerCallback.handleOnIncomingRequest(webClientId)
 
                                     if (webClientId == null) {
                                         //fail
                                         respondError(
+                                            null,
                                             HttpStatusCode.BadRequest,
-                                            "X-WebClientId header missing"
+                                            "X-WebClientId header missing",
                                         )
                                         return@post
                                     }
 
                                     val key = activity.masterSecretKey
                                     if (key == null) {
-                                        respondError(HttpStatusCode.Unauthorized, "Locked")
+                                        respondError(
+                                            webClientId,
+                                            HttpStatusCode.Unauthorized,
+                                            "Locked",
+                                        )
                                         return@post
                                     }
 
@@ -209,8 +231,9 @@ object HttpServer {
                                             }
                                     if (webExtension == null) {
                                         respondError(
+                                            webClientId,
                                             HttpStatusCode.NotFound,
-                                            "$webClientId is unknown"
+                                            "webClientId is unknown",
                                         )
                                         return@post
                                     }
@@ -218,8 +241,9 @@ object HttpServer {
 
                                     if (!webExtension.enabled) {
                                         respondError(
+                                            webClientId,
                                             HttpStatusCode.Forbidden,
-                                            "$webClientId is blocked"
+                                            "webClientId is blocked",
                                         )
                                         return@post
                                     }
@@ -234,8 +258,9 @@ object HttpServer {
                                     if (!sharedBaseOrLinkingSessionKey.isValid()) {
                                         Log.w("HTTP", "No configured base key")
                                         respondError(
+                                            webClientId,
                                             HttpStatusCode.BadRequest,
-                                            "No base key"
+                                            "No base key",
                                         )
                                         return@post
                                     }
@@ -250,8 +275,9 @@ object HttpServer {
                                     )
                                     if (requestTransportKey == null) {
                                         respondError(
+                                            webClientId,
                                             HttpStatusCode.BadRequest,
-                                            "Cannot derive request transport key"
+                                            "Cannot derive request transport key",
                                         )
                                         return@post
                                     }
@@ -263,31 +289,38 @@ object HttpServer {
                                     )
                                     if (message == null) {
                                         respondError(
+                                            webClientId,
                                             HttpStatusCode.BadRequest,
-                                            "Cannot parse message"
+                                            "Cannot parse message",
                                         )
                                         return@post
                                     }
 
-                                    val response = handleAction(webExtension, webClientId, message)
+                                    val response = handleAction(call.request.origin, webExtension, webClientId, message)
                                     if (response == null) {
                                         respondError(
+                                            webClientId,
                                             HttpStatusCode.InternalServerError,
-                                            "Missing action listener"
+                                            "Missing action listener",
                                         )
                                         return@post
                                     }
 
                                     if (!response.first.isSuccess()) {
-                                        respondError(response.first, response.second)
+                                        respondError(
+                                            webClientId,
+                                            response.first,
+                                            response.second,
+                                        )
                                         return@post
                                     }
 
                                     val responseKeys = extractResponseTransportKey(sharedBaseOrLinkingSessionKey, key, webExtension, activity)
                                     if (responseKeys == null) {
                                         respondError(
+                                            webClientId,
                                             HttpStatusCode.BadRequest,
-                                            "Cannot provide a valid response"
+                                            "Cannot provide a valid response",
                                         )
                                         return@post
                                     }
@@ -299,12 +332,13 @@ object HttpServer {
                                         response.second,
                                         activity)
 
-                                    respond(text, response)
+                                    respond(webClientId, text, response)
                                 } catch (e: Exception) {
                                     Log.e("HTTP", "Something went wrong!!!", e)
                                     respondError(
+                                        webClientId,
                                         HttpStatusCode.InternalServerError,
-                                        "Unexpected error during handling post request: ${e.stackTraceToString() ?: e.toString()}"
+                                        "Unexpected error during handling post request: ${e.message ?: e.toString()}",
                                     )
                                     return@post
                                 }
@@ -320,6 +354,7 @@ object HttpServer {
                 httpServer = embeddedServer(Netty, environment)
                 httpServer?.start(wait = false)
                 Log.i("HTTP", "API server started")
+
                 isHttpServerRunning = true
                 true
             } catch (e: Exception) {
@@ -359,7 +394,15 @@ object HttpServer {
 
             monitorWifiEnablement(activity, httpServerCallback)
 
-            successWebServer && successApiServer
+            val success = successWebServer && successApiServer
+            if (success) {
+                serverLog(
+                    webClientId = null,
+                    msg = "Server started on port $httpServerPort",
+                )
+            }
+
+            return@async success
         }
 
     }
@@ -436,10 +479,41 @@ object HttpServer {
                 isHttpServerRunning = false
                 Log.i("HTTP", "shutdown done")
 
+                if (httpsServer != null && httpServer != null) { //server ran before
+                    serverLog(
+                        webClientId = null,
+                        msg = "Server stopped",
+                    )
+                }
+                httpsServer = null
+                httpServer = null
+
                 true
             } catch (e: Exception) {
                 Log.e("HTTP", e.toString())
                 false
+            }
+        }
+    }
+
+    private fun serverLog(
+        origin: RequestConnectionPoint? = null,
+        webClientId: String? = null,
+        msg: String,
+    ) {
+        val dateTime = Date().toSimpleDateTimeFormat()
+        if (webClientId == null && origin == null) {
+            Log.i(SERVER_LOG_PREFIX, "$dateTime : $msg")
+        }
+        else {
+            val webClient = webClientId ?: "-unknwn-"
+            if (origin != null) {
+                val remoteHost = origin.remoteHost
+                val remotePort = origin.remotePort
+                Log.i(SERVER_LOG_PREFIX, "$dateTime [ $webClient @ $remoteHost:$remotePort ] : $msg")
+            }
+            else {
+                Log.i(SERVER_LOG_PREFIX, "$dateTime [$webClient] : $msg")
             }
         }
     }
@@ -586,11 +660,21 @@ object HttpServer {
         Pair(httStatusCode, toErrorJson(msg))
 
     private fun handleAction(
+        origin: RequestConnectionPoint,
         webExtension: EncWebExtension,
         webClientId: String,
         message: JSONObject,
     ): Pair<HttpStatusCode, JSONObject>? {
-        return when (val action = message.get("action")) {
+
+        val action = message.get("action")
+
+        serverLog(
+            origin = origin,
+            webClientId = webClientId,
+            msg = "Handling action $action",
+        )
+
+        return when (action) {
             "link_app" -> handleLinking(Action.LINKING, webClientId, webExtension, message)
             "request_credential" -> handleRequestCredential(Action.REQUEST_CREDENTIAL, webClientId, webExtension, message)
             else -> Pair(HttpStatusCode.BadRequest, toErrorJson("unknown action: $action"))
@@ -638,9 +722,17 @@ object HttpServer {
     }
 
     private suspend fun PipelineContext<Unit, ApplicationCall>.respond(
+        webClientId: String,
         text: String,
         response: Pair<HttpStatusCode, JSONObject>
     ) {
+
+        serverLog(
+            origin = call.request.origin,
+            webClientId = webClientId,
+            msg = "Respond OK",
+        )
+
         call.respondText(
             text = text,
             contentType = ContentType("application", "json"),
@@ -649,9 +741,17 @@ object HttpServer {
     }
 
     private suspend fun PipelineContext<Unit, ApplicationCall>.respondError(
+        webClientId: String?,
         code: HttpStatusCode,
-        json: JSONObject
+        json: JSONObject,
     ) {
+
+        serverLog(
+            origin = call.request.origin,
+            webClientId = webClientId,
+            msg = "Error response: $code - ${json.optString("error")} ",
+        )
+
         call.respondText(
             text = json.toString(4),
             contentType = ContentType("application", "json"),
@@ -660,9 +760,16 @@ object HttpServer {
     }
 
     private suspend fun PipelineContext<Unit, ApplicationCall>.respondError(
+        webClientId: String?,
         code: HttpStatusCode,
-        msg: String
+        msg: String,
     ) {
+        serverLog(
+            origin = call.request.origin,
+            webClientId = webClientId,
+            msg = "Error response: $code - $msg",
+        )
+
         call.respondText(
             text = toErrorJson(msg).toString(4),
             contentType = ContentType("application", "json"),

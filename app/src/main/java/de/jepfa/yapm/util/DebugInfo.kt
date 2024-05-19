@@ -9,6 +9,7 @@ import de.jepfa.yapm.database.YapmDatabase
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_VERSION
 import de.jepfa.yapm.service.biometrix.BiometricUtils
+import de.jepfa.yapm.service.net.HttpServer.SERVER_LOG_PREFIX
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.service.secret.SaltService
@@ -107,8 +108,8 @@ object DebugInfo {
         sb.addFormattedLine("Codename", Build.VERSION.CODENAME)
         sb.addFormattedLine("Security patch", Build.VERSION.SECURITY_PATCH)
 
-        sb.append("\n************ APP-LOG ************\n")
-        val logs = getLogcat(LOG_PREFIX)?.takeLast(1024)
+        sb.append("\n************ APP-ERROR-LOG ************\n")
+        val logs = getLogcat(LOG_PREFIX, command = "-v time *:E", null)?.takeLast(1024)
         sb.append(logs)
 
         return sb.toString()
@@ -118,7 +119,11 @@ object DebugInfo {
         return getLogcat("", command = "-b all *:D")?:"no logs available"
     }
 
-    private fun getLogcat(filter: String, command: String = "-v time *:I"): String? {
+    fun getServerLog(context: Context): String {
+        return getLogcat(SERVER_LOG_PREFIX, command = "-v tag *:I", cutoutPrefix = "I/$SERVER_LOG_PREFIX")?:"no logs available"
+    }
+
+    private fun getLogcat(filter: String, command: String = "-v time *:I", cutoutPrefix: String? = null): String? {
         try {
             val p = Runtime.getRuntime().exec("logcat -d $command") // only errors
             BufferedReader(InputStreamReader(p.inputStream)).use { bais ->
@@ -127,6 +132,9 @@ object DebugInfo {
                         var line: String?
                         while (bais.readLine().also { line = it } != null) {
                             if (line?.contains(filter) == true) {
+                                if (cutoutPrefix != null) {
+                                    line = line?.removePrefix(cutoutPrefix)
+                                }
                                 pw.println(line)
                             }
                         }
