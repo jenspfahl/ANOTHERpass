@@ -2,7 +2,6 @@ package de.jepfa.yapm.ui.login
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.util.Log

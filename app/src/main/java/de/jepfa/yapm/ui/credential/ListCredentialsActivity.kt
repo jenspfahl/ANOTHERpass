@@ -32,7 +32,6 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.MenuItemCompat
@@ -99,6 +98,7 @@ import de.jepfa.yapm.ui.webextension.AddWebExtensionActivity
 import de.jepfa.yapm.ui.webextension.ListWebExtensionsActivity
 import de.jepfa.yapm.usecase.app.ShowDebugLogUseCase
 import de.jepfa.yapm.usecase.app.ShowInfoUseCase
+import de.jepfa.yapm.usecase.app.ShowServerLogUseCase
 import de.jepfa.yapm.usecase.credential.DeleteMultipleCredentialsUseCase
 import de.jepfa.yapm.usecase.secret.*
 import de.jepfa.yapm.usecase.session.LogoutUseCase
@@ -234,8 +234,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                             true
                         }
                         R.id.menu_server_settings_show_server_log -> {
-                            //TODO
-                            toastText(this, "Not yet implemented")
+                            ShowServerLogUseCase.execute(this)
                             true
                         }
                         R.id.menu_server_settings_open_settings -> {

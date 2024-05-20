@@ -21,7 +21,6 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.util.*
 import io.ktor.http.*
-import io.ktor.network.tls.certificates.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -32,14 +31,12 @@ import io.ktor.server.routing.*
 import io.ktor.util.pipeline.*
 import kotlinx.coroutines.*
 import org.json.JSONObject
-import org.slf4j.LoggerFactory
 import java.math.BigInteger
 import java.net.InetAddress
 import java.security.NoSuchAlgorithmException
 import java.security.PublicKey
 import java.security.cert.CertificateEncodingException
 import java.util.*
-import javax.security.auth.x500.X500Principal
 
 
 object HttpServer {
@@ -89,7 +86,7 @@ object HttpServer {
 
                                 serverLog(
                                     origin = call.request.origin,
-                                    msg = "GET received",
+                                    msg = "GET request received, ignored",
                                 )
 
                                 call.respondText(
@@ -107,8 +104,6 @@ object HttpServer {
                                     "X-WebClientId,Content-Type"
                                 )
 
-                                serverLog(origin = call.request.origin, msg = "OPTIONS received")
-
                                 call.respond(
                                     status = HttpStatusCode.OK,
                                     message = ""
@@ -122,13 +117,14 @@ object HttpServer {
                                         "*"
                                     )
 
+                                    webClientId = call.request.headers["X-WebClientId"]
+
                                     serverLog(
+                                        webClientId = webClientId,
                                         origin = call.request.origin,
-                                        msg = "POST received",
+                                        msg = "POST request received",
                                     )
 
-
-                                    webClientId = call.request.headers["X-WebClientId"]
                                     httpServerCallback.handleOnIncomingRequest(webClientId)
 
                                     if (webClientId == null) {
@@ -427,20 +423,21 @@ object HttpServer {
         msg: String,
     ) {
         val dateTime = Date().toSimpleDateTimeFormat()
-        if (webClientId == null && origin == null) {
-            Log.i(SERVER_LOG_PREFIX, "$dateTime : $msg")
+        val header = if (webClientId == null && origin == null) {
+            dateTime
         }
         else {
-            val webClient = webClientId ?: "-unknwn-"
+            val webClient = webClientId ?: "???-???"
             if (origin != null) {
                 val remoteHost = origin.remoteHost
-                val remotePort = origin.remotePort
-                Log.i(SERVER_LOG_PREFIX, "$dateTime [ $webClient @ $remoteHost:$remotePort ] : $msg")
+                "$dateTime [$webClient@$remoteHost]"
             }
             else {
-                Log.i(SERVER_LOG_PREFIX, "$dateTime [$webClient] : $msg")
+                "$dateTime [$webClient]"
             }
         }
+
+        Log.i(SERVER_LOG_PREFIX, "$header : $msg")
     }
 
     private fun extractRequestTransportKey(sharedBaseKey: Key, webExtension: EncWebExtension, encOneTimeKeyBase64: String): Key? {

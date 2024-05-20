@@ -1,8 +1,6 @@
 package de.jepfa.yapm.usecase.app
 
 import android.graphics.Typeface
-import android.graphics.drawable.Drawable
-import android.view.ViewGroup
 import android.widget.HorizontalScrollView
 import android.widget.ScrollView
 import android.widget.TextView
@@ -14,13 +12,13 @@ import de.jepfa.yapm.usecase.BasicUseCase
 import de.jepfa.yapm.util.*
 import java.util.*
 
-object ShowDebugLogUseCase: BasicUseCase<BaseActivity>() {
+
+object ShowServerLogUseCase: BasicUseCase<BaseActivity>() {
 
     override fun execute(activity: BaseActivity): Boolean {
-        val builder: AlertDialog.Builder = AlertDialog.Builder(activity)
-        val icon: Drawable = activity.resources.getDrawable(R.drawable.ic_baseline_memory_24)
-        val logs = DebugInfo.getDebugLog(activity)
-        val message = "Log length: ${logs.length} chars\nCapture time: ${Date()}\n\n$logs"
+        val builder = AlertDialog.Builder(activity)
+        val icon = activity.resources.getDrawable(R.drawable.outline_list_24)
+        val logs = DebugInfo.getServerLog(activity)
 
         val container = ScrollView(builder.context)
         val view = HorizontalScrollView(builder.context)
@@ -29,22 +27,18 @@ object ShowDebugLogUseCase: BasicUseCase<BaseActivity>() {
         val textView = TextView(builder.context)
         textView.typeface = Typeface.MONOSPACE
         textView.setHorizontallyScrolling(true)
-        textView.text = message
+        textView.text = logs
         view.addView(textView)
 
-        builder.setTitle(R.string.debug)
+        builder.setTitle("Server logs")
             .setView(container)
             .setIcon(icon)
             .setPositiveButton(android.R.string.ok) { dialog, _ ->
                 dialog.dismiss()
             }
-            .setNegativeButton(android.R.string.copy) { dialog, _ ->
-                ClipboardUtil.copy("logcat logs", logs, activity)
+            .setNeutralButton(android.R.string.copy) { dialog, _ ->
+                ClipboardUtil.copy("server logs", logs, activity)
                 toastText(activity, "Copied to clipboard")
-            }
-            .setNeutralButton("Clear logs") { dialog, _ ->
-                DebugInfo.clearLogs()
-                dialog.dismiss()
             }
             .show()
 

@@ -120,7 +120,12 @@ object DebugInfo {
     }
 
     fun getServerLog(context: Context): String {
-        return getLogcat(SERVER_LOG_PREFIX, command = "-v tag *:I", cutoutPrefix = "I/$SERVER_LOG_PREFIX")?:"no logs available"
+        var logs = getLogcat(
+            SERVER_LOG_PREFIX,
+            command = "-v tag *:I",
+            cutoutPrefix = "I/$SERVER_LOG_PREFIX: "
+        )?.replaceFirst(":", "")
+        return logs ?:"no logs available"
     }
 
     private fun getLogcat(filter: String, command: String = "-v time *:I", cutoutPrefix: String? = null): String? {
