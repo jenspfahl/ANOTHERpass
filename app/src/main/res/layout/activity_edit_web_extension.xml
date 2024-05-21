@@ -84,6 +84,16 @@
                     android:text="Allow unconfirmed password requests"/>
 
 
+
+                <TextView
+                    android:id="@+id/web_extension_last_used_timestamp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="48dp"
+                    android:layout_marginBottom="10dp"
+                    android:textSize="16sp"
+                    android:text="@string/nothing_placeholder"/>
+
             </LinearLayout>
 
 
@@ -92,7 +102,7 @@
                 style="?android:textAppearanceSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="16dp"
                 android:background="@color/colorAccent"
                 android:text="@string/button_save"
                 android:textColor="@color/buttonLabel"

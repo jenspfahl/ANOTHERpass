@@ -13,6 +13,7 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
+import de.jepfa.yapm.util.dateTimeToNiceString
 import de.jepfa.yapm.util.getIntExtra
 
 
@@ -41,7 +42,6 @@ class EditWebExtensionActivity : SecureActivity() {
         enabledSwitchView.setOnCheckedChangeListener { _, isChecked ->
             hideKeyboard(titleTextView)
 
-
         }
 
         val webExtensionId = intent.getIntExtra(EncWebExtension.EXTRA_WEB_EXTENSION_ID)
@@ -54,6 +54,8 @@ class EditWebExtensionActivity : SecureActivity() {
                     enabledSwitchView.isChecked = encWebExtension.enabled
                     bypassSwitchView.isChecked = encWebExtension.bypassIncomingRequests
 
+                    findViewById<TextView>(R.id.web_extension_last_used_timestamp).text =
+                        "Last used at: ${dateTimeToNiceString(encWebExtension.getLastUsedTimeStamp(), this)}"
                 }
             }
         }

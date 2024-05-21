@@ -33,7 +33,7 @@ object ShowServerLogUseCase: BasicUseCase<BaseActivity>() {
         builder.setTitle("Server logs")
             .setView(container)
             .setIcon(icon)
-            .setPositiveButton(android.R.string.ok) { dialog, _ ->
+            .setPositiveButton(R.string.close) { dialog, _ ->
                 dialog.dismiss()
             }
             .setNeutralButton(android.R.string.copy) { dialog, _ ->

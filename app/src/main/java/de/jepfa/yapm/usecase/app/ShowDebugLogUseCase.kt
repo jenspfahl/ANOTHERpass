@@ -35,7 +35,7 @@ object ShowDebugLogUseCase: BasicUseCase<BaseActivity>() {
         builder.setTitle(R.string.debug)
             .setView(container)
             .setIcon(icon)
-            .setPositiveButton(android.R.string.ok) { dialog, _ ->
+            .setPositiveButton(R.string.close) { dialog, _ ->
                 dialog.dismiss()
             }
             .setNegativeButton(android.R.string.copy) { dialog, _ ->

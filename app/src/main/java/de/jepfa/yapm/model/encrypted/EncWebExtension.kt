@@ -1,5 +1,8 @@
 package de.jepfa.yapm.model.encrypted
 
+import de.jepfa.yapm.util.toDate
+import java.util.*
+
 data class EncWebExtension(val id: Int?,
                            val webClientId: Encrypted,
                            var title: Encrypted,
@@ -38,6 +41,12 @@ data class EncWebExtension(val id: Int?,
     }
 
     fun getServerKeyPairAlias(): String = "$SERVER_KEY_PAIR_ALIAS_PREFIX$id"
+
+    fun touch() {
+        lastUsedTimestamp = Date().time
+    }
+
+    fun getLastUsedTimeStamp(): Date? = lastUsedTimestamp?.toDate()
 
     companion object {
         const val EXTRA_WEB_EXTENSION_ID = "de.jepfa.yapm.ui.web_extension.id"

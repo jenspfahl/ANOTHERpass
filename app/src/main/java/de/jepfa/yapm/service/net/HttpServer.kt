@@ -16,6 +16,7 @@ import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.encrypted.EncryptedType
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.SecretKeyHolder
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
@@ -84,6 +85,16 @@ object HttpServer {
                                     "*"
                                 )
 
+                                if (Session.isDenied()) {
+                                    respondError(
+                                        null,
+                                        HttpStatusCode.Unauthorized,
+                                        "no active session",
+                                    )
+                                    shutdownAllAsync()
+                                    return@get
+                                }
+
                                 serverLog(
                                     origin = call.request.origin,
                                     msg = "GET request received, ignored",
@@ -124,6 +135,16 @@ object HttpServer {
                                         origin = call.request.origin,
                                         msg = "POST request received",
                                     )
+
+                                    if (Session.isDenied()) {
+                                        respondError(
+                                            null,
+                                            HttpStatusCode.Unauthorized,
+                                            "no active session",
+                                        )
+                                        shutdownAllAsync()
+                                        return@post
+                                    }
 
                                     httpServerCallback.handleOnIncomingRequest(webClientId)
 
@@ -259,6 +280,9 @@ object HttpServer {
                                         activity)
 
                                     respond(webClientId, text, response)
+
+                                    webExtension.touch()
+                                    activity.webExtensionViewModel.save(webExtension, activity)
                                 } catch (e: Exception) {
                                     Log.e("HTTP", "Something went wrong!!!", e)
                                     respondError(
