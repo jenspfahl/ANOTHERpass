@@ -65,8 +65,14 @@
 
     <item
         android:id="@+id/menu_resume_autofill"
-        android:orderInCategory="1000"
         android:title="@string/resume_paused_autofill"
+        android:visible="false">
+    </item>
+
+    <item
+        android:id="@+id/menu_show_server_panel"
+        android:icon="@drawable/outline_dns_24"
+        android:title="Restore server panel"
         android:visible="false">
     </item>
 

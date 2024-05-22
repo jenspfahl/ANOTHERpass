@@ -124,7 +124,7 @@ object DebugInfo {
             SERVER_LOG_PREFIX,
             command = "-v tag *:I",
             cutoutPrefix = "I/$SERVER_LOG_PREFIX: "
-        )?.replaceFirst(":", "")
+        )
         return logs ?:"no logs available"
     }
 

@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.RecyclerView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
+import de.jepfa.yapm.usecase.webextension.DeleteWebExtensionUseCase
 
 class ListWebExtensionsActivity : SecureActivity() {
 
@@ -31,6 +33,14 @@ class ListWebExtensionsActivity : SecureActivity() {
                 val sorted = webExtensions
                     .filter { it.linked }
                     .sortedBy { SecretService.decryptCommonString(key, it.title).lowercase() }
+
+                // delete all unlinked where the linking was aborted
+                webExtensions
+                    .filter { !it.linked }
+                    .forEach {
+                        UseCaseBackgroundLauncher(DeleteWebExtensionUseCase)
+                            .launch(this, it)
+                    }
 
                 listWebExtensionsAdapter.submitList(sorted)
             }

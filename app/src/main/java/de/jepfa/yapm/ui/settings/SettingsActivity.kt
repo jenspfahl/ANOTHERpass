@@ -374,6 +374,12 @@ class SettingsActivity : SecureActivity(),
                 }
             }
 
+            findPreference<SwitchPreferenceCompat>(
+                PreferenceService.PREF_SERVER_HIDE_PANEL)?.setOnPreferenceChangeListener { preference, newValue ->
+                PreferenceService.putBoolean(PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD, true, preference.context)
+                true
+            }
+
             findPreference<EditTextPreference>(PreferenceService.PREF_SERVER_PORT)?.let { pref ->
                 pref.setOnBindEditTextListener { editText ->
                     editText.inputType = InputType.TYPE_CLASS_NUMBER

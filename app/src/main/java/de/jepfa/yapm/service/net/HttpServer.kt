@@ -529,9 +529,7 @@ object HttpServer {
     }
 
     fun getHostNameOrIp(context: Context, getHostNameCallback: (String) -> Unit): String {
-        val wifiManager = context.getSystemService(AppCompatActivity.WIFI_SERVICE) as WifiManager
-        val ipAddress =
-            Formatter.formatIpAddress(wifiManager.connectionInfo.ipAddress)
+        val ipAddress = getIp(context)
         getHostName(ipAddress) { hostName ->
             CoroutineScope(Dispatchers.Main).launch {
                 if (hostName != null && hostName != ipAddress) {
@@ -545,7 +543,13 @@ object HttpServer {
         return ipAddress
     }
 
-    private fun getHostName(ipAddress: String, callback: (String?) -> Unit) {
+    fun getIp(context: Context): String {
+        val wifiManager = context.getSystemService(AppCompatActivity.WIFI_SERVICE) as WifiManager
+        return Formatter.formatIpAddress(wifiManager.connectionInfo.ipAddress)
+
+    }
+
+    fun getHostName(ipAddress: String, callback: (String?) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val hostName = withContext(Dispatchers.IO) {

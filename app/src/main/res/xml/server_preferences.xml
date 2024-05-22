@@ -21,6 +21,7 @@
         app:useSimpleSummaryProvider="true"/>
 
 
+
     <SwitchPreferenceCompat
         app:key="YAPM/pref:server_autostart"
         app:title="Autostart when vault is unlocked"
@@ -42,4 +43,14 @@
         app:singleLineTitle="false"
         app:useSimpleSummaryProvider="true"/-->
 
+
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:server_hide_panel"
+        app:title="Hide server panel"
+        app:summary="Hides the panel which gives you access to the server"
+        app:iconSpaceReserved="false"
+        app:dependency="YAPM/pref:enable_server_capability"
+        app:singleLineTitle="false"
+        app:allowDividerAbove="true"
+        app:defaultValue="false"/>
 </PreferenceScreen>

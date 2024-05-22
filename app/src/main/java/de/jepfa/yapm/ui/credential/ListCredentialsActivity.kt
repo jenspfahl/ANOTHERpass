@@ -150,6 +150,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private lateinit var navigationView: NavigationView
     private lateinit var toggle: ActionBarDrawerToggle
     private var resumeAutofillItem: MenuItem? = null
+    private var restoreServerPanel: MenuItem? = null
     private var lastReminderItem: MenuItem? = null
     private var nextReminderItem: MenuItem? = null
 
@@ -215,12 +216,47 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         serverViewSwitch = findViewById(R.id.server_view_switch)
 
         val serverCapabilityEnabled= PreferenceService.getAsBool(PreferenceService.PREF_SERVER_CAPABILITIES_ENABLED, true, this)
+        val serverHidePanel= PreferenceService.getAsBool(PreferenceService.PREF_SERVER_HIDE_PANEL, false, this)
+        val serverAutostartEnabled = PreferenceService.getAsBool(PreferenceService.PREF_SERVER_AUTOSTART, false, this)
+
         if (!serverCapabilityEnabled) {
             serverView.visibility = View.GONE
-            //serverViewSwitch.isChecked = false
-            //reflectServerStopped()
+        }
+        else if (serverHidePanel) {
+            serverView.visibility = View.GONE
+            updateRestoreServerPanelMenuItem()
+
+            if (!Session.isDenied() && serverAutostartEnabled) {
+                startStopServer(start = true, silent = true)
+            }
         }
         else {
+
+            val onLongClick = object : View.OnLongClickListener {
+                override fun onLongClick(v: View?): Boolean {
+                    val stat = if (HttpServer.isRunning())  "Running" else "Stopped"
+                    val ip = HttpServer.getIp(this@ListCredentialsActivity)
+                    val port = PreferenceService.getAsString(PreferenceService.PREF_SERVER_PORT, this@ListCredentialsActivity) ?: HttpServer.DEFAULT_HTTP_SERVER_PORT
+                    HttpServer.getHostName(ip) { host ->
+                        CoroutineScope(Dispatchers.Main).launch {
+                            val sb = java.lang.StringBuilder()
+                            sb.addFormattedLine("Status", stat)
+                            sb.addFormattedLine("Protocol", "HTTP")
+                            sb.addFormattedLine("IP", ip)
+                            sb.addFormattedLine("Hostname", host)
+                            sb.addFormattedLine("Port", port)
+                            AlertDialog.Builder(this@ListCredentialsActivity)
+                                .setTitle("Server details")
+                                .setMessage(sb.toString())
+                                .setIcon(R.drawable.outline_dns_24)
+                                .show()
+                        }
+                    }
+                    return true
+                }
+            }
+            serverViewState.setOnLongClickListener(onLongClick)
+            serverViewDetails.setOnLongClickListener(onLongClick)
 
             val serverViewLink = findViewById<ImageView>(R.id.server_link)
             val serverViewSettings = findViewById<ImageView>(R.id.server_settings)
@@ -229,8 +265,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 popup.setOnMenuItemClickListener { item ->
                     when (item.itemId) {
                         R.id.menu_server_settings_hide -> {
-                            //TODO
-                            toastText(this, "Not yet implemented")
+                            PreferenceService.toggleBoolean(PreferenceService.PREF_SERVER_HIDE_PANEL, this)
+                            updateRestoreServerPanelMenuItem()
+                            recreate()
                             true
                         }
                         R.id.menu_server_settings_show_server_log -> {
@@ -282,18 +319,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 }
             }
 
-            //TODO server restart when orientation changes should be denied
             serverViewSwitch.setOnCheckedChangeListener { _, isChecked ->
                 startStopServer(isChecked)
             }
 
-            val serverAutostartEnabled = PreferenceService.getAsBool(PreferenceService.PREF_SERVER_AUTOSTART, false, this)
             if (!Session.isDenied() && serverAutostartEnabled) {
-               // serverViewSwitch.setOnCheckedChangeListener(null)
                 serverViewSwitch.performClick()
-                //startStopServer(start = true)
-                //reflectServerState()
-
             }
             else {
                 reflectServerState()
@@ -440,30 +471,38 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     }
 
-    private fun startStopServer(start: Boolean) {
+    private fun startStopServer(start: Boolean, silent: Boolean = false) {
         if (start) {
-            serverViewStateText = "Starting ..."
-            serverViewState.text = serverViewStateText
-            serverViewSwitch.isEnabled = false
+            if (!silent) {
+                serverViewStateText = "Starting ..."
+                serverViewState.text = serverViewStateText
+                serverViewSwitch.isEnabled = false
+            }
             startAllServersAsync(this, this).asCompletableFuture()
                 .whenComplete { success, e ->
                     Log.i("HTTP", "async server start success: $success")
 
                     CoroutineScope(Dispatchers.Main).launch {
-                        serverViewSwitch.isEnabled = true
+                        if (!silent) {
+                            serverViewSwitch.isEnabled = true
+                        }
 
                         if (e != null) {
                             Log.w("HTTP", e)
                         }
 
                         if (success == null || !success) {
-                            serverViewSwitch.isChecked = false
+                            if (!silent) {
+                                serverViewSwitch.isChecked = false
+                            }
                             toastText(
                                 this@ListCredentialsActivity,
                                 "Failed to start server. Is Wifi enabled?"
                             )
                         } else {
-                            reflectServerStarted()
+                            if (!silent) {
+                                reflectServerStarted()
+                            }
                             toastText(this@ListCredentialsActivity, "Server started")
                             HttpServer.requestCredentialHttpCallback =
                                 this@ListCredentialsActivity
@@ -472,16 +511,20 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 }
         } else {
             if (HttpServer.isRunning()) { // otherwise it is already stopped
-                serverViewStateText = "Stopping ..."
-                serverViewState.text = serverViewStateText
-                serverViewSwitch.isEnabled = false
+                if (!silent) {
+                    serverViewStateText = "Stopping ..."
+                    serverViewState.text = serverViewStateText
+                    serverViewSwitch.isEnabled = false
+                }
                 wasWifiLost = false
 
                 shutdownAllAsync().asCompletableFuture().whenComplete { success, e ->
                     Log.i("HTTP", "async stop=$success")
 
                     CoroutineScope(Dispatchers.Main).launch {
-                        serverViewSwitch.isEnabled = true
+                        if (!silent) {
+                            serverViewSwitch.isEnabled = true
+                        }
 
                         webClientRequestIdentifier = null
                         webClientCredentialRequestState = CredentialRequestState.Incoming
@@ -490,15 +533,19 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                             Log.w("HTTP", e)
                         }
                         if (success == null || !success) {
-                            serverViewSwitch.isChecked = true
+                            if (!silent) {
+                                serverViewSwitch.isChecked = true
+                            }
                             toastText(this@ListCredentialsActivity, "Failed to stop server")
                         } else {
-                            reflectServerStopped()
+                            if (!silent) {
+                                reflectServerStopped()
+                            }
                             toastText(this@ListCredentialsActivity, "Server stopped")
                         }
                     }
                 }
-            } else {
+            } else if (!silent) {
                 reflectServerStopped()
             }
         }
@@ -739,6 +786,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
         refreshNavigationMenu()
 
+        updateRestoreServerPanelMenuItem()
         updateResumeAutofillMenuItem()
         updateReminderMenuItems()
 
@@ -895,9 +943,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 refreshMenuFiltersItem(menu.findItem(R.id.menu_filter))
             }
         }
+        restoreServerPanel = menu.findItem(R.id.menu_show_server_panel)
+        updateRestoreServerPanelMenuItem()
 
         resumeAutofillItem = menu.findItem(R.id.menu_resume_autofill)
         updateResumeAutofillMenuItem()
+
         lastReminderItem = menu.findItem(R.id.menu_show_last_reminder)
         nextReminderItem = menu.findItem(R.id.menu_show_next_reminder)
         updateReminderMenuItems()
@@ -1153,6 +1204,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     toastText(this, R.string.resume_paused_autofill_done)
                     item.isVisible = false
                 }
+                return true
+            }
+            R.id.menu_show_server_panel -> {
+                PreferenceService.toggleBoolean(PreferenceService.PREF_SERVER_HIDE_PANEL, this)
+                updateRestoreServerPanelMenuItem()
+                recreate()
                 return true
             }
             else -> super.onOptionsItemSelected(item)
@@ -1703,6 +1760,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             }
         }
         finish()
+    }
+
+    private fun updateRestoreServerPanelMenuItem() {
+        restoreServerPanel?.isVisible = PreferenceService.getAsBool(PreferenceService.PREF_SERVER_CAPABILITIES_ENABLED, this)
+                && PreferenceService.getAsBool(PreferenceService.PREF_SERVER_HIDE_PANEL, this)
     }
 
     private fun updateResumeAutofillMenuItem() {

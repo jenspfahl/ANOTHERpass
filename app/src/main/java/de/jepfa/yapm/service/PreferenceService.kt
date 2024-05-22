@@ -89,6 +89,7 @@ object PreferenceService {
     const val PREF_SERVER_CAPABILITIES_ENABLED = PREF_PREFIX + "enable_server_capability"
     const val PREF_SERVER_PORT = PREF_PREFIX + "server_listening_port"
     const val PREF_SERVER_AUTOSTART = PREF_PREFIX + "server_autostart"
+    const val PREF_SERVER_HIDE_PANEL = PREF_PREFIX + "server_hide_panel"
 
 
     const val DATA_REFRESH_MPT_NOTIFICATION_SHOWED_AT = DATA_PREFIX + "refresh_mpt_notification_showed_at"

@@ -1,5 +1,6 @@
 package de.jepfa.yapm.usecase.app
 
+import android.annotation.SuppressLint
 import android.graphics.Typeface
 import android.widget.HorizontalScrollView
 import android.widget.ScrollView
@@ -17,7 +18,7 @@ object ShowServerLogUseCase: BasicUseCase<BaseActivity>() {
 
     override fun execute(activity: BaseActivity): Boolean {
         val builder = AlertDialog.Builder(activity)
-        val icon = activity.resources.getDrawable(R.drawable.outline_list_24)
+        val icon = activity.resources.getDrawable(R.drawable.outline_list_24, null)
         val logs = DebugInfo.getServerLog(activity)
 
         val container = ScrollView(builder.context)
