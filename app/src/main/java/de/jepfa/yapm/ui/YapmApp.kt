@@ -33,12 +33,11 @@ class YapmApp : Application() {
         val prefLang = PreferenceService.getAsString(PreferenceService.PREF_LANGUAGE, this)
         val locale = getLocale(prefLang)
         Lingver.init(this, locale)
+        Locale.getDefault()
     }
 
-    fun getLocale(language: String?): Locale {
-        val locale =
-            if (language == null || language == "default") Locale.getDefault()
-            else Locale(language)
-        return locale
+    private fun getLocale(language: String?): Locale {
+        return if (language == null || language == "default") Locale.getDefault()
+        else Locale(language)
     }
 }
