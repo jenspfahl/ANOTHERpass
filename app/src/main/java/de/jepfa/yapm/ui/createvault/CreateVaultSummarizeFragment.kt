@@ -34,8 +34,11 @@ import de.jepfa.yapm.ui.createvault.CreateVaultActivity.Companion.ARG_ENC_MASTER
 import de.jepfa.yapm.usecase.secret.ExportEncMasterPasswordUseCase
 import de.jepfa.yapm.usecase.vault.BenchmarkLoginIterationsUseCase
 import de.jepfa.yapm.usecase.vault.CreateVaultUseCase
-import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.PasswordColorizer
+import de.jepfa.yapm.util.getEncrypted
+import de.jepfa.yapm.util.toReadableFormat
+import de.jepfa.yapm.util.toastText
 
 class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedListener {
 
@@ -81,6 +84,7 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
                     .map { getString(it.uiLabel)})
             cipherSelection.adapter = cipherSelectionAdapter
             cipherSelection.onItemSelectedListener = this
+            cipherSelection.setSelection(cipherAlgorithm.ordinal)
 
             cipherSelectionInfo.setOnClickListener{
                 AlertDialog.Builder(_context)

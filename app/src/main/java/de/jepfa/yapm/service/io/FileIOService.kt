@@ -8,6 +8,7 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Handler
 import android.util.Log
+import de.jepfa.yapm.BuildConfig.APPLICATION_ID
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.session.Session
@@ -56,6 +57,12 @@ class FileIOService: IntentService("FileIOService") {
         if (intent == null) {
             return
         }
+        val uri = intent.getParcelableExtra<Uri>(PARAM_FILE_URI)
+        if (!isUriValid(uri)) {
+            Log.e(LOG_PREFIX + "IO", "invalid export URI: $uri")
+            return
+        }
+
         when (intent.action) {
             ACTION_SAVE_QRC -> saveQrCodeAsImage(intent)
             ACTION_EXPORT_VAULT -> exportVault(intent)
@@ -63,8 +70,14 @@ class FileIOService: IntentService("FileIOService") {
         }
     }
 
+    private fun isUriValid(uri: Uri?): Boolean {
+        val appPath = getApp().applicationContext.dataDir.path
+        val uriPath = uri?.path?:""
+        return (!uriPath.startsWith(appPath))
+    }
+
     private fun exportVault(intent: Intent) {
-        var message: String
+        val message: String
         if (FileUtil.isExternalStorageWritable()) {
             val includeMasterKey = intent.getBooleanExtra(PARAM_INCLUDE_MK, false)
             val includePreferences = intent.getBooleanExtra(PARAM_INCLUDE_PREFS, false)

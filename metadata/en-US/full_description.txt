@@ -2,9 +2,9 @@
 
 ANOTHERpass generates easy but strong passwords for you. It uses so called <i>Pseudo Phrases</i> by default which looks like real words but are still very random and unpredictable.
 
-It also comes with a clever two factor authentication to login into the credential vault. These factors are knowledge (a PIN) and ownership (the master password). So instead of remembering a long and complicated master password you just remember the PIN and have your master password with you (as QR code or NFC tag). Additionally you can safely store it on your device using biometrics (e.g. fingerprint).
+It also comes with a clever two factor authentication to unlock the vault. These factors are knowledge (a PIN) and ownership (the master password). So instead of remembering a long and complicated master password you just remember the PIN and have your master password with you (as QR code or NFC tag). Additionally you can safely store it on your device using biometrics (e.g. fingerprint).
 
-With ANOTHERpass you can store backups of the vault and the encrypted master key separately (latter e.g. as QR code on a analogue sheet). So the backup file is very useless for hackers and can safely be stored on cloud drives.
+With ANOTHERpass you can store backups of the vault and the encrypted master key separately (latter e.g. as QR code on a analogue sheet). So the backup file is very useless for hackers and can safely be stored in cloud storages.
 
 
 <b>Core features of the app</b>

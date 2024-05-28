@@ -423,6 +423,9 @@
     <string name="pref_general_summary_passwords_multiple_lines">Show password words on multiple lines to increase readability</string>
     <string name="pref_general_colorize_qrcodes">Use colors to show criticality of QR code content</string>
     <string name="pref_general_qrcodes_with_header">Print a short content info as header on top of the QR code</string>
+
+    <string name="pref_autofill_open_autofill_config_title">Activate autofill in system settings</string>
+    <string name="pref_autofill_open_autofill_config_summary">Click here to go to the system settings and select ANOTHERpass as Autofill service</string>
     <string name="pref_autofill_summary_off_suggest">Suggesting Autofill only on identified user or password fields. With this option, the app could miss some fields, e.g. in web browsers.</string>
     <string name="pref_autofill_summary_on_suggest">Suggesting Autofill on every text field.</string>
     <string name="pref_autofill_exclude_apps">Exclude apps from Autofill</string>
