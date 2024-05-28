@@ -345,7 +345,7 @@ class SettingsActivity : SecureActivity(),
             }
         }
 
-        fun isUserOrExcludedApp(ai: ApplicationInfo, excludedApps: Set<String>): Boolean {
+        private fun isUserOrExcludedApp(ai: ApplicationInfo, excludedApps: Set<String>): Boolean {
             if (excludedApps.contains(ai.packageName)) {
                 return true // always show excluded apps, so filter them
             }
