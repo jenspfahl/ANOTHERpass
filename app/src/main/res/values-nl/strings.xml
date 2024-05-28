@@ -401,6 +401,8 @@ Deze waarschuwing kunt u deactiveren onder \'Instellingen/Beveiliging\'.</string
   <string name="pref_general_summary_passwords_multiple_lines">Toon wachtwoorden op meerdere regels om de leesbaarheid nog verder te vergroten</string>
   <string name="pref_general_colorize_qrcodes">Gebruik kleuren om het belang van de QR-code-inhoud te illustreren</string>
   <string name="pref_general_qrcodes_with_header">Druk een korte, inhoudelijke koptekst af bovenaan een QR-code</string>
+  <string name="pref_autofill_open_autofill_config_title">Activate autofill in system settings</string>
+  <string name="pref_autofill_open_autofill_config_summary">Click here to go to the system settings and select ANOTHERpass as Autofill service</string>
   <string name="pref_autofill_summary_off_suggest">Bied alleen automatisch aanvullen aan voor uniek herkende gebruikers- of wachtwoordvelden.  Hierdoor kunnen echter enkele velden worden genegeerd die niet duidelijk kunnen worden herkend, bijvoorbeeld in webbrowsers.</string>
   <string name="pref_autofill_summary_on_suggest">Bied automatisch aanvullen aan voor elk tekstveld.</string>
   <string name="pref_autofill_exclude_apps">Negeer Automatisch aanvullen voor deze apps</string>

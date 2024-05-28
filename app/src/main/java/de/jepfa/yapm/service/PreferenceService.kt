@@ -137,6 +137,7 @@ object PreferenceService {
     const val PREF_QRCODES_WITH_HEADER = PREF_PREFIX + "qrcodes_with_header"
     const val PREF_LABEL_FILTER_SINGLE_CHOICE = PREF_PREFIX + "label_filter_single_choice"
 
+    const val ACTION_OPEN_AUTOFILL_SETTINGS = ACTION_PREFIX + "open_autofill_settings"
     const val PREF_AUTOFILL_EVERYWHERE = PREF_PREFIX + "autofill_suggest_everywhere"
     const val PREF_AUTOFILL_INLINE_PRESENTATIONS = PREF_PREFIX + "autofill_inline_presentations"
     const val PREF_AUTOFILL_SUGGEST_CREDENTIALS = PREF_PREFIX + "autofill_suggest_credentials"

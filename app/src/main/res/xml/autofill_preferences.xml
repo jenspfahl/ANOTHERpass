@@ -1,5 +1,14 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
+
+    <Preference
+        app:defaultValue="-1"
+        app:key="YAPM/action:open_autofill_settings"
+        app:title="@string/pref_autofill_open_autofill_config_title"
+        app:summary="@string/pref_autofill_open_autofill_config_summary"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"/>
+
     <SwitchPreferenceCompat
         app:key="YAPM/pref:autofill_suggest_everywhere"
         app:summaryOff="@string/pref_autofill_summary_off_suggest"

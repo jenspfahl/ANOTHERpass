@@ -4,13 +4,16 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputType
+import android.provider.Settings
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.*
 import com.yariksoffice.lingver.Lingver
+import de.jepfa.yapm.BuildConfig.APPLICATION_ID
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
@@ -137,13 +140,18 @@ class SettingsActivity : SecureActivity(),
                 PreferenceService.PREF_LANGUAGE)
 
             languagePref?.let {
-                it.setOnPreferenceChangeListener { preference, newValue ->
+                it.setOnPreferenceChangeListener { preference, value ->
 
                     val oldValue = languagePref.value
+                    var newValue = value.toString()
 
+                    // get default language if chosen
+                    if (newValue == "default") {
+                        newValue = preference.context.resources.configuration.locales.get(0).language
+                    }
                     if (oldValue != newValue) {
                         (activity as? SettingsActivity)?.let { activity ->
-                            Lingver.getInstance().setLocale(activity, Locale(newValue.toString()))
+                            Lingver.getInstance().setLocale(activity, Locale(newValue))
 
                             AlertDialog.Builder(activity)
                                 .setTitle(R.string.title_change_language)
@@ -292,6 +300,18 @@ class SettingsActivity : SecureActivity(),
             preferenceManager.preferenceDataStore = EncryptedPreferenceDataStore.getInstance(requireContext())
             setPreferencesFromResource(R.xml.autofill_preferences, rootKey)
 
+            findPreference<Preference>(PreferenceService.ACTION_OPEN_AUTOFILL_SETTINGS)?.let {
+                it.isEnabled = ResponseFiller.isAutofillSupported()
+                it.setOnPreferenceClickListener { _ ->
+                    if (ResponseFiller.isAutofillSupported()) {
+                        val intent = Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE)
+                        intent.data = Uri.parse("package:$APPLICATION_ID")
+                        startActivityForResult(intent, 0) // unhandled result
+                    }
+                    true
+                }
+            }
+
             findPreference<SwitchPreferenceCompat>(PreferenceService.PREF_AUTOFILL_EVERYWHERE)?.let { pref ->
                 activity?.let { pref.isEnabled = ResponseFiller.isAutofillSupported() }
             }
@@ -318,6 +338,9 @@ class SettingsActivity : SecureActivity(),
             val exclusionAppPref = findPreference<MultiSelectListPreference>(
                 PreferenceService.PREF_AUTOFILL_EXCLUSION_LIST)
             exclusionAppPref?.let { pref ->
+
+                pref.isEnabled = ResponseFiller.isAutofillSupported()
+
                 val pm = requireContext().packageManager
                 val packages = pm.getInstalledApplications(PackageManager.GET_META_DATA)
 
@@ -336,7 +359,7 @@ class SettingsActivity : SecureActivity(),
             }
         }
 
-        fun isUserOrExcludedApp(ai: ApplicationInfo, excludedApps: Set<String>): Boolean {
+        private fun isUserOrExcludedApp(ai: ApplicationInfo, excludedApps: Set<String>): Boolean {
             if (excludedApps.contains(ai.packageName)) {
                 return true // always show excluded apps, so filter them
             }

@@ -13,6 +13,7 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.model.session.Session
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.ui.ChangeKeyboardForPinManager
 import de.jepfa.yapm.ui.SecureActivity
@@ -24,6 +25,7 @@ import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.PasswordColorizer
+import de.jepfa.yapm.util.PasswordColorizer.spannableObfusableAndMaskableString
 import de.jepfa.yapm.util.toastText
 
 class ChangeMasterPasswordActivity : SecureActivity() {
@@ -31,6 +33,10 @@ class ChangeMasterPasswordActivity : SecureActivity() {
     private var generatedPassword: Password = Password.empty()
     private var combinations = 0.0
     private var passwordChanged = false
+
+    private var passwordPresentation = Password.FormattingStyle.DEFAULT
+    private var maskPassword = false
+    private var multiLine = false
 
     init {
         enableBack = true
@@ -43,6 +49,12 @@ class ChangeMasterPasswordActivity : SecureActivity() {
             LockVaultUseCase.execute(this)
             return
         }
+
+        maskPassword = PreferenceService.getAsBool(PreferenceService.PREF_MASK_PASSWORD, this)
+        val formatted =
+            PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_SHOW_FORMATTED, this)
+        multiLine = PreferenceService.getAsBool(PreferenceService.PREF_PASSWD_WORDS_ON_NL, this)
+        passwordPresentation = Password.FormattingStyle.createFromFlags(multiLine, formatted)
 
         setContentView(R.layout.activity_change_master_password)
 
@@ -59,7 +71,7 @@ class ChangeMasterPasswordActivity : SecureActivity() {
         val masterPasswd = MasterPasswordService.getMasterPasswordFromSession(this)
         if (!Session.isDenied() && masterPasswd != null) {
             generatedPassword = masterPasswd
-            generatedPasswdView.text = PasswordColorizer.spannableString(generatedPassword, this)
+            updatePasswordView(generatedPasswdView, generatedPassword)
         }
 
         generatedPasswdView.setOnLongClickListener {
@@ -68,6 +80,17 @@ class ChangeMasterPasswordActivity : SecureActivity() {
             }
             ShowPasswordStrengthUseCase.showPasswordStrength(combinations, R.string.password_strength, this )
             true
+        }
+
+        generatedPasswdView.setOnClickListener {
+            if (maskPassword) {
+                maskPassword = false
+            } else {
+                passwordPresentation =
+                    if (multiLine) passwordPresentation.prev()
+                    else passwordPresentation.next()
+            }
+            updatePasswordView(generatedPasswdView, generatedPassword)
         }
 
         val buttonGeneratePasswd: Button = findViewById(R.id.button_generate_passwd)
@@ -88,8 +111,7 @@ class ChangeMasterPasswordActivity : SecureActivity() {
                     .setView(input)
                     .setPositiveButton(android.R.string.ok) { dialog, which ->
                         generatedPassword = Password(input.text)
-                        var spannedString = PasswordColorizer.spannableString(generatedPassword, it.context)
-                        generatedPasswdView.text = spannedString
+                        updatePasswordView(generatedPasswdView, generatedPassword)
                         passwordChanged = true
                     }
                     .setNegativeButton(android.R.string.cancel) { dialog, which ->
@@ -109,7 +131,8 @@ class ChangeMasterPasswordActivity : SecureActivity() {
                 { output ->
                     generatedPassword = output.data.first
                     combinations = output.data.second
-                    generatedPasswdView.text = PasswordColorizer.spannableString(generatedPassword, this)
+                    maskPassword = false
+                    updatePasswordView(generatedPasswdView, generatedPassword)
                     passwordChanged = true
                 }
         }
@@ -147,6 +170,18 @@ class ChangeMasterPasswordActivity : SecureActivity() {
 
             }
         }
+    }
+
+    private fun updatePasswordView(generatedPasswdView: TextView, password: Password) {
+        val spannedString =
+            spannableObfusableAndMaskableString(
+                password,
+                passwordPresentation,
+                maskPassword,
+                obfuscated = false,
+                this
+            )
+        generatedPasswdView.text = spannedString
     }
 
     override fun lock() {

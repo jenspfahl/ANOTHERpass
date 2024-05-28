@@ -421,6 +421,9 @@
     <string name="pref_general_colorize_qrcodes">Verwende Farben um die Kritikalität von QR-Code Inhalten zu verdeutlichen</string>
     <string name="pref_general_qrcodes_with_header">Drucke eine kurze inhaltsbezogene Kopfzeile am oberen Rand eines QR-Codes</string>
 
+    <string name="pref_autofill_open_autofill_config_title">Aktiviere Automatisches Ausfüllen in den Systemeinstellungen</string>
+    <string name="pref_autofill_open_autofill_config_summary">Klicke hier um das Automatische Ausfüllen für ANOTHERpass zu erlauben.</string>
+
     <string name="pref_autofill_summary_off_suggest">Biete Automatisches Ausfüllen nur für eindeutig erkannte Nutzer- oder Passwortfelder an. Dadurch könnten allerdings einige Felder ignoriert werden, die nicht eindeutig erkannt werden können, z.B. in Webbrowsern. </string>
     <string name="pref_autofill_summary_on_suggest">Biete Automatisches Ausfüllen für jedes Textfeld an.</string>
     <string name="pref_autofill_exclude_apps">Ignoriere Automatisches Ausfüllen für diese Apps</string>

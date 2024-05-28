@@ -1,10 +1,14 @@
 # ANOTHERpass
 
-This Android app is another approach of a password manager. Instead of managing manually created passwords this app encourages to generate passwords. Passwords can be generated in a human readable but secure way by default, called Pseudo Phrases. Another feature is a two-factor authentication with knowledge (a user PIN) and ownership (a master password physically stored as NFC tag or QR code). 
+This Android app is another approach of a password manager. It addresses the problem of having to remember a strong master password, which is more often a weak one because it is created by humans.
 
-One consistent idea of the app is to use QR codes and NFC tags as offline-storage for credentials and secrets. Printed QR codes and NFC tags can easily be stored at a protected analogue place. With that and the option to separate the encrypted vault and the encryption keys it is possible to implement your own specific security and backup strategy.
+To avoid weak master passwords, the app generates them! The app requires two factors to unlock the vault, the generated master password (ownership in the sense of key) and a PIN (knowledge, in the sense of a remembered secret).
 
-Further this app tries to not be just another offline password manager by focusing on making it easy *AND* safe to work with secure password credentials.
+One consistent idea of the app is to use QR codes and NFC tags as offline-storage for credentials and secrets, such as the master password. Printed QR codes and NFC tags can be easily stored in a protected analogue place. With this and the ability to separate the encrypted vault and the encryption key, it is possible to implement your own specific security and backup strategy.
+
+Instead of managing manually created passwords, this app encourages using only generated passwords. By default, passwords can be generated in a human-readable but secure way, called Pseudo Phrases. 
+
+Additionally, this app tries to avoid being just another offline password manager by focusing on making working with strong passwords easy *AND* safe.
 
 The motivation of developing this app was curiosity of how cryptography works, how to code in Kotlin and the personal need of an easy, lightweight but secure password manager. It is a one-man-project without any warranty and pretension of absolute professionality.
 
@@ -15,7 +19,7 @@ The motivation of developing this app was curiosity of how cryptography works, h
 **Core features of the app**
 
 >* easy two-factor authentication
->* no complicated master password to memorize
+>* no complicated master password to remember
 >* easy to read generated passwords
 >* strong modern encryption (AES, Blowfish, Chacha20)
 >* Autofill support

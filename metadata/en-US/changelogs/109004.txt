@@ -1,0 +1,3 @@
+* fix https://github.com/jenspfahl/ANOTHERpass/issues/72
+* use AES 256 as default if supported
+
