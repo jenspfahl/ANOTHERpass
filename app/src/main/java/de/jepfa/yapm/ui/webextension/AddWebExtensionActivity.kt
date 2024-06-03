@@ -16,6 +16,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
+import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.encrypted.EncWebExtension
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.session.Session
@@ -298,7 +299,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
 
 
                 // generate shared base key
-                val sharedBaseKey = SecretService.generateRandomKey(16, this)
+                val sharedBaseKey = SecretService.generateRandomKey(32, this)
 
                 webExtension.sharedBaseKey = SecretService.encryptKey(key, sharedBaseKey)
                 webExtension.extensionPublicKey = SecretService.encryptCommonString(key, clientPubKeyAsJWK.toString())
@@ -331,6 +332,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
                 response.put("serverPubKey", jwk)
                 response.put("sharedBaseKey", sharedBaseKeyBase64)
                 response.put("linkedVaultId", SaltService.getVaultId(this))
+                response.put("preferredCipher", CipherAlgorithm.getPreferredCipher())
 
                 val webClientTitle = SecretService.decryptCommonString(key, webExtension.title)
 
