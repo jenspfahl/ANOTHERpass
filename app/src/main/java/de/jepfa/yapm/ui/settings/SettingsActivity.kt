@@ -6,11 +6,13 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.text.InputFilter
 import android.text.InputType
-import android.provider.Settings
+import android.view.autofill.AutofillManager
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.preference.*
 import com.yariksoffice.lingver.Lingver
 import de.jepfa.yapm.BuildConfig.APPLICATION_ID
@@ -301,14 +303,18 @@ class SettingsActivity : SecureActivity(),
             setPreferencesFromResource(R.xml.autofill_preferences, rootKey)
 
             findPreference<Preference>(PreferenceService.ACTION_OPEN_AUTOFILL_SETTINGS)?.let {
-                it.isEnabled = ResponseFiller.isAutofillSupported()
-                it.setOnPreferenceClickListener { _ ->
-                    if (ResponseFiller.isAutofillSupported()) {
-                        val intent = Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE)
-                        intent.data = Uri.parse("package:$APPLICATION_ID")
-                        startActivityForResult(intent, 0) // unhandled result
+                if (ResponseFiller.isAutofillSupported() ) {
+                    it.isEnabled = ResponseFiller.isAutofillSupported()
+                    val autofillManager = it.context.getSystemService(AutofillManager::class.java)
+                    it.isVisible = !autofillManager.hasEnabledAutofillServices()
+                    it.setOnPreferenceClickListener { _ ->
+                        if (ResponseFiller.isAutofillSupported()) {
+                            val intent = Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE)
+                            intent.data = Uri.parse("package:$APPLICATION_ID")
+                            startActivityForResult(intent, 0) // unhandled result
+                        }
+                        true
                     }
-                    true
                 }
             }
 
