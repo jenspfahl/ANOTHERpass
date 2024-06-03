@@ -16,7 +16,27 @@ The motivation of developing this app was curiosity of how cryptography works, h
      alt="Get it on F-Droid"
      height="80">](https://f-droid.org/packages/de.jepfa.yapm/)
 
-**Core features of the app**
+
+## Screenshots
+<details>
+<summary>Show screenshots</summary>
+
+![](metadata/en-US/images/phoneScreenshots/1.png)
+![](metadata/en-US/images/phoneScreenshots/3.png)
+![](metadata/en-US/images/phoneScreenshots/4.png)
+![](metadata/en-US/images/phoneScreenshots/5.png)
+![](metadata/en-US/images/phoneScreenshots/6.png)
+![](metadata/en-US/images/phoneScreenshots/7.png)
+
+Dark theme:
+![](metadata/en-US/images/phoneScreenshots/A.png)
+![](metadata/en-US/images/phoneScreenshots/B.png)
+![](metadata/en-US/images/phoneScreenshots/C.png)
+![](metadata/en-US/images/phoneScreenshots/D.png)
+
+</details>
+
+## Core features of the app
 
 >* easy two-factor authentication
 >* no complicated master password to remember
