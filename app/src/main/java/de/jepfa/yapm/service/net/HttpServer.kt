@@ -11,6 +11,7 @@ import android.util.Base64
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import de.jepfa.yapm.model.Validable.Companion.FAILED_STRING
+import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.encrypted.EncWebExtension
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.encrypted.EncryptedType
@@ -441,6 +442,12 @@ object HttpServer {
         }
     }
 
+    fun createSymmetricKey(context: Context): Key {
+        // generate shared base key for AES 128 or if supported AES 256
+        val preferredCipherAlgorithm = CipherAlgorithm.getPreferredCipher()
+        return SecretService.generateRandomKey(preferredCipherAlgorithm.keyLength / 8, context)
+    }
+
     private fun serverLog(
         origin: RequestConnectionPoint? = null,
         webClientId: String? = null,
@@ -488,7 +495,7 @@ object HttpServer {
      * Returns first the responseTransportKey second the one-time key as base64
      */
     private fun extractResponseTransportKey(linkingSessionKey: Key, key: SecretKeyHolder, webExtension: EncWebExtension, context: Context): Pair<Key, Key>? {
-        val oneTimeKey = SecretService.generateRandomKey(16, context)
+        val oneTimeKey = createSymmetricKey(context)
 
         val isLinking = !webExtension.linked
         val responseTransportKey = if (isLinking) {
