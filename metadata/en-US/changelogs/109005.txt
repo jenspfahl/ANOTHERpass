@@ -1,0 +1,3 @@
+* fix username template broken when master key is regenerated
+* smaller improvements
+
