@@ -7,13 +7,9 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.provider.Settings
-import android.text.InputFilter
-import android.text.InputType
 import android.view.autofill.AutofillManager
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.preference.*
 import com.yariksoffice.lingver.Lingver
 import de.jepfa.yapm.BuildConfig.APPLICATION_ID
