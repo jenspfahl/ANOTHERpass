@@ -3,10 +3,7 @@ package de.jepfa.yapm.usecase.secret
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.encrypted.CipherAlgorithm
-import de.jepfa.yapm.model.encrypted.EncCredential
-import de.jepfa.yapm.model.encrypted.EncLabel
-import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.encrypted.*
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.LoginData
@@ -158,6 +155,16 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
                     label.color
                 )
                 app.labelRepository.update(updated)
+            }
+
+            app.usernameTemplateRepository.getAllSync().forEach { usernameTemplate ->
+                val updated = EncUsernameTemplate(
+                    usernameTemplate.id,
+                    reencryptString(usernameTemplate.username, oldMasterSK, newMasterSK),
+                    reencryptString(usernameTemplate.description, oldMasterSK, newMasterSK),
+                    reencryptString(usernameTemplate.generatorType, oldMasterSK, newMasterSK),
+                )
+                app.usernameTemplateRepository.update(updated)
             }
 
             PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_MODIFIED_AT, activity)
