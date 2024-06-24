@@ -15,12 +15,12 @@ android {
         exclude("META-INF/io.netty.versions.properties")
     }
 
-    compileSdkVersion 33
+    compileSdkVersion 34
 
     defaultConfig {
         applicationId "de.jepfa.yapm"
         minSdkVersion 24
-        targetSdkVersion 33
+        targetSdkVersion 34
         // format: <XXYYZZZ>
         // XX=major (breaks compatibility to old apps or includes significant changes)
         // YY=minor (new features)
