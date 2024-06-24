@@ -555,7 +555,9 @@ Deze waarschuwing kunt u deactiveren onder \'Instellingen/Beveiliging\'.</string
   <string name="name">Achternaam</string>
   <string name="source">bron</string>
   <string name="copy_universal_identifier">Kopieer uid</string>
+  <string name="copy_url">Kopieer URL</string>
   <string name="universal_identifier_copied">Uid gekopieerd naar het klembord</string>
+  <string name="url_copied">URL gekopieerd naar het klembord</string>
   <string name="source_from_file">van bestand</string>
   <string name="source_from_record">via QR-code of NFC-tag</string>
   <string name="source_from_the_app">van de app</string>

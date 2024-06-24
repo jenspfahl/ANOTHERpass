@@ -43,7 +43,7 @@ import java.util.*
 
 object HttpServer {
 
-    val DEFAULT_HTTP_SERVER_PORT = 8001
+    val DEFAULT_HTTP_SERVER_PORT = 8787
     val SERVER_LOG_PREFIX = Constants.LOG_PREFIX + "HttpServer"
 
     enum class Action {LINKING, REQUEST_CREDENTIAL}
@@ -540,7 +540,7 @@ object HttpServer {
         getHostName(ipAddress) { hostName ->
             CoroutineScope(Dispatchers.Main).launch {
                 if (hostName != null && hostName != ipAddress) {
-                    getHostNameCallback("${hostName.lowercase()} ($ipAddress)")
+                    getHostNameCallback("$hostName ($ipAddress)")
                 } else {
                     getHostNameCallback("$ipAddress")
                 }
@@ -562,7 +562,7 @@ object HttpServer {
                 val hostName = withContext(Dispatchers.IO) {
                     InetAddress.getByName(ipAddress)
                 }.hostName
-                callback(hostName)
+                callback(hostName.lowercase())
             } catch (e: Exception) {
                 Log.w("HTTP", "Cannot get host name from IP:", e)
                 callback(null)

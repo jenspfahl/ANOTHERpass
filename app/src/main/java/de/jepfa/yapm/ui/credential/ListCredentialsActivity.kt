@@ -249,6 +249,16 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                                 .setTitle("Server details")
                                 .setMessage(sb.toString())
                                 .setIcon(R.drawable.outline_dns_24)
+                                .setNegativeButton(R.string.close, null)
+                                .setNeutralButton(R.string.copy_url) { _, _ ->
+                                    ClipboardUtil.copy(
+                                        "URL",
+                                        "http://$host:$port",
+                                        this@ListCredentialsActivity,
+                                        isSensible = false,
+                                    )
+                                    toastText(this@ListCredentialsActivity, R.string.url_copied)
+                                }
                                 .show()
                         }
                     }

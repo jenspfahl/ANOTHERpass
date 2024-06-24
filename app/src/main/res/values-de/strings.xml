@@ -581,7 +581,9 @@
     <string name="name">Name</string>
     <string name="source">Quelle</string>
     <string name="copy_universal_identifier">Uid kopieren</string>
+    <string name="copy_url">URL kopieren</string>
     <string name="universal_identifier_copied">Uid in die Zwischenablage kopiert</string>
+    <string name="url_copied">URL in die Zwischenablage kopiert</string>
     <string name="source_from_file">aus Datei</string>
     <string name="source_from_record">von QR-Code oder NFC-Tag</string>
     <string name="source_from_the_app">von der App</string>

@@ -167,6 +167,21 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
                 app.usernameTemplateRepository.update(updated)
             }
 
+            app.webExtensionRepository.getAllSync().forEach { webExtension ->
+                val updated = EncWebExtension(
+                    webExtension.id,
+                    reencryptString(webExtension.webClientId, oldMasterSK, newMasterSK),
+                    reencryptString(webExtension.title, oldMasterSK, newMasterSK),
+                    reencryptString(webExtension.extensionPublicKey, oldMasterSK, newMasterSK),
+                    reencryptString(webExtension.sharedBaseKey, oldMasterSK, newMasterSK),
+                    linked = webExtension.linked,
+                    enabled = webExtension.enabled,
+                    bypassIncomingRequests = webExtension.bypassIncomingRequests,
+                    webExtension.lastUsedTimestamp,
+                )
+                app.webExtensionRepository.update(updated)
+            }
+
             PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_MODIFIED_AT, activity)
             PreferenceService.putString(
                 PreferenceService.DATA_CIPHER_ALGORITHM,

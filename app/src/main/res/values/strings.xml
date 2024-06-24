@@ -591,7 +591,9 @@
     <string name="identifier" translatable="false">Id</string>
     <string name="universal_identifier" translatable="false">Uid</string>
     <string name="copy_universal_identifier">Copy Uid</string>
+    <string name="copy_url">Copy URL</string>
     <string name="universal_identifier_copied">Uid copied to the clipboard</string>
+    <string name="url_copied">URL copied to the clipboard</string>
     <string name="source">Source</string>
     <string name="source_from_file">from external file</string>
     <string name="source_from_record">from external QR code or NFC tag</string>
