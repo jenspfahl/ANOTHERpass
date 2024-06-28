@@ -42,6 +42,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback
 import com.google.android.material.snackbar.Snackbar
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
@@ -157,6 +159,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         Denied(false);
     }
 
+    private var serverSnackbar: Snackbar? = null
     private var serverViewStateText: String = ""
     private lateinit var serverViewSwitch: SwitchCompat
     private lateinit var serverViewDetails: TextView
@@ -603,7 +606,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         if (webClientRequestIdentifier != requestIdentifier) {
             if (webClientCredentialRequestState.isProgressing) {
-                Log.i("HTTP", "concurrent but ignored credential request $requestIdentifier for $webClientId")
+                Log.i("HTTP", "concurrent but ignored credential request $requestIdentifier for $webClientId: $webClientCredentialRequestState")
                 return toErrorResponse(HttpStatusCode.Conflict, "waiting for concurrent request")
             }
             else {
@@ -642,7 +645,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         startSearchFor(extractDomain(website), commit = true)
                     }
 
-                    val span = SpannableString("$webClientTitle ($webClientId) $details Fingerprint: $shortenedFingerprint")
+                    val span = SpannableString("$webClientTitle ($webClientId) $details Swipe to cancel. Fingerprint: $shortenedFingerprint")
 
                     span.setSpan(ForegroundColorSpan(getColor(R.color.colorAltAccent)),
                         0, webClientTitle.length + webClientId.length + 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -664,19 +667,29 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                     )
 
-                    val snackbar = Snackbar.make(
+                    serverSnackbar = Snackbar.make(
                         serverView,
                         span,
-                        15_000
+                        300_000
                     )
-                        .setAction("Deny and revoke") {
+                        .setAction("Deny and revoke bypass") {
                             webClientCredentialRequestState = CredentialRequestState.Denied
-                            toastText(this@ListCredentialsActivity, "Automatic bypass revoked")
                             webExtension.bypassIncomingRequests = false
                             webExtensionViewModel.save(webExtension, this@ListCredentialsActivity)
-                        }
+                            searchItem?.collapseActionView()
+                            toastText(this@ListCredentialsActivity, "Request denied and bypass revoked")
 
-                    snackbar.show()
+                        }
+                        .setTextMaxLines(7)
+                        .addCallback(object: BaseCallback<Snackbar>() {
+                            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                                webClientCredentialRequestState = CredentialRequestState.Denied
+                                searchItem?.collapseActionView()
+                                toastText(this@ListCredentialsActivity, "Request denied")
+                            }
+                        })
+
+                        serverSnackbar?.show()
                 }
                 else {
                     ServerRequestBottomSheet(
@@ -700,6 +713,29 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                             if (website.isNotBlank()) {
                                 startSearchFor(extractDomain(website), commit = true)
                             }
+                            if (!webExtension.bypassIncomingRequests || serverSnackbar?.isShown == false) {
+                                serverSnackbar = Snackbar.make(
+                                    serverView,
+                                    "Select the credential to fulfill the request.",
+                                    300_000
+                                )
+                                    .setAction("Cancel request") {
+                                        webClientCredentialRequestState = CredentialRequestState.Denied
+                                        searchItem?.collapseActionView()
+                                        toastText(this@ListCredentialsActivity, "Request denied")
+
+                                    }
+                                    .setTextMaxLines(7)
+                                    .addCallback(object: BaseCallback<Snackbar>() {
+                                        override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                                            webClientCredentialRequestState = CredentialRequestState.Denied
+                                            searchItem?.collapseActionView()
+                                            toastText(this@ListCredentialsActivity, "Request denied")
+                                        }
+                                    })
+
+                                    serverSnackbar?.show()
+                            }
                         }
                     ).show()
                 }
@@ -717,7 +753,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             return toErrorResponse(HttpStatusCode.Forbidden, "denied by user")
         }
         else if (webClientCredentialRequestState == CredentialRequestState.Accepted) {
-           // if a new holder holds a selected cred like AutofillCredentialHolder
+            // if a new holder holds a selected cred like AutofillCredentialHolder
             val currCredential = AutofillCredentialHolder.currentCredential
             if (currCredential != null) {
                 if (webClientRequestIdentifier != requestIdentifier) {
@@ -745,6 +781,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 webClientCredentialRequestState = CredentialRequestState.Fulfilled
 
                 CoroutineScope(Dispatchers.Main).launch {
+                    serverSnackbar?.dismiss()
                     toastText(this@ListCredentialsActivity, "Credential '$name' posted")
                 }
 
