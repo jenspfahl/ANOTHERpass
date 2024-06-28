@@ -1,10 +1,12 @@
 package de.jepfa.yapm.ui
 
 import android.content.Context
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.SwitchCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import de.jepfa.yapm.R
 
@@ -14,8 +16,9 @@ class ServerRequestBottomSheet(
     webClientId: CharSequence,
     webRequestDetails: CharSequence,
     fingerprint: CharSequence,
-    denyHandler: () -> Unit,
-    acceptHandler: () -> Unit,
+    denyHandler: (allowBypass: Boolean) -> Unit,
+    acceptHandler: (allowBypass: Boolean) -> Unit,
+    hideBypassFlag: Boolean = false
 ): BottomSheetDialog(context) {
 
     init {
@@ -29,12 +32,16 @@ class ServerRequestBottomSheet(
         bottomSheet.findViewById<TextView>(R.id.text_web_request).text = webRequestDetails
         bottomSheet.findViewById<TextView>(R.id.text_fingerprint).text = fingerprint
 
+        val bypassSwitch = bottomSheet.findViewById<SwitchCompat>(R.id.switch_allow_bypass)
+        if (hideBypassFlag) {
+            bypassSwitch.visibility = View.GONE
+        }
         bottomSheet.findViewById<Button>(R.id.button_server_call_deny).setOnClickListener {
-            denyHandler()
+            denyHandler(bypassSwitch.isChecked)
             dismiss()
         }
         bottomSheet.findViewById<Button>(R.id.button_server_call_accept).setOnClickListener {
-            acceptHandler()
+            acceptHandler(bypassSwitch.isChecked)
             dismiss()
         }
 

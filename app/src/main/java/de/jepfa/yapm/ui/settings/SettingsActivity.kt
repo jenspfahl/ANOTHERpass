@@ -10,9 +10,9 @@ import android.provider.Settings
 import android.text.InputFilter
 import android.text.InputType
 import android.view.autofill.AutofillManager
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.preference.*
 import com.yariksoffice.lingver.Lingver
 import de.jepfa.yapm.BuildConfig.APPLICATION_ID
@@ -29,6 +29,7 @@ import de.jepfa.yapm.ui.login.LoginActivity
 import de.jepfa.yapm.usecase.session.LogoutUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.ClipboardUtil
+import de.jepfa.yapm.util.toastText
 import java.util.*
 
 
@@ -408,11 +409,19 @@ class SettingsActivity : SecureActivity(),
                 PreferenceService.putBoolean(PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD, true, preference.context)
                 true
             }
-
             findPreference<EditTextPreference>(PreferenceService.PREF_SERVER_PORT)?.let { pref ->
                 pref.setOnBindEditTextListener { editText ->
                     editText.inputType = InputType.TYPE_CLASS_NUMBER
                     editText.filters = arrayOf(InputFilter.LengthFilter(5))
+                }
+
+                pref.setOnPreferenceChangeListener { _, newValue ->
+                    val newPort = newValue.toString().toIntOrNull()
+                    if (newPort == null || newPort < 1024 || newPort > 49151) {
+                        toastText(activity, "Invalid port number")
+                        return@setOnPreferenceChangeListener false
+                    }
+                    return@setOnPreferenceChangeListener true
                 }
 
                 val port =

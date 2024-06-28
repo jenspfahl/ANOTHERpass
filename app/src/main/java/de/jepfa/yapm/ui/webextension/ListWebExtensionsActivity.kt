@@ -32,7 +32,7 @@ class ListWebExtensionsActivity : SecureActivity() {
             masterSecretKey?.let { key ->
                 val sorted = webExtensions
                     .filter { it.linked }
-                    .sortedBy { SecretService.decryptCommonString(key, it.title).lowercase() }
+                    .sortedBy { SecretService.decryptCommonString(key, it.webClientId).lowercase() }
 
                 // delete all unlinked where the linking was aborted
                 webExtensions

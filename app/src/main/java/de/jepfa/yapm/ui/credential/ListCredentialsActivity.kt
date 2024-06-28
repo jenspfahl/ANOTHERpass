@@ -127,10 +127,35 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     HttpServer.HttpCallback, HttpServer.HttpServerCallback {
 
     /**
-     * Incoming -> Requesting -> Accepted -> Fulfilled
-     *                        -> Denied
+     * None -> Incoming -> AwaitingAcceptance -> Accepted -> Fulfilled
+     *                                        -> Denied
      */
-    enum class CredentialRequestState {Incoming, Requesting, Accepted, Denied, Fulfilled}
+    enum class CredentialRequestState(val isProgressing: Boolean) {
+        /**
+         * No incoming request, ready to take one
+         */
+        None(false),
+        /**
+         * Incoming request, confirmation dialog will be displayed to the user (if configured)
+         */
+        Incoming(true),
+        /**
+         * Incoming request awaits confirmation from ddsplayed dialog
+         */
+        AwaitingAcceptance(true),
+        /**
+         * Incoming request accepted by the user or automatically (if configured)
+         */
+        Accepted(true),
+        /**
+         * Incoming request fulfilled by delivering requested data back
+         */
+        Fulfilled(false),
+        /**
+         * Incoming request declined and aborted
+         */
+        Denied(false);
+    }
 
     private var serverViewStateText: String = ""
     private lateinit var serverViewSwitch: SwitchCompat
@@ -162,7 +187,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private var jumpToUuid: UUID? = null
     private var jumpToItemPosition: Int? = null
 
-    private var webClientCredentialRequestState = CredentialRequestState.Incoming
+    private var webClientCredentialRequestState = CredentialRequestState.None
     private var webClientRequestIdentifier: String? = null
 
 
@@ -537,7 +562,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         }
 
                         webClientRequestIdentifier = null
-                        webClientCredentialRequestState = CredentialRequestState.Incoming
+                        webClientCredentialRequestState = CredentialRequestState.None
 
                         if (e != null) {
                             Log.w("HTTP", e)
@@ -577,14 +602,20 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         val website = message.optString("website")
 
         if (webClientRequestIdentifier != requestIdentifier) {
-            Log.i("HTTP", "new credential request $requestIdentifier for $webClientId")
-            webClientCredentialRequestState = CredentialRequestState.Incoming
-            webClientRequestIdentifier = requestIdentifier
-
+            if (webClientCredentialRequestState.isProgressing) {
+                Log.i("HTTP", "concurrent but ignored credential request $requestIdentifier for $webClientId")
+                return toErrorResponse(HttpStatusCode.Conflict, "waiting for concurrent request")
+            }
+            else {
+                Log.i("HTTP", "next credential request $requestIdentifier for $webClientId")
+                webClientCredentialRequestState = CredentialRequestState.Incoming
+                webClientRequestIdentifier = requestIdentifier
+            }
         }
 
+
         if (webClientCredentialRequestState == CredentialRequestState.Incoming) {
-            webClientCredentialRequestState = CredentialRequestState.Requesting
+            webClientCredentialRequestState = CredentialRequestState.AwaitingAcceptance
 
 
             CoroutineScope(Dispatchers.Main).launch {
@@ -654,11 +685,17 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         webClientId = webClientId,
                         webRequestDetails = details,
                         fingerprint = shortenedFingerprint,
-                        denyHandler = {
+                        denyHandler = { allowBypass ->
+                            webExtension.bypassIncomingRequests = allowBypass
+                            webExtensionViewModel.save(webExtension, this@ListCredentialsActivity)
+
                             webClientCredentialRequestState = CredentialRequestState.Denied
                             toastText(this@ListCredentialsActivity, "Request denied")
                         },
-                        acceptHandler = {
+                        acceptHandler = { allowBypass ->
+                            webExtension.bypassIncomingRequests = allowBypass
+                            webExtensionViewModel.save(webExtension, this@ListCredentialsActivity)
+
                             webClientCredentialRequestState = CredentialRequestState.Accepted
                             if (website.isNotBlank()) {
                                 startSearchFor(extractDomain(website), commit = true)
@@ -670,11 +707,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
             return toErrorResponse(HttpStatusCode.NotFound, "no user acknowledge")
         }
-        else if (webClientCredentialRequestState == CredentialRequestState.Requesting) {
+        else if (webClientCredentialRequestState == CredentialRequestState.AwaitingAcceptance) {
             return toErrorResponse(HttpStatusCode.NotFound, "pending request")
         }
         else if (webClientCredentialRequestState == CredentialRequestState.Denied) {
             webClientRequestIdentifier = null
+            webClientCredentialRequestState = CredentialRequestState.Fulfilled
 
             return toErrorResponse(HttpStatusCode.Forbidden, "denied by user")
         }
@@ -699,7 +737,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 response.put("name", name)
                 response.put("password", password.toRawFormattedPassword())
                 response.put("user", user)
-                response.put("website", website)
+                response.put("website", ensureHttp(website))
 
                 password.clear()
 
@@ -719,8 +757,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
         else if (webClientCredentialRequestState == CredentialRequestState.Fulfilled) {
             webClientRequestIdentifier = null
-            // TODO send something back to indicate the web client to stop polling
-            return toErrorResponse(HttpStatusCode.BadRequest, "still provided")
+            return toErrorResponse(HttpStatusCode.Conflict, "still provided")
         }
         else {
             return toErrorResponse(HttpStatusCode.InternalServerError, "unhandled request state: $webClientCredentialRequestState")
@@ -728,15 +765,15 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     }
 
     private fun extractDomain(website: String, withTld: Boolean = false): String {
-        try {
+        return try {
             val host = URL(website).host.lowercase()
-            return if (withTld) {
+            if (withTld) {
                 host
             } else {
                 host.substringBeforeLast(".").substringAfterLast(".")
             }
         } catch (e: MalformedURLException) {
-            return website.lowercase()
+            website.lowercase()
         }
     }
 

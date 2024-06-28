@@ -202,12 +202,12 @@ fun emoji(unicode: Int): String {
     return String(Character.toChars(unicode))
 }
 
-private fun ensureHttp(s: String): String {
-    if (s.startsWith(prefix = "http", ignoreCase = true)) {
-        return s
+fun ensureHttp(s: String): String {
+    return if (s.startsWith(prefix = "http", ignoreCase = true)) {
+        s
     }
     else {
-        return "https://" + s
+        "https://" + s
     }
 }
 

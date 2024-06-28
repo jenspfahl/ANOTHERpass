@@ -341,15 +341,17 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
                         webClientId = webClientId,
                         webRequestDetails = "wants to establish a permanent link with this device. Please verify the fingerprint before accepting!",
                         fingerprint = shortenedServerPubKeyFingerprint,
-                        denyHandler = {
+                        hideBypassFlag = true,
+                        denyHandler = {_ ->
                             removeWebExtension()
                             val upIntent = Intent(this@AddWebExtensionActivity.intent)
                             navigateUpTo(upIntent)
 
                             toastText(this@AddWebExtensionActivity, "Not linked!")
                         },
-                        acceptHandler = {
+                        acceptHandler = { allowBypass ->
                             webExtension.linked = true
+                            webExtension.bypassIncomingRequests = allowBypass
                             webExtensionViewModel.save(webExtension!!, this@AddWebExtensionActivity)
 
                             val upIntent = Intent(this@AddWebExtensionActivity.intent)
