@@ -159,8 +159,8 @@ object HttpServer {
                                         return@post
                                     }
 
-                                    val key = activity.masterSecretKey
-                                    if (key == null) {
+                                    val masterKey = activity.masterSecretKey
+                                    if (masterKey == null) {
                                         respondError(
                                             webClientId,
                                             HttpStatusCode.Unauthorized,
@@ -173,7 +173,7 @@ object HttpServer {
                                         activity.getApp().webExtensionRepository.getAllSync()
                                             .find {
                                                 SecretService.decryptCommonString(
-                                                    key,
+                                                    masterKey,
                                                     it.webClientId
                                                 ) == webClientId
                                             }
@@ -202,7 +202,7 @@ object HttpServer {
                                     Log.d("HTTP", "requesting web extension: $webClientId")
                                     Log.d("HTTP", "payload: $body")
 
-                                    val sharedBaseOrLinkingSessionKey = SecretService.decryptKey(key, webExtension.sharedBaseKey)
+                                    val sharedBaseOrLinkingSessionKey = SecretService.decryptKey(masterKey, webExtension.sharedBaseKey)
                                     if (!sharedBaseOrLinkingSessionKey.isValid()) {
                                         Log.w("HTTP", "No configured base key")
                                         respondError(
@@ -263,7 +263,7 @@ object HttpServer {
                                         return@post
                                     }
 
-                                    val responseKeys = extractResponseTransportKey(sharedBaseOrLinkingSessionKey, key, webExtension, activity)
+                                    val responseKeys = createResponseTransportKey(sharedBaseOrLinkingSessionKey, requestTransportKey, masterKey, webExtension, activity)
                                     if (responseKeys == null) {
                                         respondError(
                                             webClientId,
@@ -275,7 +275,7 @@ object HttpServer {
 
                                     val text = wrapBody(
                                         responseKeys,
-                                        key,
+                                        masterKey,
                                         webExtension,
                                         response.second,
                                         activity)
@@ -494,7 +494,8 @@ object HttpServer {
     /**
      * Returns first the responseTransportKey second the one-time key as base64
      */
-    private fun extractResponseTransportKey(linkingSessionKey: Key, key: SecretKeyHolder, webExtension: EncWebExtension, context: Context): Pair<Key, Key>? {
+    private fun createResponseTransportKey(linkingSessionKey: Key, requestTransportKey: Key, key: SecretKeyHolder,
+                                           webExtension: EncWebExtension, context: Context): Pair<Key, Key>? {
         val oneTimeKey = createSymmetricKey(context)
 
         val isLinking = !webExtension.linked
@@ -508,7 +509,8 @@ object HttpServer {
                 Log.w("HTTP", "No configured base key")
                 return null
             }
-            SecretService.conjunctKeys(sharedBaseKey, oneTimeKey)
+            // conjunct the requestTransportKey to the responseTransportKey to have kind of session secret in case oneTimeKeys and sharedBAseKey get revealed
+            SecretService.conjunctKeys(sharedBaseKey, oneTimeKey, requestTransportKey)
         }
 
         return Pair(responseTransportKey, oneTimeKey)

@@ -258,15 +258,12 @@ object SecretService {
         return Password(result)
     }
 
-    fun conjunctKeys(key1: Key, key2: Key): Key {
-        val key = key1.toByteArray() + key2.toByteArray()
+    fun conjunctKeys(key1: Key, key2: Key, key3: Key? = null): Key {
+        val key =
+            if (key3 != null) key1.toByteArray() + key2.toByteArray() + key3.toByteArray()
+            else key1.toByteArray() + key2.toByteArray()
         val message = MessageDigest.getInstance("SHA-256")
-        val hashed = Key(message.digest(key))
-        Log.d("HTTP", "hashed key=" + key.contentToString())
-        Log.d("HTTP", "hashed key1=" + key1.toBase64String())
-        Log.d("HTTP", "hashed key2=" + key2.toBase64String())
-        Log.d("HTTP", "hashed keys=" + hashed.toBase64String())
-        return hashed
+        return Key(message.digest(key))
     }
 
     fun secretKeyToKey(secretKeyHolder:  SecretKeyHolder, salt: Key) : Key {

@@ -683,9 +683,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         .setTextMaxLines(7)
                         .addCallback(object: BaseCallback<Snackbar>() {
                             override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                                webClientCredentialRequestState = CredentialRequestState.Denied
                                 searchItem?.collapseActionView()
-                                toastText(this@ListCredentialsActivity, "Request denied")
+                                if (webClientCredentialRequestState.isProgressing) {
+                                    webClientCredentialRequestState = CredentialRequestState.Denied
+                                    toastText(this@ListCredentialsActivity, "Request denied")
+                                }
                             }
                         })
 
@@ -728,9 +730,14 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                                     .setTextMaxLines(7)
                                     .addCallback(object: BaseCallback<Snackbar>() {
                                         override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                                            webClientCredentialRequestState = CredentialRequestState.Denied
                                             searchItem?.collapseActionView()
-                                            toastText(this@ListCredentialsActivity, "Request denied")
+                                            if (webClientCredentialRequestState.isProgressing) {
+                                                webClientCredentialRequestState = CredentialRequestState.Denied
+                                                toastText(
+                                                    this@ListCredentialsActivity,
+                                                    "Request denied"
+                                                )
+                                            }
                                         }
                                     })
 
