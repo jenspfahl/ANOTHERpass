@@ -53,15 +53,15 @@ fun Intent.getIntExtra(key: String): Int? {
     return if (value != -1) value else null
 }
 
-fun StringBuilder.addFormattedLine(label: String, data: Any?) {
-    append(label)
+fun StringBuilder.addFormattedLine(label: String, data: Any?): StringBuilder {
+    return append(label)
         .append(": ")
         .append(data ?: "")
         .append(System.lineSeparator())
 }
 
-fun StringBuilder.addNewLine() {
-    append(System.lineSeparator())
+fun StringBuilder.addNewLine(): StringBuilder {
+    return append(System.lineSeparator())
 }
 
 fun Long.toDate(): Date {

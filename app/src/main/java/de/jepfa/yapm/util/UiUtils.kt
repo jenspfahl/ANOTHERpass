@@ -203,6 +203,9 @@ fun emoji(unicode: Int): String {
 }
 
 fun ensureHttp(s: String): String {
+    if (s.isBlank()) {
+        return s
+    }
     return if (s.startsWith(prefix = "http", ignoreCase = true)) {
         s
     }

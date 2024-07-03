@@ -43,7 +43,7 @@ import java.util.*
 
 object HttpServer {
 
-    val DEFAULT_HTTP_SERVER_PORT = 8787
+    const val DEFAULT_HTTP_SERVER_PORT = 8787
     val SERVER_LOG_PREFIX = Constants.LOG_PREFIX + "HttpServer"
 
     enum class Action {LINKING, REQUEST_CREDENTIAL}
@@ -588,10 +588,7 @@ object HttpServer {
 
         val modulus = BigInteger(1, nBytes)
         val exponent = BigInteger(1, eBytes)
-        Log.d("HTTP","client nB.s: " + nBytes.size)
-        Log.d("HTTP","client nB: " + nBytes.contentToString())
-        Log.d("HTTP","client modulus: " + modulus)
-        Log.d("HTTP","client exponent: " + exponent)
+
 
         val clientPublicKey = SecretService.buildRsaPublicKey(modulus, exponent)
         val encOneTimeKey = SecretService.encryptKeyWithPublicKey(clientPublicKey, oneTimeKey)

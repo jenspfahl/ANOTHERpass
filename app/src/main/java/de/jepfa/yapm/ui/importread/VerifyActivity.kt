@@ -111,7 +111,7 @@ class VerifyActivity : ReadActivityBase() {
             return
         }
         if (tagId != null && storedTagId != null && tagId != storedTagId) {
-            Log.i(LOG_PREFIX + "nfc", "mpt tag id missmatch: tagId = $tagId <> storedTagId=$storedTagId")
+            Log.i(LOG_PREFIX + "nfc", "mpt tag id mismatch: tagId = $tagId <> storedTagId=$storedTagId")
             verifyResultText.text = "\u274C " + getString(R.string.not_a_original_mpt_nfc_token)
 
             return

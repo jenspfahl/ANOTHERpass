@@ -366,7 +366,7 @@ class LoginActivity : NfcBaseActivity() {
                 return
             }
             else if (tagId != storedTagId) {
-                Log.i(LOG_PREFIX + "nfc", "mpt tag id missmatch: tagId = $tagId <> storedTagId=$storedTagId")
+                Log.i(LOG_PREFIX + "nfc", "mpt tag id mismatch: tagId = $tagId <> storedTagId=$storedTagId")
                 toastText(this, R.string.not_a_original_mpt_nfc_token)
 
                 return

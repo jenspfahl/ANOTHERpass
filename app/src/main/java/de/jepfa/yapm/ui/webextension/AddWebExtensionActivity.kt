@@ -225,7 +225,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
                 val encWebClientId = SecretService.encryptCommonString(key, webClientId!!)
                 // this field contains the QR code payload in this phase
                 val encSessionKey = SecretService.encryptKey(key, sessionKey)
-                val encClientPublicKey = SecretService.encryptCommonString(key, clientPubKeyFingerprint)
+                val encClientPublicKeyFingerprint = SecretService.encryptCommonString(key, clientPubKeyFingerprint)
 
                 // save unlinked extension, the HttpServer will complete it once the user proceeds in the extension ...
                 webExtensionViewModel.allWebExtensions.observeOnce(this) { webExtensions ->
@@ -236,6 +236,11 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
 
                     var id: Int? = null
                     if (existingWebExtension != null) {
+                        if (existingWebExtension.linked) {
+                            finish()
+                            toastText(this, "This device link already exists. Delete it first.")
+                            return@observeOnce
+                        }
                         id = existingWebExtension.id
                     }
 
@@ -243,7 +248,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
                         id,
                         encWebClientId,
                         title,
-                        encClientPublicKey,
+                        encClientPublicKeyFingerprint, // we borrow this field in the linking phase
                         encSessionKey, // we borrow this field in the linking phase
                         linked = false,
                         enabled = true,
@@ -291,9 +296,17 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
 
                 if (fingerprintToHex != knownClientPubKeyFingerprintHex) {
                     Log.e("HTTP", "wrong fingerprint")
-                    return toErrorResponse(HttpStatusCode.BadRequest,"fingerprint missmatch")
+                    return toErrorResponse(HttpStatusCode.BadRequest,"fingerprint mismatch")
                 }
                 Log.i("HTTP", "client public key approved")
+
+                val remoteVaultId = message.optString("vaultId")
+                Log.d("HTTP", "remoteVaultId=$remoteVaultId")
+                if (remoteVaultId.isNotBlank() && remoteVaultId != SaltService.getVaultId(this)) {
+                    Log.e("HTTP", "relink vault id mismatch")
+                    return toErrorResponse(HttpStatusCode.BadRequest,"relink vault id mismatch")
+                }
+
                 val sharedBaseKey = HttpServer.createSymmetricKey(this)
 
                 webExtension.sharedBaseKey = SecretService.encryptKey(key, sharedBaseKey)
