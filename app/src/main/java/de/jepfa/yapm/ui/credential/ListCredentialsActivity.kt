@@ -42,7 +42,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback
 import com.google.android.material.snackbar.Snackbar
 import de.jepfa.yapm.R
@@ -603,6 +602,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         val requestIdentifier = message.getString("requestIdentifier")
         val website = message.optString("website")
+        val name = message.optString("name")
+        val uid = message.optString("uid")
 
         if (webClientRequestIdentifier != requestIdentifier) {
             if (webClientCredentialRequestState.isProgressing) {
@@ -620,6 +621,16 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         if (webClientCredentialRequestState == CredentialRequestState.Incoming) {
             webClientCredentialRequestState = CredentialRequestState.AwaitingAcceptance
 
+            val details =
+                if (uid.isNotBlank() && name.isNotBlank()) {
+                    "wants to fetch credential with name '$name'."
+                }
+                else if (website.isNotBlank()) {
+                    "wants to fetch credential for '${extractDomain(website, withTld = true)}'."
+                }
+                else {
+                    "wants to ask for any credential. Please select one."
+                }
 
             CoroutineScope(Dispatchers.Main).launch {
 
@@ -633,17 +644,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 val shortenedFingerprint = fingerprintAsKey.toShortenedFingerprint()
 
 
-                val details = if (website.isNotBlank()) {
-                    "wants to fetch credential for '${extractDomain(website, withTld = true)}'."
-                }
-                else {
-                    "wants to ask for any credential. Please select one."
-                }
+
                 if (webExtension.bypassIncomingRequests) {
                     webClientCredentialRequestState = CredentialRequestState.Accepted
-                    if (website.isNotBlank()) {
-                        startSearchFor(extractDomain(website), commit = true)
-                    }
+                    stageCredentialToPushOrStartSearch(uid, website)
+
 
                     val span = SpannableString("$webClientTitle ($webClientId) $details Swipe to cancel. Fingerprint: $shortenedFingerprint")
 
@@ -712,11 +717,10 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                             webExtensionViewModel.save(webExtension, this@ListCredentialsActivity)
 
                             webClientCredentialRequestState = CredentialRequestState.Accepted
-                            if (website.isNotBlank()) {
-                                startSearchFor(extractDomain(website), commit = true)
-                            }
+                            stageCredentialToPushOrStartSearch(uid, website)
+
                             if (!webExtension.bypassIncomingRequests || serverSnackbar?.isShown == false) {
-                                serverSnackbar = Snackbar.make(
+                                this@ListCredentialsActivity.serverSnackbar = Snackbar.make(
                                     serverView,
                                     "Select the credential to fulfill the request.",
                                     300_000
@@ -763,36 +767,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             // if a new holder holds a selected cred like AutofillCredentialHolder
             val currCredential = AutofillCredentialHolder.currentCredential
             if (currCredential != null) {
-                if (webClientRequestIdentifier != requestIdentifier) {
-                    return toErrorResponse(HttpStatusCode.BadRequest, "wrong request identifier")
-                }
-                val password = SecretService.decryptPassword(key, currCredential.password)
-                val user = SecretService.decryptCommonString(key, currCredential.user)
-                val name = SecretService.decryptCommonString(key, currCredential.name)
-                val website = SecretService.decryptCommonString(key, currCredential.website)
-                val uid = currCredential.uid
-                AutofillCredentialHolder.obfuscationKey?.let {
-                    password.deobfuscate(it)
-                }
-
-                val response = JSONObject()
-                response.put("uid", uid)
-                response.put("name", name)
-                response.put("password", password.toRawFormattedPassword())
-                response.put("user", user)
-                response.put("website", ensureHttp(website))
-
-                password.clear()
-
-                webClientRequestIdentifier = null
-                webClientCredentialRequestState = CredentialRequestState.Fulfilled
-
-                CoroutineScope(Dispatchers.Main).launch {
-                    serverSnackbar?.dismiss()
-                    toastText(this@ListCredentialsActivity, "Credential '$name' posted")
-                }
-
-                return Pair(HttpStatusCode.OK, response)
+                return postCredential(key, requestIdentifier, currCredential)
             }
             else {
                 // waiting for user s selection
@@ -806,6 +781,72 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         else {
             return toErrorResponse(HttpStatusCode.InternalServerError, "unhandled request state: $webClientCredentialRequestState")
         }
+    }
+
+    private fun stageCredentialToPushOrStartSearch(uid: String, website: String) {
+        if (uid.isNotBlank()) {
+            //TODO just fetch it
+            val uuid = try {
+                UUID.fromString(uid)
+            } catch (e: Exception) {
+                null
+            }
+            if (uuid != null) {
+                credentialViewModel.findByUid(uuid)
+                    .observeOnce(this@ListCredentialsActivity) { existingCredential ->
+                        if (existingCredential != null) {
+                            AutofillCredentialHolder.update(
+                                existingCredential,
+                                obfuscationKey = null
+                            )
+                        }
+                    }
+            } else {
+                Log.w("HTTP", "cannot parse UUID ($uid)")
+                //return toErrorResponse(HttpStatusCode.BadRequest, "cannot parse UUID")
+            }
+        } else if (website.isNotBlank()) {
+            startSearchFor(extractDomain(website), commit = true)
+        }
+    }
+
+    private fun postCredential(
+        key: SecretKeyHolder,
+        requestIdentifier: String?,
+        currCredential: EncCredential
+    ): Pair<HttpStatusCode, JSONObject> {
+        if (webClientRequestIdentifier != requestIdentifier) {
+            return toErrorResponse(HttpStatusCode.BadRequest, "wrong request identifier")
+        }
+        val password = SecretService.decryptPassword(key, currCredential.password)
+        val user = SecretService.decryptCommonString(key, currCredential.user)
+        val name = SecretService.decryptCommonString(key, currCredential.name)
+        val website = SecretService.decryptCommonString(key, currCredential.website)
+        val uid = currCredential.uid
+        AutofillCredentialHolder.obfuscationKey?.let {
+            password.deobfuscate(it)
+        }
+
+        val response = JSONObject()
+        if (uid != null) {
+            response.put("uid", uid)
+        }
+        response.put("name", name)
+        response.put("password", password.toRawFormattedPassword())
+        response.put("user", user)
+        response.put("website", ensureHttp(website))
+
+        password.clear()
+
+        webClientRequestIdentifier = null
+        webClientCredentialRequestState = CredentialRequestState.Fulfilled
+
+        CoroutineScope(Dispatchers.Main).launch {
+            serverSnackbar?.dismiss()
+            toastText(this@ListCredentialsActivity, "Credential '$name' posted")
+        }
+
+        return Pair(HttpStatusCode.OK, response)
     }
 
     private fun extractDomain(website: String, withTld: Boolean = false): String {
