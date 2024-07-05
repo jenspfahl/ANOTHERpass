@@ -602,7 +602,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         val requestIdentifier = message.getString("requestIdentifier")
         val website = message.optString("website")
-        val name = message.optString("name")
         val uid = message.optString("uid")
 
         if (webClientRequestIdentifier != requestIdentifier) {
@@ -621,134 +620,45 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         if (webClientCredentialRequestState == CredentialRequestState.Incoming) {
             webClientCredentialRequestState = CredentialRequestState.AwaitingAcceptance
 
-            val details =
-                if (uid.isNotBlank() && name.isNotBlank()) {
-                    "wants to fetch credential with name '$name'."
-                }
-                else if (website.isNotBlank()) {
-                    "wants to fetch credential for '${extractDomain(website, withTld = true)}'."
-                }
-                else {
-                    "wants to ask for any credential. Please select one."
-                }
+            val sharedBaseKey = SecretService.decryptKey(key, webExtension.sharedBaseKey)
+            val requestIdentifierKey = Key(Base64.decode(webClientRequestIdentifier, 0))
+            val fingerprintAsKey = SecretService.conjunctKeys(sharedBaseKey, requestIdentifierKey)
+            val shortenedFingerprint = fingerprintAsKey.toShortenedFingerprint()
 
             CoroutineScope(Dispatchers.Main).launch {
 
                 AutofillCredentialHolder.clear()
                 searchItem?.collapseActionView()
 
-                val sharedBaseKey = SecretService.decryptKey(key, webExtension.sharedBaseKey)
-                val requestIdentifierKey = Key(Base64.decode(webClientRequestIdentifier, 0))
-                val fingerprintAsKey = SecretService.conjunctKeys(sharedBaseKey, requestIdentifierKey)
 
-                val shortenedFingerprint = fingerprintAsKey.toShortenedFingerprint()
-
-
-
-                if (webExtension.bypassIncomingRequests) {
-                    webClientCredentialRequestState = CredentialRequestState.Accepted
-                    stageCredentialToPushOrStartSearch(uid, website)
-
-
-                    val span = SpannableString("$webClientTitle ($webClientId) $details Swipe to cancel. Fingerprint: $shortenedFingerprint")
-
-                    span.setSpan(ForegroundColorSpan(getColor(R.color.colorAltAccent)),
-                        0, webClientTitle.length + webClientId.length + 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    span.setSpan(StyleSpan(Typeface.BOLD),
-                        0, webClientTitle.length + webClientId.length + 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                        span.setSpan(
-                            TypefaceSpan(Typeface.MONOSPACE),
-                            span.length - shortenedFingerprint.length,
-                            span.length,
-                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                        )
-                    }
-                    span.setSpan(
-                        StyleSpan(Typeface.BOLD),
-                        span.length - shortenedFingerprint.length,
-                        span.length,
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                val uuid = uid.toUUIDOrNull()
+                if (uuid != null) {
+                    startFetchCredentialForUidFlow(
+                        uuid,
+                        key,
+                        webExtension,
+                        webClientTitle,
+                        webClientId,
+                        shortenedFingerprint,
+                        website
                     )
-
-                    serverSnackbar = Snackbar.make(
-                        serverView,
-                        span,
-                        300_000
+                }
+                else if (website.isNotBlank()) {
+                    startFetchCredentialforWebsiteFlow(
+                        website,
+                        webExtension,
+                        webClientTitle,
+                        webClientId,
+                        shortenedFingerprint
                     )
-                        .setAction("Deny and revoke bypass") {
-                            webClientCredentialRequestState = CredentialRequestState.Denied
-                            webExtension.bypassIncomingRequests = false
-                            webExtensionViewModel.save(webExtension, this@ListCredentialsActivity)
-                            searchItem?.collapseActionView()
-                            toastText(this@ListCredentialsActivity, "Request denied and bypass revoked")
-
-                        }
-                        .setTextMaxLines(7)
-                        .addCallback(object: BaseCallback<Snackbar>() {
-                            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                                searchItem?.collapseActionView()
-                                if (webClientCredentialRequestState.isProgressing) {
-                                    webClientCredentialRequestState = CredentialRequestState.Denied
-                                    toastText(this@ListCredentialsActivity, "Request denied")
-                                }
-                            }
-                        })
-
-                        serverSnackbar?.show()
                 }
                 else {
-                    ServerRequestBottomSheet(
-                        this@ListCredentialsActivity,
-                        webClientTitle = webClientTitle,
-                        webClientId = webClientId,
-                        webRequestDetails = details,
-                        fingerprint = shortenedFingerprint,
-                        denyHandler = { allowBypass ->
-                            webExtension.bypassIncomingRequests = allowBypass
-                            webExtensionViewModel.save(webExtension, this@ListCredentialsActivity)
-
-                            webClientCredentialRequestState = CredentialRequestState.Denied
-                            toastText(this@ListCredentialsActivity, "Request denied")
-                        },
-                        acceptHandler = { allowBypass ->
-                            webExtension.bypassIncomingRequests = allowBypass
-                            webExtensionViewModel.save(webExtension, this@ListCredentialsActivity)
-
-                            webClientCredentialRequestState = CredentialRequestState.Accepted
-                            stageCredentialToPushOrStartSearch(uid, website)
-
-                            if (!webExtension.bypassIncomingRequests || serverSnackbar?.isShown == false) {
-                                this@ListCredentialsActivity.serverSnackbar = Snackbar.make(
-                                    serverView,
-                                    "Select the credential to fulfill the request.",
-                                    300_000
-                                )
-                                    .setAction("Cancel request") {
-                                        webClientCredentialRequestState = CredentialRequestState.Denied
-                                        searchItem?.collapseActionView()
-                                        toastText(this@ListCredentialsActivity, "Request denied")
-
-                                    }
-                                    .setTextMaxLines(7)
-                                    .addCallback(object: BaseCallback<Snackbar>() {
-                                        override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                                            searchItem?.collapseActionView()
-                                            if (webClientCredentialRequestState.isProgressing) {
-                                                webClientCredentialRequestState = CredentialRequestState.Denied
-                                                toastText(
-                                                    this@ListCredentialsActivity,
-                                                    "Request denied"
-                                                )
-                                            }
-                                        }
-                                    })
-
-                                    serverSnackbar?.show()
-                            }
-                        }
-                    ).show()
+                    startFetchAnyCredentialFlow(
+                        webExtension,
+                        webClientTitle,
+                        webClientId,
+                        shortenedFingerprint
+                    )
                 }
             }
 
@@ -783,32 +693,248 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
     }
 
-    private fun stageCredentialToPushOrStartSearch(uid: String, website: String) {
-        if (uid.isNotBlank()) {
-            //TODO just fetch it
-            val uuid = try {
-                UUID.fromString(uid)
-            } catch (e: Exception) {
-                null
-            }
-            if (uuid != null) {
-                credentialViewModel.findByUid(uuid)
-                    .observeOnce(this@ListCredentialsActivity) { existingCredential ->
-                        if (existingCredential != null) {
-                            AutofillCredentialHolder.update(
-                                existingCredential,
-                                obfuscationKey = null
-                            )
-                        }
-                    }
+    private fun startFetchCredentialForUidFlow(
+        uuid: UUID,
+        key: SecretKeyHolder,
+        webExtension: EncWebExtension,
+        webClientTitle: String,
+        webClientId: String,
+        shortenedFingerprint: String,
+        website: String
+    ) {
+        findCredentialByUuid(uuid) { credential ->
+            if (credential != null) {
+                val name = SecretService.decryptCommonString(key, credential.name)
+                showClientRequest(
+                    webExtension,
+                    webClientTitle,
+                    webClientId,
+                    "wants to fetch credential with name '$name'.",
+                    shortenedFingerprint,
+                    "Returning credential with name '$name' ...",
+                    300_000,
+                )
+                {
+                    AutofillCredentialHolder.update(credential, obfuscationKey = null)
+                }
             } else {
-                Log.w("HTTP", "cannot parse UUID ($uid)")
-                //return toErrorResponse(HttpStatusCode.BadRequest, "cannot parse UUID")
+                toastText(this@ListCredentialsActivity, "")
+                startFetchCredentialforWebsiteFlow(
+                    website,
+                    webExtension,
+                    webClientTitle,
+                    webClientId,
+                    shortenedFingerprint
+                )
             }
-        } else if (website.isNotBlank()) {
-            startSearchFor(extractDomain(website), commit = true)
         }
     }
+
+    private fun startFetchCredentialforWebsiteFlow(
+        website: String,
+        webExtension: EncWebExtension,
+        webClientTitle: String,
+        webClientId: String,
+        shortenedFingerprint: String
+    ) {
+        val domain = extractDomain(website, withTld = true)
+        showClientRequest(
+            webExtension,
+            webClientTitle,
+            webClientId,
+            "wants to fetch credential for '$domain'.",
+            shortenedFingerprint,
+            "Select the credential for '$domain' to fulfill the request.",
+            300_000,
+        )
+        {
+            startSearchFor("!$domain", commit = true)
+        }
+    }
+
+    private fun startFetchAnyCredentialFlow(
+        webExtension: EncWebExtension,
+        webClientTitle: String,
+        webClientId: String,
+        shortenedFingerprint: String
+    ) {
+        showClientRequest(
+            webExtension,
+            webClientTitle,
+            webClientId,
+            "wants to ask for any credential. Please select one.",
+            shortenedFingerprint,
+            "Select a credential to fulfill the request.",
+            300_000,
+        )
+        {
+            // nothing
+        }
+    }
+
+    private fun showClientRequest(
+        webExtension: EncWebExtension,
+        webClientTitle: String,
+        webClientId: String,
+        details: String,
+        shortenedFingerprint: String,
+        userActionText: String,
+        userActionDuration: Int,
+        acceptHandler: () -> Unit,
+    ) {
+        if (webExtension.bypassIncomingRequests) {
+            webClientCredentialRequestState = CredentialRequestState.Accepted
+            acceptHandler()
+
+            showBypassSnackbar(
+                webClientTitle,
+                webClientId,
+                details,
+                shortenedFingerprint,
+                webExtension
+            )
+        } else {
+            showAcceptBottomSheet(
+                webClientTitle,
+                webClientId,
+                details,
+                shortenedFingerprint,
+                webExtension
+            )
+            {
+                acceptHandler()
+                showUserActionSnackbar(userActionText, userActionDuration)
+            }
+        }
+    }
+
+    private fun showAcceptBottomSheet(
+        webClientTitle: String,
+        webClientId: String,
+        details: String,
+        shortenedFingerprint: String,
+        webExtension: EncWebExtension,
+        acceptHandler: () -> Unit,
+    ) {
+        ServerRequestBottomSheet(
+            this@ListCredentialsActivity,
+            webClientTitle = webClientTitle,
+            webClientId = webClientId,
+            webRequestDetails = details,
+            fingerprint = shortenedFingerprint,
+            denyHandler = { allowBypass ->
+                webExtension.bypassIncomingRequests = allowBypass
+                webExtensionViewModel.save(webExtension, this@ListCredentialsActivity)
+
+                webClientCredentialRequestState = CredentialRequestState.Denied
+                toastText(this@ListCredentialsActivity, "Request denied")
+            },
+            acceptHandler = { allowBypass ->
+                webExtension.bypassIncomingRequests = allowBypass
+                webExtensionViewModel.save(webExtension, this@ListCredentialsActivity)
+
+                webClientCredentialRequestState = CredentialRequestState.Accepted
+
+                acceptHandler()
+            }
+        ).show()
+    }
+
+    private fun showUserActionSnackbar(text: String, duration: Int) {
+        this@ListCredentialsActivity.serverSnackbar = Snackbar.make(
+            serverView,
+            text, duration
+        )
+            .setAction("Cancel request") {
+                webClientCredentialRequestState = CredentialRequestState.Denied
+                searchItem?.collapseActionView()
+                toastText(this@ListCredentialsActivity, "Request denied")
+
+            }
+            .setTextMaxLines(7)
+            .addCallback(object : BaseCallback<Snackbar>() {
+                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                    searchItem?.collapseActionView()
+                    if (webClientCredentialRequestState.isProgressing) {
+                        webClientCredentialRequestState = CredentialRequestState.Denied
+                        toastText(
+                            this@ListCredentialsActivity,
+                            "Request denied"
+                        )
+                    }
+                }
+            })
+
+        serverSnackbar?.show()
+    }
+
+    private fun showBypassSnackbar(
+        webClientTitle: String,
+        webClientId: String,
+        details: String,
+        shortenedFingerprint: String,
+        webExtension: EncWebExtension
+    ) {
+
+        val span =
+            SpannableString("$webClientTitle ($webClientId) $details Swipe to cancel. Fingerprint: $shortenedFingerprint")
+
+        span.setSpan(
+            ForegroundColorSpan(getColor(R.color.colorAltAccent)),
+            0, webClientTitle.length + webClientId.length + 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        span.setSpan(
+            StyleSpan(Typeface.BOLD),
+            0, webClientTitle.length + webClientId.length + 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            span.setSpan(
+                TypefaceSpan(Typeface.MONOSPACE),
+                span.length - shortenedFingerprint.length,
+                span.length,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+        span.setSpan(
+            StyleSpan(Typeface.BOLD),
+            span.length - shortenedFingerprint.length,
+            span.length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        serverSnackbar = Snackbar.make(
+            serverView,
+            span,
+            300_000
+        )
+            .setAction("Deny and revoke bypass") {
+                webClientCredentialRequestState = CredentialRequestState.Denied
+                webExtension.bypassIncomingRequests = false
+                webExtensionViewModel.save(webExtension, this@ListCredentialsActivity)
+                searchItem?.collapseActionView()
+                toastText(this@ListCredentialsActivity, "Request denied and bypass revoked")
+
+            }
+            .setTextMaxLines(7)
+            .addCallback(object : BaseCallback<Snackbar>() {
+                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                    searchItem?.collapseActionView()
+                    if (webClientCredentialRequestState.isProgressing) {
+                        webClientCredentialRequestState = CredentialRequestState.Denied
+                        toastText(this@ListCredentialsActivity, "Request denied")
+                    }
+                }
+            })
+
+        serverSnackbar?.show()
+    }
+
+    private fun findCredentialByUuid(uuid: UUID, resolved: (EncCredential?) -> Unit) {
+        credentialViewModel.findByUid(uuid)
+            .observeOnce(this@ListCredentialsActivity, resolved)
+    }
+
 
     private fun postCredential(
         key: SecretKeyHolder,

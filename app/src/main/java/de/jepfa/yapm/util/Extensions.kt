@@ -189,6 +189,14 @@ fun String.toUUIDFromBase64String(): UUID {
     }
 }
 
+fun String.toUUIDOrNull(): UUID? {
+    return try {
+        UUID.fromString(this)
+    } catch (e: Exception) {
+        null
+    }
+}
+
 
 fun Double.secondsToYear(): Double {
     return this / 60 / 60 / 24 / 365
