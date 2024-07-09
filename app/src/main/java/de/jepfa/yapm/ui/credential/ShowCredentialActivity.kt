@@ -389,7 +389,7 @@ class ShowCredentialActivity : SecureActivity() {
                 credential.uid?.let {
                     sb.addFormattedLine(
                         getString(R.string.universal_identifier),
-                        shortenBase64String(it.toBase64String()))
+                        it.toReadableString())
                 }
 
                 masterSecretKey?.let { key ->
@@ -423,7 +423,7 @@ class ShowCredentialActivity : SecureActivity() {
                         credential.uid?.let { uid ->
                             ClipboardUtil.copy(
                                 this.getString(R.string.universal_identifier),
-                                shortenBase64String(uid.toBase64String()),
+                                uid.toReadableString(),
                                 this,
                                 isSensible = false,
                             )

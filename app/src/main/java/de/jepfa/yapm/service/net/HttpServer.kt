@@ -573,6 +573,8 @@ object HttpServer {
     }
 
     private fun wrapBody(responseKeys: Pair<Key, Key>, key: SecretKeyHolder, webExtension: EncWebExtension, message: JSONObject, context: Context): String {
+        //Log.d("HTTP","plain response: " + message.toString(4))
+
         val responseTransportKey = responseKeys.first
         val oneTimeKey = responseKeys.second
         val secretKey = SecretService.buildAesKey(responseTransportKey, context)
@@ -655,26 +657,6 @@ object HttpServer {
     ): Pair<HttpStatusCode, JSONObject>? {
         Log.d("HTTP", "credential request ...")
         return requestCredentialHttpCallback?.handleHttpRequest(action, webClientId, webExtension, message)
-    }
-
-    // doesn't work like browser fingerprints ...
-    private fun getSHA256Fingerprint(publicKey: PublicKey): String? {
-        var hexString: String? = null
-        try {
-
-
-            val tag = "ssh-rsa".toByteArray()
-            val pK = publicKey.encoded
-
-            val encoded: ByteArray = tag + pK
-
-            hexString = encoded.sha256().toHex()
-        } catch (e1: NoSuchAlgorithmException) {
-            Log.e("HTTP", e1.toString())
-        } catch (e: CertificateEncodingException) {
-            Log.e("HTTP", e.toString())
-        }
-        return hexString
     }
 
     private suspend fun PipelineContext<Unit, ApplicationCall>.respond(

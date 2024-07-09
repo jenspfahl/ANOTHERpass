@@ -232,10 +232,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                             val user = SecretService.decryptCommonString(key, credential.user)
                             val addInfo = SecretService.decryptCommonString(key, credential.additionalInfo)
                             val expiredAt = SecretService.decryptLong(key, credential.expiresAt)
-                            var uid = credential.uid?.toBase64String()
-                            if (uid != null) {
-                               uid = shortenBase64String(uid)
-                            }
+                            val uid = credential.uid?.toReadableString()
                             val id = credential.id?.toString()
 
                             if (Command.SEARCH_COMMAND_SHOW_EXPIRED.applies(charSequence)) {

@@ -644,7 +644,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     )
                 }
                 else if (website.isNotBlank()) {
-                    startFetchCredentialforWebsiteFlow(
+                    startFetchCredentialForWebsiteFlow(
                         website,
                         webExtension,
                         webClientTitle,
@@ -677,7 +677,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             // if a new holder holds a selected cred like AutofillCredentialHolder
             val currCredential = AutofillCredentialHolder.currentCredential
             if (currCredential != null) {
-                return postCredential(key, requestIdentifier, currCredential)
+                return postCredential(key, webClientId, requestIdentifier, currCredential)
             }
             else {
                 // waiting for user s selection
@@ -719,7 +719,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 }
             } else {
                 toastText(this@ListCredentialsActivity, "")
-                startFetchCredentialforWebsiteFlow(
+                startFetchCredentialForWebsiteFlow(
                     website,
                     webExtension,
                     webClientTitle,
@@ -730,7 +730,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
     }
 
-    private fun startFetchCredentialforWebsiteFlow(
+    private fun startFetchCredentialForWebsiteFlow(
         website: String,
         webExtension: EncWebExtension,
         webClientTitle: String,
@@ -938,6 +938,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     private fun postCredential(
         key: SecretKeyHolder,
+        webClientId: String,
         requestIdentifier: String?,
         currCredential: EncCredential
     ): Pair<HttpStatusCode, JSONObject> {
@@ -949,18 +950,28 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         val name = SecretService.decryptCommonString(key, currCredential.name)
         val website = SecretService.decryptCommonString(key, currCredential.website)
         val uid = currCredential.uid
+
         AutofillCredentialHolder.obfuscationKey?.let {
             password.deobfuscate(it)
         }
 
-        val response = JSONObject()
+
+        val responseCredential = JSONObject()
         if (uid != null) {
-            response.put("uid", uid)
+            responseCredential.put("uid", uid)
+            responseCredential.put("readableUid", uid.toReadableString())
         }
-        response.put("name", name)
-        response.put("password", password.toRawFormattedPassword())
-        response.put("user", user)
-        response.put("website", ensureHttp(website))
+        responseCredential.put("name", name)
+        responseCredential.put("password", password.toRawFormattedPassword())
+        responseCredential.put("user", user)
+        responseCredential.put("website", ensureHttp(website))
+
+        val clientKey = SecretService.secretKeyToKey(key, Key(webClientId.toByteArray()))
+
+        val response = JSONObject()
+
+        response.put("credential", responseCredential)
+        response.put("clientKey", clientKey.toBase64String())
 
         password.clear()
 

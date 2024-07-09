@@ -175,6 +175,10 @@ fun UUID.toBase64String(): String {
     return Base64.encodeToString(byteArray, Base64.NO_PADDING or Base64.NO_WRAP)
 }
 
+fun UUID.toReadableString(): String {
+    return shortenBase64String (this.toBase64String())
+}
+
 fun String.toUUIDFromBase64String(): UUID {
     try {
         val dec = Base64.decode(this, Base64.NO_PADDING or Base64.NO_WRAP)

@@ -17,10 +17,7 @@ import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.label.LabelService
-import de.jepfa.yapm.util.addFormattedLine
-import de.jepfa.yapm.util.observeOnce
-import de.jepfa.yapm.util.shortenBase64String
-import de.jepfa.yapm.util.toBase64String
+import de.jepfa.yapm.util.*
 
 
 class ListLabelsAdapter(private val listLabelsActivity: ListLabelsActivity) :
@@ -60,7 +57,7 @@ class ListLabelsAdapter(private val listLabelsActivity: ListLabelsActivity) :
                     encLabel.uid?.let {
                         sb.addFormattedLine(
                             listLabelsActivity.getString(R.string.universal_identifier),
-                            shortenBase64String(it.toBase64String()))
+                            it.toReadableString())
                     }
                     sb.addFormattedLine(listLabelsActivity.getString(R.string.name), current.name)
                     AlertDialog.Builder(listLabelsActivity)
