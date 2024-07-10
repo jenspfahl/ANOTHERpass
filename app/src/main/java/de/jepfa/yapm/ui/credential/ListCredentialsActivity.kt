@@ -603,6 +603,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         val requestIdentifier = message.getString("requestIdentifier")
         val website = message.optString("website")
         val uid = message.optString("uid")
+        val requestClientKey = message.optBoolean("requestClientKey")
 
         if (webClientRequestIdentifier != requestIdentifier) {
             if (webClientCredentialRequestState.isProgressing) {
@@ -652,6 +653,14 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         shortenedFingerprint
                     )
                 }
+                else if (requestClientKey) {
+                    startFetchClientKeyFlow(
+                        webExtension,
+                        webClientTitle,
+                        webClientId,
+                        shortenedFingerprint
+                    )
+                }
                 else {
                     startFetchAnyCredentialFlow(
                         webExtension,
@@ -674,14 +683,18 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             return toErrorResponse(HttpStatusCode.Forbidden, "denied by user")
         }
         else if (webClientCredentialRequestState == CredentialRequestState.Accepted) {
-            // if a new holder holds a selected cred like AutofillCredentialHolder
-            val currCredential = AutofillCredentialHolder.currentCredential
-            if (currCredential != null) {
-                return postCredential(key, webClientId, requestIdentifier, currCredential)
+            if (requestClientKey) {
+                return postClientKey(key, webClientId, requestIdentifier)
             }
             else {
-                // waiting for user s selection
-                return toErrorResponse(HttpStatusCode.NotFound, "no user selection")
+                // if a new holder holds a selected cred like AutofillCredentialHolder
+                val currCredential = AutofillCredentialHolder.currentCredential
+                return if (currCredential != null) {
+                    postCredential(key, webClientId, requestIdentifier, currCredential)
+                } else {
+                    // waiting for user s selection
+                    toErrorResponse(HttpStatusCode.NotFound, "no user selection")
+                }
             }
         }
         else if (webClientCredentialRequestState == CredentialRequestState.Fulfilled) {
@@ -749,6 +762,26 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         )
         {
             startSearchFor("!$domain", commit = true)
+        }
+    }
+
+    private fun startFetchClientKeyFlow(
+        webExtension: EncWebExtension,
+        webClientTitle: String,
+        webClientId: String,
+        shortenedFingerprint: String
+    ) {
+        showClientRequest(
+            webExtension,
+            webClientTitle,
+            webClientId,
+            "wants to unlock the client vault.",
+            shortenedFingerprint,
+            "Unlocking client vault ...",
+            300_000,
+        )
+        {
+            // nothing
         }
     }
 
@@ -974,6 +1007,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         response.put("clientKey", clientKey.toBase64String())
 
         password.clear()
+        clientKey.clear()
 
         webClientRequestIdentifier = null
         webClientCredentialRequestState = CredentialRequestState.Fulfilled
@@ -981,6 +1015,34 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         CoroutineScope(Dispatchers.Main).launch {
             serverSnackbar?.dismiss()
             toastText(this@ListCredentialsActivity, "Credential '$name' posted")
+        }
+
+        return Pair(HttpStatusCode.OK, response)
+    }
+
+    private fun postClientKey(
+        key: SecretKeyHolder,
+        webClientId: String,
+        requestIdentifier: String?,
+    ): Pair<HttpStatusCode, JSONObject> {
+        if (webClientRequestIdentifier != requestIdentifier) {
+            return toErrorResponse(HttpStatusCode.BadRequest, "wrong request identifier")
+        }
+
+
+        val clientKey = SecretService.secretKeyToKey(key, Key(webClientId.toByteArray()))
+        val response = JSONObject()
+
+        response.put("clientKey", clientKey.toBase64String())
+
+        clientKey.clear()
+
+        webClientRequestIdentifier = null
+        webClientCredentialRequestState = CredentialRequestState.Fulfilled
+
+        CoroutineScope(Dispatchers.Main).launch {
+            serverSnackbar?.dismiss()
+            toastText(this@ListCredentialsActivity, "Local vault unlocked")
         }
 
         return Pair(HttpStatusCode.OK, response)
@@ -1078,9 +1140,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         val view: View = findViewById(R.id.content_list_credentials)
 
         // wait until ViewModel is fully loaded
-        view.postDelayed({
-            ReminderService.showNextReminder(view, this)
-        }, 500L)
+        if (!webClientCredentialRequestState.isProgressing) {
+            view.postDelayed({
+                ReminderService.showNextReminder(view, this)
+            }, 500L)
+        }
 
         // wait until ViewModel is fully loaded
         val disclaimerShowed = PreferenceService.getAsBool(PreferenceService.STATE_DISCLAIMER_SHOWED, this)
