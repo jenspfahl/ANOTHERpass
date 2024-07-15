@@ -115,6 +115,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.asCompletableFuture
 import kotlinx.coroutines.launch
+import org.json.JSONArray
 import org.json.JSONObject
 import java.net.MalformedURLException
 import java.net.URL
@@ -156,6 +157,22 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
          * Incoming request declined and aborted
          */
         Denied(false);
+    }
+
+    enum class FetchCredentialCommand(val command: String) {
+        FETCH_CREDENTIAL_FOR_URL("fetch_credential_for_url"),
+        FETCH_SINGLE_CREDENTIAL("fetch_single_credential"),
+        FETCH_MULTIPLE_CREDENTIALS("fetch_multiple_credentials"),
+        FETCH_ALL_CREDENTIALS("fetch_all_credentials"),
+        FETCH_CLIENT_KEY("get_client_key"),
+        ;
+
+        companion object {
+            fun getByCommand(command: String): FetchCredentialCommand {
+                return values().first { it.command == command }
+            }
+        }
+
     }
 
     private var serverSnackbar: Snackbar? = null
@@ -600,10 +617,17 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         val webClientTitle = SecretService.decryptCommonString(key, webExtension.title)
 
+        val command = try {
+            val command = message.getString("command")
+            FetchCredentialCommand.getByCommand(command)
+        } catch (e: Exception) {
+            Log.w("HTTP", "Cannot parse command")
+            return toErrorResponse(HttpStatusCode.BadRequest, "unknown command")
+        }
+        Log.d("HTTP", "command: $command")
         val requestIdentifier = message.getString("requestIdentifier")
         val website = message.optString("website")
         val uid = message.optString("uid")
-        val requestClientKey = message.optBoolean("requestClientKey")
 
         if (webClientRequestIdentifier != requestIdentifier) {
             if (webClientCredentialRequestState.isProgressing) {
@@ -633,7 +657,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
 
                 val uuid = uid.toUUIDOrNull()
-                if (uuid != null) {
+                if (command == FetchCredentialCommand.FETCH_CREDENTIAL_FOR_URL && uuid != null) {
                     startFetchCredentialForUidFlow(
                         uuid,
                         key,
@@ -644,7 +668,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         website
                     )
                 }
-                else if (website.isNotBlank()) {
+                else if (command == FetchCredentialCommand.FETCH_CREDENTIAL_FOR_URL  && website.isNotBlank()) {
                     startFetchCredentialForWebsiteFlow(
                         website,
                         webExtension,
@@ -653,7 +677,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         shortenedFingerprint
                     )
                 }
-                else if (requestClientKey) {
+                else if (command == FetchCredentialCommand.FETCH_CLIENT_KEY) {
                     startFetchClientKeyFlow(
                         webExtension,
                         webClientTitle,
@@ -661,13 +685,24 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         shortenedFingerprint
                     )
                 }
-                else {
+                else if (command == FetchCredentialCommand.FETCH_SINGLE_CREDENTIAL) {
                     startFetchAnyCredentialFlow(
                         webExtension,
                         webClientTitle,
                         webClientId,
                         shortenedFingerprint
                     )
+                }
+                else if (command == FetchCredentialCommand.FETCH_ALL_CREDENTIALS) {
+                    startFetchAllCredentialsFlow(
+                        webExtension,
+                        webClientTitle,
+                        webClientId,
+                        shortenedFingerprint
+                    )
+                }
+                else {
+                    Log.i("HTTP", "unhandled command")
                 }
             }
 
@@ -683,14 +718,18 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             return toErrorResponse(HttpStatusCode.Forbidden, "denied by user")
         }
         else if (webClientCredentialRequestState == CredentialRequestState.Accepted) {
-            if (requestClientKey) {
-                return postClientKey(key, webClientId, requestIdentifier)
+            if (webClientRequestIdentifier != requestIdentifier) {
+                return toErrorResponse(HttpStatusCode.BadRequest, "wrong request identifier")
             }
-            else {
+            return if (command == FetchCredentialCommand.FETCH_CLIENT_KEY) {
+                postClientKey(key, webClientId)
+            } else if (command == FetchCredentialCommand.FETCH_ALL_CREDENTIALS) {
+                postAllCredentials(key, webClientId)
+            } else {
                 // if a new holder holds a selected cred like AutofillCredentialHolder
                 val currCredential = AutofillCredentialHolder.currentCredential
-                return if (currCredential != null) {
-                    postCredential(key, webClientId, requestIdentifier, currCredential)
+                if (currCredential != null) {
+                    postCredential(key, webClientId, currCredential)
                 } else {
                     // waiting for user s selection
                     toErrorResponse(HttpStatusCode.NotFound, "no user selection")
@@ -797,7 +836,28 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             webClientId,
             "wants to ask for any credential. Please select one.",
             shortenedFingerprint,
-            "Select a credential to fulfill the request.",
+            "Fetching all credentials ...",
+            300_000,
+        )
+        {
+            // nothing
+        }
+    }
+
+
+    private fun startFetchAllCredentialsFlow(
+        webExtension: EncWebExtension,
+        webClientTitle: String,
+        webClientId: String,
+        shortenedFingerprint: String
+    ) {
+        showClientRequest(
+            webExtension,
+            webClientTitle,
+            webClientId,
+            "wants to fetch for ALL credentials!",
+            shortenedFingerprint,
+            "Fetching all credentials...",
             300_000,
         )
         {
@@ -972,32 +1032,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private fun postCredential(
         key: SecretKeyHolder,
         webClientId: String,
-        requestIdentifier: String?,
         currCredential: EncCredential
     ): Pair<HttpStatusCode, JSONObject> {
-        if (webClientRequestIdentifier != requestIdentifier) {
-            return toErrorResponse(HttpStatusCode.BadRequest, "wrong request identifier")
-        }
-        val password = SecretService.decryptPassword(key, currCredential.password)
-        val user = SecretService.decryptCommonString(key, currCredential.user)
-        val name = SecretService.decryptCommonString(key, currCredential.name)
-        val website = SecretService.decryptCommonString(key, currCredential.website)
-        val uid = currCredential.uid
-
-        AutofillCredentialHolder.obfuscationKey?.let {
-            password.deobfuscate(it)
-        }
-
-
-        val responseCredential = JSONObject()
-        if (uid != null) {
-            responseCredential.put("uid", uid)
-            responseCredential.put("readableUid", uid.toReadableString())
-        }
-        responseCredential.put("name", name)
-        responseCredential.put("password", password.toRawFormattedPassword())
-        responseCredential.put("user", user)
-        responseCredential.put("website", ensureHttp(website))
+        val (name, responseCredential) = mapCredential(key, currCredential, deobfuscate = true)
 
         val clientKey = SecretService.secretKeyToKey(key, Key(webClientId.toByteArray()))
 
@@ -1006,7 +1043,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         response.put("credential", responseCredential)
         response.put("clientKey", clientKey.toBase64String())
 
-        password.clear()
         clientKey.clear()
 
         webClientRequestIdentifier = null
@@ -1020,15 +1056,43 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         return Pair(HttpStatusCode.OK, response)
     }
 
+    private fun postAllCredentials(
+        key: SecretKeyHolder,
+        webClientId: String,
+    ): Pair<HttpStatusCode, JSONObject> {
+
+        val response = JSONObject()
+        val responseCredentials = JSONArray()
+
+        val allCredentials = getApp().credentialRepository.getAllSync()
+        allCredentials.forEach {
+            val (_, responseCredential) = mapCredential(key, it, deobfuscate = true)
+            responseCredentials.put(responseCredential)
+        }
+
+        val clientKey = SecretService.secretKeyToKey(key, Key(webClientId.toByteArray()))
+
+
+        response.put("credentials", responseCredentials)
+        response.put("clientKey", clientKey.toBase64String())
+
+        clientKey.clear()
+
+        webClientRequestIdentifier = null
+        webClientCredentialRequestState = CredentialRequestState.Fulfilled
+
+        CoroutineScope(Dispatchers.Main).launch {
+            serverSnackbar?.dismiss()
+            toastText(this@ListCredentialsActivity, "All credentials posted")
+        }
+
+        return Pair(HttpStatusCode.OK, response)
+    }
+
     private fun postClientKey(
         key: SecretKeyHolder,
         webClientId: String,
-        requestIdentifier: String?,
     ): Pair<HttpStatusCode, JSONObject> {
-        if (webClientRequestIdentifier != requestIdentifier) {
-            return toErrorResponse(HttpStatusCode.BadRequest, "wrong request identifier")
-        }
-
 
         val clientKey = SecretService.secretKeyToKey(key, Key(webClientId.toByteArray()))
         val response = JSONObject()
@@ -1046,6 +1110,37 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
 
         return Pair(HttpStatusCode.OK, response)
+    }
+
+
+    private fun mapCredential(
+        key: SecretKeyHolder,
+        credential: EncCredential,
+        deobfuscate: Boolean
+    ): Pair<String, JSONObject> {
+        val password = SecretService.decryptPassword(key, credential.password)
+        val user = SecretService.decryptCommonString(key, credential.user)
+        val name = SecretService.decryptCommonString(key, credential.name)
+        val website = SecretService.decryptCommonString(key, credential.website)
+        val uid = credential.uid
+
+        if (deobfuscate) {
+            AutofillCredentialHolder.obfuscationKey?.let {
+                password.deobfuscate(it)
+            }
+        }
+
+        val responseCredential = JSONObject()
+        if (uid != null) {
+            responseCredential.put("uid", uid)
+            responseCredential.put("readableUid", uid.toReadableString())
+        }
+        responseCredential.put("name", name)
+        responseCredential.put("password", password.toRawFormattedPassword())
+        responseCredential.put("user", user)
+        responseCredential.put("website", ensureHttp(website))
+        password.clear()
+        return Pair(name, responseCredential)
     }
 
     private fun extractDomain(website: String, withTld: Boolean = false): String {
