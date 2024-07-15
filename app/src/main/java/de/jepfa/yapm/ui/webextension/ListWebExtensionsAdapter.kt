@@ -44,47 +44,7 @@ class ListWebExtensionsAdapter(private val listWebExtensionsActivity: ListWebExt
 
         holder.listenForDetailsWebExtension { pos, _ ->
             val current = getItem(pos)
-
-            listWebExtensionsActivity.masterSecretKey?.let { key ->
-                val webClientId = SecretService.decryptCommonString(key, current.webClientId)
-                val sb = java.lang.StringBuilder()
-
-                val clientPubKeyAsJWK = JSONObject(SecretService.decryptCommonString(key, current.extensionPublicKey))
-                val nBase64 = clientPubKeyAsJWK.getString("n")
-                val nBytes = Base64.decode(nBase64, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
-                val clientPubKeyFingerprint = nBytes.sha256().toHex(separator = ":")
-
-                val serverPublicKey = SecretService.getServerPublicKey(current.getServerKeyPairAlias())
-                if (serverPublicKey != null) {
-                    val m = SecretService.getRsaPublicKeyData(serverPublicKey).first
-                    val serverPubKeyFingerprint = m.sha256().toHex(separator = ":")
-                    sb.append("App Public Key Fingerprint:").addNewLine().append(serverPubKeyFingerprint).addNewLine().addNewLine()
-                }
-
-                val sharedBaseKey = SecretService.decryptKey(key, current.sharedBaseKey)
-                val sharedBaseKeyFingerprint = sharedBaseKey.data.sha256().toHex(separator = ":")
-                sharedBaseKey.clear()
-
-                sb.append("Device Public Key Fingerprint:").addNewLine().append(clientPubKeyFingerprint).addNewLine().addNewLine()
-                sb.append("Shared Secret Fingerprint:").addNewLine().append(sharedBaseKeyFingerprint).addNewLine().addNewLine()
-
-                AlertDialog.Builder(listWebExtensionsActivity)
-                    .setTitle("Linking details for $webClientId")
-                    .setMessage(sb.toString())
-                    .setIcon(R.drawable.baseline_phonelink_24)
-                    .setNegativeButton(R.string.close, null)
-                    .setNeutralButton("Copy to clipboard") { _, _ ->
-                        ClipboardUtil.copy(
-                            "Linking details for $webClientId",
-                            sb.toString(),
-                            listWebExtensionsActivity,
-                            isSensible = false,
-                        )
-                        toastText(listWebExtensionsActivity, "Copied to clipboard")
-                    }
-                    .show()
-            }
-
+            WebExtensionDialogs.openWebExtensionDetails(current, listWebExtensionsActivity)
         }
 
         holder.listenForUnlinkWebExtension { pos, _ ->

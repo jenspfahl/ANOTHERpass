@@ -59,6 +59,7 @@
     <string name="title_delete_web_extension">Unlink device</string>
     <string name="message_delete_web_extension">Do you really want to unlink the linked device \'%1$s\' by deleting it?</string>
 
+
     <string name="lock_items">Lock vault</string>
     <string name="logout">Logout and exit</string>
     <string name="login_help">Help</string>
@@ -803,5 +804,9 @@
     <string name="bug_description_hint">Provide a short description</string>
     <string name="captured_error_details">Captured error details:</string>
     <string name="report_a_bug">Report a bug</string>
+
+    <string name="webextension_sort_by_name">By name of the link</string>
+    <string name="webextension_sort_by_id">By client ID</string>
+    <string name="webextension_sort_by_last_used">By last used</string>
 
 </resources>

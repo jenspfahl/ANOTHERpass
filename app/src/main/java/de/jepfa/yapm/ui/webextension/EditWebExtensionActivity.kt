@@ -117,6 +117,14 @@ class EditWebExtensionActivity : SecureActivity() {
             return true
         }
 
+        if (id == R.id.menu_details) {
+            webExtension?.let { current ->
+                WebExtensionDialogs.openWebExtensionDetails(current, this)
+            }
+
+            return true
+        }
+
 
         return super.onOptionsItemSelected(item)
     }

@@ -753,9 +753,14 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="csv_column_credential_expiry_date">kolom voor vervaldatum</string>
   <string name="csv_column_credential_additional_info">kolom voor aanvullende informatie</string>
 
-    <string name="keystore_not_ready">KeyStore not ready, please wait a bit and try again</string>
-    <string name="describe_a_bug">You can shortly describe and report the error here.</string>
+  <string name="keystore_not_ready">KeyStore not ready, please wait a bit and try again</string>
+  <string name="describe_a_bug">You can shortly describe and report the error here.</string>
   <string name="bug_description_hint">Provide a short description</string>
   <string name="captured_error_details">Captured error details:</string>
   <string name="report_a_bug">Report a bug</string>
+
+  <string name="webextension_sort_by_name">By name of the link</string>
+  <string name="webextension_sort_by_id">By client ID</string>
+  <string name="webextension_sort_by_last_used">By last used</string>
+
 </resources>

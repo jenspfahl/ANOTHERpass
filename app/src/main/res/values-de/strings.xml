@@ -797,4 +797,9 @@
     <string name="captured_error_details">Aufgezeichnete Fehler-Details:</string>
     <string name="report_a_bug">Fehler melden</string>
 
+    <string name="webextension_sort_by_name">Nach Name der Verknüpfung</string>
+    <string name="webextension_sort_by_id">Nach Client ID</string>
+    <string name="webextension_sort_by_last_used">Nach zuletzt verwendet</string>
+
+
 </resources>
