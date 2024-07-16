@@ -21,6 +21,9 @@ interface EncCredentialDao {
     @Query("SELECT * FROM EncCredentialEntity WHERE uid = :uid")
     fun getByUid(uid: String): Flow<EncCredentialEntity>
 
+    @Query("SELECT * FROM EncCredentialEntity WHERE uid IN (:uids)")
+    fun getByUidsSync(uids: List<String>): List<EncCredentialEntity>
+
     @Query("SELECT * FROM EncCredentialEntity WHERE id = :id")
     suspend fun getByIdSync(id: Int): EncCredentialEntity?
 

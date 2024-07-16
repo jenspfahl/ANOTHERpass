@@ -217,7 +217,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                     val filteredList: MutableList<EncCredential> = ArrayList<EncCredential>()
 
                     val exactMatch = charSequence.endsWith(SEARCH_COMMAND_END)
-                    val filterLatest = Command.SEARCH_COMMAND_SHOW_LATEST.applies(charSequence)
+                    val filterLatest = SearchCommand.SEARCH_COMMAND_SHOW_LATEST.applies(charSequence)
 
                     var latestModifyTimestamp: Long ? = null
                     if (filterLatest) {
@@ -235,12 +235,12 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                             val uid = credential.uid?.toReadableString()
                             val id = credential.id?.toString()
 
-                            if (Command.SEARCH_COMMAND_SHOW_EXPIRED.applies(charSequence)) {
+                            if (SearchCommand.SEARCH_COMMAND_SHOW_EXPIRED.applies(charSequence)) {
                                 if (credential.isExpired(key)) {
                                     filteredList.add(credential)
                                 }
                             }
-                            else if (Command.SEARCH_COMMAND_SHOW_EXPIRES.applies(charSequence)) {
+                            else if (SearchCommand.SEARCH_COMMAND_SHOW_EXPIRES.applies(charSequence)) {
                                 if ((expiredAt != null) && (expiredAt > 0)) {
                                     filteredList.add(credential)
                                 }
@@ -250,13 +250,13 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                                     filteredList.add(credential)
                                 }
                             }
-                            else if (Command.SEARCH_COMMAND_SHOW_VEILED.applies(charSequence)) {
+                            else if (SearchCommand.SEARCH_COMMAND_SHOW_VEILED.applies(charSequence)) {
                                 if (credential.isObfuscated) {
                                     filteredList.add(credential)
                                 }
                             }
-                            else if (Command.SEARCH_COMMAND_SEARCH_ID.applies(charSequence)) {
-                                val arg = Command.SEARCH_COMMAND_SEARCH_ID.extractArg(charSequence)
+                            else if (SearchCommand.SEARCH_COMMAND_SEARCH_ID.applies(charSequence)) {
+                                val arg = SearchCommand.SEARCH_COMMAND_SEARCH_ID.extractArg(charSequence)
                                 if (exactMatch) {
                                     if (id != null && id == arg) {
                                         filteredList.add(credential)
@@ -268,8 +268,8 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                                     }
                                 }
                             }
-                            else if (Command.SEARCH_COMMAND_SEARCH_UID.applies(charSequence)) {
-                                val searchUid = Command.SEARCH_COMMAND_SEARCH_UID.extractArg(charSequence)
+                            else if (SearchCommand.SEARCH_COMMAND_SEARCH_UID.applies(charSequence)) {
+                                val searchUid = SearchCommand.SEARCH_COMMAND_SEARCH_UID.extractArg(charSequence)
                                 if (exactMatch) {
                                     if (uid != null && uid == searchUid) {
                                         filteredList.add(credential)
@@ -281,8 +281,8 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                                     }
                                 }
                             }
-                            else if (Command.SEARCH_COMMAND_SEARCH_USER.applies(charSequence)) {
-                                val searchUser = Command.SEARCH_COMMAND_SEARCH_USER.extractArg(charSequence)
+                            else if (SearchCommand.SEARCH_COMMAND_SEARCH_USER.applies(charSequence)) {
+                                val searchUser = SearchCommand.SEARCH_COMMAND_SEARCH_USER.extractArg(charSequence)
                                 if (exactMatch) {
                                     if (user == searchUser) {
                                         filteredList.add(credential)
@@ -294,8 +294,8 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                                     }
                                 }
                             }
-                            else if (Command.SEARCH_COMMAND_SEARCH_WEBSITE.applies(charSequence)) {
-                                val searchWebsite = Command.SEARCH_COMMAND_SEARCH_WEBSITE.extractArg(charSequence)
+                            else if (SearchCommand.SEARCH_COMMAND_SEARCH_WEBSITE.applies(charSequence)) {
+                                val searchWebsite = SearchCommand.SEARCH_COMMAND_SEARCH_WEBSITE.extractArg(charSequence)
                                 if (exactMatch) {
                                     if (website == searchWebsite) {
                                         filteredList.add(credential)
@@ -307,8 +307,8 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                                     }
                                 }
                             }
-                            else if (Command.SEARCH_COMMAND_SEARCH_LABEL.applies(charSequence)) {
-                                val searchLabel = Command.SEARCH_COMMAND_SEARCH_LABEL.extractArg(charSequence)
+                            else if (SearchCommand.SEARCH_COMMAND_SEARCH_LABEL.applies(charSequence)) {
+                                val searchLabel = SearchCommand.SEARCH_COMMAND_SEARCH_LABEL.extractArg(charSequence)
                                 val labels =
                                     LabelService.defaultHolder.decryptLabelsForCredential(
                                         key,
@@ -329,8 +329,8 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                                         }
                                 }
                             }
-                            else if (Command.SEARCH_COMMAND_SEARCH_IN_ALL.applies(charSequence)) {
-                                var searchString = Command.SEARCH_COMMAND_SEARCH_IN_ALL.extractArg(charSequence)
+                            else if (SearchCommand.SEARCH_COMMAND_SEARCH_IN_ALL.applies(charSequence)) {
+                                var searchString = SearchCommand.SEARCH_COMMAND_SEARCH_IN_ALL.extractArg(charSequence)
                                 if (containsValue(name, searchString)) {
                                     filteredList.add(credential)
                                 }

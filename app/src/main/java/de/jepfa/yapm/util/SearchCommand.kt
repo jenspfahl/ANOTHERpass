@@ -7,7 +7,7 @@ const val SEARCH_COMMAND_START = "!"
 const val SEARCH_COMMAND_COMMAND_END = ":"
 const val SEARCH_COMMAND_END = ";"
 
-enum class Command(
+enum class SearchCommand(
     private val cmd: String,
     private val descriptionId: Int,
     private val withArg: Boolean) {

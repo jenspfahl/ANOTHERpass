@@ -161,6 +161,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     enum class FetchCredentialCommand(val command: String) {
         FETCH_CREDENTIAL_FOR_URL("fetch_credential_for_url"),
+        FETCH_CREDENTIAL_FOR_UID("fetch_credential_for_uid"),
+        FETCH_CREDENTIALS_FOR_UIDS("fetch_credentials_for_uids"),
         FETCH_SINGLE_CREDENTIAL("fetch_single_credential"),
         FETCH_MULTIPLE_CREDENTIALS("fetch_multiple_credentials"),
         FETCH_ALL_CREDENTIALS("fetch_all_credentials"),
@@ -174,6 +176,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
 
     }
+
+    private final val SERVER_REQUEST_SNACKBAR_DURATION = 300_000 // this is the maximun timout of the extension
 
     private var serverSnackbar: Snackbar? = null
     private var serverViewStateText: String = ""
@@ -628,6 +632,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         val requestIdentifier = message.getString("requestIdentifier")
         val website = message.optString("website")
         val uid = message.optString("uid")
+        val uids = message.optJSONArray("uids")
+
+        Log.d("HTTP", "webClientRequestIdentifier: $webClientRequestIdentifier ($webClientCredentialRequestState)")
 
         if (webClientRequestIdentifier != requestIdentifier) {
             if (webClientCredentialRequestState.isProgressing) {
@@ -675,6 +682,25 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         webClientTitle,
                         webClientId,
                         shortenedFingerprint
+                    )
+                }
+                if (command == FetchCredentialCommand.FETCH_CREDENTIAL_FOR_UID && uuid != null) {
+                    startFetchCredentialForUidFlow(
+                        uuid,
+                        key,
+                        webExtension,
+                        webClientTitle,
+                        webClientId,
+                        shortenedFingerprint,
+                        null
+                    )
+                }
+                if (command == FetchCredentialCommand.FETCH_CREDENTIALS_FOR_UIDS && uids != null) {
+                    startFetchCredentialForUidsFlow(
+                        webExtension,
+                        webClientTitle,
+                        webClientId,
+                        shortenedFingerprint,
                     )
                 }
                 else if (command == FetchCredentialCommand.FETCH_CLIENT_KEY) {
@@ -725,6 +751,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 postClientKey(key, webClientId)
             } else if (command == FetchCredentialCommand.FETCH_ALL_CREDENTIALS) {
                 postAllCredentials(key, webClientId)
+            } else if (command == FetchCredentialCommand.FETCH_CREDENTIALS_FOR_UIDS) {
+                postCredentialsByUids(key, webClientId, uids)
             } else {
                 // if a new holder holds a selected cred like AutofillCredentialHolder
                 val currCredential = AutofillCredentialHolder.currentCredential
@@ -752,7 +780,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         webClientTitle: String,
         webClientId: String,
         shortenedFingerprint: String,
-        website: String
+        website: String?
     ) {
         findCredentialByUuid(uuid) { credential ->
             if (credential != null) {
@@ -764,22 +792,54 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     "wants to fetch credential with name '$name'.",
                     shortenedFingerprint,
                     "Returning credential with name '$name' ...",
-                    300_000,
+                    SERVER_REQUEST_SNACKBAR_DURATION,
                 )
                 {
                     AutofillCredentialHolder.update(credential, obfuscationKey = null)
                 }
             } else {
-                toastText(this@ListCredentialsActivity, "")
-                startFetchCredentialForWebsiteFlow(
-                    website,
-                    webExtension,
-                    webClientTitle,
-                    webClientId,
-                    shortenedFingerprint
-                )
+                if (website != null) {
+                    Log.i("HTTP","Requested credential not found, ask the user to select one")
+
+                    startFetchCredentialForWebsiteFlow(
+                        website,
+                        webExtension,
+                        webClientTitle,
+                        webClientId,
+                        shortenedFingerprint
+                    )
+                }
+                else {
+                    toastText(
+                        this@ListCredentialsActivity,
+                        "Requested credential to synchronise not found."
+                    )
+                    webClientCredentialRequestState = CredentialRequestState.Denied
+                }
             }
         }
+    }
+
+    private fun startFetchCredentialForUidsFlow(
+        webExtension: EncWebExtension,
+        webClientTitle: String,
+        webClientId: String,
+        shortenedFingerprint: String,
+    ) {
+
+        showClientRequest(
+            webExtension,
+            webClientTitle,
+            webClientId,
+            "wants to sync all local credentials.",
+            shortenedFingerprint,
+            "Returning all local credentials ...",
+            SERVER_REQUEST_SNACKBAR_DURATION,
+        )
+        {
+            // no user interaction
+        }
+
     }
 
     private fun startFetchCredentialForWebsiteFlow(
@@ -797,7 +857,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             "wants to fetch credential for '$domain'.",
             shortenedFingerprint,
             "Select the credential for '$domain' to fulfill the request.",
-            300_000,
+            SERVER_REQUEST_SNACKBAR_DURATION,
         )
         {
             startSearchFor("!$domain", commit = true)
@@ -817,10 +877,10 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             "wants to unlock the client vault.",
             shortenedFingerprint,
             "Unlocking client vault ...",
-            300_000,
+            SERVER_REQUEST_SNACKBAR_DURATION,
         )
         {
-            // nothing
+            // no user interaction
         }
     }
 
@@ -836,11 +896,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             webClientId,
             "wants to ask for any credential. Please select one.",
             shortenedFingerprint,
-            "Fetching all credentials ...",
-            300_000,
+            "Select a credential to fulfill the request.",
+            SERVER_REQUEST_SNACKBAR_DURATION,
         )
         {
-            // nothing
+            // no user interaction
         }
     }
 
@@ -858,10 +918,10 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             "wants to fetch for ALL credentials!",
             shortenedFingerprint,
             "Fetching all credentials...",
-            300_000,
+            SERVER_REQUEST_SNACKBAR_DURATION,
         )
         {
-            // nothing
+            // no user interaction
         }
     }
 
@@ -999,7 +1059,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         serverSnackbar = Snackbar.make(
             serverView,
             span,
-            300_000
+            SERVER_REQUEST_SNACKBAR_DURATION
         )
             .setAction("Deny and revoke bypass") {
                 webClientCredentialRequestState = CredentialRequestState.Denied
@@ -1027,7 +1087,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         credentialViewModel.findByUid(uuid)
             .observeOnce(this@ListCredentialsActivity, resolved)
     }
-
 
     private fun postCredential(
         key: SecretKeyHolder,
@@ -1066,6 +1125,50 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         val allCredentials = getApp().credentialRepository.getAllSync()
         allCredentials.forEach {
+            val (_, responseCredential) = mapCredential(key, it, deobfuscate = true)
+            responseCredentials.put(responseCredential)
+        }
+
+        val clientKey = SecretService.secretKeyToKey(key, Key(webClientId.toByteArray()))
+
+
+        response.put("credentials", responseCredentials)
+        response.put("clientKey", clientKey.toBase64String())
+
+        clientKey.clear()
+
+        webClientRequestIdentifier = null
+        webClientCredentialRequestState = CredentialRequestState.Fulfilled
+
+        CoroutineScope(Dispatchers.Main).launch {
+            serverSnackbar?.dismiss()
+            toastText(this@ListCredentialsActivity, "All credentials posted")
+        }
+
+        return Pair(HttpStatusCode.OK, response)
+    }
+
+    private fun postCredentialsByUids(
+        key: SecretKeyHolder,
+        webClientId: String,
+        uidsAsJSONArray: JSONArray?
+    ): Pair<HttpStatusCode, JSONObject> {
+
+        val uids = LinkedList<UUID>()
+        if (uidsAsJSONArray != null) {
+            for (i in 0 until uidsAsJSONArray.length()) {
+                val uid = uidsAsJSONArray.optString(i).toUUIDOrNull()
+                if (uid != null) {
+                    uids.add(uid)
+                }
+            }
+        }
+
+        val response = JSONObject()
+        val responseCredentials = JSONArray()
+
+        val credentials = getApp().credentialRepository.getAllByUidsSync(uids)
+        credentials.forEach {
             val (_, responseCredential) = mapCredential(key, it, deobfuscate = true)
             responseCredentials.put(responseCredential)
         }
@@ -1344,7 +1447,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
                 val cursor = MatrixCursor(arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_TEXT_2))
                 query?.let { q ->
-                    Command.values().forEachIndexed { index, command ->
+                    SearchCommand.values().forEachIndexed { index, command ->
                         val cmd = command.getCmd()
                         if (cmd.startsWith(q, ignoreCase = true)) {
                             cursor.addRow(arrayOf(index, cmd, command.getDescription(this@ListCredentialsActivity)))
@@ -2231,7 +2334,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     }
 
     fun searchForExpiredCredentials() {
-        startSearchFor(Command.SEARCH_COMMAND_SHOW_EXPIRED.getCmd() + " ") // space at the end to not show suggestion menu popup
+        startSearchFor(SearchCommand.SEARCH_COMMAND_SHOW_EXPIRED.getCmd() + " ") // space at the end to not show suggestion menu popup
     }
 
     private fun startSearchFor(searchString: String, commit: Boolean = true): Boolean {
