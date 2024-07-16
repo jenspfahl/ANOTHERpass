@@ -106,14 +106,15 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
 
 
             if (selectionMode) {
-                resetSelection()
+                stopSelectionMode()
             }
             else {
-                selectionMode = true
+                startSelectionMode()
+
+
                 val current = getItem(pos)
                 selected.add(current)
 
-                notifyDataSetChanged()
                 multipleSelectionCallback(selected)
             }
 
@@ -182,6 +183,12 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         }
 
         return holder
+    }
+
+    fun startSelectionMode() {
+        selectionMode = true
+        multipleSelectionCallback(selected)
+        notifyDataSetChanged()
     }
 
 
@@ -420,7 +427,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             .toList()
     }
 
-    fun resetSelection(withRefresh: Boolean = true) {
+    fun stopSelectionMode(withRefresh: Boolean = true) {
         selectionMode = false
         selected.clear()
         multipleSelectionCallback(selected)

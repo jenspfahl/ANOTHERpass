@@ -177,7 +177,13 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     }
 
-    private final val SERVER_REQUEST_SNACKBAR_DURATION = 300_000 // this is the maximun timout of the extension
+    enum class MultipleCredentialSelectState {
+        NONE, USER_SELECTING, USER_COMMITTED
+    }
+
+    private val SERVER_REQUEST_SNACKBAR_DURATION = 300_000 // this is the maximum timeout of the extension
+
+    private var credentialSelectState: MultipleCredentialSelectState = MultipleCredentialSelectState.NONE
 
     private var serverSnackbar: Snackbar? = null
     private var serverViewStateText: String = ""
@@ -396,7 +402,10 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         listCredentialAdapter = ListCredentialAdapter(this)
         { selected ->
-            if (selected.isNotEmpty()) {
+            if (credentialSelectState == MultipleCredentialSelectState.USER_SELECTING) {
+                fab.setImageResource(R.drawable.baseline_send_to_mobile_24)
+            }
+            else if (selected.isNotEmpty()) {
                 fab.setImageResource(R.drawable.ic_baseline_delete_24_white)
             }
             else {
@@ -446,29 +455,41 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         fab.setOnClickListener {
             val selectedCredentials = listCredentialAdapter?.getSelectedCredentials()
-            if (selectedCredentials?.isNotEmpty() == true) {
+
+            if (credentialSelectState == MultipleCredentialSelectState.USER_SELECTING) {
+                toastText(this, "Posting ${selectedCredentials?.size?:0} credentials ..")
+                credentialSelectState = MultipleCredentialSelectState.USER_COMMITTED
+            }
+            else if (selectedCredentials != null && selectedCredentials.isNotEmpty()) {
 
                 AlertDialog.Builder(this)
                     .setTitle(getString(R.string.title_delete_selected))
-                    .setMessage(getString(R.string.message_delete_selected, selectedCredentials.size))
+                    .setMessage(
+                        getString(
+                            R.string.message_delete_selected,
+                            selectedCredentials.size
+                        )
+                    )
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         UseCaseBackgroundLauncher(DeleteMultipleCredentialsUseCase)
-                            .launch(this, DeleteMultipleCredentialsUseCase.Input(selectedCredentials))
+                            .launch(
+                                this,
+                                DeleteMultipleCredentialsUseCase.Input(selectedCredentials)
+                            )
                             { output ->
                                 if (output.success) {
                                     toastText(this, R.string.message_selected_deleted)
-                                    listCredentialAdapter?.resetSelection(withRefresh = false)
+                                    listCredentialAdapter?.stopSelectionMode(withRefresh = false)
 
                                 }
                             }
                     }
                     .setNegativeButton(android.R.string.cancel, null)
                     .setNeutralButton(R.string.reset_selection) { _, _ ->
-                        listCredentialAdapter?.resetSelection()
+                        listCredentialAdapter?.stopSelectionMode()
                     }
                     .show()
-
 
             }
             else {
@@ -719,6 +740,14 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         shortenedFingerprint
                     )
                 }
+                else if (command == FetchCredentialCommand.FETCH_MULTIPLE_CREDENTIALS) {
+                    startFetchMultipleCredentialsFlow(
+                        webExtension,
+                        webClientTitle,
+                        webClientId,
+                        shortenedFingerprint
+                    )
+                }
                 else if (command == FetchCredentialCommand.FETCH_ALL_CREDENTIALS) {
                     startFetchAllCredentialsFlow(
                         webExtension,
@@ -749,11 +778,22 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             }
             return if (command == FetchCredentialCommand.FETCH_CLIENT_KEY) {
                 postClientKey(key, webClientId)
-            } else if (command == FetchCredentialCommand.FETCH_ALL_CREDENTIALS) {
-                postAllCredentials(key, webClientId)
-            } else if (command == FetchCredentialCommand.FETCH_CREDENTIALS_FOR_UIDS) {
+            }
+            else if (command == FetchCredentialCommand.FETCH_MULTIPLE_CREDENTIALS) {
+                if (credentialSelectState == MultipleCredentialSelectState.USER_COMMITTED) {
+                    postSelectedCredentials(key, webClientId)
+                }
+                else {
+                    toErrorResponse(HttpStatusCode.NotFound, "no user selection")
+                }
+            }
+            else if (command == FetchCredentialCommand.FETCH_ALL_CREDENTIALS) {
+               postAllCredentials(key, webClientId)
+            }
+            else if (command == FetchCredentialCommand.FETCH_CREDENTIALS_FOR_UIDS) {
                 postCredentialsByUids(key, webClientId, uids)
-            } else {
+            }
+            else {
                 // if a new holder holds a selected cred like AutofillCredentialHolder
                 val currCredential = AutofillCredentialHolder.currentCredential
                 if (currCredential != null) {
@@ -905,6 +945,29 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     }
 
 
+    private fun startFetchMultipleCredentialsFlow(
+        webExtension: EncWebExtension,
+        webClientTitle: String,
+        webClientId: String,
+        shortenedFingerprint: String
+    ) {
+        showClientRequest(
+            webExtension,
+            webClientTitle,
+            webClientId,
+            "wants to fetch for multiple credentials",
+            shortenedFingerprint,
+            "Select all credentials to fetch and press the Action-button.",
+            SERVER_REQUEST_SNACKBAR_DURATION,
+        )
+        {
+            // start multiple selection mode
+            credentialSelectState = MultipleCredentialSelectState.USER_SELECTING
+            listCredentialAdapter?.startSelectionMode()
+
+        }
+    }
+
     private fun startFetchAllCredentialsFlow(
         webExtension: EncWebExtension,
         webClientTitle: String,
@@ -1008,6 +1071,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             .addCallback(object : BaseCallback<Snackbar>() {
                 override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
                     searchItem?.collapseActionView()
+                    listCredentialAdapter?.stopSelectionMode()
+                    credentialSelectState = MultipleCredentialSelectState.NONE
+
                     if (webClientCredentialRequestState.isProgressing) {
                         webClientCredentialRequestState = CredentialRequestState.Denied
                         toastText(
@@ -1115,6 +1181,43 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         return Pair(HttpStatusCode.OK, response)
     }
 
+    private fun postSelectedCredentials(
+        key: SecretKeyHolder,
+        webClientId: String,
+    ): Pair<HttpStatusCode, JSONObject> {
+
+
+        val response = JSONObject()
+        val responseCredentials = JSONArray()
+
+        listCredentialAdapter?.getSelectedCredentials()?.forEach { it ->
+            val (_, responseCredential) = mapCredential(key, it, deobfuscate = true)
+            responseCredentials.put(responseCredential)
+        }
+
+        credentialSelectState = MultipleCredentialSelectState.NONE
+
+
+        val clientKey = SecretService.secretKeyToKey(key, Key(webClientId.toByteArray()))
+
+        response.put("credentials", responseCredentials)
+        response.put("clientKey", clientKey.toBase64String())
+
+        clientKey.clear()
+
+        webClientRequestIdentifier = null
+        webClientCredentialRequestState = CredentialRequestState.Fulfilled
+
+        CoroutineScope(Dispatchers.Main).launch {
+            serverSnackbar?.dismiss()
+            listCredentialAdapter?.stopSelectionMode()
+
+            toastText(this@ListCredentialsActivity, "Selected credentials posted")
+        }
+
+        return Pair(HttpStatusCode.OK, response)
+    }
+
     private fun postAllCredentials(
         key: SecretKeyHolder,
         webClientId: String,
@@ -1186,7 +1289,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         CoroutineScope(Dispatchers.Main).launch {
             serverSnackbar?.dismiss()
-            toastText(this@ListCredentialsActivity, "All credentials posted")
+            toastText(this@ListCredentialsActivity, "Credentials posted")
         }
 
         return Pair(HttpStatusCode.OK, response)
@@ -1776,7 +1879,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
         else if (requestCode == newOrUpdateCredentialActivityRequestCode && resultCode == Activity.RESULT_OK) {
             data?.let {
-                listCredentialAdapter?.resetSelection(withRefresh = false)
+                listCredentialAdapter?.stopSelectionMode(withRefresh = false)
                 val credential = EncCredential.fromIntent(it, createUuid = true)
                 jumpToUuid = credential.uid
 
