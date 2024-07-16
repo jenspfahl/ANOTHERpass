@@ -10,6 +10,7 @@ import android.database.Cursor
 import android.database.MatrixCursor
 import android.graphics.Bitmap
 import android.graphics.Typeface
+import android.net.InetAddresses
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -22,6 +23,7 @@ import android.text.style.StyleSpan
 import android.text.style.TypefaceSpan
 import android.util.Base64
 import android.util.Log
+import android.util.Patterns
 import android.view.*
 import android.view.autofill.AutofillManager
 import android.widget.*
@@ -1352,13 +1354,27 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private fun extractDomain(website: String, withTld: Boolean = false): String {
         return try {
             val host = URL(website).host.lowercase()
+
+            if (isIpAddress(host)) {
+                return host
+            }
+            val hostPart = host.substringBeforeLast(".").substringAfterLast(".")
+            val tld = host.substringAfterLast(".")
             if (withTld) {
-                host
+                "$hostPart.$tld"
             } else {
-                host.substringBeforeLast(".").substringAfterLast(".")
+                hostPart
             }
         } catch (e: MalformedURLException) {
             website.lowercase()
+        }
+    }
+
+    private fun isIpAddress(s: String): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            InetAddresses.isNumericAddress(s)
+        } else {
+            Patterns.IP_ADDRESS.matcher(s).matches()
         }
     }
 
