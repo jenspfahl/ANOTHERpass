@@ -790,10 +790,10 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 }
             }
             else if (command == FetchCredentialCommand.FETCH_ALL_CREDENTIALS) {
-               postAllCredentials(key, webClientId)
+               postAllCredentialsExceptVeiled(key, webClientId)
             }
             else if (command == FetchCredentialCommand.FETCH_CREDENTIALS_FOR_UIDS) {
-                postCredentialsByUids(key, webClientId, uids)
+                postCredentialsByUidsExceptVeiled(key, webClientId, uids)
             }
             else {
                 // if a new holder holds a selected cred like AutofillCredentialHolder
@@ -1220,7 +1220,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         return Pair(HttpStatusCode.OK, response)
     }
 
-    private fun postAllCredentials(
+    private fun postAllCredentialsExceptVeiled(
         key: SecretKeyHolder,
         webClientId: String,
     ): Pair<HttpStatusCode, JSONObject> {
@@ -1229,10 +1229,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         val responseCredentials = JSONArray()
 
         val allCredentials = getApp().credentialRepository.getAllSync()
-        allCredentials.forEach {
-            val (_, responseCredential) = mapCredential(key, it, deobfuscate = true)
-            responseCredentials.put(responseCredential)
-        }
+        allCredentials
+            .filter { !it.isObfuscated }
+            .forEach {
+                val (_, responseCredential) = mapCredential(key, it, deobfuscate = true)
+                responseCredentials.put(responseCredential)
+            }
 
         val clientKey = SecretService.secretKeyToKey(key, Key(webClientId.toByteArray()))
 
@@ -1253,7 +1255,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         return Pair(HttpStatusCode.OK, response)
     }
 
-    private fun postCredentialsByUids(
+    private fun postCredentialsByUidsExceptVeiled(
         key: SecretKeyHolder,
         webClientId: String,
         uidsAsJSONArray: JSONArray?
@@ -1273,10 +1275,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         val responseCredentials = JSONArray()
 
         val credentials = getApp().credentialRepository.getAllByUidsSync(uids)
-        credentials.forEach {
-            val (_, responseCredential) = mapCredential(key, it, deobfuscate = true)
-            responseCredentials.put(responseCredential)
-        }
+        credentials
+            .filter { !it.isObfuscated }
+            .forEach {
+                val (_, responseCredential) = mapCredential(key, it, deobfuscate = true)
+                responseCredentials.put(responseCredential)
+            }
 
         val clientKey = SecretService.secretKeyToKey(key, Key(webClientId.toByteArray()))
 
@@ -1459,7 +1463,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         // wait until ViewModel is fully loaded
         if (!webClientCredentialRequestState.isProgressing) {
             view.postDelayed({
-                ReminderService.showNextReminder(view, this)
+                if (!webClientCredentialRequestState.isProgressing) {
+                    ReminderService.showNextReminder(view, this)
+                }
             }, 500L)
         }
 
