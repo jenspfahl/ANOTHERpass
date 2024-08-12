@@ -1636,7 +1636,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     }
 
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         Log.i(LOG_PREFIX + "LST", "onNewIntent: action=${intent?.action}")
         updateSearchFieldWithAutofillSuggestion(intent)
