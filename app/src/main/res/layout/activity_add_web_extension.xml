@@ -87,7 +87,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="16dp"
-                android:text="Last, enter the app's IP address or hostname presented below into the extension. It is recommend to make the IP address of your phone static and provide a host name." />
+                android:text="Last, enter the app's IP address or hostname presented below into the extension. It is recommend to make the IP address of your phone static or provide a host name." />
 
             <TextView
                 android:id="@+id/web_extension_server_address"

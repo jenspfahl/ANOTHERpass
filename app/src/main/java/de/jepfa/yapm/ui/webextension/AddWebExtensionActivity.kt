@@ -205,7 +205,10 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
             Log.i("HTTP", "received clientPubKeyFingerprint=$clientPubKeyFingerprint")
             Log.i("HTTP", "received sessionKeyBase64=$sessionKeyBase64")
 
-            if (webClientId.isNullOrBlank() || sessionKeyBase64.isNullOrBlank() || clientPubKeyFingerprint.isNullOrBlank()) {
+            if (webClientId.isNullOrBlank()
+                || sessionKeyBase64.isNullOrBlank()
+                || clientPubKeyFingerprint.isNullOrBlank()
+                || !HttpServer.checkWebClientIdFormat(webClientId!!)) {
                 webClientId = null
                 toastText(this, "Wrong QR code")
                 return

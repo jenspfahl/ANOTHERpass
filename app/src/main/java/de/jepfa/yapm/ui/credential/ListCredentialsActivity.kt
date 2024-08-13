@@ -162,6 +162,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     }
 
     enum class FetchCredentialCommand(val command: String) {
+        CREATE_CREDENTIAL_FOR_URL("create_credential_for_url"),
         FETCH_CREDENTIAL_FOR_URL("fetch_credential_for_url"),
         FETCH_CREDENTIAL_FOR_UID("fetch_credential_for_uid"),
         FETCH_CREDENTIALS_FOR_UIDS("fetch_credentials_for_uids"),
@@ -220,6 +221,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     private var webClientCredentialRequestState = CredentialRequestState.None
     private var webClientRequestIdentifier: String? = null
+    private var webClientRequestedWebsite: String? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -497,7 +499,15 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             else {
                 val intent =
                     Intent(this@ListCredentialsActivity, EditCredentialActivity::class.java)
-                intent.action = this.intent.action
+                if (webClientCredentialRequestState.isProgressing && webClientRequestedWebsite != null) {
+                    val suggestedDomain = extractDomain(webClientRequestedWebsite!!, withTld = true)
+                    val suggestedName = extractDomain(webClientRequestedWebsite!!, withTld = false).capitalize()
+
+                    intent.action = "${Constants.ACTION_PREFILLED_FROM_EXTENSION}$ACTION_DELIMITER$suggestedName$ACTION_DELIMITER$suggestedDomain"
+                }
+                else {
+                    intent.action = this.intent.action
+                }
                 intent.putExtras(this.intent) // forward all extras, especially needed for Autofill
                 startActivityForResult(intent, newOrUpdateCredentialActivityRequestCode)
             }
@@ -668,6 +678,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 Log.i("HTTP", "next credential request $requestIdentifier for $webClientId")
                 webClientCredentialRequestState = CredentialRequestState.Incoming
                 webClientRequestIdentifier = requestIdentifier
+                webClientRequestedWebsite = null
             }
         }
 
@@ -758,8 +769,17 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         shortenedFingerprint
                     )
                 }
+                else if (command == FetchCredentialCommand.CREATE_CREDENTIAL_FOR_URL && website.isNotBlank()) {
+                    startCreateCredentialForWebsiteFlow(
+                        webExtension,
+                        webClientTitle,
+                        webClientId,
+                        shortenedFingerprint,
+                        website
+                    )
+                }
                 else {
-                    Log.i("HTTP", "unhandled command")
+                    Log.i("HTTP", "unhandled command: $command")
                 }
             }
 
@@ -903,6 +923,30 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         )
         {
             startSearchFor("!$domain", commit = true)
+            webClientRequestedWebsite = website
+        }
+    }
+
+    private fun startCreateCredentialForWebsiteFlow(
+        webExtension: EncWebExtension,
+        webClientTitle: String,
+        webClientId: String,
+        shortenedFingerprint: String,
+        website: String
+    ) {
+        val domain = extractDomain(website, withTld = true)
+        val name = extractDomain(website, withTld = false).capitalize()
+        showClientRequest(
+            webExtension,
+            webClientTitle,
+            webClientId,
+            "wants to create a new credential for '$domain'.",
+            shortenedFingerprint,
+            "Create a new credential for '$domain' to fulfill the request.",
+            SERVER_REQUEST_SNACKBAR_DURATION,
+        )
+        {
+            startCredentialCreation(name, domain)
         }
     }
 
@@ -990,6 +1034,14 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
     }
 
+    private fun startCredentialCreation(name: String, domain: String) {
+        val intent =
+            Intent(this@ListCredentialsActivity, EditCredentialActivity::class.java)
+        intent.action = "${Constants.ACTION_PREFILLED_FROM_EXTENSION}$ACTION_DELIMITER$name$ACTION_DELIMITER$domain"
+        startActivityForResult(intent, newOrUpdateCredentialActivityRequestCode)
+    }
+
+
     private fun showClientRequest(
         webExtension: EncWebExtension,
         webClientTitle: String,
@@ -1071,9 +1123,13 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             }
             .setTextMaxLines(7)
             .addCallback(object : BaseCallback<Snackbar>() {
-                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                override fun onDismissed(bar: Snackbar, event: Int) {
                     searchItem?.collapseActionView()
                     listCredentialAdapter?.stopSelectionMode()
+                    credentialsRecycleView?.let { view ->
+                        view.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+                    }
+
                     credentialSelectState = MultipleCredentialSelectState.NONE
 
                     if (webClientCredentialRequestState.isProgressing) {
@@ -1082,6 +1138,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                             this@ListCredentialsActivity,
                             "Request denied"
                         )
+                    }
+                }
+
+                override fun onShown(bar: Snackbar) {
+                    credentialsRecycleView?.let { view ->
+                        view.layoutParams.height = view.measuredHeight - bar.view.measuredHeight
                     }
                 }
             })
@@ -1139,11 +1201,22 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             }
             .setTextMaxLines(7)
             .addCallback(object : BaseCallback<Snackbar>() {
-                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                override fun onDismissed(bar: Snackbar, event: Int) {
                     searchItem?.collapseActionView()
+                    listCredentialAdapter?.stopSelectionMode()
+                    credentialsRecycleView?.let { view ->
+                        view.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+                    }
+
                     if (webClientCredentialRequestState.isProgressing) {
                         webClientCredentialRequestState = CredentialRequestState.Denied
                         toastText(this@ListCredentialsActivity, "Request denied")
+                    }
+                }
+
+                override fun onShown(bar: Snackbar) {
+                    credentialsRecycleView?.let { view ->
+                        view.layoutParams.height = view.measuredHeight - bar.view.measuredHeight
                     }
                 }
             })

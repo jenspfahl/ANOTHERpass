@@ -44,10 +44,11 @@ class EditCredentialActivity : AutofillPushBackActivityBase() {
         }
 
         intent?.action?.let { action ->
-            if (action.startsWith(Constants.ACTION_OPEN_VAULT_FOR_AUTOFILL)) {
+            if (action.startsWith(Constants.ACTION_OPEN_VAULT_FOR_AUTOFILL) || action.startsWith(Constants.ACTION_PREFILLED_FROM_EXTENSION)) {
                 suggestedCredentialName = action.substringAfter(ACTION_DELIMITER).substringBeforeLast(ACTION_DELIMITER)
                 suggestedWebSite = action.substringAfterLast(ACTION_DELIMITER)
             }
+
         }
 
         super.onCreate(savedInstanceState)
@@ -97,7 +98,7 @@ class EditCredentialActivity : AutofillPushBackActivityBase() {
             val replyIntent = Intent()
             current.applyExtras(replyIntent)
 
-            if (shouldPushBackAutoFill()) {
+            if (shouldPushBackAutoFill() || intent?.action?.startsWith(Constants.ACTION_PREFILLED_FROM_EXTENSION) == true) {
                 AutofillCredentialHolder.update(current, deobfuscationKey)
             }
 

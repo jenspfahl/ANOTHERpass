@@ -202,10 +202,45 @@ class EditCredentialDataFragment : SecureFragment() {
             }
         }
         else {
-            editCredentialNameView.requestFocus()
-            editCredentialActivity.suggestedCredentialName?.let {
-                editCredentialNameView.setText(it.capitalize())
+            if (editCredentialActivity.suggestedCredentialName != null) {
+                //TODO check if the name already exists and add (1) if so
+                masterSecretKey?.let { key ->
+                    editCredentialActivity.credentialViewModel.allCredentials.observeOnce(editCredentialActivity) { credentials ->
+
+                        var suggestedName =
+                            editCredentialActivity.suggestedCredentialName!!.capitalize()
+
+                        var nameCounter = 0
+                        var maxNumber = 0
+                        // e.g. if given (1) and (2) and (1) is deleted, we don't want to get (2) again. Therefor i added maxNumber.
+                        val regex = Regex("\\Q${suggestedName.lowercase()}\\E \\((\\d+)\\)")  // one capturing group to get the number in the brackets
+
+                        credentials.forEach { credential ->
+                            val name = decryptCommonString(key, credential.name).lowercase().trim()
+                            if (name == suggestedName.lowercase() || regex.matches(name)) {
+                                val groups = regex.find(name)?.groups
+                                if (!groups.isNullOrEmpty()) {
+                                    val value = groups[1]?.value?.toIntOrNull()
+                                    if (value != null && value > maxNumber) {
+                                        maxNumber = value + 1
+                                    }
+                                }
+                                nameCounter++
+                            }
+                        }
+                        val counter = Math.max(nameCounter, maxNumber)
+                        if (counter > 0) {
+                            suggestedName = "$suggestedName ($counter)"
+                        }
+                        editCredentialNameView.setText(suggestedName)
+                    }
+                }
+
             }
+            else {
+                editCredentialNameView.requestFocus()
+            }
+
             editCredentialActivity.suggestedWebSite?.let {
                 editCredentialWebsiteView.setText(it)
             }

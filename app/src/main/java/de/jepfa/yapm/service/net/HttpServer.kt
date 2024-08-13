@@ -35,9 +35,6 @@ import kotlinx.coroutines.*
 import org.json.JSONObject
 import java.math.BigInteger
 import java.net.InetAddress
-import java.security.NoSuchAlgorithmException
-import java.security.PublicKey
-import java.security.cert.CertificateEncodingException
 import java.util.*
 
 
@@ -45,6 +42,7 @@ object HttpServer {
 
     const val DEFAULT_HTTP_SERVER_PORT = 8787
     val SERVER_LOG_PREFIX = Constants.LOG_PREFIX + "HttpServer"
+    val REGEX_WEB_CLIENT_ID = Regex("[A-Z]{3}-[A-Z]{3}")
 
     enum class Action {LINKING, REQUEST_CREDENTIAL}
 
@@ -155,6 +153,15 @@ object HttpServer {
                                             null,
                                             HttpStatusCode.BadRequest,
                                             "X-WebClientId header missing",
+                                        )
+                                        return@post
+                                    }
+                                    if (!checkWebClientIdFormat(webClientId)) {
+                                        //fail
+                                        respondError(
+                                            null,
+                                            HttpStatusCode.BadRequest,
+                                            "X-WebClientId malformed",
                                         )
                                         return@post
                                     }
@@ -570,6 +577,11 @@ object HttpServer {
                 callback(null)
             }
         }
+    }
+
+
+    fun checkWebClientIdFormat(webClientId: String): Boolean {
+        return REGEX_WEB_CLIENT_ID.matches(webClientId)
     }
 
     private fun wrapBody(responseKeys: Pair<Key, Key>, key: SecretKeyHolder, webExtension: EncWebExtension, message: JSONObject, context: Context): String {
