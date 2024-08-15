@@ -3,7 +3,9 @@ package de.jepfa.yapm.ui.editcredential
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.lifecycle.LiveData
+import com.google.android.material.snackbar.Snackbar
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Key
@@ -44,7 +46,7 @@ class EditCredentialActivity : AutofillPushBackActivityBase() {
         }
 
         intent?.action?.let { action ->
-            if (action.startsWith(Constants.ACTION_OPEN_VAULT_FOR_AUTOFILL) || action.startsWith(Constants.ACTION_PREFILLED_FROM_EXTENSION)) {
+            if (action.startsWith(Constants.ACTION_OPEN_VAULT_FOR_AUTOFILL) || isOpenedFromWebExtension()) {
                 suggestedCredentialName = action.substringAfter(ACTION_DELIMITER).substringBeforeLast(ACTION_DELIMITER)
                 suggestedWebSite = action.substringAfterLast(ACTION_DELIMITER)
             }
@@ -98,7 +100,7 @@ class EditCredentialActivity : AutofillPushBackActivityBase() {
             val replyIntent = Intent()
             current.applyExtras(replyIntent)
 
-            if (shouldPushBackAutoFill() || intent?.action?.startsWith(Constants.ACTION_PREFILLED_FROM_EXTENSION) == true) {
+            if (shouldPushBackAutoFill() || isOpenedFromWebExtension()) {
                 AutofillCredentialHolder.update(current, deobfuscationKey)
             }
 
@@ -115,4 +117,47 @@ class EditCredentialActivity : AutofillPushBackActivityBase() {
         }
     }
 
+    fun isOpenedFromWebExtension() = intent?.action?.startsWith(Constants.ACTION_PREFILLED_FROM_EXTENSION) == true
+
+
+    fun showUserActionSnackbar(text: String, duration: Int, view: View) {
+        val snackbar = Snackbar.make(
+            view,
+            text, duration
+        )
+      /*      .setAction("Cancel request") {
+                webClientCredentialRequestState = CredentialRequestState.Denied
+                searchItem?.collapseActionView()
+                toastText(this@ListCredentialsActivity, "Request denied")
+
+            }
+            .setTextMaxLines(7)
+            .addCallback(object : BaseCallback<Snackbar>() {
+                override fun onDismissed(bar: Snackbar, event: Int) {
+                    searchItem?.collapseActionView()
+                    listCredentialAdapter?.stopSelectionMode()
+                    credentialsRecycleView?.let { view ->
+                        view.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+                    }
+
+                    credentialSelectState = MultipleCredentialSelectState.NONE
+
+                    if (webClientCredentialRequestState.isProgressing) {
+                        webClientCredentialRequestState = CredentialRequestState.Denied
+                        toastText(
+                            this@ListCredentialsActivity,
+                            "Request denied"
+                        )
+                    }
+                }
+
+                override fun onShown(bar: Snackbar) {
+                    credentialsRecycleView?.let { view ->
+                        view.layoutParams.height = view.measuredHeight - bar.view.measuredHeight
+                    }
+                }
+            })*/
+
+        snackbar?.show()
+    }
 }

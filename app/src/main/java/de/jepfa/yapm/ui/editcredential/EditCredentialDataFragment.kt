@@ -270,6 +270,10 @@ class EditCredentialDataFragment : SecureFragment() {
                 }
             }, 100L)
         }
+
+        if (editCredentialActivity.isOpenedFromWebExtension()) {
+            editCredentialActivity.showUserActionSnackbar("sdfsdf", 5000, view) //TODO reuse the snackbar method from ListCredentialActivity
+        }
     }
 
     private fun updateUsernameTemplateSuggestions() {
