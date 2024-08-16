@@ -10,6 +10,7 @@ import android.text.style.TypefaceSpan
 import android.util.Base64
 import android.util.Log
 import android.view.ViewGroup
+import androidx.core.view.updatePadding
 import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback
 import com.google.android.material.snackbar.Snackbar
 import de.jepfa.yapm.R
@@ -39,22 +40,36 @@ import java.util.UUID
 
 
 object HttpCredentialRequestHandler {
-    val SERVER_REQUEST_SNACKBAR_DURATION = 300_000 // this is the maximum timeout of the extension
+    private const val SERVER_REQUEST_SNACKBAR_DURATION = 300_000 // this is the maximum timeout of the extension
 
-    var webClientCredentialRequestState = CredentialRequestState.None
+    private var webClientCredentialRequestState = CredentialRequestState.None
     private var webClientRequestIdentifier: String? = null
-    var webClientRequestedWebsite: String? = null
+    private var webClientRequestedWebsite: String? = null
+    private var webClientRequestedUser: String? = null
 
     var credentialSelectState: MultipleCredentialSelectState = MultipleCredentialSelectState.NONE
     private var serverSnackbar: Snackbar? = null
 
 
+    fun isProgressing() = webClientCredentialRequestState.isProgressing
 
+    fun getWebsiteSuggestion(): Triple<String, String, String>? {
+        if (isProgressing() && webClientRequestedWebsite != null) {
+            val suggestedName = extractDomain(webClientRequestedWebsite!!, withTld = false).capitalize()
+            val suggestedDomain = extractDomain(webClientRequestedWebsite!!, withTld = true)
+
+            return Triple(suggestedName, suggestedDomain, webClientRequestedUser?:"")
+        }
+        else {
+            return null
+        }
+    }
 
     fun reset() {
         webClientRequestIdentifier = null
         webClientCredentialRequestState = CredentialRequestState.None
         webClientRequestedWebsite = null
+        webClientRequestedUser = null
     }
 
     fun handleIncomingRequest(
@@ -78,6 +93,7 @@ object HttpCredentialRequestHandler {
         Log.d("HTTP", "command: $command")
         val incomingRequestIdentifier = message.getString("requestIdentifier")
         val website = message.optString("website")
+        val user = message.optString("user")
         val uid = message.optString("uid")
         val uids = message.optJSONArray("uids")
 
@@ -91,6 +107,7 @@ object HttpCredentialRequestHandler {
                 webClientCredentialRequestState = CredentialRequestState.Incoming
                 webClientRequestIdentifier = incomingRequestIdentifier
                 webClientRequestedWebsite = null
+                webClientRequestedUser = null
             }
         }
 
@@ -118,13 +135,15 @@ object HttpCredentialRequestHandler {
                             webClientTitle,
                             webClientId,
                             shortenedFingerprint,
-                            website
+                            website,
+                            user
                         )
                     }
                     else if (command == FetchCredentialCommand.FETCH_CREDENTIAL_FOR_URL  && website.isNotBlank()) {
                         startFetchCredentialForWebsiteFlow(
                             requestFlows,
                             website,
+                            user,
                             webExtension,
                             webClientTitle,
                             webClientId,
@@ -140,6 +159,7 @@ object HttpCredentialRequestHandler {
                             webClientTitle,
                             webClientId,
                             shortenedFingerprint,
+                            null,
                             null
                         )
                     }
@@ -195,7 +215,8 @@ object HttpCredentialRequestHandler {
                             webClientTitle,
                             webClientId,
                             shortenedFingerprint,
-                            website
+                            website,
+                            user
                         )
                     }
                     else {
@@ -265,7 +286,8 @@ object HttpCredentialRequestHandler {
         webClientId: String,
         shortenedFingerprint: String,
         website: String?,
-        ) {
+        user: String?
+    ) {
         findCredentialByUuid(requestFlows.getLifeCycleActivity(), uuid) { credential ->
             if (credential != null) {
                 val name = SecretService.decryptCommonString(key, credential.name)
@@ -288,6 +310,7 @@ object HttpCredentialRequestHandler {
                     startFetchCredentialForWebsiteFlow(
                         requestFlows,
                         website,
+                        user?:"",
                         webExtension,
                         webClientTitle,
                         webClientId,
@@ -331,6 +354,7 @@ object HttpCredentialRequestHandler {
     private fun startFetchCredentialForWebsiteFlow(
         requestFlows: RequestFlows,
         website: String,
+        user: String,
         webExtension: EncWebExtension,
         webClientTitle: String,
         webClientId: String,
@@ -349,6 +373,7 @@ object HttpCredentialRequestHandler {
         {
             requestFlows.startCredentialUiSearchFor(domain)
             webClientRequestedWebsite = website
+            webClientRequestedUser = user
         }
     }
 
@@ -358,7 +383,8 @@ object HttpCredentialRequestHandler {
         webClientTitle: String,
         webClientId: String,
         shortenedFingerprint: String,
-        website: String
+        website: String,
+        user: String
     ) {
         val domain = extractDomain(website, withTld = true)
         val name = extractDomain(website, withTld = false).capitalize()
@@ -370,9 +396,17 @@ object HttpCredentialRequestHandler {
             "wants to create a new credential for '$domain'.",
             shortenedFingerprint,
             "Create a new credential for '$domain' to fulfill the request.",
+            showByPassSnackbar = false,
+            denyOnDismiss = false
         )
         {
-            requestFlows.startCredentialCreation(name, domain)
+            requestFlows.startCredentialCreation(
+                name,
+                domain,
+                user,
+                webExtension.id!!,
+                shortenedFingerprint,
+            )
         }
     }
 
@@ -482,20 +516,25 @@ object HttpCredentialRequestHandler {
         details: String,
         shortenedFingerprint: String,
         userActionText: String,
+        denyOnDismiss: Boolean = true,
+        showByPassSnackbar: Boolean = true,
         acceptHandler: () -> Unit,
     ) {
         if (webExtension.bypassIncomingRequests) {
             webClientCredentialRequestState = CredentialRequestState.Accepted
             acceptHandler()
 
-            showBypassSnackbar(
-                requestFlows,
-                webClientTitle,
-                webClientId,
-                details,
-                shortenedFingerprint,
-                webExtension,
-            )
+            if (showByPassSnackbar) {
+                showBypassSnackbar(
+                    requestFlows,
+                    webClientTitle,
+                    webClientId,
+                    details,
+                    shortenedFingerprint,
+                    webExtension,
+                    denyOnDismiss
+                )
+            }
         } else {
             showAcceptBottomSheet(
                 requestFlows.getLifeCycleActivity(),
@@ -503,13 +542,14 @@ object HttpCredentialRequestHandler {
                 webClientId,
                 details,
                 shortenedFingerprint,
-                webExtension
+                webExtension,
             )
             {
                 acceptHandler()
                 showUserActionSnackbar(
                     requestFlows,
-                    userActionText, 
+                    userActionText,
+                    denyOnDismiss
                 )
             }
         }
@@ -548,10 +588,12 @@ object HttpCredentialRequestHandler {
         ).show()
     }
 
-    private fun showUserActionSnackbar(
+    fun showUserActionSnackbar(
         requestFlows: RequestFlows,
         text: String,
-        ) {
+        denyOnDismiss: Boolean
+    ) {
+        serverSnackbar?.dismiss()
         serverSnackbar = Snackbar.make(
             requestFlows.getRootView(),
             text,
@@ -560,7 +602,6 @@ object HttpCredentialRequestHandler {
             .setAction("Cancel request") {
                 webClientCredentialRequestState = CredentialRequestState.Denied
                 requestFlows.resetUi()
-                //searchItem?.collapseActionView()
                 toastText(requestFlows.getLifeCycleActivity(), "Request denied")
 
             }
@@ -568,17 +609,11 @@ object HttpCredentialRequestHandler {
             .addCallback(object : BaseCallback<Snackbar>() {
                 override fun onDismissed(bar: Snackbar, event: Int) {
                     requestFlows.resetUi()
-                    /*
-                    searchItem?.collapseActionView()
-                    listCredentialAdapter?.stopSelectionMode()
-
-                     */
-                    requestFlows.getRootView().layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
-
+                    requestFlows.getRootView().updatePadding(bottom = 0)
 
                     credentialSelectState = MultipleCredentialSelectState.NONE
 
-                    if (webClientCredentialRequestState.isProgressing) {
+                    if (denyOnDismiss && webClientCredentialRequestState.isProgressing) {
                         webClientCredentialRequestState = CredentialRequestState.Denied
                         toastText(
                             requestFlows.getLifeCycleActivity(),
@@ -588,20 +623,21 @@ object HttpCredentialRequestHandler {
                 }
 
                 override fun onShown(bar: Snackbar) {
-                    requestFlows.getRootView().layoutParams.height = requestFlows.getRootView().measuredHeight - bar.view.measuredHeight
+                    requestFlows.getRootView().updatePadding(bottom = bar.view.measuredHeight)
                 }
             })
 
         serverSnackbar?.show()
     }
 
-    private fun showBypassSnackbar(
+    fun showBypassSnackbar(
         requestFlows: RequestFlows,
         webClientTitle: String,
         webClientId: String,
         details: String,
         shortenedFingerprint: String,
         webExtension: EncWebExtension,
+        denyOnDismiss: Boolean
     ) {
 
         val span =
@@ -631,6 +667,7 @@ object HttpCredentialRequestHandler {
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
 
+        serverSnackbar?.dismiss()
         serverSnackbar = Snackbar.make(
             requestFlows.getRootView(),
             span,
@@ -649,16 +686,17 @@ object HttpCredentialRequestHandler {
             .addCallback(object : BaseCallback<Snackbar>() {
                 override fun onDismissed(bar: Snackbar, event: Int) {
                     requestFlows.resetUi()
-                    requestFlows.getRootView().layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+                    requestFlows.getRootView().updatePadding(bottom = 0)
 
-                    if (webClientCredentialRequestState.isProgressing) {
+
+                    if (denyOnDismiss && webClientCredentialRequestState.isProgressing) {
                         webClientCredentialRequestState = CredentialRequestState.Denied
                         toastText(requestFlows.getLifeCycleActivity(), "Request denied")
                     }
                 }
 
                 override fun onShown(bar: Snackbar) {
-                    requestFlows.getRootView().layoutParams.height = requestFlows.getRootView().measuredHeight - bar.view.measuredHeight
+                    requestFlows.getRootView().updatePadding(bottom = bar.view.measuredHeight)
                 }
             })
 

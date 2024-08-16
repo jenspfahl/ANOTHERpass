@@ -128,7 +128,6 @@ import de.jepfa.yapm.util.PermissionChecker.verifyNotificationPermissions
 import de.jepfa.yapm.util.SearchCommand
 import de.jepfa.yapm.util.addFormattedLine
 import de.jepfa.yapm.util.createAndAddLabelChip
-import de.jepfa.yapm.util.extractDomain
 import de.jepfa.yapm.util.toastText
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineScope
@@ -242,38 +241,36 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
         else {
 
-            val onLongClick = object : View.OnLongClickListener {
-                override fun onLongClick(v: View?): Boolean {
-                    val stat = if (HttpServer.isRunning())  "Running" else "Stopped"
-                    val ip = HttpServer.getIp(this@ListCredentialsActivity)
-                    val port = PreferenceService.getAsString(PreferenceService.PREF_SERVER_PORT, this@ListCredentialsActivity) ?: HttpServer.DEFAULT_HTTP_SERVER_PORT
-                    HttpServer.getHostName(ip) { host ->
-                        CoroutineScope(Dispatchers.Main).launch {
-                            val sb = java.lang.StringBuilder()
-                            sb.addFormattedLine("Status", stat)
-                            sb.addFormattedLine("Protocol", "HTTP")
-                            sb.addFormattedLine("IP", ip)
-                            sb.addFormattedLine("Hostname", host)
-                            sb.addFormattedLine("Port", port)
-                            AlertDialog.Builder(this@ListCredentialsActivity)
-                                .setTitle("Server details")
-                                .setMessage(sb.toString())
-                                .setIcon(R.drawable.outline_dns_24)
-                                .setNegativeButton(R.string.close, null)
-                                .setNeutralButton(R.string.copy_url) { _, _ ->
-                                    ClipboardUtil.copy(
-                                        "URL",
-                                        "http://$host:$port",
-                                        this@ListCredentialsActivity,
-                                        isSensible = false,
-                                    )
-                                    toastText(this@ListCredentialsActivity, R.string.url_copied)
-                                }
-                                .show()
-                        }
+            val onLongClick = View.OnLongClickListener {
+                val stat = if (HttpServer.isRunning())  "Running" else "Stopped"
+                val ip = HttpServer.getIp(this@ListCredentialsActivity)
+                val port = PreferenceService.getAsString(PreferenceService.PREF_SERVER_PORT, this@ListCredentialsActivity) ?: HttpServer.DEFAULT_HTTP_SERVER_PORT
+                HttpServer.getHostName(ip) { host ->
+                    CoroutineScope(Dispatchers.Main).launch {
+                        val sb = java.lang.StringBuilder()
+                        sb.addFormattedLine("Status", stat)
+                        sb.addFormattedLine("Protocol", "HTTP")
+                        sb.addFormattedLine("IP", ip)
+                        sb.addFormattedLine("Hostname", host)
+                        sb.addFormattedLine("Port", port)
+                        AlertDialog.Builder(this@ListCredentialsActivity)
+                            .setTitle("Server details")
+                            .setMessage(sb.toString())
+                            .setIcon(R.drawable.outline_dns_24)
+                            .setNegativeButton(R.string.close, null)
+                            .setNeutralButton(R.string.copy_url) { _, _ ->
+                                ClipboardUtil.copy(
+                                    "URL",
+                                    "http://$host:$port",
+                                    this@ListCredentialsActivity,
+                                    isSensible = false,
+                                )
+                                toastText(this@ListCredentialsActivity, R.string.url_copied)
+                            }
+                            .show()
                     }
-                    return true
                 }
+                true
             }
             serverViewState.setOnLongClickListener(onLongClick)
             serverViewDetails.setOnLongClickListener(onLongClick)
@@ -451,11 +448,17 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             else {
                 val intent =
                     Intent(this@ListCredentialsActivity, EditCredentialActivity::class.java)
-                if (HttpCredentialRequestHandler.webClientCredentialRequestState.isProgressing && HttpCredentialRequestHandler.webClientRequestedWebsite != null) {
-                    val suggestedDomain = extractDomain(HttpCredentialRequestHandler.webClientRequestedWebsite!!, withTld = true)
-                    val suggestedName = extractDomain(HttpCredentialRequestHandler.webClientRequestedWebsite!!, withTld = false).capitalize()
 
-                    intent.action = "${Constants.ACTION_PREFILLED_FROM_EXTENSION}$ACTION_DELIMITER$suggestedName$ACTION_DELIMITER$suggestedDomain"
+                val websiteSuggestion = HttpCredentialRequestHandler.getWebsiteSuggestion()
+                if (HttpCredentialRequestHandler.isProgressing() && websiteSuggestion != null) {
+                    val name = websiteSuggestion.first
+                    val domain = websiteSuggestion.second
+                    val user = websiteSuggestion.third
+
+                    intent.action = Constants.ACTION_PREFILLED_FROM_EXTENSION
+                    intent.putExtra("name", name)
+                    intent.putExtra("domain", domain)
+                    intent.putExtra("user", user)
                 }
                 else {
                     intent.action = this.intent.action
@@ -607,10 +610,21 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     }
 
-    override fun startCredentialCreation(name: String, domain: String) {
+    override fun startCredentialCreation(
+        name: String,
+        domain: String,
+        user: String,
+        webExtensionId: Int,
+        shortenedFingerprint: String,
+    ) {
         val intent =
             Intent(this@ListCredentialsActivity, EditCredentialActivity::class.java)
-        intent.action = "${Constants.ACTION_PREFILLED_FROM_EXTENSION}$ACTION_DELIMITER$name$ACTION_DELIMITER$domain"
+        intent.action = Constants.ACTION_PREFILLED_FROM_EXTENSION
+        intent.putExtra("name", name)
+        intent.putExtra("domain", domain)
+        intent.putExtra("user", user)
+        intent.putExtra("webExtensionId", webExtensionId)
+        intent.putExtra("shortenedFingerprint", shortenedFingerprint)
         startActivityForResult(intent, newOrUpdateCredentialActivityRequestCode)
     }
 
@@ -724,9 +738,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         val view: View = findViewById(R.id.content_list_credentials)
 
         // wait until ViewModel is fully loaded
-        if (!HttpCredentialRequestHandler.webClientCredentialRequestState.isProgressing) {
+        if (!HttpCredentialRequestHandler.isProgressing()) {
             view.postDelayed({
-                if (!HttpCredentialRequestHandler.webClientCredentialRequestState.isProgressing) {
+                if (!HttpCredentialRequestHandler.isProgressing()) {
                     ReminderService.showNextReminder(view, this)
                 }
             }, 500L)

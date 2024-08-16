@@ -10,12 +10,17 @@ interface RequestFlows {
     fun getLifeCycleActivity(): SecureActivity
     fun getRootView(): View
 
-    fun resetUi()
-
-    fun startCredentialCreation(name: String, domain: String)
+    fun startCredentialCreation(
+        name: String,
+        domain: String,
+        user: String,
+        webExtensionId: Int,
+        shortenedFingerprint: String,
+    )
     fun startCredentialUiSearchFor(domain: String)
     fun startCredentialSelectionMode()
     fun getSelectedCredentials(): Set<EncCredential>
     fun stopCredentialSelectionMode()
 
+    fun resetUi()
 }

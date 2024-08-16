@@ -20,6 +20,8 @@ import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.net.HttpCredentialRequestHandler
+import de.jepfa.yapm.service.net.RequestFlows
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.decryptLong
@@ -27,6 +29,7 @@ import de.jepfa.yapm.service.secret.SecretService.encryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.encryptLong
 import de.jepfa.yapm.service.usernametemplate.UsernameTemplateService
 import de.jepfa.yapm.ui.DropDownList
+import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.SecureFragment
 import de.jepfa.yapm.ui.label.LabelEditViewExtender
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
@@ -244,6 +247,9 @@ class EditCredentialDataFragment : SecureFragment() {
             editCredentialActivity.suggestedWebSite?.let {
                 editCredentialWebsiteView.setText(it)
             }
+            editCredentialActivity.suggestedUser?.let {
+                editCredentialUserView.setText(it)
+            }
         }
 
         val buttonNext: Button = view.findViewById(R.id.button_next)
@@ -269,10 +275,6 @@ class EditCredentialDataFragment : SecureFragment() {
                     }
                 }
             }, 100L)
-        }
-
-        if (editCredentialActivity.isOpenedFromWebExtension()) {
-            editCredentialActivity.showUserActionSnackbar("sdfsdf", 5000, view) //TODO reuse the snackbar method from ListCredentialActivity
         }
     }
 
@@ -454,5 +456,6 @@ class EditCredentialDataFragment : SecureFragment() {
         )
         editCredentialActivity.current = credentialToSave
     }
+
 
 }
