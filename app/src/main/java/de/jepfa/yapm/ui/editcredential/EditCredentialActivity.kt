@@ -32,6 +32,7 @@ class EditCredentialActivity : AutofillPushBackActivityBase(), RequestFlows {
     internal var currentId: Int? = null
     internal var current: EncCredential? = null
     internal var original: EncCredential? = null
+    internal var saved = false
 
     public override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -98,14 +99,17 @@ class EditCredentialActivity : AutofillPushBackActivityBase(), RequestFlows {
                             "wants to create a new credential for '${suggestedWebSite ?: "??"}'.",
                             shortenedFingerprint?:"??",
                             webExtension,
-                            denyOnDismiss = true
-                        )
+                        ) {
+                            saved
+                        }
                     } else {
                         HttpCredentialRequestHandler.showUserActionSnackbar(
                             this,
                             "Create a new credential for '${suggestedWebSite ?: "??"}' to fulfill the request.",
-                            denyOnDismiss = true
                         )
+                        {
+                            saved
+                        }
                     }
                 }
             }

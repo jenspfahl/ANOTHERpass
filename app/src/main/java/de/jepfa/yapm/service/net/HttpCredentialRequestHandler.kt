@@ -9,7 +9,6 @@ import android.text.style.StyleSpan
 import android.text.style.TypefaceSpan
 import android.util.Base64
 import android.util.Log
-import android.view.ViewGroup
 import androidx.core.view.updatePadding
 import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback
 import com.google.android.material.snackbar.Snackbar
@@ -401,8 +400,7 @@ object HttpCredentialRequestHandler {
             "wants to create a new credential for '$domain'.",
             shortenedFingerprint,
             "Create a new credential for '$domain' to fulfill the request.",
-            showByPassSnackbar = false,
-            denyOnDismiss = false
+            showSnackbars = false,
         )
         {
             requestFlows.startCredentialCreation(
@@ -521,8 +519,7 @@ object HttpCredentialRequestHandler {
         details: String,
         shortenedFingerprint: String,
         userActionText: String,
-        denyOnDismiss: Boolean = true,
-        showByPassSnackbar: Boolean = true,
+        showSnackbars: Boolean = true,
         acceptHandler: () -> Unit,
     ) {
         Log.d("HTTP", "showClientRequest for $shortenedFingerprint")
@@ -531,16 +528,17 @@ object HttpCredentialRequestHandler {
             webClientCredentialRequestState = CredentialRequestState.Accepted
             acceptHandler()
 
-            if (showByPassSnackbar) {
+            if (showSnackbars) {
                 showBypassSnackbar(
                     requestFlows,
                     webClientTitle,
                     webClientId,
                     details,
                     shortenedFingerprint,
-                    webExtension,
-                    denyOnDismiss
-                )
+                    webExtension
+                ) {
+                    false
+                }
             }
         } else {
             showAcceptBottomSheet(
@@ -553,11 +551,14 @@ object HttpCredentialRequestHandler {
             )
             {
                 acceptHandler()
-                showUserActionSnackbar(
-                    requestFlows,
-                    userActionText,
-                    denyOnDismiss
-                )
+                if (showSnackbars) {
+                    showUserActionSnackbar(
+                        requestFlows,
+                        userActionText,
+                    ) {
+                        false
+                    }
+                }
             }
             webClientCredentialRequestState = CredentialRequestState.AwaitingAcceptance
         }
@@ -599,7 +600,7 @@ object HttpCredentialRequestHandler {
     fun showUserActionSnackbar(
         requestFlows: RequestFlows,
         text: String,
-        denyOnDismiss: Boolean
+        denyRequestVeto: () -> Boolean
     ) {
         serverSnackbar?.dismiss()
         serverSnackbar = Snackbar.make(
@@ -621,7 +622,7 @@ object HttpCredentialRequestHandler {
 
                     credentialSelectState = MultipleCredentialSelectState.NONE
 
-                    if (denyOnDismiss && webClientCredentialRequestState.isProgressing) {
+                    if (!denyRequestVeto() && webClientCredentialRequestState.isProgressing) {
                         webClientCredentialRequestState = CredentialRequestState.Denied
                         toastText(
                             requestFlows.getLifeCycleActivity(),
@@ -645,7 +646,7 @@ object HttpCredentialRequestHandler {
         details: String,
         shortenedFingerprint: String,
         webExtension: EncWebExtension,
-        denyOnDismiss: Boolean
+        denyRequestVeto: () -> Boolean
     ) {
 
         val span =
@@ -696,7 +697,7 @@ object HttpCredentialRequestHandler {
                     requestFlows.getRootView().updatePadding(bottom = 0)
 
 
-                    if (denyOnDismiss && webClientCredentialRequestState.isProgressing) {
+                    if (!denyRequestVeto() && webClientCredentialRequestState.isProgressing) {
                         webClientCredentialRequestState = CredentialRequestState.Denied
                         toastText(requestFlows.getLifeCycleActivity(), "Request denied")
                     }
