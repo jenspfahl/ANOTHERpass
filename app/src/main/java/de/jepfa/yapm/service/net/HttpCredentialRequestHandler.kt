@@ -80,6 +80,7 @@ object HttpCredentialRequestHandler {
         ): Pair<HttpStatusCode, JSONObject> {
         Log.d("HTTP", "webClientRequestIdentifier: $webClientRequestIdentifier ($webClientCredentialRequestState)")
 
+
         val webClientId = SecretService.decryptCommonString(key, webExtension.webClientId)
         val webClientTitle = SecretService.decryptCommonString(key, webExtension.title)
 
@@ -113,7 +114,11 @@ object HttpCredentialRequestHandler {
 
         when (webClientCredentialRequestState) {
             CredentialRequestState.Incoming -> {
-                webClientCredentialRequestState = CredentialRequestState.AwaitingAcceptance
+
+                if (!requestFlows.getLifeCycleActivity().isActivityInForeground()) {
+                    Log.d("HTTP", "activity ${requestFlows.getLifeCycleActivity()} not in foreground (${requestFlows.getLifeCycleActivity().lifecycle.currentState})")
+                    return toErrorResponse(HttpStatusCode.Conflict, "not in foreground")
+                }
 
                 val sharedBaseKey = SecretService.decryptKey(key, webExtension.sharedBaseKey)
                 val requestIdentifierKey = Key(Base64.decode(webClientRequestIdentifier, 0))
@@ -150,7 +155,7 @@ object HttpCredentialRequestHandler {
                             shortenedFingerprint
                         )
                     }
-                    if (command == FetchCredentialCommand.FETCH_CREDENTIAL_FOR_UID && uuid != null) {
+                    else if (command == FetchCredentialCommand.FETCH_CREDENTIAL_FOR_UID && uuid != null) {
                         startFetchCredentialForUidFlow(
                             requestFlows,
                             uuid,
@@ -163,7 +168,7 @@ object HttpCredentialRequestHandler {
                             null
                         )
                     }
-                    if (command == FetchCredentialCommand.FETCH_CREDENTIALS_FOR_UIDS && uids != null) {
+                    else if (command == FetchCredentialCommand.FETCH_CREDENTIALS_FOR_UIDS && uids != null) {
                         startFetchCredentialForUidsFlow(
                             requestFlows,
                             webExtension,
@@ -520,6 +525,8 @@ object HttpCredentialRequestHandler {
         showByPassSnackbar: Boolean = true,
         acceptHandler: () -> Unit,
     ) {
+        Log.d("HTTP", "showClientRequest for $shortenedFingerprint")
+
         if (webExtension.bypassIncomingRequests) {
             webClientCredentialRequestState = CredentialRequestState.Accepted
             acceptHandler()
@@ -552,6 +559,7 @@ object HttpCredentialRequestHandler {
                     denyOnDismiss
                 )
             }
+            webClientCredentialRequestState = CredentialRequestState.AwaitingAcceptance
         }
     }
 
@@ -678,7 +686,6 @@ object HttpCredentialRequestHandler {
                 webExtension.bypassIncomingRequests = false
                 requestFlows.getLifeCycleActivity().webExtensionViewModel.save(webExtension, requestFlows.getLifeCycleActivity())
                 requestFlows.resetUi()
-               // searchItem?.collapseActionView()
                 toastText(requestFlows.getLifeCycleActivity(), "Request denied and bypass revoked")
 
             }
