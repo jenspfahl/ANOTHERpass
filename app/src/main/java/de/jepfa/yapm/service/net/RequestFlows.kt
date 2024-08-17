@@ -23,4 +23,6 @@ interface RequestFlows {
     fun stopCredentialSelectionMode()
 
     fun resetUi()
+
+    fun notifyRequestStateUpdated(oldState: CredentialRequestState, newState: CredentialRequestState) {}
 }

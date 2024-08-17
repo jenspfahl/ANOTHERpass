@@ -64,9 +64,9 @@ object HttpCredentialRequestHandler {
         }
     }
 
-    fun reset() {
+    fun reset(requestFlows: RequestFlows) {
         webClientRequestIdentifier = null
-        webClientCredentialRequestState = CredentialRequestState.None
+        updateRequestState(CredentialRequestState.None, requestFlows)
         webClientRequestedWebsite = null
         webClientRequestedUser = null
     }
@@ -104,7 +104,7 @@ object HttpCredentialRequestHandler {
             }
             else {
                 Log.i("HTTP", "next credential request $incomingRequestIdentifier for $webClientId")
-                webClientCredentialRequestState = CredentialRequestState.Incoming
+                updateRequestState(CredentialRequestState.Incoming, requestFlows)
                 webClientRequestIdentifier = incomingRequestIdentifier
                 webClientRequestedWebsite = null
                 webClientRequestedUser = null
@@ -235,7 +235,7 @@ object HttpCredentialRequestHandler {
             }
             CredentialRequestState.Denied -> {
                 webClientRequestIdentifier = null
-                webClientCredentialRequestState = CredentialRequestState.Fulfilled
+                updateRequestState(CredentialRequestState.Fulfilled, requestFlows)
 
                 return toErrorResponse(HttpStatusCode.Forbidden, "denied by user")
             }
@@ -326,7 +326,7 @@ object HttpCredentialRequestHandler {
                         requestFlows.getLifeCycleActivity(),
                         "Requested credential to synchronise not found."
                     )
-                    webClientCredentialRequestState = CredentialRequestState.Denied
+                    updateRequestState(CredentialRequestState.Denied, requestFlows)
                 }
             }
         }
@@ -525,7 +525,7 @@ object HttpCredentialRequestHandler {
         Log.d("HTTP", "showClientRequest for $shortenedFingerprint")
 
         if (webExtension.bypassIncomingRequests) {
-            webClientCredentialRequestState = CredentialRequestState.Accepted
+            updateRequestState(CredentialRequestState.Accepted, requestFlows)
             acceptHandler()
 
             if (showSnackbars) {
@@ -542,7 +542,7 @@ object HttpCredentialRequestHandler {
             }
         } else {
             showAcceptBottomSheet(
-                requestFlows.getLifeCycleActivity(),
+                requestFlows,
                 webClientTitle,
                 webClientId,
                 details,
@@ -560,12 +560,12 @@ object HttpCredentialRequestHandler {
                     }
                 }
             }
-            webClientCredentialRequestState = CredentialRequestState.AwaitingAcceptance
+            updateRequestState(CredentialRequestState.AwaitingAcceptance, requestFlows)
         }
     }
 
     private fun showAcceptBottomSheet(
-        activity: SecureActivity,
+        requestFlows: RequestFlows,
         webClientTitle: String,
         webClientId: String,
         details: String,
@@ -574,23 +574,23 @@ object HttpCredentialRequestHandler {
         acceptHandler: () -> Unit,
     ) {
         ServerRequestBottomSheet(
-            activity,
+            requestFlows.getLifeCycleActivity(),
             webClientTitle = webClientTitle,
             webClientId = webClientId,
             webRequestDetails = details,
             fingerprint = shortenedFingerprint,
             denyHandler = { allowBypass ->
                 webExtension.bypassIncomingRequests = allowBypass
-                activity.webExtensionViewModel.save(webExtension, activity)
+                requestFlows.getLifeCycleActivity().webExtensionViewModel.save(webExtension, requestFlows.getLifeCycleActivity())
 
-                webClientCredentialRequestState = CredentialRequestState.Denied
-                toastText(activity, "Request denied")
+                updateRequestState(CredentialRequestState.Denied, requestFlows)
+                toastText(requestFlows.getLifeCycleActivity(), "Request denied")
             },
             acceptHandler = { allowBypass ->
                 webExtension.bypassIncomingRequests = allowBypass
-                activity.webExtensionViewModel.save(webExtension, activity)
+                requestFlows.getLifeCycleActivity().webExtensionViewModel.save(webExtension, requestFlows.getLifeCycleActivity())
 
-                webClientCredentialRequestState = CredentialRequestState.Accepted
+                updateRequestState(CredentialRequestState.Accepted, requestFlows)
 
                 acceptHandler()
             }
@@ -609,7 +609,8 @@ object HttpCredentialRequestHandler {
             SERVER_REQUEST_SNACKBAR_DURATION
         )
             .setAction("Cancel request") {
-                webClientCredentialRequestState = CredentialRequestState.Denied
+                updateRequestState(CredentialRequestState.Denied, requestFlows)
+
                 requestFlows.resetUi()
                 toastText(requestFlows.getLifeCycleActivity(), "Request denied")
 
@@ -623,7 +624,7 @@ object HttpCredentialRequestHandler {
                     credentialSelectState = MultipleCredentialSelectState.NONE
 
                     if (!denyRequestVeto() && webClientCredentialRequestState.isProgressing) {
-                        webClientCredentialRequestState = CredentialRequestState.Denied
+                        updateRequestState(CredentialRequestState.Denied, requestFlows)
                         toastText(
                             requestFlows.getLifeCycleActivity(),
                             "Request denied"
@@ -683,7 +684,7 @@ object HttpCredentialRequestHandler {
             SERVER_REQUEST_SNACKBAR_DURATION
         )
             .setAction("Deny and revoke bypass") {
-                webClientCredentialRequestState = CredentialRequestState.Denied
+                updateRequestState(CredentialRequestState.Denied, requestFlows)
                 webExtension.bypassIncomingRequests = false
                 requestFlows.getLifeCycleActivity().webExtensionViewModel.save(webExtension, requestFlows.getLifeCycleActivity())
                 requestFlows.resetUi()
@@ -698,7 +699,7 @@ object HttpCredentialRequestHandler {
 
 
                     if (!denyRequestVeto() && webClientCredentialRequestState.isProgressing) {
-                        webClientCredentialRequestState = CredentialRequestState.Denied
+                        updateRequestState(CredentialRequestState.Denied, requestFlows)
                         toastText(requestFlows.getLifeCycleActivity(), "Request denied")
                     }
                 }
@@ -729,7 +730,7 @@ object HttpCredentialRequestHandler {
         clientKey.clear()
 
         webClientRequestIdentifier = null
-        webClientCredentialRequestState = CredentialRequestState.Fulfilled
+        updateRequestState(CredentialRequestState.Fulfilled, requestFlows)
 
         CoroutineScope(Dispatchers.Main).launch {
             serverSnackbar?.dismiss()
@@ -765,7 +766,7 @@ object HttpCredentialRequestHandler {
         clientKey.clear()
 
         webClientRequestIdentifier = null
-        webClientCredentialRequestState = CredentialRequestState.Fulfilled
+        updateRequestState(CredentialRequestState.Fulfilled, requestFlows)
 
         CoroutineScope(Dispatchers.Main).launch {
             serverSnackbar?.dismiss()
@@ -803,8 +804,7 @@ object HttpCredentialRequestHandler {
         clientKey.clear()
 
         webClientRequestIdentifier = null
-        webClientCredentialRequestState = CredentialRequestState.Fulfilled
-
+        updateRequestState(CredentialRequestState.Fulfilled, requestFlows)
         CoroutineScope(Dispatchers.Main).launch {
             serverSnackbar?.dismiss()
             toastText(requestFlows.getLifeCycleActivity(), "All credentials posted")
@@ -850,7 +850,7 @@ object HttpCredentialRequestHandler {
         clientKey.clear()
 
         webClientRequestIdentifier = null
-        webClientCredentialRequestState = CredentialRequestState.Fulfilled
+        updateRequestState(CredentialRequestState.Fulfilled, requestFlows)
 
         CoroutineScope(Dispatchers.Main).launch {
             serverSnackbar?.dismiss()
@@ -874,7 +874,7 @@ object HttpCredentialRequestHandler {
         clientKey.clear()
 
         webClientRequestIdentifier = null
-        webClientCredentialRequestState = CredentialRequestState.Fulfilled
+        updateRequestState(CredentialRequestState.Fulfilled, requestFlows)
 
         CoroutineScope(Dispatchers.Main).launch {
             serverSnackbar?.dismiss()
@@ -915,5 +915,10 @@ object HttpCredentialRequestHandler {
     }
 
 
+    private fun updateRequestState(newState: CredentialRequestState, requestFlows: RequestFlows) {
+        val oldState = webClientCredentialRequestState
+        webClientCredentialRequestState = newState
+        requestFlows.notifyRequestStateUpdated(oldState, newState)
+    }
 
 }

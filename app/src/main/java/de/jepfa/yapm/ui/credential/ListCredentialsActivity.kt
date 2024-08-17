@@ -9,6 +9,7 @@ import android.content.res.Configuration
 import android.database.Cursor
 import android.database.MatrixCursor
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
@@ -74,6 +75,7 @@ import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelFilter.WITH_NO_LABELS_ID
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.net.CredentialRequestState
 import de.jepfa.yapm.service.net.HttpCredentialRequestHandler
 import de.jepfa.yapm.service.net.HttpServer
 import de.jepfa.yapm.service.net.HttpServer.shutdownAllAsync
@@ -147,6 +149,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private var serverViewStateText: String = ""
     private lateinit var serverViewSwitch: SwitchCompat
     private lateinit var serverViewDetails: TextView
+    private lateinit var serverViewRequestState: TextView
     private lateinit var serverViewState: TextView
     private lateinit var serverView: LinearLayout
     private var wasWifiLost = false
@@ -220,6 +223,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         setSupportActionBar(toolbar)
 
         serverView = findViewById(R.id.server_view)
+        serverViewRequestState = findViewById(R.id.server_view_request_status)
         serverViewState = findViewById(R.id.server_view_status)
         serverViewDetails = findViewById(R.id.server_view_details)
         serverViewSwitch = findViewById(R.id.server_view_switch)
@@ -572,7 +576,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                             serverViewSwitch.isEnabled = true
                         }
 
-                        HttpCredentialRequestHandler.reset()
+                        HttpCredentialRequestHandler.reset(this@ListCredentialsActivity)
 
                         if (e != null) {
                             Log.w("HTTP", e)
@@ -1786,6 +1790,22 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 reflectServerState()
             }, 2000)
         }
+    }
+
+    override fun notifyRequestStateUpdated(
+        oldState: CredentialRequestState,
+        newState: CredentialRequestState
+    ) {
+        when (newState) {
+            CredentialRequestState.Incoming -> serverViewRequestState.setTextColor(Color.YELLOW)
+            CredentialRequestState.AwaitingAcceptance -> serverViewRequestState.setTextColor(Color.YELLOW)
+            CredentialRequestState.Accepted -> serverViewRequestState.setTextColor(Color.GREEN)
+            CredentialRequestState.Denied -> serverViewRequestState.setTextColor(Color.RED)
+
+            else -> serverViewRequestState.setTextColor(Color.TRANSPARENT)
+
+        }
+
     }
 
 }
