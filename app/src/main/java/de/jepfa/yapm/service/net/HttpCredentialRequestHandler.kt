@@ -719,7 +719,7 @@ object HttpCredentialRequestHandler {
     ): Pair<HttpStatusCode, JSONObject> {
         val (name, responseCredential) = mapCredential(key, currCredential, deobfuscate = true)
 
-        val clientKey = SecretService.secretKeyToKey(key, Key(webClientId.toByteArray()))
+        val clientKey = SecretService.deriveClientKey(key, webClientId, requestFlows.getLifeCycleActivity())
 
         val response = JSONObject()
 
@@ -757,7 +757,7 @@ object HttpCredentialRequestHandler {
         credentialSelectState = MultipleCredentialSelectState.NONE
 
 
-        val clientKey = SecretService.secretKeyToKey(key, Key(webClientId.toByteArray()))
+        val clientKey = SecretService.deriveClientKey(key, webClientId, requestFlows.getLifeCycleActivity())
 
         response.put("credentials", responseCredentials)
         response.put("clientKey", clientKey.toBase64String())
@@ -794,7 +794,7 @@ object HttpCredentialRequestHandler {
                 responseCredentials.put(responseCredential)
             }
 
-        val clientKey = SecretService.secretKeyToKey(key, Key(webClientId.toByteArray()))
+        val clientKey = SecretService.deriveClientKey(key, webClientId, requestFlows.getLifeCycleActivity())
 
 
         response.put("credentials", responseCredentials)
@@ -841,7 +841,7 @@ object HttpCredentialRequestHandler {
                 responseCredentials.put(responseCredential)
             }
 
-        val clientKey = SecretService.secretKeyToKey(key, Key(webClientId.toByteArray()))
+        val clientKey = SecretService.deriveClientKey(key, webClientId, requestFlows.getLifeCycleActivity())
 
 
         response.put("credentials", responseCredentials)
@@ -866,7 +866,7 @@ object HttpCredentialRequestHandler {
         webClientId: String,
     ): Pair<HttpStatusCode, JSONObject> {
 
-        val clientKey = SecretService.secretKeyToKey(key, Key(webClientId.toByteArray()))
+        val clientKey = SecretService.deriveClientKey(key, webClientId, requestFlows.getLifeCycleActivity())
         val response = JSONObject()
 
         response.put("clientKey", clientKey.toBase64String())

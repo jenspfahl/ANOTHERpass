@@ -556,4 +556,10 @@ object SecretService {
             return bytes
         }
     }
+
+    fun deriveClientKey(key: SecretKeyHolder, webClientId: String, context: Context): Key {
+        val salt = SaltService.getSalt(context)
+        val clientKey = Key(webClientId.toByteArray())
+        return secretKeyToKey(key, conjunctKeys(salt, clientKey))
+    }
 }
