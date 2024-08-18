@@ -32,17 +32,6 @@
         app:allowDividerAbove="true"
         app:defaultValue="false"/>
 
-    <!--ListPreference
-        app:defaultValue="600"
-        app:entries="@array/reminder_period_entries"
-        app:entryValues="@array/reminder_period_values"
-        app:key="YAPM/pref:autostart_server_condition"
-        app:title="Autostart only if in these networks:"
-        app:dependency="YAPM/pref:enable_server_capability"
-        app:iconSpaceReserved="false"
-        app:singleLineTitle="false"
-        app:useSimpleSummaryProvider="true"/-->
-
 
     <SwitchPreferenceCompat
         app:key="YAPM/pref:server_hide_panel"

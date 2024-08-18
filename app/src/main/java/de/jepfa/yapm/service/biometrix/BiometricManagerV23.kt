@@ -1,5 +1,6 @@
 package de.jepfa.yapm.service.biometrix
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.core.hardware.fingerprint.FingerprintManagerCompat
 import androidx.core.os.CancellationSignal
@@ -9,9 +10,11 @@ import javax.crypto.Cipher
 /*
 Taken and modified from https://github.com/FSecureLABS/android-keystore-audit/tree/master/keystorecrypto-app
  */
+@SuppressLint("RestrictedApi")
 open class BiometricManagerV23(val cipher: Cipher, val context: Context) {
 
 
+    @SuppressLint("RestrictedApi")
     private var cryptoObject: FingerprintManagerCompat.CryptoObject
     private lateinit var biometricDialogV23: BiometricDialogV23
 

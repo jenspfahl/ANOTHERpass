@@ -1,5 +1,6 @@
 package de.jepfa.yapm.ui.changelogin
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -37,6 +38,7 @@ class ChangeEncryptionActivity : SecureActivity(), AdapterView.OnItemSelectedLis
         enableBack = true
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

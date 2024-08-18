@@ -23,7 +23,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                android:text="Link a device by using the ANOTHERpass Browser Extension. Follow the instructions to link ANOTHERass as described here(link)." />
+                android:text="@string/link_webextension_explanation" />
 
 
 
@@ -32,7 +32,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="1dp"
-                android:text="At first, give them a name to organise your linked devices." />
+                android:text="@string/link_webextension_step_1" />
 
 
 
@@ -42,7 +42,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    android:hint="A name"
+                    android:hint="@string/webextension_title"
                     android:inputType="text"
                     android:maxLines="1"
                     android:maxLength="@integer/max_template_username_length"
@@ -56,7 +56,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="16dp"
-                android:text="Second, scan the QR code presented by the extension by clicking on this icon. Once done, the Client Identifier will be shown instead." />
+                android:text="@string/link_webextension_step_2" />
 
 
             <ImageView
@@ -87,7 +87,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="16dp"
-                android:text="Last, enter the app's IP address or hostname presented below into the extension. It is recommend to make the IP address of your phone static or provide a host name." />
+                android:text="@string/link_webextension_step_3" />
 
             <TextView
                 android:id="@+id/web_extension_server_address"

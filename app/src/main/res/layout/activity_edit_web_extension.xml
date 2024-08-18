@@ -23,7 +23,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="16dp"
-                android:text="A link to a device using the ANOTHERpass Browser Extension." />
+                android:text="@string/edit_link_webextension_description" />
 
 
 
@@ -49,7 +49,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="30dp"
-                    android:hint="A name of the link"
+                    android:hint="@string/webextension_title"
                     android:inputType="text"
                     android:maxLines="1"
                     android:maxLength="@integer/max_template_username_length"
@@ -71,7 +71,7 @@
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="4pt"
                     android:paddingVertical="16dp"
-                    android:text="Enable this link"/>
+                    android:text="@string/edit_link_webextension_enable"/>
 
 
                 <androidx.appcompat.widget.SwitchCompat
@@ -81,7 +81,7 @@
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="4pt"
                     android:paddingVertical="16dp"
-                    android:text="Allow unconfirmed password requests"/>
+                    android:text="@string/edit_link_webextension_allow_unconfirmed"/>
 
 
 

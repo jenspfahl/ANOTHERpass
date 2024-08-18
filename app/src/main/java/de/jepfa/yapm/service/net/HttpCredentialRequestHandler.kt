@@ -300,9 +300,9 @@ object HttpCredentialRequestHandler {
                     webExtension,
                     webClientTitle,
                     webClientId,
-                    "wants to fetch credential with name '$name'.",
+                    requestFlows.getLifeCycleActivity().getString(R.string.request_detail_fetch_by_uid, name),
                     shortenedFingerprint,
-                    "Returning credential with name '$name' ...",
+                    requestFlows.getLifeCycleActivity().getString(R.string.request_user_action_fetch_by_uid, name)
                 )
                 {
                     AutofillCredentialHolder.update(credential, obfuscationKey = null)
@@ -324,7 +324,7 @@ object HttpCredentialRequestHandler {
                 else {
                     toastText(
                         requestFlows.getLifeCycleActivity(),
-                        "Requested credential to synchronise not found."
+                        requestFlows.getLifeCycleActivity().getString(R.string.requested_credential_to_sync_not_found)
                     )
                     updateRequestState(CredentialRequestState.Denied, requestFlows)
                 }
@@ -345,9 +345,9 @@ object HttpCredentialRequestHandler {
             webExtension,
             webClientTitle,
             webClientId,
-            "wants to sync all local credentials.",
+            requestFlows.getLifeCycleActivity().getString(R.string.request_detail_fetch_by_uids),
             shortenedFingerprint,
-            "Returning all local credentials ...",
+            requestFlows.getLifeCycleActivity().getString(R.string.request_user_action_fetch_by_uids)
         )
         {
             // no user interaction
@@ -370,9 +370,9 @@ object HttpCredentialRequestHandler {
             webExtension,
             webClientTitle,
             webClientId,
-            "wants to fetch credential for '$domain'.",
+            requestFlows.getLifeCycleActivity().getString(R.string.request_detail_fetch_by_website, domain),
             shortenedFingerprint,
-            "Select the credential for '$domain' to fulfill the request.",
+            requestFlows.getLifeCycleActivity().getString(R.string.request_user_action_fetch_by_website, domain)
         )
         {
             requestFlows.startCredentialUiSearchFor(domain)
@@ -397,9 +397,9 @@ object HttpCredentialRequestHandler {
             webExtension,
             webClientTitle,
             webClientId,
-            "wants to create a new credential for '$domain'.",
+            requestFlows.getLifeCycleActivity().getString(R.string.request_detail_create_by_website, domain),
             shortenedFingerprint,
-            "Create a new credential for '$domain' to fulfill the request.",
+            requestFlows.getLifeCycleActivity().getString(R.string.request_user_action_create_by_website, domain),
             showSnackbars = false,
         )
         {
@@ -425,9 +425,9 @@ object HttpCredentialRequestHandler {
             webExtension,
             webClientTitle,
             webClientId,
-            "wants to unlock the client vault.",
+            requestFlows.getLifeCycleActivity().getString(R.string.request_detail_client_key),
             shortenedFingerprint,
-            "Unlocking client vault ...",
+            requestFlows.getLifeCycleActivity().getString(R.string.request_user_action_client_key)
         )
         {
             // no user interaction
@@ -446,9 +446,9 @@ object HttpCredentialRequestHandler {
             webExtension,
             webClientTitle,
             webClientId,
-            "wants to ask for any credential. Please select one.",
+            requestFlows.getLifeCycleActivity().getString(R.string.request_detail_fetch_any),
             shortenedFingerprint,
-            "Select a credential to fulfill the request.",
+            requestFlows.getLifeCycleActivity().getString(R.string.request_user_action_fetch_any)
         )
         {
             // no user interaction
@@ -468,9 +468,10 @@ object HttpCredentialRequestHandler {
             webExtension,
             webClientTitle,
             webClientId,
-            "wants to fetch for multiple credentials",
+
+            requestFlows.getLifeCycleActivity().getString(R.string.request_detail_fetch_multiple),
             shortenedFingerprint,
-            "Select all credentials to fetch and press the Action-button.",
+            requestFlows.getLifeCycleActivity().getString(R.string.request_user_action_fetch_multiple)
         )
         {
             // start multiple selection mode
@@ -492,9 +493,9 @@ object HttpCredentialRequestHandler {
             webExtension,
             webClientTitle,
             webClientId,
-            "wants to fetch for ALL credentials!",
+            requestFlows.getLifeCycleActivity().getString(R.string.request_detail_fetch_all),
             shortenedFingerprint,
-            "Fetching all credentials...",
+            requestFlows.getLifeCycleActivity().getString(R.string.request_user_action_fetch_all)
         )
         {
             // no user interaction
@@ -507,7 +508,6 @@ object HttpCredentialRequestHandler {
         activity.credentialViewModel.findByUid(uuid)
             .observeOnce(activity, resolved)
     }
-
 
 
 
@@ -584,7 +584,8 @@ object HttpCredentialRequestHandler {
                 requestFlows.getLifeCycleActivity().webExtensionViewModel.save(webExtension, requestFlows.getLifeCycleActivity())
 
                 updateRequestState(CredentialRequestState.Denied, requestFlows)
-                toastText(requestFlows.getLifeCycleActivity(), "Request denied")
+                toastText(requestFlows.getLifeCycleActivity(),
+                    requestFlows.getLifeCycleActivity().getString(R.string.request_denied))
             },
             acceptHandler = { allowBypass ->
                 webExtension.bypassIncomingRequests = allowBypass
@@ -608,11 +609,11 @@ object HttpCredentialRequestHandler {
             text,
             SERVER_REQUEST_SNACKBAR_DURATION
         )
-            .setAction("Cancel request") {
+            .setAction(requestFlows.getLifeCycleActivity().getString(R.string.cancel_request)) {
                 updateRequestState(CredentialRequestState.Denied, requestFlows)
 
                 requestFlows.resetUi()
-                toastText(requestFlows.getLifeCycleActivity(), "Request denied")
+                toastText(requestFlows.getLifeCycleActivity(), requestFlows.getLifeCycleActivity().getString(R.string.request_denied))
 
             }
             .setTextMaxLines(7)
@@ -627,7 +628,7 @@ object HttpCredentialRequestHandler {
                         updateRequestState(CredentialRequestState.Denied, requestFlows)
                         toastText(
                             requestFlows.getLifeCycleActivity(),
-                            "Request denied"
+                            requestFlows.getLifeCycleActivity().getString(R.string.request_denied)
                         )
                     }
                 }
@@ -650,8 +651,10 @@ object HttpCredentialRequestHandler {
         denyRequestVeto: () -> Boolean
     ) {
 
+        val swipeToCancel = requestFlows.getLifeCycleActivity().getString(R.string.swipe_to_cancel)
+        val fingerprint = requestFlows.getLifeCycleActivity().getString(R.string.fingerprint)
         val span =
-            SpannableString("$webClientTitle ($webClientId) $details Swipe to cancel. Fingerprint: $shortenedFingerprint")
+            SpannableString("$webClientTitle ($webClientId) $details $swipeToCancel. ${fingerprint.capitalize()}: $shortenedFingerprint")
 
         span.setSpan(
             ForegroundColorSpan(requestFlows.getLifeCycleActivity().getColor(R.color.colorAltAccent)),
@@ -683,12 +686,12 @@ object HttpCredentialRequestHandler {
             span,
             SERVER_REQUEST_SNACKBAR_DURATION
         )
-            .setAction("Deny and revoke bypass") {
+            .setAction(requestFlows.getLifeCycleActivity().getString(R.string.deny_and_revoke_bypass)) {
                 updateRequestState(CredentialRequestState.Denied, requestFlows)
                 webExtension.bypassIncomingRequests = false
                 requestFlows.getLifeCycleActivity().webExtensionViewModel.save(webExtension, requestFlows.getLifeCycleActivity())
                 requestFlows.resetUi()
-                toastText(requestFlows.getLifeCycleActivity(), "Request denied and bypass revoked")
+                toastText(requestFlows.getLifeCycleActivity(), requestFlows.getLifeCycleActivity().getString(R.string.request_denied_and_bypass_revoked))
 
             }
             .setTextMaxLines(7)
@@ -700,7 +703,7 @@ object HttpCredentialRequestHandler {
 
                     if (!denyRequestVeto() && webClientCredentialRequestState.isProgressing) {
                         updateRequestState(CredentialRequestState.Denied, requestFlows)
-                        toastText(requestFlows.getLifeCycleActivity(), "Request denied")
+                        toastText(requestFlows.getLifeCycleActivity(), requestFlows.getLifeCycleActivity().getString(R.string.request_denied))
                     }
                 }
 
@@ -734,7 +737,8 @@ object HttpCredentialRequestHandler {
 
         CoroutineScope(Dispatchers.Main).launch {
             serverSnackbar?.dismiss()
-            toastText(requestFlows.getLifeCycleActivity(), "Credential '$name' posted")
+            toastText(requestFlows.getLifeCycleActivity(),
+                requestFlows.getLifeCycleActivity().getString(R.string.credential_posted, name))
         }
 
         return Pair(HttpStatusCode.OK, response)
@@ -772,7 +776,8 @@ object HttpCredentialRequestHandler {
             serverSnackbar?.dismiss()
             requestFlows.stopCredentialSelectionMode()
 
-            toastText(requestFlows.getLifeCycleActivity(), "Selected credentials posted")
+            toastText(requestFlows.getLifeCycleActivity(),
+                requestFlows.getLifeCycleActivity().getString(R.string.selected_credentials_posted))
         }
 
         return Pair(HttpStatusCode.OK, response)
@@ -807,7 +812,7 @@ object HttpCredentialRequestHandler {
         updateRequestState(CredentialRequestState.Fulfilled, requestFlows)
         CoroutineScope(Dispatchers.Main).launch {
             serverSnackbar?.dismiss()
-            toastText(requestFlows.getLifeCycleActivity(), "All credentials posted")
+            toastText(requestFlows.getLifeCycleActivity(), requestFlows.getLifeCycleActivity().getString(R.string.all_credentials_posted))
         }
 
         return Pair(HttpStatusCode.OK, response)
@@ -854,7 +859,7 @@ object HttpCredentialRequestHandler {
 
         CoroutineScope(Dispatchers.Main).launch {
             serverSnackbar?.dismiss()
-            toastText(requestFlows.getLifeCycleActivity(), "Credentials posted")
+            toastText(requestFlows.getLifeCycleActivity(), requestFlows.getLifeCycleActivity().getString(R.string.credentials_posted))
         }
 
         return Pair(HttpStatusCode.OK, response)
@@ -878,7 +883,7 @@ object HttpCredentialRequestHandler {
 
         CoroutineScope(Dispatchers.Main).launch {
             serverSnackbar?.dismiss()
-            toastText(requestFlows.getLifeCycleActivity(), "Local vault unlocked")
+            toastText(requestFlows.getLifeCycleActivity(), requestFlows.getLifeCycleActivity().getString(R.string.local_vault_unlocked))
         }
 
         return Pair(HttpStatusCode.OK, response)

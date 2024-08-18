@@ -29,7 +29,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                    android:text="Incoming request from" />
+                    android:text="@string/server_sheet_incoming_request_from" />
 
                 <TextView
                     android:id="@+id/text_webclient_title"
@@ -68,7 +68,7 @@
                         android:layout_marginTop="16dp"
                         android:layout_marginBottom="4dp"
                         android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                        android:text="Fingerprint" />
+                        android:text="@string/server_sheet_fingerprint" />
                     <ImageView
                         android:id="@+id/imageview_fingerprint_help"
                         android:layout_width="wrap_content"
@@ -92,7 +92,7 @@
 
                 <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/switch_allow_bypass"
-                    android:text="Allow all future requests from this device"
+                    android:text="@string/server_sheet_bypass_future_requests"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
@@ -115,7 +115,7 @@
                     android:layout_gravity="center"
                     android:background="@color/white"
                     android:elevation="10dp"
-                    android:text="Deny"
+                    android:text="@string/server_request_deny"
                     android:textAlignment="center"
                     android:textColor="@color/colorAccent"
                     android:textStyle="normal" />
@@ -127,7 +127,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="24dp"
                     android:background="@color/colorAccent"
-                    android:text="Accept"
+                    android:text="@string/server_request_accept"
                     android:textColor="@color/buttonLabel"
                     android:textStyle="bold" />
             </LinearLayout>

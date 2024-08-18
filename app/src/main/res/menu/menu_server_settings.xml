@@ -2,13 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/menu_server_settings_hide"
         android:icon="@drawable/variable_remove_24"
-        android:title="Hide control panel" />
+        android:title="@string/hide_control_panel" />
 
     <item android:id="@+id/menu_server_settings_show_server_log"
         android:icon="@drawable/outline_list_24"
-        android:title="Show server logs" />
+        android:title="@string/show_server_logs" />
 
     <item android:id="@+id/menu_server_settings_open_settings"
         android:icon="@drawable/outline_dns_24"
-        android:title="Open server settings" />
+        android:title="@string/open_server_settings" />
 </menu>

@@ -50,12 +50,15 @@ class EditWebExtensionActivity : SecureActivity() {
                 webExtension = encWebExtension
                 masterSecretKey?.let { key ->
                     webClientIdTextView.text = SecretService.decryptCommonString(key, encWebExtension.webClientId)
-                    titleTextView.text = encWebExtension.title?.let { SecretService.decryptCommonString(key, it) } ?: ""
+                    titleTextView.text = encWebExtension.title.let { SecretService.decryptCommonString(key, it) } ?: ""
                     enabledSwitchView.isChecked = encWebExtension.enabled
                     bypassSwitchView.isChecked = encWebExtension.bypassIncomingRequests
 
                     findViewById<TextView>(R.id.web_extension_last_used_timestamp).text =
-                        "Last used at: ${dateTimeToNiceString(encWebExtension.getLastUsedTimeStamp(), this)}"
+                        getString(
+                            R.string.last_used_at,
+                            dateTimeToNiceString(encWebExtension.getLastUsedTimeStamp(), this)
+                        )
                 }
             }
         }

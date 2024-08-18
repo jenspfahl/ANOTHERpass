@@ -1,5 +1,6 @@
 package de.jepfa.yapm.ui.importread
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
@@ -100,6 +101,7 @@ class VerifyActivity : ReadActivityBase() {
         scannedMasterPassword.clear()
     }
 
+    @SuppressLint("SetTextI18n")
     private fun checkMPT(mpt: Encrypted) {
         verifyResultText.text = getString(R.string.unknown_mpt_scanned)
         val tagId = ndefTag?.tagId

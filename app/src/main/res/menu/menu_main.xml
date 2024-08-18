@@ -72,7 +72,7 @@
     <item
         android:id="@+id/menu_show_server_panel"
         android:icon="@drawable/outline_dns_24"
-        android:title="Restore server panel"
+        android:title="@string/restore_server_panel"
         android:visible="false">
     </item>
 

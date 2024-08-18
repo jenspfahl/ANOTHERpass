@@ -116,7 +116,7 @@ class ListWebExtensionsActivity : SecureActivity() {
 
             val checkBox = CheckBox(this)
             checkBox.isChecked = PreferenceService.getAsBool(PreferenceService.PREF_ENABLED_WEB_EXTENSIONS_ON_TOP, this)
-            checkBox.text = "Enabled links always on top"
+            checkBox.text = getString(R.string.enabled_links_always_on_top)
             view.addView(checkBox)
 
             var selectedSortOrder = prefSortOrder.ordinal

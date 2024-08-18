@@ -4,7 +4,7 @@
     <item android:id="@+id/menu_delete_disabled_web_extensions"
         app:showAsAction="never"
         android:icon="@drawable/ic_baseline_delete_24_white"
-        android:title="Delete disabled linked devices" />
+        android:title="@string/delete_disabled_linked_devices" />
 
     <item android:id="@+id/menu_sort_web_extensions"
         app:showAsAction="ifRoom"
