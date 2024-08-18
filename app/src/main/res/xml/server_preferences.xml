@@ -2,8 +2,8 @@
 
     <SwitchPreferenceCompat
         app:key="YAPM/pref:enable_server_capability"
-        app:title="Enable server capability"
-        app:summary="If enabled, the server UI is displayed and you can turn on and off the server. Disable it if you don\'t want any server capabilities at all (as before version 2)."
+        app:title="@string/pref_server_capability_title"
+        app:summary="@string/pref_server_capability_summary"
         app:allowDividerAbove="true"
         app:iconSpaceReserved="false"
         app:singleLineTitle="false"
@@ -11,9 +11,9 @@
 
     <EditTextPreference
         app:key="YAPM/pref:server_listening_port"
-        app:title="Port where the server listens"
-        app:dialogTitle="Port where the server listens"
-        app:dialogMessage="Ensure the same value is configured in the extension. A change here requires a restart of the server."
+        app:title="@string/pref_server_port_title"
+        app:dialogTitle="@string/pref_server_port_dialog_title"
+        app:dialogMessage="@string/pref_server_port_dialog_message"
         app:singleLine="true"
         app:dependency="YAPM/pref:enable_server_capability"
         app:iconSpaceReserved="false"
@@ -24,8 +24,8 @@
 
     <SwitchPreferenceCompat
         app:key="YAPM/pref:server_autostart"
-        app:title="Autostart when vault is unlocked"
-        app:summary="If enabled, the server starts listening every time the vault is unlocked."
+        app:title="@string/pref_server_autostart_title"
+        app:summary="@string/pref_server_autostart_summary"
         app:iconSpaceReserved="false"
         app:dependency="YAPM/pref:enable_server_capability"
         app:singleLineTitle="false"
@@ -35,8 +35,8 @@
 
     <SwitchPreferenceCompat
         app:key="YAPM/pref:server_hide_panel"
-        app:title="Hide server panel"
-        app:summary="Hides the panel which gives you access to the server"
+        app:title="@string/pref_server_hide_panel_title"
+        app:summary="@string/pref_server_hide_panel_summary"
         app:iconSpaceReserved="false"
         app:dependency="YAPM/pref:enable_server_capability"
         app:singleLineTitle="false"

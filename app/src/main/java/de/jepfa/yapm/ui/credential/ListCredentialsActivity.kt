@@ -524,7 +524,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private fun startStopServer(start: Boolean, silent: Boolean = false) {
         if (start) {
             if (!silent) {
-                serverViewStateText = "Starting ..."
+                serverViewStateText = getString(R.string.server_starting)
                 serverViewState.text = serverViewStateText
                 serverViewSwitch.isEnabled = false
             }
@@ -562,7 +562,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         } else {
             if (HttpServer.isRunning()) { // otherwise it is already stopped
                 if (!silent) {
-                    serverViewStateText = "Stopping ..."
+                    serverViewStateText = getString(R.string.server_stopping)
                     serverViewState.text = serverViewStateText
                     serverViewSwitch.isEnabled = false
                 }
@@ -665,7 +665,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     private fun reflectServerStarted(msg: String? = null, showIp: Boolean = true) {
         serverViewSwitch.isChecked = true
-        serverViewStateText = msg?: "Listening ..."
+        serverViewStateText = msg?: getString(R.string.server_listening)
         serverViewState.text = serverViewStateText
         serverViewState.setTypeface(null, Typeface.BOLD)
         if (showIp) {
@@ -684,7 +684,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private fun reflectServerStopped(msg: String? = null) {
         if (!HttpServer.isRunning()) {
             serverViewSwitch.isChecked = false
-            serverViewStateText = msg ?: "Stopped"
+            serverViewStateText = msg ?: getString(R.string.server_stopped)
             serverViewState.text = serverViewStateText
             serverView.background = null
             serverViewDetails.text = ""
@@ -1765,7 +1765,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     override fun handleOnWifiEstablished() {
         CoroutineScope(Dispatchers.Main).launch {
             if (wasWifiLost) {
-                toastText(this@ListCredentialsActivity, "Wifi reconnected")
+                toastText(this@ListCredentialsActivity, getString(R.string.server_wifi_reconnected))
             }
             reflectServerState()
             wasWifiLost = false
@@ -1775,17 +1775,18 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     override fun handleOnWifiUnavailable() {
         CoroutineScope(Dispatchers.Main).launch {
             if (!wasWifiLost) {
-                toastText(this@ListCredentialsActivity, "Wifi lost or unavailable")
+                toastText(this@ListCredentialsActivity,
+                    getString(R.string.server_wifi_lost_or_unavailable))
                 wasWifiLost = true
             }
-            reflectServerState("No Wifi!", showIp = false)
+            reflectServerState(getString(R.string.server_no_wifi), showIp = false)
         }
     }
 
     override fun handleOnIncomingRequest(webClientId: String?) {
         CoroutineScope(Dispatchers.Main).launch {
             // this code wil lbe executed on ALL activities!
-            reflectServerState("Responding to ${webClientId ?: "Unknown"} ...")
+            reflectServerState(getString(R.string.server_responding_to, webClientId ?: getString(R.string.unknown)))
             Handler().postDelayed({
                 reflectServerState()
             }, 2000)

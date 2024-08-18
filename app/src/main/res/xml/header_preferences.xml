@@ -53,6 +53,6 @@
         app:fragment="de.jepfa.yapm.ui.settings.SettingsActivity$ServerSettingsFragment"
         app:icon="@drawable/outline_dns_24"
         app:key="server_header"
-        app:title="Server settings" />
+        app:title="@string/server_settings" />
 
 </PreferenceScreen>

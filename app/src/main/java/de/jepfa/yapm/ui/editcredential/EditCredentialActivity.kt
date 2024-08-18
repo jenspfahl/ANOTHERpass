@@ -96,7 +96,7 @@ class EditCredentialActivity : AutofillPushBackActivityBase(), RequestFlows {
                             this,
                             webClientTitle?:"??",
                             webClientId?:"??",
-                            "wants to create a new credential for '${suggestedWebSite ?: "??"}'.",
+                            getString(R.string.request_detail_create_by_website, suggestedWebSite),
                             shortenedFingerprint?:"??",
                             webExtension,
                         ) {
@@ -105,7 +105,7 @@ class EditCredentialActivity : AutofillPushBackActivityBase(), RequestFlows {
                     } else {
                         HttpCredentialRequestHandler.showUserActionSnackbar(
                             this,
-                            "Create a new credential for '${suggestedWebSite ?: "??"}' to fulfill the request.",
+                            getString(R.string.request_user_action_create_by_website, suggestedWebSite)
                         )
                         {
                             saved

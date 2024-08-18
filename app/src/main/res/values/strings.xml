@@ -824,7 +824,7 @@
     <string name="restore_server_panel">Restore server panel</string>
     <string name="link_new_device">Link new device</string>
     <string name="manage_linked_devices">Manage linked devices</string>
-    <string name="hide_control_panel">Hide control panel</string>
+    <string name="hide_control_panel">Hide server panel</string>
     <string name="show_server_logs">Show server logs</string>
     <string name="open_server_settings">Open server settings</string>
     <string name="delete_disabled_linked_devices">Delete disabled linked devices</string>
@@ -841,22 +841,43 @@
     <string name="cancel_request">Cancel request</string>
     <string name="deny_and_revoke_bypass">Deny and revoke bypass</string>
     <string name="request_detail_fetch_by_uid">wants to fetch credential with name \'%1$s\'.</string>
-    <string name="request_user_action_fetch_by_uid">Returning credential with name \'%1$s\' ...</string>
+    <string name="request_user_action_fetch_by_uid">Returning credential with name \'%1$s\' …</string>
     <string name="request_detail_fetch_by_uids">wants to sync all local credentials.</string>
-    <string name="request_user_action_fetch_by_uids">Returning all local credentials ...</string>
+    <string name="request_user_action_fetch_by_uids">Returning all local credentials …</string>
     <string name="request_detail_fetch_by_website">wants to fetch credential for \'%1$s\'.</string>
     <string name="request_user_action_fetch_by_website">Select the credential for \'%1$s\' to fulfill the request.</string>
     <string name="request_detail_create_by_website">wants to create a new credential for \'%1$s\'.</string>
     <string name="request_user_action_create_by_website">Create a new credential for \'%1$s\' to fulfill the request.</string>
     <string name="request_detail_client_key">wants to unlock the client vault.</string>
-    <string name="request_user_action_client_key">Unlocking client vault ...</string>
+    <string name="request_user_action_client_key">Unlocking client vault …</string>
     <string name="request_detail_fetch_any">wants to ask for any credential. Please select one.</string>
     <string name="request_user_action_fetch_any">Select a credential to fulfill the request.</string>
     <string name="request_detail_fetch_multiple">wants to fetch for multiple credentials</string>
     <string name="request_user_action_fetch_multiple">Select all credentials to fetch and press the Action-button.</string>
     <string name="request_detail_fetch_all">wants to fetch for ALL credentials!</string>
-    <string name="request_user_action_fetch_all">Fetching all credentials...</string>
+    <string name="request_user_action_fetch_all">Fetching all credentials…</string>
     <string name="swipe_to_cancel">Swipe to cancel</string>
     <string name="fingerprint">Fingerprint</string>
+    <string name="server_settings">Server settings</string>
+    <string name="pref_server_capability_title">Enable server capability</string>
+    <string name="pref_server_capability_summary">If enabled, the server UI is displayed and you can turn on and off the server. Disable it if you don\'t want any server capabilities at all (as before version 2).</string>
+    <string name="pref_server_port_title">Port where the server listens</string>
+    <string name="pref_server_port_dialog_title">Port where the server listens</string>
+    <string name="pref_server_port_dialog_message">Ensure the same value is configured in the extension. A change here requires a restart of the server.</string>
+    <string name="pref_server_autostart_title">Autostart when vault is unlocked</string>
+    <string name="pref_server_autostart_summary">If enabled, the server starts listening every time the vault is unlocked.</string>
+    <string name="pref_server_hide_panel_title">Hide server control panel</string>
+    <string name="pref_server_hide_panel_summary">Hides the panel which gives you access to the server</string>
+    <string name="server_listening">Listening ...</string>
+    <string name="server_stopped">Stopped</string>
+    <string name="server_starting">Starting ...</string>
+    <string name="server_stopping">Stopping ...</string>
+    <string name="server_responding_to">Responding to %1$s ...</string>
+    <string name="server_no_wifi">No Wifi!</string>
+    <string name="server_wifi_lost_or_unavailable">Wifi lost or unavailable</string>
+    <string name="server_wifi_reconnected">Wifi reconnected</string>
+
+    <string name="unknown">Unknown</string>
+
 
 </resources>

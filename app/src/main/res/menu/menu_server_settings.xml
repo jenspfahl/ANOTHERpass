@@ -9,6 +9,6 @@
         android:title="@string/show_server_logs" />
 
     <item android:id="@+id/menu_server_settings_open_settings"
-        android:icon="@drawable/outline_dns_24"
+        android:icon="@drawable/ic_settings_black_24dp"
         android:title="@string/open_server_settings" />
 </menu>
