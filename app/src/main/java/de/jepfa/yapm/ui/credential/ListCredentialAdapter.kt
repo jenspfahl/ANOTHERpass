@@ -23,6 +23,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_OVERLAY_FEATURE
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_LABELS_IN_LIST
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.net.HttpCredentialRequestHandler
 import de.jepfa.yapm.service.overlay.DetachHelper
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
@@ -67,7 +68,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         holder.listenForShowCredential { pos, _ ->
             val current = getItem(pos)
 
-            if (listCredentialsActivity.shouldPushBackAutoFill()) {
+            if (listCredentialsActivity.shouldPushBackAutoFill() || HttpCredentialRequestHandler.isProgressing()) {
                     if (current.isObfuscated) {
                     DeobfuscationDialog.openDeobfuscationDialogForCredentials(listCredentialsActivity) { deobfuscationKey ->
                         if (deobfuscationKey == null) {

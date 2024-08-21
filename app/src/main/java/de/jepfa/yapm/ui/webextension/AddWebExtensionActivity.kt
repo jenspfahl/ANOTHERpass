@@ -269,7 +269,8 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
         action: HttpServer.Action,
         webClientId: String,
         webExtension: EncWebExtension,
-        message: JSONObject
+        message: JSONObject,
+        origin: RequestConnectionPoint
     ): Pair<HttpStatusCode, JSONObject> {
 
         masterSecretKey?.let { key ->

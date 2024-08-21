@@ -132,6 +132,7 @@ import de.jepfa.yapm.util.addFormattedLine
 import de.jepfa.yapm.util.createAndAddLabelChip
 import de.jepfa.yapm.util.toastText
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.RequestConnectionPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.asCompletableFuture
@@ -547,13 +548,14 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                             }
                             toastText(
                                 this@ListCredentialsActivity,
-                                "Failed to start server. Is Wifi enabled?"
+                                getString(R.string.failed_to_start_server)
                             )
                         } else {
                             if (!silent) {
                                 reflectServerStarted()
                             }
-                            toastText(this@ListCredentialsActivity, "Server started")
+                            toastText(this@ListCredentialsActivity,
+                                getString(R.string.server_started))
                             HttpServer.requestCredentialHttpCallback =
                                 this@ListCredentialsActivity
                         }
@@ -585,12 +587,14 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                             if (!silent) {
                                 serverViewSwitch.isChecked = true
                             }
-                            toastText(this@ListCredentialsActivity, "Failed to stop server")
+                            toastText(this@ListCredentialsActivity,
+                                getString(R.string.failed_to_stop_server))
                         } else {
                             if (!silent) {
                                 reflectServerStopped()
                             }
-                            toastText(this@ListCredentialsActivity, "Server stopped")
+                            toastText(this@ListCredentialsActivity,
+                                getString(R.string.server_stopped_msg))
                         }
                     }
                 }
@@ -604,13 +608,14 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         action: HttpServer.Action,
         webClientId: String,
         webExtension: EncWebExtension,
-        message: JSONObject
+        message: JSONObject,
+        origin: RequestConnectionPoint
     ): Pair<HttpStatusCode, JSONObject> {
         Log.d("HTTP", "credential request callback")
 
         val key = masterSecretKey ?: return toErrorResponse(HttpStatusCode.Unauthorized, "locked")
 
-        return HttpCredentialRequestHandler.handleIncomingRequest(key, webExtension, message, this)
+        return HttpCredentialRequestHandler.handleIncomingRequest(key, webExtension, message, this, origin)
 
     }
 

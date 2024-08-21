@@ -18,6 +18,7 @@ import de.jepfa.yapm.model.encrypted.EncWebExtension
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.autofill.AutofillCredentialHolder
+import de.jepfa.yapm.service.net.HttpServer.serverLog
 import de.jepfa.yapm.service.net.HttpServer.toErrorResponse
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
@@ -29,6 +30,8 @@ import de.jepfa.yapm.util.toReadableString
 import de.jepfa.yapm.util.toUUIDOrNull
 import de.jepfa.yapm.util.toastText
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.RequestConnectionPoint
+import io.ktor.util.encodeBase64
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -76,6 +79,7 @@ object HttpCredentialRequestHandler {
         webExtension: EncWebExtension,
         message: JSONObject,
         requestFlows: RequestFlows,
+        origin: RequestConnectionPoint
         ): Pair<HttpStatusCode, JSONObject> {
         Log.d("HTTP", "webClientRequestIdentifier: $webClientRequestIdentifier ($webClientCredentialRequestState)")
 
@@ -97,6 +101,7 @@ object HttpCredentialRequestHandler {
         val uid = message.optString("uid")
         val uids = message.optJSONArray("uids")
 
+
         if (webClientRequestIdentifier != incomingRequestIdentifier) {
             if (webClientCredentialRequestState.isProgressing) {
                 Log.i("HTTP", "concurrent but ignored credential request $incomingRequestIdentifier for $webClientId: $webClientCredentialRequestState")
@@ -110,6 +115,12 @@ object HttpCredentialRequestHandler {
                 webClientRequestedUser = null
             }
         }
+
+        serverLog(
+            origin = origin,
+            webClientId = webClientId,
+            msg = "Handling request '${webClientRequestIdentifier?.take(6)?:"??"}' with command ${command.command} and state $webClientCredentialRequestState",
+        )
 
         when (webClientCredentialRequestState) {
             CredentialRequestState.Incoming -> {

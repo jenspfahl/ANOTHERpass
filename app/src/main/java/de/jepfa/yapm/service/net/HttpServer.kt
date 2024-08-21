@@ -53,7 +53,13 @@ object HttpServer {
     }
 
     interface HttpCallback {
-        fun handleHttpRequest(action: Action, webClientId: String, webExtension: EncWebExtension, message: JSONObject): Pair<HttpStatusCode, JSONObject>
+        fun handleHttpRequest(
+            action: Action,
+            webClientId: String,
+            webExtension: EncWebExtension,
+            message: JSONObject,
+            origin: RequestConnectionPoint
+        ): Pair<HttpStatusCode, JSONObject>
     }
 
 
@@ -455,7 +461,7 @@ object HttpServer {
         return SecretService.generateRandomKey(preferredCipherAlgorithm.keyLength / 8, context)
     }
 
-    private fun serverLog(
+    fun serverLog(
         origin: RequestConnectionPoint? = null,
         webClientId: String? = null,
         msg: String,
@@ -645,8 +651,8 @@ object HttpServer {
         )
 
         return when (action) {
-            "link_app" -> handleLinking(Action.LINKING, webClientId, webExtension, message)
-            "request_credential" -> handleRequestCredential(Action.REQUEST_CREDENTIAL, webClientId, webExtension, message)
+            "link_app" -> handleLinking(Action.LINKING, webClientId, webExtension, message, origin)
+            "request_credential" -> handleRequestCredential(Action.REQUEST_CREDENTIAL, webClientId, webExtension, message, origin)
             else -> Pair(HttpStatusCode.BadRequest, toErrorJson("unknown action: $action"))
         }
     }
@@ -656,9 +662,10 @@ object HttpServer {
         webClientId: String,
         webExtension: EncWebExtension,
         message: JSONObject,
+        origin: RequestConnectionPoint,
     ): Pair<HttpStatusCode, JSONObject>? {
         Log.d("HTTP", "linking ...")
-        return linkHttpCallback?.handleHttpRequest(action, webClientId, webExtension, message)
+        return linkHttpCallback?.handleHttpRequest(action, webClientId, webExtension, message, origin)
     }
 
     private fun handleRequestCredential(
@@ -666,9 +673,10 @@ object HttpServer {
         webClientId: String,
         webExtension: EncWebExtension,
         message: JSONObject,
+        origin: RequestConnectionPoint,
     ): Pair<HttpStatusCode, JSONObject>? {
         Log.d("HTTP", "credential request ...")
-        return requestCredentialHttpCallback?.handleHttpRequest(action, webClientId, webExtension, message)
+        return requestCredentialHttpCallback?.handleHttpRequest(action, webClientId, webExtension, message, origin)
     }
 
     private suspend fun PipelineContext<Unit, ApplicationCall>.respond(

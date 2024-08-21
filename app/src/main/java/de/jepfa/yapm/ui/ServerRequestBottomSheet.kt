@@ -47,8 +47,8 @@ class ServerRequestBottomSheet(
 
         bottomSheet.findViewById<ImageView>(R.id.imageview_fingerprint_help).setOnClickListener {
             AlertDialog.Builder(context)
-                .setTitle("Fingerprint")
-                .setMessage("Ensure the fingerprint is equal with the fingerprint shown in the browser before accept.")
+                .setTitle(R.string.fingerprint)
+                .setMessage(context.getString(R.string.fingerprint_explanation))
                 .show()
         }
 
