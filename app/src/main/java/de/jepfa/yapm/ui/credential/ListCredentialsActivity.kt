@@ -126,6 +126,7 @@ import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.Constants.ACTION_DELIMITER
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.DebugInfo
+import de.jepfa.yapm.util.IpConverter
 import de.jepfa.yapm.util.PermissionChecker.verifyNotificationPermissions
 import de.jepfa.yapm.util.SearchCommand
 import de.jepfa.yapm.util.addFormattedLine
@@ -138,6 +139,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.asCompletableFuture
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import java.lang.StringBuilder
 import java.util.UUID
 
 
@@ -246,20 +248,21 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
         else {
 
-            val onLongClick = View.OnLongClickListener {
+            val onLongClickServerDetails = View.OnLongClickListener {
                 val stat = if (HttpServer.isRunning())  "Running" else "Stopped"
                 val ip = HttpServer.getIp(this@ListCredentialsActivity)
                 val port = PreferenceService.getAsString(PreferenceService.PREF_SERVER_PORT, this@ListCredentialsActivity) ?: HttpServer.DEFAULT_HTTP_SERVER_PORT
                 HttpServer.getHostName(ip) { host ->
                     CoroutineScope(Dispatchers.Main).launch {
-                        val sb = java.lang.StringBuilder()
+                        val sb = StringBuilder()
                         sb.addFormattedLine("Status", stat)
                         sb.addFormattedLine("Protocol", "HTTP")
                         sb.addFormattedLine("IP", ip)
                         sb.addFormattedLine("Hostname", host)
                         sb.addFormattedLine("Port", port)
+                        sb.addFormattedLine("Handle", IpConverter.getHandle(ip))
                         AlertDialog.Builder(this@ListCredentialsActivity)
-                            .setTitle("Server details")
+                            .setTitle(getString(R.string.server_details_title))
                             .setMessage(sb.toString())
                             .setIcon(R.drawable.outline_dns_24)
                             .setNegativeButton(R.string.close, null)
@@ -277,8 +280,41 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 }
                 true
             }
-            serverViewState.setOnLongClickListener(onLongClick)
-            serverViewDetails.setOnLongClickListener(onLongClick)
+
+            val onClickServerAddresses: (View) -> Unit = {
+                if (HttpServer.isRunning()) {
+                    val ip = HttpServer.getIp(this@ListCredentialsActivity)
+                    HttpServer.getHostName(ip) { host ->
+                        CoroutineScope(Dispatchers.Main).launch {
+
+                            val view: View = layoutInflater.inflate(R.layout.content_server_addresses, null)
+                            val handleView = view.findViewById<TextView>(R.id.server_address_handle)
+                            handleView.text = IpConverter.getHandle(ip)
+
+                            val hostnameView = view.findViewById<TextView>(R.id.server_address_hostname)
+                            if (host == null) {
+                                hostnameView.visibility = View.GONE
+                            }
+                            else {
+                                hostnameView.text = host.lowercase()
+                            }
+
+                            val ipAddressView = view.findViewById<TextView>(R.id.server_address_ip_address)
+                            ipAddressView.text = ip
+
+                            AlertDialog.Builder(this@ListCredentialsActivity)
+                                .setTitle(getString(R.string.server_address_title))
+                                .setView(view)
+                                .setIcon(R.drawable.baseline_alternate_email_24)
+                                .show()
+                        }
+                    }
+                }
+            }
+            serverViewState.setOnLongClickListener(onLongClickServerDetails)
+            serverViewState.setOnClickListener(onClickServerAddresses)
+            serverViewDetails.setOnLongClickListener(onLongClickServerDetails)
+            serverViewDetails.setOnClickListener(onClickServerAddresses)
 
             val serverViewLink = findViewById<ImageView>(R.id.server_link)
             val serverViewSettings = findViewById<ImageView>(R.id.server_settings)
@@ -675,7 +711,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         serverViewState.setTypeface(null, Typeface.BOLD)
         if (showIp) {
             serverViewDetails.visibility = ViewGroup.VISIBLE
-            serverViewDetails.text = HttpServer.getHostNameOrIp(this) {
+            serverViewDetails.text = HttpServer.getHostNameOrIpAndHandle(this) {
                 serverViewDetails.text = it
             }
         }

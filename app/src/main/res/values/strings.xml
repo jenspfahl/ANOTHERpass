@@ -882,8 +882,12 @@
     <string name="failed_to_stop_server">Failed to stop server. Try to restart the app.</string>
     <string name="server_stopped_msg">Server stopped</string>
 
+    <string name="server_details_title">Server details</string>
+    <string name="server_address_title">Server addresses</string>
+    <string name="server_address_description">The server is reachable from the browser extension within a local network by the following address alternatives:</string>
+
+
 
     <string name="unknown">Unknown</string>
-
 
 </resources>

@@ -550,14 +550,15 @@ object HttpServer {
         return jsonBody
     }
 
-    fun getHostNameOrIp(context: Context, getHostNameCallback: (String) -> Unit): String {
+    fun getHostNameOrIpAndHandle(context: Context, getHostNameCallback: (String) -> Unit): String {
         val ipAddress = getIp(context)
         getHostName(ipAddress) { hostName ->
+            val handle = IpConverter.getHandle(ipAddress)
             CoroutineScope(Dispatchers.Main).launch {
                 if (hostName != null && hostName != ipAddress) {
-                    getHostNameCallback("$hostName ($ipAddress)")
+                    getHostNameCallback("$hostName\n$handle\n($ipAddress)")
                 } else {
-                    getHostNameCallback("$ipAddress")
+                    getHostNameCallback("$handle\n($ipAddress)")
                 }
             }
         }

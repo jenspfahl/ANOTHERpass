@@ -876,5 +876,11 @@
     <string name="failed_to_stop_server">Server konnte nicht gestartet werden. Versuche die App neuzustarten.</string>
     <string name="server_stopped_msg">Server gestoppt</string>
 
+    <string name="server_details_title">Serverdetails</string>
+    <string name="server_address_title">Serveradressen</string>
+    <string name="server_address_description">Der Server ist unter den folgenden Adressen von der Browsererweiterung aus erreichbar:</string>
+
+
+
     <string name="unknown">Unbekannt</string>
 </resources>

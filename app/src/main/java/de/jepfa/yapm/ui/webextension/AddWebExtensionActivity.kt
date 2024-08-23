@@ -71,7 +71,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
         webClientIdTextView = findViewById(R.id.web_extension_client_id)
         serverAddressTextView = findViewById(R.id.web_extension_server_address)
 
-        serverAddressTextView.text = HttpServer.getHostNameOrIp(this) {
+        serverAddressTextView.text = HttpServer.getHostNameOrIpAndHandle(this) {
             serverAddressTextView.text = it
         }
 
