@@ -556,9 +556,9 @@ object HttpServer {
             val handle = IpConverter.getHandle(ipAddress)
             CoroutineScope(Dispatchers.Main).launch {
                 if (hostName != null && hostName != ipAddress) {
-                    getHostNameCallback("$hostName\n$handle\n($ipAddress)")
+                    getHostNameCallback("$hostName\n$handle - $ipAddress")
                 } else {
-                    getHostNameCallback("$handle\n($ipAddress)")
+                    getHostNameCallback("$handle - $ipAddress")
                 }
             }
         }
