@@ -805,7 +805,7 @@
     <string name="link_webextension_explanation">Verknüpfe ein anderes Gerät im selben lokalen Netzerk mit der ANOTHERpass Browser-Erweiterung, z.B. deinem Laptop. Eine detaillierte Anleitung findest du hier (TODO url).</string>
     <string name="link_webextension_step_1">Als Erstes vergebe einen Namen, um deine verknüpften Geräte im Überblick zu behalten.</string>
     <string name="link_webextension_step_2">Als Nächstes scanne den QR-Code aus der Erweiterung indem du auf dieses Symbol klickst. Danach wird die Link-ID der Erweiterung hier angezeigt.</string>
-    <string name="link_webextension_step_3">Zuletzt gibst du die IP-Adresse oder den Hostnamen in die Erweiterung ein, welche weiter unten angezeigt wird. Wenn du der Admin des lokalen Netzwerks bist, kannst du eine statische IP oder einen Hostnamen für dein Smartphone vergeben.</string>
+    <string name="link_webextension_step_3">Zuletzt gibst du das Handle, die IP-Adresse oder den Hostnamen in die Erweiterung ein, welche weiter unten angezeigt wird. (Das Handle ist die eingekürzte IP-Adresse.) Wenn du der Admin des lokalen Netzwerks bist, kannst du eine statische IP oder einen Hostnamen für dein Smartphone vergeben.</string>
     <string name="edit_link_webextension_description">Eine Verknüpfung zu einem Gerät welches die ANOTHERpass Browser-Erweiterung verwendet.</string>
     <string name="edit_link_webextension_enable">Aktiviere die Verknüpfung</string>
     <string name="edit_link_webextension_allow_unconfirmed">Erlaube Zugangsdaten-Anfragen ohne Bestätigung</string>

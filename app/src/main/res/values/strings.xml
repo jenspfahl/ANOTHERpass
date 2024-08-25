@@ -812,7 +812,7 @@
     <string name="link_webextension_explanation">Link a different device in the same local network by using the ANOTHERpass Browser Extension, e.g. your laptop. Follow the instructions as described here (link).</string>
     <string name="link_webextension_step_1">At first, give it a name to organise your linked devices.</string>
     <string name="link_webextension_step_2">Second, scan the QR code presented by the extension by clicking on this icon. Once done, the Link ID of the extension will be shown instead.</string>
-    <string name="link_webextension_step_3">Last, enter the app\'s IP address or hostname presented below into the extension. It is recommend to make the IP address of your phone static or configure a hostname.</string>
+    <string name="link_webextension_step_3">Last, enter the app\'s handle, IP address or hostname presented below into the extension. (The handle is a shortened IP address.) In case you are the admin of the local network, make the IP address of your phone static or configure a hostname.</string>
     <string name="edit_link_webextension_description">A link to a device using the ANOTHERpass Browser Extension.</string>
     <string name="edit_link_webextension_enable">Enable this link</string>
     <string name="edit_link_webextension_allow_unconfirmed">Allow unconfirmed credential requests</string>
