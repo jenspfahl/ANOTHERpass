@@ -40,18 +40,21 @@ object WebExtensionDialogs {
             sb.append("Shared Secret Fingerprint:").addNewLine().append(sharedBaseKeyFingerprint).addNewLine().addNewLine()
 
             AlertDialog.Builder(activity)
-                .setTitle("Linking details for $webClientId")
+                .setTitle(activity.getString(R.string.linking_details, webClientId))
                 .setMessage(sb.toString())
                 .setIcon(R.drawable.baseline_phonelink_24)
                 .setNegativeButton(R.string.close, null)
-                .setNeutralButton("Copy to clipboard") { _, _ ->
+                .setNeutralButton(activity.getString(R.string.copy_to_clipboard)) { _, _ ->
                     ClipboardUtil.copy(
-                        "Linking details for $webClientId",
+                        activity.getString(R.string.linking_details, webClientId),
                         sb.toString(),
                         activity,
                         isSensible = false,
                     )
-                    toastText(activity, "Copied to clipboard")
+                    toastText(
+                        activity,
+                        activity.getString(R.string.copied_to_clipboard)
+                    )
                 }
                 .show()
         }
@@ -72,7 +75,7 @@ object WebExtensionDialogs {
                 .setTitle(R.string.title_delete_web_extension)
                 .setMessage(activity.getString(R.string.message_delete_web_extension, name))
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                .setPositiveButton(android.R.string.yes) { _, _ ->
                     UseCaseBackgroundLauncher(DeleteWebExtensionUseCase)
                         .launch(activity, webExtension)
                         {
@@ -92,14 +95,15 @@ object WebExtensionDialogs {
 
 
             AlertDialog.Builder(activity)
-                .setTitle("Delete disabled linked devices")
-                .setMessage("Do you really want to delete all disabled but linked devices?")
+                .setTitle(R.string.delete_disabled_linked_devices_title)
+                .setMessage(R.string.delete_disabled_linked_devices_message)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes) { _, _ ->
                     UseCaseBackgroundLauncher(DeleteDisabledWebExtensionsUseCase)
                         .launch(activity, Unit)
                         { result ->
-                            toastText(activity, "${result.data} disabled links deleted")
+                            toastText(activity,
+                                activity.getString(R.string.xx_disabled_links_deleted, result.data))
                         }
 
                 }

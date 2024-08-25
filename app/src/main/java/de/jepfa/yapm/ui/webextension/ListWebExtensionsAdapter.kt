@@ -56,10 +56,12 @@ class ListWebExtensionsAdapter(private val listWebExtensionsActivity: ListWebExt
                     current.enabled = !current.enabled
                     listWebExtensionsActivity.webExtensionViewModel.save(current,listWebExtensionsActivity)
                     if (current.enabled) {
-                        toastText(listWebExtensionsActivity, "Device '$webClientId' linked")
+                        toastText(listWebExtensionsActivity,
+                            listWebExtensionsActivity.getString(R.string.device_xx_linked, webClientId))
                     }
                     else {
-                        toastText(listWebExtensionsActivity, "Device '$webClientId' unlinked")
+                        toastText(listWebExtensionsActivity,
+                            listWebExtensionsActivity.getString(R.string.device_xx_unlinked, webClientId))
                     }
                 }
             }

@@ -173,7 +173,7 @@ Het scheiden van de gecodeerde hoofdsleutel van het kluisbestand maakt het besta
   <string name="notification_channel_scheduled_title">ANDERE meldingen over het verlopen van de pas</string>
   <string name="toast_copied_to_clipboard">Wachtwoord gekopieerd naar klembord</string>
   <string name="toast_test_copypaste_password">Testgegevens gekopieerd naar het klembord</string>
-  <string name="copy_to_clipboard">Kopieer wachtwoord naar klembord</string>
+  <string name="copy_password_to_clipboard">Kopieer wachtwoord naar klembord</string>
   <string name="test_copypaste_password"><![CDATA[Test C&P password]]></string>
   <string name="navigation_drawer_open">Navigatiemenu openen</string>
   <string name="navigation_drawer_close">Navigatiemenu sluiten</string>
@@ -782,7 +782,7 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="hide_control_panel">Hide server panel</string>
   <string name="show_server_logs">Show server logs</string>
   <string name="open_server_settings">Open server settings</string>
-  <string name="delete_disabled_linked_devices">Delete all disabled links</string>
+  <string name="delete_disabled_linked_devices">Delete disabled links</string>
   <string name="last_used_at">Lastly used at: %1$s</string>
   <string name="enabled_links_always_on_top">Enabled links always on top</string>
   <string name="credentials_posted">Credentials posted</string>
@@ -840,6 +840,23 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="server_details_title">Server details</string>
   <string name="server_address_title">Server addresses</string>
   <string name="server_address_description">The server is reachable from the browser extension within a local network by the following address alternatives:</string>
+
+  <string name="scan_qr_code_first">Please scan the QR code first.</string>
+  <string name="please_proceed_with_the_extension">Please proceed with the extension!</string>
+  <string name="device_linked">Device linked</string>
+  <string name="cancel_linking_device_title">Cancel linking device %1$s</string>
+  <string name="cancel_linking_device_message">Going back will cancel the current linking, sure?</string>
+  <string name="unknown_qr_code">Unknown QR code content</string>
+  <string name="relink_device_not_possible">This device link already exists. Delete it first.</string>
+  <string name="action_link_device_details">wants to establish a permanent link with this device. Please verify the fingerprint before accepting!</string>
+  <string name="device_xx_linked">Device link \'%1$s\' enabled</string>
+  <string name="device_xx_unlinked">Device link \'%1$s\' disabled</string>
+  <string name="linking_details">Linking details for %1$s</string>
+  <string name="copy_to_clipboard">Copy to clipboard</string>
+  <string name="copied_to_clipboard">Copied to clipboard</string>
+  <string name="delete_disabled_linked_devices_title">Delete all disabled linked devices</string>
+  <string name="delete_disabled_linked_devices_message">Do you really want to delete all disabled but linked devices?</string>
+  <string name="xx_disabled_links_deleted">%1$s disabled links deleted</string>
 
 
   <string name="unknown">Unknown</string>

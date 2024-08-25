@@ -55,8 +55,8 @@
 
     <string name="title_delete_username_template">Benutzernamenvorlage löschen</string>
     <string name="message_delete_username_template">Benutzernamenvorlage \'%1$s\' wirklich löschen? Sie wird in den Benutzernaenvorschlägen nicht mehr sichbar sein.</string>
-    <string name="title_delete_web_extension">Geräteverknüpfung lösen</string>
-    <string name="message_delete_web_extension">Möchtest du wirklich die Geräteverknüpfug für \'%1$s\' lösen?</string>
+    <string name="title_delete_web_extension">Geräteverknüpfung löschen</string>
+    <string name="message_delete_web_extension">Möchtest du wirklich die Geräteverknüpfug für \'%1$s\' löschen?</string>
 
 
     <string name="lock_items">Tresor sperren</string>
@@ -185,7 +185,7 @@
     <string name="notification_channel_scheduled_title">ANOTHERpass Ablauf-Benachrichtigungen</string>
     <string name="toast_copied_to_clipboard">Passwort in die Zwischenablage kopiert</string>
     <string name="toast_test_copypaste_password">Testdaten in die Zwischenablage kopiert</string>
-    <string name="copy_to_clipboard">Kopiere Passwort in die Zwischenablage</string>
+    <string name="copy_password_to_clipboard">Kopiere Passwort in die Zwischenablage</string>
     <string name="navigation_drawer_open">Öffne Navigationsmenü</string>
     <string name="navigation_drawer_close">Schliesse Navigationsmenü</string>
     <string name="nav_header_desc">Navigationsleiste</string>
@@ -821,7 +821,7 @@
     <string name="hide_control_panel">Server-Panel ausblenden</string>
     <string name="show_server_logs">Zeige Server-Logs</string>
     <string name="open_server_settings">Server-Einstellungen öffnen</string>
-    <string name="delete_disabled_linked_devices">Lösche alle deaktivierten Verknüpfungen</string>
+    <string name="delete_disabled_linked_devices">Lösche deaktivierten Verknüpfungen</string>
     <string name="last_used_at">Zuletzt verwendet am: %1$s</string>
     <string name="enabled_links_always_on_top">Aktivierte Verknüpfungen immer zuerst</string>
     <string name="credentials_posted">Zugangsdaten gesendet</string>
@@ -880,6 +880,22 @@
     <string name="server_address_title">Serveradressen</string>
     <string name="server_address_description">Der Server ist unter den folgenden Adressen von der Browsererweiterung aus erreichbar:</string>
 
+    <string name="scan_qr_code_first">Bitte erst den QR-Code scannen.</string>
+    <string name="please_proceed_with_the_extension">Bitte in der Browser-Erweitung fortfahren!</string>
+    <string name="device_linked">Geräteverknüpfung erstellt</string>
+    <string name="cancel_linking_device_title">Aktuellen Vorgang für %1$s abbrechen</string>
+    <string name="cancel_linking_device_message">Wenn du zurückgehst, wird die aktuelle Verknüfung verworfen. Fortfahren?</string>
+    <string name="unknown_qr_code">Unbekannter QR-Code</string>
+    <string name="relink_device_not_possible">Es existiert schon eine Verknüpfung mit dieser Link-ID. Bitte lösche diese zuerst.</string>
+    <string name="action_link_device_details">möchte eine permanente Verknüpfung mit diesem Gerät herstellen. Bitte prüfe den Fingerprint auf Gleichheit bevor du auf Erlauben klickst!</string>
+    <string name="device_xx_linked">Geräteverknüpfung \'%1$s\' aktiviert</string>
+    <string name="device_xx_unlinked">Geräteverknüpfung \'%1$s\' deaktiviert</string>
+    <string name="linking_details">Verknüpfungsdetails für %1$s</string>
+    <string name="copy_to_clipboard">In die Zwischenablage kopieren</string>
+    <string name="copied_to_clipboard">In die Zwischenablage kopiert</string>
+    <string name="delete_disabled_linked_devices_title">Lösche alle deaktivierten Verknüpfungen</string>
+    <string name="delete_disabled_linked_devices_message">Sollen wirklich alle deaktivierten Verknüpfungen gelöscht werden?</string>
+    <string name="xx_disabled_links_deleted">%1$s Verknüpfungen entvernt</string>
 
 
     <string name="unknown">Unbekannt</string>

@@ -88,20 +88,20 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
             }
 
             if (!hasQrCodeScanned()) {
-                toastText(this, "Please scan the QR code first to proceed")
+                toastText(this, getString(R.string.scan_qr_code_first))
                 return@setOnClickListener
             }
 
             if (webExtension == null) {
-                toastText(this, "Something went wrong")
+                toastText(this, R.string.something_went_wrong)
                 return@setOnClickListener
             }
             else if (!webExtension!!.linked)  {
-                toastText(this, "Please proceed on the extension first!")
+                toastText(this, getString(R.string.please_proceed_with_the_extension))
                 return@setOnClickListener
             }
 
-            toastText(this, "Device linked")
+            toastText(this, getString(R.string.device_linked))
 
             finish()
 
@@ -116,8 +116,8 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
     override fun onBackPressed() {
         if (hasQrCodeScanned()) {
             AlertDialog.Builder(this)
-                .setTitle("Cancel linking device $webClientId")
-                .setMessage("Going back will cancel the current linking, sure?")
+                .setTitle(getString(R.string.cancel_linking_device_title, webClientId))
+                .setMessage(getString(R.string.cancel_linking_device_message))
                 .setCancelable(false)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     removeWebExtension()
@@ -137,8 +137,8 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
         if (id == android.R.id.home) {
             if (hasQrCodeScanned()) {
                 AlertDialog.Builder(this)
-                    .setTitle("Cancel linking device $webClientId")
-                    .setMessage("Going back will cancel the current linking, sure?")
+                    .setTitle(getString(R.string.cancel_linking_device_title, webClientId))
+                    .setMessage(getString(R.string.cancel_linking_device_message))
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         removeWebExtension()
 
@@ -195,7 +195,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
     override fun handleScannedData(scanned: String) {
         val splitted = scanned.split(":")
         if (splitted.size != 3) {
-            toastText(this, "Unknown QR code content")
+            toastText(this, getString(R.string.unknown_qr_code))
         }
         else {
             webClientId = splitted[0]
@@ -210,7 +210,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
                 || clientPubKeyFingerprint.isNullOrBlank()
                 || !HttpServer.checkWebClientIdFormat(webClientId!!)) {
                 webClientId = null
-                toastText(this, "Wrong QR code")
+                toastText(this, R.string.unknown_qr_code)
                 return
             }
 
@@ -241,7 +241,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
                     if (existingWebExtension != null) {
                         if (existingWebExtension.linked) {
                             finish()
-                            toastText(this, "This device link already exists. Delete it first.")
+                            toastText(this, getString(R.string.relink_device_not_possible))
                             return@observeOnce
                         }
                         id = existingWebExtension.id
@@ -356,7 +356,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
                         this@AddWebExtensionActivity,
                         webClientTitle = webClientTitle,
                         webClientId = webClientId,
-                        webRequestDetails = "wants to establish a permanent link with this device. Please verify the fingerprint before accepting!",
+                        webRequestDetails = getString(R.string.action_link_device_details),
                         fingerprint = shortenedServerPubKeyFingerprint,
                         hideBypassFlag = true,
                         denyHandler = {_ ->
@@ -364,7 +364,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
                             val upIntent = Intent(this@AddWebExtensionActivity.intent)
                             navigateUpTo(upIntent)
 
-                            toastText(this@AddWebExtensionActivity, "Not linked!")
+                            toastText(this@AddWebExtensionActivity, R.string.request_denied)
                         },
                         acceptHandler = { allowBypass ->
                             webExtension.linked = true
@@ -374,7 +374,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
                             val upIntent = Intent(this@AddWebExtensionActivity.intent)
                             navigateUpTo(upIntent)
 
-                            toastText(this@AddWebExtensionActivity, "Device linked!")
+                            toastText(this@AddWebExtensionActivity, R.string.device_linked)
                         }
                     ).show()
                 }
