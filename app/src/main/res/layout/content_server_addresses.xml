@@ -33,6 +33,7 @@
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:textSize="20sp"
+        android:text="@string/nothing_placeholder"
         android:textColor="@color/colorAltAccent"
         android:textIsSelectable="true"
         android:selectAllOnFocus="true"

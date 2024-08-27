@@ -284,29 +284,29 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             val onClickServerAddresses: (View) -> Unit = {
                 if (HttpServer.isRunning()) {
                     val ip = HttpServer.getIp(this@ListCredentialsActivity)
+                    val view: View = layoutInflater.inflate(R.layout.content_server_addresses, null)
+                    val handleView = view.findViewById<TextView>(R.id.server_address_handle)
+                    handleView.text = IpConverter.getHandle(ip)
+
+                    val hostnameView = view.findViewById<TextView>(R.id.server_address_hostname)
+
+                    val ipAddressView = view.findViewById<TextView>(R.id.server_address_ip_address)
+                    ipAddressView.text = ip
+
+                    AlertDialog.Builder(this@ListCredentialsActivity)
+                        .setTitle(getString(R.string.server_address_title))
+                        .setView(view)
+                        .setIcon(R.drawable.baseline_alternate_email_24)
+                        .show()
+
                     HttpServer.getHostName(ip) { host ->
                         CoroutineScope(Dispatchers.Main).launch {
-
-                            val view: View = layoutInflater.inflate(R.layout.content_server_addresses, null)
-                            val handleView = view.findViewById<TextView>(R.id.server_address_handle)
-                            handleView.text = IpConverter.getHandle(ip)
-
-                            val hostnameView = view.findViewById<TextView>(R.id.server_address_hostname)
-                            if (host == null) {
+                            if (host == null || host == ip) {
                                 hostnameView.visibility = View.GONE
                             }
                             else {
                                 hostnameView.text = host.lowercase()
                             }
-
-                            val ipAddressView = view.findViewById<TextView>(R.id.server_address_ip_address)
-                            ipAddressView.text = ip
-
-                            AlertDialog.Builder(this@ListCredentialsActivity)
-                                .setTitle(getString(R.string.server_address_title))
-                                .setView(view)
-                                .setIcon(R.drawable.baseline_alternate_email_24)
-                                .show()
                         }
                     }
                 }

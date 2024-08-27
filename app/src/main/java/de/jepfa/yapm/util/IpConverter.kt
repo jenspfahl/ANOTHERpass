@@ -47,8 +47,8 @@ object IpConverter {
     }
 
     fun getHandle(ip: String): String {
-        val ipClass = classifyIp(ip) ?: return ip
-        val ipAsLong = ipToLong(ip) ?: return ip
+        val ipClass = classifyIp(ip) ?: return "?"
+        val ipAsLong = ipToLong(ip) ?: return "?"
         val shortened = ipAsLong - ipClass.rangeFrom
         val base22 = toBasedString(shortened)
         return "@${ipClass.sign}$base22"

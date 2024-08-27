@@ -10,6 +10,7 @@ import android.text.format.Formatter
 import android.util.Base64
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Validable.Companion.FAILED_STRING
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.encrypted.EncWebExtension
@@ -38,8 +39,10 @@ import java.net.InetAddress
 import java.util.*
 
 
+
 object HttpServer {
 
+    const val NO_IP_ADDRESS_AVAILABLE = "0.0.0.0"
     const val DEFAULT_HTTP_SERVER_PORT = 8787
     val SERVER_LOG_PREFIX = Constants.LOG_PREFIX + "HttpServer"
     val REGEX_WEB_CLIENT_ID = Regex("[A-Z]{3}-[A-Z]{3}")
@@ -552,22 +555,27 @@ object HttpServer {
 
     fun getHostNameOrIpAndHandle(context: Context, emphasiseHandle: Boolean = false, getHostNameCallback: (String) -> Unit): String {
         val ipAddress = getIp(context)
-        getHostName(ipAddress) { hostName ->
-            val handle = IpConverter.getHandle(ipAddress)
-            CoroutineScope(Dispatchers.Main).launch {
-                if (hostName != null && hostName != ipAddress) {
-                    if (emphasiseHandle) {
-                        getHostNameCallback("$handle\n$hostName\n$ipAddress")
-                    }
-                    else {
-                        getHostNameCallback("$hostName\n$handle - $ipAddress")
-                    }
-                } else {
-                    if (emphasiseHandle) {
-                        getHostNameCallback("$handle\$ipAddress")
-                    }
-                    else {
-                        getHostNameCallback("$handle - $ipAddress")
+        Log.d("HTTP", "IP='$ipAddress'")
+        if (ipAddress == NO_IP_ADDRESS_AVAILABLE) {
+            getHostNameCallback(context.getString(R.string.server_no_wifi))
+            return context.getString(R.string.server_no_wifi)
+        }
+        else {
+            getHostName(ipAddress) { hostName ->
+                val handle = IpConverter.getHandle(ipAddress)
+                CoroutineScope(Dispatchers.Main).launch {
+                    if (hostName != null && hostName != ipAddress) {
+                        if (emphasiseHandle) {
+                            getHostNameCallback("$handle\n$hostName\n$ipAddress")
+                        } else {
+                            getHostNameCallback("$hostName\n$handle - $ipAddress")
+                        }
+                    } else {
+                        if (emphasiseHandle) {
+                            getHostNameCallback("$handle\n$ipAddress")
+                        } else {
+                            getHostNameCallback("$handle - $ipAddress")
+                        }
                     }
                 }
             }
@@ -583,6 +591,10 @@ object HttpServer {
     }
 
     fun getHostName(ipAddress: String, callback: (String?) -> Unit) {
+        if (ipAddress == NO_IP_ADDRESS_AVAILABLE) {
+            callback(null)
+        }
+        else {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val hostName = withContext(Dispatchers.IO) {
@@ -594,6 +606,7 @@ object HttpServer {
                 callback(null)
             }
         }
+            }
     }
 
 
