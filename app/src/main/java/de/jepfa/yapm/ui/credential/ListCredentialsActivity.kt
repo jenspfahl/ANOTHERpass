@@ -78,6 +78,7 @@ import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.net.CredentialRequestState
 import de.jepfa.yapm.service.net.HttpCredentialRequestHandler
 import de.jepfa.yapm.service.net.HttpServer
+import de.jepfa.yapm.service.net.HttpServer.NO_IP_ADDRESS_AVAILABLE
 import de.jepfa.yapm.service.net.HttpServer.shutdownAllAsync
 import de.jepfa.yapm.service.net.HttpServer.startAllServersAsync
 import de.jepfa.yapm.service.net.HttpServer.toErrorResponse
@@ -250,8 +251,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
             val onLongClickServerDetails = View.OnLongClickListener {
                 val stat = if (HttpServer.isRunning())  "Running" else "Stopped"
-                val ip = HttpServer.getIp(this@ListCredentialsActivity)
-                val port = PreferenceService.getAsString(PreferenceService.PREF_SERVER_PORT, this@ListCredentialsActivity) ?: HttpServer.DEFAULT_HTTP_SERVER_PORT
+                val ip = HttpServer.getIp(this)
+                val port = PreferenceService.getAsString(PreferenceService.PREF_SERVER_PORT, this) ?: HttpServer.DEFAULT_HTTP_SERVER_PORT
                 HttpServer.getHostName(ip) { host ->
                     CoroutineScope(Dispatchers.Main).launch {
                         val sb = StringBuilder()
@@ -283,7 +284,10 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
             val onClickServerAddresses: (View) -> Unit = {
                 if (HttpServer.isRunning()) {
-                    val ip = HttpServer.getIp(this@ListCredentialsActivity)
+                    var ip = HttpServer.getIp(this)
+                    if (ip == NO_IP_ADDRESS_AVAILABLE) {
+                        ip = this.getString(R.string.server_no_wifi)
+                    }
                     val view: View = layoutInflater.inflate(R.layout.content_server_addresses, null)
                     val handleView = view.findViewById<TextView>(R.id.server_address_handle)
                     handleView.text = IpConverter.getHandle(ip)
@@ -293,7 +297,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     val ipAddressView = view.findViewById<TextView>(R.id.server_address_ip_address)
                     ipAddressView.text = ip
 
-                    AlertDialog.Builder(this@ListCredentialsActivity)
+                    AlertDialog.Builder(this)
                         .setTitle(getString(R.string.server_address_title))
                         .setView(view)
                         .setIcon(R.drawable.baseline_alternate_email_24)
