@@ -305,7 +305,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
                     HttpServer.getHostName(ip) { host ->
                         CoroutineScope(Dispatchers.Main).launch {
-                            if (host == null || host == ip) {
+                            if (host == null || host == ip || host == NO_IP_ADDRESS_AVAILABLE) {
                                 hostnameView.visibility = View.GONE
                             }
                             else {

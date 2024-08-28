@@ -555,14 +555,13 @@ object HttpServer {
 
     fun getHostNameOrIpAndHandle(context: Context, emphasiseHandle: Boolean = false, getHostNameCallback: (String) -> Unit): String {
         val ipAddress = getIp(context)
-        Log.d("HTTP", "IP='$ipAddress'")
+        val handle = IpConverter.getHandle(ipAddress)
         if (ipAddress == NO_IP_ADDRESS_AVAILABLE) {
             getHostNameCallback(context.getString(R.string.server_no_wifi))
             return context.getString(R.string.server_no_wifi)
         }
         else {
             getHostName(ipAddress) { hostName ->
-                val handle = IpConverter.getHandle(ipAddress)
                 CoroutineScope(Dispatchers.Main).launch {
                     if (hostName != null && hostName != ipAddress) {
                         if (emphasiseHandle) {
@@ -581,7 +580,7 @@ object HttpServer {
             }
         }
 
-        return ipAddress
+        return "$handle - $ipAddress"
     }
 
     fun getIp(context: Context): String {

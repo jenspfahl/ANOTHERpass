@@ -239,10 +239,10 @@ object HttpCredentialRequestHandler {
                     }
                 }
 
-                return toErrorResponse(HttpStatusCode.NotFound, "no user acknowledge")
+                return toErrorResponse(HttpStatusCode.Conflict, "no user acknowledge")
             }
             CredentialRequestState.AwaitingAcceptance -> {
-                return toErrorResponse(HttpStatusCode.NotFound, "pending request")
+                return toErrorResponse(HttpStatusCode.Conflict, "pending request")
             }
             CredentialRequestState.Denied -> {
                 webClientRequestIdentifier = null
@@ -262,7 +262,7 @@ object HttpCredentialRequestHandler {
                         postSelectedCredentials(requestFlows, key, webClientId)
                     }
                     else {
-                        toErrorResponse(HttpStatusCode.NotFound, "no user selection")
+                        toErrorResponse(HttpStatusCode.Conflict, "no user selection")
                     }
                 }
                 else if (command == FetchCredentialCommand.FETCH_ALL_CREDENTIALS) {
@@ -278,7 +278,7 @@ object HttpCredentialRequestHandler {
                         postCredential(requestFlows, key, webClientId, currCredential)
                     } else {
                         // waiting for user s selection
-                        toErrorResponse(HttpStatusCode.NotFound, "no user selection")
+                        toErrorResponse(HttpStatusCode.Conflict, "no user selection")
                     }
                 }
             }
