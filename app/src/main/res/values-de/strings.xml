@@ -559,7 +559,7 @@
     <string name="intro_5_head">ANOTHERpass ist sicher</string>
     <string name="intro_5_subtext">ANOTHERpass verhindert typische sicherheitsrelevante Fallstricke.</string>
     <string name="intro_5_bullet_1">Passwörter in die Zwischenablage zu kopieren ist standardmäßig deaktiviert. Dies ist nämlich ein Sicherheitsrisiko, da alle anderen Apps auf die Zwischenablage zugreifen können.</string>
-    <string name="intro_5_bullet_2">Keine Internetverbindung benötigt, außer du sendest Daten mit anderen Apps via Internet.</string>
+    <string name="intro_5_bullet_2">Es werden keine Daten in der Cloud abgelegt, außer du speicherst sie selber in der Cloud.</string>
     <string name="intro_5_bullet_3">Starke Verschlüsselung ALLER sensitiven Daten mit mindestens 128 bit Schlüsseln.</string>
     <string name="intro_5_bullet_4">ANOTHERpass kann einen integrierten Sicherheitschip verwenden, falls vorhanden.</string>
 

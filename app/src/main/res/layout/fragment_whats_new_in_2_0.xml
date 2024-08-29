@@ -88,6 +88,12 @@
 
                     <TableRow android:minHeight="20dp" />
 
+                    <CheckBox
+                        android:id="@+id/enable_server"
+                        android:text="Yes, i want to try it out!"
+                        android:checked="true"
+                        ></CheckBox>
+
 
                 </TableLayout>
 

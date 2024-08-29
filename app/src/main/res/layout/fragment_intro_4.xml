@@ -4,46 +4,52 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.core.widget.NestedScrollView
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:padding="16dp">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraintLayout"
+        <TextView
+            android:id="@+id/textview_head"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:text="@string/intro_4_head"
+            android:textColor="@color/colorAltAccent"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/textview_subtext"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_weight="2" />
+
+        <TextView
+            android:id="@+id/textview_subtext"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:paddingHorizontal="15dp"
+            android:text="@string/intro_4_subtext"
+
+            app:layout_constraintBottom_toTopOf="@id/scrollview_bulletpoints"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textview_head"
+            app:layout_constraintVertical_weight="2" />
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollview_bulletpoints"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="16dp">
-
-            <TextView
-                android:id="@+id/textview_head"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:gravity="center"
-                android:text="@string/intro_4_head"
-                android:textColor="@color/colorAltAccent"
-                android:textSize="28sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toTopOf="@id/textview_subtext"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_weight="2" />
-
-            <TextView
-                android:id="@+id/textview_subtext"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:gravity="center"
-                android:paddingHorizontal="15dp"
-                android:text="@string/intro_4_subtext"
-
-                app:layout_constraintBottom_toTopOf="@id/textview_bulletpoints"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/textview_head"
-                app:layout_constraintVertical_weight="2" />
-
+            android:layout_height="0dp"
+            app:layout_constraintVertical_weight="6"
+            android:fillViewport="true"
+            app:layout_constraintBottom_toTopOf="@id/textview_space"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textview_subtext">
 
             <TableLayout
                 android:id="@+id/textview_bulletpoints"
@@ -155,10 +161,24 @@
                 </TableRow>
 
             </TableLayout>
+        </androidx.core.widget.NestedScrollView>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/textview_space"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintVertical_weight="0.9"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:paddingHorizontal="15dp"
 
-    </androidx.core.widget.NestedScrollView>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/scrollview_bulletpoints" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 

@@ -10,12 +10,13 @@ Ebenso verwendet die App eine clevere Zwei-Faktor-Authentifizierung, um den Tres
 - Kein kompliziertes Masterpasswort nötig zu merken, es wird einfach exportiert
 - Leicht zu lesende generierte Passwörter
 - Starke Verschlüsselung (AES 128/256, Blowfish, Chacha20)
-- verwendet einen integrierten Sicherheitschip oder eine TEE (Trusted Execution Environment), falls vorhanden
+- Verwendet einen integrierten Sicherheitschip oder eine TEE (Trusted Execution Environment), falls vorhanden
 - Autofill Unterstützung
+- Arbeitet mit der ANOTHERpass Browser-Erweiterung zusammen, um Zugangsdaten innerhalb eines lokalen Netzwerks zu teilen (z.B. von der App zum Desktop-PC)
 - Biometrisches Merkmal (z.B. Fingerabdruck) für gespeichertes Masterpasswort
 - Unsichere Zwischenablage standardmäßig deaktiviert
 - Passwörter können über anderen Apps angezeigt werden um Abtippen zu erleichtern
-- Keine Internetverbindung notwendig, App funktioniert komplett offline
+- Es werden keine Daten in der Cloud gespeichert, außer der Anwender speichert seine Backups selber in der Cloud
 - Exportieren und Importieren des kompletten Passwort-Tresors als Backup
 - Option um einzelne Zugangsdaten zu exportieren bzw. auszulagern
 - Verschleierung von einzelnen Passwörtern als zusätzlicher Schutz möglich

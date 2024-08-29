@@ -127,7 +127,7 @@ object HttpCredentialRequestHandler {
 
                 if (!requestFlows.getLifeCycleActivity().isActivityInForeground()) {
                     Log.d("HTTP", "activity ${requestFlows.getLifeCycleActivity()} not in foreground (${requestFlows.getLifeCycleActivity().lifecycle.currentState})")
-                    return toErrorResponse(HttpStatusCode.Conflict, "not in foreground")
+                    return toErrorResponse(HttpStatusCode.Continue, "not in foreground")
                 }
 
                 val sharedBaseKey = SecretService.decryptKey(key, webExtension.sharedBaseKey)
@@ -239,10 +239,10 @@ object HttpCredentialRequestHandler {
                     }
                 }
 
-                return toErrorResponse(HttpStatusCode.Conflict, "no user acknowledge")
+                return toErrorResponse(HttpStatusCode.Continue, "no user acknowledge")
             }
             CredentialRequestState.AwaitingAcceptance -> {
-                return toErrorResponse(HttpStatusCode.Conflict, "pending request")
+                return toErrorResponse(HttpStatusCode.Continue, "pending request")
             }
             CredentialRequestState.Denied -> {
                 webClientRequestIdentifier = null
@@ -262,7 +262,7 @@ object HttpCredentialRequestHandler {
                         postSelectedCredentials(requestFlows, key, webClientId)
                     }
                     else {
-                        toErrorResponse(HttpStatusCode.Conflict, "no user selection")
+                        toErrorResponse(HttpStatusCode.Continue, "no user selection")
                     }
                 }
                 else if (command == FetchCredentialCommand.FETCH_ALL_CREDENTIALS) {
@@ -278,13 +278,13 @@ object HttpCredentialRequestHandler {
                         postCredential(requestFlows, key, webClientId, currCredential)
                     } else {
                         // waiting for user s selection
-                        toErrorResponse(HttpStatusCode.Conflict, "no user selection")
+                        toErrorResponse(HttpStatusCode.Continue, "no user selection")
                     }
                 }
             }
             CredentialRequestState.Fulfilled -> {
                 webClientRequestIdentifier = null
-                return toErrorResponse(HttpStatusCode.Conflict, "still provided")
+                return toErrorResponse(HttpStatusCode.NoContent, "still provided")
             }
             else -> {
                 return toErrorResponse(HttpStatusCode.InternalServerError, "unhandled request state: $webClientCredentialRequestState")

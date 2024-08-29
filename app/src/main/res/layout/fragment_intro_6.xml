@@ -16,7 +16,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:gravity="center"
-            android:text="@string/intro_5_head"
+            android:text="@string/intro_6_head"
             android:textColor="@color/colorAltAccent"
             android:textSize="28sp"
             android:textStyle="bold"
@@ -32,13 +32,14 @@
             android:layout_height="0dp"
             android:gravity="center"
             android:paddingHorizontal="15dp"
-            android:text="@string/intro_5_subtext"
-
+            android:text="@string/intro_6_subtext"
             app:layout_constraintBottom_toTopOf="@id/scrollview_bulletpoints"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textview_head"
             app:layout_constraintVertical_weight="1" />
+
+
 
         <androidx.core.widget.NestedScrollView
             android:id="@+id/scrollview_bulletpoints"
@@ -50,6 +51,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textview_subtext">
+
 
             <TableLayout
                 android:id="@+id/textview_bulletpoints"
@@ -75,13 +77,13 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:padding="12dp"
-                            app:srcCompat="@drawable/ic_twotone_copy_attent_black_48dp" />
+                            app:srcCompat="@drawable/twotone_screen_lock_portrait_48" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:padding="12dp"
-                            android:text="@string/intro_5_bullet_1" />
+                            android:text="@string/intro_6_bullet_1" />
 
                     </LinearLayout>
 
@@ -99,19 +101,42 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:padding="12dp"
-                            app:srcCompat="@drawable/ic_twotone_cloud_off_24" />
+                            app:srcCompat="@drawable/twotone_devices_48" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:padding="12dp"
-                            android:text="@string/intro_5_bullet_2" />
+                            android:text="@string/intro_6_bullet_2" />
 
 
                     </LinearLayout>
 
                 </TableRow>
 
+                <TableRow>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="12dp"
+                            app:srcCompat="@drawable/baseline_browser_updated_48" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="12dp"
+                            android:text="@string/intro_6_bullet_3" />
+
+                    </LinearLayout>
+
+                </TableRow>
                 <TableRow>
 
                     <LinearLayout
@@ -130,7 +155,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:padding="12dp"
-                            android:text="@string/intro_5_bullet_3" />
+                            android:text="@string/intro_6_bullet_4" />
 
                     </LinearLayout>
 
@@ -147,13 +172,13 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:padding="12dp"
-                            app:srcCompat="@drawable/ic_twotone_memory_24" />
+                            app:srcCompat="@drawable/baseline_phonelink_off_48" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:padding="12dp"
-                            android:text="@string/intro_5_bullet_4" />
+                            android:text="@string/intro_6_bullet_5" />
 
                     </LinearLayout>
 
@@ -177,6 +202,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/scrollview_bulletpoints" />
+
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

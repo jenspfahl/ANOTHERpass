@@ -31,6 +31,10 @@ class IntroActivity : IntroBaseActivity() {
             AppIntroCustomLayoutFragment.newInstance(R.layout.fragment_intro_5
             ))
 
+        addSlide(
+            AppIntroCustomLayoutFragment.newInstance(R.layout.fragment_intro_6
+            ))
+
     }
 
     override fun onSkipPressed(currentFragment: Fragment?) {

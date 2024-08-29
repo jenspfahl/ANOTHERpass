@@ -253,6 +253,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 val stat = if (HttpServer.isRunning())  "Running" else "Stopped"
                 val ip = HttpServer.getIp(this)
                 val port = PreferenceService.getAsString(PreferenceService.PREF_SERVER_PORT, this) ?: HttpServer.DEFAULT_HTTP_SERVER_PORT
+                val waiting = AlertDialog.Builder(this@ListCredentialsActivity)
+                    .setTitle(getString(R.string.server_details_title))
+                    .setMessage("Loading ...")
+                    .setCancelable(false)
+                    .create()
+                waiting.show()
                 HttpServer.getHostName(ip) { host ->
                     CoroutineScope(Dispatchers.Main).launch {
                         val sb = StringBuilder()
@@ -262,6 +268,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         sb.addFormattedLine("Hostname", host)
                         sb.addFormattedLine("Port", port)
                         sb.addFormattedLine("Handle", IpConverter.getHandle(ip))
+                        waiting.dismiss()
                         AlertDialog.Builder(this@ListCredentialsActivity)
                             .setTitle(getString(R.string.server_details_title))
                             .setMessage(sb.toString())

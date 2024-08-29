@@ -1,6 +1,6 @@
 # ANOTHERpass built-in server API specification
 
-From [ANOTHERpass version 2](https://github.com/jenspfahl/ANOTHERpass/tree/rc-2.0.0) (still in develepment) onwards, a new server  capability is included in the mobile app, to let the app function as a credential server in a local network. Together with the [ANOTHERpass Browser Extension](https://github.com/jenspfahl/anotherpass-browserextension) it is possible to easily and securelly use credentials stored in the app by any computer in a local network. This is a very requested feature to use credentials outside of the mobile device.
+From [ANOTHERpass version 2](https://github.com/jenspfahl/ANOTHERpass/tree/rc-2.0.0) (still in development) onwards, a new server  capability is included in the mobile app, to let the app function as a credential server in a local network. Together with the [ANOTHERpass Browser Extension](https://github.com/jenspfahl/anotherpass-browserextension) it is possible to easily and securelly use credentials stored in the app by any computer in a local network. This is a very requested feature to use credentials outside of the mobile device.
 
 This server capability of the app can be used by any client, who follows its API. This document is about describing this API.
 
@@ -10,6 +10,7 @@ The server capability is designed to serve in local networks only, never as a pu
 
 
 ## Transport layer
+
 * Communication over HTTP only
     * The client has to implement the service layer described in this document and in [that document](https://github.com/jenspfahl/anotherpass-browserextension?tab=readme-ov-file#common-communication-between-extension-and-app).
 * Supported HTTP methods:
@@ -18,6 +19,7 @@ The server capability is designed to serve in local networks only, never as a pu
 
 
 ### HTTP headers
+
 * `Accept`: "application/json"
 * `Content-Type`: "application/json"
 * `X-WebClientId`: <webClientId>
@@ -32,23 +34,30 @@ Other routes return HTTP error code 404.
 ### Request body structure
 
 Every request has the same basic structure (JSON format):
-      
-		{ 
-			"encOneTimeKey": <base64 encoded and RSA-encrypted Request Transport Key or Session Key for linking phase>
-        	"envelope": <base64 encoded and AES-encrypted request payload>
-		}
+
+```
+{ 
+    "encOneTimeKey": <base64 encoded and RSA-encrypted Request Transport Key or Session Key for linking phase>
+    "envelope": <base64 encoded and AES-encrypted request payload>
+}
+```
 
 ### Response body structure
+
 The response body looks similar to the request body. A body is only contained if the HTTP code is 200.
 
-      
-		{ 
-			"encOneTimeKey": <base64 encoded and RSA-encrypted Response Transport Key or Session Key for linking phase>
-        	"envelope": <base64 encoded and AES-encrypted request payload>
-		}
+```
+{ 
+    "encOneTimeKey": <base64 encoded and RSA-encrypted Response Transport Key or Session Key for linking phase>
+    "envelope": <base64 encoded and AES-encrypted request payload>
+}
+```
 
 ### HTTP status codes
+
+ * 100 continue requestinh
  * 200 success
+ * 204 success, but no content
  * 400 malformed or bad client request
  * 401 app vault is locked
  * 403 request denied by user, client should stop current request
@@ -57,13 +66,16 @@ The response body looks similar to the request body. A body is only contained if
  * 500 error in the server/app
 
 Clients can keep polling if they receive these status codes:
+ * 100 --> user should accept the incoming request or perform the requested action
  * 401 --> user should open the app and unlock the vault
- * 409 --> user should accept the incoming request or perfom a credential selection
 
-Clients should stop polling if they recieve:
+Clients should stop polling if they receive:
  * 200 --> the request is fulfilled and the requested data should be in the response payload
- * 400 --> the client hasn't correctly implemented against this API spec
+ * 204 --> the request was fulfilled with the previous request
  * 403 --> the user has denied the request in the app
+
+Clients should stop polling due to an error:
+ * 400 --> the client hasn't correctly implemented against this API spec
  * 404 --> due to a misconfiguration related data cannot be found on the server or the app and the client are not linked
  * 500 --> an error in the app/server, please raise a report ticket
 
@@ -71,10 +83,12 @@ Clients should stop polling if they recieve:
 
 Every request contains an encrypted `"envelope"` with a payload. Each plain request payload has an `"action"` property in common, the rest can differ, depending on the action.
 
-			{
-				"action": <a string telling the server what to do>,
-				...
-			}
+```
+{
+    "action": <a string telling the server what to do>,
+    ...
+}
+```
 
 #### Supported actions
 
@@ -87,46 +101,52 @@ The follow strings are supported:
 
 A linking request looks like this:
 
-			{
-				"action": "link_app",
-				"clientPublicKey": {
-					"n" : <modulus as base64 of the Public Key of the client>,
-					"e" : <exponent as base64 of the Public Key of the client>
-				}  
-				"vaultId": <vaultId of the current linked app, only for relinking; absent in initial linking phase>
-			}
+```
+{
+    "action": "link_app",
+    "clientPublicKey": {
+        "n" : <modulus as base64 of the Public Key of the client>,
+        "e" : <exponent as base64 of the Public Key of the client>
+    }  
+    "vaultId": <vaultId of the current linked app, only for relinking; absent in initial linking phase>
+}
+```
 
 And the response like this:
 
-
-			{
-				"linkedVaultId" : <string, the vault id of the app vault>,
-				"sharedBaseKey": <base64 encoded Base Key, either 128 or 256 bit long depending on the phone>,	
-				"serverPubKey": {
-					"n" : <modulus as base64 of the Public Key of the app>,
-					"e" : <exponent as base64 of the Public Key of the app>
-				}
-
+```
+{
+    "linkedVaultId" : <string, the vault id of the app vault>,
+    "sharedBaseKey": <base64 encoded Base Key, either 128 or 256 bit long depending on the phone>,	
+    "serverPubKey": {
+        "n" : <modulus as base64 of the Public Key of the app>,
+        "e" : <exponent as base64 of the Public Key of the app>
+    }
+}
+```
 
 
 ##### `request_credential` - Credential request and response
 
 As request looks like this:
 
-			{
-				"action": "request_credential",
-				"command": <a command string to specify how the app should behave>,
-				"requestIdentifier": <a unique random identifier per request, hashed with the Base Key by the app and presented in the app for comparison and acceptance as shortened fingerprint (see below)>
-				...
-			}
+```
+{
+    "action": "request_credential",
+    "command": <a command string to specify how the app should behave>,
+    "requestIdentifier": <a unique random identifier per request, hashed with the Base Key by the app and presented in the app for comparison and acceptance as shortened fingerprint (see below)>
+    ...
+}
+```
 
 A successful response looks has this pattern:
 
-			{
-				<command specific data>,
-				"clientKey": <the base64 encoded AES key to unlock a client vault, see section ClientKey below>	
-			}
-
+```
+{
+    <command specific data>,
+    "clientKey": <the base64 encoded AES key to unlock a client vault, see section ClientKey below>	
+}
+```
 
 #### Supported commands
 
@@ -138,17 +158,19 @@ Requires `"website"` as a sibling of the ´"command"´-property and asks the use
 
 Returns the selected credential or 409 if nothing is selected.
 
-			{
-				"credential": {
-					"uid": <the UUID of the credental stored in the app>,
-					"readableUid": <the shortened and readable UUID of the credential>,
-					"name": <the name of the credential stored in the app>,
-					"password", <the raw password of the credential in plaintext>,
-					"user": <the user of the credential>,
-					"website": <the website information of the credential>
-				}
-				..
-			}
+```
+{
+    "credential": {
+        "uid": <the UUID of the credental stored in the app>,
+        "readableUid": <the shortened and readable UUID of the credential>,
+        "name": <the name of the credential stored in the app>,
+        "password", <the raw password of the credential in plaintext>,
+        "user": <the user of the credential>,
+        "website": <the website information of the credential>
+    }
+    ..
+}
+```
 
 * `fetch_credential_for_uid`
 
@@ -162,16 +184,17 @@ Requires `"uids"`-array as a sibling of the ´"command"´-property containing al
 
 Returns all related credentials or 404 if no credential found for this UID.
 
-
-			{
-				"credentials": [
-					{
-						<credential object, see above>
-					},
-					..
-				}
-				..
-			}
+```
+{
+    "credentials": [
+        {
+            <credential object, see above>
+        },
+        ..
+    }
+    ..
+}
+```
 
 * `fetch_single_credential`
 
@@ -211,14 +234,20 @@ Returns the clientKey and no other credential.
 
 #### Client Key for client based encryption
 
-If the client wants to store received credentials it can take advantage of the clientKey, which is an 128/256 bit long key derived from the apps master key. The clientKey is derived by taking the Webclient-Id, the master key and the vault salt and hashing both together (SHA-256). With that, a key is derived that cannot leak any information about the origin master key, but requires an interaction with the phone app to get. This derived key should only be held in memory of the client, ideally with a TTL. With that, a local encrypted credential storage / vault can be implemented on client side.
+If the client wants to store received credentials, it can take advantage of the clientKey, which is an 128/256 bit long key derived from the apps master key. The clientKey is derived by taking the Webclient-Id, the master key and the vault salt and hashing both together (SHA-256). With that, a key is derived that cannot leak any information about the origin master key, but requires an interaction with the phone app to get. This derived key should only be held in memory of the client, ideally with a TTL. With that, a local encrypted credential storage / vault can be implemented on client side with having the app as the key factor.
 
 
 ### Request fingerprinting
 
 Shortened fingerprint is a function that takes the first 7 alphanumeric characters of a base64 and converts them into an easy and fast to read fingerprint string with the format [A-Z]{2}-[A-Z]{3}-[A-Z]{2}.
 
+The fingerprint is derived from:
+ * the `"serverPubKey"."n"`-value for the link_app requests
+ * or the Base Key and the `"requestIdentifier"`-value, both joined and hashed (`SHA-256(BK + requestIdentifier)`) for the "request_credential" requests.
 
+The output is encoded as Base64 and the first 7 alphabetic characters are printed out as uppercase in the format `AB-CDE-FG`.
+
+The same fingerprint shall be calculated on the client side, so the user has the chance to compare both for equality to ensure the validity of the request.
 
 
 
