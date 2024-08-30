@@ -19,10 +19,6 @@ class WhatsNewActivity : IntroBaseActivity() {
         addSlide(WhatsNew2_0Fragment())
 
         addSlide(
-            AppIntroCustomLayoutFragment.newInstance(R.layout.fragment_whats_new_in_2_0
-            ))
-
-        addSlide(
             AppIntroCustomLayoutFragment.newInstance(R.layout.fragment_whats_new_in_1_9
             ))
 
@@ -34,6 +30,8 @@ class WhatsNewActivity : IntroBaseActivity() {
             AppIntroCustomLayoutFragment.newInstance(R.layout.fragment_whats_new_in_1_7
             ))
 
+
+        setSkipText(R.string.close)
     }
 
     override fun onSkipPressed(currentFragment: Fragment?) {

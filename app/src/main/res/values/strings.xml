@@ -546,9 +546,15 @@
     <string name="whats_new_in_1_9_bullet_4_text">The launcher icon has been polished to support any scale and, even more important, support monochrone themes.</string>
 
     <string name="whats_new_in_2_0">What\'s new in version 2.0</string>
-    <string name="whats_new_subtext_2_0">This new version is a breaking change since the app can act as a server, which requires internet connection.</string>
-    <string name="whats_new_in_2_0_bullet_1_head">Link the app to a remote device</string>
-    <string name="whats_new_in_2_0_bullet_1_text">The app can act as server in a local network. With the new ANOTHERpass browser extension (see here) you can link the app to several browsers running on remote devices, e.g. your laptop. You can fully disable this if you don\'t like this.</string>
+    <string name="whats_new_subtext_2_0">This new version can act as a credential server in a local network, which requires internet permission.</string>
+    <string name="whats_new_in_2_0_bullet_1_head">Link other device with the app</string>
+    <string name="whats_new_in_2_0_bullet_1_text">With the new ANOTHERpass Browser Extension you can link any device / browser in the same local network with the app, for instance your laptop.</string>
+    <string name="whats_new_in_2_0_bullet_2_head">Access credentials by other devices</string>
+    <string name="whats_new_in_2_0_bullet_2_text">After linking the app you can access all credentials of the app vault by the browser extension through an end-to-end-secured channel.</string>
+    <string name="whats_new_in_2_0_bullet_3_head">Store your credentials on the other devices</string>
+    <string name="whats_new_in_2_0_bullet_3_text">You can also store any credentials from the app\'s vault inside the extensions vault to access them faster.</string>
+    <string name="whats_new_in_2_0_enable_server">Yes, i want to give it a try!</string>
+    <string name="whats_new_in_2_0_disabled_server">OK, the server capability is completely deactivated. You can enable it again in the Settings.</string>
 
     <string name="intro">Show intro</string>
     <string name="intro_1_head">Another way to manage passwords</string>
@@ -573,7 +579,7 @@
     <string name="intro_6_head">Access the vault from different devices</string>
     <string name="intro_6_subtext">With the ANOTHERpass Browser Extension you can access your credentials from each browser on each device in your local network.</string>
     <string name="intro_6_bullet_1">The app is still the central place of your credentials.</string>
-    <string name="intro_6_bullet_2">You can fetch any credential from the app with the browser extension.</string>
+    <string name="intro_6_bullet_2">You can fetch any credential from the app with the browser extension. You only need to unlock the app.</string>
     <string name="intro_6_bullet_3">You may want to store fetched credentials locally in the extension / browser to access them faster.</string>
     <string name="intro_6_bullet_4">All data transferred between the extension and the app is end-to-end encrypted. Locally stored credentials are encrypted with the app\'s master key.</string>
     <string name="intro_6_bullet_5">If you don\'t want to use the extension, you can completely disable the server capability in the app.</string>

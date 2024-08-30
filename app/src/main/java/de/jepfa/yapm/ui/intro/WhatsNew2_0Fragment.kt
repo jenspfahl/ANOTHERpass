@@ -6,14 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import de.jepfa.yapm.R
 import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.service.secretgenerator.SecretStrength
 import de.jepfa.yapm.service.secretgenerator.passphrase.PassphraseGenerator
-import de.jepfa.yapm.service.secretgenerator.passphrase.PassphraseGeneratorSpec
-import de.jepfa.yapm.util.PasswordColorizer
 
 
 class WhatsNew2_0Fragment : Fragment() {
@@ -41,7 +37,7 @@ class WhatsNew2_0Fragment : Fragment() {
         enableServer.setOnCheckedChangeListener { _, checked ->
             PreferenceService.putBoolean(PreferenceService.PREF_SERVER_CAPABILITIES_ENABLED, checked, null)
             if (!checked) {
-                enableServer.text = "Ok, the server capability is completelly deactivated. You can enable it again in the Settings."
+                enableServer.text = getString(R.string.whats_new_in_2_0_disabled_server)
             }
             else {
                 enableServer.text = currentText

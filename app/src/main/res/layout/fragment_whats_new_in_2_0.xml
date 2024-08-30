@@ -31,7 +31,7 @@
                 android:id="@+id/textview_subtext"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                app:layout_constraintVertical_weight="1"
+                app:layout_constraintVertical_weight="1.1"
                 android:gravity="center"
                 android:textSize="16sp"
                 android:paddingHorizontal="15dp"
@@ -82,7 +82,35 @@
                                 android:layout_height="wrap_content"
                                 android:paddingHorizontal="12dp"
                                 android:text="@string/whats_new_in_2_0_bullet_1_text" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:paddingTop="16dp"
+                                android:text="@string/whats_new_in_2_0_bullet_2_head" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingHorizontal="12dp"
+                                android:text="@string/whats_new_in_2_0_bullet_2_text" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:paddingTop="16dp"
+                                android:text="@string/whats_new_in_2_0_bullet_3_head" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingHorizontal="12dp"
+                                android:text="@string/whats_new_in_2_0_bullet_3_text" />
                         </LinearLayout>
+
+
                     </TableRow>
 
 
@@ -90,9 +118,10 @@
 
                     <CheckBox
                         android:id="@+id/enable_server"
-                        android:text="Yes, i want to try it out!"
+                        android:text="@string/whats_new_in_2_0_enable_server"
                         android:checked="true"
-                        ></CheckBox>
+                        android:paddingBottom="8dp"
+                        />
 
 
                 </TableLayout>
@@ -104,7 +133,7 @@
                 android:id="@+id/textview_space"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                app:layout_constraintVertical_weight="0.5"
+                app:layout_constraintVertical_weight="0.7"
                 android:gravity="center"
                 android:textSize="16sp"
                 android:paddingHorizontal="15dp"
