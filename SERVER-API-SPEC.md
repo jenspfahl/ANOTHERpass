@@ -55,7 +55,7 @@ The response body looks similar to the request body. A body is only contained if
 
 ### HTTP status codes
 
- * 100 continue requestinh
+ * 100 continue requesting
  * 200 success
  * 204 success, but no content
  * 400 malformed or bad client request
@@ -228,6 +228,12 @@ Returns the created credentials as for `fetch_credential_for_url` or 409 if noth
 Tries to derive the client key from the app's master key. No user interaction needed.
 
 Returns the clientKey and no other credential.
+
+* `cancel_request`
+
+Cancels the current active request on the app. Executed when the user cancels the request in the client.
+
+Returns no data.
 
 
 

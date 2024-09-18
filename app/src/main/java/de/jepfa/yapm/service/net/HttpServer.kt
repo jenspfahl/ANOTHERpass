@@ -162,6 +162,16 @@ object HttpServer {
                                         return@post
                                     }
 
+                                    if (!activity.isActivityInForeground()) {
+                                        Log.d("HTTP", "activity $activity not in foreground (${activity.lifecycle.currentState})")
+                                        respondError(
+                                            null,
+                                            HttpStatusCode.Continue,
+                                            "not in foreground",
+                                        )
+                                        return@post
+                                    }
+
                                     if (Session.isDenied()) {
                                         respondError(
                                             null,

@@ -263,6 +263,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     CoroutineScope(Dispatchers.Main).launch {
                         val sb = StringBuilder()
                         sb.addFormattedLine("Status", stat)
+                        sb.addFormattedLine("Request-Status", HttpCredentialRequestHandler.currentRequestState())
                         sb.addFormattedLine("Protocol", "HTTP")
                         sb.addFormattedLine("IP", ip)
                         sb.addFormattedLine("Hostname", host)

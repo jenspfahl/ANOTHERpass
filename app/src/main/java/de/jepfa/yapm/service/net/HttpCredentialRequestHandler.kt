@@ -31,7 +31,6 @@ import de.jepfa.yapm.util.toUUIDOrNull
 import de.jepfa.yapm.util.toastText
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.RequestConnectionPoint
-import io.ktor.util.encodeBase64
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -51,9 +50,13 @@ object HttpCredentialRequestHandler {
 
     var credentialSelectState: MultipleCredentialSelectState = MultipleCredentialSelectState.NONE
     private var serverSnackbar: Snackbar? = null
+    private var serverRequestBottomSheets: MutableMap<String, ServerRequestBottomSheet> = HashMap()
+
 
 
     fun isProgressing() = webClientCredentialRequestState.isProgressing
+
+    fun currentRequestState() = webClientCredentialRequestState
 
     fun getWebsiteSuggestion(): Triple<String, String, String>? {
         if (isProgressing() && webClientRequestedWebsite != null) {
@@ -122,13 +125,24 @@ object HttpCredentialRequestHandler {
             msg = "Handling request '${webClientRequestIdentifier?.take(6)?:"??"}' with command ${command.command} and state $webClientCredentialRequestState",
         )
 
+        if (command == FetchCredentialCommand.CANCEL_REQUEST) {
+            updateRequestState(CredentialRequestState.Denied, requestFlows)
+            CoroutineScope(Dispatchers.Main).launch {
+                serverRequestBottomSheets[incomingRequestIdentifier]?.dismiss()
+                serverRequestBottomSheets.remove(incomingRequestIdentifier)
+
+                serverSnackbar?.dismiss()
+                requestFlows.resetUi()
+                toastText(
+                    requestFlows.getLifeCycleActivity(),
+                    requestFlows.getLifeCycleActivity().getString(R.string.request_denied)
+                )
+            }
+        }
+
+
         when (webClientCredentialRequestState) {
             CredentialRequestState.Incoming -> {
-
-                if (!requestFlows.getLifeCycleActivity().isActivityInForeground()) {
-                    Log.d("HTTP", "activity ${requestFlows.getLifeCycleActivity()} not in foreground (${requestFlows.getLifeCycleActivity().lifecycle.currentState})")
-                    return toErrorResponse(HttpStatusCode.Continue, "not in foreground")
-                }
 
                 val sharedBaseKey = SecretService.decryptKey(key, webExtension.sharedBaseKey)
                 val requestIdentifierKey = Key(Base64.decode(webClientRequestIdentifier, 0))
@@ -149,6 +163,7 @@ object HttpCredentialRequestHandler {
                             webExtension,
                             webClientTitle,
                             webClientId,
+                            incomingRequestIdentifier,
                             shortenedFingerprint,
                             website,
                             user
@@ -162,6 +177,7 @@ object HttpCredentialRequestHandler {
                             webExtension,
                             webClientTitle,
                             webClientId,
+                            incomingRequestIdentifier,
                             shortenedFingerprint
                         )
                     }
@@ -173,6 +189,7 @@ object HttpCredentialRequestHandler {
                             webExtension,
                             webClientTitle,
                             webClientId,
+                            incomingRequestIdentifier,
                             shortenedFingerprint,
                             null,
                             null
@@ -184,6 +201,7 @@ object HttpCredentialRequestHandler {
                             webExtension,
                             webClientTitle,
                             webClientId,
+                            incomingRequestIdentifier,
                             shortenedFingerprint,
                         )
                     }
@@ -193,6 +211,7 @@ object HttpCredentialRequestHandler {
                             webExtension,
                             webClientTitle,
                             webClientId,
+                            incomingRequestIdentifier,
                             shortenedFingerprint
                         )
                     }
@@ -202,6 +221,7 @@ object HttpCredentialRequestHandler {
                             webExtension,
                             webClientTitle,
                             webClientId,
+                            incomingRequestIdentifier,
                             shortenedFingerprint
                         )
                     }
@@ -211,6 +231,7 @@ object HttpCredentialRequestHandler {
                             webExtension,
                             webClientTitle,
                             webClientId,
+                            incomingRequestIdentifier,
                             shortenedFingerprint
                         )
                     }
@@ -220,6 +241,7 @@ object HttpCredentialRequestHandler {
                             webExtension,
                             webClientTitle,
                             webClientId,
+                            incomingRequestIdentifier,
                             shortenedFingerprint
                         )
                     }
@@ -229,6 +251,7 @@ object HttpCredentialRequestHandler {
                             webExtension,
                             webClientTitle,
                             webClientId,
+                            incomingRequestIdentifier,
                             shortenedFingerprint,
                             website,
                             user
@@ -299,6 +322,7 @@ object HttpCredentialRequestHandler {
         webExtension: EncWebExtension,
         webClientTitle: String,
         webClientId: String,
+        incomingRequestIdentifier: String,
         shortenedFingerprint: String,
         website: String?,
         user: String?
@@ -312,6 +336,7 @@ object HttpCredentialRequestHandler {
                     webClientTitle,
                     webClientId,
                     requestFlows.getLifeCycleActivity().getString(R.string.request_detail_fetch_by_uid, name),
+                    incomingRequestIdentifier,
                     shortenedFingerprint,
                     requestFlows.getLifeCycleActivity().getString(R.string.request_user_action_fetch_by_uid, name)
                 )
@@ -329,6 +354,7 @@ object HttpCredentialRequestHandler {
                         webExtension,
                         webClientTitle,
                         webClientId,
+                        incomingRequestIdentifier,
                         shortenedFingerprint
                     )
                 }
@@ -348,6 +374,7 @@ object HttpCredentialRequestHandler {
         webExtension: EncWebExtension,
         webClientTitle: String,
         webClientId: String,
+        incomingRequestIdentifier: String,
         shortenedFingerprint: String,
     ) {
 
@@ -357,6 +384,7 @@ object HttpCredentialRequestHandler {
             webClientTitle,
             webClientId,
             requestFlows.getLifeCycleActivity().getString(R.string.request_detail_fetch_by_uids),
+            incomingRequestIdentifier,
             shortenedFingerprint,
             requestFlows.getLifeCycleActivity().getString(R.string.request_user_action_fetch_by_uids)
         )
@@ -373,6 +401,7 @@ object HttpCredentialRequestHandler {
         webExtension: EncWebExtension,
         webClientTitle: String,
         webClientId: String,
+        incomingRequestIdentifier: String,
         shortenedFingerprint: String
     ) {
         val domain = extractDomain(website, withTld = true)
@@ -382,6 +411,7 @@ object HttpCredentialRequestHandler {
             webClientTitle,
             webClientId,
             requestFlows.getLifeCycleActivity().getString(R.string.request_detail_fetch_by_website, domain),
+            incomingRequestIdentifier,
             shortenedFingerprint,
             requestFlows.getLifeCycleActivity().getString(R.string.request_user_action_fetch_by_website, domain)
         )
@@ -397,6 +427,7 @@ object HttpCredentialRequestHandler {
         webExtension: EncWebExtension,
         webClientTitle: String,
         webClientId: String,
+        incomingRequestIdentifier: String,
         shortenedFingerprint: String,
         website: String,
         user: String
@@ -409,6 +440,7 @@ object HttpCredentialRequestHandler {
             webClientTitle,
             webClientId,
             requestFlows.getLifeCycleActivity().getString(R.string.request_detail_create_by_website, domain),
+            incomingRequestIdentifier,
             shortenedFingerprint,
             requestFlows.getLifeCycleActivity().getString(R.string.request_user_action_create_by_website, domain),
             showSnackbars = false,
@@ -429,6 +461,7 @@ object HttpCredentialRequestHandler {
         webExtension: EncWebExtension,
         webClientTitle: String,
         webClientId: String,
+        incomingRequestIdentifier: String,
         shortenedFingerprint: String
     ) {
         showClientRequest(
@@ -437,6 +470,7 @@ object HttpCredentialRequestHandler {
             webClientTitle,
             webClientId,
             requestFlows.getLifeCycleActivity().getString(R.string.request_detail_client_key),
+            incomingRequestIdentifier,
             shortenedFingerprint,
             requestFlows.getLifeCycleActivity().getString(R.string.request_user_action_client_key)
         )
@@ -450,6 +484,7 @@ object HttpCredentialRequestHandler {
         webExtension: EncWebExtension,
         webClientTitle: String,
         webClientId: String,
+        incomingRequestIdentifier: String,
         shortenedFingerprint: String
     ) {
         showClientRequest(
@@ -458,6 +493,7 @@ object HttpCredentialRequestHandler {
             webClientTitle,
             webClientId,
             requestFlows.getLifeCycleActivity().getString(R.string.request_detail_fetch_any),
+            incomingRequestIdentifier,
             shortenedFingerprint,
             requestFlows.getLifeCycleActivity().getString(R.string.request_user_action_fetch_any)
         )
@@ -472,6 +508,7 @@ object HttpCredentialRequestHandler {
         webExtension: EncWebExtension,
         webClientTitle: String,
         webClientId: String,
+        incomingRequestIdentifier: String,
         shortenedFingerprint: String
     ) {
         showClientRequest(
@@ -481,6 +518,7 @@ object HttpCredentialRequestHandler {
             webClientId,
 
             requestFlows.getLifeCycleActivity().getString(R.string.request_detail_fetch_multiple),
+            incomingRequestIdentifier,
             shortenedFingerprint,
             requestFlows.getLifeCycleActivity().getString(R.string.request_user_action_fetch_multiple)
         )
@@ -497,6 +535,7 @@ object HttpCredentialRequestHandler {
         webExtension: EncWebExtension,
         webClientTitle: String,
         webClientId: String,
+        incomingRequestIdentifier: String,
         shortenedFingerprint: String
     ) {
         showClientRequest(
@@ -505,6 +544,7 @@ object HttpCredentialRequestHandler {
             webClientTitle,
             webClientId,
             requestFlows.getLifeCycleActivity().getString(R.string.request_detail_fetch_all),
+            incomingRequestIdentifier,
             shortenedFingerprint,
             requestFlows.getLifeCycleActivity().getString(R.string.request_user_action_fetch_all)
         )
@@ -528,6 +568,7 @@ object HttpCredentialRequestHandler {
         webClientTitle: String,
         webClientId: String,
         details: String,
+        incomingRequestIdentifier: String,
         shortenedFingerprint: String,
         userActionText: String,
         showSnackbars: Boolean = true,
@@ -557,6 +598,7 @@ object HttpCredentialRequestHandler {
                 webClientTitle,
                 webClientId,
                 details,
+                incomingRequestIdentifier,
                 shortenedFingerprint,
                 webExtension,
             )
@@ -580,11 +622,15 @@ object HttpCredentialRequestHandler {
         webClientTitle: String,
         webClientId: String,
         details: String,
+        incomingRequestIdentifier: String,
         shortenedFingerprint: String,
         webExtension: EncWebExtension,
         acceptHandler: () -> Unit,
     ) {
-        ServerRequestBottomSheet(
+        serverRequestBottomSheets[incomingRequestIdentifier]?.dismiss()
+        serverRequestBottomSheets.remove(incomingRequestIdentifier)
+
+        val serverRequestBottomSheet = ServerRequestBottomSheet(
             requestFlows.getLifeCycleActivity(),
             webClientTitle = webClientTitle,
             webClientId = webClientId,
@@ -592,21 +638,31 @@ object HttpCredentialRequestHandler {
             fingerprint = shortenedFingerprint,
             denyHandler = { allowBypass ->
                 webExtension.bypassIncomingRequests = allowBypass
-                requestFlows.getLifeCycleActivity().webExtensionViewModel.save(webExtension, requestFlows.getLifeCycleActivity())
+                requestFlows.getLifeCycleActivity().webExtensionViewModel.save(
+                    webExtension,
+                    requestFlows.getLifeCycleActivity()
+                )
 
                 updateRequestState(CredentialRequestState.Denied, requestFlows)
-                toastText(requestFlows.getLifeCycleActivity(),
-                    requestFlows.getLifeCycleActivity().getString(R.string.request_denied))
+                toastText(
+                    requestFlows.getLifeCycleActivity(),
+                    requestFlows.getLifeCycleActivity().getString(R.string.request_denied)
+                )
             },
             acceptHandler = { allowBypass ->
                 webExtension.bypassIncomingRequests = allowBypass
-                requestFlows.getLifeCycleActivity().webExtensionViewModel.save(webExtension, requestFlows.getLifeCycleActivity())
+                requestFlows.getLifeCycleActivity().webExtensionViewModel.save(
+                    webExtension,
+                    requestFlows.getLifeCycleActivity()
+                )
 
                 updateRequestState(CredentialRequestState.Accepted, requestFlows)
 
                 acceptHandler()
             }
-        ).show()
+        )
+        serverRequestBottomSheet.show()
+        serverRequestBottomSheets[incomingRequestIdentifier] = serverRequestBottomSheet
     }
 
     fun showUserActionSnackbar(

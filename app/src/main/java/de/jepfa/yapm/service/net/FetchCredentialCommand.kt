@@ -10,6 +10,7 @@ enum class FetchCredentialCommand(val command: String) {
     FETCH_MULTIPLE_CREDENTIALS("fetch_multiple_credentials"),
     FETCH_ALL_CREDENTIALS("fetch_all_credentials"),
     FETCH_CLIENT_KEY("get_client_key"),
+    CANCEL_REQUEST("cancel_request"),
     ;
 
     companion object {
