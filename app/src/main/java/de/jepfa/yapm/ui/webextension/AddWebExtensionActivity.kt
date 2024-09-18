@@ -71,6 +71,12 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
         webClientIdTextView = findViewById(R.id.web_extension_client_id)
         serverAddressTextView = findViewById(R.id.web_extension_server_address)
 
+        webClientIdTextView.setOnLongClickListener {
+            qrCodeScannerImageView.visibility = ViewGroup.VISIBLE
+            titleTextView.isEnabled = true
+            true
+       }
+
         serverAddressTextView.text = HttpServer.getHostNameOrIpAndHandle(this, emphasiseHandle = true) {
             serverAddressTextView.text = it
         }
@@ -203,11 +209,11 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
             val clientPubKeyFingerprint = splitted[2]
 
             Log.i("HTTP", "received clientPubKeyFingerprint=$clientPubKeyFingerprint")
-            Log.i("HTTP", "received sessionKeyBase64=$sessionKeyBase64")
+            Log.i("HTTP", "received sessionKeyBase64.length=${sessionKeyBase64.length}")
 
             if (webClientId.isNullOrBlank()
-                || sessionKeyBase64.isNullOrBlank()
-                || clientPubKeyFingerprint.isNullOrBlank()
+                || sessionKeyBase64.isBlank()
+                || clientPubKeyFingerprint.isBlank()
                 || !HttpServer.checkWebClientIdFormat(webClientId!!)) {
                 webClientId = null
                 toastText(this, R.string.unknown_qr_code)
@@ -215,7 +221,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
             }
 
             val sessionKey = Key(Base64.decode(sessionKeyBase64, Base64.DEFAULT))
-            Log.i("HTTP", "received sessionKey=${sessionKey.debugToString()}")
+            Log.i("HTTP", "received sessionKey.size=${sessionKey.data.size}")
 
             qrCodeScannerImageView.visibility = ViewGroup.GONE
             webClientIdTextView.visibility = ViewGroup.VISIBLE
@@ -289,7 +295,6 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
                 val eBase64 = clientPubKeyAsJWK.getString("e")
                 Log.d("HTTP", "clientPubKey.n=$nBase64")
                 Log.d("HTTP", "clientPubKey.e=$eBase64")
-                Log.d("HTTP", "clientPubKey as bytes=${Base64.decode(nBase64, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING).contentToString()}")
 
                 val nHashed = nBase64.toByteArray().sha256()
                 val fingerprintToHex = nHashed.toHex()
@@ -331,7 +336,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
                 val sharedBaseKeyBase64 = Base64.encodeToString(sharedBaseKey.toByteArray(), Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
                 sharedBaseKey.clear()
 
-                Log.d("HTTP", "sharedBaseKeyBase64=$sharedBaseKeyBase64")
+                Log.d("HTTP", "sharedBaseKeyBase64.length=${sharedBaseKeyBase64.length}")
 
                 val jwk = JSONObject()
                 jwk.put("n", nServerBase64)
@@ -379,7 +384,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
                     ).show()
                 }
 
-                Log.d("HTTP", "link response=" + response.toString(4))
+                //Log.d("HTTP", "link response=" + response.toString(4))
 
                 return Pair(HttpStatusCode.OK, response)
             }

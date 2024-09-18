@@ -93,6 +93,15 @@ object HttpServer {
                                     "*"
                                 )
 
+                                if (SecretService.isDeviceLocked(activity)) {
+                                    respondError(
+                                        null,
+                                        HttpStatusCode.Unauthorized,
+                                        "device locked",
+                                    )
+                                    return@get
+                                }
+
                                 if (Session.isDenied()) {
                                     respondError(
                                         null,
@@ -143,6 +152,15 @@ object HttpServer {
                                         origin = call.request.origin,
                                         msg = "POST request received",
                                     )
+
+                                    if (SecretService.isDeviceLocked(activity)) {
+                                        respondError(
+                                            null,
+                                            HttpStatusCode.Unauthorized,
+                                            "device locked",
+                                        )
+                                        return@post
+                                    }
 
                                     if (Session.isDenied()) {
                                         respondError(
@@ -216,7 +234,6 @@ object HttpServer {
                                     val body = call.receive<String>()
 
                                     Log.d("HTTP", "requesting web extension: $webClientId")
-                                    Log.d("HTTP", "payload: $body")
 
                                     val sharedBaseOrLinkingSessionKey = SecretService.decryptKey(masterKey, webExtension.sharedBaseKey)
                                     if (!sharedBaseOrLinkingSessionKey.isValid()) {
@@ -497,11 +514,13 @@ object HttpServer {
         else {
             val encOneTimeKey = Base64.decode(encOneTimeKeyBase64, Base64.DEFAULT)
             val serverPrivateKey = SecretService.getServerPrivateKey(webExtension.getServerKeyPairAlias()) ?: return null
-            Log.d("HTTP", "encOneTimeKey=" + encOneTimeKey.contentToString())
+            Log.d("HTTP", "encOneTimeKey.size=" + encOneTimeKey.size)
 
             val decOneTimeKey = SecretService.decryptKeyWithPrivateKey(serverPrivateKey, encOneTimeKey, workaroundMode = true)
-            Log.d("HTTP", "sharedBaseKeyBase64=" + sharedBaseKey.toBase64String())
-            Log.d("HTTP", "reqOneTimeKeyBase64=" + decOneTimeKey.toBase64String())
+            if (!decOneTimeKey.isValid()) {
+                Log.w("HTTP", "decOneTimeKey not valid")
+                return null
+            }
 
             return SecretService.conjunctKeys(sharedBaseKey, decOneTimeKey)
         }
@@ -534,12 +553,9 @@ object HttpServer {
 
     private fun unwrapBody(transportKey: Key, body: JSONObject, context: Context): JSONObject? {
         val envelope = body.getString("envelope")
-        Log.d("HTTP", "envelope=$envelope")
         val encEnvelope = Encrypted.fromBase64String(envelope)
 
-        Log.d("HTTP", "reqTransportKey.array=${transportKey.debugToString()}")
         Log.d("HTTP", "reqTransportKey.length=${transportKey.data.size}")
-        Log.d("HTTP", "reqTransportKey.base64=${transportKey.toBase64String()}")
 
         val secretKey = SecretService.buildAesKey(transportKey, context)
         val decryptedEnvelope = SecretService.decryptCommonString(secretKey, encEnvelope)
@@ -548,7 +564,7 @@ object HttpServer {
             return null
         }
         val jsonBody = JSONObject(decryptedEnvelope)
-        Log.d("HTTP","unwrapped request: " + jsonBody.toString(4))
+        //Log.d("HTTP","unwrapped request: " + jsonBody.toString(4))
 
         return jsonBody
     }
@@ -640,7 +656,7 @@ object HttpServer {
         val envelope = JSONObject()
         envelope.put("encOneTimeKey", encOneTimeKeyBase64)
         envelope.put("envelope", encryptedEnvelope.toBase64String())
-        Log.d("HTTP","wrapped response: " + envelope.toString(4))
+        //Log.d("HTTP","wrapped response: " + envelope.toString(4))
 
         oneTimeKey.clear()
         responseTransportKey.clear()

@@ -1,1 +1,1 @@
-* Use app as a local server to connect to ANOTHERpass web extension (https://github.com/jenspfahl/anotherpass-webext)
+* Use app as a local credential server to connect with the ANOTHERpass browser extension (https://github.com/jenspfahl/anotherpass-browserextension)

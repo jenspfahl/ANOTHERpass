@@ -440,7 +440,12 @@ object SecretService {
         return SecretKeyHolder(sk, DEFAULT_CIPHER_ALGORITHM, androidKey, context)
     }
 
-    fun checkKeyRequiresUserAuthOnInsecureDevice(secretKeyHolder: SecretKeyHolder, context: Context): Boolean {
+    fun isDeviceLocked(context: Context): Boolean {
+        val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+        return keyguardManager.isDeviceLocked
+    }
+
+    private fun checkKeyRequiresUserAuthOnInsecureDevice(secretKeyHolder: SecretKeyHolder, context: Context): Boolean {
         val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         val deviceRequiresUserAuth = keyguardManager.isDeviceSecure
         val keyInfo = getKeyInfo(secretKeyHolder)
