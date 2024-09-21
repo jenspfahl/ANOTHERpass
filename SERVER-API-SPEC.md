@@ -55,8 +55,8 @@ The response body looks similar to the request body. A body is only contained if
 
 ### HTTP status codes
 
- * 100 continue requesting
  * 200 success
+ * 202 accepted, but continue requesting
  * 204 success, but no content
  * 400 malformed or bad client request
  * 401 app vault is locked
@@ -66,7 +66,7 @@ The response body looks similar to the request body. A body is only contained if
  * 500 error in the server/app
 
 Clients can keep polling if they receive these status codes:
- * 100 --> user should accept the incoming request or perform the requested action
+ * 202 --> user should accept the incoming request or perform the requested action
  * 401 --> user should open the app and unlock the vault
 
 Clients should stop polling if they receive:

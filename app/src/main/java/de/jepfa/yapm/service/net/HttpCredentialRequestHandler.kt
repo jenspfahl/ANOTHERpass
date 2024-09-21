@@ -125,6 +125,11 @@ object HttpCredentialRequestHandler {
             msg = "Handling request '${webClientRequestIdentifier?.take(6)?:"??"}' with command ${command.command} and state $webClientCredentialRequestState",
         )
 
+        if (!requestFlows.getLifeCycleActivity().isActivityInForeground()) {
+            Log.d("HTTP", "activity ${requestFlows.getLifeCycleActivity()} not in foreground (${requestFlows.getLifeCycleActivity().lifecycle.currentState})")
+            return toErrorResponse(HttpStatusCode.Unauthorized, "not in foreground")
+        }
+
         if (command == FetchCredentialCommand.CANCEL_REQUEST) {
             updateRequestState(CredentialRequestState.Denied, requestFlows)
             CoroutineScope(Dispatchers.Main).launch {
@@ -262,10 +267,10 @@ object HttpCredentialRequestHandler {
                     }
                 }
 
-                return toErrorResponse(HttpStatusCode.Continue, "no user acknowledge")
+                return toErrorResponse(HttpStatusCode.Accepted, "no user acknowledge")
             }
             CredentialRequestState.AwaitingAcceptance -> {
-                return toErrorResponse(HttpStatusCode.Continue, "pending request")
+                return toErrorResponse(HttpStatusCode.Accepted, "pending request")
             }
             CredentialRequestState.Denied -> {
                 webClientRequestIdentifier = null
@@ -285,7 +290,7 @@ object HttpCredentialRequestHandler {
                         postSelectedCredentials(requestFlows, key, webClientId)
                     }
                     else {
-                        toErrorResponse(HttpStatusCode.Continue, "no user selection")
+                        toErrorResponse(HttpStatusCode.Accepted, "no user selection")
                     }
                 }
                 else if (command == FetchCredentialCommand.FETCH_ALL_CREDENTIALS) {
@@ -301,7 +306,7 @@ object HttpCredentialRequestHandler {
                         postCredential(requestFlows, key, webClientId, currCredential)
                     } else {
                         // waiting for user s selection
-                        toErrorResponse(HttpStatusCode.Continue, "no user selection")
+                        toErrorResponse(HttpStatusCode.Accepted, "no user selection")
                     }
                 }
             }
