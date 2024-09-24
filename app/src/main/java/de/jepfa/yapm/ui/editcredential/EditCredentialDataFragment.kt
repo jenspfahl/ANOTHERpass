@@ -438,7 +438,7 @@ class EditCredentialDataFragment : SecureFragment() {
         // we create the new credential out of a former current if present or else out of the original if present
         val credentialToSave = EncCredential(
             editCredentialActivity.currentId,
-            editCredentialActivity.original?.uid,
+            editCredentialActivity.original?.uid ?: UUID.randomUUID(),
             encName,
             encAdditionalInfo,
             encUser,
