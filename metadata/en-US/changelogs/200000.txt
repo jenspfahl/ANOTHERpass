@@ -1,1 +1,2 @@
 * Use app as a local credential server to connect with the ANOTHERpass browser extension (https://github.com/jenspfahl/anotherpass-browserextension)
+* bugfix issue #74 Unlocking vault from Autofill wit no entries

@@ -763,7 +763,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     override fun onResume() {
         super.onResume()
         Log.i(LOG_PREFIX + "LST", "onResume")
-        updateSearchFieldWithAutofillSuggestion(intent)
+        updateSearchFieldWithAutofillSuggestion(intent, refreshCredentials = true)
 
         val navMenuAlwaysCollapsed = PreferenceService.getAsBool(
             PREF_NAV_MENU_ALWAYS_COLLAPSED, false, this@ListCredentialsActivity)
@@ -987,7 +987,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         super.onDestroy()
     }
 
-    private fun updateSearchFieldWithAutofillSuggestion(intent: Intent?) {
+    private fun updateSearchFieldWithAutofillSuggestion(intent: Intent?, refreshCredentials: Boolean = false) {
         if (!Session.isDenied()) {
             intent?.action?.let { action ->
                 Log.i(LOG_PREFIX + "LST", "action2=$action")
@@ -998,6 +998,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         val searchString = action.substringAfter(ACTION_DELIMITER).substringBeforeLast(ACTION_DELIMITER).lowercase()
                         if (searchString.isNotBlank()) {
                             startSearchFor("!$searchString")
+                            if (refreshCredentials) {
+                                refreshCredentials()
+                            }
                         }
                     }
                 }
@@ -1008,6 +1011,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     if (searchString.isNotBlank()) {
                         val success = startSearchFor("$searchString")
                         if (success) {
+                            if (refreshCredentials) {
+                                refreshCredentials()
+                            }
                             intent.action = null // one shot, don't filter again
                         }
                     }
