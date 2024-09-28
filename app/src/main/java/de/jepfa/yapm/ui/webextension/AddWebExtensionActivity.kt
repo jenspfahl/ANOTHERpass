@@ -289,7 +289,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
             else{
                 Log.d("HTTP", "Validate client pubkey")
 
-                val clientPubKeyAsJWK = message.getJSONObject("clientPublicKey")
+                val clientPubKeyAsJWK = message.getJSONObject("clientPubKey")
 
                 val nBase64 = clientPubKeyAsJWK.getString("n")
                 val eBase64 = clientPubKeyAsJWK.getString("e")

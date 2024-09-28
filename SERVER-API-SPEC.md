@@ -104,7 +104,7 @@ A linking request looks like this:
 ```
 {
     "action": "link_app",
-    "clientPublicKey": {
+    "clientPubKey": {
         "n" : <modulus as base64 of the Public Key of the client>,
         "e" : <exponent as base64 of the Public Key of the client>
     }  
