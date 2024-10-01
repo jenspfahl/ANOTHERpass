@@ -350,6 +350,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                             startActivity(intent)
                             true
                         }
+                        R.id.action_server_help -> {
+                            val browserIntent = Intent(Intent.ACTION_VIEW, Constants.EXTENSION_HOMEPAGE)
+                            startActivity(browserIntent)
+                            true
+                        }
                         else -> false
                     }
                 }

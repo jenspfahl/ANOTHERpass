@@ -539,7 +539,7 @@
     <string name="whats_new_in_2_0">Was ist neu in Version  2.0</string>
     <string name="whats_new_subtext_2_0">Diese neue Version enthält einen neuen Zugangsdaten-Server für das lokale Netzwerk, welche die Internet-Berechtigung erfordert.</string>
     <string name="whats_new_in_2_0_bullet_1_head">Verknüpfe andere Geräte mit der App</string>
-    <string name="whats_new_in_2_0_bullet_1_text">Mit der neuen ANOTHERpass Browsererweiterung kannst du jedes Gerät mit einem Browser in deinem lokalen Netzwerk mit der App verknüpfen, z.B. deinem Laptop.</string>
+    <string name="whats_new_in_2_0_bullet_1_text">Mit der neuen <a href="https://anotherpass.jepfa.de/extension/">ANOTHERpass Browsererweiterung</a> kannst du jedes Gerät mit einem Browser in deinem lokalen Netzwerk mit der App verknüpfen, z.B. deinem Laptop.</string>
     <string name="whats_new_in_2_0_bullet_2_head">Greife auf deine Zugangsdaten von anderen Geräten aus zu</string>
     <string name="whats_new_in_2_0_bullet_2_text">Nachdem eine Verknüpfung mit der App hergestellt wurde, kannst du verschiedene Zugangsdaten in deinem App-Tresor von der Erweiterung aus abrufen. Dies geschieht Ende-zu-Ende-verschlüsselt.</string>
     <string name="whats_new_in_2_0_bullet_3_head">Speichere deine Zugangsdaten auf dem anderen Gerät</string>
@@ -569,7 +569,7 @@
     <string name="intro_5_bullet_4">ANOTHERpass kann einen integrierten Sicherheitschip verwenden, falls vorhanden.</string>
 
     <string name="intro_6_head">Verwendung von verschiedenen Geräten</string>
-    <string name="intro_6_subtext">Mit der ANOTHERpass Browsererweiterung kannst du deine Zugangsdaten von jedem Gerät mit einem Browser innerhalb deines lokelen Netzwerkes abrufen.</string>
+    <string name="intro_6_subtext">Mit der <a href="https://anotherpass.jepfa.de/extension/">ANOTHERpass Browsererweiterung</a> kannst du deine Zugangsdaten von jedem Gerät mit einem Browser innerhalb deines lokelen Netzwerkes abrufen.</string>
     <string name="intro_6_bullet_1">Die App bleibt der zentrale Speicherort deiner Zugangsdaten.</string>
     <string name="intro_6_bullet_2">Du kannst die Zugangsdaten mit der Browsererweitungung bequem abfragen. Du musst nur deine App entsperren.</string>
     <string name="intro_6_bullet_3">Du kannst deine Zugangsdaten in der Browsererweiterung speichern, um schneller darauf zugreifen zu können.</string>

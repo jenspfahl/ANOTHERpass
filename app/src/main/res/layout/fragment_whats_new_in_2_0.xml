@@ -78,6 +78,7 @@
                                 android:padding="6dp"
                                 android:text="@string/whats_new_in_2_0_bullet_1_head" />
                             <TextView
+                                android:id="@+id/textview_bullet_point_extension"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:paddingHorizontal="12dp"

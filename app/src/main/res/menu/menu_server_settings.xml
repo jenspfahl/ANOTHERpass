@@ -11,4 +11,9 @@
     <item android:id="@+id/menu_server_settings_open_settings"
         android:icon="@drawable/ic_settings_black_24dp"
         android:title="@string/open_server_settings" />
+
+    <item
+        android:id="@+id/action_server_help"
+        android:icon="@drawable/ic_baseline_help_outline_24"
+        android:title="@string/help" />
 </menu>

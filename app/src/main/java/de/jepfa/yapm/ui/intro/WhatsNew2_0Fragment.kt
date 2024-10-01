@@ -2,10 +2,12 @@ package de.jepfa.yapm.ui.intro
 
 import android.content.Context
 import android.os.Bundle
+import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import de.jepfa.yapm.R
 import de.jepfa.yapm.service.PreferenceService
@@ -33,6 +35,9 @@ class WhatsNew2_0Fragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val enableServer = view.findViewById<CheckBox>(R.id.enable_server)
         val currentText = enableServer.text
+
+        val textView: TextView = view.findViewById(R.id.textview_bullet_point_extension)
+        textView.movementMethod = LinkMovementMethod.getInstance()
 
         enableServer.setOnCheckedChangeListener { _, checked ->
             PreferenceService.putBoolean(PreferenceService.PREF_SERVER_CAPABILITIES_ENABLED, checked, null)
