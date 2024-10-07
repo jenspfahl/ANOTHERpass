@@ -550,7 +550,7 @@
     <string name="whats_new_in_2_0_bullet_1_head">Link other device with the app</string>
     <string name="whats_new_in_2_0_bullet_1_text">With the new <a href="https://anotherpass.jepfa.de/extension/">ANOTHERpass Browser Extension</a> you can link any device / browser in the same local network with the app, for instance your laptop.</string>
     <string name="whats_new_in_2_0_bullet_2_head">Access credentials from other devices</string>
-    <string name="whats_new_in_2_0_bullet_2_text">After linking the app you can access all credentials of the app\'s vault from the browser extension through an end-to-end-encrypted channel.</string>
+    <string name="whats_new_in_2_0_bullet_2_text">After linking the app you are able to access all credentials of the app\'s vault from the browser extension through an end-to-end-encrypted channel.</string>
     <string name="whats_new_in_2_0_bullet_3_head">Store your credentials on the other devices</string>
     <string name="whats_new_in_2_0_bullet_3_text">You can also store any credentials from the app\'s vault inside the extension\'s vault to access them faster.</string>
     <string name="whats_new_in_2_0_enable_server">Yes, i want to give it a try!</string>
@@ -577,7 +577,7 @@
     <string name="intro_5_bullet_3">Strong encryption of ALL sensitive vault data with at least 128 bit keys.</string>
     <string name="intro_5_bullet_4">ANOTHERpass uses a security chip if present for secure keys.</string>
     <string name="intro_6_head">Access the vault from different devices</string>
-    <string name="intro_6_subtext">With the <a href="https://anotherpass.jepfa.de/extension/">ANOTHERpass Browser Extension</a> you can access your credentials from each browser on each device in your local network.</string>
+    <string name="intro_6_subtext">With the <a href="https://anotherpass.jepfa.de/extension/">ANOTHERpass Browser Extension</a> you can access your credentials from each browser on each device in a local network.</string>
     <string name="intro_6_bullet_1">The app is still the central place of your credentials.</string>
     <string name="intro_6_bullet_2">You can fetch any credential from the app with the browser extension. You only need to unlock the app.</string>
     <string name="intro_6_bullet_3">You may want to store fetched credentials locally in the extension / browser to access them faster.</string>
@@ -822,7 +822,7 @@
     <string name="webextension_sort_by_id">By Link ID</string>
     <string name="webextension_sort_by_last_used">By last used</string>
     <string name="webextension_title">Name of the link</string>
-    <string name="link_webextension_explanation">Link a different device in the same local network by using the ANOTHERpass Browser Extension, e.g. your laptop. Follow the instructions as described here (link).</string>
+    <string name="link_webextension_explanation">Link a different device in the same local network by using the <a href="https://anotherpass.jepfa.de/extension/">ANOTHERpass Browser Extension</a>, e.g. your laptop.</string>
     <string name="link_webextension_step_1">At first, give it a name to organise your linked devices.</string>
     <string name="link_webextension_step_2">Second, scan the QR code presented by the extension by clicking on this icon. Once done, the Link ID of the extension will be shown instead.</string>
     <string name="link_webextension_step_3">Last, enter the app\'s handle, IP address or hostname presented below into the extension. (The handle is a shortened IP address.) In case you are the admin of the local network, make the IP address of your phone static or configure a hostname.</string>

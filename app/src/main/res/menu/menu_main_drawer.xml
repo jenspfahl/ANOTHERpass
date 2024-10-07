@@ -129,6 +129,12 @@
             android:title="@string/action_username_templates" />
 
         <item
+            android:id="@+id/menu_linked_devices"
+            android:icon="@drawable/baseline_phonelink_24"
+            android:title="@string/manage_linked_devices"
+            android:orderInCategory="140"/>
+
+        <item
             android:id="@+id/menu_settings"
             android:icon="@drawable/ic_settings_black_24dp"
             android:orderInCategory="160"

@@ -1511,6 +1511,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 return true
             }
 
+            R.id.menu_linked_devices -> {
+                val intent = Intent(this, ListWebExtensionsActivity::class.java)
+                startActivity(intent)
+                return true
+            }
+
             R.id.menu_settings -> {
                 val intent = Intent(this, SettingsActivity::class.java)
                 startActivity(intent)

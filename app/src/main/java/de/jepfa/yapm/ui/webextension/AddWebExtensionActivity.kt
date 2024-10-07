@@ -2,6 +2,7 @@ package de.jepfa.yapm.ui.webextension
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.SpannableString
 import android.text.TextUtils
 import android.util.Base64
 import android.util.Log
@@ -66,6 +67,8 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
             currentLogoutTimeout.coerceAtLeast(15),
         )
 
+        val explanationTextView = findViewById<TextView>(R.id.add_web_extension_intro)
+        linkify(explanationTextView, noScheme = true)
         titleTextView = findViewById(R.id.edit_web_extension_title)
         qrCodeScannerImageView = findViewById(R.id.imageview_scan_qrcode)
         webClientIdTextView = findViewById(R.id.web_extension_client_id)

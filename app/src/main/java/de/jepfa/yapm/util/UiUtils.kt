@@ -127,8 +127,10 @@ fun linkify(s: SpannableString) {
     Linkify.addLinks(s, Linkify.WEB_URLS)
 }
 
-fun linkify(textView: TextView) {
-    textView.text = ensureHttp(textView.text.toString())
+fun linkify(textView: TextView, noScheme: Boolean = false) {
+    if (!noScheme) {
+        textView.text = ensureHttp(textView.text.toString())
+    }
     Linkify.addLinks(textView, Linkify.WEB_URLS)
     textView.movementMethod = LinkMovementMethod.getInstance()
 }
