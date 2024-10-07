@@ -131,7 +131,7 @@
         <item
             android:id="@+id/menu_linked_devices"
             android:icon="@drawable/baseline_phonelink_24"
-            android:title="@string/manage_linked_devices"
+            android:title="@string/title_activity_list_web_extensions"
             android:orderInCategory="140"/>
 
         <item
