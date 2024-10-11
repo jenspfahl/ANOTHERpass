@@ -22,6 +22,7 @@ import de.jepfa.yapm.util.toastText
 abstract class ReadActivityBase : NfcBaseActivity() {
 
     protected var isFromQRScan = false
+    protected var onlyQrCodeScan = false
 
     init {
         enableBack = true
@@ -39,18 +40,24 @@ abstract class ReadActivityBase : NfcBaseActivity() {
 
         val scanQrCodeImageView = findViewById<ImageView>(R.id.imageview_scan_qrcode)
         scanQrCodeImageView.setOnClickListener {
-            QRCodeUtil.scanQRCode(this, getString(R.string.scanning_qrcode))
+            if (isAllowedToScanQrCode()) {
+                QRCodeUtil.scanQRCode(this, getString(R.string.scanning_qrcode))
+            }
         }
 
-        val scanNfcImageView: ImageView = findViewById(R.id.imageview_scan_nfc)
-        if (!NfcService.isNfcAvailable(this)) {
-            scanNfcImageView.visibility = View.GONE
-        }
-        scanNfcImageView.setOnClickListener {
-            NfcService.scanNfcTag(this)
+        if (!onlyQrCodeScan) {
+            val scanNfcImageView: ImageView = findViewById(R.id.imageview_scan_nfc)
+            if (!NfcService.isNfcAvailable(this)) {
+                scanNfcImageView.visibility = View.GONE
+            }
+            scanNfcImageView.setOnClickListener {
+                NfcService.scanNfcTag(this)
+            }
         }
 
     }
+
+    open fun isAllowedToScanQrCode(): Boolean = true
 
     override fun handleTag() {
         Log.i(LOG_PREFIX + "VERIFY", "tag detected " + ndefTag?.tagId)

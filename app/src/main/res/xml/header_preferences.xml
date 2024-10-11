@@ -49,4 +49,10 @@
         app:key="reminder_header"
         app:title="@string/pref_header_reminder" />
 
+    <Preference
+        app:fragment="de.jepfa.yapm.ui.settings.SettingsActivity$ServerSettingsFragment"
+        app:icon="@drawable/outline_dns_24"
+        app:key="server_header"
+        app:title="@string/server_settings" />
+
 </PreferenceScreen>

@@ -9,15 +9,17 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import de.jepfa.yapm.database.dao.EncCredentialDao
 import de.jepfa.yapm.database.dao.EncLabelDao
 import de.jepfa.yapm.database.dao.EncUsernameTemplateDao
+import de.jepfa.yapm.database.dao.EncWebExtensionDao
 import de.jepfa.yapm.database.entity.EncCredentialEntity
 import de.jepfa.yapm.database.entity.EncLabelEntity
 import de.jepfa.yapm.database.entity.EncUsernameTemplateEntity
+import de.jepfa.yapm.database.entity.EncWebExtensionEntity
 import java.util.*
 
-const val DB_VERSION = 7
+const val DB_VERSION = 8
 
 @Database(
-    entities = [EncCredentialEntity::class, EncLabelEntity::class, EncUsernameTemplateEntity::class],
+    entities = [EncCredentialEntity::class, EncLabelEntity::class, EncUsernameTemplateEntity::class, EncWebExtensionEntity::class],
     version = DB_VERSION,
     exportSchema = false
 )
@@ -25,6 +27,7 @@ abstract class YapmDatabase : RoomDatabase() {
     abstract fun credentialDao(): EncCredentialDao
     abstract fun labelDao(): EncLabelDao
     abstract fun usernameTemplateDao(): EncUsernameTemplateDao
+    abstract fun webExtensionDao(): EncWebExtensionDao
 
     companion object {
 
@@ -79,12 +82,25 @@ abstract class YapmDatabase : RoomDatabase() {
                                 database.execSQL("CREATE TABLE IF NOT EXISTS `EncUsernameTemplateEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `username` TEXT NOT NULL, `description` TEXT NOT NULL, `generatorType` TEXT NOT NULL)");
                             }
                         }
+                        val migration7to8 = object : Migration(7, 8) {
+                            override fun migrate(database: SupportSQLiteDatabase) {
+                                database.execSQL("CREATE TABLE IF NOT EXISTS `EncWebExtensionEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `webClientId` TEXT NOT NULL, `title` TEXT NOT NULL, `extensionPublicKey` TEXT NOT NULL, `sharedBaseKey` TEXT NOT NULL, `linked` INTEGER NOT NULL, `enabled` INTEGER NOT NULL, `bypassIncomingRequests` INTEGER NOT NULL, `lastUsedTimestamp` INTEGER)")
+                            }
+                        }
 
                         INSTANCE = Room.databaseBuilder(
                             context.applicationContext,
                             YapmDatabase::class.java, "yapm_database"
                         )
-                        .addMigrations(migration1to2, migration2to3, migration3to4, migration4to5, migration5to6, migration6to7)
+                        .addMigrations(
+                            migration1to2,
+                            migration2to3,
+                            migration3to4,
+                            migration4to5,
+                            migration5to6,
+                            migration6to7,
+                            migration7to8
+                        )
                         .build()
                     }
                 }

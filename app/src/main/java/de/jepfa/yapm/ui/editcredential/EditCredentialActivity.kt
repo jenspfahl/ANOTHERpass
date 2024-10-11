@@ -3,6 +3,7 @@ package de.jepfa.yapm.ui.editcredential
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.lifecycle.LiveData
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
@@ -10,21 +11,28 @@ import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.autofill.AutofillCredentialHolder
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.net.HttpCredentialRequestHandler
+import de.jepfa.yapm.service.net.RequestFlows
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.credential.AutofillPushBackActivityBase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.Constants.ACTION_DELIMITER
 import de.jepfa.yapm.util.enrichId
+import de.jepfa.yapm.util.observeOnce
 
 
-class EditCredentialActivity : AutofillPushBackActivityBase() {
+class EditCredentialActivity : AutofillPushBackActivityBase(), RequestFlows {
 
-    internal var suggestedCredentialName: String? =null
-    internal var suggestedWebSite: String? =null
+    private lateinit var rootView: View
+    internal var suggestedCredentialName: String? = null
+    internal var suggestedWebSite: String? = null
+    internal var suggestedUser: String? = null
     internal var currentId: Int? = null
     internal var current: EncCredential? = null
     internal var original: EncCredential? = null
+    internal var saved = false
 
     public override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -45,9 +53,17 @@ class EditCredentialActivity : AutofillPushBackActivityBase() {
 
         intent?.action?.let { action ->
             if (action.startsWith(Constants.ACTION_OPEN_VAULT_FOR_AUTOFILL)) {
-                suggestedCredentialName = action.substringAfter(ACTION_DELIMITER).substringBeforeLast(ACTION_DELIMITER)
-                suggestedWebSite = action.substringAfterLast(ACTION_DELIMITER)
+                val splitted = action.split(ACTION_DELIMITER)
+                suggestedCredentialName = splitted.getOrNull(1)
+                suggestedWebSite = splitted.getOrNull(2)
+                suggestedUser = splitted.getOrNull(3)
             }
+            else if (isOpenedFromWebExtension()) {
+                suggestedCredentialName = intent.getStringExtra("name")
+                suggestedWebSite = intent.getStringExtra("domain")
+                suggestedUser = intent.getStringExtra("user")
+            }
+
         }
 
         super.onCreate(savedInstanceState)
@@ -58,12 +74,46 @@ class EditCredentialActivity : AutofillPushBackActivityBase() {
         }
         setContentView(R.layout.activity_edit_credential)
 
+        rootView = findViewById(R.id.edit_credential)
+
         labelViewModel.allLabels.observe(this) { labels ->
             masterSecretKey?.let { key ->
                 LabelService.defaultHolder.initLabels(key, labels.toSet())
             }
         }
 
+
+        if (isOpenedFromWebExtension()) {
+            val webExtensionId = intent.getIntExtra("webExtensionId", 0)
+
+            webExtensionViewModel.getById(webExtensionId).observeOnce(this) { webExtension ->
+                val shortenedFingerprint = intent.getStringExtra("shortenedFingerprint")
+                masterSecretKey?.let { key ->
+                    val webClientId = SecretService.decryptCommonString(key, webExtension.webClientId)
+                    val webClientTitle = SecretService.decryptCommonString(key, webExtension.title)
+                    if (webExtension.bypassIncomingRequests) {
+                        HttpCredentialRequestHandler.showBypassSnackbar(
+                            this,
+                            webClientTitle?:"??",
+                            webClientId?:"??",
+                            getString(R.string.request_detail_create_by_website, suggestedWebSite),
+                            shortenedFingerprint?:"??",
+                            webExtension,
+                        ) {
+                            saved
+                        }
+                    } else {
+                        HttpCredentialRequestHandler.showUserActionSnackbar(
+                            this,
+                            getString(R.string.request_user_action_create_by_website, suggestedWebSite)
+                        )
+                        {
+                            saved
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -97,7 +147,7 @@ class EditCredentialActivity : AutofillPushBackActivityBase() {
             val replyIntent = Intent()
             current.applyExtras(replyIntent)
 
-            if (shouldPushBackAutoFill()) {
+            if (shouldPushBackAutoFill() || isOpenedFromWebExtension()) {
                 AutofillCredentialHolder.update(current, deobfuscationKey)
             }
 
@@ -114,4 +164,39 @@ class EditCredentialActivity : AutofillPushBackActivityBase() {
         }
     }
 
+    private fun isOpenedFromWebExtension() = intent?.action == Constants.ACTION_PREFILLED_FROM_EXTENSION
+
+
+    override fun getLifeCycleActivity(): SecureActivity {
+        return this
+    }
+
+    override fun getRootView(): View {
+        return rootView
+    }
+
+    override fun startCredentialCreation(
+        name: String,
+        domain: String,
+        user: String,
+        webExtensionId: Int,
+        shortenedFingerprint: String,
+    ) {
+    }
+
+    override fun startCredentialUiSearchFor(domain: String) {
+    }
+
+    override fun startCredentialSelectionMode() {
+    }
+
+    override fun getSelectedCredentials(): Set<EncCredential> {
+        return emptySet()
+    }
+
+    override fun stopCredentialSelectionMode() {
+    }
+
+    override fun resetUi() {
+    }
 }

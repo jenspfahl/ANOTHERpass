@@ -9,22 +9,36 @@ import android.content.res.Configuration
 import android.database.Cursor
 import android.database.MatrixCursor
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.Typeface
-import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.provider.BaseColumns
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
 import android.view.autofill.AutofillManager
-import android.widget.*
+import android.widget.AutoCompleteTextView
+import android.widget.CheckBox
+import android.widget.CursorAdapter
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ScrollView
+import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
@@ -40,6 +54,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.encrypted.EncWebExtension
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
@@ -60,11 +75,21 @@ import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelFilter.WITH_NO_LABELS_ID
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.net.CredentialRequestState
+import de.jepfa.yapm.service.net.HttpCredentialRequestHandler
+import de.jepfa.yapm.service.net.HttpServer
+import de.jepfa.yapm.service.net.HttpServer.NO_IP_ADDRESS_AVAILABLE
+import de.jepfa.yapm.service.net.HttpServer.shutdownAllAsync
+import de.jepfa.yapm.service.net.HttpServer.startAllServersAsync
+import de.jepfa.yapm.service.net.HttpServer.toErrorResponse
+import de.jepfa.yapm.service.net.MultipleCredentialSelectState
+import de.jepfa.yapm.service.net.RequestFlows
 import de.jepfa.yapm.service.notification.NotificationService
 import de.jepfa.yapm.service.notification.ReminderService
 import de.jepfa.yapm.service.secret.MasterPasswordService.getMasterPasswordFromSession
 import de.jepfa.yapm.service.secret.MasterPasswordService.storeMasterPassword
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.changelogin.ChangeEncryptionActivity
 import de.jepfa.yapm.ui.changelogin.ChangeMasterPasswordActivity
@@ -81,28 +106,57 @@ import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.ui.label.ListLabelsActivity
 import de.jepfa.yapm.ui.settings.SettingsActivity
 import de.jepfa.yapm.ui.usernametemplate.ListUsernameTemplatesActivity
+import de.jepfa.yapm.ui.webextension.AddWebExtensionActivity
+import de.jepfa.yapm.ui.webextension.ListWebExtensionsActivity
 import de.jepfa.yapm.usecase.app.ShowDebugLogUseCase
 import de.jepfa.yapm.usecase.app.ShowInfoUseCase
+import de.jepfa.yapm.usecase.app.ShowServerLogUseCase
 import de.jepfa.yapm.usecase.credential.DeleteMultipleCredentialsUseCase
-import de.jepfa.yapm.usecase.secret.*
+import de.jepfa.yapm.usecase.secret.ExportEncMasterKeyUseCase
+import de.jepfa.yapm.usecase.secret.ExportEncMasterPasswordUseCase
+import de.jepfa.yapm.usecase.secret.GenerateMasterPasswordTokenUseCase
+import de.jepfa.yapm.usecase.secret.RemoveStoredMasterPasswordUseCase
+import de.jepfa.yapm.usecase.secret.RevokeMasterPasswordTokenUseCase
+import de.jepfa.yapm.usecase.secret.SeedRandomGeneratorUseCase
 import de.jepfa.yapm.usecase.session.LogoutUseCase
 import de.jepfa.yapm.usecase.vault.DropVaultUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.usecase.vault.ShowVaultInfoUseCase
-import de.jepfa.yapm.util.*
+import de.jepfa.yapm.util.ClipboardUtil
+import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.Constants.ACTION_DELIMITER
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
+import de.jepfa.yapm.util.IpConverter
 import de.jepfa.yapm.util.PermissionChecker.verifyNotificationPermissions
+import de.jepfa.yapm.util.SearchCommand
+import de.jepfa.yapm.util.addFormattedLine
+import de.jepfa.yapm.util.createAndAddLabelChip
+import de.jepfa.yapm.util.toastText
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.RequestConnectionPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.future.asCompletableFuture
 import kotlinx.coroutines.launch
-import java.util.*
+import org.json.JSONObject
+import java.lang.StringBuilder
+import java.util.UUID
 
 
 /**
  * This is the main activity
  */
-class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.OnNavigationItemSelectedListener  {
+class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.OnNavigationItemSelectedListener,
+    HttpServer.HttpCallback, HttpServer.HttpServerCallback, RequestFlows {
+
+    private var serverViewStateText: String = ""
+    private lateinit var serverViewSwitch: SwitchCompat
+    private lateinit var serverViewDetails: TextView
+    private lateinit var serverViewRequestState: TextView
+    private lateinit var serverViewState: TextView
+    private lateinit var serverView: LinearLayout
+    private var wasWifiLost = false
 
     private var navMenuQuickAccessVisible = true
     private var navMenuExportVisible = false
@@ -115,6 +169,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private lateinit var navigationView: NavigationView
     private lateinit var toggle: ActionBarDrawerToggle
     private var resumeAutofillItem: MenuItem? = null
+    private var restoreServerPanel: MenuItem? = null
     private var lastReminderItem: MenuItem? = null
     private var nextReminderItem: MenuItem? = null
 
@@ -126,6 +181,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private var jumpToUuid: UUID? = null
     private var jumpToItemPosition: Int? = null
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
 
         verifyNotificationPermissions(this, withUiResponse = false)
@@ -170,12 +226,202 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         val toolbar: Toolbar = findViewById(R.id.list_credentials_toolbar)
         setSupportActionBar(toolbar)
 
+        serverView = findViewById(R.id.server_view)
+        serverViewRequestState = findViewById(R.id.server_view_request_status)
+        serverViewState = findViewById(R.id.server_view_status)
+        serverViewDetails = findViewById(R.id.server_view_details)
+        serverViewSwitch = findViewById(R.id.server_view_switch)
+
+        val serverCapabilityEnabled= PreferenceService.getAsBool(PreferenceService.PREF_SERVER_CAPABILITIES_ENABLED, true, this)
+        val serverHidePanel= PreferenceService.getAsBool(PreferenceService.PREF_SERVER_HIDE_PANEL, false, this)
+        val serverAutostartEnabled = PreferenceService.getAsBool(PreferenceService.PREF_SERVER_AUTOSTART, false, this)
+
+        if (!serverCapabilityEnabled) {
+            serverView.visibility = View.GONE
+        }
+        else if (serverHidePanel) {
+            serverView.visibility = View.GONE
+            updateRestoreServerPanelMenuItem()
+
+            if (!Session.isDenied() && serverAutostartEnabled) {
+                startStopServer(start = true, silent = true)
+            }
+        }
+        else {
+
+            val onLongClickServerDetails = View.OnLongClickListener {
+                val stat = if (HttpServer.isRunning())  "Running" else "Stopped"
+                val ip = HttpServer.getIp(this)
+                val port = PreferenceService.getAsString(PreferenceService.PREF_SERVER_PORT, this) ?: HttpServer.DEFAULT_HTTP_SERVER_PORT
+                val waiting = AlertDialog.Builder(this@ListCredentialsActivity)
+                    .setTitle(getString(R.string.server_details_title))
+                    .setMessage("Loading ...")
+                    .setCancelable(false)
+                    .create()
+                waiting.show()
+                HttpServer.getHostName(ip) { host ->
+                    CoroutineScope(Dispatchers.Main).launch {
+                        val sb = StringBuilder()
+                        sb.addFormattedLine("Status", stat)
+                        sb.addFormattedLine("Request-Status", HttpCredentialRequestHandler.currentRequestState())
+                        sb.addFormattedLine("Protocol", "HTTP")
+                        sb.addFormattedLine("IP", ip)
+                        sb.addFormattedLine("Hostname", host)
+                        sb.addFormattedLine("Port", port)
+                        sb.addFormattedLine("Handle", IpConverter.getHandle(ip))
+                        waiting.dismiss()
+                        AlertDialog.Builder(this@ListCredentialsActivity)
+                            .setTitle(getString(R.string.server_details_title))
+                            .setMessage(sb.toString())
+                            .setIcon(R.drawable.outline_dns_24)
+                            .setNegativeButton(R.string.close, null)
+                            .setNeutralButton(R.string.copy_url) { _, _ ->
+                                ClipboardUtil.copy(
+                                    "URL",
+                                    "http://$host:$port",
+                                    this@ListCredentialsActivity,
+                                    isSensible = false,
+                                )
+                                toastText(this@ListCredentialsActivity, R.string.url_copied)
+                            }
+                            .show()
+                    }
+                }
+                true
+            }
+
+            val onClickServerAddresses: (View) -> Unit = {
+                if (HttpServer.isRunning()) {
+                    var ip = HttpServer.getIp(this)
+                    if (ip == NO_IP_ADDRESS_AVAILABLE) {
+                        ip = this.getString(R.string.server_no_wifi)
+                    }
+                    val view: View = layoutInflater.inflate(R.layout.content_server_addresses, null)
+                    val handleView = view.findViewById<TextView>(R.id.server_address_handle)
+                    handleView.text = IpConverter.getHandle(ip)
+
+                    val hostnameView = view.findViewById<TextView>(R.id.server_address_hostname)
+
+                    val ipAddressView = view.findViewById<TextView>(R.id.server_address_ip_address)
+                    ipAddressView.text = ip
+
+                    AlertDialog.Builder(this)
+                        .setTitle(getString(R.string.server_address_title))
+                        .setView(view)
+                        .setIcon(R.drawable.baseline_alternate_email_24)
+                        .show()
+
+                    HttpServer.getHostName(ip) { host ->
+                        CoroutineScope(Dispatchers.Main).launch {
+                            if (host == null || host == ip || host == NO_IP_ADDRESS_AVAILABLE) {
+                                hostnameView.visibility = View.GONE
+                            }
+                            else {
+                                hostnameView.text = host.lowercase()
+                            }
+                        }
+                    }
+                }
+                else {
+                    AlertDialog.Builder(this)
+                        .setMessage(getString(R.string.server_not_started_hint))
+                        .show()
+                }
+            }
+            serverViewState.setOnLongClickListener(onLongClickServerDetails)
+            serverViewState.setOnClickListener(onClickServerAddresses)
+            serverViewDetails.setOnLongClickListener(onLongClickServerDetails)
+            serverViewDetails.setOnClickListener(onClickServerAddresses)
+
+            val serverViewLink = findViewById<ImageView>(R.id.server_link)
+            val serverViewSettings = findViewById<ImageView>(R.id.server_settings)
+            serverViewSettings.setOnClickListener {
+                val popup = PopupMenu(this, it)
+                popup.setOnMenuItemClickListener { item ->
+                    when (item.itemId) {
+                        R.id.menu_server_settings_hide -> {
+                            PreferenceService.toggleBoolean(PreferenceService.PREF_SERVER_HIDE_PANEL, this)
+                            updateRestoreServerPanelMenuItem()
+                            recreate()
+                            true
+                        }
+                        R.id.menu_server_settings_show_server_log -> {
+                            ShowServerLogUseCase.execute(this)
+                            true
+                        }
+                        R.id.menu_server_settings_open_settings -> {
+                            val intent = Intent(this, SettingsActivity::class.java)
+                            intent.putExtra("OpenServerSettings", true)
+                            startActivity(intent)
+                            true
+                        }
+                        R.id.action_server_help -> {
+                            val browserIntent = Intent(Intent.ACTION_VIEW, Constants.EXTENSION_HOMEPAGE)
+                            startActivity(browserIntent)
+                            true
+                        }
+                        else -> false
+                    }
+                }
+                popup.inflate(R.menu.menu_server_settings)
+                popup.setForceShowIcon(true)
+                popup.show()
+
+            }
+
+            serverViewLink.setOnClickListener {
+                if (serverViewSwitch.isEnabled) {
+                    val popup = PopupMenu(this, it)
+                    popup.setOnMenuItemClickListener { item ->
+                        when (item.itemId) {
+                            R.id.menu_server_link_add -> {
+                                if (!HttpServer.isRunning()) {
+                                    toastText(this, "Please start the server first")
+                                } else if (!HttpServer.isWifiEnabled(this)) {
+                                    toastText(this, "Please enable Wifi first")
+                                } else {
+                                    val intent = Intent(this, AddWebExtensionActivity::class.java)
+                                    startActivity(intent)
+                                }
+                                true
+                            }
+                            R.id.menu_server_link_manage -> {
+                                val intent = Intent(this, ListWebExtensionsActivity::class.java)
+                                startActivity(intent)
+                                true
+                            }
+                            else -> false
+                        }
+                    }
+                    popup.inflate(R.menu.menu_server_link)
+                    popup.setForceShowIcon(true)
+                    popup.show()
+                }
+            }
+
+            serverViewSwitch.setOnCheckedChangeListener { _, isChecked ->
+                startStopServer(isChecked)
+            }
+
+            if (!Session.isDenied() && serverAutostartEnabled) {
+                serverViewSwitch.performClick()
+            }
+            else {
+                reflectServerState()
+            }
+
+
+        }
+
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
         val fab = findViewById<FloatingActionButton>(R.id.fab)
 
         listCredentialAdapter = ListCredentialAdapter(this)
         { selected ->
-            if (selected.isNotEmpty()) {
+            if (HttpCredentialRequestHandler.credentialSelectState == MultipleCredentialSelectState.USER_SELECTING) {
+                fab.setImageResource(R.drawable.baseline_send_to_mobile_24)
+            }
+            else if (selected.isNotEmpty()) {
                 fab.setImageResource(R.drawable.ic_baseline_delete_24_white)
             }
             else {
@@ -225,35 +471,61 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         fab.setOnClickListener {
             val selectedCredentials = listCredentialAdapter?.getSelectedCredentials()
-            if (selectedCredentials?.isNotEmpty() == true) {
+
+            if (HttpCredentialRequestHandler.credentialSelectState == MultipleCredentialSelectState.USER_SELECTING) {
+                toastText(this, "Posting ${selectedCredentials?.size?:0} credentials ..")
+                HttpCredentialRequestHandler.credentialSelectState = MultipleCredentialSelectState.USER_COMMITTED
+            }
+            else if (!selectedCredentials.isNullOrEmpty()) {
 
                 AlertDialog.Builder(this)
                     .setTitle(getString(R.string.title_delete_selected))
-                    .setMessage(getString(R.string.message_delete_selected, selectedCredentials.size))
+                    .setMessage(
+                        getString(
+                            R.string.message_delete_selected,
+                            selectedCredentials.size
+                        )
+                    )
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         UseCaseBackgroundLauncher(DeleteMultipleCredentialsUseCase)
-                            .launch(this, DeleteMultipleCredentialsUseCase.Input(selectedCredentials))
+                            .launch(
+                                this,
+                                DeleteMultipleCredentialsUseCase.Input(selectedCredentials)
+                            )
                             { output ->
                                 if (output.success) {
                                     toastText(this, R.string.message_selected_deleted)
-                                    listCredentialAdapter?.resetSelection(withRefresh = false)
+                                    listCredentialAdapter?.stopSelectionMode(withRefresh = false)
 
                                 }
                             }
                     }
                     .setNegativeButton(android.R.string.cancel, null)
                     .setNeutralButton(R.string.reset_selection) { _, _ ->
-                        listCredentialAdapter?.resetSelection()
+                        listCredentialAdapter?.stopSelectionMode()
                     }
                     .show()
-
 
             }
             else {
                 val intent =
                     Intent(this@ListCredentialsActivity, EditCredentialActivity::class.java)
-                intent.action = this.intent.action
+
+                val websiteSuggestion = HttpCredentialRequestHandler.getWebsiteSuggestion()
+                if (HttpCredentialRequestHandler.isProgressing() && websiteSuggestion != null) {
+                    val name = websiteSuggestion.first
+                    val domain = websiteSuggestion.second
+                    val user = websiteSuggestion.third
+
+                    intent.action = Constants.ACTION_PREFILLED_FROM_EXTENSION
+                    intent.putExtra("name", name)
+                    intent.putExtra("domain", domain)
+                    intent.putExtra("user", user)
+                }
+                else {
+                    intent.action = this.intent.action
+                }
                 intent.putExtras(this.intent) // forward all extras, especially needed for Autofill
                 startActivityForResult(intent, newOrUpdateCredentialActivityRequestCode)
             }
@@ -308,6 +580,193 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     }
 
+    private fun startStopServer(start: Boolean, silent: Boolean = false) {
+        if (start) {
+            if (!silent) {
+                serverViewStateText = getString(R.string.server_starting)
+                serverViewState.text = serverViewStateText
+                serverViewSwitch.isEnabled = false
+            }
+            startAllServersAsync(this, this).asCompletableFuture()
+                .whenComplete { success, e ->
+                    Log.i("HTTP", "async server start success: $success")
+
+                    CoroutineScope(Dispatchers.Main).launch {
+                        if (!silent) {
+                            serverViewSwitch.isEnabled = true
+                        }
+
+                        if (e != null) {
+                            Log.w("HTTP", e)
+                        }
+
+                        if (success == null || !success) {
+                            if (!silent) {
+                                serverViewSwitch.isChecked = false
+                            }
+                            toastText(
+                                this@ListCredentialsActivity,
+                                getString(R.string.failed_to_start_server)
+                            )
+                        } else {
+                            if (!silent) {
+                                reflectServerStarted()
+                            }
+                            toastText(this@ListCredentialsActivity,
+                                getString(R.string.server_started))
+                            HttpServer.requestCredentialHttpCallback =
+                                this@ListCredentialsActivity
+                        }
+                    }
+                }
+        } else {
+            if (HttpServer.isRunning()) { // otherwise it is already stopped
+                if (!silent) {
+                    serverViewStateText = getString(R.string.server_stopping)
+                    serverViewState.text = serverViewStateText
+                    serverViewSwitch.isEnabled = false
+                }
+                wasWifiLost = false
+
+                shutdownAllAsync().asCompletableFuture().whenComplete { success, e ->
+                    Log.i("HTTP", "async stop=$success")
+
+                    CoroutineScope(Dispatchers.Main).launch {
+                        if (!silent) {
+                            serverViewSwitch.isEnabled = true
+                        }
+
+                        HttpCredentialRequestHandler.reset(this@ListCredentialsActivity)
+
+                        if (e != null) {
+                            Log.w("HTTP", e)
+                        }
+                        if (success == null || !success) {
+                            if (!silent) {
+                                serverViewSwitch.isChecked = true
+                            }
+                            toastText(this@ListCredentialsActivity,
+                                getString(R.string.failed_to_stop_server))
+                        } else {
+                            if (!silent) {
+                                reflectServerStopped()
+                            }
+                            toastText(this@ListCredentialsActivity,
+                                getString(R.string.server_stopped_msg))
+                        }
+                    }
+                }
+            } else if (!silent) {
+                reflectServerStopped()
+            }
+        }
+    }
+
+    override fun handleHttpRequest(
+        action: HttpServer.Action,
+        webClientId: String,
+        webExtension: EncWebExtension,
+        message: JSONObject,
+        origin: RequestConnectionPoint
+    ): Pair<HttpStatusCode, JSONObject> {
+        Log.d("HTTP", "credential request callback")
+
+        val key = masterSecretKey ?: return toErrorResponse(HttpStatusCode.Unauthorized, "locked")
+
+        return HttpCredentialRequestHandler.handleIncomingRequest(key, webExtension, message, this, origin)
+
+    }
+
+    override fun startCredentialCreation(
+        name: String,
+        domain: String,
+        user: String,
+        webExtensionId: Int,
+        shortenedFingerprint: String,
+    ) {
+        val intent =
+            Intent(this@ListCredentialsActivity, EditCredentialActivity::class.java)
+        intent.action = Constants.ACTION_PREFILLED_FROM_EXTENSION
+        intent.putExtra("name", name)
+        intent.putExtra("domain", domain)
+        intent.putExtra("user", user)
+        intent.putExtra("webExtensionId", webExtensionId)
+        intent.putExtra("shortenedFingerprint", shortenedFingerprint)
+        startActivityForResult(intent, newOrUpdateCredentialActivityRequestCode)
+    }
+
+    override fun getLifeCycleActivity(): SecureActivity {
+        return this
+    }
+
+    override fun getRootView(): View {
+        return credentialsRecycleView!!
+    }
+
+    override fun resetUi() {
+        searchItem?.collapseActionView()
+        listCredentialAdapter?.stopSelectionMode()
+
+    }
+
+    override fun startCredentialUiSearchFor(domain: String) {
+        startSearchFor("!$domain", commit = true)
+    }
+
+    override fun startCredentialSelectionMode() {
+        listCredentialAdapter?.startSelectionMode()
+    }
+
+    override fun getSelectedCredentials(): Set<EncCredential> {
+        return listCredentialAdapter?.getSelectedCredentials() ?: emptySet()
+    }
+
+    override fun stopCredentialSelectionMode() {
+        listCredentialAdapter?.stopSelectionMode()
+    }
+
+
+    private fun reflectServerStarted(msg: String? = null, showIp: Boolean = true) {
+        serverViewSwitch.isChecked = true
+        serverViewStateText = msg?: getString(R.string.server_listening)
+        serverViewState.text = serverViewStateText
+        serverViewState.setTypeface(null, Typeface.BOLD)
+        if (showIp) {
+            serverViewDetails.visibility = ViewGroup.VISIBLE
+            serverViewDetails.text = HttpServer.getHostNameOrIpAndHandle(this) {
+                serverViewDetails.text = it
+            }
+        }
+        else {
+            serverViewDetails.text = ""
+            serverViewDetails.visibility = ViewGroup.GONE
+        }
+        serverView.setBackgroundColor(getColor(R.color.colorServer))
+        serverView.setPadding(0, 8, 10, 10)
+    }
+
+    private fun reflectServerStopped(msg: String? = null) {
+        if (!HttpServer.isRunning()) {
+            serverViewSwitch.isChecked = false
+            serverViewStateText = msg ?: getString(R.string.server_stopped)
+            serverViewState.text = serverViewStateText
+            serverView.background = null
+            serverViewDetails.text = ""
+            serverViewState.setTypeface(null, Typeface.NORMAL)
+            serverViewDetails.visibility = ViewGroup.GONE
+            serverView.setPadding(0, 26, 10, 24)
+        }
+    }
+
+    private fun reflectServerState(msg: String? = null, showIp: Boolean = true) {
+        if (serverViewSwitch.isChecked) {
+            reflectServerStarted(msg, showIp)
+        }
+        else {
+            reflectServerStopped(msg)
+        }
+    }
+
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
         toggle.syncState()
@@ -316,7 +775,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     override fun onResume() {
         super.onResume()
         Log.i(LOG_PREFIX + "LST", "onResume")
-        updateSearchFieldWithAutofillSuggestion(intent)
+        updateSearchFieldWithAutofillSuggestion(intent, refreshCredentials = true)
 
         val navMenuAlwaysCollapsed = PreferenceService.getAsBool(
             PREF_NAV_MENU_ALWAYS_COLLAPSED, false, this@ListCredentialsActivity)
@@ -325,6 +784,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
         refreshNavigationMenu()
 
+        updateRestoreServerPanelMenuItem()
         updateResumeAutofillMenuItem()
         updateReminderMenuItems()
 
@@ -347,9 +807,13 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         val view: View = findViewById(R.id.content_list_credentials)
 
         // wait until ViewModel is fully loaded
-        view.postDelayed({
-            ReminderService.showNextReminder(view, this)
-        }, 500L)
+        if (!HttpCredentialRequestHandler.isProgressing()) {
+            view.postDelayed({
+                if (!HttpCredentialRequestHandler.isProgressing()) {
+                    ReminderService.showNextReminder(view, this)
+                }
+            }, 500L)
+        }
 
         // wait until ViewModel is fully loaded
         val disclaimerShowed = PreferenceService.getAsBool(PreferenceService.STATE_DISCLAIMER_SHOWED, this)
@@ -454,7 +918,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
                 val cursor = MatrixCursor(arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_TEXT_2))
                 query?.let { q ->
-                    Command.values().forEachIndexed { index, command ->
+                    SearchCommand.values().forEachIndexed { index, command ->
                         val cmd = command.getCmd()
                         if (cmd.startsWith(q, ignoreCase = true)) {
                             cursor.addRow(arrayOf(index, cmd, command.getDescription(this@ListCredentialsActivity)))
@@ -481,9 +945,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 refreshMenuFiltersItem(menu.findItem(R.id.menu_filter))
             }
         }
+        restoreServerPanel = menu.findItem(R.id.menu_show_server_panel)
+        updateRestoreServerPanelMenuItem()
 
         resumeAutofillItem = menu.findItem(R.id.menu_resume_autofill)
         updateResumeAutofillMenuItem()
+
         lastReminderItem = menu.findItem(R.id.menu_show_last_reminder)
         nextReminderItem = menu.findItem(R.id.menu_show_next_reminder)
         updateReminderMenuItems()
@@ -511,12 +978,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
         refreshNavigationMenu()
 
-
         return true
     }
 
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         Log.i(LOG_PREFIX + "LST", "onNewIntent: action=${intent?.action}")
         updateSearchFieldWithAutofillSuggestion(intent)
@@ -528,7 +994,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         return super.onPrepareOptionsMenu(menu)
     }
 
-    private fun updateSearchFieldWithAutofillSuggestion(intent: Intent?) {
+    override fun onDestroy() {
+        shutdownAllAsync()
+        super.onDestroy()
+    }
+
+    private fun updateSearchFieldWithAutofillSuggestion(intent: Intent?, refreshCredentials: Boolean = false) {
         if (!Session.isDenied()) {
             intent?.action?.let { action ->
                 Log.i(LOG_PREFIX + "LST", "action2=$action")
@@ -539,6 +1010,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         val searchString = action.substringAfter(ACTION_DELIMITER).substringBeforeLast(ACTION_DELIMITER).lowercase()
                         if (searchString.isNotBlank()) {
                             startSearchFor("!$searchString")
+                            if (refreshCredentials) {
+                                refreshCredentials()
+                            }
                         }
                     }
                 }
@@ -549,6 +1023,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     if (searchString.isNotBlank()) {
                         val success = startSearchFor("$searchString")
                         if (success) {
+                            if (refreshCredentials) {
+                                refreshCredentials()
+                            }
                             intent.action = null // one shot, don't filter again
                         }
                     }
@@ -737,6 +1214,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 }
                 return true
             }
+            R.id.menu_show_server_panel -> {
+                PreferenceService.toggleBoolean(PreferenceService.PREF_SERVER_HIDE_PANEL, this)
+                updateRestoreServerPanelMenuItem()
+                recreate()
+                return true
+            }
             else -> super.onOptionsItemSelected(item)
         }
 
@@ -770,7 +1253,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
         else if (requestCode == newOrUpdateCredentialActivityRequestCode && resultCode == Activity.RESULT_OK) {
             data?.let {
-                listCredentialAdapter?.resetSelection(withRefresh = false)
+                listCredentialAdapter?.stopSelectionMode(withRefresh = false)
                 val credential = EncCredential.fromIntent(it, createUuid = true)
                 jumpToUuid = credential.uid
 
@@ -1035,6 +1518,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 return true
             }
 
+            R.id.menu_linked_devices -> {
+                val intent = Intent(this, ListWebExtensionsActivity::class.java)
+                startActivity(intent)
+                return true
+            }
+
             R.id.menu_settings -> {
                 val intent = Intent(this, SettingsActivity::class.java)
                 startActivity(intent)
@@ -1287,6 +1776,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         finish()
     }
 
+    private fun updateRestoreServerPanelMenuItem() {
+        restoreServerPanel?.isVisible = PreferenceService.getAsBool(PreferenceService.PREF_SERVER_CAPABILITIES_ENABLED, this)
+                && PreferenceService.getAsBool(PreferenceService.PREF_SERVER_HIDE_PANEL, this)
+    }
+
     private fun updateResumeAutofillMenuItem() {
         resumeAutofillItem?.isVisible =
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && ResponseFiller.isAutofillPaused(this)
@@ -1323,7 +1817,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     }
 
     fun searchForExpiredCredentials() {
-        startSearchFor(Command.SEARCH_COMMAND_SHOW_EXPIRED.getCmd() + " ") // space at the end to not show suggestion menu popup
+        startSearchFor(SearchCommand.SEARCH_COMMAND_SHOW_EXPIRED.getCmd() + " ") // space at the end to not show suggestion menu popup
     }
 
     private fun startSearchFor(searchString: String, commit: Boolean = true): Boolean {
@@ -1344,5 +1838,53 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
         return false
     }
+
+    override fun handleOnWifiEstablished() {
+        CoroutineScope(Dispatchers.Main).launch {
+            if (wasWifiLost) {
+                toastText(this@ListCredentialsActivity, getString(R.string.server_wifi_reconnected))
+            }
+            reflectServerState()
+            wasWifiLost = false
+        }
+    }
+
+    override fun handleOnWifiUnavailable() {
+        CoroutineScope(Dispatchers.Main).launch {
+            if (!wasWifiLost) {
+                toastText(this@ListCredentialsActivity,
+                    getString(R.string.server_wifi_lost_or_unavailable))
+                wasWifiLost = true
+            }
+            reflectServerState(getString(R.string.server_no_wifi), showIp = false)
+        }
+    }
+
+    override fun handleOnIncomingRequest(webClientId: String?) {
+        CoroutineScope(Dispatchers.Main).launch {
+            // this code wil lbe executed on ALL activities!
+            reflectServerState(getString(R.string.server_responding_to, webClientId ?: getString(R.string.unknown)))
+            Handler().postDelayed({
+                reflectServerState()
+            }, 2000)
+        }
+    }
+
+    override fun notifyRequestStateUpdated(
+        oldState: CredentialRequestState,
+        newState: CredentialRequestState
+    ) {
+        when (newState) {
+            CredentialRequestState.Incoming -> serverViewRequestState.setTextColor(Color.YELLOW)
+            CredentialRequestState.AwaitingAcceptance -> serverViewRequestState.setTextColor(Color.YELLOW)
+            CredentialRequestState.Accepted -> serverViewRequestState.setTextColor(Color.GREEN)
+            CredentialRequestState.Denied -> serverViewRequestState.setTextColor(Color.RED)
+
+            else -> serverViewRequestState.setTextColor(Color.TRANSPARENT)
+
+        }
+
+    }
+
 }
 

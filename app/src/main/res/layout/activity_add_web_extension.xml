@@ -1,0 +1,124 @@
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:fitsSystemWindows="true"
+    tools:context=".ui.webextension.AddWebExtensionActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/add_web_extension_intro"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/link_webextension_explanation" />
+
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="1dp"
+                android:text="@string/link_webextension_step_1" />
+
+
+
+
+                <EditText
+                    android:id="@+id/edit_web_extension_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:hint="@string/webextension_title"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:maxLength="@integer/max_template_username_length"
+                    android:singleLine="true" />
+
+
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                android:text="@string/link_webextension_step_2" />
+
+
+            <ImageView
+                android:id="@+id/imageview_scan_qrcode"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:clickable="true"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_baseline_qr_code_scanner_48"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/web_extension_client_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:textSize="24sp"
+                android:textAlignment="center"
+                android:typeface="monospace"
+                android:textStyle="bold"
+                android:visibility="gone"
+                android:textIsSelectable="true"
+                android:text="@string/nothing_placeholder"/>
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:text="@string/link_webextension_step_3" />
+
+            <TextView
+                android:id="@+id/web_extension_server_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:textSize="20sp"
+                android:textAlignment="center"
+                android:textIsSelectable="true"
+                android:text="@string/nothing_placeholder"/>
+
+            <Button
+                android:id="@+id/button_save"
+                style="?android:textAppearanceSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:background="@color/colorAccent"
+                android:text="@string/button_save"
+                android:textColor="@color/buttonLabel"
+                android:textStyle="bold" />
+
+
+        </LinearLayout>
+    </ScrollView>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

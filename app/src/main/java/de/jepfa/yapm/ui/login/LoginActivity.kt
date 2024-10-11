@@ -2,7 +2,6 @@ package de.jepfa.yapm.ui.login
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -367,7 +366,7 @@ class LoginActivity : NfcBaseActivity() {
                 return
             }
             else if (tagId != storedTagId) {
-                Log.i(LOG_PREFIX + "nfc", "mpt tag id missmatch: tagId = $tagId <> storedTagId=$storedTagId")
+                Log.i(LOG_PREFIX + "nfc", "mpt tag id mismatch: tagId = $tagId <> storedTagId=$storedTagId")
                 toastText(this, R.string.not_a_original_mpt_nfc_token)
 
                 return

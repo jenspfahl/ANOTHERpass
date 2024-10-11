@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat
 
 object Constants {
     val HOMEPAGE = Uri.parse("https://anotherpass.jepfa.de")
+    val EXTENSION_HOMEPAGE = Uri.parse("https://anotherpass.jepfa.de/extension")
     val FOSS_SITE = "https://github.com/jenspfahl/anotherpass"
     val BUG_REPORT_SITE = FOSS_SITE + "/issues/new?title=%s&body=%s"
 
@@ -32,6 +33,8 @@ object Constants {
     const val ACTION_CLOSE_VAULT = "closeVault"
     const val ACTION_EXCLUDE_FROM_AUTOFILL = "excludeFromAutofill"
     const val ACTION_PAUSE_AUTOFILL = "pauseAutofill"
+    const val ACTION_PREFILLED_FROM_EXTENSION = "prefilledFromExtension"
+
 
 
 }

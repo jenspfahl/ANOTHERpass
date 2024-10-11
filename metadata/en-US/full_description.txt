@@ -15,15 +15,16 @@ With ANOTHERpass you can store backups of the vault and the encrypted master key
 - strong modern encryption (AES 128/256, Blowfish, Chacha20)
 - uses an integrated security chip or TEE (Trusted Execution Environment) if present
 - Autofill support
+- works with the ANOTHERpass Browser Extension to share credentials within a local network (e.g. from the app to the desktop PC)
 - biometrics (e.g. fingerprint) for stored master password
 - no insecure clipboard function by default
 - show passwords over other apps to type it easily
-- no internet connection needed, all is offline
+- no data is stored in the cloud, except the user itself backups files in the cloud
 - export and import credential vault
 - export vault and master key separately (latter analogue if wished)
 - share and outsource credentials
 - obfuscate several passwords as additional security layer
-- optional self desctruction mode after too many failed login attempts
+- optional self destruction mode after too many failed login attempts
 - Dark theme support ;-)
 
 For detailed information see <a href="https://anotherpass.jepfa.de">anotherpass.jepfa.de</a>

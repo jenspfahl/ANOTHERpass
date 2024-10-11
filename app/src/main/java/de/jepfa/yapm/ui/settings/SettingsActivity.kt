@@ -7,7 +7,10 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.text.InputFilter
+import android.text.InputType
 import android.view.autofill.AutofillManager
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.*
@@ -18,12 +21,15 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.autofill.ResponseFiller
 import de.jepfa.yapm.service.biometrix.BiometricUtils
+import de.jepfa.yapm.service.net.HttpServer
+import de.jepfa.yapm.service.net.HttpServer.DEFAULT_HTTP_SERVER_PORT
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.login.LoginActivity
 import de.jepfa.yapm.usecase.session.LogoutUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.ClipboardUtil
+import de.jepfa.yapm.util.toastText
 import java.util.*
 
 
@@ -41,7 +47,16 @@ class SettingsActivity : SecureActivity(),
         }
 
         setContentView(R.layout.settings_activity)
-        if (savedInstanceState == null) {
+
+        val openServerSettings = intent.getBooleanExtra("OpenServerSettings", false)
+
+        if (openServerSettings) {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.settings, ServerSettingsFragment())
+                .commit()
+        }
+        else if (savedInstanceState == null) {
             supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.settings, HeaderFragment())
@@ -55,6 +70,7 @@ class SettingsActivity : SecureActivity(),
             }
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
     }
 
     override fun lock() {
@@ -366,6 +382,52 @@ class SettingsActivity : SecureActivity(),
 
             findPreference<SwitchPreferenceCompat>(PreferenceService.PREF_SHOW_BIOMETRIC_SMP_REMINDER)?.let { pref ->
                 activity?.let { pref.isEnabled = BiometricUtils.isBiometricsSupported(it) }
+            }
+        }
+    }
+
+    class ServerSettingsFragment : PreferenceFragmentCompat() {
+        override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+            preferenceManager.preferenceDataStore = EncryptedPreferenceDataStore.getInstance(requireContext())
+            setPreferencesFromResource(R.xml.server_preferences, rootKey)
+
+            val prefServerCapabilityEnabled = findPreference<SwitchPreferenceCompat>(
+                PreferenceService.PREF_SERVER_CAPABILITIES_ENABLED)
+
+            prefServerCapabilityEnabled?.let {
+                it.setOnPreferenceChangeListener { preference, newValue ->
+                    if (newValue == false) {
+                        HttpServer.shutdownAllAsync()
+                    }
+                    PreferenceService.putBoolean(PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD, true, preference.context)
+                    true
+                }
+            }
+
+            findPreference<SwitchPreferenceCompat>(
+                PreferenceService.PREF_SERVER_HIDE_PANEL)?.setOnPreferenceChangeListener { preference, newValue ->
+                PreferenceService.putBoolean(PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD, true, preference.context)
+                true
+            }
+            findPreference<EditTextPreference>(PreferenceService.PREF_SERVER_PORT)?.let { pref ->
+                pref.setOnBindEditTextListener { editText ->
+                    editText.inputType = InputType.TYPE_CLASS_NUMBER
+                    editText.filters = arrayOf(InputFilter.LengthFilter(5))
+                }
+
+                pref.setOnPreferenceChangeListener { _, newValue ->
+                    val newPort = newValue.toString().toIntOrNull()
+                    if (newPort == null || newPort < 1024 || newPort > 49151) {
+                        toastText(activity, "Invalid port number")
+                        return@setOnPreferenceChangeListener false
+                    }
+                    return@setOnPreferenceChangeListener true
+                }
+
+                val port =
+                    PreferenceService.getAsString(PreferenceService.PREF_SERVER_PORT, context)
+                pref.text = if (port == null || port == "" || port == "0") DEFAULT_HTTP_SERVER_PORT.toString() else port.toString()
+
             }
         }
     }

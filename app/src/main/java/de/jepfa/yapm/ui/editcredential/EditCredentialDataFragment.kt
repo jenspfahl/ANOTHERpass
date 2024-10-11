@@ -20,6 +20,8 @@ import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.net.HttpCredentialRequestHandler
+import de.jepfa.yapm.service.net.RequestFlows
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.decryptLong
@@ -27,6 +29,7 @@ import de.jepfa.yapm.service.secret.SecretService.encryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.encryptLong
 import de.jepfa.yapm.service.usernametemplate.UsernameTemplateService
 import de.jepfa.yapm.ui.DropDownList
+import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.SecureFragment
 import de.jepfa.yapm.ui.label.LabelEditViewExtender
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
@@ -202,12 +205,50 @@ class EditCredentialDataFragment : SecureFragment() {
             }
         }
         else {
-            editCredentialNameView.requestFocus()
-            editCredentialActivity.suggestedCredentialName?.let {
-                editCredentialNameView.setText(it.capitalize())
+            if (editCredentialActivity.suggestedCredentialName != null) {
+                //TODO check if the name already exists and add (1) if so
+                masterSecretKey?.let { key ->
+                    editCredentialActivity.credentialViewModel.allCredentials.observeOnce(editCredentialActivity) { credentials ->
+
+                        var suggestedName =
+                            editCredentialActivity.suggestedCredentialName!!.capitalize()
+
+                        var nameCounter = 0
+                        var maxNumber = 0
+                        // e.g. if given (1) and (2) and (1) is deleted, we don't want to get (2) again. Therefor i added maxNumber.
+                        val regex = Regex("\\Q${suggestedName.lowercase()}\\E \\((\\d+)\\)")  // one capturing group to get the number in the brackets
+
+                        credentials.forEach { credential ->
+                            val name = decryptCommonString(key, credential.name).lowercase().trim()
+                            if (name == suggestedName.lowercase() || regex.matches(name)) {
+                                val groups = regex.find(name)?.groups
+                                if (!groups.isNullOrEmpty()) {
+                                    val value = groups[1]?.value?.toIntOrNull()
+                                    if (value != null && value > maxNumber) {
+                                        maxNumber = value + 1
+                                    }
+                                }
+                                nameCounter++
+                            }
+                        }
+                        val counter = Math.max(nameCounter, maxNumber)
+                        if (counter > 0) {
+                            suggestedName = "$suggestedName ($counter)"
+                        }
+                        editCredentialNameView.setText(suggestedName)
+                    }
+                }
+
             }
+            else {
+                editCredentialNameView.requestFocus()
+            }
+
             editCredentialActivity.suggestedWebSite?.let {
                 editCredentialWebsiteView.setText(it)
+            }
+            editCredentialActivity.suggestedUser?.let {
+                editCredentialUserView.setText(it)
             }
         }
 
@@ -397,7 +438,7 @@ class EditCredentialDataFragment : SecureFragment() {
         // we create the new credential out of a former current if present or else out of the original if present
         val credentialToSave = EncCredential(
             editCredentialActivity.currentId,
-            editCredentialActivity.original?.uid,
+            editCredentialActivity.original?.uid ?: UUID.randomUUID(),
             encName,
             encAdditionalInfo,
             encUser,
@@ -415,5 +456,6 @@ class EditCredentialDataFragment : SecureFragment() {
         )
         editCredentialActivity.current = credentialToSave
     }
+
 
 }

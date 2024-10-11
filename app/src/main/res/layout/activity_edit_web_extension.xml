@@ -1,0 +1,114 @@
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:fitsSystemWindows="true"
+    tools:context=".ui.webextension.EditWebExtensionActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                android:text="@string/edit_link_webextension_description" />
+
+
+
+            <TextView
+                android:id="@+id/web_extension_client_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:textSize="24sp"
+                android:textAlignment="center"
+                android:textIsSelectable="true"
+                android:typeface="monospace"
+                android:textStyle="bold"
+                android:text="@string/nothing_placeholder"/>
+
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/edit_web_extension_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="30dp"
+                    android:hint="@string/webextension_title"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:maxLength="@integer/max_template_username_length"
+                    android:singleLine="true" />
+
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/switch_web_extension_enabled"
+                    android:checked="false"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="4pt"
+                    android:paddingVertical="16dp"
+                    android:text="@string/edit_link_webextension_enable"/>
+
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/switch_web_extension_bypass"
+                    android:checked="false"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="4pt"
+                    android:paddingVertical="16dp"
+                    android:text="@string/edit_link_webextension_allow_unconfirmed"/>
+
+
+
+                <TextView
+                    android:id="@+id/web_extension_last_used_timestamp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="48dp"
+                    android:layout_marginBottom="10dp"
+                    android:textSize="16sp"
+                    android:text="@string/nothing_placeholder"/>
+
+            </LinearLayout>
+
+
+            <Button
+                android:id="@+id/button_save"
+                style="?android:textAppearanceSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@color/colorAccent"
+                android:text="@string/button_save"
+                android:textColor="@color/buttonLabel"
+                android:textStyle="bold" />
+
+
+        </LinearLayout>
+    </ScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

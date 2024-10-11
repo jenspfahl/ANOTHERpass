@@ -55,6 +55,8 @@
 
     <string name="title_delete_username_template">Benutzernamenvorlage löschen</string>
     <string name="message_delete_username_template">Benutzernamenvorlage \'%1$s\' wirklich löschen? Sie wird in den Benutzernaenvorschlägen nicht mehr sichbar sein.</string>
+    <string name="title_delete_web_extension">Geräteverknüpfung löschen</string>
+    <string name="message_delete_web_extension">Möchtest du wirklich die Geräteverknüpfug für \'%1$s\' löschen?</string>
 
 
     <string name="lock_items">Tresor sperren</string>
@@ -183,7 +185,7 @@
     <string name="notification_channel_scheduled_title">ANOTHERpass Ablauf-Benachrichtigungen</string>
     <string name="toast_copied_to_clipboard">Passwort in die Zwischenablage kopiert</string>
     <string name="toast_test_copypaste_password">Testdaten in die Zwischenablage kopiert</string>
-    <string name="copy_to_clipboard">Kopiere Passwort in die Zwischenablage</string>
+    <string name="copy_password_to_clipboard">Kopiere Passwort in die Zwischenablage</string>
     <string name="navigation_drawer_open">Öffne Navigationsmenü</string>
     <string name="navigation_drawer_close">Schliesse Navigationsmenü</string>
     <string name="nav_header_desc">Navigationsleiste</string>
@@ -200,6 +202,8 @@
     <string name="pref_header_autofill">Unterstützung für Automatisches Ausfüllen</string>
 
     <string name="title_activity_list_username_templates">Vorlagen für Benutzernamen</string>
+    <string name="title_activity_list_web_extensions">Verknüpfte Geräte</string>
+    <string name="title_activity_add_web_extensions">Verknüpfe ein Gerät</string>
     <string name="action_username_templates">Benutzernamenvorlagen</string>
     <string name="username_template_data_params">Gib der Vorlage einen Benutzernamen und eine optionale Beschreibung. Der Benutzername wird als Vorschlag für die Zugangsdaten verwendet.</string>
     <string name="hint_edit_username_template_username">Benutzername</string>
@@ -214,6 +218,7 @@
     <string name="title_change_label">Kategorie bearbeiten</string>
     <string name="title_new_username_template">Neue Benutzernamenvorlage</string>
     <string name="title_change_username_template">Benutzernamenvorlage ändern</string>
+    <string name="title_change_web_extension">Verknüpftes Gerät ändern</string>
     <string name="reset_vault">Alles zurücksetzen</string>
     <string name="reset_vault_and_delete">Alles löschen und zurücksetzen</string>
     <string name="button_report_bug">Fehler melden</string>
@@ -531,6 +536,17 @@
     <string name="whats_new_in_1_9_bullet_4_head">Adaptives Start-Symbol</string>
     <string name="whats_new_in_1_9_bullet_4_text">Das Start-Symbol wurde verbessert um jede mögliche Auflösung zu unterstützen und um einfarbige Farbthemen zu unterstützen.</string>
 
+    <string name="whats_new_in_2_0">Was ist neu in Version  2.0</string>
+    <string name="whats_new_subtext_2_0">Diese neue Version enthält einen neuen Zugangsdaten-Server für das lokale Netzwerk, welche die Internet-Berechtigung erfordert.</string>
+    <string name="whats_new_in_2_0_bullet_1_head">Verknüpfe andere Geräte mit der App</string>
+    <string name="whats_new_in_2_0_bullet_1_text">Mit der neuen <a href="https://anotherpass.jepfa.de/extension/">ANOTHERpass Browsererweiterung</a> kannst du jedes Gerät mit einem Browser in einem lokalen Netzwerk mit der App verknüpfen, z.B. deinen Laptop.</string>
+    <string name="whats_new_in_2_0_bullet_2_head">Greife auf deine Zugangsdaten von anderen Geräten aus zu</string>
+    <string name="whats_new_in_2_0_bullet_2_text">Nachdem eine Verknüpfung mit der App hergestellt wurde, kannst du verschiedene Zugangsdaten in deinem App-Tresor von der Erweiterung aus abrufen. Dies geschieht Ende-zu-Ende-verschlüsselt.</string>
+    <string name="whats_new_in_2_0_bullet_3_head">Speichere deine Zugangsdaten auf dem anderen Gerät</string>
+    <string name="whats_new_in_2_0_bullet_3_text">Du kannst auch Zugangsdaten von der App innerhalb des Tresors der Browsererweitungung dauerhaft ablegen, um schneller auf diese zugreifen zu können.</string>
+    <string name="whats_new_in_2_0_enable_server">Ja, ich möchte es mal ausprobieren!</string>
+    <string name="whats_new_in_2_0_disabled_server">OK, der Zugangsdaten-Server wurde komplett deaktiviert. Du kannst ihn jederzeit wieder über die Einstellungen aktivieren.</string>
+
     <string name="intro">Starte Intro</string>
     <string name="intro_1_head">Ein etwas anderer Passwortmanager</string>
     <string name="intro_1_subtext">ANOTHERpass bietet eine etwas andere Herangehensweise. Lies hier was das heißt:</string>
@@ -548,9 +564,17 @@
     <string name="intro_5_head">ANOTHERpass ist sicher</string>
     <string name="intro_5_subtext">ANOTHERpass verhindert typische sicherheitsrelevante Fallstricke.</string>
     <string name="intro_5_bullet_1">Passwörter in die Zwischenablage zu kopieren ist standardmäßig deaktiviert. Dies ist nämlich ein Sicherheitsrisiko, da alle anderen Apps auf die Zwischenablage zugreifen können.</string>
-    <string name="intro_5_bullet_2">Keine Internetverbindung benötigt, außer du sendest Daten mit anderen Apps via Internet.</string>
+    <string name="intro_5_bullet_2">Es werden keine Daten in der Cloud abgelegt, außer du speicherst sie selber in der Cloud.</string>
     <string name="intro_5_bullet_3">Starke Verschlüsselung ALLER sensitiven Daten mit mindestens 128 bit Schlüsseln.</string>
     <string name="intro_5_bullet_4">ANOTHERpass kann einen integrierten Sicherheitschip verwenden, falls vorhanden.</string>
+
+    <string name="intro_6_head">Verwendung von verschiedenen Geräten</string>
+    <string name="intro_6_subtext">Mit der <a href="https://anotherpass.jepfa.de/extension/">ANOTHERpass Browsererweiterung</a> kannst du deine Zugangsdaten von jedem Gerät mit einem Browser innerhalb eines lokalen Netzwerkes abrufen.</string>
+    <string name="intro_6_bullet_1">Die App bleibt der zentrale Speicherort deiner Zugangsdaten.</string>
+    <string name="intro_6_bullet_2">Du kannst die Zugangsdaten mit der Browsererweitungung bequem abfragen. Du musst nur deine App entsperren.</string>
+    <string name="intro_6_bullet_3">Du kannst deine Zugangsdaten in der Browsererweiterung speichern, um schneller darauf zugreifen zu können.</string>
+    <string name="intro_6_bullet_4">Die Kommunikation zwischen der Erweiterung und der App ist Ende-zu-Ende-verschlüsselt. In der Erweiterung gespeicherte Zugangsdaten werden mit dem Masterkey des App-Tresors verschlüsselt.</string>
+    <string name="intro_6_bullet_5">Wenn du die Erweiterung nicht verwenden möchtest, kannst du die Server-Funktion in der App komplett ausschalten.</string>
 
     <string name="credentials_to_be_imported">%1$d von %2$d Zugangsdaten zum Importieren</string>
     <string name="credentials_to_be_inserted">%1$d von %2$d Zugangsdaten zum Wiederherstellen</string>
@@ -570,7 +594,9 @@
     <string name="name">Name</string>
     <string name="source">Quelle</string>
     <string name="copy_universal_identifier">Uid kopieren</string>
+    <string name="copy_url">URL kopieren</string>
     <string name="universal_identifier_copied">Uid in die Zwischenablage kopiert</string>
+    <string name="url_copied">URL in die Zwischenablage kopiert</string>
     <string name="source_from_file">aus Datei</string>
     <string name="source_from_record">von QR-Code oder NFC-Tag</string>
     <string name="source_from_the_app">von der App</string>
@@ -764,8 +790,8 @@
     <string name="username_template_type_desc_both">Beides vorschlagen</string>
     <string name="open_vault">Tresor öffnen</string>
 
-    <string name="define_columns_of_csv_file">Datei kann nicht geladen werden oder einge Felder fehlen? Gib die Spaltennamen der CSV-Datei manuell ein.</string>
-    <string name="define_columns_of_given_csv_file">Datei \'%1$s\' kann nicht geladen werden oder einge Felder fehlen? Gib die Spaltennamen der CSV-Datei manuell ein.</string>
+    <string name="define_columns_of_csv_file">Datei kann nicht geladen werden oder einige Felder fehlen? Gib die Spaltennamen der CSV-Datei manuell ein.</string>
+    <string name="define_columns_of_given_csv_file">Datei \'%1$s\' kann nicht geladen werden oder einige Felder fehlen? Gib die Spaltennamen der CSV-Datei manuell ein.</string>
     <string name="not_a_csv_column">Nur Buchstaben, Ziffern, Binde- und Unterstrich erlaubt</string>
     <string name="csv_column_title">CSV-Spaltennamen</string>
     <string name="csv_column_message">Öffne die CSV-Datei welche importiert werden soll und gib hier die Spaltennamen der entsprechenden Zugangsdaten-Felder ein.</string>
@@ -784,4 +810,107 @@
     <string name="captured_error_details">Aufgezeichnete Fehler-Details:</string>
     <string name="report_a_bug">Fehler melden</string>
 
+
+    <string name="webextension_sort_by_name">Nach Name der Verknüpfung</string>
+    <string name="webextension_sort_by_id">Nach Link-ID</string>
+    <string name="webextension_sort_by_last_used">Nach zuletzt verwendet</string>
+    <string name="webextension_title">Name der Verknüpfung</string>
+    <string name="link_webextension_explanation">Verknüpfe ein anderes Gerät im selben lokalen Netzerk mit der <a href="https://anotherpass.jepfa.de/extension/">ANOTHERpass Browsererweiterung</a>, z.B. deinen Laptop.</string>
+    <string name="link_webextension_step_1">Als Erstes vergebe einen Namen, um deine verknüpften Geräte im Überblick zu behalten.</string>
+    <string name="link_webextension_step_2">Als Nächstes scanne den QR-Code aus der Erweiterung indem du auf dieses Symbol klickst. Danach wird die Link-ID der Erweiterung hier angezeigt.</string>
+    <string name="link_webextension_step_3">Zuletzt gibst du das Handle, die IP-Adresse oder den Hostnamen in die Erweiterung ein, welche weiter unten angezeigt wird. (Das Handle ist die eingekürzte IP-Adresse.) Wenn du der Admin des lokalen Netzwerks bist, kannst du eine statische IP oder einen Hostnamen für dein Smartphone vergeben.</string>
+    <string name="edit_link_webextension_description">Eine Verknüpfung zu einem Gerät welches die ANOTHERpass Browser-Erweiterung verwendet.</string>
+    <string name="edit_link_webextension_enable">Aktiviere die Verknüpfung</string>
+    <string name="edit_link_webextension_allow_unconfirmed">Erlaube Zugangsdaten-Anfragen ohne Bestätigung</string>
+    <string name="server_sheet_incoming_request_from">Eingehende Anfrage von</string>
+    <string name="server_sheet_fingerprint">Fingerprint</string>
+    <string name="server_sheet_bypass_future_requests">Erlaube alle zukünftigen Anfragen für diese Verknüpfung</string>
+    <string name="server_request_deny">Ablehnen</string>
+    <string name="server_request_accept">Erlauben</string>
+
+    <string name="restore_server_panel">Server-Panel wiederherstellen</string>
+    <string name="link_new_device">Neues Gerät verknüpfen</string>
+    <string name="manage_linked_devices">Verknüpfungen bearbeiten</string>
+    <string name="hide_control_panel">Server-Panel ausblenden</string>
+    <string name="show_server_logs">Zeige Server-Logs</string>
+    <string name="open_server_settings">Server-Einstellungen öffnen</string>
+    <string name="delete_disabled_linked_devices">Lösche deaktivierten Verknüpfungen</string>
+    <string name="last_used_at">Zuletzt verwendet am: %1$s</string>
+    <string name="enabled_links_always_on_top">Aktivierte Verknüpfungen immer zuerst</string>
+    <string name="credentials_posted">Zugangsdaten gesendet</string>
+    <string name="local_vault_unlocked">Vernüpfter Tresor entsperrt</string>
+    <string name="requested_credential_to_sync_not_found">Angefragte Zugangsdaten zum Synchronisieren nicht gefunden</string>
+    <string name="request_denied">Anfrage abgelehnt</string>
+    <string name="request_denied_and_bypass_revoked">Anfrage abgelehnt und Erlaubnis zurückgezogen</string>
+    <string name="credential_posted">Zugangsdaten \'%1$s\' gesendet</string>
+    <string name="selected_credentials_posted">Ausgewählte Zugangsdaten gesendet</string>
+    <string name="all_credentials_posted">Alle Zugangsdaten gesendet</string>
+    <string name="cancel_request">Anfrage abbrechen</string>
+    <string name="deny_and_revoke_bypass">Ablehnen und Erlaubnis zurückziehen</string>
+    <string name="request_detail_fetch_by_uid">möchte Zugangsdaten mit Namen \'%1$s\' abrufen.</string>
+    <string name="request_user_action_fetch_by_uid">Rufe Zugangsdaten mit Namen \'%1$s\' ab …</string>
+    <string name="request_detail_fetch_by_uids">möchte alle Zugangsdaten der Erweiterung synchronisieren.</string>
+    <string name="request_user_action_fetch_by_uids">Synchronisiere alle Zugangsdaten der Erweiterung …</string>
+    <string name="request_detail_fetch_by_website">möchte Zugangsdaten für \'%1$s\' abrufen.</string>
+    <string name="request_user_action_fetch_by_website">Wähle die Zugangsdaten für \'%1$s\', um die Anfrage abzuschließen.</string>
+    <string name="request_detail_create_by_website">möchte neue Zugangsdaten für \'%1$s\' anlegen.</string>
+    <string name="request_user_action_create_by_website">Lege neue Zugangsdaten für \'%1$s\' an, um die Anfrage abzuschließen.</string>
+    <string name="request_detail_client_key">möchte den verknüpften Tresor entsperren.</string>
+    <string name="request_user_action_client_key">Entsperre verknüpften Tresor …</string>
+    <string name="request_detail_fetch_any">möchte beliebige Zugangsdaten abrufen. Bitte wähle eins aus.</string>
+    <string name="request_user_action_fetch_any">Wahle die Zugangsdaten, um die Anfrage abzuschließen.</string>
+    <string name="request_detail_fetch_multiple">möchte mehrere beliebige Zugangsdaten abrufen.</string>
+    <string name="request_user_action_fetch_multiple">Wähle alle Zugangsdaten aus, die abgerufen werden sollen und klicke auf den Action-Button.</string>
+    <string name="request_detail_fetch_all">möchte ALLE (unverschleierten) Zugangsdaten abrufen!</string>
+    <string name="request_user_action_fetch_all">Alle Zugangsdaten werden abgerufen …</string>
+    <string name="swipe_to_cancel">Wischen um abzubrechen</string>
+    <string name="fingerprint">Fingerprint</string>
+    <string name="fingerprint_explanation">Stelle sicher, dass der hier gezeigte Fingerprint identisch zu dem in der Browser-Erweiterung ist. Wenn nicht, lehne die Anfrage ab!!</string>
+    <string name="server_settings">Server-Einstellungen</string>
+    <string name="pref_server_capability_title">Aktiviere die Server-Funktion</string>
+    <string name="pref_server_capability_summary">Falls aktiviert, wird ein neues Server-Panel sichtbar, um den Server nach Bedarf an- und abzuschalten. Deaktiviere die Funktion wenn du sie nicht nutzen möchtest (wie als vor Version 2).</string>
+    <string name="pref_server_port_title">Server-Port</string>
+    <string name="pref_server_port_dialog_title">Port auf dem der Server läuft</string>
+    <string name="pref_server_port_dialog_message">Stelle sicher, dass der Port der gleiche ist wie in der Browser-Erweiterung. Eine Änderung hier erfordert einen manuellen Server-Neustart!</string>
+    <string name="pref_server_autostart_title">Starte den Server automatisch wenn der Tresor entsperrt wird</string>
+    <string name="pref_server_autostart_summary">Falls aktiviert, wird der Server automatisch gestartet und kann Anfragen entgegennehmen, wenn der Tresor entsperrt wurde.</string>
+    <string name="pref_server_hide_panel_title">Verstecke das Server-Kontrollpanel</string>
+    <string name="pref_server_hide_panel_summary">Verstecke das Panel mit welchen du den Server kontrollieren kannst.</string>
+    <string name="server_listening">Wartend ...</string>
+    <string name="server_stopped">Gestoppt</string>
+    <string name="server_starting">Starte ...</string>
+    <string name="server_stopping">Stoppe ...</string>
+    <string name="server_responding_to">Antworten an %1$s ...</string>
+    <string name="server_no_wifi">Kein WLAN!</string>
+    <string name="server_wifi_lost_or_unavailable">WLAN verloren oder nicht erreichbar</string>
+    <string name="server_wifi_reconnected">WLAN verbunden</string>
+    <string name="failed_to_start_server">Server konnte nicht gestartet werden. Ist WLAN aktiviert?</string>
+    <string name="server_started">Server gestartet</string>
+    <string name="failed_to_stop_server">Server konnte nicht gestartet werden. Versuche die App neuzustarten.</string>
+    <string name="server_stopped_msg">Server gestoppt</string>
+
+    <string name="server_details_title">Serverdetails</string>
+    <string name="server_address_title">Serveradressen</string>
+    <string name="server_address_description">Der Server ist unter den folgenden Adressen von der Browsererweiterung aus erreichbar:</string>
+    <string name="server_not_started_hint">Der Zugangsdaten-Server wurde nicht gestartet. Zum Starten bitte den rechten Schalter betätigen.</string>
+
+    <string name="scan_qr_code_first">Bitte erst den QR-Code scannen.</string>
+    <string name="please_proceed_with_the_extension">Bitte in der Browser-Erweitung fortfahren!</string>
+    <string name="device_linked">Geräteverknüpfung erstellt</string>
+    <string name="cancel_linking_device_title">Aktuellen Vorgang für %1$s abbrechen</string>
+    <string name="cancel_linking_device_message">Wenn du zurückgehst, wird die aktuelle Verknüfung verworfen. Fortfahren?</string>
+    <string name="unknown_qr_code">Unbekannter QR-Code</string>
+    <string name="relink_device_not_possible">Es existiert schon eine Verknüpfung mit dieser Link-ID. Bitte lösche diese zuerst.</string>
+    <string name="action_link_device_details">möchte eine permanente Verknüpfung mit diesem Gerät herstellen. Bitte prüfe den Fingerprint auf Gleichheit bevor du auf Erlauben klickst!</string>
+    <string name="device_xx_linked">Geräteverknüpfung \'%1$s\' aktiviert</string>
+    <string name="device_xx_unlinked">Geräteverknüpfung \'%1$s\' deaktiviert</string>
+    <string name="linking_details">Verknüpfungsdetails für %1$s</string>
+    <string name="copy_to_clipboard">In die Zwischenablage kopieren</string>
+    <string name="copied_to_clipboard">In die Zwischenablage kopiert</string>
+    <string name="delete_disabled_linked_devices_title">Lösche alle deaktivierten Verknüpfungen</string>
+    <string name="delete_disabled_linked_devices_message">Sollen wirklich alle deaktivierten Verknüpfungen gelöscht werden?</string>
+    <string name="xx_disabled_links_deleted">%1$s Verknüpfungen entvernt</string>
+
+
+    <string name="unknown">Unbekannt</string>
 </resources>

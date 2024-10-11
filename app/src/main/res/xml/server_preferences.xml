@@ -1,0 +1,45 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:enable_server_capability"
+        app:title="@string/pref_server_capability_title"
+        app:summary="@string/pref_server_capability_summary"
+        app:allowDividerAbove="true"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:defaultValue="true"/>
+
+    <EditTextPreference
+        app:key="YAPM/pref:server_listening_port"
+        app:title="@string/pref_server_port_title"
+        app:dialogTitle="@string/pref_server_port_dialog_title"
+        app:dialogMessage="@string/pref_server_port_dialog_message"
+        app:singleLine="true"
+        app:dependency="YAPM/pref:enable_server_capability"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:useSimpleSummaryProvider="true"/>
+
+
+
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:server_autostart"
+        app:title="@string/pref_server_autostart_title"
+        app:summary="@string/pref_server_autostart_summary"
+        app:iconSpaceReserved="false"
+        app:dependency="YAPM/pref:enable_server_capability"
+        app:singleLineTitle="false"
+        app:allowDividerAbove="true"
+        app:defaultValue="false"/>
+
+
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:server_hide_panel"
+        app:title="@string/pref_server_hide_panel_title"
+        app:summary="@string/pref_server_hide_panel_summary"
+        app:iconSpaceReserved="false"
+        app:dependency="YAPM/pref:enable_server_capability"
+        app:singleLineTitle="false"
+        app:allowDividerAbove="true"
+        app:defaultValue="false"/>
+</PreferenceScreen>

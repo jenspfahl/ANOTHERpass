@@ -60,6 +60,10 @@ class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
         return encCredentialDao.getAllSync().map {mapToCredential(it)}
     }
 
+    fun getAllByUidsSync(uids: List<UUID>): List<EncCredential> {
+        return encCredentialDao.getByUidsSync(uids.map { it.toString() }).map {mapToCredential(it)}
+    }
+
     private fun mapToCredentials(entities: List<EncCredentialEntity>): List<EncCredential> {
         return entities.map {mapToCredential(it) }.toList()
     }

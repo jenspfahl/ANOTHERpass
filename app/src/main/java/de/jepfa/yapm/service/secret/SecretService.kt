@@ -21,8 +21,11 @@ import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_SEED
 import de.jepfa.yapm.service.biometrix.BiometricUtils
 import de.jepfa.yapm.service.secret.PbkdfIterationService.getStoredPbkdfIterations
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import java.math.BigInteger
 import java.security.*
+import java.security.KeyStore.PrivateKeyEntry
 import java.security.spec.InvalidKeySpecException
+import java.security.spec.RSAPublicKeySpec
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
@@ -128,6 +131,122 @@ object SecretService {
         }
     }
 
+    fun buildAesKey(key: Key, context: Context): SecretKeyHolder {
+        return SecretKeyHolder(
+            SecretKeySpec(key.data, "AES"),
+            CipherAlgorithm.AES_128,
+            null,
+            context
+        )
+    }
+
+    fun buildRsaPublicKey(modulus: BigInteger, exponent: BigInteger): PublicKey {
+        val spec = RSAPublicKeySpec(modulus, exponent)
+        return KeyFactory.getInstance(KeyProperties.KEY_ALGORITHM_RSA).generatePublic(spec);
+    }
+
+    /**
+     * Flag workaround see IllegalBlockSizeException for SHA256 decrypt: https://issuetracker.google.com/issues/36708951
+     */
+    fun generateRsaKeyPair(alias: String, context: Context, workaroundMode: Boolean = false): KeyPair {
+        androidKeyStore.load(null)
+
+        val keyGen = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, ANDROID_KEY_STORE)
+        val spec = KeyGenParameterSpec.Builder(
+            alias,
+            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT or KeyProperties.PURPOSE_VERIFY
+        )
+        .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_OAEP) // ENCRYPTION_PADDING_RSA_OAEP with SHA-256 does not work, see  https://issuetracker.google.com/issues/36708951
+        .setDigests(if (workaroundMode) KeyProperties.DIGEST_SHA1 else KeyProperties.DIGEST_SHA256)
+        .setKeySize(4096)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            spec
+                //.setIsStrongBoxBacked(hasStrongBoxSupport(context)) //TODO failed if StrongBox is used with:
+                    /*
+                    java.security.ProviderException: Failed to generate key pair.
+                        at android.security.keystore2.AndroidKeyStoreKeyPairGeneratorSpi.generateKeyPairHelper(AndroidKeyStoreKeyPairGeneratorSpi.java:717)
+                        at android.security.keystore2.AndroidKeyStoreKeyPairGeneratorSpi.generateKeyPair(AndroidKeyStoreKeyPairGeneratorSpi.java:627)
+                        at java.security.KeyPairGenerator$Delegate.generateKeyPair(KeyPairGenerator.java:746)
+                        at de.jepfa.yapm.service.secret.SecretService.generateRsaKeyPair(SecretService.kt:171)
+                    [...]
+                    Caused by:
+                        0: While generating Key without explicit attestation key.
+                        1: Error::Km(ErrorCode(-6))) (public error code: 12 internal Keystore code: -6)
+                        at android.security.KeyStore2.getKeyStoreException(KeyStore2.java:369)
+                        at android.security.KeyStoreSecurityLevel.handleExceptions(KeyStoreSecurityLevel.java:57)
+                        at android.security.KeyStoreSecurityLevel.generateKey(KeyStoreSecurityLevel.java:145)
+                        at android.security.keystore2.AndroidKeyStoreKeyPairGeneratorSpi.generateKeyPairHelper(AndroidKeyStoreKeyPairGeneratorSpi.java:690)
+
+                       No attestion key found if StringBox is used, see https://android.googlesource.com/platform/system/security/+/main/keystore2/src/security_level.rs
+                     */
+                .setUnlockedDeviceRequired(true)
+                .setUserAuthenticationRequired(false)
+        }
+        keyGen.initialize(spec.build())
+
+        return keyGen.generateKeyPair()
+    }
+
+    fun getServerPrivateKey(alias: String): PrivateKey? {
+        androidKeyStore.load(null)
+
+        if (!androidKeyStore.containsAlias(alias)) {
+            Log.i("SS", "RSA key $alias doesn't exist")
+            return null
+        }
+        return androidKeyStore.getKey(alias, null) as PrivateKey
+    }
+
+    fun getServerPublicKey(alias: String): PublicKey? {
+        androidKeyStore.load(null)
+
+        if (!androidKeyStore.containsAlias(alias)) {
+            Log.i("SS", "RSA key $alias doesn't exist")
+            return null
+        }
+        val entry = androidKeyStore.getCertificate(alias)
+
+        return entry.publicKey
+    }
+
+    /**
+     * Returns first modulus, second public exponent
+     */
+    fun getRsaPublicKeyData(publicKey: PublicKey): Pair<ByteArray, ByteArray> {
+        val kf = KeyFactory.getInstance("RSA")
+        val serverPublicKey = kf.getKeySpec(publicKey, RSAPublicKeySpec::class.java)
+        val modulus = serverPublicKey.modulus
+        val exponent = serverPublicKey.publicExponent
+
+        val m = cutToLength(modulus.toByteArray(), 512)
+        val e = exponent.toByteArray()
+
+        return Pair(m, e)
+    }
+
+    /**
+     * Flag workaround see IllegalBlockSizeException for SHA256 decrypt: https://issuetracker.google.com/issues/36708951
+     */
+    fun encryptKeyWithPublicKey(publicKey: PublicKey, key: Key, workaroundMode: Boolean = false): ByteArray {
+        val cipher = if (workaroundMode) Cipher.getInstance("RSA/None/OAEPwithSHA-1andMGF1Padding")
+            else Cipher.getInstance("RSA/None/OAEPwithSHA-256andMGF1Padding")
+
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey)
+        return cipher.doFinal(key.data)
+    }
+
+    /**
+     * Flag workaround see IllegalBlockSizeException for SHA256 decrypt: https://issuetracker.google.com/issues/36708951
+     */
+    fun decryptKeyWithPrivateKey(privateKey: PrivateKey, data: ByteArray, workaroundMode: Boolean = false): Key {
+        val cipher = if (workaroundMode) Cipher.getInstance("RSA/None/OAEPwithSHA-1andMGF1Padding")
+        else Cipher.getInstance("RSA/None/OAEPwithSHA-256andMGF1Padding")
+
+        cipher.init(Cipher.DECRYPT_MODE, privateKey)
+        return Key(cipher.doFinal(data))
+    }
+
     fun conjunctPasswords(password1: Password, password2: Password, salt: Key): Password {
         val message = MessageDigest.getInstance("SHA-256")
         message.update(salt.data)
@@ -137,6 +256,14 @@ object SecretService {
         val result = digest.map { it.toChar() }.toCharArray()
 
         return Password(result)
+    }
+
+    fun conjunctKeys(key1: Key, key2: Key, key3: Key? = null): Key {
+        val key =
+            if (key3 != null) key1.toByteArray() + key2.toByteArray() + key3.toByteArray()
+            else key1.toByteArray() + key2.toByteArray()
+        val message = MessageDigest.getInstance("SHA-256")
+        return Key(message.digest(key))
     }
 
     fun secretKeyToKey(secretKeyHolder:  SecretKeyHolder, salt: Key) : Key {
@@ -174,6 +301,10 @@ object SecretService {
 
     fun decryptPassword(secretKeyHolder:  SecretKeyHolder, encrypted: Encrypted): Password {
         return Password(decryptData(secretKeyHolder, encrypted))
+    }
+
+    fun encryptCommonString(type: EncryptedType, secretKeyHolder:  SecretKeyHolder, string: String): Encrypted {
+        return encryptData(type, secretKeyHolder, string.toByteArray())
     }
 
     fun encryptCommonString(secretKeyHolder:  SecretKeyHolder, string: String): Encrypted {
@@ -292,7 +423,7 @@ object SecretService {
             }
             return cipher.doFinal(encryptedData)
         } catch (e: GeneralSecurityException) {
-            Log.e(LOG_PREFIX + "SS", "unable to decrypt")
+            Log.e(LOG_PREFIX + "SS", "unable to decrypt", e)
             return FAILED_BYTE_ARRAY
         }
     }
@@ -309,7 +440,12 @@ object SecretService {
         return SecretKeyHolder(sk, DEFAULT_CIPHER_ALGORITHM, androidKey, context)
     }
 
-    fun checkKeyRequiresUserAuthOnInsecureDevice(secretKeyHolder: SecretKeyHolder, context: Context): Boolean {
+    fun isDeviceLocked(context: Context): Boolean {
+        val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+        return keyguardManager.isDeviceLocked
+    }
+
+    private fun checkKeyRequiresUserAuthOnInsecureDevice(secretKeyHolder: SecretKeyHolder, context: Context): Boolean {
         val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         val deviceRequiresUserAuth = keyguardManager.isDeviceSecure
         val keyInfo = getKeyInfo(secretKeyHolder)
@@ -327,13 +463,17 @@ object SecretService {
         return null
     }
 
-    fun removeAndroidSecretKey(androidKey: AndroidKey) {
+    fun removeAndroidSecretKey(alias: String) {
         androidKeyStore.load(null)
         try {
-            androidKeyStore.deleteEntry(androidKey.alias)
+            androidKeyStore.deleteEntry(alias)
         } catch (e: Exception) {
             // do nothing
         }
+    }
+
+    fun removeAndroidSecretKey(androidKey: AndroidKey) {
+        removeAndroidSecretKey(androidKey.alias)
     }
 
     private fun initAndroidSecretKey(androidKey: AndroidKey, context: Context): SecretKey {
@@ -412,4 +552,19 @@ object SecretService {
     }
 
 
+    private fun cutToLength(bytes: ByteArray, length: Int): ByteArray {
+        val offset = bytes.size - length
+        if (offset > 0) {
+            return bytes.copyOfRange(offset, bytes.size)
+        }
+        else {
+            return bytes
+        }
+    }
+
+    fun deriveClientKey(key: SecretKeyHolder, webClientId: String, context: Context): Key {
+        val salt = SaltService.getSalt(context)
+        val clientKey = Key(webClientId.toByteArray())
+        return secretKeyToKey(key, conjunctKeys(salt, clientKey))
+    }
 }

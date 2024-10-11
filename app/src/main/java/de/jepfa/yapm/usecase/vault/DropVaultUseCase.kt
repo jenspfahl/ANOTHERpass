@@ -9,7 +9,9 @@ import de.jepfa.yapm.service.notification.NotificationService
 import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.usecase.BasicUseCase
+import de.jepfa.yapm.usecase.webextension.DeleteWebExtensionUseCase
 import de.jepfa.yapm.util.observeOnce
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -65,6 +67,9 @@ object DropVaultUseCase: BasicUseCase<SecureActivity>() {
                 credential.id?.let { id ->
                     NotificationService.cancelScheduledNotification(activity, id)
                 }
+            }
+            activity.getApp().webExtensionRepository.getAllSync().forEach { webExtension ->
+                DeleteWebExtensionUseCase.execute(webExtension, activity)
             }
             activity.getApp().database?.clearAllTables()
         }

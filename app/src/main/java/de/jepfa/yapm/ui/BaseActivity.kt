@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuItemImpl
 import androidx.core.view.forEach
+import androidx.lifecycle.Lifecycle
 import de.jepfa.yapm.R
 import de.jepfa.yapm.ui.errorhandling.ExceptionHandler
 import de.jepfa.yapm.util.PermissionChecker
@@ -39,6 +40,10 @@ open class BaseActivity : AppCompatActivity() {
 
     val usernameTemplateViewModel: UsernameTemplateViewModel by viewModels {
         UsernameTemplateViewModelFactory(getApp())
+    }
+
+    val webExtensionViewModel: WebExtensionViewModel by viewModels {
+        WebExtensionViewModelFactory(getApp())
     }
 
     fun getProgressBar(): ProgressBar? {
@@ -109,6 +114,8 @@ open class BaseActivity : AppCompatActivity() {
             }
         }
     }
+
+    fun isActivityInForeground() = lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)
 
     @SuppressLint("RestrictedApi")
     private fun isActionItemInOverflowMenu(item: MenuItem): Boolean {

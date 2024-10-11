@@ -108,7 +108,7 @@ object NotificationService {
     private fun createAlarmPendingIntent(
         context: Context,
         id: Int
-    ): PendingIntent? {
+    ): PendingIntent {
         val alarmIntent = Intent(context, ExpiryAlarmNotificationReceiver::class.java).let { intent ->
             intent.putExtra("ID", id)
             PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)

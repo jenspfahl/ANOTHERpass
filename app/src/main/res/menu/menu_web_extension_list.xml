@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/menu_delete_disabled_web_extensions"
+        app:showAsAction="never"
+        android:icon="@drawable/ic_baseline_delete_24_white"
+        android:title="@string/delete_disabled_linked_devices" />
+
+    <item android:id="@+id/menu_sort_web_extensions"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_baseline_sort_24_white"
+        android:title="@string/sort_order" />
+
+</menu>

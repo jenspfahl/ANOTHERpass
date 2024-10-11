@@ -11,6 +11,10 @@
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+    <uses-permission android:name="android.permission.INTERNET" /><!--Needed to open a net socket for the http server-->
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" /><!--Unfortunately needed to monitor wifi state-->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /><!--Needed to get current IP/hostname-->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /><!--Needed to get current wifi state (enabled or disabled)-->
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
     <uses-feature android:name="android.hardware.camera"
@@ -124,6 +128,17 @@
         <activity
             android:name=".ui.usernametemplate.EditUsernameTemplateActivity"
             android:noHistory="true" />
+        <activity
+            android:name=".ui.webextension.ListWebExtensionsActivity"
+            android:label="@string/title_activity_list_web_extensions" />
+        <activity
+            android:name=".ui.webextension.EditWebExtensionActivity"
+            android:label="@string/title_change_web_extension"
+            android:noHistory="true" />
+        <activity
+            android:name=".ui.webextension.AddWebExtensionActivity"
+            android:label="@string/title_activity_add_web_extensions"
+            android:noHistory="false" />
         <activity
             android:name=".ui.label.ListLabelsActivity"
             android:label="@string/title_activity_list_label" />

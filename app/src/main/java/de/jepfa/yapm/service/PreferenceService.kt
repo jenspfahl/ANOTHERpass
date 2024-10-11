@@ -86,6 +86,12 @@ object PreferenceService {
     const val DATA_BIOMETRIC_SMP_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "biometric_smp_notification_showed_as"
     const val PREF_SHOW_BIOMETRIC_SMP_REMINDER = PREF_PREFIX + "show_biometric_smp_reminder"
 
+    const val PREF_SERVER_CAPABILITIES_ENABLED = PREF_PREFIX + "enable_server_capability"
+    const val PREF_SERVER_PORT = PREF_PREFIX + "server_listening_port"
+    const val PREF_SERVER_AUTOSTART = PREF_PREFIX + "server_autostart"
+    const val PREF_SERVER_HIDE_PANEL = PREF_PREFIX + "server_hide_panel"
+
+
     const val DATA_REFRESH_MPT_NOTIFICATION_SHOWED_AT = DATA_PREFIX + "refresh_mpt_notification_showed_at"
     const val DATA_REFRESH_MPT_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "refresh_mpt_notification_showed_as"
     const val PREF_SHOW_REFRESH_MPT_REMINDER = PREF_PREFIX + "show_refresh_mpt_reminder"
@@ -149,6 +155,9 @@ object PreferenceService {
     const val STATE_PREVIOUS_LOGIN_ATTEMPTS = STATE_PREFIX + "previous_login_attempts"
     const val STATE_PREVIOUS_LOGIN_SUCCEEDED_AT = STATE_PREFIX + "previous_login_succeeded_at"
 
+    const val PREF_WEB_EXTENSION_SORT_ORDER = PREF_PREFIX + "webextension_sort_order"
+    const val PREF_ENABLED_WEB_EXTENSIONS_ON_TOP = PREF_PREFIX + "enabled_webextensions_on_top"
+
     const val PREF_CREDENTIAL_SORT_ORDER = PREF_PREFIX + "credential_sort_order"
     const val PREF_SHOW_CREDENTIAL_IDS = PREF_PREFIX + "show_credential_ids"
     const val PREF_EXPIRED_CREDENTIALS_ON_TOP = PREF_PREFIX + "expired_credentials_on_top"
@@ -177,6 +186,7 @@ object PreferenceService {
     const val TEMP_BLOB_LABELS = TEMP_PREFIX + "blob_labels"
     const val TEMP_BLOB_USERNAME_TEMPLATES = TEMP_PREFIX + "blob_username_templates"
     const val TEMP_BLOB_SETTINGS = TEMP_PREFIX + "blob_settings"
+
 
     private lateinit var prefs: SharedPreferences
 

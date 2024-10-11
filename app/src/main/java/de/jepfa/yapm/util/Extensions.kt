@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import java.nio.ByteBuffer
+import java.security.MessageDigest
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.text.NumberFormat
@@ -52,15 +53,15 @@ fun Intent.getIntExtra(key: String): Int? {
     return if (value != -1) value else null
 }
 
-fun StringBuilder.addFormattedLine(label: String, data: Any?) {
-    append(label)
+fun StringBuilder.addFormattedLine(label: String, data: Any?): StringBuilder {
+    return append(label)
         .append(": ")
         .append(data ?: "")
         .append(System.lineSeparator())
 }
 
-fun StringBuilder.addNewLine() {
-    append(System.lineSeparator())
+fun StringBuilder.addNewLine(): StringBuilder {
+    return append(System.lineSeparator())
 }
 
 fun Long.toDate(): Date {
@@ -174,6 +175,10 @@ fun UUID.toBase64String(): String {
     return Base64.encodeToString(byteArray, Base64.NO_PADDING or Base64.NO_WRAP)
 }
 
+fun UUID.toReadableString(): String {
+    return shortenBase64String (this.toBase64String())
+}
+
 fun String.toUUIDFromBase64String(): UUID {
     try {
         val dec = Base64.decode(this, Base64.NO_PADDING or Base64.NO_WRAP)
@@ -185,6 +190,14 @@ fun String.toUUIDFromBase64String(): UUID {
         return UUID(buf.getLong(0), buf.getLong(8))
     } catch (e: IllegalArgumentException) {
         throw IllegalArgumentException("Invalid Base64 sequence", e)
+    }
+}
+
+fun String.toUUIDOrNull(): UUID? {
+    return try {
+        UUID.fromString(this)
+    } catch (e: Exception) {
+        null
     }
 }
 
@@ -202,7 +215,13 @@ fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observ
     })
 }
 
-fun ByteArray.toHex(): String = joinToString(separator = "") { eachByte ->
+fun ByteArray.sha256(): ByteArray {
+    val md = MessageDigest.getInstance("SHA-256")
+    return md.digest(this)
+}
+
+
+fun ByteArray.toHex(separator: String = ""): String = joinToString(separator) { eachByte ->
     "%02x".format(eachByte)
 }
 

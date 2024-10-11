@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+    <FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/design_bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        app:layout_behavior="@string/bottom_sheet_behavior"
+       >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="16dp"
+            android:paddingHorizontal="4dp"
+            android:orientation="vertical">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="32dp"
+                android:paddingVertical="16dp"
+                >
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                    android:text="@string/server_sheet_incoming_request_from" />
+
+                <TextView
+                    android:id="@+id/text_webclient_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="24sp"
+                    android:layout_marginVertical="4dp"
+                    android:textAlignment="center" />
+
+
+                <TextView
+                    android:id="@+id/text_webclient_id"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clickable="true"
+                    android:layout_marginBottom="8dp"
+                    style="@style/generated_password"
+                    android:textSize="12sp"
+                    android:focusable="true" />
+
+                <TextView
+                    android:id="@+id/text_web_request"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    >
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="4dp"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                        android:text="@string/server_sheet_fingerprint" />
+                    <ImageView
+                        android:id="@+id/imageview_fingerprint_help"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:paddingHorizontal="8dp"
+                        android:layout_marginTop="8dp"
+                        android:clickable="true"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_baseline_info_24"
+                        android:focusable="true" />
+                </LinearLayout>
+
+
+                <TextView
+                    android:id="@+id/text_fingerprint"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginVertical="8dp"
+                    style="@style/generated_password"
+                    android:focusable="true" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/switch_allow_bypass"
+                    android:text="@string/server_sheet_bypass_future_requests"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/button_server_call_deny"
+                    style="?android:textAppearanceSmall"
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="24dp"
+                    android:layout_gravity="center"
+                    android:background="@color/white"
+                    android:elevation="10dp"
+                    android:text="@string/server_request_deny"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorAccent"
+                    android:textStyle="normal" />
+
+                <Button
+                    android:id="@+id/button_server_call_accept"
+                    style="?android:textAppearanceSmall"
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:background="@color/colorAccent"
+                    android:text="@string/server_request_accept"
+                    android:textColor="@color/buttonLabel"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </FrameLayout>
+
+
+

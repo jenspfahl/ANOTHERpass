@@ -5,9 +5,12 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
+import android.net.InetAddresses
+import android.os.Build
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
+import android.util.Patterns
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -17,6 +20,8 @@ import com.google.android.material.chip.Chip
 import de.jepfa.yapm.R
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.ui.label.Label
+import java.net.MalformedURLException
+import java.net.URL
 import java.util.*
 
 
@@ -122,8 +127,10 @@ fun linkify(s: SpannableString) {
     Linkify.addLinks(s, Linkify.WEB_URLS)
 }
 
-fun linkify(textView: TextView) {
-    textView.text = ensureHttp(textView.text.toString())
+fun linkify(textView: TextView, noScheme: Boolean = false) {
+    if (!noScheme) {
+        textView.text = ensureHttp(textView.text.toString())
+    }
     Linkify.addLinks(textView, Linkify.WEB_URLS)
     textView.movementMethod = LinkMovementMethod.getInstance()
 }
@@ -202,12 +209,15 @@ fun emoji(unicode: Int): String {
     return String(Character.toChars(unicode))
 }
 
-private fun ensureHttp(s: String): String {
-    if (s.startsWith(prefix = "http", ignoreCase = true)) {
+fun ensureHttp(s: String): String {
+    if (s.isBlank()) {
         return s
     }
+    return if (s.startsWith(prefix = "http", ignoreCase = true)) {
+        s
+    }
     else {
-        return "https://" + s
+        "https://" + s
     }
 }
 
@@ -220,5 +230,33 @@ fun getAppNameFromPackage(packageName: String, context: Context): String? {
     }
 
     return ai?.loadLabel(pm)?.toString()
+}
+
+fun extractDomain(website: String, withTld: Boolean = false): String {
+    return try {
+        val host = URL(website).host.lowercase()
+
+        if (isIpAddress(host)) {
+            return host
+        }
+        val hostPart = host.substringBeforeLast(".").substringAfterLast(".")
+        val tld = host.substringAfterLast(".")
+        if (withTld) {
+            "$hostPart.$tld"
+        } else {
+            hostPart
+        }
+    } catch (e: MalformedURLException) {
+        website.lowercase()
+    }
+}
+
+
+fun isIpAddress(s: String): Boolean {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        InetAddresses.isNumericAddress(s)
+    } else {
+        Patterns.IP_ADDRESS.matcher(s).matches()
+    }
 }
 

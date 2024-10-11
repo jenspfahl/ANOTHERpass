@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_server_settings_hide"
+        android:icon="@drawable/variable_remove_24"
+        android:title="@string/hide_control_panel" />
+
+    <item android:id="@+id/menu_server_settings_show_server_log"
+        android:icon="@drawable/outline_list_24"
+        android:title="@string/show_server_logs" />
+
+    <item android:id="@+id/menu_server_settings_open_settings"
+        android:icon="@drawable/ic_settings_black_24dp"
+        android:title="@string/open_server_settings" />
+
+    <item
+        android:id="@+id/action_server_help"
+        android:icon="@drawable/ic_baseline_help_outline_24"
+        android:title="@string/help" />
+</menu>

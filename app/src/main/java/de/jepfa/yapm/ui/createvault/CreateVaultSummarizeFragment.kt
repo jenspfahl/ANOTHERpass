@@ -1,5 +1,6 @@
 package de.jepfa.yapm.ui.createvault
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -57,6 +58,7 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
         return inflater.inflate(R.layout.fragment_create_vault_summarize, container, false)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setTitle(R.string.create_vault_summarize_fragment_label)

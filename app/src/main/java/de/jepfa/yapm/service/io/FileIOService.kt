@@ -44,7 +44,7 @@ class FileIOService: IntentService("FileIOService") {
 
         internal fun bitmapToJpegFile(contentResolver: ContentResolver, bitmap: Bitmap, destUri: Uri): Boolean {
             return try {
-                val fileOutStream = contentResolver.openOutputStream(destUri)
+                val fileOutStream = contentResolver.openOutputStream(destUri) ?: return false
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fileOutStream)
             } catch (e: IOException) {
                 Log.e(LOG_PREFIX + "TS", "cannot create file", e)
