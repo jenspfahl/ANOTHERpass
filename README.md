@@ -55,9 +55,11 @@ Dark theme:
 >* Dark Theme support ;-)
 
 
-With version 2, the app is able to act as a credential server in a local network. With [this browser extension](https://github.com/jenspfahl/anotherpass-webext) you can fetch certain credentials directly from a browser on different devices (e.g. your laptop) .
+With version 2, the app is able to act as a credential server in a local network. With [this browser extension](https://github.com/jenspfahl/anotherpass-browserextension) you can fetch certain credentials directly from a browser on different devices (e.g. your laptop) .
 
 For more information see [https://anotherpass.jepfa.de](https://anotherpass.jepfa.de)
+
+Information about the ANOTHERpass browser extension can be found [here](https://anotherpass.jepfa.de/extension/).
 
 You can download the latest release version [here](https://anotherpass.jepfa.de/download/).
 
