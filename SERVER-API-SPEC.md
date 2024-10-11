@@ -1,18 +1,18 @@
 # ANOTHERpass built-in server API specification
 
-From [ANOTHERpass version 2](https://github.com/jenspfahl/ANOTHERpass/tree/rc-2.0.0) (still in development) onwards, a new server  capability is included in the mobile app, to let the app function as a credential server in a local network. Together with the [ANOTHERpass Browser Extension](https://github.com/jenspfahl/anotherpass-browserextension) it is possible to easily and securelly use credentials stored in the app by any computer in a local network. This is a very requested feature to use credentials outside of the mobile device.
+From [ANOTHERpass version 2](https://github.com/jenspfahl/ANOTHERpass) onwards, a new server capability is included in the mobile app, to let the app function as a credential server in a local network. Together with the [ANOTHERpass Browser Extension](https://github.com/jenspfahl/anotherpass-browserextension) it is possible to easily and securely use credentials stored in the app by any computer in a local network. This is a very requested feature to use credentials outside of the mobile device.
 
 This server capability of the app can be used by any client, who follows its API. This document is about describing this API.
 
 ## Limitations
 
-The server capability is designed to serve in local networks only, never as a public server visible from the public. Therefore no TLS and certificates is used to secure the connection. Instead n end-to-end encryption is established, [see this section](https://github.com/jenspfahl/anotherpass-browserextension?tab=readme-ov-file#common-communication-between-extension-and-app).
+The server capability is designed to serve in local networks only, never as a public server visible from the public. Therefore no TLS and certificates is used to secure the connection. Instead an end-to-end encryption is established, [see this section](https://github.com/jenspfahl/anotherpass-browserextension?tab=readme-ov-file#common-communication-between-extension-and-app).
 
 
 ## Transport layer
 
 * Communication over HTTP only
-    * The client has to implement the service layer described in this document and in [that document](https://github.com/jenspfahl/anotherpass-browserextension?tab=readme-ov-file#common-communication-between-extension-and-app).
+    * The client has to implement the service layer described in this document and in [this document](https://github.com/jenspfahl/anotherpass-browserextension?tab=readme-ov-file#common-communication-between-extension-and-app).
 * Supported HTTP methods:
     * `OPTIONS` : to tell the client about the supported HTTP methods and headers and application content
     * `POST` : to send requests to the server
@@ -22,7 +22,7 @@ The server capability is designed to serve in local networks only, never as a pu
 
 * `Accept`: "application/json"
 * `Content-Type`: "application/json"
-* `X-WebClientId`: <webClientId>
+* `X-WebClientId`: "<webClientId>"
 
 `X-WebClientId` is the only custom header used by the server to identify the calling client. This identifier is generated once by the client during [the linking phase](https://github.com/jenspfahl/anotherpass-browserextension?tab=readme-ov-file#link-extension-with-the-app) and must be a random and unique 6 alphanumeric uppercase char sequence in the format `[A-Z]{3}-[A-Z]{3}` (e.g. `ABC-DEF`). It is the only value transferred in plaintext.
 
@@ -154,9 +154,9 @@ All commands initiate a different flow in the app and may enforce user interacti
 
 * `fetch_credential_for_url`
 
-Requires `"website"` as a sibling of the ´"command"´-property and asks the user of the app to select a credential for the given website. The app starts a credential search with the website domain name to support the user. User has to select one credential.
+Requires `"website"` as a sibling of the `"command"`-property and asks the user of the app to select a credential for the given website. The app starts a credential search with the website domain name to support the user. User has to select one credential.
 
-Returns the selected credential or 409 if nothing is selected.
+Returns the selected credential.
 
 ```
 {
@@ -174,13 +174,13 @@ Returns the selected credential or 409 if nothing is selected.
 
 * `fetch_credential_for_uid`
 
-Requires `"uid"` as a sibling of the ´"command"´-property and tries to fetch the credential with the given UID. No user interaction required.
+Requires `"uid"` as a sibling of the `"command"`-property and tries to fetch the credential with the given UID. No user interaction required.
 
 Returns the related credential as for `fetch_credential_for_url` or 404 if no credential found for this UID.
 
 * `fetch_credentials_for_uids`
 
-Requires `"uids"`-array as a sibling of the ´"command"´-property containing all UIDs to fetch. The app tries to fetch all credentials with the given UIDs. No user interaction required.
+Requires `"uids"`-array as a sibling of the `"command"`-property containing all UIDs to fetch. The app tries to fetch all credentials with the given UIDs. No user interaction required.
 
 Returns all related credentials or 404 if no credential found for this UID.
 
@@ -218,7 +218,7 @@ Returns all credentials as for `fetch_credentials_for_uids`.
 
 * `create_credential_for_url`
 
-Requires `"website"` as a sibling of the ´"command"´-property and starts the flow to create a new credential with a suggested name,  and website derived from the received `"website"`. It may also receive a `"user"` from the client to be prefilled in the form.
+Requires `"website"` as a sibling of the `"command"`-property and starts the flow to create a new credential with a suggested name,  and website derived from the received `"website"`. It may also receive a `"user"` from the client to be prefilled in the form.
 
 Returns the created credentials as for `fetch_credential_for_url` or 409 if nothing is created.
 
@@ -245,7 +245,7 @@ If the client wants to store received credentials, it can take advantage of the 
 
 ### Request fingerprinting
 
-Shortened fingerprint is a function that takes the first 7 alphanumeric characters of a base64 and converts them into an easy and fast to read fingerprint string with the format [A-Z]{2}-[A-Z]{3}-[A-Z]{2}.
+Shortened fingerprint is a function that takes the first 7 alphanumeric characters of a base64 and converts them into an easy and fast to read fingerprint string with the format `[A-Z]{2}-[A-Z]{3}-[A-Z]{2}`.
 
 The fingerprint is derived from:
  * the `"serverPubKey"."n"`-value for the link_app requests
