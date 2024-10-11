@@ -1,2 +1,2 @@
-* Use app as a local credential server to connect with the ANOTHERpass browser extension (https://github.com/jenspfahl/anotherpass-browserextension)
+* Use the app as a local credential server to connect the app with the brand-new browser extension (https://anotherpass.jepfa.de/extension/)
 * bugfix issue #74 Unlocking vault from Autofill wit no entries

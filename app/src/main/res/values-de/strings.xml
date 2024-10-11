@@ -892,6 +892,7 @@
     <string name="server_details_title">Serverdetails</string>
     <string name="server_address_title">Serveradressen</string>
     <string name="server_address_description">Der Server ist unter den folgenden Adressen von der Browsererweiterung aus erreichbar:</string>
+    <string name="server_not_started_hint">Der Zugangsdaten-Server wurde nicht gestartet. Zum Starten bitte den rechten Schalter betätigen.</string>
 
     <string name="scan_qr_code_first">Bitte erst den QR-Code scannen.</string>
     <string name="please_proceed_with_the_extension">Bitte in der Browser-Erweitung fortfahren!</string>

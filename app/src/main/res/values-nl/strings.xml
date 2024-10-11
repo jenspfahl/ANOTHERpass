@@ -855,6 +855,7 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="server_details_title">Server details</string>
   <string name="server_address_title">Server addresses</string>
   <string name="server_address_description">The server is reachable from the browser extension within a local network by the following address alternatives:</string>
+  <string name="server_not_started_hint">The credential server has not been started. To do so, click on the right toggle.</string>
 
   <string name="scan_qr_code_first">Please scan the QR code first.</string>
   <string name="please_proceed_with_the_extension">Please proceed with the extension!</string>

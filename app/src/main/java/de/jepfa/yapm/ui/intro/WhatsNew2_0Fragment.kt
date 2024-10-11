@@ -49,7 +49,7 @@ class WhatsNew2_0Fragment : Fragment() {
             }
         }
 
-        val currentState = PreferenceService.getAsBool(PreferenceService.PREF_SERVER_CAPABILITIES_ENABLED, null)
+        val currentState = PreferenceService.getAsBool(PreferenceService.PREF_SERVER_CAPABILITIES_ENABLED, true, null)
         enableServer.isChecked = currentState
     }
 

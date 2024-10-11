@@ -322,6 +322,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         }
                     }
                 }
+                else {
+                    AlertDialog.Builder(this)
+                        .setMessage(getString(R.string.server_not_started_hint))
+                        .show()
+                }
             }
             serverViewState.setOnLongClickListener(onLongClickServerDetails)
             serverViewState.setOnClickListener(onClickServerAddresses)
@@ -737,6 +742,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             serverViewDetails.visibility = ViewGroup.GONE
         }
         serverView.setBackgroundColor(getColor(R.color.colorServer))
+        serverView.setPadding(0, 8, 10, 10)
     }
 
     private fun reflectServerStopped(msg: String? = null) {
@@ -748,11 +754,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             serverViewDetails.text = ""
             serverViewState.setTypeface(null, Typeface.NORMAL)
             serverViewDetails.visibility = ViewGroup.GONE
+            serverView.setPadding(0, 26, 10, 24)
         }
     }
 
     private fun reflectServerState(msg: String? = null, showIp: Boolean = true) {
-        if (serverViewSwitch.isChecked /*&& HttpServer.isRunning()*/) {
+        if (serverViewSwitch.isChecked) {
             reflectServerStarted(msg, showIp)
         }
         else {
