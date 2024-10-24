@@ -15,7 +15,7 @@ With ANOTHERpass you can store backups of the vault and the encrypted master key
 - strong modern encryption (AES 128/256, Blowfish, Chacha20)
 - uses an integrated security chip or TEE (Trusted Execution Environment) if present
 - Autofill support
-- works with the ANOTHERpass Browser Extension to share credentials within a local network (e.g. from the app to the desktop PC)
+- works with the <a href="https://anotherpass.jepfa.de/extension">ANOTHERpass Browser Extension</a> to share credentials within a local network (e.g. from the app to the desktop PC)
 - biometrics (e.g. fingerprint) for stored master password
 - no insecure clipboard function by default
 - show passwords over other apps to type it easily

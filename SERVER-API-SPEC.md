@@ -235,7 +235,20 @@ Cancels the current active request on the app. Executed when the user cancels th
 
 Returns no data.
 
+* `download_vault_backup`
 
+Initiates a download of a backup file of the app vault. Returns the filename and the download path used to eventually download the file with HTTP GET under a one-time path.
+```
+{
+    "filename": "anotherpassvault_xxx.json",
+    "downloadKey": "XXX-YYY_zzzzzzzzzzzzzzzzzzzzzzzzzzz" 
+    ..
+}
+```
+
+The file can now be downloaded once under http://<server>:<port>/<downloadKey>.
+
+Note! This download is not encrypted anf happens on plain HTTP GET.
 
 
 #### Client Key for client based encryption

@@ -12,7 +12,7 @@ Ebenso verwendet die App eine clevere Zwei-Faktor-Authentifizierung, um den Tres
 - Starke Verschlüsselung (AES 128/256, Blowfish, Chacha20)
 - Verwendet einen integrierten Sicherheitschip oder eine TEE (Trusted Execution Environment), falls vorhanden
 - Autofill Unterstützung
-- Arbeitet mit der ANOTHERpass Browser-Erweiterung zusammen, um Zugangsdaten innerhalb eines lokalen Netzwerks zu teilen (z.B. von der App zum Desktop-PC)
+- Arbeitet mit der <a href="https://anotherpass.jepfa.de/extension">ANOTHERpass Browser-Erweiterung</a> zusammen, um Zugangsdaten innerhalb eines lokalen Netzwerks zu teilen (z.B. von der App zum Desktop-PC)
 - Biometrisches Merkmal (z.B. Fingerabdruck) für gespeichertes Masterpasswort
 - Unsichere Zwischenablage standardmäßig deaktiviert
 - Passwörter können über anderen Apps angezeigt werden um Abtippen zu erleichtern

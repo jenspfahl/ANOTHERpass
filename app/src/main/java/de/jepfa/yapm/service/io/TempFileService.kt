@@ -12,6 +12,7 @@ import java.io.File
 
 object TempFileService {
 
+
     fun createTempImageContentUri(context: Context, bitmap: Bitmap, baseFileName: String): Uri? {
         try {
             val tempFile = createTempFile(context, "$baseFileName.jpeg")
@@ -34,6 +35,7 @@ object TempFileService {
         return null
     }
 
+    private var vaultTempFile: File? = null
     private const val SHARE_FOLDER = "shares"
 
     fun createTempFile(context: Context, fileName: String): File {
@@ -51,6 +53,19 @@ object TempFileService {
         } catch (e: Exception) {
             Log.e(LOG_PREFIX + "FS", "cannot clear shares cache", e)
         }
+    }
+
+    fun holdVaultBackupFile(tempFile: File) {
+        Log.d("HTTP", "holding ${tempFile.name}")
+        vaultTempFile = tempFile
+    }
+
+    fun unholdVaultBackupFile(): File? {
+        val tempFile = vaultTempFile
+        vaultTempFile = null
+        Log.d("HTTP", "unholding ${tempFile?.name}")
+
+        return tempFile
     }
 
 

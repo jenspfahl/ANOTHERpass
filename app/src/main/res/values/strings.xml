@@ -845,6 +845,7 @@
     <string name="enabled_links_always_on_top">Enabled links always on top</string>
     <string name="credentials_posted">Credentials posted</string>
     <string name="local_vault_unlocked">Linked vault unlocked</string>
+    <string name="vault_backup_file_sent">Vault backup file sent</string>
     <string name="requested_credential_to_sync_not_found">Requested credential to synchronise not found.</string>
     <string name="request_denied">Request denied</string>
     <string name="request_denied_and_bypass_revoked">Request denied and bypass revoked</string>
@@ -861,6 +862,8 @@
     <string name="request_user_action_fetch_by_website">Select the credential for \'%1$s\' to fulfill the request.</string>
     <string name="request_detail_create_by_website">wants to create a new credential for \'%1$s\'.</string>
     <string name="request_user_action_create_by_website">Create a new credential for \'%1$s\' to fulfill the request.</string>
+    <string name="request_detail_download_vault_backup">wants to download the vault backup file.</string>
+    <string name="request_user_action_download_vault_backup">Returning the vault backup file …</string>
     <string name="request_detail_client_key">wants to unlock the linked vault.</string>
     <string name="request_user_action_client_key">Unlocking linked vault …</string>
     <string name="request_detail_fetch_any">wants to ask for any credential. Please select one.</string>

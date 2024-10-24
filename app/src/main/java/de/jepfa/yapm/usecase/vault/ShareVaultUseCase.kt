@@ -17,6 +17,7 @@ import de.jepfa.yapm.usecase.UseCase
 import de.jepfa.yapm.usecase.UseCaseOutput
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.toastText
+import java.io.File
 import java.util.*
 
 object ShareVaultUseCase: UseCase<ShareVaultUseCase.Input, Uri?, SecureActivity> {
@@ -25,7 +26,21 @@ object ShareVaultUseCase: UseCase<ShareVaultUseCase.Input, Uri?, SecureActivity>
                      val includeSettings: Boolean)
 
     override suspend fun execute(input: Input, activity: SecureActivity): UseCaseOutput<Uri?> {
-        activity.masterSecretKey?.let{ key ->
+        val vaultFile = createVaultTempFile(input, activity)
+        if (vaultFile != null) {
+            val uri = TempFileService.getContentUriFromFile(activity, vaultFile)
+            return UseCaseOutput(uri)
+        }
+        else {
+            return UseCaseOutput(false, null)
+        }
+    }
+
+    fun createVaultTempFile(
+        input: Input,
+        activity: SecureActivity
+    ): File? {
+        activity.masterSecretKey?.let { key ->
 
             var tempFile = TempFileService.createTempFile(activity, getBackupFileName(activity))
 
@@ -33,14 +48,14 @@ object ShareVaultUseCase: UseCase<ShareVaultUseCase.Input, Uri?, SecureActivity>
                 VaultExportService.createVaultFile(
                     activity,
                     activity.getApp(),
-                    input.includeMasterKey, input.includeSettings, tempFile.toUri())
+                    input.includeMasterKey, input.includeSettings, tempFile.toUri()
+                )
 
             if (success) {
-                val uri = TempFileService.getContentUriFromFile(activity, tempFile)
-                return UseCaseOutput(uri)
+                return tempFile
             }
         }
-        return UseCaseOutput(false, null)
+        return null
     }
 
     fun startShareActivity(uri: Uri?, activity: SecureActivity) {

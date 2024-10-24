@@ -17,12 +17,17 @@ import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncWebExtension
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.SecretKeyHolder
+import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.PREF_INCLUDE_MASTER_KEY_IN_BACKUP_FILE
+import de.jepfa.yapm.service.PreferenceService.PREF_INCLUDE_SETTINGS_IN_BACKUP_FILE
 import de.jepfa.yapm.service.autofill.AutofillCredentialHolder
+import de.jepfa.yapm.service.io.TempFileService
 import de.jepfa.yapm.service.net.HttpServer.serverLog
 import de.jepfa.yapm.service.net.HttpServer.toErrorResponse
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.ServerRequestBottomSheet
+import de.jepfa.yapm.usecase.vault.ShareVaultUseCase
 import de.jepfa.yapm.util.ensureHttp
 import de.jepfa.yapm.util.extractDomain
 import de.jepfa.yapm.util.observeOnce
@@ -262,6 +267,16 @@ object HttpCredentialRequestHandler {
                             user
                         )
                     }
+                    else if (command == FetchCredentialCommand.DOWNLOAD_VAULT_BACKUP) {
+                        startDownloadVaultBackupFlow(
+                            requestFlows,
+                            webExtension,
+                            webClientTitle,
+                            webClientId,
+                            incomingRequestIdentifier,
+                            shortenedFingerprint
+                        )
+                    }
                     else {
                         Log.i("HTTP", "unhandled command: $command")
                     }
@@ -298,6 +313,9 @@ object HttpCredentialRequestHandler {
                 }
                 else if (command == FetchCredentialCommand.FETCH_CREDENTIALS_FOR_UIDS) {
                     postCredentialsByUidsExceptVeiled(requestFlows, key, webClientId, uids)
+                }
+                else if (command == FetchCredentialCommand.DOWNLOAD_VAULT_BACKUP) {
+                    postVaultBackupFileUrl(requestFlows, key, webClientId)
                 }
                 else {
                     // if a new holder holds a selected cred like AutofillCredentialHolder
@@ -559,6 +577,29 @@ object HttpCredentialRequestHandler {
     }
 
 
+    private fun startDownloadVaultBackupFlow(
+        requestFlows: RequestFlows,
+        webExtension: EncWebExtension,
+        webClientTitle: String,
+        webClientId: String,
+        incomingRequestIdentifier: String,
+        shortenedFingerprint: String,
+    ) {
+        showClientRequest(
+            requestFlows,
+            webExtension,
+            webClientTitle,
+            webClientId,
+            requestFlows.getLifeCycleActivity().getString(R.string.request_detail_download_vault_backup),
+            incomingRequestIdentifier,
+            shortenedFingerprint,
+            requestFlows.getLifeCycleActivity().getString(R.string.request_user_action_download_vault_backup),
+            showSnackbars = false,
+        )
+        {
+            // no user interaction
+        }
+    }
 
     private fun findCredentialByUuid(activity: SecureActivity, uuid: UUID, resolved: (EncCredential?) -> Unit) {
         activity.credentialViewModel.findByUid(uuid)
@@ -932,6 +973,45 @@ object HttpCredentialRequestHandler {
         CoroutineScope(Dispatchers.Main).launch {
             serverSnackbar?.dismiss()
             toastText(requestFlows.getLifeCycleActivity(), requestFlows.getLifeCycleActivity().getString(R.string.credentials_posted))
+        }
+
+        return Pair(HttpStatusCode.OK, response)
+    }
+
+    private fun postVaultBackupFileUrl(
+        requestFlows: RequestFlows,
+        key: SecretKeyHolder,
+        webClientId: String,
+    ): Pair<HttpStatusCode, JSONObject> {
+        val includeSettings = PreferenceService.getAsBool(
+            PREF_INCLUDE_SETTINGS_IN_BACKUP_FILE, true, requestFlows.getLifeCycleActivity())
+        val includeMasterKey = PreferenceService.getAsBool(
+            PREF_INCLUDE_MASTER_KEY_IN_BACKUP_FILE, true, requestFlows.getLifeCycleActivity())
+        val input = ShareVaultUseCase.Input(includeMasterKey, includeSettings)
+
+        val vaultFile = ShareVaultUseCase.createVaultTempFile(input, requestFlows.getLifeCycleActivity())
+        if (vaultFile == null) {
+            return toErrorResponse(HttpStatusCode.InternalServerError, "Cannot create vault backup")
+        }
+        TempFileService.holdVaultBackupFile(vaultFile)
+
+        val clientKey = SecretService.deriveClientKey(key, webClientId, requestFlows.getLifeCycleActivity())
+
+        val downloadKey = HttpServer.generateAndRegisterDownloadKey(webClientId, requestFlows.getLifeCycleActivity())
+        val response = JSONObject()
+
+        response.put("clientKey", clientKey.toBase64String())
+        response.put("downloadKey", downloadKey)
+        response.put("filename", vaultFile.name)
+
+        clientKey.clear()
+
+        webClientRequestIdentifier = null
+        updateRequestState(CredentialRequestState.Fulfilled, requestFlows)
+
+        CoroutineScope(Dispatchers.Main).launch {
+            serverSnackbar?.dismiss()
+            toastText(requestFlows.getLifeCycleActivity(), requestFlows.getLifeCycleActivity().getString(R.string.vault_backup_file_sent))
         }
 
         return Pair(HttpStatusCode.OK, response)

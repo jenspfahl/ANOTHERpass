@@ -20,6 +20,7 @@ import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.io.TempFileService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.util.*
@@ -34,6 +35,7 @@ import io.ktor.server.routing.*
 import io.ktor.util.pipeline.*
 import kotlinx.coroutines.*
 import org.json.JSONObject
+import java.io.File
 import java.math.BigInteger
 import java.net.InetAddress
 import java.util.*
@@ -45,7 +47,9 @@ object HttpServer {
     const val NO_IP_ADDRESS_AVAILABLE = "0.0.0.0"
     const val DEFAULT_HTTP_SERVER_PORT = 8787
     val SERVER_LOG_PREFIX = Constants.LOG_PREFIX + "HttpServer"
-    val REGEX_WEB_CLIENT_ID = Regex("[A-Z]{3}-[A-Z]{3}")
+
+    private val REGEX_WEB_CLIENT_ID = Regex("[A-Z]{3}-[A-Z]{3}")
+    private var latestDownloadKey: String? = null
 
     enum class Action {LINKING, REQUEST_CREDENTIAL}
 
@@ -86,7 +90,35 @@ object HttpServer {
                     }
                     module {
                         routing {
+                            options {
+                                call.response.header(
+                                    "Access-Control-Allow-Origin",
+                                    "*"
+                                )
+                                call.response.header(
+                                    "Access-Control-Allow-Headers",
+                                    "X-WebClientId,Content-Type"
+                                )
+
+                                call.respond(
+                                    status = HttpStatusCode.OK,
+                                    message = ""
+                                )
+                            }
                             get("/") {
+
+                                serverLog(
+                                    origin = call.request.origin,
+                                    msg = "GET request received, ignored",
+                                )
+
+                                call.respondText(
+                                    text = "Use the ANOTHERpass browser extension to use the app as a credential server.",
+                                    contentType = ContentType("text", "html"),
+                                )
+
+                            }
+                            get("/{downloadKey}") {
 
                                 call.response.header(
                                     "Access-Control-Allow-Origin",
@@ -112,30 +144,48 @@ object HttpServer {
                                     return@get
                                 }
 
-                                serverLog(
-                                    origin = call.request.origin,
-                                    msg = "GET request received, ignored",
-                                )
+                                val downloadKey = call.parameters["downloadKey"]
 
-                                call.respondText(
-                                    text = "Use the ANOTHERpass browser extension to use the app as a credential server.",
-                                    contentType = ContentType("text", "html"),
-                                )
-                            }
-                            options {
-                                call.response.header(
-                                    "Access-Control-Allow-Origin",
-                                    "*"
-                                )
-                                call.response.header(
-                                    "Access-Control-Allow-Headers",
-                                    "X-WebClientId,Content-Type"
-                                )
+                                if (!downloadKey.isNullOrEmpty()) {
 
-                                call.respond(
-                                    status = HttpStatusCode.OK,
-                                    message = ""
-                                )
+                                    Log.i("HTTP", "download request for $downloadKey")
+
+                                    if (downloadKey != latestDownloadKey) {
+                                        respondError(
+                                            null,
+                                            HttpStatusCode.NotFound,
+                                            "Unknown file to download"
+                                        )
+                                    }
+                                    else {
+
+                                        val webClientId = downloadKey.substringBefore("_")
+                                        val file = TempFileService.unholdVaultBackupFile()
+
+                                        Log.i(
+                                            "HTTP",
+                                            "continuing download request for $webClientId and ${file?.name}"
+                                        )
+
+                                        if (file != null) {
+
+                                            respondFile(webClientId, file)
+                                        } else {
+                                            respondError(
+                                                webClientId,
+                                                HttpStatusCode.NotFound,
+                                                "No file to download"
+                                            )
+                                        }
+                                    }
+                                }
+                                else {
+                                    respondError(
+                                        null,
+                                        HttpStatusCode.BadRequest,
+                                        "Missing download key"
+                                    )
+                                }
                             }
                             post("/") {
                                 var webClientId: String? = null
@@ -311,7 +361,8 @@ object HttpServer {
                                         masterKey,
                                         webExtension,
                                         response.second,
-                                        activity)
+                                        activity
+                                    )
 
                                     respond(webClientId, text, response)
 
@@ -737,6 +788,20 @@ object HttpServer {
         )
     }
 
+    private suspend fun PipelineContext<Unit, ApplicationCall>.respondFile(
+        webClientId: String,
+        file: File
+    ) {
+
+        serverLog(
+            origin = call.request.origin,
+            webClientId = webClientId,
+            msg = "Respond File ${file.name}",
+        )
+
+        call.respondFile(file)
+    }
+
     private suspend fun PipelineContext<Unit, ApplicationCall>.respondError(
         webClientId: String?,
         code: HttpStatusCode,
@@ -772,6 +837,18 @@ object HttpServer {
             contentType = ContentType("application", "json"),
             status = code
         )
+    }
+
+    fun generateAndRegisterDownloadKey(webClientId: String, context: Context): String {
+        val key = SecretService.generateRandomKey(32, context)
+
+        val keyAsString = key.toBase64String().replace(Regex("[^a-zA-Z0-9]"), "")
+        val url = "${webClientId}_$keyAsString"
+        key.clear()
+
+        this.latestDownloadKey = url
+
+        return url
     }
 
 }

@@ -839,6 +839,7 @@
     <string name="enabled_links_always_on_top">Aktivierte Verknüpfungen immer zuerst</string>
     <string name="credentials_posted">Zugangsdaten gesendet</string>
     <string name="local_vault_unlocked">Vernüpfter Tresor entsperrt</string>
+    <string name="vault_backup_file_sent">Tresor-Backup heruntergeladen</string>
     <string name="requested_credential_to_sync_not_found">Angefragte Zugangsdaten zum Synchronisieren nicht gefunden</string>
     <string name="request_denied">Anfrage abgelehnt</string>
     <string name="request_denied_and_bypass_revoked">Anfrage abgelehnt und Erlaubnis zurückgezogen</string>
@@ -855,6 +856,8 @@
     <string name="request_user_action_fetch_by_website">Wähle die Zugangsdaten für \'%1$s\', um die Anfrage abzuschließen.</string>
     <string name="request_detail_create_by_website">möchte neue Zugangsdaten für \'%1$s\' anlegen.</string>
     <string name="request_user_action_create_by_website">Lege neue Zugangsdaten für \'%1$s\' an, um die Anfrage abzuschließen.</string>
+    <string name="request_detail_download_vault_backup">möchte ein Tresor-Backup herunterladen.</string>
+    <string name="request_user_action_download_vault_backup">Tresor-Backup wird gesendet …</string>
     <string name="request_detail_client_key">möchte den verknüpften Tresor entsperren.</string>
     <string name="request_user_action_client_key">Entsperre verknüpften Tresor …</string>
     <string name="request_detail_fetch_any">möchte beliebige Zugangsdaten abrufen. Bitte wähle eins aus.</string>

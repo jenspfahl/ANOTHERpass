@@ -1,0 +1,1 @@
+* Support backup app vault file through browser extension
