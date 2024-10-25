@@ -23,7 +23,6 @@ import de.jepfa.yapm.service.secret.PbkdfIterationService.getStoredPbkdfIteratio
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import java.math.BigInteger
 import java.security.*
-import java.security.KeyStore.PrivateKeyEntry
 import java.security.spec.InvalidKeySpecException
 import java.security.spec.RSAPublicKeySpec
 import javax.crypto.Cipher
@@ -335,9 +334,22 @@ object SecretService {
         return Encrypted.fromBase64(decryptData(secretKeyHolder, encrypted))
     }
 
-    fun hasStrongBoxSupport(context: Context): Boolean {
-        return context.packageManager
-            .hasSystemFeature(PackageManager.FEATURE_STRONGBOX_KEYSTORE)
+    fun hasStrongBoxSupport(context: Context): Boolean? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            context.packageManager
+                .hasSystemFeature(PackageManager.FEATURE_STRONGBOX_KEYSTORE)
+        } else {
+            null
+        }
+    }
+
+    fun hasHardwareTEESupport(context: Context): Boolean? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            context.packageManager
+                .hasSystemFeature(PackageManager.FEATURE_HARDWARE_KEYSTORE)
+        } else {
+            null
+        }
     }
 
     private fun encryptData(type: EncryptedType?, secretKeyHolder: SecretKeyHolder, data: ByteArray): Encrypted {
@@ -485,7 +497,7 @@ object SecretService {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             spec
-                .setIsStrongBoxBacked(androidKey.boxed && hasStrongBoxSupport(context))
+                .setIsStrongBoxBacked(androidKey.boxed && hasStrongBoxSupport(context) == true)
                 .setUnlockedDeviceRequired(true)
                 .setUserAuthenticationRequired(false)
 
