@@ -248,7 +248,7 @@ Initiates a download of a backup file of the app vault. Returns the filename and
 
 The file can now be downloaded once under http://<server>:<port>/<downloadKey>.
 
-Note! This download is not encrypted anf happens on plain HTTP GET.
+Note! This download is not encrypted by the configured end-to-end-encryption, because of restrictions of the JavaScript Download API used by possible clients like the browser extension. The reason is that a client can not manipulate (like encrypt) a download stream. Usually the backup file is encrypted but contains plain metadata which could be revealed in an untrusted local network.
 
 
 #### Client Key for client based encryption

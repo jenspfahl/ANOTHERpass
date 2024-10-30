@@ -113,7 +113,7 @@ object HttpServer {
                                 )
 
                                 call.respondText(
-                                    text = "Use the ANOTHERpass browser extension to use the app as a credential server.",
+                                    text = "Download the ANOTHERpass browser extension to use the app as a credential server. It can be downloaded <a href=\"https://anotherpass.jepfa.de/extension/\">here</a>.",
                                     contentType = ContentType("text", "html"),
                                 )
 
