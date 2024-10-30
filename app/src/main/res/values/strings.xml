@@ -922,5 +922,9 @@
 
 
     <string name="unknown">Unknown</string>
+    <string name="device_key_storage">Device Key Storage</string>
+    <string name="device_key_storage_strong_box">Security Chip (SE/StrongBox)</string>
+    <string name="device_key_storage_tee">Protected Environment (TEE)</string>
+    <string name="device_key_storage_software">Android OS / Software-based</string>
 
 </resources>

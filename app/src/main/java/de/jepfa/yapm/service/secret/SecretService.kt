@@ -103,7 +103,7 @@ object SecretService {
     }
 
     fun createSecretKey(data: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
-        val sk = SecretKeySpec(data.data.copyOf(cipherAlgorithm.keyLength/8), cipherAlgorithm.secretKeyAlgorithm)
+        val sk = SecretKeySpec(data.data.copyOf(cipherAlgorithm.keyLength/8), cipherAlgorithm.keyDerivationAlgorithm)
         return SecretKeyHolder(sk, cipherAlgorithm, null, context)
     }
 
@@ -121,7 +121,7 @@ object SecretService {
 
     fun generatePBESecretKey(password: Password, salt: Key, iterations: Int, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
         val keySpec = PBEKeySpec(password.toEncodedCharArray(), salt.data, iterations, cipherAlgorithm.keyLength)
-        val factory = SecretKeyFactory.getInstance(cipherAlgorithm.secretKeyAlgorithm)
+        val factory = SecretKeyFactory.getInstance(cipherAlgorithm.keyDerivationAlgorithm)
         try {
             return SecretKeyHolder(factory.generateSecret(keySpec), cipherAlgorithm, null, context)
         }
@@ -465,11 +465,11 @@ object SecretService {
         return keyInfo?.isUserAuthenticationRequired?:false && !deviceRequiresUserAuth
     }
 
-    private fun getKeyInfo(secretKeyHolder: SecretKeyHolder): KeyInfo? {
-        val factory = SecretKeyFactory.getInstance(secretKeyHolder.cipherAlgorithm.secretKeyAlgorithm)
+    fun getKeyInfo(secretKeyHolder: SecretKeyHolder): KeyInfo? {
+        val factory = SecretKeyFactory.getInstance(secretKeyHolder.cipherAlgorithm.cipherName)
         try {
             return factory.getKeySpec(secretKeyHolder.secretKey, KeyInfo::class.java) as KeyInfo
-        } catch (e: InvalidKeySpecException) {
+        } catch (e: Exception) {
             Log.e(LOG_PREFIX + "SS", "Asking for invalid key spec: ${secretKeyHolder.cipherAlgorithm}", e)
         }
         return null

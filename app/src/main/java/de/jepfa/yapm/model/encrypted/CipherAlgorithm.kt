@@ -9,7 +9,7 @@ val PREFERRED_CIPHER_ALGORITHM = CipherAlgorithm.AES_256
 enum class CipherAlgorithm(
     val keyLength: Int,
     val cipherName: String,
-    val secretKeyAlgorithm: String,
+    val keyDerivationAlgorithm: String,
     val gcmSupport: Boolean,
     val integratedIvSupport: Boolean,
     val uiLabel: Int,

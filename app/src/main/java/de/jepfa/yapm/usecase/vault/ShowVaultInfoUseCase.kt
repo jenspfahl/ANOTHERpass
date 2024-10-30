@@ -1,6 +1,8 @@
 package de.jepfa.yapm.usecase.vault
 
 import android.graphics.drawable.Drawable
+import android.os.Build
+import android.security.keystore.KeyProperties
 import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.service.PreferenceService
@@ -43,10 +45,26 @@ object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActi
         )
         val cipherAlgorithm = SecretService.getCipherAlgorithm(activity)
 
+
         val sb = StringBuilder()
         sb.addFormattedLine(activity.getString(R.string.vault_id), vaultId)
         sb.addFormattedLine(activity.getString(R.string.vault_version), vaultVersion)
         sb.addFormattedLine(activity.getString(R.string.cipher_name), activity.getString(cipherAlgorithm.uiLabel))
+
+        // security level
+        var level = activity.getString(R.string.unknown)
+        if (SecretService.hasStrongBoxSupport(activity) == true) {
+            level = activity.getString(R.string.device_key_storage_strong_box) + " " + emoji(0x1f603)
+        }
+        else if (SecretService.hasHardwareTEESupport(activity) == true) {
+            level = activity.getString(R.string.device_key_storage_tee) + " " + emoji(0x1f642)
+        }
+        else if (SecretService.hasStrongBoxSupport(activity) == false && SecretService.hasHardwareTEESupport(activity) == false) {
+            level =
+                activity.getString(R.string.device_key_storage_software) + " " + emoji(0x1f610)
+        }
+        sb.addFormattedLine(activity.getString(R.string.device_key_storage), level)
+
         sb.addFormattedLine(activity.getString(R.string.login_iterations), PbkdfIterationService.getStoredPbkdfIterations().toReadableFormat())
         sb.addNewLine()
         sb.addFormattedLine(activity.getString(R.string.credential_count), input.credentialCount)
@@ -88,7 +106,7 @@ object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActi
             sb.addFormattedLine(activity.getString(R.string.last_denied_login_at), dateTimeToNiceString(it, activity))
         }
         val lastDeniedLoginAttempts = PreferenceService.getAsInt(STATE_PREVIOUS_LOGIN_ATTEMPTS, activity)
-        lastDeniedLoginAttempts?.let {
+        lastDeniedLoginAttempts.let {
             sb.addFormattedLine(activity.getString(R.string.last_denied_login_attempts), it)
         }
 

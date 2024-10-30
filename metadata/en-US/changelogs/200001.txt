@@ -1,1 +1,2 @@
 * Support backup app vault file through browser extension
+* Add details about security chip or TEE of used device to vault info
