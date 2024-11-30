@@ -26,10 +26,10 @@ android {
         // YY=minor (new features)
         // ZZZ=micro (just bugfixes)
     //  versionCode XXYYZZZ
-        versionCode  200002
+        versionCode  200003
         // remove _rc when release
         // e.g. versionName "1.3.0_rc"
-        versionName "2.0.2"
+        versionName "2.0.3"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'

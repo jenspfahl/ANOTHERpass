@@ -4,6 +4,8 @@ ANOTHERpass generiert leicht zu tippende aber starke Passwörter für dich. Soge
 
 Ebenso verwendet die App eine clevere Zwei-Faktor-Authentifizierung, um den Tresor mit den Zugangsdaten zu entsperren. Diese Faktoren sind Wissen (eine PIN) und Besitz (das Masterpasswort). Anstatt sich ein langes und kompliziertes Masterpasswort zu merken, merkt man sich nur eine PIN und hat das Masterpasswort als QR-Code oder NFC-Tag bei sich. Zusätzlich kann man das Masterpasswort geschützt mit einem biometrischem Merkmal (z.B. Fingerabdruck) auf dem Gerät speichern.
 
+Mit der <a href="https://anotherpass.jepfa.de/extension">ANOTHERpass Browser-Erweiterung</a> für Firefox und Chrome kann man die Zugangsdaten auch am heimischen Laptop verwenden.
+
 <b>Kernfunktionen</b>
 
 - Einfache Zwei-Faktor-Authentifizierung
@@ -15,7 +17,7 @@ Ebenso verwendet die App eine clevere Zwei-Faktor-Authentifizierung, um den Tres
 - Arbeitet mit der <a href="https://anotherpass.jepfa.de/extension">ANOTHERpass Browser-Erweiterung</a> zusammen, um Zugangsdaten innerhalb eines lokalen Netzwerks zu teilen (z.B. von der App zum Desktop-PC)
 - Biometrisches Merkmal (z.B. Fingerabdruck) für gespeichertes Masterpasswort
 - Unsichere Zwischenablage standardmäßig deaktiviert
-- Passwörter können über anderen Apps angezeigt werden um Abtippen zu erleichtern
+- Passwörter können über anderen Apps angezeigt werden, um Abtippen zu erleichtern
 - Es werden keine Daten in der Cloud gespeichert, außer der Anwender speichert seine Backups selber in der Cloud
 - Exportieren und Importieren des kompletten Passwort-Tresors als Backup
 - Option um einzelne Zugangsdaten zu exportieren bzw. auszulagern

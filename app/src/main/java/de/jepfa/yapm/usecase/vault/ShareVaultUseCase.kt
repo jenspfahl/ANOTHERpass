@@ -3,9 +3,11 @@ package de.jepfa.yapm.usecase.vault
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Context.RECEIVER_EXPORTED
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
+import android.os.Build
 import androidx.core.net.toUri
 import de.jepfa.yapm.R
 import de.jepfa.yapm.service.PreferenceService
@@ -84,7 +86,12 @@ object ShareVaultUseCase: UseCase<ShareVaultUseCase.Input, Uri?, SecureActivity>
             val shareAction = "de.jepfa.yapm.share.SHARE_ACTION_" + UUID.randomUUID().toString()
             val receiverIntent = Intent(shareAction)
 
-            activity.registerReceiver(receiver, IntentFilter(shareAction))
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                activity.registerReceiver(receiver, IntentFilter(shareAction), RECEIVER_EXPORTED)
+            }
+            else {
+                activity.registerReceiver(receiver, IntentFilter(shareAction))
+            }
 
             val intentSender = PendingIntent
                 .getBroadcast(activity, 0, receiverIntent, PendingIntent.FLAG_IMMUTABLE)

@@ -4,8 +4,7 @@ ANOTHERpass generates easy but strong passwords for you. It uses so called <i>Ps
 
 It also comes with a clever two factor authentication to unlock the vault. These factors are knowledge (a PIN) and ownership (the master password). So instead of remembering a long and complicated master password you just remember the PIN and have your master password with you (as QR code or NFC tag). Additionally you can safely store it on your device using biometrics (e.g. fingerprint).
 
-With ANOTHERpass you can store backups of the vault and the encrypted master key separately (latter e.g. as QR code on a analogue sheet). So the backup file is very useless for hackers and can safely be stored in cloud storages.
-
+You can also access the vault from your laptop at home, if you use the <a href="https://anotherpass.jepfa.de/extension">ANOTHERpass Browser Extension</a>.
 
 <b>Core features of the app</b>
 
@@ -16,10 +15,10 @@ With ANOTHERpass you can store backups of the vault and the encrypted master key
 - uses an integrated security chip or TEE (Trusted Execution Environment) if present
 - Autofill support
 - works with the <a href="https://anotherpass.jepfa.de/extension">ANOTHERpass Browser Extension</a> to share credentials within a local network (e.g. from the app to the desktop PC)
-- biometrics (e.g. fingerprint) for stored master password
+- biometrics (e.g. fingerprint) to use stored master password
 - no insecure clipboard function by default
 - show passwords over other apps to type it easily
-- no data is stored in the cloud, except the user itself backups files in the cloud
+- no data is stored in the cloud, except if the user itself backups files in the cloud
 - export and import credential vault
 - export vault and master key separately (latter analogue if wished)
 - share and outsource credentials
