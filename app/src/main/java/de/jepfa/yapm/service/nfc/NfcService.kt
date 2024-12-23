@@ -45,13 +45,12 @@ object NfcService {
     }
 
     fun createNdefMessage(activity: BaseActivity, payload: ByteArray, withAppRecord: Boolean) : NdefMessage {
-        val typeBytes = (
+        val mimeType = (
                 if (withAppRecord)
                     getMimeType(activity)
                 else
                     "text/plain")
-            .toByteArray()
-        val dataRecord = NdefRecord(NdefRecord.TNF_MIME_MEDIA, typeBytes, null, payload)
+        val dataRecord = NdefRecord.createMime(mimeType, payload)
 
         return NdefMessage(dataRecord)
 
@@ -64,7 +63,8 @@ object NfcService {
             message.records.forEach { record ->
                 if (record.tnf == NdefRecord.TNF_MIME_MEDIA) {
                     // only consider own mime types
-                    if (record.toMimeType() == getMimeType(activity) || record.toMimeType() == getLegacyMimeType(activity)) {
+                    val mimeType = record.toMimeType()
+                    if (mimeType == getMimeType(activity) || mimeType == getLegacyMimeType(activity) || mimeType == "text/plain") {
                         val data = String(record.payload)
                         sb.append(data)
                     }
