@@ -17,6 +17,7 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.decryptLong
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
+import de.jepfa.yapm.ui.nfc.NfcActivity
 import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.usecase.InputUseCase
 import de.jepfa.yapm.util.putEncryptedExtra
@@ -77,6 +78,9 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE, tempEncQrCode)
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE_HEADER, tempEncName)
             intent.putExtra(QrCodeActivity.EXTRA_COLOR, input.mode.colorId)
+
+            // will be bypassed to NfcActivity
+            intent.putExtra(NfcActivity.EXTRA_WITH_APP_RECORD, true)
 
             activity.startActivity(intent)
 

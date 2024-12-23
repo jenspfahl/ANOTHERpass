@@ -64,7 +64,7 @@ object NfcService {
                 if (record.tnf == NdefRecord.TNF_MIME_MEDIA) {
                     // only consider own mime types
                     val mimeType = record.toMimeType()
-                    if (mimeType == getMimeType(activity) || mimeType == getLegacyMimeType(activity) || mimeType == "text/plain") {
+                    if (mimeType == getMimeType(activity) || mimeType == getLegacyMimeType(activity)) {
                         val data = String(record.payload)
                         sb.append(data)
                     }
