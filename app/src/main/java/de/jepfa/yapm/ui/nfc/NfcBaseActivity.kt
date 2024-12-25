@@ -17,6 +17,7 @@ import de.jepfa.yapm.util.Constants.LOG_PREFIX
 abstract class NfcBaseActivity : SecureActivity() {
 
     protected var nfcAdapter: NfcAdapter? = null
+    protected var readPlainTextFromNfc: Boolean = false
     internal var ndefTag: NdefTag? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +43,7 @@ abstract class NfcBaseActivity : SecureActivity() {
 
     fun readTagFromIntent(intent: Intent?) {
         intent?.let {
-            ndefTag = NfcService.getNdefTag(intent, this)
+            ndefTag = NfcService.getNdefTag(intent, this, readPlainTextFromNfc)
             handleTag()
         }
     }

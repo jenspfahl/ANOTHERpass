@@ -13,6 +13,10 @@ import de.jepfa.yapm.util.toastText
 
 class ImportCredentialActivity : ReadActivityBase() {
 
+    init {
+        readPlainTextFromNfc = true
+    }
+
     override fun getLayoutId(): Int = R.layout.activity_import_credential
 
     override fun handleScannedData(scanned: String) {
