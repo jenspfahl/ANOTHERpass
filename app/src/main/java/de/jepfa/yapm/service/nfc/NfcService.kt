@@ -31,12 +31,12 @@ object NfcService {
         return adapter != null && adapter.isEnabled
     }
 
-    fun getNdefTag(intent: Intent, activity: BaseActivity): NdefTag? {
+    fun getNdefTag(intent: Intent, activity: BaseActivity, readPlainText: Boolean = false): NdefTag? {
         val tagFromIntent: Tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG) ?: return null
 
         try {
             val messages = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
-            val data = messages?.run { getData(this, activity) }
+            val data = messages?.run { getData(this, activity, readPlainText) }
             return NdefTag(tagFromIntent, data)
         } catch (e: FormatException) {
             Log.e(LOG_PREFIX + "NFC", "Unsupported tag tapped", e)
@@ -45,26 +45,28 @@ object NfcService {
     }
 
     fun createNdefMessage(activity: BaseActivity, payload: ByteArray, withAppRecord: Boolean) : NdefMessage {
-        val typeBytes = (
+        val mimeType = (
                 if (withAppRecord)
                     getMimeType(activity)
                 else
                     "text/plain")
-            .toByteArray()
-        val dataRecord = NdefRecord(NdefRecord.TNF_MIME_MEDIA, typeBytes, null, payload)
+        val dataRecord = NdefRecord.createMime(mimeType, payload)
 
         return NdefMessage(dataRecord)
 
     }
 
-    private fun getData(rawMessages: Array<Parcelable>, activity: BaseActivity): String {
+    private fun getData(rawMessages: Array<Parcelable>, activity: BaseActivity, readPlainText: Boolean): String {
         val sb = StringBuilder()
         for (i in rawMessages.indices) {
             val message = rawMessages[i] as NdefMessage
             message.records.forEach { record ->
                 if (record.tnf == NdefRecord.TNF_MIME_MEDIA) {
                     // only consider own mime types
-                    if (record.toMimeType() == getMimeType(activity) || record.toMimeType() == getLegacyMimeType(activity)) {
+                    val mimeType = record.toMimeType()
+                    if (mimeType == getMimeType(activity)
+                        || mimeType == getLegacyMimeType(activity)
+                        || (readPlainText && mimeType == "text/plain")) {
                         val data = String(record.payload)
                         sb.append(data)
                     }
