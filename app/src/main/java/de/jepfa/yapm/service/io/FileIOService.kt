@@ -11,6 +11,7 @@ import android.util.Log
 import de.jepfa.yapm.BuildConfig.APPLICATION_ID
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.VaultExportService.createVaultFile
@@ -22,6 +23,8 @@ import de.jepfa.yapm.util.FileUtil
 import de.jepfa.yapm.util.QRCodeUtil
 import de.jepfa.yapm.util.getEncryptedExtra
 import de.jepfa.yapm.util.toastText
+import java.io.BufferedOutputStream
+import java.io.ByteArrayOutputStream
 import java.io.IOException
 
 
@@ -34,8 +37,10 @@ class FileIOService: IntentService("FileIOService") {
         const val ACTION_SAVE_QRC = "action_saveQrc"
         const val ACTION_EXPORT_VAULT = "action_exportVault"
         const val ACTION_EXPORT_PLAIN_CREDENTIALS = "action_exportPlainCredentials"
+        const val ACTION_EXPORT_AS_KDBX = "action_exportAsKDBX"
 
         const val PARAM_FILE_URI = "param_file_url"
+        const val PARAM_KEEPASS_PASSWORD = "param_keepass_password"
         const val PARAM_QRC = "param_qrc"
         const val PARAM_QRC_HEADER = "param_qrc_header"
         const val PARAM_QRC_COLOR = "param_qrc_color"
@@ -67,6 +72,7 @@ class FileIOService: IntentService("FileIOService") {
             ACTION_SAVE_QRC -> saveQrCodeAsImage(intent)
             ACTION_EXPORT_VAULT -> exportVault(intent)
             ACTION_EXPORT_PLAIN_CREDENTIALS -> exportPlainCredentials(intent)
+            ACTION_EXPORT_AS_KDBX -> exportAsKdbx(intent)
         }
     }
 
@@ -124,6 +130,49 @@ class FileIOService: IntentService("FileIOService") {
 
             message = if (success) {
                 getString(R.string.csv_file_saved)
+            } else {
+                getString(R.string.something_went_wrong)
+            }
+        }
+        else {
+            message = getString(R.string.backup_permission_missing)
+        }
+        if (message.isNotBlank()) {
+            handler.post {
+                toastText(baseContext, message)
+            }
+        }
+
+    }
+
+    private fun exportAsKdbx(intent: Intent) {
+        var message: String
+        if (FileUtil.isExternalStorageWritable()) {
+            val uri = intent.getParcelableExtra<Uri>(PARAM_FILE_URI) ?: return
+
+            val key = Session.getMasterKeySK() ?: return
+
+            val encKeepassPassword = intent.getEncryptedExtra(PARAM_KEEPASS_PASSWORD) ?: return
+            val tempKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, this)
+            val keepassPassword = SecretService.decryptPassword(tempKey, encKeepassPassword)
+
+
+            val byteStream = ByteArrayOutputStream()
+            var success = KdbxService.createKdbxExportContent(
+                keepassPassword,
+                getApp().credentialRepository.getAllSync(),
+                key,
+                byteStream,
+                this
+            )
+            keepassPassword.clear()
+
+            if (success) {
+                success = FileUtil.writeFile(this, uri, byteStream)
+            }
+
+            message = if (success) {
+                getString(R.string.kdbx_file_saved)
             } else {
                 getString(R.string.something_went_wrong)
             }

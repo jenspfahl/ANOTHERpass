@@ -26,10 +26,10 @@ android {
         // YY=minor (new features)
         // ZZZ=micro (just bugfixes)
     //  versionCode XXYYZZZ
-        versionCode  200004
+        versionCode  201000
         // remove _rc when release
         // e.g. versionName "1.3.0_rc"
-        versionName "2.0.4"
+        versionName "2.1.0_rc"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
@@ -59,6 +59,7 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
+        coreLibraryDesugaringEnabled true
     }
     kotlinOptions {
         jvmTarget = '11'
@@ -67,6 +68,7 @@ android {
 }
 
 dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
     implementation "androidx.appcompat:appcompat:1.7.0"
     implementation "androidx.activity:activity-ktx:1.9.1"
 
@@ -123,6 +125,10 @@ dependencies {
 
     // CSV
     implementation "com.opencsv:opencsv:5.6"
+
+    // KDBX support
+    implementation("app.keemobile:kotpass:0.10.0")
+    implementation("com.squareup.okio:okio:3.9.0") //Needed for Meta for kotpass
 
     // Testing
     testImplementation "junit:junit:$rootProject.junitVersion"

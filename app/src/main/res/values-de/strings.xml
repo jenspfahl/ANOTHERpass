@@ -77,6 +77,7 @@
     <string name="pin_too_short">Die PIN ist zu kurz (minimum 6 Zeichen)</string>
     <string name="pin_not_equal">Wiederholung der PIN nicht gleich</string>
     <string name="password_not_equal">Wiederholung des Passworts nicht gleich</string>
+    <string name="password_too_short">Password ist zu kurz (minimum 6 Zeichen)</string>
     <string name="pin_wrong">Falsche PIN</string>
     <string name="button_create_vault">Tresor erstellen</string>
     <string name="create_vault_explanation_3">Hier siehst du nochmal dein Masterpasswort. Exportiere es als QR-Code oder auf ein NFC-Tag, indem du auf das entsprechende Symbol klickst. Wenn du es als QR-Code exportierst, kannst du es entweder als Bild sichern oder du scannst oder fotografierst den QR-Code direkt vom Gerät ab. Verwahre es an einem sicheren Ort! Du wirst es zusammen mit deiner PIN brauchen, um dich einzuloggen. \nFür einen einfacheren und schnelleren Login kannst du das Masterpasswort auch in der App speichern (geschützt mit einem biometrischem Merkmal wenn unterstützt).</string>
@@ -119,10 +120,11 @@
     <string name="include_preferences">Inklusive App-Einstellungen</string>
 
     <string name="export_plain_credentials">Entnehme Zugangsdaten</string>
-    <string name="export_plain_credentials_explanation">Hier kannst du alle Zugangsdaten unverschlüsselt(!!!) als CSV-Datei entnehmen um diese z.B. in anderen Passworttools zu verwenden. Dies ist keine Backupfunktion, verwende \'Exportiere Tresor\' dafür! Beachte: Verschleierte Passwörter werden mit diesem Export nicht automatisch entschleiert! Du musst sie erst entschleiert abspeichern wenn du sie entschleiert exportieren möchtest.</string>
+    <string name="export_plain_credentials_explanation">Hier kannst du alle Zugangsdaten als CSV-Datei (unverschlüsselt!!!) oder Keepass-Datei entnehmen um diese z.B. in anderen Passworttools zu verwenden. Dies ist keine Backupfunktion, verwende \'Exportiere Tresor\' dafür! Beachte: Verschleierte Passwörter werden mit diesem Export nicht automatisch entschleiert! Du musst sie erst entschleiert abspeichern wenn du sie entschleiert exportieren möchtest.</string>
     <string name="button_share_plain_credentials">CSV-Datei teilen</string>
     <string name="button_export_plain_credentials">CSV-Datei speichern</string>
-
+    <string name="button_share_credentials">KDBX-Datei teilen</string>
+    <string name="button_export_credentials">KDBX-Datei speichern</string>
     <string name="too_may_wrong_logins">Zu viele Loginversuche, Masterpasswort wird nun benötigt</string>
     <string name="too_may_wrong_logins_self_destruction">Zu viele Loginversuche, Tresordaten werden nun gelöscht!</string>
 
@@ -280,6 +282,7 @@
     <string name="paste_credential_for_autofill">Zugangsdaten für \'%1$s\'</string>
     <string name="backup_file_saved">Tresor-Datei gespeichert</string>
     <string name="csv_file_saved">CSV-Datei gespeichert</string>
+    <string name="kdbx_file_saved">KDBX-Datei gespeichert</string>
     <string name="backup_failed">Fehler beim Erzeugen der Tresor-Datei</string>
     <string name="backup_permission_missing">Berechtigung zum Schreiben des Externen Speichers fehlt</string>
     <string name="qr_code_saved">QR-Code als Bild gespeichert</string>
@@ -626,6 +629,8 @@
     <string name="no_thanks">Nein danke</string>
     <string name="enter_codeword">Gebe ein Codeword ein</string>
     <string name="repeat_codeword">Wiederhole das Codeword</string>
+    <string name="enter_password">Gebe ein Passwort ein</string>
+    <string name="repeat_password">Wiederhole das Passwort</string>
     <string name="unlock_masterpassword">Entsperre Masterpasswort</string>
     <string name="message_unlock_masterpassword">Das exportierte Masterpasswort (EMP) ist mit einem Codeword geschützt. Gebe es ein um es zu entsperren.</string>
     <string name="small">Klein</string>

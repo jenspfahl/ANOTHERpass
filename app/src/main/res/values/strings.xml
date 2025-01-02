@@ -78,6 +78,7 @@
     <string name="pin_too_short">PIN is too short (6 chars at least)</string>
     <string name="pin_not_equal">PIN repetition not equal</string>
     <string name="password_not_equal">Password repetition not equal</string>
+    <string name="password_too_short">Password is too short (6 chars at least)</string>
     <string name="pin_wrong">Wrong PIN</string>
     <string name="button_create_vault">Create vault</string>
     <string name="create_vault_explanation_3">Here you see again your master password. Export it as QR code or NFC tag by clicking on the corresponding icon or note it on a safe piece of paper. (If you decide to export as QR code you can either download it as image file of just photograph or copy the QR code directly from your phone.) Store it safely. You will need it together with your PIN to login into the vault. \nFor more convenience you may additionally store it on this device for faster login (biometric criteria may be needed).</string>
@@ -120,10 +121,11 @@
     <string name="include_preferences">Include current app settings</string>
 
     <string name="export_plain_credentials">Takeout credentials</string>
-    <string name="export_plain_credentials_explanation">Here you can takeout all plain (decrypted!!!) credentials as CSV file to e.g. import them into other password tools. This feature should not be used for backup purposes! Use \'Export Vault\' instead! Note: Obfuscated passwords are not de-obfuscated with this export! You need to de-obfuscate them first manually if you need them de-obfuscated.</string>
+    <string name="export_plain_credentials_explanation">Here you can takeout all credentials as CSV or Keepass file to e.g. import them into other password tools. This feature should not be used for backup purposes! Use \'Export Vault\' instead! Note: Obfuscated passwords are not de-obfuscated with this export! You need to de-obfuscate them first manually if you need them de-obfuscated.</string>
     <string name="button_share_plain_credentials">Share CSV file</string>
     <string name="button_export_plain_credentials">Save CSV file</string>
-
+    <string name="button_share_credentials">Share KDBX file</string>
+    <string name="button_export_credentials">Save KDBX file</string>
     <string name="too_may_wrong_logins">Too many login attempts, master password is now needed</string>
     <string name="too_may_wrong_logins_self_destruction">Too many login attempts, vault completely deleted</string>
 
@@ -287,6 +289,7 @@
     <string name="paste_credential_for_autofill">Credential for \'%1$s\'</string>
     <string name="backup_file_saved">Vault file saved</string>
     <string name="csv_file_saved">CSV file saved</string>
+    <string name="kdbx_file_saved">KDBX file saved</string>
     <string name="backup_failed">Error while creating the backup file</string>
     <string name="backup_permission_missing">Permission to write to external storage is missing</string>
     <string name="qr_code_saved">QR code as image saved</string>
@@ -627,6 +630,8 @@
     <string name="no_thanks">No, thanks</string>
     <string name="enter_codeword">Enter a codeword</string>
     <string name="repeat_codeword">Repeat the codeword</string>
+    <string name="enter_password">Enter a password</string>
+    <string name="repeat_password">Repeat the password</string>
     <string name="unlock_masterpassword">Unlock Exported Master Password</string>
     <string name="message_unlock_masterpassword">The Exported Master Password (EMP) is protected with a codeword. Type it to unlock it.</string>
 

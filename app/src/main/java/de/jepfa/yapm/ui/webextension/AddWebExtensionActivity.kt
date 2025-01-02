@@ -328,7 +328,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
 
                 // generate and store server RSA key pair
                 CoroutineScope(Dispatchers.Main).launch {
-                    showProgressBar()
+                    showProgressBar(progressBar)
                 }
 
                 val serverKeyPair = SecretService.generateRsaKeyPair(webExtension.getServerKeyPairAlias(), this, workaroundMode = true)
@@ -357,7 +357,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
 
 
                 CoroutineScope(Dispatchers.Main).launch {
-                    hideProgressBar()
+                    hideProgressBar(progressBar)
 
 
                     ServerRequestBottomSheet(
@@ -396,18 +396,5 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
         return toErrorResponse(HttpStatusCode.Forbidden, "locked")
     }
 
-    private fun showProgressBar() {
-        progressBar.visibility = View.VISIBLE
-        window?.setFlags(
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-    }
-
-
-    private fun hideProgressBar() {
-        progressBar.visibility = View.INVISIBLE
-        window?.clearFlags(
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-    }
 
 }

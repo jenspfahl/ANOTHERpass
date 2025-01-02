@@ -27,7 +27,7 @@ object ExportPlainCredentialsUseCase: OutputUseCase<Uri?, SecureActivity>() {
     override fun execute(activity: SecureActivity): UseCaseOutput<Uri?> {
         activity.masterSecretKey?.let{ key ->
 
-            var tempFile = TempFileService.createTempFile(activity, getCsvFileName(activity))
+            var tempFile = TempFileService.createTempFile(activity, getTakeoutFileName(activity, "csv"))
 
             val csvData = CsvService.createCsvExportContent(
                 activity.getApp().credentialRepository.getAllSync(), Session.getMasterKeySK())
@@ -94,11 +94,13 @@ object ExportPlainCredentialsUseCase: OutputUseCase<Uri?, SecureActivity>() {
         toastText(activity, R.string.cannot_share_csvfile)
     }
 
-    fun getCsvFileName(context: Context): String {
+    fun getTakeoutFileName(context: Context, extension: String): String {
         val currentDate = Constants.SDF_D_INTERNATIONAL.format(Date())
         val vaultId = SaltService.getVaultId(context)
-        return "anotherpass_credentials-${vaultId}-${currentDate}.csv"
+        return "anotherpass_credentials-${vaultId}-${currentDate}.$extension"
     }
+
+
 
     fun getSubject(context: Context): String {
         val currentDate = Constants.SDF_D_INTERNATIONAL.format(Date())

@@ -67,6 +67,7 @@
   <string name="pin_too_short">De pincode is te kort (minimaal 6 tekens)</string>
   <string name="pin_not_equal">Herhaal de pincode niet meteen</string>
   <string name="password_not_equal">Herhaal het wachtwoord niet meteen</string>
+  <string name="password_too_short">Password is too short (6 chars at least)</string>
   <string name="pin_wrong">Onjuiste pincode</string>
   <string name="button_create_vault">Kluis maken</string>
   <string name="create_vault_explanation_3">Hier kunt u uw hoofdwachtwoord opnieuw zien.  Exporteer deze als QR-code of naar een NFC-tag door op het bijbehorende pictogram te klikken.  Als u de QR-code exporteert, kunt u deze opslaan als afbeelding of u kunt de QR-code rechtstreeks vanaf het apparaat scannen of fotograferen.  Bewaar het op een veilige plaats!  U heeft deze samen met uw pincode nodig om in te loggen.
@@ -113,9 +114,12 @@ Het scheiden van de gecodeerde hoofdsleutel van het kluisbestand maakt het besta
   <string name="include_enc_masterkey">Inclusief gecodeerde hoofdsleutel</string>
   <string name="include_preferences">Inclusief app-instellingen</string>
   <string name="export_plain_credentials">Haal uw inloggegevens eruit</string>
-  <string name="export_plain_credentials_explanation">Hier kunt u alle toegangsgegevens ongecodeerd (!!!) als CSV-bestand verkrijgen, zodat u deze bijvoorbeeld in andere wachtwoordtools kunt gebruiken.  Dit is geen back-upfunctie, gebruik hiervoor \'Export Tresor\'!  Let op: verborgen wachtwoorden worden bij deze export niet automatisch zichtbaar gemaakt!  U moet ze eerst gedeobfusceerd opslaan als u ze gedeobfusceerd wilt exporteren.</string>
+  <string name="export_plain_credentials_explanation">Hier kunt u alle toegangsgegevens als CSV-bestand (ongecodeerd!!!) of Keepass-bestand verkrijgen, zodat u deze bijvoorbeeld in andere wachtwoordtools kunt gebruiken.  Dit is geen back-upfunctie, gebruik hiervoor \'Export Tresor\'!  Let op: verborgen wachtwoorden worden bij deze export niet automatisch zichtbaar gemaakt!  U moet ze eerst gedeobfusceerd opslaan als u ze gedeobfusceerd wilt exporteren.</string>
   <string name="button_share_plain_credentials">CSV-bestand delen</string>
   <string name="button_export_plain_credentials">CSV-bestand opslaan</string>
+  <string name="button_share_credentials">KDBX-bestand delen</string>
+  <string name="button_export_credentials">KDBX-bestand opslaan</string>
+
   <string name="too_may_wrong_logins">Te veel inlogpogingen, het hoofdwachtwoord is nu vereist</string>
   <string name="too_may_wrong_logins_self_destruction">Te veel inlogpogingen, kluisgegevens worden nu verwijderd!</string>
   <string name="import_vault_explanation">Selecteer een kluisbestand om te importeren.  Let op: U heeft de bijbehorende pincode en het (geëxporteerde) hoofdwachtwoord nodig, en afhankelijk van het bestand de geëxporteerde hoofdsleutel.</string>
@@ -267,6 +271,7 @@ Het scheiden van de gecodeerde hoofdsleutel van het kluisbestand maakt het besta
   <string name="paste_credential_for_autofill">Inloggegevens voor \'%1$s\'</string>
   <string name="backup_file_saved">Kluisbestand opgeslagen</string>
   <string name="csv_file_saved">CSV-bestand opgeslagen</string>
+  <string name="kdbx_file_saved">KDBX-bestand opgeslagen</string>
   <string name="backup_failed">Fout bij het maken van het kluisbestand</string>
   <string name="backup_permission_missing">Autorisatie om naar externe opslag te schrijven ontbreekt</string>
   <string name="qr_code_saved">QR-code opgeslagen als afbeelding</string>
@@ -601,6 +606,8 @@ Deze waarschuwing kunt u deactiveren onder \'Instellingen/Beveiliging\'.</string
   <string name="no_thanks">Nee bedankt</string>
   <string name="enter_codeword">Voer een codewoord in</string>
   <string name="repeat_codeword">Herhaal het codewoord</string>
+  <string name="enter_password">Voer een passwoord in</string>
+  <string name="repeat_password">Herhaal het passwoord</string>
   <string name="unlock_masterpassword">Ontgrendel het hoofdwachtwoord</string>
   <string name="message_unlock_masterpassword">Het geëxporteerde hoofdwachtwoord (EMP) is beveiligd met een codewoord.  Voer het in om het te ontgrendelen.</string>
   <string name="small">Klein</string>

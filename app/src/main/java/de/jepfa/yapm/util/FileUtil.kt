@@ -126,6 +126,20 @@ object FileUtil {
         return true
     }
 
+    fun writeFile(context: Context, uri: Uri, byteStream: ByteArrayOutputStream): Boolean {
+
+        try {
+            context.contentResolver.openOutputStream(uri)?.use { os ->
+                byteStream.writeTo(os)
+            }
+        } catch (e: IOException) {
+            Log.e(LOG_PREFIX + "READFILE", "Cannot read $uri", e)
+            return false
+        }
+
+        return true
+    }
+
 
 
 }
