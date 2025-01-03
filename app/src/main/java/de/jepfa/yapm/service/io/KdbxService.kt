@@ -53,10 +53,10 @@ object KdbxService {
 
             val meta = Meta(
                 generator = "ANOTHERpass",
-                name = "Vault Id ${SaltService.getVaultId(context)}",
-                description = "Exported from an ANOTHERpass vault.",
+                name = "ANOTHERpass vault '${SaltService.getVaultId(context)}'",
+                description = "Exported from an ANOTHERpass vault with Id ${SaltService.getVaultId(context)}",
             )
-            val database = KeePassDatabase.Ver4x.create("", meta, credentialFactory(kdbxPassword.toRawFormattedPassword().toString())).run {
+            val database = KeePassDatabase.Ver4x.create("ANOTHERpass", meta, credentialFactory(kdbxPassword.toRawFormattedPassword().toString())).run {
 
                 modifyParentGroup {
                     copy(entries = credentials.map { encCredential ->

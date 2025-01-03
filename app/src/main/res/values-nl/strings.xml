@@ -890,4 +890,10 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="device_key_storage_strong_box">Security Chip (SE/StrongBox)</string>
   <string name="device_key_storage_tee">Protected Environment (TEE)</string>
   <string name="device_key_storage_software">Android OS / Software-based</string>
+
+  <string name="choose_takeout_file_format">Choose the desired file format:</string>
+  <string name="takeout_file_format_csv">CSV - decrypted!!!</string>
+  <string name="takeout_file_format_kdbx">Keepass/KDBX - encrypted</string>
+  <string name="title_takeout_kdbx_master_password">Please set a master password</string>
+  <string name="message_takeout_kdbx_master_password">A Keepass vault requires a master password, which is used to open the KDBX file.</string>
 </resources>

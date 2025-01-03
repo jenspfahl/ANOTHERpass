@@ -8,41 +8,89 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
 import android.os.Build
+import android.widget.EditText
 import androidx.core.net.toUri
 import de.jepfa.yapm.R
+import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.secret.Key
+import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.Session
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.CsvService
+import de.jepfa.yapm.service.io.KdbxService
 import de.jepfa.yapm.service.io.TempFileService
+import de.jepfa.yapm.service.secret.MasterKeyService
+import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.service.secret.SaltService
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.OutputUseCase
+import de.jepfa.yapm.usecase.UseCase
 import de.jepfa.yapm.usecase.UseCaseOutput
+import de.jepfa.yapm.usecase.credential.ExportCredentialUseCase.ExportMode
 import de.jepfa.yapm.util.Constants
+import de.jepfa.yapm.util.FileUtil
 import de.jepfa.yapm.util.toastText
+import java.io.ByteArrayOutputStream
 import java.util.*
 
-object ExportPlainCredentialsUseCase: OutputUseCase<Uri?, SecureActivity>() {
 
 
-    override fun execute(activity: SecureActivity): UseCaseOutput<Uri?> {
+object ExportPlainCredentialsUseCase: UseCase<ExportPlainCredentialsUseCase.Input, Uri?, SecureActivity> {
+
+    data class Input(val currentPin: Password, val keepassPassword: Password?)
+
+    override suspend fun execute(input: Input, activity: SecureActivity): UseCaseOutput<Uri?> {
+
+        val errorMessage = checkPin(input.currentPin, activity)
+        if (errorMessage != null) {
+            return UseCaseOutput.fail(errorMessage)
+        }
+
         activity.masterSecretKey?.let{ key ->
 
-            var tempFile = TempFileService.createTempFile(activity, getTakeoutFileName(activity, "csv"))
+            if (input.keepassPassword != null) {
+                val tempFile =
+                    TempFileService.createTempFile(activity, getTakeoutFileName(activity, "kdbx"))
 
-            val csvData = CsvService.createCsvExportContent(
-                activity.getApp().credentialRepository.getAllSync(), Session.getMasterKeySK())
+                val byteStream = ByteArrayOutputStream()
+                var success = KdbxService.createKdbxExportContent(
+                    input.keepassPassword,
+                    activity.getApp().credentialRepository.getAllSync(),
+                    key,
+                    byteStream,
+                    activity
+                )
 
-            var success = false
-            if (csvData != null) {
-                success = CsvService.writeCsvExportFile(activity, tempFile.toUri(), csvData)
+                if (success) {
+                    success = FileUtil.writeFile(activity, tempFile.toUri(), byteStream)
+                }
+
+                if (success) {
+                    val uri = TempFileService.getContentUriFromFile(activity, tempFile)
+                    return UseCaseOutput(uri)
+                }
             }
+            else {
+                val tempFile =
+                    TempFileService.createTempFile(activity, getTakeoutFileName(activity, "csv"))
 
-            if (success) {
-                val uri = TempFileService.getContentUriFromFile(activity, tempFile)
-                return UseCaseOutput(uri)
+                val csvData = CsvService.createCsvExportContent(
+                    activity.getApp().credentialRepository.getAllSync(), Session.getMasterKeySK()
+                )
+
+                var success = false
+                if (csvData != null) {
+                    success = CsvService.writeCsvExportFile(activity, tempFile.toUri(), csvData)
+                }
+
+                if (success) {
+                    val uri = TempFileService.getContentUriFromFile(activity, tempFile)
+                    return UseCaseOutput(uri)
+                }
             }
         }
-        return UseCaseOutput(false, null)
+        return UseCaseOutput.fail(activity.getString(R.string.something_went_wrong))
     }
 
     fun startShareActivity(uri: Uri?, activity: SecureActivity) {
@@ -102,10 +150,38 @@ object ExportPlainCredentialsUseCase: OutputUseCase<Uri?, SecureActivity>() {
 
 
 
-    fun getSubject(context: Context): String {
+    private fun getSubject(context: Context): String {
         val currentDate = Constants.SDF_D_INTERNATIONAL.format(Date())
         val vaultId = SaltService.getVaultId(context)
         return "ANOTHERpass credentials (vault id = '${vaultId}') takeout from $currentDate"
+    }
+
+    fun checkPin(currentPin: Password, context: Context): String? {
+
+        if (currentPin.isEmpty()) {
+            return context.getString(R.string.pin_required)
+        }
+
+        val encEncryptedMasterKey =
+            PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, context)
+                ?: return context.getString(R.string.something_went_wrong)
+
+        val currentMasterPassword = MasterPasswordService.getMasterPasswordFromSession(context)
+            ?: return context.getString(R.string.something_went_wrong)
+
+        val cipherAlgorithm = SecretService.getCipherAlgorithm(context)
+        val salt = SaltService.getSalt(context)
+        val masterPassphraseSK = MasterKeyService.getMasterPassPhraseSK(
+            currentPin,
+            currentMasterPassword,
+            salt,
+            cipherAlgorithm,
+            context,
+        )
+
+        MasterKeyService.getMasterKey(masterPassphraseSK, encEncryptedMasterKey, context)
+                ?: return context.getString(R.string.pin_wrong)
+        return null
     }
 
 }

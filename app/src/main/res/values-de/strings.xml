@@ -85,7 +85,7 @@
     <string name="create_vault_summarize_fragment_label">Tresor erstellen 3/3</string>
     <string name="login_explanation_1">Bitte PIN zum Einloggen eingeben</string>
     <string name="login_explanation_2">Scanne dein exportiertes Masterpasswort (EMP) oder Masterpasswort-Token (MPT), indem du auf das QR-Code oder NFC-Symbol klickst. Wenn du es notiert hast, gib es direkt ein.</string>
-    <string name="enter_or_scan_masterpassword">Scanne oder gebe dein Masterpasswort ein</string>
+    <string name="enter_or_scan_masterpassword">Scanne oder gib dein Masterpasswort ein</string>
     <string name="button_login">Login</string>
     <string name="password_required">Passwort erforderlich</string>
     <string name="delete_stored_masterpasswd">Entferne Masterpasswort</string>
@@ -627,9 +627,9 @@
     <string name="yes_continue">Ja, fortfahren</string>
     <string name="yes_protect_it">Ja, absichern</string>
     <string name="no_thanks">Nein danke</string>
-    <string name="enter_codeword">Gebe ein Codeword ein</string>
+    <string name="enter_codeword">Gib ein Codeword ein</string>
     <string name="repeat_codeword">Wiederhole das Codeword</string>
-    <string name="enter_password">Gebe ein Passwort ein</string>
+    <string name="enter_password">Gib ein Passwort ein</string>
     <string name="repeat_password">Wiederhole das Passwort</string>
     <string name="unlock_masterpassword">Entsperre Masterpasswort</string>
     <string name="message_unlock_masterpassword">Das exportierte Masterpasswort (EMP) ist mit einem Codeword geschützt. Gebe es ein um es zu entsperren.</string>
@@ -925,4 +925,10 @@
     <string name="device_key_storage_strong_box">Sicherheitschip (SE/StrongBox)</string>
     <string name="device_key_storage_tee">Geschützte Umgebung (TEE)</string>
     <string name="device_key_storage_software">Android OS / Software-basiert</string>
+
+    <string name="choose_takeout_file_format">Wähle das gewünschte Dateiformat:</string>
+    <string name="takeout_file_format_csv">CSV - entschlüsselt!!!</string>
+    <string name="takeout_file_format_kdbx">Keepass/KDBX - verschlüsselt</string>
+    <string name="title_takeout_kdbx_master_password">Bitte ein Masterpasswort setzen</string>
+    <string name="message_takeout_kdbx_master_password">Ein Keepass-Tresor benötigt ein Masterpasswort, welches benötigt wird, um die KDBX-Datei zu öffnen.</string>
 </resources>
