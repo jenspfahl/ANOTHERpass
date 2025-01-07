@@ -5,17 +5,23 @@ import com.google.gson.JsonElement
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import java.util.*
 
-data class EncLabel(val id: Int?,
-                    val uid: UUID?,
-                    override var name: Encrypted,
-                    var description: Encrypted,
-                    var color: Int?): EncNamed {
+data class EncLabel(
+    var id: Int?,
+    val uid: UUID?,
+    override var name: Encrypted,
+    var description: Encrypted,
+    var color: Int?): EncNamed {
+
+    constructor(name: Encrypted, description: Encrypted) :
+            this(null, null, name, description, null)
+
 
     constructor(id: Int?, uid: String?, nameBase64: String, descriptionBase64: String, color: Int?) :
             this(id,
                 uid?.let { UUID.fromString(uid) },
                 Encrypted.fromBase64String(nameBase64),
                 Encrypted.fromBase64String(descriptionBase64), color)
+
 
     fun isPersistent(): Boolean {
         return id != null

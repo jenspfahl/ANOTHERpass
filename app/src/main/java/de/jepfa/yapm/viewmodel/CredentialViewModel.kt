@@ -57,7 +57,7 @@ class CredentialViewModel(private val repository: CredentialRepository) : ViewMo
         return credentialIdsAndExpiresAt.values.any { it < currMillis }
     }
 
-    fun updateExpiredCredential(credential: EncCredential, key: SecretKeyHolder, context: Context, considerExpiredForThePast: Boolean = false) {
+    fun updateCredentialExpiry(credential: EncCredential, key: SecretKeyHolder, context: Context, considerExpiredForThePast: Boolean = false) {
         val id = credential.id
         if (id != null) {
             val currentMillis = if (considerExpiredForThePast) 0 else Date().removeTime().addDays(1).time
@@ -77,12 +77,12 @@ class CredentialViewModel(private val repository: CredentialRepository) : ViewMo
                 }
             }
             else {
-                deleteExpiredCredential(id, context)
+                deleteCredentialExpiry(id, context)
             }
         }
     }
 
-    fun deleteExpiredCredential(id: Int, context: Context) {
+    fun deleteCredentialExpiry(id: Int, context: Context) {
         Log.i(LOG_PREFIX + "EXP", "remove notification for $id")
         credentialIdsAndExpiresAt.remove(id)
         PreferenceService.delete(DATA_EXPIRY_DATES + SCHEDULED_NOTIFICATION_KEY_SEPARATOR + id, null)
@@ -90,7 +90,7 @@ class CredentialViewModel(private val repository: CredentialRepository) : ViewMo
     }
 
 
-    fun clearExpiredCredentials() {
+    fun clearCredentialExpiries() {
         credentialIdsAndExpiresAt.clear()
         PreferenceService.deleteAllStartingWith(DATA_EXPIRY_DATES, null)
     }

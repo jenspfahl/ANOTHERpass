@@ -550,6 +550,10 @@
     <string name="whats_new_in_2_0_enable_server">Ja, ich möchte es mal ausprobieren!</string>
     <string name="whats_new_in_2_0_disabled_server">OK, der Zugangsdaten-Server wurde komplett deaktiviert. Du kannst ihn jederzeit wieder über die Einstellungen aktivieren.</string>
 
+    <string name="whats_new_in_2_1">What\'s new in version 2.1</string>
+    <string name="whats_new_in_2_1_bullet_1_head">Keepass support</string>
+    <string name="whats_new_in_2_1_bullet_1_text">Now you can use your credentials in any Keepass fork! Export all your credentials into a Keepass vault file (KDBX).</string>
+
     <string name="intro">Starte Intro</string>
     <string name="intro_1_head">Ein etwas anderer Passwortmanager</string>
     <string name="intro_1_subtext">ANOTHERpass bietet eine etwas andere Herangehensweise. Lies hier was das heißt:</string>

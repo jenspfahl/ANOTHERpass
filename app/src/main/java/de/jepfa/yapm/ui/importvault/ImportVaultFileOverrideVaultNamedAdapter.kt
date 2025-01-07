@@ -147,16 +147,16 @@ class ImportVaultFileOverrideVaultNamedAdapter(
                 val origEncLabel = child.origNamed as? EncLabel
                 if (origEncLabel == null) {
                     val encLabel = child.newNamed
-                    val label = LabelService.createLabel(key, encLabel)
+                    val label = LabelService.getLabelFromEncLabel(key, encLabel)
                     views += createLabel(label)
                 }
                 else {
-                    val origLabel = LabelService.createLabel(key, origEncLabel)
+                    val origLabel = LabelService.getLabelFromEncLabel(key, origEncLabel)
                     views += createLabel(origLabel)
 
                     createAndAddSeparator(views)
 
-                    val newLabel = LabelService.createLabel(key, newEncLabel)
+                    val newLabel = LabelService.getLabelFromEncLabel(key, newEncLabel)
                     views += createLabel(newLabel)
                 }
             }

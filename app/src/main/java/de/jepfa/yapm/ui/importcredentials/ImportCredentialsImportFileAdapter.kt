@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.service.io.CredentialFileRecord
+import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.ViewRecyclerViewAdapter
 import de.jepfa.yapm.ui.credential.ShowCredentialActivity
@@ -24,20 +26,10 @@ import java.util.*
 class ImportCredentialsImportFileAdapter(
     private val selectNoneAll: CheckBox,
     private val activity: SecureActivity,
-    private val dataMap: List<FileRecord>,
-    val checkedChildren: MutableSet<FileRecord>
+    private val dataMap: List<CredentialFileRecord>,
+    val checkedChildren: MutableSet<CredentialFileRecord>
 ): BaseExpandableListAdapter() {
 
-
-    data class FileRecord(
-        val id: Int,
-        val name: String,
-        val url: String?,
-        val userName: String?,
-        val plainPassword: String,
-        val description: String,
-        val expiresOn: Date?
-    )
 
     private val checkBoxes = ArrayList<CheckBox>()
 
@@ -57,7 +49,7 @@ class ImportCredentialsImportFileAdapter(
         return "group"
     }
 
-    override fun getChild(groupPosition: Int, childPosition: Int): FileRecord {
+    override fun getChild(groupPosition: Int, childPosition: Int): CredentialFileRecord {
         return dataMap[childPosition]
     }
 
@@ -181,7 +173,7 @@ class ImportCredentialsImportFileAdapter(
 
     private fun createAndAddCredentialNameTextView(
         activity: ImportCredentialsActivity,
-        record: FileRecord,
+        record: CredentialFileRecord,
         views: ArrayList<View>,
         isExternal: Boolean
     ) {
@@ -191,7 +183,7 @@ class ImportCredentialsImportFileAdapter(
         textView.setTextAppearance(R.style.credential_title)
         textView.setOnClickListener {
             this.activity.masterSecretKey?.let { key ->
-                val credential = activity.createCredentialFromRecord(key, record, emptyList())
+                val credential = activity.createCredentialFromRecord(key, record, emptyList(), LabelService.externalHolder)
                 startShowCredentialActivity(credential, isExternal)
             }
         }

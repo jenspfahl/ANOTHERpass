@@ -3,18 +3,16 @@ package de.jepfa.yapm.ui.credential
 import android.content.Context
 import android.text.InputFilter
 import android.text.InputType
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.setPadding
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
-import de.jepfa.yapm.service.secret.SaltService
-import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.util.Constants
 
-object PasswordDialog {
+object KeepassPasswordDialog {
 
     fun openAskForPasswordDialog(
         context: Context,
@@ -44,6 +42,10 @@ object PasswordDialog {
         pwd2.hint = context.getString(R.string.repeat_password)
         inputView.addView(pwd2)
 
+        //val checkBox = CheckBox(context)
+        //checkBox.text = "Save password for future usage"
+        //inputView.addView(checkBox)
+
         val builder = AlertDialog.Builder(context)
         val dialog: AlertDialog = builder
             .setTitle(titleText)
@@ -51,6 +53,7 @@ object PasswordDialog {
             .setView(inputView)
             .setPositiveButton(okText, null)
             .setNegativeButton(cancelText, null)
+            //.setNeutralButton("GENERATE PASSWORD", null)
             .create()
 
         dialog.setOnShowListener {

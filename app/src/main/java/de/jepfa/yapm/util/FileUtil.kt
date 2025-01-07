@@ -31,6 +31,23 @@ object FileUtil {
         return Environment.MEDIA_MOUNTED == state || Environment.MEDIA_MOUNTED_READ_ONLY == state
     }
 
+    fun openInputStreamFromFile(context: Context, uri: Uri): InputStream? {
+
+        val size = getFileSize(context, uri)?:0
+        if (size > MAX_FILE_SIZE_MB) {
+            Log.e(LOG_PREFIX + "READFILE", "File too big for $uri")
+            return null
+        }
+
+        try {
+            return context.contentResolver.openInputStream(uri)
+        } catch (e: IOException) {
+            Log.e(LOG_PREFIX + "READFILE", "Cannot read $uri", e)
+            return null
+        }
+
+    }
+
     fun readFile(context: Context, uri: Uri): String? {
 
         val size = getFileSize(context, uri)?:0

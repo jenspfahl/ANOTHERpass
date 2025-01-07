@@ -16,7 +16,15 @@ data class Label(
         name = name.uppercase(Locale.ROOT).trim()
     }
 
+    constructor(id: Int?, name: String, colorRGB: Int?, iconResId: Int? = null) : this(id, name, "", colorRGB, iconResId)
+
     constructor(name: String, colorRGB: Int?, iconResId: Int? = null) : this(null, name, "", colorRGB, iconResId)
+
+    constructor(name: String) : this(
+        null,
+        name,
+        "",
+        null)
 
     constructor(name: String, description: String) : this(
         null,

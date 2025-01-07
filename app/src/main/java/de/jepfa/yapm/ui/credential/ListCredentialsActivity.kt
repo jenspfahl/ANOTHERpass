@@ -1595,7 +1595,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
                 masterSecretKey?.let { key ->
 
-                    credentialViewModel.clearExpiredCredentials()
+                    credentialViewModel.clearCredentialExpiries()
 
                     credentials.forEach { credential ->
                         LabelService.defaultHolder.updateLabelsForCredential(
@@ -1603,7 +1603,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                             credential
                         )
 
-                        credentialViewModel.updateExpiredCredential(credential, key, this)
+                        credentialViewModel.updateCredentialExpiry(credential, key, this)
                     }
 
                     val expiredCredentialsOnTop = PreferenceService.getAsBool(PREF_EXPIRED_CREDENTIALS_ON_TOP, this)
@@ -1750,7 +1750,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         jumpToItemPosition = (credentialsRecycleView?.layoutManager as LinearLayoutManager)
             .findFirstVisibleItemPosition()
         credential.id?.let { id ->
-            credentialViewModel.deleteExpiredCredential(id, this)
+            credentialViewModel.deleteCredentialExpiry(id, this)
         }
         credentialViewModel.delete(credential)
         toastText(this, R.string.credential_deleted)

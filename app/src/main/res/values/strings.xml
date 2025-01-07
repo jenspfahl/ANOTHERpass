@@ -559,6 +559,10 @@
     <string name="whats_new_in_2_0_enable_server">Yes, i want to give it a try!</string>
     <string name="whats_new_in_2_0_disabled_server">OK, the server capability is completely deactivated. You can enable it again in the Settings.</string>
 
+    <string name="whats_new_in_2_1">What\'s new in version 2.1</string>
+    <string name="whats_new_in_2_1_bullet_1_head">Keepass support</string>
+    <string name="whats_new_in_2_1_bullet_1_text">Now you can use your credentials in any Keepass fork! Export all your credentials into a Keepass vault file (KDBX).</string>
+
     <string name="intro">Show intro</string>
     <string name="intro_1_head">Another way to manage passwords</string>
     <string name="intro_1_subtext">ANOTHERpass is another approach of a password manager. See what it means:</string>

@@ -11,7 +11,10 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.encrypted.EncLabel
+import de.jepfa.yapm.service.io.CredentialFileRecord
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
@@ -82,16 +85,38 @@ class ImportCredentialsImportFileFragment : BaseFragment() {
                 .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
 
                     importCredentialsActivity.masterSecretKey?.let { key ->
-                        importExternalCredentials(
-                            credentialsToImport
-                                .map {
-                                    importCredentialsActivity.createCredentialFromRecord(
-                                        key,
-                                        it,
-                                        labelEditViewExtender.getCommittedLabelNames()
+
+                        val newEncLabels = ArrayList<EncLabel>()
+                        val encCredentials = credentialsToImport
+                            .map { record ->
+                                newEncLabels.addAll(
+                                    record.labels
+                                      .filter { LabelService.defaultHolder.lookupByLabelName(it) == null } // new label
+                                      .map {
+                                          var newLabel = LabelService.externalHolder.lookupByLabelName(it)
+                                          if (newLabel == null) {
+                                              newLabel =
+                                                  LabelService.externalHolder.createNewLabel(
+                                                      it,
+                                                      importCredentialsActivity
+                                                  )
+                                          }
+                                          LabelService.getEncLabelFromLabel(key, newLabel)
+                                      }
                                     )
-                                }
-                                .toList(), importCredentialsActivity)
+
+                                importCredentialsActivity.createCredentialFromRecord(
+                                    key,
+                                    record,
+                                    labelEditViewExtender.getCommittedLabelNames(),
+                                    LabelService.defaultHolder
+                                )
+                            }
+                            .toList()
+                        importExternalCredentials(
+                            encCredentials,
+                            newEncLabels,
+                            importCredentialsActivity)
                     }
 
                 }
@@ -112,11 +137,11 @@ class ImportCredentialsImportFileFragment : BaseFragment() {
     }
 
     private fun createExpandableView(
-        children: List<ImportCredentialsImportFileAdapter.FileRecord>,
+        children: List<CredentialFileRecord>,
         view: View,
         importCredentialsActivity: ImportCredentialsActivity,
         savedInstanceState: Bundle?
-    ): Set<ImportCredentialsImportFileAdapter.FileRecord> {
+    ): Set<CredentialFileRecord> {
 
         expandableListView =
             view.findViewById(R.id.expandable_list_credentials)
@@ -153,9 +178,9 @@ class ImportCredentialsImportFileFragment : BaseFragment() {
     }
 
     private fun fillChildrenFromState(
-        children: List<ImportCredentialsImportFileAdapter.FileRecord>,
+        children: List<CredentialFileRecord>,
         savedInstanceState: Bundle?
-    ): MutableSet<ImportCredentialsImportFileAdapter.FileRecord> {
+    ): MutableSet<CredentialFileRecord> {
        val ids = savedInstanceState?.getIntArray("records_list")?.toList()
             ?: return children.toMutableSet()
 
@@ -170,10 +195,11 @@ class ImportCredentialsImportFileFragment : BaseFragment() {
 
     private fun importExternalCredentials(
         credentials: List<EncCredential>,
+        labels: List<EncLabel>,
         activity: SecureActivity
     ) {
        UseCaseBackgroundLauncher(ImportCredentialsUseCase)
-            .launch(activity, ImportCredentialsUseCase.Input(credentials)
+            .launch(activity, ImportCredentialsUseCase.Input(credentials, labels)
             ) { output ->
                 if (!output.success) {
                     toastText(context, R.string.something_went_wrong)

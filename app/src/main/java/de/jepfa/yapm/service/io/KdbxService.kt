@@ -1,42 +1,40 @@
 package de.jepfa.yapm.service.io
 
 import android.content.Context
-import android.net.Uri
-import android.text.TextUtils
 import android.util.Log
 import app.keemobile.kotpass.constants.BasicField
 import app.keemobile.kotpass.cryptography.EncryptedValue
 import app.keemobile.kotpass.database.Credentials
 import app.keemobile.kotpass.database.KeePassDatabase
+import app.keemobile.kotpass.database.decode
 import app.keemobile.kotpass.database.encode
-import app.keemobile.kotpass.database.modifiers.modifyGroups
 import app.keemobile.kotpass.database.modifiers.modifyParentGroup
+import app.keemobile.kotpass.database.traverse
 import app.keemobile.kotpass.models.Entry
 import app.keemobile.kotpass.models.EntryFields
 import app.keemobile.kotpass.models.EntryValue
 import app.keemobile.kotpass.models.Meta
 import app.keemobile.kotpass.models.TimeData
-import com.opencsv.CSVReaderHeaderAware
-import com.opencsv.CSVWriter
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
-import de.jepfa.yapm.util.Constants.LOG_PREFIX
-import de.jepfa.yapm.util.FileUtil
-import de.jepfa.yapm.util.toSimpleDateFormat
+import de.jepfa.yapm.ui.label.Label
+import io.ktor.server.util.toGMTDate
+import io.ktor.util.date.toJvmDate
 import java.io.ByteArrayOutputStream
 import java.io.IOException
-import java.io.OutputStream
-import java.io.OutputStreamWriter
-import java.io.StringReader
-import java.time.Instant
+import java.io.InputStream
 import java.util.*
 
 
 object KdbxService {
+
+    private val credentialFactory: (String) -> Credentials = {
+        Credentials.from(EncryptedValue.fromString(it)) //TODO use fromBinary
+    }
 
     fun createKdbxExportContent(
         kdbxPassword: Password,
@@ -47,9 +45,6 @@ object KdbxService {
 
         try {
 
-            val credentialFactory: (String) -> Credentials = {
-                Credentials.from(EncryptedValue.fromString(it))
-            }
 
             val meta = Meta(
                 generator = "ANOTHERpass",
@@ -57,7 +52,7 @@ object KdbxService {
                 description = "Exported from an ANOTHERpass vault with Id ${SaltService.getVaultId(context)}",
             )
             val database = KeePassDatabase.Ver4x.create("ANOTHERpass", meta, credentialFactory(kdbxPassword.toRawFormattedPassword().toString())).run {
-
+                
                 modifyParentGroup {
                     copy(entries = credentials.map { encCredential ->
 
@@ -108,5 +103,50 @@ object KdbxService {
             Log.e("KDBX", "cannot export to KDBX format", e)
             return false
         }
+    }
+
+    fun readKdbxContent(
+        kdbxPassword: Password,
+        inputStream: InputStream,
+    ): MutableList<CredentialFileRecord> {
+        val database = inputStream.use { KeePassDatabase.decode(it, credentialFactory(kdbxPassword.toString())) }
+
+        val fileRecords = mutableListOf<CredentialFileRecord>()
+
+        var count = 0
+        database.traverse {
+            when (it) {
+                is Entry -> {
+                    val fields = it.fields
+                    val times = it.times
+
+                    val record = CredentialFileRecord(
+                        it.uuid,
+                        count,
+                        fields.title?.content!!,
+                        fields.url?.content,
+                        fields.userName?.content,
+                        fields.password?.content!!,
+                        fields.notes?.content.orEmpty(),
+                        times?.expiryTime?.toGMTDate()?.toJvmDate(),
+                        times?.lastModificationTime?.toGMTDate()?.toJvmDate(),
+                        it.tags,
+                    )
+
+                    it.tags.forEach { tag ->
+                        LabelService.externalHolder.updateLabel(Label(tag))
+                    }
+
+                    fileRecords.add(record)
+
+                    count++
+
+
+                }
+
+                else -> {}
+            }
+        }
+        return fileRecords
     }
 }

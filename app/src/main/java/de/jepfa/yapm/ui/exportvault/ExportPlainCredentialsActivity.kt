@@ -16,7 +16,7 @@ import de.jepfa.yapm.ui.ChangeKeyboardForPinManager
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
-import de.jepfa.yapm.ui.credential.PasswordDialog
+import de.jepfa.yapm.ui.credential.KeepassPasswordDialog
 import de.jepfa.yapm.usecase.vault.ExportPlainCredentialsUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.PermissionChecker
@@ -99,7 +99,7 @@ class ExportPlainCredentialsActivity : SecureActivity() {
 
                             } else if (radioFileFormat.checkedRadioButtonId == R.id.radio_format_kdbx) {
                                 // ask for password
-                                PasswordDialog.openAskForPasswordDialog(
+                                KeepassPasswordDialog.openAskForPasswordDialog(
                                     this,
                                     getString(R.string.title_takeout_kdbx_master_password),
                                     getString(R.string.message_takeout_kdbx_master_password),
@@ -154,7 +154,7 @@ class ExportPlainCredentialsActivity : SecureActivity() {
                 }
             } else if (radioFileFormat.checkedRadioButtonId == R.id.radio_format_kdbx) {
                 // ask for password
-                PasswordDialog.openAskForPasswordDialog(
+                KeepassPasswordDialog.openAskForPasswordDialog(
                     this,
                     getString(R.string.title_takeout_kdbx_master_password),
                     getString(R.string.message_takeout_kdbx_master_password),

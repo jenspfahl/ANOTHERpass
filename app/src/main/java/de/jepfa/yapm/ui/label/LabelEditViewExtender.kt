@@ -120,7 +120,7 @@ class LabelEditViewExtender(private val activity: SecureActivity,
 
     private fun addTextToLabelGroup(labelName: String, silent: Boolean) {
         if (labelName.isNotBlank()) {
-            val label = LabelService.defaultHolder.lookupByLabelName(labelName) ?: createNewLabel(labelName)
+            val label = LabelService.defaultHolder.lookupByLabelName(labelName) ?: LabelService.defaultHolder.createNewLabel(labelName, activity)
             val maxLabelLength = activity.resources.getInteger(R.integer.max_label_name_length)
             val chipsCount = editCredentialLabelsChipGroup.size
             if (containsLabel(editCredentialLabelsChipGroup, label)) {
@@ -150,23 +150,6 @@ class LabelEditViewExtender(private val activity: SecureActivity,
         }
     }
 
-    private fun createNewLabel(labelName: String): Label {
-        val labelColors = activity.resources.getIntArray(R.array.label_colors)
-        labelColors.shuffle() // to get next color by random
-        val allLabelColors = LabelService.defaultHolder.getAllLabels()
-            .map { it.getColor(activity) }
-            .toSet()
-        var freeColor = labelColors
-            .filterNot { allLabelColors.contains(it) }
-            .firstOrNull()
-
-        if (freeColor == null) {
-            val randId = Random.nextInt(allLabelColors.size)
-            freeColor = allLabelColors.elementAt(randId)
-        }
-
-        return Label(labelName, freeColor)
-    }
 
     private fun saveLabelIfNeeded(label: Label) {
         activity.masterSecretKey?.let { key ->
