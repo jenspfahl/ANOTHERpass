@@ -99,12 +99,8 @@ class ExportPlainCredentialsActivity : SecureActivity() {
 
                             } else if (radioFileFormat.checkedRadioButtonId == R.id.radio_format_kdbx) {
                                 // ask for password
-                                KeepassPasswordDialog.openAskForPasswordDialog(
-                                    this,
-                                    getString(R.string.title_takeout_kdbx_master_password),
-                                    getString(R.string.message_takeout_kdbx_master_password),
-                                    getString(android.R.string.ok),
-                                    getString(android.R.string.cancel)
+                                KeepassPasswordDialog.openAskForSettingAPasswordDialog(
+                                    this
                                 )
                                 { keepassMasterPassword ->
                                     if (keepassMasterPassword != null) {
@@ -154,12 +150,8 @@ class ExportPlainCredentialsActivity : SecureActivity() {
                 }
             } else if (radioFileFormat.checkedRadioButtonId == R.id.radio_format_kdbx) {
                 // ask for password
-                KeepassPasswordDialog.openAskForPasswordDialog(
+                KeepassPasswordDialog.openAskForSettingAPasswordDialog(
                     this,
-                    getString(R.string.title_takeout_kdbx_master_password),
-                    getString(R.string.message_takeout_kdbx_master_password),
-                    getString(android.R.string.ok),
-                    getString(android.R.string.cancel)
                 )
                 { keepassMasterPassword ->
                     if (keepassMasterPassword != null) {

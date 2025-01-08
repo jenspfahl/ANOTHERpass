@@ -3,7 +3,6 @@ package de.jepfa.yapm.ui.credential
 import android.content.Context
 import android.text.InputFilter
 import android.text.InputType
-import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
@@ -14,13 +13,10 @@ import de.jepfa.yapm.util.Constants
 
 object KeepassPasswordDialog {
 
-    fun openAskForPasswordDialog(
+    fun openAskForSettingAPasswordDialog(
         context: Context,
-        titleText: String,
-        messageText: String,
-        okText: String,
-        cancelText: String,
         handlePassword: (password: Password?) -> Unit) {
+
         val inputView = LinearLayout(context)
         inputView.orientation = LinearLayout.VERTICAL
         inputView.setPadding(32)
@@ -48,11 +44,11 @@ object KeepassPasswordDialog {
 
         val builder = AlertDialog.Builder(context)
         val dialog: AlertDialog = builder
-            .setTitle(titleText)
-            .setMessage(messageText)
+            .setTitle(R.string.title_takeout_kdbx_master_password)
+            .setMessage(R.string.message_takeout_kdbx_master_password)
             .setView(inputView)
-            .setPositiveButton(okText, null)
-            .setNegativeButton(cancelText, null)
+            .setPositiveButton(context.getString(android.R.string.ok), null)
+            .setNegativeButton(context.getString(android.R.string.cancel), null)
             //.setNeutralButton("GENERATE PASSWORD", null)
             .create()
 
@@ -83,6 +79,56 @@ object KeepassPasswordDialog {
                 }
 
                 handlePassword(passwd1)
+
+                dialog.dismiss()
+            }
+            val buttonNegative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+            buttonNegative.setOnClickListener {
+                handlePassword(null)
+                dialog.dismiss()
+            }
+        }
+        dialog.show()
+    }
+
+    fun openAskForUnlockPasswordDialog(
+        context: Context,
+        handlePassword: (password: Password?) -> Unit) {
+        val inputView = LinearLayout(context)
+        inputView.orientation = LinearLayout.VERTICAL
+        inputView.setPadding(32)
+
+        val pwd = EditText(context)
+        pwd.inputType =
+            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+        val filters =
+            arrayOf<InputFilter>(InputFilter.LengthFilter(Constants.MAX_CREDENTIAL_PASSWD_LENGTH))
+        pwd.filters = filters
+        pwd.hint = context.getString(R.string.enter_password)
+        pwd.requestFocus()
+        inputView.addView(pwd)
+
+
+        val builder = AlertDialog.Builder(context)
+        val dialog: AlertDialog = builder
+            .setTitle(R.string.title_enter_kdbx_master_password)
+            .setMessage(R.string.message_enter_kdbx_master_password)
+            .setView(inputView)
+            .setPositiveButton(context.getString(android.R.string.ok), null)
+            .setNegativeButton(context.getString(android.R.string.cancel), null)
+            .create()
+
+        dialog.setOnShowListener {
+            val buttonPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            buttonPositive.setOnClickListener {
+                val passwd = Password(pwd.text)
+                if (passwd.isEmpty()) {
+                    pwd.setError(context.getString(R.string.error_field_required))
+                    pwd.requestFocus()
+                    return@setOnClickListener
+                }
+
+                handlePassword(passwd)
 
                 dialog.dismiss()
             }

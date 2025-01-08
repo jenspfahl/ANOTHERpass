@@ -110,7 +110,7 @@ object DebugInfo {
         sb.addFormattedLine("Security patch", Build.VERSION.SECURITY_PATCH)
 
         sb.append("\n************ APP-ERROR-LOG ************\n")
-        val logs = getLogcat(LOG_PREFIX, command = "-v time *:E", null)?.takeLast(1024)
+        val logs = getLogcat("", command = "-b all *:E", null)?.takeLast(4096 * 2)
         sb.append(logs)
 
         return sb.toString()

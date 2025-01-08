@@ -128,7 +128,7 @@ Het scheiden van de gecodeerde hoofdsleutel van het kluisbestand maakt het besta
   <string name="import_vault_import_file_fragment_label">Veilig importeren 2/2</string>
   <string name="button_load_vault">Kluisbestand laden</string>
   <string name="button_import_vault">Kluis importeren</string>
-  <string name="import_credentials_load_file_explanation">Selecteer een bestand met niet-gecodeerde inloggegevens.  Momenteel worden alleen CSV-bestanden ondersteund.  Zo worden bijvoorbeeld toegangsgegevens herkend die zijn geëxporteerd uit browsers zoals Firefox of Chrome of uit Keepass-varianten.</string>
+  <string name="import_credentials_load_file_explanation">Selecteer een bestand met inloggegevens.  Momenteel worden alleen CSV-of KDBX bestanden ondersteund.  Zo worden bijvoorbeeld toegangsgegevens herkend die zijn geëxporteerd uit browsers zoals Firefox of Chrome of uit Keepass-varianten.</string>
   <string name="import_credentials_load_file_fragment_label" tools:ignore="TypographyFractions">Toegangsgegevens importeren 1/2</string>
   <string name="import_credentials_import_file_fragment_label">Toegangsgegevens importeren 2/2</string>
   <string name="button_load_credentials_file">Toegangsgegevensbestand laden</string>
@@ -900,4 +900,8 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="takeout_file_format_kdbx">Keepass/KDBX - encrypted</string>
   <string name="title_takeout_kdbx_master_password">Please set a master password</string>
   <string name="message_takeout_kdbx_master_password">A Keepass vault requires a master password, which is used to open the KDBX file.</string>
+  <string name="keepass_password_wrong">Provided password is wrong or KDBX file is corrupt!</string>
+  <string name="title_enter_kdbx_master_password">Open Keepass file</string>
+  <string name="message_enter_kdbx_master_password">Provide the password to open the given Keepass file.</string>
+
 </resources>

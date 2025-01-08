@@ -135,7 +135,7 @@
     <string name="button_load_vault">Tresor-Datei laden</string>
     <string name="button_import_vault">Tresor importieren</string>
 
-    <string name="import_credentials_load_file_explanation">Wähle eine Datei mit unverschlüsselten Zugangsdaten aus. Zur Zeit werden nur CSV-Dateien unterstützt. Erkannt werden z.B. Zugangsdaten exportiert aus Browsern wie Firefox oder Chrome oder aus Keepass-Varianten.</string>
+    <string name="import_credentials_load_file_explanation">Wähle eine Datei mit Zugangsdaten aus. Zur Zeit werden nur CSV- und KDBX-Dateien unterstützt. Erkannt werden z.B. unverschlüsselte Zugangsdaten exportiert aus Browsern wie Firefox oder Chrome oder Tresor-Dateien von Keepass-Varianten (ab Version 4).</string>
     <string name="import_credentials_load_file_fragment_label" tools:ignore="TypographyFractions">Zugangsdaten importieren 1/2</string>
     <string name="import_credentials_import_file_fragment_label">Zugangsdaten importieren 2/2</string>
     <string name="button_load_credentials_file">Zugangsdatendatei laden</string>
@@ -732,7 +732,7 @@
     <string name="credentials_in_file">%1$d Zugangsdaten in Datei gefunden</string>
     <string name="cannot_read_file">Datei kann nicht gelesen werden</string>
     <string name="cannot_parse_csv_credentials">Zugangsdaten konnten nicht gelesen werden</string>
-    <string name="empty_csv_credentials">Diese CSV-Datei sheint leer zu sein oder ist keine CSV-Datei</string>
+    <string name="empty_csv_credentials">Diese CSV-Datei scheint leer zu sein oder ist keine CSV-Datei</string>
     <string name="go_back_to_app">Zurück zur App</string>
     <string name="no_autofill_for_app">Kein Ausfüllen für \'%1$s\'</string>
     <string name="no_autofill_for_current_app">Kein Ausfüllen für diese App</string>
@@ -799,7 +799,7 @@
     <string name="username_template_type_desc_both">Beides vorschlagen</string>
     <string name="open_vault">Tresor öffnen</string>
 
-    <string name="define_columns_of_csv_file">Datei kann nicht geladen werden oder einige Felder fehlen? Gib die Spaltennamen der CSV-Datei manuell ein.</string>
+    <string name="define_columns_of_csv_file">CSV-Datei kann nicht geladen werden oder einige Felder fehlen? Gib die Spaltennamen der CSV-Datei manuell ein.</string>
     <string name="define_columns_of_given_csv_file">Datei \'%1$s\' kann nicht geladen werden oder einige Felder fehlen? Gib die Spaltennamen der CSV-Datei manuell ein.</string>
     <string name="not_a_csv_column">Nur Buchstaben, Ziffern, Binde- und Unterstrich erlaubt</string>
     <string name="csv_column_title">CSV-Spaltennamen</string>
@@ -935,4 +935,7 @@
     <string name="takeout_file_format_kdbx">Keepass/KDBX - verschlüsselt</string>
     <string name="title_takeout_kdbx_master_password">Bitte ein Masterpasswort setzen</string>
     <string name="message_takeout_kdbx_master_password">Ein Keepass-Tresor benötigt ein Masterpasswort, welches benötigt wird, um die KDBX-Datei zu öffnen.</string>
+    <string name="keepass_password_wrong">Das eingegebene Passwort ist falsch oder die KDBX-Datei is fehlerhaft!</string>
+    <string name="title_enter_kdbx_master_password">Keepass-Datei öffnen</string>
+    <string name="message_enter_kdbx_master_password">Bitte das Passwort eingeben, um die Keepass-Datei öffnen zu können.</string>
 </resources>

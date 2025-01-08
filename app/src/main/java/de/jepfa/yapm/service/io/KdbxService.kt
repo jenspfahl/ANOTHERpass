@@ -108,45 +108,62 @@ object KdbxService {
     fun readKdbxContent(
         kdbxPassword: Password,
         inputStream: InputStream,
-    ): MutableList<CredentialFileRecord> {
-        val database = inputStream.use { KeePassDatabase.decode(it, credentialFactory(kdbxPassword.toString())) }
+    ): MutableList<CredentialFileRecord>? {
+        try {
+            val database = inputStream.use { KeePassDatabase.decode(it, credentialFactory(kdbxPassword.toString())) }
 
-        val fileRecords = mutableListOf<CredentialFileRecord>()
+            val fileRecords = mutableListOf<CredentialFileRecord>()
 
-        var count = 0
-        database.traverse {
-            when (it) {
-                is Entry -> {
-                    val fields = it.fields
-                    val times = it.times
+            var count = 0
+            database.traverse {
+                when (it) {
+                    is Entry -> {
+                        val fields = it.fields
+                        val times = it.times
 
-                    val record = CredentialFileRecord(
-                        it.uuid,
-                        count,
-                        fields.title?.content!!,
-                        fields.url?.content,
-                        fields.userName?.content,
-                        fields.password?.content!!,
-                        fields.notes?.content.orEmpty(),
-                        times?.expiryTime?.toGMTDate()?.toJvmDate(),
-                        times?.lastModificationTime?.toGMTDate()?.toJvmDate(),
-                        it.tags,
-                    )
+                        if (fields.title != null && fields.password != null) {
 
-                    it.tags.forEach { tag ->
-                        LabelService.externalHolder.updateLabel(Label(tag))
+                            var expiresAt = if (times?.expiryTime != null) Date.from(times.expiryTime) else null
+                            // For some unknown reasons sometimes credentials from Keepass have an expiry date equal or before the creation date.
+                            // If so, we clear the expiration date.
+                            if (times?.creationTime != null && !times.creationTime!!.isBefore(times.expiryTime)) {
+                                expiresAt = null
+                            }
+
+                            val modifiedAt = if (times?.lastModificationTime != null) Date.from(times.lastModificationTime) else null
+
+                            val record = CredentialFileRecord(
+                                it.uuid,
+                                count,
+                                fields.title?.content!!,
+                                fields.url?.content,
+                                fields.userName?.content,
+                                fields.password?.content!!,
+                                fields.notes?.content.orEmpty(),
+                                if (expiresAt?.time == 0L) null else expiresAt,
+                                if (modifiedAt?.time == 0L) null else modifiedAt,
+                                it.tags,
+                            )
+
+                            it.tags.forEach { tag ->
+                                LabelService.externalHolder.updateLabel(Label(tag))
+                            }
+
+                            fileRecords.add(record)
+
+                            count++
+                        }
+
+
                     }
 
-                    fileRecords.add(record)
-
-                    count++
-
-
+                    else -> {}
                 }
-
-                else -> {}
             }
+            return fileRecords
+        } catch (e: Exception) {
+            Log.e("KDBX", "Cannot read file", e)
+            return null
         }
-        return fileRecords
     }
 }

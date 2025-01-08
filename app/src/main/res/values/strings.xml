@@ -136,7 +136,7 @@
     <string name="button_load_vault">Load vault file</string>
     <string name="button_import_vault">Import vault</string>
 
-    <string name="import_credentials_load_file_explanation">Select a file which contains the unencrypted credentials to import. Currently only CSV-files are supported. Use this to import your credentials e.g. from browsers like Firefox or Chrome or from Keepass variants.</string>
+    <string name="import_credentials_load_file_explanation">Select a file which contains the credentials to import. Currently only CSV- and KDBX files are supported. Use this to import your plain credentials e.g. from browsers like Firefox or Chrome or vault databases from Keepass variants.</string>
     <string name="import_credentials_load_file_fragment_label" tools:ignore="TypographyFractions">Import Credentials 1/2</string>
     <string name="import_credentials_import_file_fragment_label">Import Credentials 2/2</string>
     <string name="button_load_credentials_file">Load credentials file</string>
@@ -807,7 +807,7 @@
     <string name="username_template_type_desc_both">provide both</string>
     <string name="open_vault">Open vault</string>
 
-    <string name="define_columns_of_csv_file">Cannot load file or fields are missing? Define columns of the file manually.</string>
+    <string name="define_columns_of_csv_file">Cannot load csv file or fields are missing? Define columns of the file manually.</string>
     <string name="define_columns_of_given_csv_file">Cannot load file \'%1$s\' or fields are missing? Define columns of the file manually.</string>
     <string name="not_a_csv_column">only letters, digits, dash and stroke are allowed</string>
     <string name="csv_column_title">CSV columns</string>
@@ -941,5 +941,8 @@
     <string name="takeout_file_format_kdbx">Keepass/KDBX - encrypted</string>
     <string name="title_takeout_kdbx_master_password">Please set a master password</string>
     <string name="message_takeout_kdbx_master_password">A Keepass vault requires a master password, which is used to open the KDBX file.</string>
+    <string name="keepass_password_wrong">Provided password is wrong or KDBX file is corrupt!</string>
+    <string name="title_enter_kdbx_master_password">Open Keepass file</string>
+    <string name="message_enter_kdbx_master_password">Provide the password to open the given Keepass file.</string>
 
 </resources>

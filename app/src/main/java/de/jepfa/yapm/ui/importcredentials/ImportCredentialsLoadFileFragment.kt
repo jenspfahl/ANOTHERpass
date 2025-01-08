@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.webkit.MimeTypeMap
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
-import androidx.core.net.toFile
 import androidx.core.view.setPadding
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
@@ -19,9 +18,9 @@ import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.CsvService
 import de.jepfa.yapm.service.io.KdbxService
 import de.jepfa.yapm.service.label.LabelService
-import de.jepfa.yapm.service.label.LabelsHolder
+import de.jepfa.yapm.ui.AsyncWithProgressBar
 import de.jepfa.yapm.ui.BaseFragment
-import de.jepfa.yapm.ui.label.Label
+import de.jepfa.yapm.ui.credential.KeepassPasswordDialog
 import de.jepfa.yapm.util.FileUtil
 import de.jepfa.yapm.util.FileUtil.getFileName
 import de.jepfa.yapm.util.PermissionChecker
@@ -222,6 +221,8 @@ class ImportCredentialsLoadFileFragment : BaseFragment() {
                     //detect whether CSV or KDBX is selected
                     val fileExtension = MimeTypeMap.getFileExtensionFromUrl(selectedFile.toString())
                     if (fileExtension.toUpperCasePreservingASCIIRules() == "KDBX") {//TODO by filetype is better
+
+                        setColumnsLink.visibility = View.INVISIBLE
                         val inputStream = FileUtil.openInputStreamFromFile(importCredentialsActivity, selectedFile)
                         if (inputStream == null) {
                             toastText(importCredentialsActivity, R.string.cannot_read_file)
@@ -231,15 +232,47 @@ class ImportCredentialsLoadFileFragment : BaseFragment() {
                         LabelService.externalHolder.copyFrom(LabelService.defaultHolder)
 
 
-                        val records = KdbxService.readKdbxContent(
-                            Password("111111"), //TODO open KdbxPAsswordDialog to get this pwd
-                            inputStream
+                        KeepassPasswordDialog.openAskForUnlockPasswordDialog(
+                            importCredentialsActivity
                         )
-                        importCredentialsActivity.records = records
+                        {
+                            password ->
 
-                        findNavController().navigate(R.id.action_importCredentials_LoadFileFragment_to_ImportFileFragment)
+                            if (password != null) {
+
+
+                                AsyncWithProgressBar(importCredentialsActivity,
+                                    {
+                                        val records = KdbxService.readKdbxContent(
+                                            password,
+                                            inputStream
+                                        )
+                                        password.clear()
+
+                                        if (records == null) {
+                                            false
+                                        }
+                                        else {
+                                            importCredentialsActivity.records = records
+                                            true
+                                        }
+                                    },
+                                    { success ->
+                                        if (success) {
+                                            findNavController().navigate(R.id.action_importCredentials_LoadFileFragment_to_ImportFileFragment)
+                                        }
+                                        else {
+                                            toastText(importCredentialsActivity, R.string.keepass_password_wrong)
+                                        }
+                                    })
+
+                            }
+                        }
                     }
                     else {
+
+                        setColumnsLink.visibility = View.VISIBLE
+
                         val content = FileUtil.readFile(importCredentialsActivity, selectedFile)
                         if (content == null) {
                             toastText(importCredentialsActivity, R.string.cannot_read_file)

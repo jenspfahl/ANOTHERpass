@@ -415,11 +415,24 @@ class ShowCredentialActivity : SecureActivity() {
                         sb.addFormattedLine(getString(R.string.last_modified), dateTimeToNiceString(it.toDate(), this))
                 }
 
-                AlertDialog.Builder(this)
+                masterSecretKey?.let { key ->
+                    val expiresAt = decryptLong(key, credential.expiresAt)
+                    if (expiresAt != null && expiresAt != 0L) {
+                        sb.addFormattedLine(
+                            getString(R.string.expires),
+                            dateTimeToNiceString(Date(expiresAt), this)
+                        )
+                    }
+                }
+
+                val builder = AlertDialog.Builder(this)
                     .setTitle(R.string.title_credential_details)
                     .setMessage(sb.toString())
                     .setNegativeButton(R.string.close, null)
-                    .setNeutralButton(R.string.copy_universal_identifier) { _, _ ->
+
+
+                if (credential.uid != null) {
+                    builder.setNeutralButton(R.string.copy_universal_identifier) { _, _ ->
                         credential.uid?.let { uid ->
                             ClipboardUtil.copy(
                                 this.getString(R.string.universal_identifier),
@@ -430,7 +443,9 @@ class ShowCredentialActivity : SecureActivity() {
                         }
                         toastText(this, R.string.universal_identifier_copied)
                     }
-                    .show()
+                }
+
+                builder.show()
 
                 return true
             }
