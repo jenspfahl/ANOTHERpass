@@ -220,7 +220,8 @@ class ImportCredentialsLoadFileFragment : BaseFragment() {
 
                     //detect whether CSV or KDBX is selected
                     val fileExtension = MimeTypeMap.getFileExtensionFromUrl(selectedFile.toString())
-                    if (fileExtension.toUpperCasePreservingASCIIRules() == "KDBX") {//TODO by filetype is better
+
+                    if (fileExtension.toUpperCasePreservingASCIIRules() == "KDBX") {//TODO by filetype would be better
 
                         setColumnsLink.visibility = View.INVISIBLE
                         val inputStream = FileUtil.openInputStreamFromFile(importCredentialsActivity, selectedFile)

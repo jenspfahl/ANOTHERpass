@@ -121,6 +121,7 @@ object KdbxService {
                         val fields = it.fields
                         val times = it.times
 
+
                         if (fields.title != null && fields.password != null) {
 
                             var expiresAt = if (times?.expiryTime != null) Date.from(times.expiryTime) else null

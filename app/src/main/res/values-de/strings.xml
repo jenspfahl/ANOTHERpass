@@ -135,7 +135,7 @@
     <string name="button_load_vault">Tresor-Datei laden</string>
     <string name="button_import_vault">Tresor importieren</string>
 
-    <string name="import_credentials_load_file_explanation">Wähle eine Datei mit Zugangsdaten aus. Zur Zeit werden nur CSV- und KDBX-Dateien unterstützt. Erkannt werden z.B. unverschlüsselte Zugangsdaten exportiert aus Browsern wie Firefox oder Chrome oder Tresor-Dateien von Keepass-Varianten (ab Version 4).</string>
+    <string name="import_credentials_load_file_explanation">Wähle eine Datei mit Zugangsdaten aus. Zur Zeit werden nur CSV- und KDBX-Dateien unterstützt. Erkannt werden z.B. unverschlüsselte Zugangsdaten exportiert aus Browsern wie Firefox oder Chrome oder Tresor-Dateien von Keepass-Varianten (*.kdbx, ab Version 3).</string>
     <string name="import_credentials_load_file_fragment_label" tools:ignore="TypographyFractions">Zugangsdaten importieren 1/2</string>
     <string name="import_credentials_import_file_fragment_label">Zugangsdaten importieren 2/2</string>
     <string name="button_load_credentials_file">Zugangsdatendatei laden</string>
@@ -254,7 +254,7 @@
     <string name="credential_sort_by">Sortiere Zugangsdaten nach</string>
     <string name="credential_sort_by_name_asc">Name (A..Z)</string>
     <string name="credential_sort_by_name_desc">Name (Z..A)</string>
-    <string name="credential_sort_by_recently_modified">Kürzlich geändert (neuste zuerst)</string>
+    <string name="credential_sort_by_recently_modified">Kürzlich geändert (neuste zuerst)</string>A
     <string name="credential_sort_by_id">Zugangsdaten-ID</string>
     <string name="show_ids">Zeige Zugangsdaten-IDs</string>
     <string name="expired_credentials_on_top">Abgelaufene Zugangsdaten ganz oben</string>
@@ -938,4 +938,9 @@
     <string name="keepass_password_wrong">Das eingegebene Passwort ist falsch oder die KDBX-Datei is fehlerhaft!</string>
     <string name="title_enter_kdbx_master_password">Keepass-Datei öffnen</string>
     <string name="message_enter_kdbx_master_password">Bitte das Passwort eingeben, um die Keepass-Datei öffnen zu können.</string>
+
+    <string name="pref_title_show_extended_search_commands">Suchbefehle beim Start der Suche vorschlagen</string>
+    <string name="pref_summary_show_extended_search_commands">Alle Suchbefehle vorschlagen, auch wenn Sie nicht mit \'!\' zu tippen beginnen.</string>
+    <string name="pref_title_flip_search_and_add_button">Such-Button mit Action-Button vertauschen</string>
+    <string name="pref_summary_flip_search_and_add_button">Der Action-Button, ursprünglich zum Erstellen neuer Zugangsdaten verwendet, wird durch den Such-Button ersetzt. Aktiviere diese Option, wenn du häufiger nach Zugangsdaten suchst, als neue zu erstellen.</string>
 </resources>

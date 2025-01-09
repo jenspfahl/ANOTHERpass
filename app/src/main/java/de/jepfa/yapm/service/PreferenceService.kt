@@ -91,6 +91,8 @@ object PreferenceService {
     const val PREF_SERVER_AUTOSTART = PREF_PREFIX + "server_autostart"
     const val PREF_SERVER_HIDE_PANEL = PREF_PREFIX + "server_hide_panel"
 
+    const val PREF_QUICK_SEARCH_ON_FAB = PREF_PREFIX + "quick_search_on_fab"
+    const val PREF_EXTENDED_SEARCH_BY_DEFAULT = PREF_PREFIX + "extended_search_by_default"
 
     const val DATA_REFRESH_MPT_NOTIFICATION_SHOWED_AT = DATA_PREFIX + "refresh_mpt_notification_showed_at"
     const val DATA_REFRESH_MPT_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "refresh_mpt_notification_showed_as"

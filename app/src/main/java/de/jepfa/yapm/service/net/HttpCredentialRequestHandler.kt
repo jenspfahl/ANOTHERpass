@@ -694,6 +694,7 @@ object HttpCredentialRequestHandler {
                     requestFlows.getLifeCycleActivity(),
                     requestFlows.getLifeCycleActivity().getString(R.string.request_denied)
                 )
+                requestFlows.resetUi()
             },
             acceptHandler = { allowBypass ->
                 webExtension.bypassIncomingRequests = allowBypass
@@ -732,10 +733,10 @@ object HttpCredentialRequestHandler {
             .setTextMaxLines(7)
             .addCallback(object : BaseCallback<Snackbar>() {
                 override fun onDismissed(bar: Snackbar, event: Int) {
+                    credentialSelectState = MultipleCredentialSelectState.NONE //do this before reset UI
+
                     requestFlows.resetUi()
                     requestFlows.getRootView().updatePadding(bottom = 0)
-
-                    credentialSelectState = MultipleCredentialSelectState.NONE
 
                     if (!denyRequestVeto() && webClientCredentialRequestState.isProgressing) {
                         updateRequestState(CredentialRequestState.Denied, requestFlows)
@@ -887,7 +888,7 @@ object HttpCredentialRequestHandler {
 
         CoroutineScope(Dispatchers.Main).launch {
             serverSnackbar?.dismiss()
-            requestFlows.stopCredentialSelectionMode()
+            requestFlows.resetUi()
 
             toastText(requestFlows.getLifeCycleActivity(),
                 requestFlows.getLifeCycleActivity().getString(R.string.selected_credentials_posted))

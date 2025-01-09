@@ -164,6 +164,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private var navMenuVaultVisible = false
 
     private var searchItem: MenuItem? = null
+    private var addCredentialItem: MenuItem? = null
     private var credentialsRecycleView: RecyclerView? = null
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
@@ -416,16 +417,31 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
         val fab = findViewById<FloatingActionButton>(R.id.fab)
 
+        val quickSearch = PreferenceService.getAsBool(PreferenceService.PREF_QUICK_SEARCH_ON_FAB, this)
+
+        if (quickSearch) {
+            fab.setImageResource(R.drawable.ic_search_white_24dp)
+            updateQuickSearchOnFab(quickSearch)
+        }
+
         listCredentialAdapter = ListCredentialAdapter(this)
         { selected ->
+
             if (HttpCredentialRequestHandler.credentialSelectState == MultipleCredentialSelectState.USER_SELECTING) {
                 fab.setImageResource(R.drawable.baseline_send_to_mobile_24)
+                updateQuickSearchOnFab(false)
             }
             else if (selected.isNotEmpty()) {
                 fab.setImageResource(R.drawable.ic_baseline_delete_24_white)
+                updateQuickSearchOnFab(false)
+            }
+            else if (PreferenceService.getAsBool(PreferenceService.PREF_QUICK_SEARCH_ON_FAB, this)) {
+                fab.setImageResource(R.drawable.ic_search_white_24dp)
+                updateQuickSearchOnFab(true)
             }
             else {
                 fab.setImageResource(R.drawable.ic_add_white_24dp)
+                updateQuickSearchOnFab(false)
             }
         }
         recyclerView.adapter = listCredentialAdapter
@@ -477,7 +493,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 HttpCredentialRequestHandler.credentialSelectState = MultipleCredentialSelectState.USER_COMMITTED
             }
             else if (!selectedCredentials.isNullOrEmpty()) {
-
                 AlertDialog.Builder(this)
                     .setTitle(getString(R.string.title_delete_selected))
                     .setMessage(
@@ -508,26 +523,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     .show()
 
             }
+            else if (quickSearch) {
+                startSearchFor("", commit = false)
+            }
             else {
-                val intent =
-                    Intent(this@ListCredentialsActivity, EditCredentialActivity::class.java)
-
-                val websiteSuggestion = HttpCredentialRequestHandler.getWebsiteSuggestion()
-                if (HttpCredentialRequestHandler.isProgressing() && websiteSuggestion != null) {
-                    val name = websiteSuggestion.first
-                    val domain = websiteSuggestion.second
-                    val user = websiteSuggestion.third
-
-                    intent.action = Constants.ACTION_PREFILLED_FROM_EXTENSION
-                    intent.putExtra("name", name)
-                    intent.putExtra("domain", domain)
-                    intent.putExtra("user", user)
-                }
-                else {
-                    intent.action = this.intent.action
-                }
-                intent.putExtras(this.intent) // forward all extras, especially needed for Autofill
-                startActivityForResult(intent, newOrUpdateCredentialActivityRequestCode)
+                startAddNewCerdentialFlow()
             }
         }
 
@@ -578,6 +578,27 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeButtonEnabled(true)
 
+    }
+
+    private fun ListCredentialsActivity.startAddNewCerdentialFlow() {
+        val intent =
+            Intent(this@ListCredentialsActivity, EditCredentialActivity::class.java)
+
+        val websiteSuggestion = HttpCredentialRequestHandler.getWebsiteSuggestion()
+        if (HttpCredentialRequestHandler.isProgressing() && websiteSuggestion != null) {
+            val name = websiteSuggestion.first
+            val domain = websiteSuggestion.second
+            val user = websiteSuggestion.third
+
+            intent.action = Constants.ACTION_PREFILLED_FROM_EXTENSION
+            intent.putExtra("name", name)
+            intent.putExtra("domain", domain)
+            intent.putExtra("user", user)
+        } else {
+            intent.action = this.intent.action
+        }
+        intent.putExtras(this.intent) // forward all extras, especially needed for Autofill
+        startActivityForResult(intent, newOrUpdateCredentialActivityRequestCode)
     }
 
     private fun startStopServer(start: Boolean, silent: Boolean = false) {
@@ -721,11 +742,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         return listCredentialAdapter?.getSelectedCredentials() ?: emptySet()
     }
 
-    override fun stopCredentialSelectionMode() {
-        listCredentialAdapter?.stopSelectionMode()
-    }
-
-
     private fun reflectServerStarted(msg: String? = null, showIp: Boolean = true) {
         serverViewSwitch.isChecked = true
         serverViewStateText = msg?: getString(R.string.server_listening)
@@ -861,9 +877,20 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         inflateActionsMenu(menu, R.menu.menu_main)
         Log.i(LOG_PREFIX + "LST", "onCreateOptionsMenu")
 
-        val searchItem: MenuItem = menu.findItem(R.id.action_search)
+        this.searchItem = menu.findItem(R.id.action_search)
+        this.searchItem?.setOnMenuItemClickListener {
+            startSearchFor("", commit = false)
+            true
+        }
 
-        this.searchItem = searchItem
+        this.addCredentialItem = menu.findItem(R.id.menu_add_credential)
+        this.addCredentialItem?.setOnMenuItemClickListener {
+            startAddNewCerdentialFlow()
+            true
+        }
+
+        updateQuickSearchOnFab(PreferenceService.getAsBool(PreferenceService.PREF_QUICK_SEARCH_ON_FAB, this))
+
         val searchView = MenuItemCompat.getActionView(searchItem) as SearchView
 
         searchView.setOnQueryTextFocusChangeListener { view, focus ->
@@ -909,7 +936,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                searchItem.collapseActionView()
+                searchItem?.collapseActionView()
                 return false
             }
 
@@ -979,6 +1006,17 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         refreshNavigationMenu()
 
         return true
+    }
+
+    private fun updateQuickSearchOnFab(quickSearchEnabled: Boolean) {
+        if (quickSearchEnabled) {
+            searchItem?.setVisible(false)
+            addCredentialItem?.setVisible(true)
+
+        } else {
+            searchItem?.setVisible(true)
+            addCredentialItem?.setVisible(false)
+        }
     }
 
 
@@ -1830,9 +1868,14 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             val searchPlate =
                 searchView.findViewById(R.id.search_src_text) as EditText
 
-            searchView.setQuery(searchString, commit)
+            var searchQuery = searchString
+            if (searchString.isEmpty() && PreferenceService.getAsBool(PreferenceService.PREF_EXTENDED_SEARCH_BY_DEFAULT, this)) {
+                searchQuery = "!"
+            }
+            searchView.setQuery(searchQuery, commit)
+
             searchItem.expandActionView()
-            searchPlate.text = SpannableStringBuilder(searchString)
+            searchPlate.text = SpannableStringBuilder(searchQuery)
             searchPlate.selectAll()
             return true
         }

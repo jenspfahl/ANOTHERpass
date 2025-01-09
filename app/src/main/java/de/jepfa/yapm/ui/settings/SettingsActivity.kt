@@ -10,7 +10,6 @@ import android.provider.Settings
 import android.text.InputFilter
 import android.text.InputType
 import android.view.autofill.AutofillManager
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.*
@@ -185,7 +184,17 @@ class SettingsActivity : SecureActivity(),
                 PreferenceService.PREF_SHOW_DIVIDERS_IN_LIST)
 
             showDividersInListPref?.let {
-                it.setOnPreferenceChangeListener { preference, newValue ->
+                it.setOnPreferenceChangeListener { preference, _ ->
+                    PreferenceService.putBoolean(PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD, true, preference.context)
+                    true
+                }
+            }
+
+            val quickSearchOnFabPref = findPreference<SwitchPreferenceCompat>(
+                PreferenceService.PREF_QUICK_SEARCH_ON_FAB)
+
+            quickSearchOnFabPref?.let {
+                it.setOnPreferenceChangeListener { preference, _ ->
                     PreferenceService.putBoolean(PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD, true, preference.context)
                     true
                 }

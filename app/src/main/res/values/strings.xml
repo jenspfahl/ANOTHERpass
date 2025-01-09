@@ -136,7 +136,7 @@
     <string name="button_load_vault">Load vault file</string>
     <string name="button_import_vault">Import vault</string>
 
-    <string name="import_credentials_load_file_explanation">Select a file which contains the credentials to import. Currently only CSV- and KDBX files are supported. Use this to import your plain credentials e.g. from browsers like Firefox or Chrome or vault databases from Keepass variants.</string>
+    <string name="import_credentials_load_file_explanation">Select a file which contains the credentials to import. Currently only CSV- and KDBX files are supported. Use this to import your plain credentials e.g. from browsers like Firefox or Chrome or vault databases from Keepass variants (*.kdbx, starting from version 3).</string>
     <string name="import_credentials_load_file_fragment_label" tools:ignore="TypographyFractions">Import Credentials 1/2</string>
     <string name="import_credentials_import_file_fragment_label">Import Credentials 2/2</string>
     <string name="button_load_credentials_file">Load credentials file</string>
@@ -944,5 +944,10 @@
     <string name="keepass_password_wrong">Provided password is wrong or KDBX file is corrupt!</string>
     <string name="title_enter_kdbx_master_password">Open Keepass file</string>
     <string name="message_enter_kdbx_master_password">Provide the password to open the given Keepass file.</string>
+
+    <string name="pref_title_show_extended_search_commands">Suggest search commands when start searching</string>
+    <string name="pref_summary_show_extended_search_commands">Suggest all search commands even if you don\'t start typing with \'!\'.</string>
+    <string name="pref_title_flip_search_and_add_button">Flip search button and action button</string>
+    <string name="pref_summary_flip_search_and_add_button">The Action button originally used to create new credentials is replaced by the Search button on the toolbar. Enable this if you need to search for credentials more often than you need to create new ones.</string>
 
 </resources>

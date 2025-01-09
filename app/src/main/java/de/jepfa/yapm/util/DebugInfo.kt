@@ -83,7 +83,7 @@ object DebugInfo {
         sb.addFormattedLine("Model", Build.MODEL)
         sb.addFormattedLine("Product", Build.PRODUCT)
         sb.addFormattedLine("Hardware", Build.HARDWARE)
-        sb.addFormattedLine("OS Build Id", Build.ID)
+        //sb.addFormattedLine("OS Build Id", Build.ID)
         sb.addFormattedLine("NFC available", NfcService.isNfcAvailable(context))
         sb.addFormattedLine("NFC enabled", NfcService.isNfcEnabled(context))
         sb.addFormattedLine("Has StrongBox support", SecretService.hasStrongBoxSupport(context) ?: "-")
