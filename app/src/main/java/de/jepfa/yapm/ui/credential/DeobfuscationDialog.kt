@@ -159,7 +159,7 @@ object DeobfuscationDialog {
         val salt = SaltService.getSalt(context)
         val cipherAlgorithm = SecretService.getCipherAlgorithm(context)
         val obfuscationSK =
-            SecretService.generateNormalSecretKey(obfusPasswd, salt, cipherAlgorithm, context)
+            SecretService.generateSecretKeyForObfuscation(obfusPasswd, salt, cipherAlgorithm, context)
         return SecretService.secretKeyToKey(obfuscationSK, salt)
     }
 

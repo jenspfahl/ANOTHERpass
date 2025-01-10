@@ -24,7 +24,6 @@ import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.DebugInfo
 import java.math.BigInteger
 import java.security.*
-import java.security.spec.InvalidKeySpecException
 import java.security.spec.RSAPublicKeySpec
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -103,24 +102,61 @@ object SecretService {
         return Key(bytes)
     }
 
-    fun createSecretKey(data: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
+    /*
+    Generates a key without any slow-down KDF
+     */
+    fun generateSecretKey(data: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
         val sk = SecretKeySpec(data.data.copyOf(cipherAlgorithm.keyLength/8), cipherAlgorithm.keyDerivationAlgorithm)
         return SecretKeyHolder(sk, cipherAlgorithm, null, context)
     }
 
-    fun generateDefaultSecretKey(data: Key, salt: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
-        return generatePBESecretKey(Password(data), salt, PbkdfIterationService.LEGACY_PBKDF_ITERATIONS, cipherAlgorithm, context)
+    /**
+     * Generates a key not used anymore, to be downward compatible
+     */
+    fun generateLegacySecretKey(data: Key, salt: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
+        return generatePBESecretKeyForGivenIterations(Password(data), salt, PbkdfIterationService.LEGACY_PBKDF_ITERATIONS, cipherAlgorithm, context)
     }
 
-    fun generateStrongSecretKey(password: Password, salt: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
-        return generatePBESecretKey(password, salt, getStoredPbkdfIterations(), cipherAlgorithm, context)
+    /**
+     * Generates a key exclusively used for Master Password Tokens. Uses a KDF with a low number of iterations (not really needed but also not performing significantly down the login process)
+     */
+    fun generateSecretKeyForMPT(data: Key, salt: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
+        return generatePBESecretKeyForGivenIterations(Password(data), salt, PbkdfIterationService.MPT_ITERATIONS, cipherAlgorithm, context)
     }
 
-    fun generateNormalSecretKey(password: Password, salt: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
-        return generatePBESecretKey(password, salt, 1000, cipherAlgorithm, context)
+    /**
+     * Generates a key exclusively used for obfuscation of passwords and exported master password. Uses a KDF with a very low number of iterations (not really needed but also not performing significantly down the crypt-process)
+     */
+    fun generateSecretKeyForObfuscation(password: Password, salt: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
+        return generatePBESecretKeyForGivenIterations(password, salt, 1000, cipherAlgorithm, context)
     }
 
-    fun generatePBESecretKey(password: Password, salt: Key, iterations: Int, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
+    /**
+     * Generates a key exclusively used to en- and decrypt the master key. Uses a custom KDF configured by the user (either PBKDF with custom iterations or Argon2Id with custom iterations and mem size).
+     */
+    fun generateSecretKeyForMasterKey(combinedPinAndMasterPassword: Password, salt: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
+        val useArgon2 = false
+        //TODO read users KDF settings
+        if (useArgon2) {
+            val argonDerivedKey = Argon2Service.derive(combinedPinAndMasterPassword, salt)
+            return generateSecretKey(argonDerivedKey, cipherAlgorithm, context)
+        }
+        else {
+            return generatePBESecretKeyForGivenIterations(
+                combinedPinAndMasterPassword,
+                salt,
+                getStoredPbkdfIterations(),
+                cipherAlgorithm,
+                context
+            )
+        }
+    }
+
+
+    /**
+     * Generates a key with PBKDF and the given iterations
+     */
+    fun generatePBESecretKeyForGivenIterations(password: Password, salt: Key, iterations: Int, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
         val keySpec = PBEKeySpec(password.toEncodedCharArray(), salt.data, iterations, cipherAlgorithm.keyLength)
         val factory = SecretKeyFactory.getInstance(cipherAlgorithm.keyDerivationAlgorithm)
         try {
@@ -253,7 +289,7 @@ object SecretService {
         message.update(password1.toByteArray())
         message.update(password2.toByteArray())
         val digest = message.digest()
-        val result = digest.map { it.toChar() }.toCharArray()
+        val result = digest.map { it.toInt().toChar() }.toCharArray()
 
         return Password(result)
     }

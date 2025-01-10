@@ -91,7 +91,7 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
         cipherAlgorithm: CipherAlgorithm,
         activity: SecureActivity
     ): SecretKeyHolder? {
-        val masterPassphraseSK = MasterKeyService.getMasterPassPhraseSK(
+        val masterPassphraseSK = MasterKeyService.getMasterPassPhraseSecretKey(
             loginData.pin,
             loginData.masterPassword,
             salt,
@@ -105,7 +105,7 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
             return null
         }
 
-        val masterKey = MasterKeyService.getMasterKey(masterPassphraseSK, encEncryptedMasterKey, activity)
+        val masterKey = MasterKeyService.decryptMasterKey(masterPassphraseSK, encEncryptedMasterKey, activity)
         if (masterKey == null) {
             DebugInfo.logException("VaultEnc", "cannot decrypt master key, pin wrong?")
             return null
@@ -229,7 +229,7 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
             MasterKeyService.generateMasterKey(activity)
         }
         else {
-            MasterKeyService.getMasterKey(masterPassphraseSK, encEncryptedMasterKey, activity)
+            MasterKeyService.decryptMasterKey(masterPassphraseSK, encEncryptedMasterKey, activity)
         }
         if (masterKey == null) {
             DebugInfo.logException("VaultEnc", "stored master key not valid")
@@ -253,12 +253,12 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
         PreferenceService.putCurrentDate(PreferenceService.DATA_MK_MODIFIED_AT, activity)
 
         val newMasterPassphraseSK =
-            MasterKeyService.getMasterPassPhraseSK(
+            MasterKeyService.getMasterPassPhraseSecretKey(
                 input.loginData.pin, input.loginData.masterPassword, salt, input.newCipherAlgorithm, activity)
 
         val vaultVersion = PreferenceService.getAsInt(PreferenceService.DATA_VAULT_VERSION, activity)
         val useLegacyGeneration = vaultVersion < Constants.FAST_KEYGEN_VAULT_VERSION
-        return MasterKeyService.getMasterSK(newMasterPassphraseSK, salt, newEncryptedMasterKey, useLegacyGeneration, activity)
+        return MasterKeyService.getMasterSecretKey(newMasterPassphraseSK, salt, newEncryptedMasterKey, useLegacyGeneration, activity)
     }
 
 }

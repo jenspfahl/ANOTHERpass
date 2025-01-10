@@ -11,6 +11,7 @@ object PbkdfIterationService {
 
     const val MIN_PBKDF_ITERATIONS = 10_000
     const val LEGACY_PBKDF_ITERATIONS = 65_536
+    const val MPT_ITERATIONS = 65_536
     const val DEFAULT_PBKDF_ITERATIONS = 100_000
     const val MAX_PBKDF_ITERATIONS = 2_000_000 + MIN_PBKDF_ITERATIONS
 

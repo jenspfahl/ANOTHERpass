@@ -15,9 +15,10 @@ import de.jepfa.yapm.util.Constants.MASTER_KEY_BYTE_SIZE
 object MasterKeyService {
 
     /**
-     * Returns the Master passphrase which is calculated of the users Master Pin and his Master password
+     * Returns the Master passphrase as Secret Key which is calculated from the user's Master Pin and Master password
+     * to decrypt or encrypt the actual master key.
      */
-    fun getMasterPassPhraseSK(
+    fun getMasterPassPhraseSecretKey(
         masterPin: Password,
         masterPassword: Password,
         salt: Key,
@@ -25,26 +26,29 @@ object MasterKeyService {
         context: Context
     ): SecretKeyHolder {
         val masterPassPhrase = SecretService.conjunctPasswords(masterPin, masterPassword, salt)
-        val masterPassPhraseSK = SecretService.generateStrongSecretKey(masterPassPhrase, salt, cipherAlgorithm, context)
+        val masterPassPhraseSK = SecretService.generateSecretKeyForMasterKey(masterPassPhrase, salt, cipherAlgorithm, context)
         masterPassPhrase.clear()
 
         return masterPassPhraseSK
     }
 
     /**
-     * Returns the Master Secret Key which is encrypted twice, first with the Android key
-     * and second with the PassPhrase key.
+     * Returns the Master Secret Key which is directly used de- and encrypt vault data like credentials
      */
-    fun getMasterSK(masterPassPhraseSK: SecretKeyHolder,
-                    salt: Key,
-                    storedEncMasterKey: Encrypted,
-                    useLegacyGeneration: Boolean,
-                    context: Context
+    fun getMasterSecretKey(masterPassPhraseSK: SecretKeyHolder,
+                           salt: Key,
+                           storedEncMasterKey: Encrypted,
+                           useLegacyGeneration: Boolean,
+                           context: Context
     ): SecretKeyHolder? {
-        val masterKey = getMasterKey(masterPassPhraseSK, storedEncMasterKey, context) ?: return null
+        val masterKey = decryptMasterKey(masterPassPhraseSK, storedEncMasterKey, context) ?: return null
         val masterSK =
-            if (useLegacyGeneration) SecretService.generateDefaultSecretKey(masterKey, salt, masterPassPhraseSK.cipherAlgorithm, context)
-            else SecretService.createSecretKey(masterKey, masterPassPhraseSK.cipherAlgorithm, context)
+            if (useLegacyGeneration) {  // vaults with version 1 use this. KDF doesn't bring any security win but slowing the login process down
+                SecretService.generateLegacySecretKey(masterKey, salt, masterPassPhraseSK.cipherAlgorithm, context)
+            }
+            else { // vaults >= version 2 use no KDF since this happened already on the master password + pin (masterPassPhraseSK)
+                SecretService.generateSecretKey(masterKey, masterPassPhraseSK.cipherAlgorithm, context)
+            }
         masterKey.clear()
 
         return masterSK
@@ -54,7 +58,11 @@ object MasterKeyService {
         return generateRandomKey(MASTER_KEY_BYTE_SIZE, context)
     }
 
-    fun getMasterKey(masterPassPhraseSK: SecretKeyHolder, storedEncMasterKey: Encrypted, context: Context): Key? {
+    /**
+     * Returns the Master Key which is encrypted twice, first with the Android key
+     * and second with the PassPhrase key.
+     */
+    fun decryptMasterKey(masterPassPhraseSK: SecretKeyHolder, storedEncMasterKey: Encrypted, context: Context): Key? {
         val androidSK = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_MK, context)
 
         val encMasterKey = SecretService.decryptEncrypted(androidSK, storedEncMasterKey)
@@ -80,7 +88,7 @@ object MasterKeyService {
 
         val mkSK = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_MK, context)
         val masterPassphrase = SecretService.conjunctPasswords(pin, masterPasswd, salt)
-        val masterPassphraseSK = SecretService.generateStrongSecretKey(masterPassphrase, salt, cipherAlgorithm, context)
+        val masterPassphraseSK = SecretService.generateSecretKeyForMasterKey(masterPassphrase, salt, cipherAlgorithm, context)
         masterPassphrase.clear()
 
         val pdkdfIterationsAsBase64String = PbkdfIterationService.toBase64String(pdkdfIterations)

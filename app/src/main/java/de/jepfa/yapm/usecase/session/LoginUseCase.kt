@@ -24,10 +24,10 @@ object LoginUseCase: InputUseCase<LoginData, BaseActivity>() {
             PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, baseActivity)
                 ?: return false
         val masterPassPhraseSK =
-            MasterKeyService.getMasterPassPhraseSK(loginData.pin, loginData.masterPassword, salt, cipherAlgorithm, baseActivity)
+            MasterKeyService.getMasterPassPhraseSecretKey(loginData.pin, loginData.masterPassword, salt, cipherAlgorithm, baseActivity)
         val vaultVersion = PreferenceService.getAsInt(PreferenceService.DATA_VAULT_VERSION, baseActivity)
         val useLegacyGeneration = vaultVersion < Constants.FAST_KEYGEN_VAULT_VERSION
-        val masterSecretKey = MasterKeyService.getMasterSK(
+        val masterSecretKey = MasterKeyService.getMasterSecretKey(
             masterPassPhraseSK,
             salt,
             encMasterKey,

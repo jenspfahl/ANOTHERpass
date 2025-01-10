@@ -8,11 +8,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
 import android.os.Build
-import android.widget.EditText
 import androidx.core.net.toUri
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.encrypted.EncCredential
-import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
@@ -24,10 +21,8 @@ import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.usecase.OutputUseCase
 import de.jepfa.yapm.usecase.UseCase
 import de.jepfa.yapm.usecase.UseCaseOutput
-import de.jepfa.yapm.usecase.credential.ExportCredentialUseCase.ExportMode
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.FileUtil
 import de.jepfa.yapm.util.toastText
@@ -171,7 +166,7 @@ object ExportPlainCredentialsUseCase: UseCase<ExportPlainCredentialsUseCase.Inpu
 
         val cipherAlgorithm = SecretService.getCipherAlgorithm(context)
         val salt = SaltService.getSalt(context)
-        val masterPassphraseSK = MasterKeyService.getMasterPassPhraseSK(
+        val masterPassphraseSK = MasterKeyService.getMasterPassPhraseSecretKey(
             currentPin,
             currentMasterPassword,
             salt,
@@ -179,7 +174,7 @@ object ExportPlainCredentialsUseCase: UseCase<ExportPlainCredentialsUseCase.Inpu
             context,
         )
 
-        MasterKeyService.getMasterKey(masterPassphraseSK, encEncryptedMasterKey, context)
+        MasterKeyService.decryptMasterKey(masterPassphraseSK, encEncryptedMasterKey, context)
                 ?: return context.getString(R.string.pin_wrong)
         return null
     }

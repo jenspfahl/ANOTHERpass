@@ -130,6 +130,9 @@ dependencies {
     implementation("app.keemobile:kotpass:0.10.0")
     implementation("com.squareup.okio:okio:3.9.0") //Needed for Meta for kotpass
 
+    // Argon2 support
+    implementation 'com.lambdapioneer.argon2kt:argon2kt:1.6.0'
+
     // Testing
     testImplementation "junit:junit:$rootProject.junitVersion"
     androidTestImplementation "androidx.arch.core:core-testing:2.2.0"

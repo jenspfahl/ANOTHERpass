@@ -126,7 +126,7 @@ object MasterPasswordService {
      */
     fun generateEncMasterPasswdSKForExport(context: Context): SecretKeyHolder {
         val saltAsPasswd = Password(SaltService.getSalt(context))
-        val empSK = SecretService.generateNormalSecretKey(saltAsPasswd, EMP_SALT, DEFAULT_CIPHER_ALGORITHM, context)
+        val empSK = SecretService.generateSecretKeyForObfuscation(saltAsPasswd, EMP_SALT, DEFAULT_CIPHER_ALGORITHM, context)
 
         saltAsPasswd.clear()
         return empSK

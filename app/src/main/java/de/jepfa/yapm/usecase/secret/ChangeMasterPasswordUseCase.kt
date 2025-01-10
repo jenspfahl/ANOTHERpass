@@ -1,13 +1,11 @@
 package de.jepfa.yapm.usecase.secret
 
-import android.util.Log
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.*
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.InputUseCase
 import de.jepfa.yapm.usecase.session.LoginUseCase
-import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.DebugInfo
 
 object ChangeMasterPasswordUseCase:
@@ -24,7 +22,7 @@ object ChangeMasterPasswordUseCase:
             return false
         }
         val cipherAlgorithm = SecretService.getCipherAlgorithm(activity)
-        val oldMasterPassphraseSK = MasterKeyService.getMasterPassPhraseSK(
+        val oldMasterPassphraseSK = MasterKeyService.getMasterPassPhraseSecretKey(
             loginData.pin,
             currentMasterPassword,
             salt,
@@ -39,7 +37,7 @@ object ChangeMasterPasswordUseCase:
             return false
         }
 
-        val masterKey = MasterKeyService.getMasterKey(oldMasterPassphraseSK, encEncryptedMasterKey, activity)
+        val masterKey = MasterKeyService.decryptMasterKey(oldMasterPassphraseSK, encEncryptedMasterKey, activity)
         if (masterKey == null) {
             DebugInfo.logException(TAG, "cannot decrypt master key, pin wrong?")
             return false

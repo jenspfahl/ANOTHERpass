@@ -20,7 +20,7 @@ object BenchmarkLoginIterationsUseCase: UseCase<BenchmarkLoginIterationsUseCase.
     override suspend fun execute(input: Input, activity: BaseActivity): UseCaseOutput<Long> {
 
         val startMillis = System.currentTimeMillis()
-        SecretService.generatePBESecretKey(
+        SecretService.generatePBESecretKeyForGivenIterations(
             Password("dummydummydummydummydummydummy"),
             Key("saltysaltysaltysaltysaltysalty".toByteArray()),
             input.iterations,

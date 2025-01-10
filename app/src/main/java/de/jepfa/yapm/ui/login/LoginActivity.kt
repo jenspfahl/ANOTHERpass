@@ -387,7 +387,7 @@ class LoginActivity : NfcBaseActivity() {
             val cipherAlgorithm = SecretService.getCipherAlgorithm(this)
 
             val mptSK =
-                SecretService.generateDefaultSecretKey(masterPasswordTokenKey, salt, cipherAlgorithm, this)
+                SecretService.generateSecretKeyForMPT(masterPasswordTokenKey, salt, cipherAlgorithm, this)
 
             val masterPassword =
                 SecretService.decryptPassword(mptSK, mpt)
