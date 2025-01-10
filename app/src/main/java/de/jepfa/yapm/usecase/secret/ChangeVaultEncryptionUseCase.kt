@@ -19,6 +19,7 @@ import de.jepfa.yapm.usecase.UseCaseOutput
 import de.jepfa.yapm.usecase.session.LoginUseCase
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 
 object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.Input, SecureActivity>() {
 
@@ -100,13 +101,13 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
         val encEncryptedMasterKey =
             PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, activity)
         if (encEncryptedMasterKey == null) {
-            Log.e(LOG_PREFIX + "VaultEnc", "master key not on device")
+            DebugInfo.logException("VaultEnc", "master key not on device")
             return null
         }
 
         val masterKey = MasterKeyService.getMasterKey(masterPassphraseSK, encEncryptedMasterKey, activity)
         if (masterKey == null) {
-            Log.e(LOG_PREFIX + "VaultEnc", "cannot decrypt master key, pin wrong?")
+            DebugInfo.logException("VaultEnc", "cannot decrypt master key, pin wrong?")
             return null
         }
         masterKey.clear()
@@ -214,7 +215,7 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
         val encEncryptedMasterKey =
             PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, activity)
         if (encEncryptedMasterKey == null) {
-            Log.e(LOG_PREFIX + "VaultEnc", "master key not on device")
+            DebugInfo.logException("VaultEnc", "master key not on device")
             return null
         }
 
@@ -231,7 +232,7 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
             MasterKeyService.getMasterKey(masterPassphraseSK, encEncryptedMasterKey, activity)
         }
         if (masterKey == null) {
-            Log.e(LOG_PREFIX + "VaultEnc", "stored master key not valid")
+            DebugInfo.logException("VaultEnc", "stored master key not valid")
             return null
         }
 

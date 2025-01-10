@@ -11,6 +11,7 @@ import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.FileUtil
 import de.jepfa.yapm.util.toSimpleDateFormat
 import java.io.ByteArrayOutputStream
@@ -34,7 +35,7 @@ object CsvService {
                 line = reader.readMap()
             }
         } catch (e: Exception) {
-            Log.e(LOG_PREFIX + "CSV", "cannot parse csvfile", e)
+            DebugInfo.logException("CSV", "cannot parse csvfile", e)
             return null
         }
         return resultList
@@ -47,11 +48,11 @@ object CsvService {
             val content: String? = FileUtil.readFile(context, uri)
             if (TextUtils.isEmpty(content)) {
                 //TODO this check seems not to work from time to time
-                Log.e(LOG_PREFIX + "BACKUP", "Empty file created: $uri")
+                DebugInfo.logException("BACKUP", "Empty file created: $uri")
                 success = false
             }
         } catch (e: Exception) {
-            Log.e(LOG_PREFIX + "BACKUP", "Cannot write file $uri", e)
+            DebugInfo.logException("BACKUP", "Cannot write file $uri", e)
         }
         return success
     }

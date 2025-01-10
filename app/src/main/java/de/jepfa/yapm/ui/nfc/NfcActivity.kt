@@ -19,6 +19,7 @@ import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.getEncryptedExtra
 import de.jepfa.yapm.util.toastText
 
@@ -221,7 +222,7 @@ class NfcActivity : NfcBaseActivity() {
             toastText(this, R.string.nfc_successfully_written)
             nfcStatusTextView.text = getString(R.string.nfc_tap_again)
         } catch (e: Exception) {
-            Log.e(LOG_PREFIX + "NFC", "Cannot write tag", e)
+            DebugInfo.logException("NFC", "Cannot write tag", e)
             toastText(this, R.string.nfc_cannot_write)
         } finally {
             data.clear()

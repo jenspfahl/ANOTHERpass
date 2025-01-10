@@ -11,6 +11,7 @@ import de.jepfa.yapm.service.label.LabelService.getLabelFromEncLabel
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
@@ -176,7 +177,7 @@ class LabelsHolder {
                 .filterNotNull()
                 .toSet()
         } catch (e: NumberFormatException) {
-            Log.e(LOG_PREFIX + "LIS", "cannot parse $ids ", e)
+            DebugInfo.logException("LIS", "cannot parse $ids ", e)
             return Collections.emptySet()
         }
     }

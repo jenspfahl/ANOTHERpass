@@ -17,10 +17,17 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.util.Constants.INITIAL_VAULT_VERSION
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import java.io.*
+import java.util.Collections
+import java.util.Date
+import java.util.LinkedList
+import java.util.concurrent.ConcurrentHashMap
 
 object DebugInfo {
 
     private var debug = BuildConfig.DEBUG
+
+    private var exceptionLogger = Collections.synchronizedList(LinkedList<String>())
+    private var serverLogger = Collections.synchronizedList(LinkedList<String>())
 
     val isDebug: Boolean
         get() = debug
@@ -28,6 +35,25 @@ object DebugInfo {
     @Synchronized
     fun toggleDebug() {
         debug = !debug
+    }
+
+    fun logException(prefix: String, msg: String, e: Exception? = null) {
+        val dateTime = Date().toSimpleDateTimeFormat()
+
+        val value = if (e != null) {
+            "$dateTime : $LOG_PREFIX$prefix $msg ${e.javaClass.simpleName} ${e.message} ${e.stackTraceToString()}"
+        }
+        else {
+            "$dateTime : $LOG_PREFIX$prefix $msg"
+        }
+        exceptionLogger.add(value)
+
+        Log.e(prefix, msg, e)
+    }
+
+    fun logServer(msg: String) {
+        serverLogger.add(msg)
+        Log.i(SERVER_LOG_PREFIX, msg)
     }
 
     fun getVersionName(context: Context): String {
@@ -109,7 +135,13 @@ object DebugInfo {
         sb.addFormattedLine("Codename", Build.VERSION.CODENAME)
         sb.addFormattedLine("Security patch", Build.VERSION.SECURITY_PATCH)
 
-        sb.append("\n************ APP-ERROR-LOG ************\n")
+        sb.append("\n************ APP-EXCEPTION-LOG ************\n")
+        exceptionLogger.forEach {
+            sb.append(it)
+            sb.append(System.lineSeparator())
+        }
+
+        sb.append("\n************ APP-LOGCAT/E-LOG ************\n")
         val logs = getLogcat("", command = "-b all *:E", null)?.takeLast(4096 * 2)
         sb.append(logs)
 
@@ -121,12 +153,25 @@ object DebugInfo {
     }
 
     fun getServerLog(context: Context): String {
+        val sb = StringBuilder()
+        serverLogger.forEach {
+            sb.append(it)
+            sb.append(System.lineSeparator())
+        }
+        if (sb.isBlank()) {
+            return "no logs available"
+        }
+        else {
+            return sb.toString()
+        }
+
+        /*
         var logs = getLogcat(
             SERVER_LOG_PREFIX,
             command = "-v tag *:I",
             cutoutPrefix = "I/$SERVER_LOG_PREFIX: "
         )
-        return logs ?:"no logs available"
+        return logs ?:"no logs available"*/
     }
 
     private fun getLogcat(filter: String, command: String = "-v time *:I", cutoutPrefix: String? = null): String? {
@@ -149,7 +194,7 @@ object DebugInfo {
                 }
             }
         } catch (e: IOException) {
-            Log.e(LOG_PREFIX + "Debug","cannot gather logs", e)
+            DebugInfo.logException("Debug","cannot gather logs", e)
         }
         return null
     }
@@ -158,7 +203,7 @@ object DebugInfo {
         try {
             Runtime.getRuntime().exec("logcat -b all -c") // clear logs
         } catch (e: IOException) {
-            Log.e(LOG_PREFIX + "Debug","cannot clear logs", e)
+            DebugInfo.logException("Debug","cannot clear logs", e)
         }
     }
 }

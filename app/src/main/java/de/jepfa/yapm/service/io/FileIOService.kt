@@ -19,6 +19,7 @@ import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.FileUtil
 import de.jepfa.yapm.util.QRCodeUtil
 import de.jepfa.yapm.util.getEncryptedExtra
@@ -52,7 +53,7 @@ class FileIOService: IntentService("FileIOService") {
                 val fileOutStream = contentResolver.openOutputStream(destUri) ?: return false
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fileOutStream)
             } catch (e: IOException) {
-                Log.e(LOG_PREFIX + "TS", "cannot create file", e)
+                DebugInfo.logException("TS", "cannot create file", e)
                 false
             }
         }
@@ -64,7 +65,7 @@ class FileIOService: IntentService("FileIOService") {
         }
         val uri = intent.getParcelableExtra<Uri>(PARAM_FILE_URI)
         if (!isUriValid(uri)) {
-            Log.e(LOG_PREFIX + "IO", "invalid export URI: $uri")
+            DebugInfo.logException("IO", "invalid export URI: $uri")
             return
         }
 

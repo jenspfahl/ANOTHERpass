@@ -35,14 +35,14 @@ object FileUtil {
 
         val size = getFileSize(context, uri)?:0
         if (size > MAX_FILE_SIZE_MB) {
-            Log.e(LOG_PREFIX + "READFILE", "File too big for $uri")
+            DebugInfo.logException("READFILE", "File too big for $uri")
             return null
         }
 
         try {
             return context.contentResolver.openInputStream(uri)
         } catch (e: IOException) {
-            Log.e(LOG_PREFIX + "READFILE", "Cannot read $uri", e)
+            DebugInfo.logException("READFILE", "Cannot read $uri", e)
             return null
         }
 
@@ -52,7 +52,7 @@ object FileUtil {
 
         val size = getFileSize(context, uri)?:0
         if (size > MAX_FILE_SIZE_MB) {
-            Log.e(LOG_PREFIX + "READFILE", "File too big for $uri")
+            DebugInfo.logException("READFILE", "File too big for $uri")
             return null
         }
 
@@ -76,7 +76,7 @@ object FileUtil {
                 }
             }
         } catch (e: IOException) {
-            Log.e(LOG_PREFIX + "READFILE", "Cannot read $uri", e)
+            DebugInfo.logException("READFILE", "Cannot read $uri", e)
             return null
         }
 
@@ -120,7 +120,7 @@ object FileUtil {
                 return buffer.toByteArray()
             }
         } catch (e: IOException) {
-            Log.e(LOG_PREFIX + "READFILE", "Cannot read $uri", e)
+            DebugInfo.logException("READFILE", "Cannot read $uri", e)
             return null
         }
 
@@ -136,7 +136,7 @@ object FileUtil {
                 }
             }
         } catch (e: IOException) {
-            Log.e(LOG_PREFIX + "READFILE", "Cannot read $uri", e)
+            DebugInfo.logException("READFILE", "Cannot read $uri", e)
             return false
         }
 
@@ -150,7 +150,7 @@ object FileUtil {
                 byteStream.writeTo(os)
             }
         } catch (e: IOException) {
-            Log.e(LOG_PREFIX + "READFILE", "Cannot read $uri", e)
+            DebugInfo.logException("READFILE", "Cannot read $uri", e)
             return false
         }
 

@@ -6,6 +6,7 @@ import com.google.gson.JsonElement
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.getEncryptedExtra
 import de.jepfa.yapm.util.putEncryptedExtra
 import java.util.*
@@ -234,7 +235,7 @@ data class EncCredential(val id: Int?,
                     jsonObject.get(ATTRIB_MODIFY_TIMESTAMP)?.asLong
                 )
             } catch (e: Exception) {
-                Log.e(LOG_PREFIX + "ENCC", "cannot parse json container", e)
+                DebugInfo.logException("ENCC", "cannot parse json container", e)
                 return null
             }
         }

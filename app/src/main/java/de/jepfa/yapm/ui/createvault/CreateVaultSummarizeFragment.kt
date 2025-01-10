@@ -36,6 +36,7 @@ import de.jepfa.yapm.usecase.secret.ExportEncMasterPasswordUseCase
 import de.jepfa.yapm.usecase.vault.BenchmarkLoginIterationsUseCase
 import de.jepfa.yapm.usecase.vault.CreateVaultUseCase
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.getEncrypted
 import de.jepfa.yapm.util.toReadableFormat
@@ -65,7 +66,7 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
 
         val encMasterPasswd = arguments?.getEncrypted(ARG_ENC_MASTER_PASSWD)
         if (encMasterPasswd == null) {
-            Log.e(LOG_PREFIX + "CV", "No master passwd in extra")
+            DebugInfo.logException("CV", "No master passwd in extra")
             toastText(context, R.string.something_went_wrong)
             return
         }
@@ -156,7 +157,7 @@ class CreateVaultSummarizeFragment : BaseFragment(), AdapterView.OnItemSelectedL
 
                 val encPin = arguments?.getEncrypted(CreateVaultActivity.ARG_ENC_PIN)
                 if (encPin == null) {
-                    Log.e(LOG_PREFIX + "CV", "No pin in extra")
+                    DebugInfo.logException("CV", "No pin in extra")
                     toastText(it, R.string.something_went_wrong)
                     return@setOnClickListener
                 }

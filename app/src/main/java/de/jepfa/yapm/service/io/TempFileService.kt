@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 import java.io.File
 
 
@@ -21,7 +22,7 @@ object TempFileService {
                 return getContentUriFromFile(context, tempFile)
             }
         } catch (e: Exception) {
-            Log.e(LOG_PREFIX + "TS", "cannot create file or content uri", e)
+            DebugInfo.logException("TS", "cannot create file or content uri", e)
         }
         return null
     }
@@ -30,7 +31,7 @@ object TempFileService {
         try {
             return FileProvider.getUriForFile(context, "de.jepfa.yapm.fileprovider", file)
         } catch (e: Exception) {
-            Log.e(LOG_PREFIX + "TS", "cannot create content uri", e)
+            DebugInfo.logException("TS", "cannot create content uri", e)
         }
         return null
     }
@@ -51,7 +52,7 @@ object TempFileService {
             val sharesPath = File(context.cacheDir, SHARE_FOLDER)
             sharesPath.deleteRecursively()
         } catch (e: Exception) {
-            Log.e(LOG_PREFIX + "FS", "cannot clear shares cache", e)
+            DebugInfo.logException("FS", "cannot clear shares cache", e)
         }
     }
 

@@ -369,7 +369,7 @@ object HttpServer {
                                     webExtension.touch()
                                     activity.webExtensionViewModel.save(webExtension, activity)
                                 } catch (e: Exception) {
-                                    Log.e("HTTP", "Something went wrong!!!", e)
+                                    DebugInfo.logException("HTTP", "Something went wrong!!!", e)
                                     respondError(
                                         webClientId,
                                         HttpStatusCode.InternalServerError,
@@ -393,7 +393,7 @@ object HttpServer {
                 isHttpServerRunning = true
                 true
             } catch (e: Exception) {
-                Log.e("HTTP", e.toString())
+                DebugInfo.logException("HTTP", e.toString())
                 isHttpServerRunning = false
                 false
             }
@@ -520,7 +520,7 @@ object HttpServer {
 
                 true
             } catch (e: Exception) {
-                Log.e("HTTP", e.toString())
+                DebugInfo.logException("HTTP", e.toString())
                 false
             }
         }
@@ -552,7 +552,7 @@ object HttpServer {
             }
         }
 
-        Log.i(SERVER_LOG_PREFIX, "$header : $msg")
+        DebugInfo.logServer("$header : $msg")
     }
 
     private fun extractRequestTransportKey(sharedBaseKey: Key, webExtension: EncWebExtension, encOneTimeKeyBase64: String): Key? {

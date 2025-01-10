@@ -22,6 +22,7 @@ import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.label.Label
+import de.jepfa.yapm.util.DebugInfo
 import io.ktor.server.util.toGMTDate
 import io.ktor.util.date.toJvmDate
 import java.io.ByteArrayOutputStream
@@ -100,7 +101,7 @@ object KdbxService {
 
             return true
         } catch (e: IOException) {
-            Log.e("KDBX", "cannot export to KDBX format", e)
+            DebugInfo.logException("KDBX", "cannot export to KDBX format", e)
             return false
         }
     }
@@ -163,7 +164,7 @@ object KdbxService {
             }
             return fileRecords
         } catch (e: Exception) {
-            Log.e("KDBX", "Cannot read file", e)
+            DebugInfo.logException("KDBX", "Cannot read file", e)
             return null
         }
     }

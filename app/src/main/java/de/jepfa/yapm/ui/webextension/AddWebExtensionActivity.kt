@@ -285,7 +285,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
         masterSecretKey?.let { key ->
             val providedWebClientId = SecretService.decryptCommonString(key, webExtension.webClientId)
             if (providedWebClientId != webClientId || action != HttpServer.Action.LINKING) {
-                Log.e("HTTP", "Programming error")
+                DebugInfo.logException("HTTP", "Programming error")
                 toastText(this, R.string.something_went_wrong)
                 return toErrorResponse(HttpStatusCode.InternalServerError, "invalid action or unexpected web client")
             }
@@ -307,7 +307,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
                 Log.d("HTTP", "knownClientPubKeyFingerprintHex=$knownClientPubKeyFingerprintHex")
 
                 if (fingerprintToHex != knownClientPubKeyFingerprintHex) {
-                    Log.e("HTTP", "wrong fingerprint")
+                    DebugInfo.logException("HTTP", "wrong fingerprint")
                     return toErrorResponse(HttpStatusCode.BadRequest,"fingerprint mismatch")
                 }
                 Log.i("HTTP", "client public key approved")
@@ -315,7 +315,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
                 val remoteVaultId = message.optString("vaultId")
                 Log.d("HTTP", "remoteVaultId=$remoteVaultId")
                 if (remoteVaultId.isNotBlank() && remoteVaultId != SaltService.getVaultId(this)) {
-                    Log.e("HTTP", "relink vault id mismatch")
+                    DebugInfo.logException("HTTP", "relink vault id mismatch")
                     return toErrorResponse(HttpStatusCode.BadRequest,"relink vault id mismatch")
                 }
 

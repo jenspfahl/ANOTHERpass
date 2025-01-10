@@ -21,6 +21,7 @@ import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_SEED
 import de.jepfa.yapm.service.biometrix.BiometricUtils
 import de.jepfa.yapm.service.secret.PbkdfIterationService.getStoredPbkdfIterations
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 import java.math.BigInteger
 import java.security.*
 import java.security.spec.InvalidKeySpecException
@@ -356,12 +357,12 @@ object SecretService {
         return try {
             encrypt(secretKeyHolder, type, data)
         } catch (e: KeyStoreNotReadyException) {
-            Log.e(LOG_PREFIX + "SS", "KeyStore not ready, trying again", e)
+            DebugInfo.logException("SS", "KeyStore not ready, trying again", e)
             SystemClock.sleep(3000) // artificial wait before retry
             return try {
                 encrypt(secretKeyHolder, type, data)
             } catch (e: KeyStoreNotReadyException) {
-                Log.e(LOG_PREFIX + "SS", "KeyStore still not ready, trying again", e)
+                DebugInfo.logException("SS", "KeyStore still not ready, trying again", e)
                 SystemClock.sleep(5000) // artificial wait before last retry
                 encrypt(secretKeyHolder, type, data)
             }
@@ -413,11 +414,11 @@ object SecretService {
 
     private fun decryptData(secretKeyHolder: SecretKeyHolder, encrypted: Encrypted): ByteArray {
         if (encrypted.isEmpty()) {
-            Log.e(LOG_PREFIX + "SS", "empty encrypted")
+            DebugInfo.logException("SS", "empty encrypted")
             return FAILED_BYTE_ARRAY
         }
         if (secretKeyHolder.cipherAlgorithm != encrypted.cipherAlgorithm) {
-            Log.e(LOG_PREFIX + "SS", "cipher algorithm mismatch")
+            DebugInfo.logException("SS", "cipher algorithm mismatch")
             return FAILED_BYTE_ARRAY
         }
 
@@ -435,7 +436,7 @@ object SecretService {
             }
             return cipher.doFinal(encryptedData)
         } catch (e: GeneralSecurityException) {
-            Log.e(LOG_PREFIX + "SS", "unable to decrypt", e)
+            DebugInfo.logException("SS", "unable to decrypt", e)
             return FAILED_BYTE_ARRAY
         }
     }
@@ -470,7 +471,7 @@ object SecretService {
         try {
             return factory.getKeySpec(secretKeyHolder.secretKey, KeyInfo::class.java) as KeyInfo
         } catch (e: Exception) {
-            Log.e(LOG_PREFIX + "SS", "Asking for invalid key spec: ${secretKeyHolder.cipherAlgorithm}", e)
+            DebugInfo.logException("SS", "Asking for invalid key spec: ${secretKeyHolder.cipherAlgorithm}", e)
         }
         return null
     }

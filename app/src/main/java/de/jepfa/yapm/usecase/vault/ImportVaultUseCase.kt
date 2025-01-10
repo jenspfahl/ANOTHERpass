@@ -21,6 +21,7 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.InputUseCase
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -52,7 +53,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
 
             return success
         } catch (e: Exception) {
-            Log.e(LOG_PREFIX + "IMP", "cannot read json", e)
+            DebugInfo.logException("IMP", "cannot read json", e)
             return false
         }
     }
@@ -191,7 +192,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
 
             return ParsedVault(appVersionCode, vaultId, cipherAlgorithm, rawJson)
         } catch (e: Exception) {
-            Log.e(LOG_PREFIX + "JSON", "cannot parse JSON", e)
+            DebugInfo.logException("JSON", "cannot parse JSON", e)
             return ParsedVault(null, null, null, null)
         }
     }
@@ -264,14 +265,14 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
         val cipherAlgorithm = extractCipherAlgorithm(jsonContent)
 
         if (Build.VERSION.SDK_INT < cipherAlgorithm.supportedSdkVersion) {
-            Log.e(LOG_PREFIX + "IMPV", "Unsupported cipher algorithm $cipherAlgorithm")
+            DebugInfo.logException("IMPV", "Unsupported cipher algorithm $cipherAlgorithm")
             return false
         }
 
         val vaultVersion = jsonContent.get(VaultExportService.JSON_VAULT_VERSION)?.asInt
             ?: Constants.INITIAL_VAULT_VERSION
         if (vaultVersion > Constants.CURRENT_VERSION) {
-            Log.e(LOG_PREFIX + "IMPV", "Unsupported vault version $vaultVersion")
+            DebugInfo.logException("IMPV", "Unsupported vault version $vaultVersion")
             return false
         }
         PreferenceService.putString(PreferenceService.DATA_VAULT_VERSION, vaultVersion.toString(), activity)

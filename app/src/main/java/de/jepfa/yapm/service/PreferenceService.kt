@@ -11,6 +11,7 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 import java.text.ParsePosition
 import java.util.*
 
@@ -209,7 +210,7 @@ object PreferenceService {
                         prefs.copyTo(encPrefs)
                         prefs.clear()
                     } catch (e: Exception) {
-                        Log.e(LOG_PREFIX + "PREFS", "could not migrate to enc prefs", e)
+                        DebugInfo.logException("PREFS", "could not migrate to enc prefs", e)
                         return
                     }
                 }
@@ -385,7 +386,7 @@ object PreferenceService {
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             )
         } catch (e: Exception) {
-            Log.e(LOG_PREFIX + "PREFS", "cannot create encrypted shared preferences", e)
+            DebugInfo.logException("PREFS", "cannot create encrypted shared preferences", e)
             null
         }
     }
@@ -413,7 +414,7 @@ fun SharedPreferences.set(key: String, value: Any?) {
         is Set<*>? -> edit { it.putStringSet(key, value?.map { it.toString() }?.toSet()) }
         is Boolean -> edit { it.putBoolean(key, value) }
         else -> {
-            Log.e(LOG_PREFIX + "PREFS", "Unsupported Type: $value")
+            DebugInfo.logException("PREFS", "Unsupported Type: $value")
         }
     }
 }

@@ -7,6 +7,7 @@ import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.toUUIDFromBase64String
 
 
@@ -67,7 +68,7 @@ data class PlainShareableCredential(val ui: String?,
                     jsonObject.get(ATTRIB_EXPIRES_AT)?.asLong,
                 )
             } catch (e: Exception) {
-                Log.e(LOG_PREFIX + "PCR", "cannot parse json container", e)
+                DebugInfo.logException("PCR", "cannot parse json container", e)
                 return null
             }
         }

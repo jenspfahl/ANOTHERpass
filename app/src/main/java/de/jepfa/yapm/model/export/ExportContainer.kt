@@ -3,6 +3,7 @@ package de.jepfa.yapm.model.export
 import android.util.Log
 import com.google.gson.JsonElement
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 
 val TYPE_ENC_CREDENTIAL_RECORD = "ECR"
 val TYPE_PLAIN_CREDENTIAL_RECORD = "PCR"
@@ -19,7 +20,7 @@ data class ExportContainer(val t: String, val c: Any) {
                 val contentAsJson = jsonObject.get(ATTRIB_CONTENT)
                 val content = createContent(type, contentAsJson)
                 if (content == null) {
-                    Log.e(LOG_PREFIX + "EXC", "cannot parse json container content object")
+                    DebugInfo.logException("EXC", "cannot parse json container content object")
                     return null
                 }
                 ExportContainer(
@@ -27,7 +28,7 @@ data class ExportContainer(val t: String, val c: Any) {
                     content
                 )
             } catch (e: Exception) {
-                Log.e(LOG_PREFIX + "EXC", "cannot parse json container", e)
+                DebugInfo.logException("EXC", "cannot parse json container", e)
                 null
             }
         }

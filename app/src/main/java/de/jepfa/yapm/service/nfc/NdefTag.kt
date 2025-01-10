@@ -8,6 +8,7 @@ import android.nfc.tech.NdefFormatable
 import android.util.Log
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 import java.io.IOException
 import java.util.*
 
@@ -95,7 +96,7 @@ class NdefTag @Throws(FormatException::class) constructor(val tag: Tag, val data
         try {
             ndef?.close() ?: ndefFormatable?.close()
         } catch (e: Exception) {
-            Log.e(LOG_PREFIX + "NFC", "cannot close", e)
+            DebugInfo.logException("NFC", "cannot close", e)
         }
     }
 

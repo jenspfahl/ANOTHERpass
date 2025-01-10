@@ -3,6 +3,7 @@ package de.jepfa.yapm.model.encrypted
 import android.util.Log
 import com.google.gson.JsonElement
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 
 data class EncUsernameTemplate(val id: Int?,
                                var username: Encrypted,
@@ -45,7 +46,7 @@ data class EncUsernameTemplate(val id: Int?,
                     jsonObject.get(ATTRIB_GENERATOR_TYPE).asString,
                 )
             } catch (e: Exception) {
-                Log.e(LOG_PREFIX + "ENCL", "cannot parse json container", e)
+                DebugInfo.logException("ENCL", "cannot parse json container", e)
                 null
             }
         }

@@ -17,6 +17,7 @@ import de.jepfa.yapm.service.biometrix.BiometricCallback
 import de.jepfa.yapm.service.biometrix.BiometricManagerVX
 import de.jepfa.yapm.service.biometrix.BiometricUtils
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.toastText
 import javax.crypto.Cipher
 import javax.crypto.spec.GCMParameterSpec
@@ -178,7 +179,7 @@ object MasterPasswordService {
 
             })
         } catch (e: Exception) {
-            Log.e(LOG_PREFIX + "MPS", "cannot encrypt with biometric", e)
+            DebugInfo.logException("MPS", "cannot encrypt with biometric", e)
             toastText(context, R.string.biometric_failed)
             deleteStoredMasterPassword(context)
             handleNothingStored()
@@ -221,7 +222,7 @@ object MasterPasswordService {
 
             })
         } catch (e: Exception) {
-            Log.e(LOG_PREFIX + "MPS", "cannot decrypt with biometric", e)
+            DebugInfo.logException("MPS", "cannot decrypt with biometric", e)
             toastText(context, R.string.biometric_failed)
             deleteStoredMasterPassword(context)
             handleNothingReceived()
@@ -250,7 +251,7 @@ object MasterPasswordService {
                 encryptedData,
                 DEFAULT_CIPHER_ALGORITHM)
         } catch (e: Exception) {
-            Log.e(LOG_PREFIX + "EMPS", "unable to encrypt stored EMP")
+            DebugInfo.logException("EMPS", "unable to encrypt stored EMP")
             return null
         }
     }
@@ -260,7 +261,7 @@ object MasterPasswordService {
             val decrypted = cipher.doFinal(encrypted.data)
             return Password(decrypted)
         } catch (e: Exception) {
-            Log.e(LOG_PREFIX + "EMPS", "unable to decrypt stored EMP")
+            DebugInfo.logException("EMPS", "unable to decrypt stored EMP")
             return null
         }
     }

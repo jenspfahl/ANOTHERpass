@@ -15,6 +15,7 @@ import com.journeyapps.barcodescanner.*
 import com.journeyapps.barcodescanner.CaptureActivity
 import de.jepfa.yapm.R
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.FileUtil
 import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.toastText
@@ -93,7 +94,7 @@ class CaptureActivity: CaptureActivity() {
                             }
                         }
                     } catch (e: Exception) {
-                        Log.e(LOG_PREFIX + "SCAN_QR", "cannot import file $selectedFile", e)
+                        DebugInfo.logException("SCAN_QR", "cannot import file $selectedFile", e)
                     }
                 }
             }
@@ -111,7 +112,7 @@ class CaptureActivity: CaptureActivity() {
         try {
             return reader.decode(bitmap)?.text
         } catch (e: Exception) {
-            Log.e(LOG_PREFIX + "SCAN_QR", "Error scanning file: ${e.message}", e)
+            DebugInfo.logException("SCAN_QR", "Error scanning file: ${e.message}", e)
         }
         return null
     }
