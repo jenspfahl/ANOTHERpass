@@ -38,7 +38,13 @@ object PreferenceService {
     const val DATA_CIPHER_ALGORITHM = DATA_PREFIX + "cipher_algorithm"
     const val DATA_SALT = DATA_PREFIX + "aslt"
     const val DATA_ENCRYPTED_SEED = DATA_PREFIX + "seed"
+
+    const val DATA_USED_KDF_ID = DATA_PREFIX + "used_kdf_id"
     const val DATA_PBKDF_ITERATIONS = DATA_PREFIX + "pbkdf_iterations"
+    const val DATA_ARGON2_ITERATIONS = DATA_PREFIX + "argon2_iterations"
+    const val DATA_ARGON2_KIB = DATA_PREFIX + "argon2_kib"
+    const val DATA_ARGON2_PARALLELISM = DATA_PREFIX + "argon2_parallelism"
+
     const val DATA_ENCRYPTED_MASTER_PASSWORD = DATA_PREFIX + "mpwd"
     const val DATA_ENCRYPTED_MASTER_KEY = DATA_PREFIX + "enmk"
     const val DATA_MASTER_PASSWORD_TOKEN_KEY = DATA_PREFIX + "mpt"

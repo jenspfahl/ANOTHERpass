@@ -45,6 +45,16 @@
     <string name="CIPHER_BLOWFISH_256_desc">This is an alternative encryption with better security but less performance. It is supposed to be harder to crack than AES but therefore slower. Supported by Android 2.3 and higher.</string>
     <string name="CIPHER_CHACHACHA20_256_desc">This is another alternative encryption with around the same security like AES but supposed to be faster. Supported by Android 9 and higher.</string>
 
+    <string name="KDF_PBKDF">PBKDF</string>
+    <string name="KDF_ARGON2_ID">Argon2Id</string>
+    <string name="KDF_ARGON2_I">Argon2i</string>
+    <string name="KDF_ARGON2_D">Argon2d</string>
+
+    <string name="KDF_PBKDF_desc">Built-In PBKDF</string>
+    <string name="KDF_ARGON2_ID_desc">Argon2Id desc</string>
+    <string name="KDF_ARGON2_I_desc">Argon2i desc</string>
+    <string name="KDF_ARGON2_D_desc">Argon2d desc</string>
+
     <string name="change">Edit</string>
     <string name="duplicate">Duplicate</string>
     <string name="delete">Delete</string>

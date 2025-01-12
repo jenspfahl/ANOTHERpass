@@ -16,7 +16,7 @@ import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.secret.MasterPasswordService
-import de.jepfa.yapm.service.secret.PbkdfIterationService
+import de.jepfa.yapm.service.secret.KdfParameterService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.ChangeKeyboardForPinManager
 import de.jepfa.yapm.ui.SecureActivity
@@ -82,19 +82,19 @@ class ChangeEncryptionActivity : SecureActivity(), AdapterView.OnItemSelectedLis
 
         }
 
-        val iterationsSlider = findViewById<Slider>(R.id.login_iterations_selection)
-        val iterationsSelectionView = findViewById<TextView>(R.id.current_iterations_selection)
-        iterationsSlider.addOnChangeListener(Slider.OnChangeListener { slider, value, fromUser ->
-            val iterations = PbkdfIterationService.mapPercentageToIterations(value)
-            iterationsSelectionView.text = iterations.toReadableFormat() + " " + getString(R.string.login_iterations)
+        val pbkdfIterationsSlider = findViewById<Slider>(R.id.login_pbkdf_iterations_selection)
+        val pbkdfIterationsSelectionView = findViewById<TextView>(R.id.current_pbkdf_iterations_selection)
+        pbkdfIterationsSlider.addOnChangeListener(Slider.OnChangeListener { slider, value, fromUser ->
+            val iterations = KdfParameterService.mapPercentageToPbkdfIterations(value)
+            pbkdfIterationsSelectionView.text = iterations.toReadableFormat() + " " + getString(R.string.login_iterations)
         })
 
-        val currentIterations = PbkdfIterationService.getStoredPbkdfIterations()
-        iterationsSlider.value = PbkdfIterationService.mapIterationsToPercentage(currentIterations)
-        iterationsSelectionView.text = currentIterations.toReadableFormat() + " " + getString(R.string.login_iterations)
+        val currentIterations = KdfParameterService.getStoredPbkdfIterations()
+        pbkdfIterationsSlider.value = KdfParameterService.mapPbkdfIterationsToPercentage(currentIterations)
+        pbkdfIterationsSelectionView.text = currentIterations.toReadableFormat() + " " + getString(R.string.login_iterations)
 
         findViewById<Button>(R.id.button_test_login_time).setOnClickListener {
-            val iterations = PbkdfIterationService.mapPercentageToIterations(iterationsSlider.value)
+            val iterations = KdfParameterService.mapPercentageToPbkdfIterations(pbkdfIterationsSlider.value)
             val input = BenchmarkLoginIterationsUseCase.Input(iterations, selectedCipherAlgorithm)
 
             if (askForBenchmarking) {
@@ -113,7 +113,7 @@ class ChangeEncryptionActivity : SecureActivity(), AdapterView.OnItemSelectedLis
         val changeButton = findViewById<Button>(R.id.button_change)
         changeButton.setOnClickListener {
 
-            val newIterations = PbkdfIterationService.mapPercentageToIterations(iterationsSlider.value)
+            val newIterations = KdfParameterService.mapPercentageToPbkdfIterations(pbkdfIterationsSlider.value)
             Log.d(LOG_PREFIX + "ITERATIONS", "final iterations=$newIterations")
             val currentPin = Password(currentPinTextView.text)
 

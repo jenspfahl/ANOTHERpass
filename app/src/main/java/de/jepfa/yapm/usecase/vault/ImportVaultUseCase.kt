@@ -13,7 +13,7 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.service.secret.AndroidKey
-import de.jepfa.yapm.service.secret.PbkdfIterationService
+import de.jepfa.yapm.service.secret.KdfParameterService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
@@ -292,9 +292,9 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
 
             val payload = encryptedMK.type?.payload
             if (payload != null) {
-                val pbkdfIterations = PbkdfIterationService.fromBase64String(payload)
+                val pbkdfIterations = KdfParameterService.fromBase64String(payload)
                 if (pbkdfIterations != null) {
-                    PbkdfIterationService.storePbkdfIterations(pbkdfIterations)
+                    KdfParameterService.storePbkdfIterations(pbkdfIterations)
                 }
                 else {
                     Log.w(LOG_PREFIX + "IMP", "Cannot parse login iterations: $payload")

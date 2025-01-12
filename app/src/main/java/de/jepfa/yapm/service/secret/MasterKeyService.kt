@@ -91,7 +91,7 @@ object MasterKeyService {
         val masterPassphraseSK = SecretService.generateSecretKeyForMasterKey(masterPassphrase, salt, cipherAlgorithm, context)
         masterPassphrase.clear()
 
-        val pdkdfIterationsAsBase64String = PbkdfIterationService.toBase64String(pdkdfIterations)
+        val pdkdfIterationsAsBase64String = KdfParameterService.toBase64String(pdkdfIterations)
         val encryptedMasterKey = SecretService.encryptKey(EncryptedType(ENC_MASTER_KEY, pdkdfIterationsAsBase64String), masterPassphraseSK, masterKey)
 
         val encEncryptedMasterKey = SecretService.encryptEncrypted(mkSK, encryptedMasterKey)

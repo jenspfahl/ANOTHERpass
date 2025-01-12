@@ -9,7 +9,7 @@ import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.MasterKeyService
-import de.jepfa.yapm.service.secret.PbkdfIterationService
+import de.jepfa.yapm.service.secret.KdfParameterService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
@@ -31,7 +31,7 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
     fun openDialog(input: Input, activity: SecureActivity, postHandler: (backgroundResult: UseCaseOutput<Unit>) -> Unit) {
 
         val currentCipherAlgorithm = SecretService.getCipherAlgorithm(activity)
-        val currentIterations = PbkdfIterationService.getStoredPbkdfIterations()
+        val currentIterations = KdfParameterService.getStoredPbkdfIterations()
 
         val messageId = if (currentCipherAlgorithm == input.newCipherAlgorithm
             && !input.generateNewMasterKey
@@ -64,7 +64,7 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
             checkAndGetMasterPassphraseSK(input.loginData, salt, currentCipherAlgorithm, activity)
                 ?: return false
 
-         val currentIterations = PbkdfIterationService.getStoredPbkdfIterations()
+         val currentIterations = KdfParameterService.getStoredPbkdfIterations()
          if (currentCipherAlgorithm != input.newCipherAlgorithm
              || input.generateNewMasterKey
              || currentIterations != input.pbkdfIterations) {
@@ -236,7 +236,7 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
             return null
         }
 
-        PbkdfIterationService.storePbkdfIterations(input.pbkdfIterations)
+        KdfParameterService.storePbkdfIterations(input.pbkdfIterations)
         Log.d(LOG_PREFIX + "ITERATIONS", "store changed iterations=${input.pbkdfIterations}")
 
         val newEncryptedMasterKey = MasterKeyService.encryptAndStoreMasterKey(

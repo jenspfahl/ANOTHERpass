@@ -19,7 +19,7 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_SEED
 import de.jepfa.yapm.service.biometrix.BiometricUtils
-import de.jepfa.yapm.service.secret.PbkdfIterationService.getStoredPbkdfIterations
+import de.jepfa.yapm.service.secret.KdfParameterService.getStoredPbkdfIterations
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.DebugInfo
 import java.math.BigInteger
@@ -114,14 +114,14 @@ object SecretService {
      * Generates a key not used anymore, to be downward compatible
      */
     fun generateLegacySecretKey(data: Key, salt: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
-        return generatePBESecretKeyForGivenIterations(Password(data), salt, PbkdfIterationService.LEGACY_PBKDF_ITERATIONS, cipherAlgorithm, context)
+        return generatePBESecretKeyForGivenIterations(Password(data), salt, KdfParameterService.LEGACY_PBKDF_ITERATIONS, cipherAlgorithm, context)
     }
 
     /**
      * Generates a key exclusively used for Master Password Tokens. Uses a KDF with a low number of iterations (not really needed but also not performing significantly down the login process)
      */
     fun generateSecretKeyForMPT(data: Key, salt: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
-        return generatePBESecretKeyForGivenIterations(Password(data), salt, PbkdfIterationService.MPT_ITERATIONS, cipherAlgorithm, context)
+        return generatePBESecretKeyForGivenIterations(Password(data), salt, KdfParameterService.MPT_PBKDF_ITERATIONS, cipherAlgorithm, context)
     }
 
     /**

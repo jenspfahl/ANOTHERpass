@@ -43,7 +43,7 @@ object ChangeMasterPasswordUseCase:
             return false
         }
 
-        val pbkdfIterations = PbkdfIterationService.getStoredPbkdfIterations()
+        val pbkdfIterations = KdfParameterService.getStoredPbkdfIterations()
 
         MasterKeyService.encryptAndStoreMasterKey(
             masterKey,
