@@ -24,19 +24,22 @@ import de.jepfa.yapm.util.DebugInfo
 object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.Input, SecureActivity>() {
 
     data class Input(val loginData: LoginData,
-                     val pbkdfIterations: Int,
+                     val kdfConfig: KdfConfig,
                      val newCipherAlgorithm: CipherAlgorithm,
                      val generateNewMasterKey: Boolean)
 
     fun openDialog(input: Input, activity: SecureActivity, postHandler: (backgroundResult: UseCaseOutput<Unit>) -> Unit) {
 
         val currentCipherAlgorithm = SecretService.getCipherAlgorithm(activity)
-        val currentIterations = KdfParameterService.getStoredPbkdfIterations()
+        val currentKdfConfig = SecretService.getStoredKdfConfig(activity)
 
-        val messageId = if (currentCipherAlgorithm == input.newCipherAlgorithm
-            && !input.generateNewMasterKey
-            && currentIterations != input.pbkdfIterations) {
-            //only iterations has been changed, no need to renew the whole vault but only the master key
+        val messageId = if (onlyNeedsToRecryptMasterSK(
+                input,
+                currentCipherAlgorithm,
+                currentKdfConfig
+            )
+        ) {
+            //only KDF config has been changed, no need to renew the whole vault but only the master key
             R.string.message_change_iterations
         }
         else {
@@ -55,7 +58,15 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
 
     }
 
-     override suspend fun doExecute(input: Input, activity: SecureActivity): Boolean {
+    private fun onlyNeedsToRecryptMasterSK(
+        input: Input,
+        currentCipherAlgorithm: CipherAlgorithm,
+        currentKdfConfig: KdfConfig
+    ) = (currentCipherAlgorithm == input.newCipherAlgorithm
+                && !input.generateNewMasterKey
+                && (currentKdfConfig != input.kdfConfig))
+
+    override suspend fun doExecute(input: Input, activity: SecureActivity): Boolean {
         val salt = SaltService.getSalt(activity)
         val currentCipherAlgorithm = SecretService.getCipherAlgorithm(activity)
 
@@ -64,12 +75,17 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
             checkAndGetMasterPassphraseSK(input.loginData, salt, currentCipherAlgorithm, activity)
                 ?: return false
 
-         val currentIterations = KdfParameterService.getStoredPbkdfIterations()
+         val currentKdfConfig = SecretService.getStoredKdfConfig(activity)
+
          if (currentCipherAlgorithm != input.newCipherAlgorithm
              || input.generateNewMasterKey
-             || currentIterations != input.pbkdfIterations) {
+             || currentKdfConfig != input.kdfConfig) {
 
-            val success = if (currentCipherAlgorithm == input.newCipherAlgorithm && !input.generateNewMasterKey) {
+            val success = if (onlyNeedsToRecryptMasterSK(
+                    input,
+                    currentCipherAlgorithm,
+                    currentKdfConfig
+                )) {
                 //only iterations has been changed, no need to renew the whole vault but only the master key
                 renewMasterSK(masterPassphraseSK, input, salt, activity) != null
             }
@@ -236,15 +252,15 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
             return null
         }
 
-        KdfParameterService.storePbkdfIterations(input.pbkdfIterations)
-        Log.d(LOG_PREFIX + "ITERATIONS", "store changed iterations=${input.pbkdfIterations}")
+        input.kdfConfig.persist(activity)
+        Log.d(LOG_PREFIX + "ITERATIONS", "store changed iterations=${input.kdfConfig}")
 
         val newEncryptedMasterKey = MasterKeyService.encryptAndStoreMasterKey(
             masterKey,
             input.loginData.pin,
             input.loginData.masterPassword,
             salt,
-            input.pbkdfIterations,
+            input.kdfConfig,
             input.newCipherAlgorithm,
             activity
         )

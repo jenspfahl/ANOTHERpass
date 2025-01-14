@@ -17,6 +17,7 @@ import com.google.android.material.slider.Slider
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm.Companion.getPreferredCipher
+import de.jepfa.yapm.model.encrypted.KdfConfig
 import de.jepfa.yapm.model.encrypted.KeyDerivationFunction
 import de.jepfa.yapm.model.encrypted.PREFERRED_KDF
 import de.jepfa.yapm.model.secret.Password
@@ -211,7 +212,20 @@ class CreateVaultSummarizeFragment : BaseFragment() {
         view.findViewById<Button>(R.id.button_test_login_time).setOnClickListener {
             getBaseActivity()?.let { activity ->
                 val iterations = KdfParameterService.mapPercentageToPbkdfIterations(pbkdfIterationsSlider.value)
-                val input = BenchmarkLoginIterationsUseCase.Input(iterations, cipherAlgorithm)
+                val input = if (isArgon2())
+                    BenchmarkLoginIterationsUseCase.Input(
+                        KdfConfig(
+                            kdfAlgorithm,
+                            argon2IterationsSlider.value.toInt(),
+                            argon2MemSlider.value.toInt()),
+                        cipherAlgorithm)
+                else
+                    BenchmarkLoginIterationsUseCase.Input(
+                        KdfConfig(
+                            kdfAlgorithm,
+                            iterations,
+                            null),
+                        cipherAlgorithm)
                 if (askForBenchmarking) {
                     BenchmarkLoginIterationsUseCase.openStartBenchmarkingDialog(input, activity)
                     { askForBenchmarking = false }
@@ -246,7 +260,16 @@ class CreateVaultSummarizeFragment : BaseFragment() {
                 }
 
                 val pin = decryptPassword(transSK, encPin)
-                val iterations = KdfParameterService.mapPercentageToPbkdfIterations(pbkdfIterationsSlider.value)
+                val iterations = if (isArgon2())
+                    argon2IterationsSlider.value.toInt()
+                else
+                    KdfParameterService.mapPercentageToPbkdfIterations(pbkdfIterationsSlider.value)
+
+                val costInKiB = if (isArgon2())
+                    argon2MemSlider.value.toInt()
+                else
+                    null
+
                 Log.d(LOG_PREFIX + "ITERATIONS", "final iterations=$iterations")
 
                 getBaseActivity()?.let { baseActivity ->
@@ -254,14 +277,14 @@ class CreateVaultSummarizeFragment : BaseFragment() {
                     if (switchStorePasswd.isChecked) {
                         MasterPasswordService.storeMasterPassword(masterPasswd, baseActivity,
                             {
-                                createVault(pin, masterPasswd, iterations, cipherAlgorithm, baseActivity)
+                                createVault(pin, masterPasswd, kdfAlgorithm, iterations, costInKiB, cipherAlgorithm, baseActivity)
                             },
                             {
                                 toastText(activity, R.string.masterpassword_not_stored)
                             })
                     }
                     else {
-                        createVault(pin, masterPasswd, iterations, cipherAlgorithm, baseActivity)
+                        createVault(pin, masterPasswd, kdfAlgorithm, iterations, costInKiB, cipherAlgorithm, baseActivity)
                     }
 
                 }
@@ -275,20 +298,25 @@ class CreateVaultSummarizeFragment : BaseFragment() {
         argon2ParamSection.isVisible = isArgon2()
     }
 
-    private fun isArgon2() = kdfAlgorithm != KeyDerivationFunction.BUILD_IN_PBKDF
+    private fun isArgon2() = kdfAlgorithm != KeyDerivationFunction.BUILT_IN_PBKDF
 
 
     private fun createVault(
         pin: Password,
         masterPasswd: Password,
-        pbkdfIterations: Int,
+        kdf: KeyDerivationFunction,
+        iterations: Int,
+        costInMiB: Int?,
         cipherAlgorithm: CipherAlgorithm,
         activity: BaseActivity
     ) {
 
         val input = CreateVaultUseCase.Input(
             LoginData(pin, masterPasswd),
-            pbkdfIterations,
+            KdfConfig(
+                kdf,
+                iterations,
+                costInMiB),
             cipherAlgorithm
         )
         UseCaseBackgroundLauncher(CreateVaultUseCase)

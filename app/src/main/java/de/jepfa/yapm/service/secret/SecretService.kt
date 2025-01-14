@@ -12,6 +12,8 @@ import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.encrypted.DEFAULT_CIPHER_ALGORITHM
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.encrypted.EncryptedType
+import de.jepfa.yapm.model.encrypted.KdfConfig
+import de.jepfa.yapm.model.encrypted.KeyDerivationFunction
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
@@ -135,10 +137,13 @@ object SecretService {
      * Generates a key exclusively used to en- and decrypt the master key. Uses a custom KDF configured by the user (either PBKDF with custom iterations or Argon2Id with custom iterations and mem size).
      */
     fun generateSecretKeyForMasterKey(combinedPinAndMasterPassword: Password, salt: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
-        val useArgon2 = false
-        //TODO read users KDF settings
-        if (useArgon2) {
-            val argonDerivedKey = Argon2Service.derive(combinedPinAndMasterPassword, salt)
+        val kdfConfig = getStoredKdfConfig(context)
+        if (kdfConfig.isArgon2()) {
+            val argonDerivedKey = Argon2Service.derive(
+                combinedPinAndMasterPassword,
+                salt,
+                kdfConfig,
+            )
             return generateSecretKey(argonDerivedKey, cipherAlgorithm, context)
         }
         else {
@@ -148,6 +153,29 @@ object SecretService {
                 getStoredPbkdfIterations(),
                 cipherAlgorithm,
                 context
+            )
+        }
+    }
+
+    fun getStoredKdfConfig(context: Context): KdfConfig {
+        val kdfId = PreferenceService.getAsString(PreferenceService.DATA_USED_KDF_ID, context)
+        var kdf = KeyDerivationFunction.BUILT_IN_PBKDF
+        if (kdfId != null) {
+            kdf = KeyDerivationFunction.getById(kdfId)
+        }
+        if (kdf == KeyDerivationFunction.BUILT_IN_PBKDF) {
+            return KdfConfig(
+                kdf,
+                getStoredPbkdfIterations(),
+                null,
+            )
+        }
+        else {
+            // Argon2
+            return KdfConfig(
+                kdf,
+                PreferenceService.getAsInt(PreferenceService.DATA_ARGON2_ITERATIONS, context),
+                PreferenceService.getAsInt(PreferenceService.DATA_ARGON2_MIB, context),
             )
         }
     }

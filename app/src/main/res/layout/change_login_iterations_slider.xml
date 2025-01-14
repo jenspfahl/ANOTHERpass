@@ -15,7 +15,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="Choose a Key Derivation Function"
+            android:text="@string/login_kdf_chooser"
             android:layout_marginVertical="16dp"
             android:layout_marginHorizontal="8dp"/>
 
@@ -156,7 +156,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Select memory usage (Argon2)"
+                android:text="@string/login_argon2_memcost_desc"
                 android:layout_marginHorizontal="8dp"
                 android:layout_marginBottom="16dp"/>
 
@@ -180,7 +180,7 @@
                     android:layout_weight="1"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="Mem in Kibi"/>
+                    android:text="@string/login_argon2_memcost_unit"/>
 
 
                 <TextView

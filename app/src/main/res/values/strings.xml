@@ -45,16 +45,6 @@
     <string name="CIPHER_BLOWFISH_256_desc">This is an alternative encryption with better security but less performance. It is supposed to be harder to crack than AES but therefore slower. Supported by Android 2.3 and higher.</string>
     <string name="CIPHER_CHACHACHA20_256_desc">This is another alternative encryption with around the same security like AES but supposed to be faster. Supported by Android 9 and higher.</string>
 
-    <string name="KDF_PBKDF">PBKDF</string>
-    <string name="KDF_ARGON2_ID">Argon2Id</string>
-    <string name="KDF_ARGON2_I">Argon2i</string>
-    <string name="KDF_ARGON2_D">Argon2d</string>
-
-    <string name="KDF_PBKDF_desc">Built-In PBKDF</string>
-    <string name="KDF_ARGON2_ID_desc">Argon2Id desc</string>
-    <string name="KDF_ARGON2_I_desc">Argon2i desc</string>
-    <string name="KDF_ARGON2_D_desc">Argon2d desc</string>
-
     <string name="change">Edit</string>
     <string name="duplicate">Duplicate</string>
     <string name="delete">Delete</string>
@@ -959,5 +949,21 @@
     <string name="pref_summary_show_extended_search_commands">Suggest all search commands even if you don\'t start typing with \'!\'.</string>
     <string name="pref_title_flip_search_and_add_button">Flip search button and action button</string>
     <string name="pref_summary_flip_search_and_add_button">The Action button originally used to create new credentials is replaced by the Search button on the toolbar. Enable this if you need to search for credentials more often than you need to create new ones.</string>
+
+
+    <string name="KDF_PBKDF">PBKDF2 (Built-In)</string>
+    <string name="KDF_ARGON2_ID">Argon2Id</string>
+    <string name="KDF_ARGON2_I">Argon2i</string>
+    <string name="KDF_ARGON2_D">Argon2d</string>
+
+    <string name="KDF_PBKDF_desc">PBKDF2 offers standard protection against brute force attacks. It is still OK with iterations larger than 200000. But it is recommend to use an Argon2-function. Use this function if you encounter problems with the others.</string>
+    <string name="KDF_ARGON2_ID_desc">Argon2Id offers best protection against brute force and side channel attacks and is therefore recommended. </string>
+    <string name="KDF_ARGON2_I_desc">Choose Argon2i if side channel attacks are the primary threat.</string>
+    <string name="KDF_ARGON2_D_desc">Choose Argon2d if you need maximum security at the expense of side channel risk.</string>
+
+    <string name="login_kdf_chooser">Choose a Key Derivation Function (KDF). It is used to make it even more difficult to break your PIN and Master Password with high computing resources (e.g. by governments). You can change this later. If in doubt, use the current default.</string>
+
+    <string name="login_argon2_memcost_desc">Select the cost in memory. The more the better.</string>
+    <string name="login_argon2_memcost_unit">Memory allocation in MiB</string>
 
 </resources>

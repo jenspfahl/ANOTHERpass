@@ -5,6 +5,8 @@ import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.encrypted.EncryptedType
 import de.jepfa.yapm.model.encrypted.EncryptedType.Types.ENC_MASTER_KEY
+import de.jepfa.yapm.model.encrypted.KdfConfig
+import de.jepfa.yapm.model.encrypted.KeyDerivationFunction
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
@@ -81,7 +83,7 @@ object MasterKeyService {
         pin: Password,
         masterPasswd: Password,
         salt: Key,
-        pdkdfIterations: Int,
+        kdfConfig: KdfConfig,
         cipherAlgorithm: CipherAlgorithm,
         context: Context)
     : Encrypted {
@@ -91,7 +93,7 @@ object MasterKeyService {
         val masterPassphraseSK = SecretService.generateSecretKeyForMasterKey(masterPassphrase, salt, cipherAlgorithm, context)
         masterPassphrase.clear()
 
-        val pdkdfIterationsAsBase64String = KdfParameterService.toBase64String(pdkdfIterations)
+        val pdkdfIterationsAsBase64String = KdfParameterService.toBase64String(kdfConfig.iterations) //TODO do it on KdfConfig
         val encryptedMasterKey = SecretService.encryptKey(EncryptedType(ENC_MASTER_KEY, pdkdfIterationsAsBase64String), masterPassphraseSK, masterKey)
 
         val encEncryptedMasterKey = SecretService.encryptEncrypted(mkSK, encryptedMasterKey)

@@ -46,14 +46,14 @@ object ChangePinUseCase: InputUseCase<ChangePinUseCase.Input, SecureActivity>() 
             return false
         }
 
-        val pbkdfIterations = KdfParameterService.getStoredPbkdfIterations()
+        val kdfConfig = SecretService.getStoredKdfConfig(activity)
 
         MasterKeyService.encryptAndStoreMasterKey(
             masterKey,
             input.newPin,
             masterPassword,
             salt,
-            pbkdfIterations,
+            kdfConfig,
             cipherAlgorithm,
             activity
         )
