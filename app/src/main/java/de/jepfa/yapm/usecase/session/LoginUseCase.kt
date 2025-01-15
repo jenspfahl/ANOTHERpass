@@ -27,16 +27,18 @@ object LoginUseCase: InputUseCase<LoginData, BaseActivity>() {
             MasterKeyService.getMasterPassPhraseSecretKey(loginData.pin, loginData.masterPassword, salt, cipherAlgorithm, baseActivity)
         val vaultVersion = PreferenceService.getAsInt(PreferenceService.DATA_VAULT_VERSION, baseActivity)
         val useLegacyGeneration = vaultVersion < Constants.FAST_KEYGEN_VAULT_VERSION
-        val masterSecretKey = MasterKeyService.getMasterSecretKey(
+        val masterSecretKeyAndHash = MasterKeyService.getMasterSecretKey(
             masterPassPhraseSK,
             salt,
             encMasterKey,
             useLegacyGeneration,
             baseActivity
         ) ?: return false
+        val masterSecretKey = masterSecretKeyAndHash.first
+        val masterKeyHash = masterSecretKeyAndHash.second
         val key = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, baseActivity)
         val encMasterPassword = SecretService.encryptPassword(key, loginData.masterPassword)
-        Session.login(masterSecretKey, encMasterPassword)
+        Session.login(masterSecretKey, masterKeyHash, encMasterPassword)
         Session.setTimeouts(
             PreferenceService.getAsInt(PreferenceService.PREF_LOCK_TIMEOUT, baseActivity),
             PreferenceService.getAsInt(PreferenceService.PREF_LOGOUT_TIMEOUT, baseActivity)

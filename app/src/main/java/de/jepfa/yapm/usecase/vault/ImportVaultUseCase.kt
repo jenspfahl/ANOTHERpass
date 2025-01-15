@@ -292,9 +292,9 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
 
             val payload = encryptedMK.type?.payload
             if (payload != null) {
-                val pbkdfIterations = KdfParameterService.fromBase64String(payload)
-                if (pbkdfIterations != null) {
-                    KdfParameterService.storePbkdfIterations(pbkdfIterations)
+                val kdfConfig = KdfConfig.fromBase64String(payload)
+                if (kdfConfig != null) {
+                    kdfConfig.persist(activity)
                 }
                 else {
                     Log.w(LOG_PREFIX + "IMP", "Cannot parse login iterations: $payload")

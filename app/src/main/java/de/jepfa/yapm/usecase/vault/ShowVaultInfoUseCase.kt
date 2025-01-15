@@ -3,6 +3,7 @@ package de.jepfa.yapm.usecase.vault
 import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY
 import de.jepfa.yapm.service.PreferenceService.DATA_MPT_CREATED_AT
@@ -53,9 +54,7 @@ object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActi
 
         if (DebugInfo.isDebug) {
             sb.addFormattedLine("KDF Config", getStoredKdfConfig(activity))
-            activity.masterSecretKey?.let { key ->
-                //TODO MasterKeyService.decryptMasterKey(key).sha256
-            }
+            sb.addFormattedLine("Master Key Fingerprint", Session.getMasterKeyHash()?.toShortenedFingerprint())
         }
         // security level
         var level = activity.getString(R.string.unknown)

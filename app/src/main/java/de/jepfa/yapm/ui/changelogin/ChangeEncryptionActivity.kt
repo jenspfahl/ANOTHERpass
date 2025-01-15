@@ -23,6 +23,8 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.service.secret.KdfParameterService
+import de.jepfa.yapm.service.secret.KdfParameterService.DEFAULT_ARGON_ITERATIONS
+import de.jepfa.yapm.service.secret.KdfParameterService.DEFAULT_ARGON_MIB
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.ChangeKeyboardForPinManager
 import de.jepfa.yapm.ui.SecureActivity
@@ -147,7 +149,8 @@ class ChangeEncryptionActivity : SecureActivity(), AdapterView.OnItemSelectedLis
             argon2IterationsSelectionView.text = value.toInt().toReadableFormat() + " " + getString(R.string.login_iterations)
         })
 
-        argon2IterationsSlider.value = PreferenceService.getAsInt(PreferenceService.DATA_ARGON2_ITERATIONS, this).toFloat()
+        val argon2Iterations = PreferenceService.getAsInt(PreferenceService.DATA_ARGON2_ITERATIONS, this)
+        argon2IterationsSlider.value = if (argon2Iterations == 0)  DEFAULT_ARGON_ITERATIONS.toFloat() else argon2Iterations.toFloat()
         argon2IterationsSlider.valueFrom = KdfParameterService.MIN_ARGON_ITERATIONS.toFloat()
         argon2IterationsSlider.valueTo = KdfParameterService.MAX_ARGON_ITERATIONS.toFloat()
         argon2IterationsSelectionView.text = argon2IterationsSlider.value.toInt().toReadableFormat() + " " + getString(R.string.login_iterations)
@@ -161,7 +164,8 @@ class ChangeEncryptionActivity : SecureActivity(), AdapterView.OnItemSelectedLis
             argon2MemSelectionView.text = value.toInt().toReadableFormat() + " " + "Mem cost"
         })
 
-        argon2MemSlider.value = PreferenceService.getAsInt(PreferenceService.DATA_ARGON2_MIB, this).toFloat()
+        val argon2MemCost = PreferenceService.getAsInt(PreferenceService.DATA_ARGON2_MIB, this)
+        argon2MemSlider.value = if (argon2MemCost == 0) DEFAULT_ARGON_MIB.toFloat() else argon2MemCost.toFloat()
         argon2MemSlider.valueFrom = KdfParameterService.MIN_ARGON_MIB.toFloat()
         argon2MemSlider.valueTo = KdfParameterService.MAX_ARGON_MIB.toFloat()
         argon2MemSelectionView.text = argon2MemSlider.value.toInt().toReadableFormat() + " " + "Mem cost"

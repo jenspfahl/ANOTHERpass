@@ -274,7 +274,7 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
 
         val vaultVersion = PreferenceService.getAsInt(PreferenceService.DATA_VAULT_VERSION, activity)
         val useLegacyGeneration = vaultVersion < Constants.FAST_KEYGEN_VAULT_VERSION
-        return MasterKeyService.getMasterSecretKey(newMasterPassphraseSK, salt, newEncryptedMasterKey, useLegacyGeneration, activity)
+        return MasterKeyService.getMasterSecretKey(newMasterPassphraseSK, salt, newEncryptedMasterKey, useLegacyGeneration, activity)?.first
     }
 
 }

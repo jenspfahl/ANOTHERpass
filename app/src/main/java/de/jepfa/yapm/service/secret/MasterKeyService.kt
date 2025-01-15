@@ -13,6 +13,7 @@ import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.SecretService.generateRandomKey
 import de.jepfa.yapm.util.Constants.MASTER_KEY_BYTE_SIZE
+import de.jepfa.yapm.util.sha256
 
 object MasterKeyService {
 
@@ -35,15 +36,19 @@ object MasterKeyService {
     }
 
     /**
-     * Returns the Master Secret Key which is directly used de- and encrypt vault data like credentials
+     * Returns the Master Secret Key (first) which is directly used de- and encrypt vault data like credentials
+     * and the hash of te master key (second) allowed to display to the user.
      */
     fun getMasterSecretKey(masterPassPhraseSK: SecretKeyHolder,
                            salt: Key,
                            storedEncMasterKey: Encrypted,
                            useLegacyGeneration: Boolean,
                            context: Context
-    ): SecretKeyHolder? {
+    ): Pair<SecretKeyHolder, Key>? {
         val masterKey = decryptMasterKey(masterPassPhraseSK, storedEncMasterKey, context) ?: return null
+
+        val masterKeyHash = Key(masterKey.data.sha256())
+
         val masterSK =
             if (useLegacyGeneration) {  // vaults with version 1 use this. KDF doesn't bring any security win but slowing the login process down
                 SecretService.generateLegacySecretKey(masterKey, salt, masterPassPhraseSK.cipherAlgorithm, context)
@@ -53,7 +58,7 @@ object MasterKeyService {
             }
         masterKey.clear()
 
-        return masterSK
+        return Pair(masterSK, masterKeyHash)
     }
 
     fun generateMasterKey(context: Context?): Key {
@@ -93,7 +98,7 @@ object MasterKeyService {
         val masterPassphraseSK = SecretService.generateSecretKeyForMasterKey(masterPassphrase, salt, cipherAlgorithm, context)
         masterPassphrase.clear()
 
-        val pdkdfIterationsAsBase64String = KdfParameterService.toBase64String(kdfConfig.iterations) //TODO do it on KdfConfig
+        val pdkdfIterationsAsBase64String = kdfConfig.toBase64String()
         val encryptedMasterKey = SecretService.encryptKey(EncryptedType(ENC_MASTER_KEY, pdkdfIterationsAsBase64String), masterPassphraseSK, masterKey)
 
         val encEncryptedMasterKey = SecretService.encryptEncrypted(mkSK, encryptedMasterKey)

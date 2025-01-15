@@ -47,36 +47,4 @@ object KdfParameterService {
     }
 
 
-    /**
-     * Removed leading AA will be considered
-     */
-    fun fromBase64String(base64: String): Int? {
-        val base64Padded = base64.padStart(6, 'A')
-        val bytes = Base64.decode(base64Padded, Base64.NO_WRAP or Base64.NO_PADDING)
-
-        if (bytes.size > 4) {
-            return null
-        }
-
-        try {
-            val iterations = ByteBuffer.wrap(bytes).int
-
-            if (iterations > MAX_PBKDF_ITERATIONS || iterations < MIN_PBKDF_ITERATIONS) {
-                return null
-            }
-            return iterations
-        } catch (e: Exception) {
-            return null
-        }
-    }
-
-    /**
-     * Leading empty AA will be removed
-     */
-    fun toBase64String(iterations: Int): String {
-        val bytes = ByteBuffer.allocate(Int.SIZE_BYTES).putInt(iterations).array()
-        val s = Base64.encodeToString(bytes, Base64.NO_WRAP or Base64.NO_PADDING)
-        return s.trimStart('A')
-    }
-
 }
