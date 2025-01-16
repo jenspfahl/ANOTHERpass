@@ -1683,7 +1683,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                                             if (expiredCredentialsOnTop && it.isExpired(key)) 1 else 0
                                         },
                                         {
-                                            it.modifyTimestamp
+                                            it.timeData.modifyTimestamp
                                         }
                                     )
                                 ).reversed()

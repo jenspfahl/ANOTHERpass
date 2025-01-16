@@ -908,7 +908,7 @@ object HttpCredentialRequestHandler {
 
         val allCredentials = requestFlows.getLifeCycleActivity().getApp().credentialRepository.getAllSync()
         allCredentials
-            .filter { !it.isObfuscated }
+            .filter { !it.passwordData.isObfuscated }
             .forEach {
                 val (_, responseCredential) = mapCredential(key, it, deobfuscate = true)
                 responseCredentials.put(responseCredential)
@@ -954,7 +954,7 @@ object HttpCredentialRequestHandler {
 
         val credentials = requestFlows.getLifeCycleActivity().getApp().credentialRepository.getAllByUidsSync(uids)
         credentials
-            .filter { !it.isObfuscated }
+            .filter { !it.passwordData.isObfuscated }
             .forEach {
                 val (_, responseCredential) = mapCredential(key, it, deobfuscate = true)
                 responseCredentials.put(responseCredential)
@@ -1047,7 +1047,7 @@ object HttpCredentialRequestHandler {
         credential: EncCredential,
         deobfuscate: Boolean
     ): Pair<String, JSONObject> {
-        val password = SecretService.decryptPassword(key, credential.password)
+        val password = SecretService.decryptPassword(key, credential.passwordData.password)
         val user = SecretService.decryptCommonString(key, credential.user)
         val name = SecretService.decryptCommonString(key, credential.name)
         val website = SecretService.decryptCommonString(key, credential.website)

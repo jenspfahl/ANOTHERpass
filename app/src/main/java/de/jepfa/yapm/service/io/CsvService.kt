@@ -3,14 +3,12 @@ package de.jepfa.yapm.service.io
 import android.content.Context
 import android.net.Uri
 import android.text.TextUtils
-import android.util.Log
 import com.opencsv.CSVReaderHeaderAware
 import com.opencsv.CSVWriter
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
-import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.FileUtil
 import de.jepfa.yapm.util.toSimpleDateFormat
@@ -74,9 +72,9 @@ object CsvService {
             credentials.forEach { encCredential ->
                 val name = SecretService.decryptCommonString(secretKey, encCredential.name)
                 val website = SecretService.decryptCommonString(secretKey, encCredential.website)
-                val expiresAt = SecretService.decryptLong(secretKey, encCredential.expiresAt)
+                val expiresAt = SecretService.decryptLong(secretKey, encCredential.timeData.expiresAt)
                 val user = SecretService.decryptCommonString(secretKey, encCredential.user)
-                val password = SecretService.decryptPassword(secretKey, encCredential.password)
+                val password = SecretService.decryptPassword(secretKey, encCredential.passwordData.password)
                 val additionalInfo = SecretService.decryptCommonString(secretKey, encCredential.additionalInfo)
                 val labelsAsString = LabelService.defaultHolder.decryptLabelsForCredential(secretKey, encCredential)
                     .map { it.name }

@@ -27,7 +27,7 @@ object ImportCredentialUseCase: InputUseCase<ImportCredentialUseCase.Input, Secu
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
 
-                            existingCredential.backupForRestore()
+                            existingCredential.passwordData.backupForRestore()
                             existingCredential.copyData(input.credential)
 
                             saveAndNavigateBack(isNew = false, activity, existingCredential, input.successHandler)
@@ -72,7 +72,7 @@ object ImportCredentialUseCase: InputUseCase<ImportCredentialUseCase.Input, Secu
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
 
-                            existingCredential.backupForRestore()
+                            existingCredential.passwordData.backupForRestore()
                             existingCredential.copyData(input.credential)
 
                             saveAndNavigateBack(

@@ -4,7 +4,6 @@ import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.ui.SecureActivity
-import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.usecase.InputUseCase
 
 object ImportCredentialsUseCase: InputUseCase<ImportCredentialsUseCase.Input, SecureActivity>() {

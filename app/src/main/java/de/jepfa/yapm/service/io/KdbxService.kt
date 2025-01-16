@@ -1,7 +1,6 @@
 package de.jepfa.yapm.service.io
 
 import android.content.Context
-import android.util.Log
 import app.keemobile.kotpass.constants.BasicField
 import app.keemobile.kotpass.cryptography.EncryptedValue
 import app.keemobile.kotpass.database.Credentials
@@ -23,8 +22,6 @@ import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.label.Label
 import de.jepfa.yapm.util.DebugInfo
-import io.ktor.server.util.toGMTDate
-import io.ktor.util.date.toJvmDate
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream
@@ -59,10 +56,10 @@ object KdbxService {
 
                         val name = SecretService.decryptCommonString(secretKey, encCredential.name)
                         val website = SecretService.decryptCommonString(secretKey, encCredential.website)
-                        val expiresAt = SecretService.decryptLong(secretKey, encCredential.expiresAt)
-                        val modifiedAt = encCredential.modifyTimestamp
+                        val expiresAt = SecretService.decryptLong(secretKey, encCredential.timeData.expiresAt)
+                        val modifiedAt = encCredential.timeData.modifyTimestamp
                         val user = SecretService.decryptCommonString(secretKey, encCredential.user)
-                        val password = SecretService.decryptPassword(secretKey, encCredential.password)
+                        val password = SecretService.decryptPassword(secretKey, encCredential.passwordData.password)
                         val additionalInfo = SecretService.decryptCommonString(secretKey, encCredential.additionalInfo)
 
 

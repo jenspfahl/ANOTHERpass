@@ -358,7 +358,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
                     .filterNotNull()
                     .filter { credentialIdsToOverride.contains(it.id) }
                     .forEach { c ->
-                        c.touchModify()
+                        c.timeData.touchModify()
                         val existingC = app.credentialRepository.findByIdSync(c.id!!)
                         if (existingC == null) {
                             app.credentialRepository.insert(c)
@@ -369,7 +369,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
                                     uid = UUID.randomUUID(),
                                     name = copyName(existingC.name, activity)
                                 )
-                                copyOfExistingC.touchModify()
+                                copyOfExistingC.timeData.touchModify()
                                 app.credentialRepository.insert(copyOfExistingC)
                             }
                             app.credentialRepository.update(c)

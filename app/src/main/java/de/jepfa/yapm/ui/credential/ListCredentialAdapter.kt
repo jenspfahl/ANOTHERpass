@@ -69,7 +69,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             val current = getItem(pos)
 
             if (listCredentialsActivity.shouldPushBackAutoFill() || HttpCredentialRequestHandler.isProgressing()) {
-                    if (current.isObfuscated) {
+                    if (current.passwordData.isObfuscated) {
                     DeobfuscationDialog.openDeobfuscationDialogForCredentials(listCredentialsActivity) { deobfuscationKey ->
                         if (deobfuscationKey == null) {
                             return@openDeobfuscationDialogForCredentials
@@ -125,13 +125,13 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         holder.listenForDetachPasswd { pos, _ ->
 
             val current = getItem(pos)
-            DetachHelper.detachPassword(listCredentialsActivity, current.user, current.password, null, null)
+            DetachHelper.detachPassword(listCredentialsActivity, current.user, current.passwordData.password, null, null)
         }
 
         holder.listenForCopyPasswd { pos, _ ->
 
             val current = getItem(pos)
-            ClipboardUtil.copyEncPasswordWithCheck(current.password, null, listCredentialsActivity)
+            ClipboardUtil.copyEncPasswordWithCheck(current.passwordData.password, null, listCredentialsActivity)
         }
 
         holder.listenForOpenMenu { position, _, view ->
@@ -229,7 +229,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
 
                     var latestModifyTimestamp: Long ? = null
                     if (filterLatest) {
-                        latestModifyTimestamp = originList.mapNotNull { it.modifyTimestamp }.maxByOrNull { it }
+                        latestModifyTimestamp = originList.mapNotNull { it.timeData.modifyTimestamp }.maxByOrNull { it }
                     }
 
                     for (credential in originList) {
@@ -239,7 +239,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                             val website = SecretService.decryptCommonString(key, credential.website)
                             val user = SecretService.decryptCommonString(key, credential.user)
                             val addInfo = SecretService.decryptCommonString(key, credential.additionalInfo)
-                            val expiredAt = SecretService.decryptLong(key, credential.expiresAt)
+                            val expiredAt = SecretService.decryptLong(key, credential.timeData.expiresAt)
                             val uid = credential.uid?.toReadableString()
                             val id = credential.id?.toString()
 
@@ -254,12 +254,12 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                                 }
                             }
                             else if (filterLatest) {
-                                if (credential.modifyTimestamp == latestModifyTimestamp) {
+                                if (credential.timeData.modifyTimestamp == latestModifyTimestamp) {
                                     filteredList.add(credential)
                                 }
                             }
                             else if (SearchCommand.SEARCH_COMMAND_SHOW_VEILED.applies(charSequence)) {
-                                if (credential.isObfuscated) {
+                                if (credential.passwordData.isObfuscated) {
                                     filteredList.add(credential)
                                 }
                             }

@@ -207,7 +207,7 @@ object ResponseFiller {
 
         val name = SecretService.decryptCommonString(key, credential.name)
         val user = SecretService.decryptCommonString(key, credential.user)
-        val password = SecretService.decryptPassword(key, credential.password)
+        val password = SecretService.decryptPassword(key, credential.passwordData.password)
         AutofillCredentialHolder.obfuscationKey?.let {
             password.deobfuscate(it)
         }

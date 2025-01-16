@@ -145,7 +145,7 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
             }
             ExportMode.PLAIN_CREDENTIAL_RECORD -> {
                 val passwd = decryptPasswd(credential, key, obfuscationKey)
-                val expiresAt = decryptLong(key, credential.expiresAt)
+                val expiresAt = decryptLong(key, credential.timeData.expiresAt)
 
                 val shortPlainCredential = PlainShareableCredential(
                     credential.uid?.toBase64String(),
@@ -172,7 +172,7 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
     ): Password {
         val passwd = SecretService.decryptPassword(
             key,
-            credential.password
+            credential.passwordData.password
         )
         obfuscationKey?.let {
             passwd.deobfuscate(it)

@@ -183,7 +183,7 @@ class ShowCredentialActivity : SecureActivity() {
     private fun showPasswordStrength() {
         if (credential != null) {
             masterSecretKey?.let { key ->
-                val password = decryptPassword(key, credential!!.password)
+                val password = decryptPassword(key, credential!!.passwordData.password)
                 obfuscationKey?.let {
                     password.deobfuscate(it)
                 }
@@ -235,7 +235,7 @@ class ShowCredentialActivity : SecureActivity() {
             menu.findItem(R.id.menu_detach_credential)?.isVisible = false
         }
 
-        menu.findItem(R.id.menu_deobfuscate_password)?.isVisible = credential?.isObfuscated ?: false
+        menu.findItem(R.id.menu_deobfuscate_password)?.isVisible = credential?.passwordData?.isObfuscated ?: false
 
 
         optionsMenu = menu
@@ -279,7 +279,7 @@ class ShowCredentialActivity : SecureActivity() {
                 DetachHelper.detachPassword(
                     this,
                     credential.user,
-                    credential.password,
+                    credential.passwordData.password,
                     obfuscationKey,
                     passwordPresentation
                 )
@@ -287,7 +287,7 @@ class ShowCredentialActivity : SecureActivity() {
             }
 
             if (id == R.id.menu_copy_credential) {
-                ClipboardUtil.copyEncPasswordWithCheck(credential.password, obfuscationKey, this)
+                ClipboardUtil.copyEncPasswordWithCheck(credential.passwordData.password, obfuscationKey, this)
                 return true
             }
 
@@ -353,7 +353,7 @@ class ShowCredentialActivity : SecureActivity() {
 
                             obfuscationKey = deobfuscationKey
                             obfuscationKey?.let {
-                                val passwordForDeobfuscation = decryptPassword(key, credential.password)
+                                val passwordForDeobfuscation = decryptPassword(key, credential.passwordData.password)
                                 passwordForDeobfuscation.deobfuscate(it)
 
                                 var spannedString =
@@ -406,17 +406,17 @@ class ShowCredentialActivity : SecureActivity() {
 
 
                 sb.addFormattedLine(getString(R.string.password_obfuscated),
-                    if (credential.isObfuscated) getString(R.string.yes)
+                    if (credential.passwordData.isObfuscated) getString(R.string.yes)
                     else getString(R.string.no))
 
 
-                credential.modifyTimestamp?.let{
+                credential.timeData.modifyTimestamp?.let{
                     if (it > 1000) // modifyTimestamp is the credential Id after running db migration, assume ids are lower than 1000
                         sb.addFormattedLine(getString(R.string.last_modified), dateTimeToNiceString(it.toDate(), this))
                 }
 
                 masterSecretKey?.let { key ->
-                    val expiresAt = decryptLong(key, credential.expiresAt)
+                    val expiresAt = decryptLong(key, credential.timeData.expiresAt)
                     if (expiresAt != null && expiresAt != 0L) {
                         sb.addFormattedLine(
                             getString(R.string.expires),
@@ -486,7 +486,7 @@ class ShowCredentialActivity : SecureActivity() {
     }
 
     private fun showObfuscated(credential: EncCredential): Boolean {
-        return credential.isObfuscated && obfuscationKey == null
+        return credential.passwordData.isObfuscated && obfuscationKey == null
     }
 
 
@@ -497,7 +497,7 @@ class ShowCredentialActivity : SecureActivity() {
             val name = enrichId(this, decName, credential.id)
             val user = decryptCommonString(key, credential.user)
             val website = decryptCommonString(key, credential.website)
-            val expiresAt = decryptLong(key, credential.expiresAt)
+            val expiresAt = decryptLong(key, credential.timeData.expiresAt)
             val additionalInfo = decryptCommonString(key, credential.additionalInfo)
 
             toolBarLayout.title = name
@@ -595,7 +595,7 @@ class ShowCredentialActivity : SecureActivity() {
             updatePasswordTextView(key, credential, true)
 
             optionsMenu?.findItem(R.id.menu_deobfuscate_password)?.isVisible =
-                credential.isObfuscated
+                credential.passwordData.isObfuscated
 
             if (DebugInfo.isDebug) {
                 titleLayout.setOnLongClickListener {
@@ -624,7 +624,7 @@ class ShowCredentialActivity : SecureActivity() {
         credential: EncCredential,
         allowDeobfuscate: Boolean
     ) {
-        val password = decryptPassword(key, credential.password)
+        val password = decryptPassword(key, credential.passwordData.password)
         if (allowDeobfuscate) {
             obfuscationKey?.let {
                 password.deobfuscate(it) //TODO this seems to cause a change of current item and a credential adapter list reload

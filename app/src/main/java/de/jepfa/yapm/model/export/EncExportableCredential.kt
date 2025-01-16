@@ -1,10 +1,10 @@
 package de.jepfa.yapm.model.export
 
-import android.util.Log
 import com.google.gson.JsonElement
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.Encrypted
-import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.model.encrypted.PasswordData
+import de.jepfa.yapm.model.encrypted.TimeData
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.toBase64String
 import de.jepfa.yapm.util.toUUIDFromBase64String
@@ -28,11 +28,11 @@ data class EncExportableCredential(val i: Int?,
                 credential.name,
                 credential.additionalInfo,
                 credential.user,
-                credential.password,
+                credential.passwordData.password,
                 credential.website,
                 credential.labels,
-                credential.expiresAt,
-                credential.isObfuscated,
+                credential.timeData.expiresAt,
+                credential.passwordData.isObfuscated,
             )
 
     constructor(id: Int?,
@@ -62,16 +62,21 @@ data class EncExportableCredential(val i: Int?,
             i,
             ui?.toUUIDFromBase64String(),
             n,
-            aI,
-            u,
-            p,
-            null,
             w,
+            u,
+            aI,
             l,
-            e,
-            o,
+            PasswordData(
+                p,
+                o,
+                null,
+                null,
+            ),
+            TimeData(
+                null,
+                e,
+            ),
             null,
-            null
         )
     }
 

@@ -1,7 +1,6 @@
 package de.jepfa.yapm.service.label
 
 import android.content.Context
-import android.util.Log
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncLabel
@@ -10,7 +9,6 @@ import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.label.LabelService.getLabelFromEncLabel
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.label.Label
-import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.DebugInfo
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap

@@ -4,6 +4,8 @@ import android.net.Uri
 import android.os.Bundle
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.encrypted.PasswordData
+import de.jepfa.yapm.model.encrypted.TimeData
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.PreferenceService
@@ -16,7 +18,6 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.fromSimpleDateFormat
 import kotlin.math.max
-import kotlin.math.min
 
 class ImportCredentialsActivity : SecureActivity() {
 
@@ -182,16 +183,21 @@ class ImportCredentialsActivity : SecureActivity() {
             null,
             null, // record.uuid, -- commented out, to not overwrite existing credentials when importing them back
             encName,
-            encAddInfo,
-            encUser,
-            encPassword,
-            null,
             encWebsite,
+            encUser,
+            encAddInfo,
             encLabels,
-            encExpiresAt,
-            false,
+            PasswordData(
+                encPassword,
+                false,
+                null,
+                null,
+            ),
+            TimeData(
+                record.modifiedAt?.time,
+                encExpiresAt,
+            ),
             null,
-            record.modifiedAt?.time,
         )
     }
 

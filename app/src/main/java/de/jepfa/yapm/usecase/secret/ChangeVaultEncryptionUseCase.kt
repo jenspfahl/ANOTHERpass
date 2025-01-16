@@ -9,7 +9,6 @@ import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.MasterKeyService
-import de.jepfa.yapm.service.secret.KdfParameterService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
@@ -149,16 +148,21 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
                     credential.id,
                     credential.uid,
                     reencryptString(credential.name, oldMasterSK, newMasterSK),
-                    reencryptString(credential.additionalInfo, oldMasterSK, newMasterSK),
-                    reencryptString(credential.user, oldMasterSK, newMasterSK),
-                    reencryptPassword(credential.password, oldMasterSK, newMasterSK),
-                    if (credential.lastPassword != null) reencryptPassword(credential.lastPassword!!, oldMasterSK, newMasterSK) else null,
                     reencryptString(credential.website, oldMasterSK, newMasterSK),
+                    reencryptString(credential.user, oldMasterSK, newMasterSK),
+                    reencryptString(credential.additionalInfo, oldMasterSK, newMasterSK),
                     reencryptString(credential.labels, oldMasterSK, newMasterSK),
-                    reencryptString(credential.expiresAt, oldMasterSK, newMasterSK),
-                    credential.isObfuscated,
-                    credential.isLastPasswordObfuscated,
-                    credential.modifyTimestamp
+                    PasswordData(
+                        reencryptPassword(credential.passwordData.password, oldMasterSK, newMasterSK),
+                        credential.passwordData.isObfuscated,
+                        if (credential.passwordData.lastPassword != null) reencryptPassword(credential.passwordData.lastPassword!!, oldMasterSK, newMasterSK) else null,
+                        credential.passwordData.isLastPasswordObfuscated,
+                    ),
+                    TimeData(
+                        credential.timeData.modifyTimestamp,
+                        reencryptString(credential.timeData.expiresAt, oldMasterSK, newMasterSK),
+                    ),
+                    null,
                 )
                 app.credentialRepository.update(updated)
             }

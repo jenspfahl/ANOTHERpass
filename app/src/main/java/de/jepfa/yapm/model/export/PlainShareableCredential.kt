@@ -1,12 +1,12 @@
 package de.jepfa.yapm.model.export
 
-import android.util.Log
 import com.google.gson.JsonElement
 import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.encrypted.PasswordData
+import de.jepfa.yapm.model.encrypted.TimeData
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.secret.SecretService
-import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.toUUIDFromBase64String
 
@@ -33,15 +33,20 @@ data class PlainShareableCredential(val ui: String?,
             null,
             ui?.toUUIDFromBase64String(),
             encName,
-            encAdditionalInfo,
-            encUser,
-            encPasswd,
-            null,
             encWebsite,
+            encUser,
+            encAdditionalInfo,
             encLabels,
-            encExpiresAt,
-            false,
-            null,
+            PasswordData(
+                encPasswd,
+                false,
+                null,
+                null,
+            ),
+            TimeData(
+                null,
+                encExpiresAt,
+            ),
             null
         )
     }
