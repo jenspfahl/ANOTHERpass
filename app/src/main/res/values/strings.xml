@@ -961,9 +961,10 @@
     <string name="KDF_ARGON2_I_desc">Choose Argon2i if side channel attacks are the primary threat.</string>
     <string name="KDF_ARGON2_D_desc">Choose Argon2d if you need maximum security at the expense of side channel risk.</string>
 
-    <string name="login_kdf_chooser">Choose a Key Derivation Function (KDF). It is used to make it even more difficult to break your PIN and Master Password with high computing resources (e.g. by governments). You can change this later. If in doubt, use the current default.</string>
+    <string name="login_kdf_chooser">Choose a method of the vault login process (called Key Derivation Function). It is used to make it even more difficult to break your PIN and Master Password with high computing resources (e.g. by governments). You can change this later. If in doubt, use the current default.</string>
 
     <string name="login_argon2_memcost_desc">Select the cost in memory. The more the better.</string>
     <string name="login_argon2_memcost_unit">Memory allocation in MiB</string>
+    <string name="login_argon2_current_memcost">%1$s MiB memory allocation</string>
 
 </resources>

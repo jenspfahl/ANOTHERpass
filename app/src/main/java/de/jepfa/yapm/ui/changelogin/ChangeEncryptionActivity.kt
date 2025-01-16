@@ -161,14 +161,14 @@ class ChangeEncryptionActivity : SecureActivity(), AdapterView.OnItemSelectedLis
         val argon2MemSlider = findViewById<Slider>(R.id.login_argon2_memory_usage_selection)
         val argon2MemSelectionView = findViewById<TextView>(R.id.current_argon2_memory_usage_selection)
         argon2MemSlider.addOnChangeListener(Slider.OnChangeListener { _, value, fromUser ->
-            argon2MemSelectionView.text = value.toInt().toReadableFormat() + " " + "Mem cost"
+            argon2MemSelectionView.text = getString(R.string.login_argon2_current_memcost, value.toInt().toReadableFormat())
         })
 
         val argon2MemCost = PreferenceService.getAsInt(PreferenceService.DATA_ARGON2_MIB, this)
         argon2MemSlider.value = if (argon2MemCost == 0) DEFAULT_ARGON_MIB.toFloat() else argon2MemCost.toFloat()
         argon2MemSlider.valueFrom = KdfParameterService.MIN_ARGON_MIB.toFloat()
         argon2MemSlider.valueTo = KdfParameterService.MAX_ARGON_MIB.toFloat()
-        argon2MemSelectionView.text = argon2MemSlider.value.toInt().toReadableFormat() + " " + "Mem cost"
+        argon2MemSelectionView.text = getString(R.string.login_argon2_current_memcost, argon2MemSlider.value.toInt().toReadableFormat())
 
 
 

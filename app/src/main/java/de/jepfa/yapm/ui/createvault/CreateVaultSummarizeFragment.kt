@@ -198,13 +198,13 @@ class CreateVaultSummarizeFragment : BaseFragment() {
         val argon2MemSlider = view.findViewById<Slider>(R.id.login_argon2_memory_usage_selection)
         val argon2MemSelectionView = view.findViewById<TextView>(R.id.current_argon2_memory_usage_selection)
         argon2MemSlider.addOnChangeListener(Slider.OnChangeListener { _, value, fromUser ->
-            argon2MemSelectionView.text = value.toInt().toReadableFormat() + " " + "Mem cost"
+            argon2MemSelectionView.text = getString(R.string.login_argon2_current_memcost, value.toInt().toReadableFormat())
         })
 
         argon2MemSlider.value = KdfParameterService.DEFAULT_ARGON_MIB.toFloat()
         argon2MemSlider.valueFrom = KdfParameterService.MIN_ARGON_MIB.toFloat()
         argon2MemSlider.valueTo = KdfParameterService.MAX_ARGON_MIB.toFloat()
-        argon2MemSelectionView.text = argon2MemSlider.value.toInt().toReadableFormat() + " " + "Mem cost"
+        argon2MemSelectionView.text = getString(R.string.login_argon2_current_memcost, argon2MemSlider.value.toInt().toReadableFormat())
 
 
 
