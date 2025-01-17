@@ -146,6 +146,10 @@
             android:name=".ui.label.EditLabelActivity"
             android:noHistory="true" />
         <activity
+            android:name=".ui.credential.ConfigOtpActivity"
+            android:label="@string/configure_one_time_password"
+            android:noHistory="false" />
+        <activity
             android:name=".ui.createvault.CreateVaultActivity"
             android:noHistory="false" />
         <activity

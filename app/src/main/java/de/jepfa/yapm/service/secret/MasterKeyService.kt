@@ -5,8 +5,7 @@ import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.encrypted.EncryptedType
 import de.jepfa.yapm.model.encrypted.EncryptedType.Types.ENC_MASTER_KEY
-import de.jepfa.yapm.model.encrypted.KdfConfig
-import de.jepfa.yapm.model.encrypted.KeyDerivationFunction
+import de.jepfa.yapm.model.kdf.KdfConfig
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder

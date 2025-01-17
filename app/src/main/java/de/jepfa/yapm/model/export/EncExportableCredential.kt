@@ -9,6 +9,7 @@ import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.toBase64String
 import de.jepfa.yapm.util.toUUIDFromBase64String
 
+//TODO deprecate this and add a new version where we just create a PlainCredential and encrypt that String instead of having so many Encrypted-blobs
 data class EncExportableCredential(val i: Int?,
                                    val ui: String?,
                                    val n: Encrypted,

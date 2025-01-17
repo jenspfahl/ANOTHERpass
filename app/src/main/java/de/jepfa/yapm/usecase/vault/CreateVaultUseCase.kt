@@ -2,12 +2,10 @@ package de.jepfa.yapm.usecase.vault
 
 import android.util.Log
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm
-import de.jepfa.yapm.model.encrypted.KdfConfig
-import de.jepfa.yapm.model.encrypted.KeyDerivationFunction
+import de.jepfa.yapm.model.kdf.KdfConfig
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.MasterKeyService
-import de.jepfa.yapm.service.secret.KdfParameterService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.usecase.InputUseCase

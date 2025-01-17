@@ -9,11 +9,11 @@ import com.google.gson.JsonParser
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Validable
 import de.jepfa.yapm.model.encrypted.*
+import de.jepfa.yapm.model.kdf.KdfConfig
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.service.secret.AndroidKey
-import de.jepfa.yapm.service.secret.KdfParameterService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity

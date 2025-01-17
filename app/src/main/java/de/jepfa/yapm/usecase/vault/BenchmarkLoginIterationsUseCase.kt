@@ -3,8 +3,7 @@ package de.jepfa.yapm.usecase.vault
 import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm
-import de.jepfa.yapm.model.encrypted.KdfConfig
-import de.jepfa.yapm.model.encrypted.KeyDerivationFunction
+import de.jepfa.yapm.model.kdf.KdfConfig
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.secret.Argon2Service

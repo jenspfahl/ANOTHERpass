@@ -37,7 +37,7 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
         val listItems = ExportMode.values().map { activity.getString(it.labelId) }.toTypedArray()
 
         AlertDialog.Builder(activity)
-            .setIcon(R.drawable.ic_baseline_qr_code_24_white)
+            .setIcon(R.drawable.ic_baseline_qr_code_24)
             .setTitle(R.string.export_credential)
             .setSingleChoiceItems(listItems, -1) { dialogInterface, i ->
                 val mode = ExportMode.values()[i]

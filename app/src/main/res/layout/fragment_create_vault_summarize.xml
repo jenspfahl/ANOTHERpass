@@ -45,7 +45,7 @@
                         android:paddingHorizontal="4dp"
                         android:clickable="true"
                         android:layout_gravity="center"
-                        android:src="@drawable/ic_baseline_qr_code_48"
+                        android:src="@drawable/ic_baseline_qr_code_48_red"
                         android:focusable="true" />
 
                     <ImageView

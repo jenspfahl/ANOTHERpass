@@ -45,11 +45,7 @@ data class TimeData(
 }
 
 data class OtpData(
-    var encMode: Encrypted,
-    var encSecret: Encrypted,
-    var encAlgorithm: Encrypted,
-    var encTimeFrameOrCounter: Encrypted,
-    var encDigits: Encrypted,
+    var encOtpAuthUri: Encrypted,
 )
 
 data class EncCredential(

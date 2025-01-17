@@ -1,6 +1,7 @@
 package de.jepfa.yapm.ui.editcredential
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputFilter.LengthFilter
@@ -12,6 +13,7 @@ import androidx.appcompat.widget.SwitchCompat
 import com.google.android.material.tabs.TabLayout
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
@@ -28,7 +30,9 @@ import de.jepfa.yapm.service.secretgenerator.passphrase.PassphraseGeneratorSpec
 import de.jepfa.yapm.service.secretgenerator.password.PasswordGenerator
 import de.jepfa.yapm.service.secretgenerator.password.PasswordGeneratorSpec
 import de.jepfa.yapm.ui.SecureFragment
+import de.jepfa.yapm.ui.credential.ConfigOtpActivity
 import de.jepfa.yapm.ui.credential.DeobfuscationDialog
+import de.jepfa.yapm.ui.label.EditLabelActivity
 import de.jepfa.yapm.usecase.credential.ShowPasswordStrengthUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.ClipboardUtil
@@ -438,6 +442,14 @@ class EditCredentialPasswordFragment : SecureFragment() {
         val editCredentialActivity = getBaseActivity() as EditCredentialActivity
 
         val id = item.itemId
+
+        if (id == R.id.menu_configure_otp) {
+
+            val intent = Intent(editCredentialActivity, ConfigOtpActivity::class.java)
+            editCredentialActivity.startActivity(intent)
+
+            return true
+        }
         if (id == R.id.menu_detach_credential) {
 
             masterSecretKey?.let{ key ->

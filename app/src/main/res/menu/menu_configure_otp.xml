@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/menu_export_otp"
+        android:icon="@drawable/ic_baseline_qr_code_24_white"
+        app:showAsAction="always"
+        android:title="@string/action_export" />
+    <item android:id="@+id/menu_delete_otp"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_baseline_delete_24_white"
+        android:title="Delete OTP" />
+
+</menu>

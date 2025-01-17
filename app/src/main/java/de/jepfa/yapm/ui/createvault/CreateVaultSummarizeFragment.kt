@@ -17,9 +17,9 @@ import com.google.android.material.slider.Slider
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm.Companion.getPreferredCipher
-import de.jepfa.yapm.model.encrypted.KdfConfig
-import de.jepfa.yapm.model.encrypted.KeyDerivationFunction
-import de.jepfa.yapm.model.encrypted.PREFERRED_KDF
+import de.jepfa.yapm.model.kdf.KdfConfig
+import de.jepfa.yapm.model.kdf.KeyDerivationFunction
+import de.jepfa.yapm.model.kdf.PREFERRED_KDF
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.service.nfc.NfcService

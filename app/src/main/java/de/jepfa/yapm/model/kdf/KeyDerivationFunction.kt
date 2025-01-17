@@ -1,4 +1,4 @@
-package de.jepfa.yapm.model.encrypted
+package de.jepfa.yapm.model.kdf
 
 import com.lambdapioneer.argon2kt.Argon2Mode
 import de.jepfa.yapm.R

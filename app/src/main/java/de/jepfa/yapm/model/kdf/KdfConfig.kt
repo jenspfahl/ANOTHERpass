@@ -1,4 +1,4 @@
-package de.jepfa.yapm.model.encrypted
+package de.jepfa.yapm.model.kdf
 
 import android.content.Context
 import android.util.Base64

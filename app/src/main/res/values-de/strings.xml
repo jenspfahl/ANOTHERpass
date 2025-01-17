@@ -954,9 +954,11 @@
     <string name="KDF_ARGON2_ID_desc">Argon2Id bietet den besten Schutz gegen Brute-Force- und Side-Channel-Angriffe und wird daher empfohlen.</string>
     <string name="KDF_ARGON2_I_desc">Wähle Argon2i, wenn Side-Channel-Angriffe die Hauptbedrohung darstellen.</string>
     <string name="KDF_ARGON2_D_desc">Wähle Argon2d, wenn maximale Sicherheit auf Kosten des Side-Channel-Risikos erforderlich ist.</string>
-    <string name="login_kdf_chooser">Wähle eine Methode die Login-Verschlüsselung (Key Derivation Function genannt). Damit wird es noch schwieriger, die PIN und das Master-Passwort mit hohen Rechenressourcen zu knacken (z. B. durch Regierungen). Sie kann auch später geändert werden. Im Zweifel belasse die Voreinstellung.</string>
-    <string name="login_argon2_memcost_desc">Wähle die Größe der Speicherzuweisung der Funktion aus. Je größer, desto besser.</string>
+    <string name="login_kdf_chooser">Wähle die Art der Login-Verschlüsselung (Key Derivation Function genannt). Damit wird es noch schwieriger, die PIN und das Master-Passwort mit hohen Rechenressourcen zu knacken (z. B. durch Regierungen). Sie kann auch später geändert werden. Im Zweifel belasse die Voreinstellung.</string>
+    <string name="login_argon2_memcost_desc">Wähle die Größe der Speicherzuweisung der Login-Verschlüsselung aus. Je größer, desto besser.</string>
     <string name="login_argon2_memcost_unit">Speicherzuweisung in MiB</string>
     <string name="login_argon2_current_memcost">%1$s MiB Speicherzuweisung</string>
+
+    <string name="configure_one_time_password">Konfiguriere Einmal-Passwort</string>
 
 </resources>

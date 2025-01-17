@@ -925,5 +925,7 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="login_argon2_memcost_unit">Memory allocation in MiB</string>
   <string name="login_argon2_current_memcost">%1$s MiB memory allocation</string>
 
+  <string name="configure_one_time_password">Configure One-Time-Password</string>
+
 
 </resources>

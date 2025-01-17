@@ -2,7 +2,7 @@ package de.jepfa.yapm.service.secret
 
 import com.lambdapioneer.argon2kt.Argon2Kt
 import com.lambdapioneer.argon2kt.Argon2Mode
-import de.jepfa.yapm.model.encrypted.KdfConfig
+import de.jepfa.yapm.model.kdf.KdfConfig
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 
