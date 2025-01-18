@@ -4,12 +4,12 @@ import android.net.Uri
 import android.util.Log
 import de.jepfa.yapm.model.secret.Key
 import io.ktor.http.encodeURLPath
-import io.ktor.util.decodeBase64Bytes
+import org.apache.commons.codec.binary.Base32
 
 private const val OTP_SCHEME = "otpauth"
 
-private const val PATH_HOTP = "hotp"
-private const val PATH_TOTP = "totp"
+private const val MODE_HOTP = "hotp"
+private const val MODE_TOTP = "totp"
 
 private const val PARAM_SECRET = "secret"
 private const val PARAM_ISSUER = "issuer"
@@ -18,31 +18,46 @@ private const val PARAM_DIGITS = "digits"
 private const val PARAM_PERIOD = "period"
 private const val PARAM_COUNTER = "counter"
 
-data class TOTPConfig(
+data class OTPConfig(
+    val mode: String,
     val account: String,
     val issuer: String,
     val secret: Key,
     val algorithm: String,
     val digits: Int,
-    val periodOrCounter: Int) {
+    var periodOrCounter: Int) {
 
     private fun getLabel() = "${issuer.encodeURLPath()}:${account.encodeURLPath()}"
 
     fun toUri(): Uri {
-        val s = "$OTP_SCHEME://$PATH_TOTP/${getLabel()}?$PARAM_SECRET=${secret.toBase64String()}&$PARAM_ISSUER=${issuer.encodeURLPath()}&$PARAM_ALGORITHM=$algorithm&$PARAM_DIGITS=$digits&$PARAM_PERIOD=$periodOrCounter"
+        val periodOrCounterParam = if (mode == MODE_TOTP)
+            "$PARAM_PERIOD=$periodOrCounter"
+        else if (mode == MODE_HOTP)
+            "$PARAM_COUNTER=$periodOrCounter"
+        else
+            throw IllegalArgumentException("illegal mode: $mode")
+        val s = "$OTP_SCHEME://$mode/${getLabel()}?$PARAM_SECRET=${Base32().encodeToString(secret.toByteArray())}&$PARAM_ISSUER=${issuer.encodeURLPath()}&$PARAM_ALGORITHM=$algorithm&$PARAM_DIGITS=$digits&$periodOrCounterParam"
         return Uri.parse(s)
     }
 
+    fun incCounter(): OTPConfig {
+        if (mode == MODE_HOTP) {
+            periodOrCounter++
+        }
+
+        return this
+    }
+
     companion object {
-        fun fromUri(uri: Uri): TOTPConfig? {
+        fun fromUri(uri: Uri): OTPConfig? {
 
             if (uri.scheme != OTP_SCHEME) {
                 Log.w("OTP", "Illegal scheme: ${uri.scheme}")
                 return null
             }
 
-            val method = uri.host
-            if (method != PATH_HOTP && method != PATH_TOTP) {
+            val mode = uri.host
+            if (mode != MODE_HOTP && mode != MODE_TOTP) {
                 Log.w("OTP", "Wrong method: $uri")
 
                 return null
@@ -72,20 +87,20 @@ data class TOTPConfig(
             val algorithm = uri.getQueryParameter(PARAM_ALGORITHM) ?: "SHA-256"
             val digits = uri.getQueryParameter(PARAM_DIGITS)?.toIntOrNull() ?: 6
             val periodInSec = uri.getQueryParameter(PARAM_PERIOD)?.toIntOrNull() ?: 30
-            val counter = uri.getQueryParameter(PARAM_COUNTER)?.toIntOrNull()
-
+            val counter = uri.getQueryParameter(PARAM_COUNTER)?.toIntOrNull() ?: 1
 
             if (issuerFromParams != issuerFromLabel) {
                 // warn
             }
 
-            return TOTPConfig(
+            return OTPConfig(
+                mode,
                 accountFromLabel ?: label,
                 issuerFromLabel,
-                Key(secretAsBase64.decodeBase64Bytes()),
+                Key(Base32().decode(secretAsBase64)),
                 algorithm,
                 digits,
-                counter ?: periodInSec
+                if (mode == MODE_HOTP) counter else periodInSec
             )
         }
     }

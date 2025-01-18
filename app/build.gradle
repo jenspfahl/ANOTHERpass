@@ -89,6 +89,7 @@ dependencies {
     implementation 'androidx.work:work-runtime-ktx:2.9.1'
     implementation 'androidx.biometric:biometric:1.1.0'
     kapt 'androidx.room:room-compiler:2.6.1'
+
     androidTestImplementation 'androidx.room:room-testing:2.6.1'
     androidTestImplementation 'androidx.test:core-ktx:1.6.1'
 
@@ -131,6 +132,9 @@ dependencies {
 
     // Argon2 support
     implementation 'com.lambdapioneer.argon2kt:argon2kt:1.6.0'
+
+    implementation group: 'commons-codec', name: 'commons-codec', version: '1.17.2'
+
 
     // Testing
     testImplementation "junit:junit:$rootProject.junitVersion"

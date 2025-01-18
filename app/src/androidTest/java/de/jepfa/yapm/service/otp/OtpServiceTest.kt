@@ -8,14 +8,16 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.core.app.launchActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import de.jepfa.yapm.model.encrypted.CipherAlgorithm
-import de.jepfa.yapm.model.otp.TOTPConfig
-import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.model.otp.OTPConfig
 import de.jepfa.yapm.ui.login.LoginActivity
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.LocalDateTime
+import java.time.Month
+import java.time.ZoneOffset
 import java.util.Date
 
 @RunWith(AndroidJUnit4::class)
@@ -24,47 +26,81 @@ class OtpServiceTest {
 
     val TAG = LOG_PREFIX + "TOTP"
 
-    val maxPins = 10 // 10_000_000
-    var currentAttempt = 0
-    val pin = Password("5")
-    val masterPassword = Password("abcd")
-    val cipherAlgorithm = CipherAlgorithm.AES_256
-
-    lateinit var loginScenario: ActivityScenario<LoginActivity>
+    lateinit var anyScenario: ActivityScenario<LoginActivity>
 
 
     @Before
     fun setup() {
         val intent = Intent(ApplicationProvider.getApplicationContext(), LoginActivity::class.java)
-        loginScenario = launchActivity(intent)
+        anyScenario = launchActivity(intent)
+    }
+
+    @Test
+    fun testHOTP() {
+        anyScenario.onActivity { _ ->
+            Log.i(TAG, "Creating test vault...")
+
+            val hotpUri = Uri.parse("otpauth://hotp/ACME%20Co:john.doe@email.com?secret=HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ&issuer=ACME%20Co&algorithm=SHA1&digits=6&counter=0")
+            val otpConfig = OTPConfig.fromUri(hotpUri)
+
+            if (otpConfig == null) {
+                Assert.fail()
+                return@onActivity
+            }
+
+            Assert.assertEquals(hotpUri, otpConfig.toUri())
+
+            println("TOTP Config: $otpConfig")
+
+            _testHOTP(otpConfig, "818800")
+            _testHOTP(otpConfig.incCounter(), "320382")
+            _testHOTP(otpConfig.incCounter(), "404533")
+        }
     }
 
     @Test
     fun testTOTP() {
-        loginScenario.onActivity { loginActivity ->
+        anyScenario.onActivity { _ ->
             Log.i(TAG, "Creating test vault...")
 
-            val uri = Uri.parse("otpauth://totp/ACME%20Co:john.doe@email.com?secret=HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ&issuer=ACME%20Co&algorithm=SHA1&digits=6&period=30")
-            val totpConfig = TOTPConfig.fromUri(uri)
+            val totpUri = Uri.parse("otpauth://totp/ACME%20Co:john.doe@email.com?secret=HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ&issuer=ACME%20Co&algorithm=SHA1&digits=6&period=30")
+            val otpConfig = OTPConfig.fromUri(totpUri)
 
-            println("TOTP Config: $totpConfig")
+            if (otpConfig == null) {
+                Assert.fail()
+                return@onActivity
+            }
 
-          /*  testTOTP(totpConfig, Date(0))
-            testTOTP(totpConfig, Date(1))
-            testTOTP(totpConfig, Date(29))
-            testTOTP(totpConfig, Date(30))
-            testTOTP(totpConfig, Date(31))
-            testTOTP(totpConfig, Date(32))
-            testTOTP(totpConfig, Date(59))
-            testTOTP(totpConfig, Date(60))
-            testTOTP(totpConfig, Date(61))*/
-            testTOTP(totpConfig, Date())  // 320 382
+            Assert.assertEquals(totpUri, otpConfig.toUri())
+
+            println("TOTP Config: $otpConfig")
+
+            _testTOTP(otpConfig, Date(0), "818800")
+            _testTOTP(otpConfig, Date(1000), "818800")
+            _testTOTP(otpConfig, Date(29000), "818800")
+            _testTOTP(otpConfig, Date(29999), "818800")
+            _testTOTP(otpConfig, Date(30000), "320382")
+            _testTOTP(otpConfig, Date(31000), "320382")
+            _testTOTP(otpConfig, Date(59999), "320382")
+            _testTOTP(otpConfig, Date(60000), "404533")
+            _testTOTP(otpConfig,
+                Date.from(LocalDateTime.of(2025, 1, 18, 19, 18, 14).toInstant(ZoneOffset.UTC)),
+                "697112")
+
         }
     }
 
-    private fun testTOTP(totpConfig: TOTPConfig?, date: Date) {
-        val totp = OtpService.createTOTP(totpConfig!!, date)
-        println("TOTP for ${date.time}: $totp")
+    private fun _testHOTP(otpConfig: OTPConfig, expectedToken: String) {
+        val hotp = OtpService.generateHOTP(otpConfig)
+        println("HOTP for counter ${otpConfig.periodOrCounter}: $hotp")
+        Assert.assertEquals(expectedToken, hotp.toString())
+    }
+
+    private fun _testTOTP(otpConfig: OTPConfig, date: Date, expectedToken: String) {
+        val totp = OtpService.generateTOTP(otpConfig, date)
+        println("TOTP for timestamp ${date.time}: $totp")
+        Assert.assertEquals(expectedToken, totp.toString())
+
     }
 
 

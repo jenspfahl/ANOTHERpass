@@ -3,7 +3,7 @@ package de.jepfa.yapm.service.otp
 import android.net.Uri
 import android.util.Log
 import de.jepfa.yapm.model.encrypted.OtpData
-import de.jepfa.yapm.model.otp.TOTPConfig
+import de.jepfa.yapm.model.otp.OTPConfig
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
@@ -11,51 +11,66 @@ import de.jepfa.yapm.service.secret.SecretService
 import io.ktor.util.toUpperCasePreservingASCIIRules
 import java.lang.reflect.UndeclaredThrowableException
 import java.math.BigInteger
+import java.nio.ByteBuffer
 import java.security.GeneralSecurityException
 import java.util.Date
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 import kotlin.experimental.and
+import kotlin.math.pow
 
 
 object OtpService {
 
-    fun createTimeBasedOneTimePassword(
+    fun generateTOTP(
         otpData: OtpData,
         timestamp: Date,
         key: SecretKeyHolder,
         obfuscationKey: Key?) : Password? {
 
         val optAuthString = SecretService.decryptCommonString(key, otpData.encOtpAuthUri)
-        val totpConfig = TOTPConfig.fromUri(Uri.parse(optAuthString))
-        if (totpConfig == null) {
+        val OTPConfig = OTPConfig.fromUri(Uri.parse(optAuthString))
+        if (OTPConfig == null) {
             Log.w("OTP", "cannot parse TOTP URI $optAuthString")
             return null
         }
 
-        return createTOTP(totpConfig, timestamp)
+        return generateTOTP(OTPConfig, timestamp)
     }
 
-    fun createTOTP(
-        totpConfig: TOTPConfig,
+    fun generateHOTP(
+        otpConfig: OTPConfig
+    ): Password? {
+        return generateHOTP(otpConfig, otpConfig.periodOrCounter.toLong())
+    }
+
+    fun generateTOTP(
+        otpConfig: OTPConfig,
         timestamp: Date
     ): Password? {
+        val counter = timestamp.time / (otpConfig.periodOrCounter * 1000)
+        return generateHOTP(otpConfig, counter)
+    }
 
-        val roundedTimestamp = 1L //timestamp.time.floorDiv(totpConfig.periodOrCounter)
-        val algorithmIdentifier = "HmacSHA1"//getHmacIdentifier(totpConfig.algorithm)
+    private fun generateHOTP(
+        otpConfig: OTPConfig,
+        counter: Long
+    ): Password? {
+
+        val algorithmIdentifier = getHmacIdentifier(otpConfig.algorithm)
         if (algorithmIdentifier == null) {
-            Log.w("OTP", "unknown algorithm: ${totpConfig.algorithm}")
+            Log.w("OTP", "unknown algorithm: ${otpConfig.algorithm}")
             return null
         }
 
         val mac = Mac.getInstance(algorithmIdentifier)
-        mac.init(SecretKeySpec(totpConfig.secret.toByteArray(), "RAW"))
-        val hmac = mac.doFinal(longToByteArray(roundedTimestamp))
+        mac.init(SecretKeySpec(otpConfig.secret.toByteArray(), algorithmIdentifier))
+        val hmac = mac.doFinal(longToByteArray(counter))
 
         return Password(
-            byteArrayToDigits(hmac, totpConfig.digits)
+            byteArrayToDigits(hmac, otpConfig.digits)
                 .toString()
-                .padStart(totpConfig.digits, '0'))
+                .padStart(otpConfig.digits, '0'))
     }
 
     fun generateTOTP(
@@ -145,13 +160,15 @@ object OtpService {
     }
 
     private fun longToByteArray(long: Long): ByteArray {
-        var movingFactor = long
+
+        return ByteBuffer.allocate(Long.SIZE_BYTES).putLong(long).array()
+       /* var movingFactor = long
         val bytes = ByteArray(8)
         for (i in bytes.indices.reversed()) {
             bytes[i] = (movingFactor and 0xff).toByte()
             movingFactor = movingFactor shr 8
         }
-        return bytes
+        return bytes*/
     }
 
     private fun byteArrayToDigits(bytes: ByteArray, digits: Int): Int {
@@ -166,9 +183,9 @@ object OtpService {
 
         val binary =
             (((bytes[offset] and 0x7f).toInt() shl 24)
-                    or ((bytes[offset + 1] and 0xff.toByte()).toInt() shl 16)
-                    or ((bytes[offset + 2] and 0xff.toByte()).toInt() shl 8)
-                    or (bytes[offset + 3] and 0xff.toByte()).toInt())
+                    or ((bytes[offset + 1].toInt() and 0xff) shl 16)
+                    or ((bytes[offset + 2].toInt() and 0xff) shl 8)
+                    or (bytes[offset + 3].toInt() and 0xff))
 /*
         val binary =
             ((bytes[offset].toInt() and 0x7f) shl 24 or ((bytes[offset + 1].toInt() and 0xff) shl 16
@@ -176,7 +193,7 @@ object OtpService {
                     ) or (bytes[offset + 3].toInt() and 0xff))*/
 
 
-        return binary % DIGITS_POWER[digits]
+        return binary % 10.0.pow(digits).toInt()
 
     }
 
