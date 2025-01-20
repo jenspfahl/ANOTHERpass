@@ -968,5 +968,7 @@
     <string name="login_argon2_current_memcost">%1$s MiB memory allocation</string>
 
     <string name="configure_one_time_password">Configure One-Time-Password</string>
+    <string name="hotp_name">Counter-based (HOTP)</string>
+    <string name="totp_name">Time-based (TOTP)</string>
 
 </resources>

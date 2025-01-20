@@ -58,7 +58,7 @@ data class EncCredential(
     var labels: Encrypted, // enc(comma-separated labelIds or "")
     val passwordData: PasswordData,
     val timeData: TimeData,
-    var optData: OtpData?
+    var otpData: OtpData?
 ): EncNamed {
 
     constructor(id: Int?,

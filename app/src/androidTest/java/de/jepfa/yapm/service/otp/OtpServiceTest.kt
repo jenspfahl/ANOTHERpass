@@ -16,7 +16,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.time.LocalDateTime
-import java.time.Month
 import java.time.ZoneOffset
 import java.util.Date
 
@@ -52,9 +51,9 @@ class OtpServiceTest {
 
             println("TOTP Config: $otpConfig")
 
-            _testHOTP(otpConfig, "818800")
-            _testHOTP(otpConfig.incCounter(), "320382")
-            _testHOTP(otpConfig.incCounter(), "404533")
+            doTestHOTP(otpConfig, "818800")
+            doTestHOTP(otpConfig.incCounter(), "320382")
+            doTestHOTP(otpConfig.incCounter(), "404533")
         }
     }
 
@@ -75,28 +74,28 @@ class OtpServiceTest {
 
             println("TOTP Config: $otpConfig")
 
-            _testTOTP(otpConfig, Date(0), "818800")
-            _testTOTP(otpConfig, Date(1000), "818800")
-            _testTOTP(otpConfig, Date(29000), "818800")
-            _testTOTP(otpConfig, Date(29999), "818800")
-            _testTOTP(otpConfig, Date(30000), "320382")
-            _testTOTP(otpConfig, Date(31000), "320382")
-            _testTOTP(otpConfig, Date(59999), "320382")
-            _testTOTP(otpConfig, Date(60000), "404533")
-            _testTOTP(otpConfig,
+            doTestTOTP(otpConfig, Date(0), "818800")
+            doTestTOTP(otpConfig, Date(1000), "818800")
+            doTestTOTP(otpConfig, Date(29000), "818800")
+            doTestTOTP(otpConfig, Date(29999), "818800")
+            doTestTOTP(otpConfig, Date(30000), "320382")
+            doTestTOTP(otpConfig, Date(31000), "320382")
+            doTestTOTP(otpConfig, Date(59999), "320382")
+            doTestTOTP(otpConfig, Date(60000), "404533")
+            doTestTOTP(otpConfig,
                 Date.from(LocalDateTime.of(2025, 1, 18, 19, 18, 14).toInstant(ZoneOffset.UTC)),
                 "697112")
 
         }
     }
 
-    private fun _testHOTP(otpConfig: OTPConfig, expectedToken: String) {
+    private fun doTestHOTP(otpConfig: OTPConfig, expectedToken: String) {
         val hotp = OtpService.generateHOTP(otpConfig)
         println("HOTP for counter ${otpConfig.periodOrCounter}: $hotp")
         Assert.assertEquals(expectedToken, hotp.toString())
     }
 
-    private fun _testTOTP(otpConfig: OTPConfig, date: Date, expectedToken: String) {
+    private fun doTestTOTP(otpConfig: OTPConfig, date: Date, expectedToken: String) {
         val totp = OtpService.generateTOTP(otpConfig, date)
         println("TOTP for timestamp ${date.time}: $totp")
         Assert.assertEquals(expectedToken, totp.toString())

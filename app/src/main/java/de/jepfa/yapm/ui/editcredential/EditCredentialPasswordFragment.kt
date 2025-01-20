@@ -446,6 +446,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
         if (id == R.id.menu_configure_otp) {
 
             val intent = Intent(editCredentialActivity, ConfigOtpActivity::class.java)
+            currentCredential.applyExtras(intent)
             editCredentialActivity.startActivity(intent)
 
             return true

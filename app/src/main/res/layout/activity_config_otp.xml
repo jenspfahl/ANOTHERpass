@@ -1,5 +1,6 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingLeft="@dimen/activity_horizontal_margin"
@@ -23,7 +24,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="16dp"
-                android:text="Scan a QR code to import OTP" />
+                android:text="Scan a QR code to quickly import a One-Time-Password configuration." />
 
 
             <ImageView
@@ -32,54 +33,195 @@
                 android:layout_height="match_parent"
                 android:clickable="true"
                 android:layout_gravity="center_horizontal"
+                android:padding="16dp"
                 android:src="@drawable/ic_baseline_qr_code_scanner_48"
                 android:focusable="true" />
 
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
             <TextView
-                android:id="@+id/edit_label_explanation"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginBottom="6dp"
-                android:text="Or edit it directly" />
+                android:text="Here you can edit or change the details of the current One-Time-Password configuration. Do only change it if you know what you are doing!" />
 
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:orientation="vertical">
+
+
+
+                <androidx.appcompat.widget.AppCompatSpinner
+                    android:id="@+id/otp_mode_selection"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:spinnerMode="dropdown"
+                    android:dropDownSelector="@color/black"
+                    />
+
+
+                <androidx.appcompat.widget.AppCompatSpinner
+                    android:id="@+id/otp_algo_selection"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:spinnerMode="dropdown"
+                    android:dropDownSelector="@color/black"
+                    />
+
+
+
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="6dp"
+                android:text="The shared secret in Base32 format:"
+                android:labelFor="@id/edit_otp_shared_secret"/>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+
+
                 <EditText
-                    android:id="@+id/edit_label_name"
+                    android:id="@+id/edit_otp_shared_secret"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="30dp"
                     android:hint="shared secret"
-                    android:inputType="text"
+                    android:inputType="text|textNoSuggestions"
                     android:maxLines="1"
-                    android:maxLength="@integer/max_label_name_length"
                     android:singleLine="true" />
 
             </com.google.android.material.textfield.TextInputLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TableRow>
+                    <TextView
+                        android:id="@+id/text_otp_counter_or_period"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="Counter or period:"
+                        android:labelFor="@id/edit_otp_counter_or_period"/>
+
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="Count of digits:"
+                        android:labelFor="@id/edit_otp_digits"
+                        android:layout_marginStart="24dp"
+                        />
+                </TableRow>
+                <TableRow>
+                    <EditText
+                        android:id="@+id/edit_otp_counter_or_period"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="30dp"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:maxLength="10"
+                        android:singleLine="true" />
+
+
+                    <EditText
+                        android:id="@+id/edit_otp_digits"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="30dp"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:maxLength="2"
+                        android:layout_marginStart="24dp"
+                        android:singleLine="true" />
+                </TableRow>
+            </TableLayout>
+
+
+
+        </LinearLayout>
+
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <EditText
-                    android:id="@+id/edit_label_desc"
+                <TextView
+                    android:id="@+id/otpauth_text"
                     android:layout_width="match_parent"
-                    android:layout_height="135dp"
+                    android:layout_height="50dp"
                     android:layout_marginBottom="30dp"
-                    android:hint="otpauth"
-                    android:inputType="textMultiLine"
+                    android:inputType="textMultiLine|textNoSuggestions|textUri"
                     android:maxLines="3"
                     android:maxLength="@integer/max_label_description_length"
+                    android:textIsSelectable="true"
                     android:singleLine="false" />
 
 
             </com.google.android.material.textfield.TextInputLayout>
 
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:layout_gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/otp_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:src="@drawable/otp_24" />
+
+                <TextView
+                    android:id="@+id/opt_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/robotomono_bold"
+                    android:textStyle="bold"
+                    android:textAlignment="center"
+                    android:layout_marginStart="15dp"
+                    android:textSize="18sp"
+                    android:textIsSelectable="true"
+                    android:text="234 236"/>
+
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginStart="8dp"
+                    app:indicatorSize="16dp"
+                    app:trackThickness="2dp"
+                    android:progress="70"
+                    android:max="100"
+                    app:indicatorColor="@color/black"
+                    app:trackColor="@color/LightGray"
+                    />
+            </LinearLayout>
 
             <Button
                 android:id="@+id/button_save"
