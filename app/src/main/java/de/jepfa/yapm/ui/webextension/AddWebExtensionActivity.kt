@@ -2,14 +2,11 @@ package de.jepfa.yapm.ui.webextension
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.SpannableString
 import android.text.TextUtils
 import android.util.Base64
 import android.util.Log
 import android.view.MenuItem
-import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -27,7 +24,7 @@ import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.ServerRequestBottomSheet
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
-import de.jepfa.yapm.ui.importread.ReadActivityBase
+import de.jepfa.yapm.ui.importread.ReadQrCodeOrNfcActivityBase
 import de.jepfa.yapm.usecase.webextension.DeleteWebExtensionUseCase
 import de.jepfa.yapm.util.*
 import io.ktor.http.*
@@ -37,7 +34,7 @@ import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 
-class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
+class AddWebExtensionActivity : ReadQrCodeOrNfcActivityBase(), HttpServer.HttpCallback {
 
     private var currentLockTimeout: Int = 0
     private var currentLogoutTimeout: Int = 0

@@ -23,7 +23,7 @@ import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
 
 
-class VerifyActivity : ReadActivityBase() {
+class VerifyActivity : ReadQrCodeOrNfcActivityBase() {
 
     private lateinit var verifyResultText :TextView
 

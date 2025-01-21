@@ -11,7 +11,7 @@ import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
 import de.jepfa.yapm.util.toastText
 
 
-class ImportCredentialActivity : ReadActivityBase() {
+class ImportCredentialActivity : ReadQrCodeOrNfcActivityBase() {
 
     init {
         readPlainTextFromNfc = true

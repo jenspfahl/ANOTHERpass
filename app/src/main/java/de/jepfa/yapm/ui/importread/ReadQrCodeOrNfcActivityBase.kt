@@ -19,7 +19,7 @@ import de.jepfa.yapm.util.enrichId
 import de.jepfa.yapm.util.toastText
 
 
-abstract class ReadActivityBase : NfcBaseActivity() {
+abstract class ReadQrCodeOrNfcActivityBase : NfcBaseActivity() {
 
     protected var isFromQRScan = false
     protected var onlyQrCodeScan = false

@@ -53,7 +53,7 @@ data class OTPConfig(
     val digits: Int,
     var periodOrCounter: Int) {
 
-    private fun getLabel(): String {
+    fun getLabel(): String {
         if (account.isBlank()) {
             return issuer.encodeURLPath()
         }

@@ -1,5 +1,8 @@
 package de.jepfa.yapm.ui.credential
 
+import android.app.Activity
+import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
@@ -10,11 +13,13 @@ import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.core.widget.addTextChangedListener
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.encrypted.EncCredential.Companion.EXTRA_CREDENTIAL_OTP_DATA
 import de.jepfa.yapm.model.encrypted.OtpData
 import de.jepfa.yapm.model.otp.OTPAlgorithm
 import de.jepfa.yapm.model.otp.OTPConfig
@@ -27,15 +32,21 @@ import de.jepfa.yapm.model.otp.OTPMode
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.Session
+import de.jepfa.yapm.service.secret.AndroidKey
+import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.service.secret.SecretService
-import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.ui.importread.ReadQrCodeOrNfcActivityBase
+import de.jepfa.yapm.ui.nfc.NfcActivity
+import de.jepfa.yapm.ui.qrcode.QrCodeActivity
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.DebugInfo
+import de.jepfa.yapm.util.putEncryptedExtra
+import de.jepfa.yapm.util.toastText
 
 
-class ConfigOtpActivity : SecureActivity() {
+class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
 
-
+    private lateinit var qrCodeScannerImageView: ImageView
     private lateinit var otpModeSelection: AppCompatSpinner
     private lateinit var otpAlgorithmSelection: AppCompatSpinner
     private lateinit var sharedSecretEditText: EditText
@@ -55,12 +66,14 @@ class ConfigOtpActivity : SecureActivity() {
 
     init {
         enableBack = true
+        onlyQrCodeScan = true
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_config_otp)
 
+        qrCodeScannerImageView = findViewById(R.id.imageview_scan_qrcode)
 
 
         otpModeSelection = findViewById(R.id.otp_mode_selection)
@@ -132,21 +145,45 @@ class ConfigOtpActivity : SecureActivity() {
         val saveButton: Button = findViewById(R.id.button_save)
         saveButton.setOnClickListener {
 
-            finish()
+            masterSecretKey?.let { key ->
+                val newOTP = createOTPConfigFromCurrentState()
+                if (newOTP != null) {
+                    val encOtpData =
+                        SecretService.encryptCommonString(key, newOTP.toUri().toString())
+
+                    val data = Intent()
+                    data.putEncryptedExtra(EXTRA_CREDENTIAL_OTP_DATA, encOtpData)
+
+                    setResult(Activity.RESULT_OK, data)
+                    finish()
+                }
+                else {
+                    toastText(this, "Cannot apply this config, since parts are missing.")
+                }
+            }
+
 
         }
 
         updateCounterOrPeriodTextView()
-        loadOTP()
+        loadOTPFromCredential()
 
     }
 
     private fun updateOtpAuthTextView() {
+        val newOTP = createOTPConfigFromCurrentState()
+        if (newOTP != null) {
+            otpAuthTextView.text = newOTP.toUri().toString()
+            updateCounterOrPeriodTextView(includeValues = false)
+        }
+    }
+
+    private fun createOTPConfigFromCurrentState(): OTPConfig? {
         val cDigits = digitsEditText.text.toString().toIntOrNull()
         val cCounterOrPeriod = counterOrPeriodEditText.text.toString().toIntOrNull()
         if (cDigits != null && cCounterOrPeriod != null) {
             secret?.let {
-                val newOTP = OTPConfig(
+                return OTPConfig(
                     otpMode,
                     if (account.isNullOrBlank()) "" else account!!,
                     issuer ?: "",
@@ -155,28 +192,33 @@ class ConfigOtpActivity : SecureActivity() {
                     cDigits,
                     cCounterOrPeriod,
                 )
-                otpAuthTextView.text = newOTP.toUri().toString()
-                updateCounterOrPeriodTextView()
             }
         }
+
+        return null
     }
 
-    private fun updateCounterOrPeriodTextView() {
+    private fun updateCounterOrPeriodTextView(includeValues: Boolean = true) {
         if (otpMode == OTPMode.HOTP) {
             counterOrPeriodTextView.setText("Current counter value:")
-            period = counterOrPeriodEditText.text.toString().toIntOrNull() ?: DEFAULT_OTP_PERIOD
-            counterOrPeriodEditText.setText(counter.toString())
+            if (includeValues) {
+                period = counterOrPeriodEditText.text.toString().toIntOrNull() ?: DEFAULT_OTP_PERIOD
+                counterOrPeriodEditText.setText(counter.toString())
+            }
         }
         else if (otpMode == OTPMode.TOTP) {
             counterOrPeriodTextView.setText("Renew-Period on seconds:")
-            counter = counterOrPeriodEditText.text.toString().toIntOrNull() ?: DEFAULT_OTP_COUNTER
-            counterOrPeriodEditText.setText(period.toString())
+            if (includeValues) {
+                counter =
+                    counterOrPeriodEditText.text.toString().toIntOrNull() ?: DEFAULT_OTP_COUNTER
+                counterOrPeriodEditText.setText(period.toString())
+            }
 
         }
 
     }
 
-    private fun loadOTP() {
+    private fun loadOTPFromCredential() {
 
         val currentCredential = EncCredential.fromIntent(intent)
 
@@ -186,41 +228,49 @@ class ConfigOtpActivity : SecureActivity() {
             account = SecretService.decryptCommonString(key, currentCredential.user)
 
             currentCredential.otpData?.let { otpData ->
-                val otpConfig = loadOtpConfig(key, otpData) ?: return
-
-                otpMode = otpConfig.mode
-                otpAlgorithm = otpConfig.algorithm
-                secret = otpConfig.secret
-                if (otpMode == OTPMode.HOTP) {
-                    counter = otpConfig.periodOrCounter
-
+                val otpUriString = SecretService.decryptCommonString(key, otpData.encOtpAuthUri)
+                val otpConfig = createOtpConfigFromUri(otpUriString)
+                if (otpConfig != null) {
+                    updateUIFromOTPConfig(otpConfig)
                 }
-                else if (otpMode == OTPMode.TOTP) {
-                    period = otpConfig.periodOrCounter
+                else {
+                    toastText(this, "Cannot load OTP data")
                 }
-
-                otpModeSelection.setSelection(otpMode.ordinal)
-                otpAlgorithmSelection.setSelection(otpAlgorithm.ordinal)
-
-                sharedSecretEditText.setText(otpConfig.secretAsBase32())
-                counterOrPeriodEditText.setText(otpConfig.periodOrCounter.toString())
-                digitsEditText.setText(otpConfig.digits.toString())
-
-                updateOtpAuthTextView()
             }
 
         }
 
     }
 
-    private fun loadOtpConfig(
-        key: SecretKeyHolder,
-        otpData: OtpData
+    private fun updateUIFromOTPConfig(
+        otpConfig: OTPConfig
+    ) {
+
+        otpMode = otpConfig.mode
+        otpAlgorithm = otpConfig.algorithm
+        secret = otpConfig.secret
+        if (otpMode == OTPMode.HOTP) {
+            counter = otpConfig.periodOrCounter
+
+        } else if (otpMode == OTPMode.TOTP) {
+            period = otpConfig.periodOrCounter
+        }
+
+        otpModeSelection.setSelection(otpMode.ordinal)
+        otpAlgorithmSelection.setSelection(otpAlgorithm.ordinal)
+
+        sharedSecretEditText.setText(otpConfig.secretAsBase32())
+        counterOrPeriodEditText.setText(otpConfig.periodOrCounter.toString())
+        digitsEditText.setText(otpConfig.digits.toString())
+
+        updateOtpAuthTextView()
+    }
+
+    private fun createOtpConfigFromUri(
+        otpUriString: String
     ): OTPConfig? {
-        val otpUriString = SecretService.decryptCommonString(key, otpData.encOtpAuthUri)
         try {
             val otpUri = Uri.parse(otpUriString)
-            //val otpUri = Uri.parse("otpauth://hotp/ACME%20Co:john.doe@email.com?secret=HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ&issuer=ACME%20Co&algorithm=SHA256&digits=6&counter=1")
             val otpConfig = OTPConfig.fromUri(otpUri)
             return otpConfig
         } catch (e: Exception) {
@@ -248,6 +298,44 @@ class ConfigOtpActivity : SecureActivity() {
             return false
         }
 
+        if (id == R.id.menu_export_otp) {
+
+            val tempKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, this)
+            val newOTP = createOTPConfigFromCurrentState()
+
+            if (newOTP == null) {
+                toastText(this, "Cannot export this OTP. Some data might be missing.")
+                return false
+            }
+
+
+            val encHead =
+                SecretService.encryptCommonString(
+                    tempKey,
+                    "One-Time-Password configuration"
+                )
+            val encSub =
+                SecretService.encryptCommonString(tempKey, "This contains all data needed to configure this One-Time-Password in any authenticator. It contains a shared secret, so handle it carefully.")
+            val encQrcHeader = SecretService.encryptCommonString(
+                tempKey,
+                newOTP.getLabel())
+            val encQrc = SecretService.encryptCommonString(tempKey, newOTP.toUri().toString())
+
+            val intent = Intent(this, QrCodeActivity::class.java)
+            intent.putEncryptedExtra(QrCodeActivity.EXTRA_HEADLINE, encHead)
+            intent.putEncryptedExtra(QrCodeActivity.EXTRA_SUBTEXT, encSub)
+            intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE_HEADER, encQrcHeader)
+            intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE, encQrc)
+            intent.putExtra(QrCodeActivity.EXTRA_COLOR, Color.RED)
+
+            // will be bypassed to NfcActivity
+            intent.putExtra(NfcActivity.EXTRA_WITH_APP_RECORD, true)
+
+            startActivity(intent)
+
+            return true
+        }
+
         if (id == R.id.menu_delete_label) {
 
 
@@ -261,6 +349,18 @@ class ConfigOtpActivity : SecureActivity() {
 
     override fun lock() {
         finish()
+    }
+
+    override fun getLayoutId() = R.layout.activity_config_otp
+
+    override fun handleScannedData(scanned: String) {
+        val otpConfig = createOtpConfigFromUri(scanned)
+        if (otpConfig != null) {
+            updateUIFromOTPConfig(otpConfig)
+        }
+        else {
+            toastText(this, "Scanned QR Code doesn't contain a OTP config.")
+        }
     }
 
 

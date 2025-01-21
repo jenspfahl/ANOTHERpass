@@ -73,6 +73,7 @@ data class EncCredential(
                 expiresAtBase64: String?,
                 isObfuscated: Boolean,
                 isLastPasswordObfuscated: Boolean?,
+                otpDataBase64: String?,
                 modifyTimestamp: Long?) :
             this(
                 id,
@@ -92,7 +93,7 @@ data class EncCredential(
                     modifyTimestamp,
                     if (expiresAtBase64 != null) Encrypted.fromBase64String(expiresAtBase64) else Encrypted.empty(),
                 ),
-                null // TODO OtpData
+                otpDataBase64?.run { OtpData(Encrypted.fromBase64String(otpDataBase64)) },
             )
 
 
@@ -126,6 +127,7 @@ data class EncCredential(
         intent.putEncryptedExtra(EXTRA_CREDENTIAL_EXPIRES_AT, timeData.expiresAt)
         intent.putExtra(EXTRA_CREDENTIAL_IS_OBFUSCATED, passwordData.isObfuscated)
         intent.putExtra(EXTRA_CREDENTIAL_IS_LAST_PASSWORD_OBFUSCATED, passwordData.isLastPasswordObfuscated)
+        otpData?.let { intent.putEncryptedExtra(EXTRA_CREDENTIAL_OTP_DATA, it.encOtpAuthUri) }
         intent.putExtra(EXTRA_CREDENTIAL_MODIFY_TIMESTAMP, timeData.modifyTimestamp)
 
     }
@@ -191,6 +193,7 @@ data class EncCredential(
         const val EXTRA_CREDENTIAL_EXPIRES_AT = "de.jepfa.yapm.ui.credential.expiresAt"
         const val EXTRA_CREDENTIAL_IS_OBFUSCATED = "de.jepfa.yapm.ui.credential.isObfuscated"
         const val EXTRA_CREDENTIAL_IS_LAST_PASSWORD_OBFUSCATED = "de.jepfa.yapm.ui.credential.isLastPasswordObfuscated"
+        const val EXTRA_CREDENTIAL_OTP_DATA = "de.jepfa.yapm.ui.credential.otpData"
         const val EXTRA_CREDENTIAL_MODIFY_TIMESTAMP = "de.jepfa.yapm.ui.credential.modifyTimestamp"
 
         const val ATTRIB_ID = "id"
@@ -205,6 +208,7 @@ data class EncCredential(
         const val ATTRIB_EXPIRES_AT = "expiresAt"
         const val ATTRIB_IS_OBFUSCATED = "isObfuscated"
         const val ATTRIB_IS_LAST_PASSWORD_OBFUSCATED = "isLastPasswordObfuscated"
+        const val ATTRIB_OTP_DATA = "otpData"
         const val ATTRIB_MODIFY_TIMESTAMP = "modifyTimestamp"
 
         fun fromIntent(intent: Intent, createUuid: Boolean = false): EncCredential {
@@ -226,6 +230,8 @@ data class EncCredential(
             val isLastPasswordObfuscated = intent.getBooleanExtra(
                 EXTRA_CREDENTIAL_IS_LAST_PASSWORD_OBFUSCATED, false)
             var modifyTimestamp = intent.getLongExtra(EXTRA_CREDENTIAL_MODIFY_TIMESTAMP, 0)
+            val encOtpData = intent.getEncryptedExtra(EXTRA_CREDENTIAL_OTP_DATA)
+
 
             if (uid == null && createUuid) {
                 uid = UUID.randomUUID()
@@ -248,8 +254,8 @@ data class EncCredential(
                 TimeData(
                     modifyTimestamp,
                     encExpiresAt,
-                )
-                , null //TODO OTP
+                ),
+                encOtpData?.run { OtpData(encOtpData) }
             )
         }
 
@@ -269,6 +275,7 @@ data class EncCredential(
                     jsonObject.get(ATTRIB_EXPIRES_AT)?.asString,
                     jsonObject.get(ATTRIB_IS_OBFUSCATED)?.asBoolean ?: false,
                     jsonObject.get(ATTRIB_IS_LAST_PASSWORD_OBFUSCATED)?.asBoolean ?: false,
+                    jsonObject.get(ATTRIB_OTP_DATA)?.asString,
                     jsonObject.get(ATTRIB_MODIFY_TIMESTAMP)?.asLong
                 )
             } catch (e: Exception) {

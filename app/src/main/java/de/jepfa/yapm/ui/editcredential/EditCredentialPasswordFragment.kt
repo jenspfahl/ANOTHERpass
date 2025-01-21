@@ -1,5 +1,6 @@
 package de.jepfa.yapm.ui.editcredential
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -8,12 +9,16 @@ import android.text.InputFilter.LengthFilter
 import android.text.InputType
 import android.view.*
 import android.widget.*
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SwitchCompat
 import com.google.android.material.tabs.TabLayout
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
-import de.jepfa.yapm.model.encrypted.EncLabel
+import de.jepfa.yapm.model.encrypted.EncCredential.Companion.EXTRA_CREDENTIAL_OTP_DATA
+import de.jepfa.yapm.model.encrypted.OtpData
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
@@ -32,16 +37,27 @@ import de.jepfa.yapm.service.secretgenerator.password.PasswordGeneratorSpec
 import de.jepfa.yapm.ui.SecureFragment
 import de.jepfa.yapm.ui.credential.ConfigOtpActivity
 import de.jepfa.yapm.ui.credential.DeobfuscationDialog
-import de.jepfa.yapm.ui.label.EditLabelActivity
 import de.jepfa.yapm.usecase.credential.ShowPasswordStrengthUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.PasswordColorizer
+import de.jepfa.yapm.util.getEncryptedExtra
 import de.jepfa.yapm.util.toastText
 
 
 class EditCredentialPasswordFragment : SecureFragment() {
+
+    private var startForResult = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val encOtpData = result.data?.getEncryptedExtra(EXTRA_CREDENTIAL_OTP_DATA)
+            if (encOtpData != null) {
+                currentCredential.otpData = OtpData(encOtpData)
+            }
+        }
+    }
 
     private val PASSPHRASE_STRENGTH_DEFAULT = SecretStrength.STRONG
     private val PASSWORD_STRENGTH_DEFAULT = SecretStrength.STRONG
@@ -94,6 +110,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
         savedInstanceState?.getBoolean("obfuscatePasswordRequired")?.let {
             obfuscatePasswordRequired = it
         }
+
 
         editCredentialActivity = getBaseActivity() as EditCredentialActivity
 
@@ -229,6 +246,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
         super.onSaveInstanceState(outState)
         outState.putBoolean("obfuscatePasswordRequired", obfuscatePasswordRequired)
     }
+
 
     private fun updatePasswordView(
         key: SecretKeyHolder,
@@ -447,7 +465,9 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
             val intent = Intent(editCredentialActivity, ConfigOtpActivity::class.java)
             currentCredential.applyExtras(intent)
-            editCredentialActivity.startActivity(intent)
+            
+
+            startForResult.launch(intent)
 
             return true
         }
