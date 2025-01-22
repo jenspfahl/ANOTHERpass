@@ -619,7 +619,7 @@ object HttpCredentialRequestHandler {
         userActionText: String,
         showSnackbars: Boolean = true,
         acceptHandler: () -> Unit,
-    ) {
+     ) {
         Log.d("HTTP", "showClientRequest for $shortenedFingerprint")
 
         if (webExtension.bypassIncomingRequests) {

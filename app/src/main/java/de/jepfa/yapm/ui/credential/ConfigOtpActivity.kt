@@ -5,9 +5,13 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.Transformation
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
@@ -17,10 +21,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.core.widget.addTextChangedListener
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncCredential.Companion.EXTRA_CREDENTIAL_OTP_DATA
-import de.jepfa.yapm.model.encrypted.OtpData
 import de.jepfa.yapm.model.otp.OTPAlgorithm
 import de.jepfa.yapm.model.otp.OTPConfig
 import de.jepfa.yapm.model.otp.OTPConfig.Companion.DEFAULT_OTP_ALGORITHM
@@ -30,10 +34,9 @@ import de.jepfa.yapm.model.otp.OTPConfig.Companion.DEFAULT_OTP_MODE
 import de.jepfa.yapm.model.otp.OTPConfig.Companion.DEFAULT_OTP_PERIOD
 import de.jepfa.yapm.model.otp.OTPMode
 import de.jepfa.yapm.model.secret.Key
-import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.Session
+import de.jepfa.yapm.service.otp.OtpService
 import de.jepfa.yapm.service.secret.AndroidKey
-import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.importread.ReadQrCodeOrNfcActivityBase
 import de.jepfa.yapm.ui.nfc.NfcActivity
@@ -42,10 +45,18 @@ import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.putEncryptedExtra
 import de.jepfa.yapm.util.toastText
+import java.util.Date
 
 
 class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
 
+    private val timer = Handler(Looper.getMainLooper())
+    private var timerRunner: Runnable? = null
+
+
+    private var otpToSave: OTPConfig? = null
+
+    private lateinit var progressCircle: CircularProgressIndicator
     private lateinit var qrCodeScannerImageView: ImageView
     private lateinit var otpModeSelection: AppCompatSpinner
     private lateinit var otpAlgorithmSelection: AppCompatSpinner
@@ -54,6 +65,7 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
     private lateinit var digitsEditText: EditText
     private lateinit var counterOrPeriodTextView: TextView
     private lateinit var otpAuthTextView: TextView
+    private lateinit var otpValueTextView: TextView
 
     private var issuer: String? = null
     private var account: String? = null
@@ -132,6 +144,13 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
         counterOrPeriodEditText = findViewById(R.id.edit_otp_counter_or_period)
         counterOrPeriodEditText.addTextChangedListener {
             updateOtpAuthTextView()
+            val value = counterOrPeriodTextView.text.toString().toIntOrNull()
+            if (otpMode == OTPMode.HOTP && value != null) {
+                counter = value
+            }
+            if (otpMode == OTPMode.TOTP && value != null) {
+                period = value
+            }
         }
 
         digitsEditText = findViewById(R.id.edit_otp_digits)
@@ -142,14 +161,36 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
 
         otpAuthTextView = findViewById(R.id.otpauth_text)
 
+        otpValueTextView = findViewById(R.id.otp_value)
+
+        progressCircle = findViewById(R.id.otp_progress_circle)
+
         val saveButton: Button = findViewById(R.id.button_save)
         saveButton.setOnClickListener {
 
+            if (sharedSecretEditText.text.isBlank()) {
+                sharedSecretEditText.requestFocus()
+                toastText(this, "A secret in Base64 is needed")
+                return@setOnClickListener
+            }
+
+            if (counterOrPeriodEditText.text.isBlank()) {
+                sharedSecretEditText.requestFocus()
+                toastText(this, "A value is requiered here")
+                return@setOnClickListener
+            }
+
+            if (digitsEditText.text.isBlank()) {
+                sharedSecretEditText.requestFocus()
+                toastText(this, "A value is required here")
+                return@setOnClickListener
+            }
+
             masterSecretKey?.let { key ->
-                val newOTP = createOTPConfigFromCurrentState()
-                if (newOTP != null) {
+                otpToSave = createOTPConfigFromCurrentState()
+                if (otpToSave != null) {
                     val encOtpData =
-                        SecretService.encryptCommonString(key, newOTP.toUri().toString())
+                        SecretService.encryptCommonString(key, otpToSave!!.toUri().toString())
 
                     val data = Intent()
                     data.putEncryptedExtra(EXTRA_CREDENTIAL_OTP_DATA, encOtpData)
@@ -165,17 +206,74 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
 
         }
 
-        updateCounterOrPeriodTextView()
+        updateCounterOrPeriodTextView(includeValues = false)
         loadOTPFromCredential()
+
+
+
+
+        timerRunner = Runnable {
+            val hasChanged = updateCurrentOTP()
+            timerRunner?.let {
+                timer.postDelayed(it, 1000L)
+                if (otpMode == OTPMode.TOTP && hasChanged) {
+                    startOtpProgressAnimation(isFirst = false)
+                }
+            }
+        }
+        val elapsedTimeOfSecond = System.currentTimeMillis() % 1000
+        val firstDelay = 1000 - elapsedTimeOfSecond
+        timer.postDelayed(timerRunner!!, firstDelay)
+
+        if (otpMode == OTPMode.TOTP) {
+            startOtpProgressAnimation(isFirst = true)
+        }
 
     }
 
-    private fun updateOtpAuthTextView() {
-        val newOTP = createOTPConfigFromCurrentState()
-        if (newOTP != null) {
-            otpAuthTextView.text = newOTP.toUri().toString()
-            updateCounterOrPeriodTextView(includeValues = false)
+    private fun startOtpProgressAnimation(isFirst: Boolean) {
+        val periodInMillis = period * 1000
+        val elapsedMillisOfPeriod = System.currentTimeMillis() % periodInMillis
+        val progressedMillisOfPeriod = (elapsedMillisOfPeriod / periodInMillis.toFloat()) * 1000
+        val anim = ProgressCircleAnimation(
+            progressCircle,
+            progressedMillisOfPeriod,
+            1000.toFloat()
+        )
+        if (isFirst) {
+            anim.duration = periodInMillis.toLong() - elapsedMillisOfPeriod
         }
+        else {
+            anim.duration = periodInMillis.toLong()
+        }
+        progressCircle.startAnimation(anim)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        timerRunner?.let { timer.removeCallbacks(it) }
+    }
+
+    private fun updateOtpAuthTextView() {
+        otpToSave = createOTPConfigFromCurrentState()
+        otpToSave?.let {
+            otpAuthTextView.text = it.toUri().toString()
+            updateCounterOrPeriodTextView(includeValues = false)
+
+            updateCurrentOTP()
+        }
+
+    }
+
+    private fun updateCurrentOTP(): Boolean {
+        otpToSave?.let {
+            val otp = OtpService.generateOTP(it, Date()) ?: return false
+            val hasChanged = otpValueTextView.text.toString() != otp.toRawFormattedPassword().toString()
+            otpValueTextView.text = otp.toRawFormattedPassword() // TODO formatting and masking
+            otp.clear()
+            return hasChanged
+        }
+        return false
     }
 
     private fun createOTPConfigFromCurrentState(): OTPConfig? {
@@ -301,9 +399,9 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
         if (id == R.id.menu_export_otp) {
 
             val tempKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, this)
-            val newOTP = createOTPConfigFromCurrentState()
+            otpToSave = createOTPConfigFromCurrentState()
 
-            if (newOTP == null) {
+            if (otpToSave == null) {
                 toastText(this, "Cannot export this OTP. Some data might be missing.")
                 return false
             }
@@ -318,8 +416,8 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
                 SecretService.encryptCommonString(tempKey, "This contains all data needed to configure this One-Time-Password in any authenticator. It contains a shared secret, so handle it carefully.")
             val encQrcHeader = SecretService.encryptCommonString(
                 tempKey,
-                newOTP.getLabel())
-            val encQrc = SecretService.encryptCommonString(tempKey, newOTP.toUri().toString())
+                otpToSave!!.getLabel())
+            val encQrc = SecretService.encryptCommonString(tempKey, otpToSave!!.toUri().toString())
 
             val intent = Intent(this, QrCodeActivity::class.java)
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_HEADLINE, encHead)
@@ -364,4 +462,18 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
     }
 
 
+}
+
+
+class ProgressCircleAnimation(
+    private val progressCircle: CircularProgressIndicator,
+    private val from: Float,
+    private val to: Float
+) :
+    Animation() {
+    override fun applyTransformation(interpolatedTime: Float, t: Transformation) {
+        super.applyTransformation(interpolatedTime, t)
+        val value = from + (to - from) * interpolatedTime
+        progressCircle.progress = value.toInt()
+    }
 }

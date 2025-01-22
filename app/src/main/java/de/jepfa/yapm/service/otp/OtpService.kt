@@ -4,6 +4,7 @@ import android.net.Uri
 import android.util.Log
 import de.jepfa.yapm.model.encrypted.OtpData
 import de.jepfa.yapm.model.otp.OTPConfig
+import de.jepfa.yapm.model.otp.OTPMode
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
@@ -18,7 +19,7 @@ import kotlin.math.pow
 
 object OtpService {
 
-    fun generateTOTP(
+    fun generateOTP(
         otpData: OtpData,
         timestamp: Date,
         key: SecretKeyHolder,
@@ -34,9 +35,23 @@ object OtpService {
         return generateTOTP(otpConfig, timestamp)
     }
 
+
+
+    fun generateOTP(
+        otpConfig: OTPConfig,
+        timestamp: Date
+    ): Password? {
+        if (otpConfig.mode == OTPMode.HOTP) {
+            return generateHOTP(otpConfig, otpConfig.periodOrCounter.toLong())
+        }
+        else {
+            return generateTOTP(otpConfig, timestamp)
+        }
+    }
+
     fun generateHOTP(
         otpConfig: OTPConfig
-    ): Password? {
+    ): Password {
         return generateHOTP(otpConfig, otpConfig.periodOrCounter.toLong())
     }
 
@@ -44,6 +59,9 @@ object OtpService {
         otpConfig: OTPConfig,
         timestamp: Date
     ): Password? {
+        if (otpConfig.periodOrCounter <= 0) {
+            return null
+        }
         val counter = timestamp.time / (otpConfig.periodOrCounter * 1000)
         return generateHOTP(otpConfig, counter)
     }

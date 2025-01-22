@@ -199,7 +199,7 @@
                     android:src="@drawable/otp_24" />
 
                 <TextView
-                    android:id="@+id/opt_value"
+                    android:id="@+id/otp_value"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/robotomono_bold"
@@ -208,18 +208,18 @@
                     android:layout_marginStart="15dp"
                     android:textSize="18sp"
                     android:textIsSelectable="true"
-                    android:text="234 236"/>
+                    />
 
                 <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/otp_progress_circle"
                     android:layout_width="18dp"
                     android:layout_height="18dp"
                     android:layout_marginStart="8dp"
                     app:indicatorSize="16dp"
                     app:trackThickness="2dp"
-                    android:progress="70"
-                    android:max="100"
-                    app:indicatorColor="@color/black"
-                    app:trackColor="@color/LightGray"
+                    android:progress="700"
+                    android:max="1000"
+                    app:indicatorColor="@color/BlackGray"
                     />
             </LinearLayout>
 
