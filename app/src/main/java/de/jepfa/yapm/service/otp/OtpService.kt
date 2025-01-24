@@ -49,12 +49,14 @@ object OtpService {
         }
     }
 
+    // https://datatracker.ietf.org/doc/html/rfc4226
     fun generateHOTP(
         otpConfig: OTPConfig
     ): Password {
         return generateHOTP(otpConfig, otpConfig.periodOrCounter.toLong())
     }
 
+    // https://datatracker.ietf.org/doc/html/rfc6238
     fun generateTOTP(
         otpConfig: OTPConfig,
         timestamp: Date

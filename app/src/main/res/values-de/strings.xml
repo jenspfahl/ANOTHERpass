@@ -959,6 +959,31 @@
     <string name="login_argon2_memcost_unit">Speicherzuweisung in MiB</string>
     <string name="login_argon2_current_memcost">%1$s MiB Speicherzuweisung</string>
 
-    <string name="configure_one_time_password">Konfiguriere Einmal-Passwort</string>
+    <string name="configure_one_time_password">Konfiguriere Einmalpasswort</string>
+    <string name="hotp_name">Zählerbasiert (HOTP)</string>
+    <string name="totp_name">Zeitbasiert (TOTP)</string>
+    <string name="otp_scan_qr_code">Scanne den vom Aussteller bereitgestellten QR-Code, um eine Einmalpasswort-Konfiguration zu importieren.</string>
+    <string name="otp_edit_otp_config">Hier kannst du die Details der aktuellen Einmalpasswort-Konfiguration bearbeiten oder ändern. Ändere sie nur, wenn du weißt, was du da tust!</string>
+    <string name="otp_shared_secret_in_base32">Das gemeinsame Geheimnis im Base32-Format:</string>
+    <string name="otp_counter_or_period">Zähler oder Zeitintervall:</string>
+    <string name="otp_count_of_digits">Anzahl der Ziffern:</string>
+    <string name="otp_apply_changes">Übernehmen</string>
+    <string name="otp_error_secret_not_in_base32">Das Geheimnis muss Base32-kodiert sein.</string>
+    <string name="error_value_greater_zero_required">Der Wert muss größer als 0 sein.</string>
+    <string name="otp_cannot_apply">Diese Konfiguration kann nicht angewendet werden, da sie unvollstängig ist.</string>
+    <string name="otp_cannot_export">Dies Konfiguration kann nicht exportiert werden, da sie unvollständig ist.</string>
+    <string name="otp_current_counter">Aktueller Zählerwert:</string>
+    <string name="otp_period_in_seconds">Gültigkeitszeitraum in Sekunden:</string>
+    <string name="otp_update_hotp_counter_title">Zähler für Einmalpasswort aktualisieren</string>
+    <string name="otp_update_hotp_counter_message">Dieser Zähler sollte mit dem Zähler des Ausstellers synchron sein. Aktueller Zählerwert ist: %1$s</string>
+    <string name="otp_cannot_load_config">Diese Konfiguration kann nicht geladen werden!</string>
+    <string name="otp_config_headline">Konfiguration für Einmalpasswort</string>
+    <string name="otp_exported_otp_desc">Dieser QR-Code enthält alle Daten, die zum Konfigurieren dieses Einmalpasswortes in einem beliebigen Authentifikator erforderlich sind. Er enthält ein gemeinsames Geheimnis, gehe also vorsichtig damit um.</string>
+    <string name="otp_cannot_scann_otp_config">Der gescannte QR-Code enthält keine gültige Konfiguration.</string>
+    <string name="otp_increment_counter">Erhöhen</string>
+    <string name="otp_remove_config_title">Einmalpasswort für \'%1$s\' entfernen</string>
+    <string name="otp_remove_config_message">Soll diese Einmalpasswort-Konfiguration wirklich von diesen Zugangsdaten entfernt werden?</string>
+    <string name="nothing_to_delete">Nichts zum entfernen</string>
+    <string name="otp_copy_configuration_to_clipboard">Konfiguration in die Zwischenablage kopieren</string>
 
 </resources>

@@ -18,6 +18,7 @@ import com.google.android.material.tabs.TabLayout
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncCredential.Companion.EXTRA_CREDENTIAL_OTP_DATA
+import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.encrypted.OtpData
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
@@ -54,7 +55,12 @@ class EditCredentialPasswordFragment : SecureFragment() {
         if (result.resultCode == Activity.RESULT_OK) {
             val encOtpData = result.data?.getEncryptedExtra(EXTRA_CREDENTIAL_OTP_DATA)
             if (encOtpData != null) {
-                currentCredential.otpData = OtpData(encOtpData)
+                if (encOtpData.isEmpty()) {
+                    currentCredential.otpData = null
+                }
+                else {
+                    currentCredential.otpData = OtpData(encOtpData)
+                }
             }
         }
     }

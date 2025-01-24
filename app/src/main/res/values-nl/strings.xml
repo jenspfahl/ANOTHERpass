@@ -926,6 +926,31 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="login_argon2_current_memcost">%1$s MiB memory allocation</string>
 
   <string name="configure_one_time_password">Configure One-Time-Password</string>
+  <string name="hotp_name">Counter-based (HOTP)</string>
+  <string name="totp_name">Time-based (TOTP)</string>
+  <string name="otp_scan_qr_code">Scan the QR code presented by the issuer to quickly import a One-Time-Password configuration.</string>
+  <string name="otp_edit_otp_config">Here you can edit or change the details of the current One-Time-Password configuration. Do only change it if you know what you are doing!</string>
+  <string name="otp_shared_secret_in_base32">The shared secret in Base32 format:</string>
+  <string name="otp_counter_or_period">Counter or period:</string>
+  <string name="otp_count_of_digits">Count of digits:</string>
+  <string name="otp_apply_changes">Apply</string>
+  <string name="otp_error_secret_not_in_base32">The secret must be Base32-encoded.</string>
+  <string name="error_value_greater_zero_required">A value greater than 0 is required.</string>
+  <string name="otp_cannot_apply">Cannot apply this configuration, since parts are incorrect.</string>
+  <string name="otp_cannot_export">Cannot export this configuration, since parts are incorrect.</string>
+  <string name="otp_current_counter">Current counter value:</string>
+  <string name="otp_period_in_seconds">Renew-Period on seconds:</string>
+  <string name="otp_update_hotp_counter_title">Update One-Time-Password counter</string>
+  <string name="otp_update_hotp_counter_message">This counter should be in sync with the issuer\'s counter. Current counter value is: %1$s</string>
+  <string name="otp_cannot_load_config">Cannot load this configuration!</string>
+  <string name="otp_config_headline">One-Time-Password configuration</string>
+  <string name="otp_exported_otp_desc">This contains all data needed to configure this One-Time-Password in any authenticator. It contains a shared secret, so handle it carefully.</string>
+  <string name="otp_cannot_scann_otp_config">The scanned QR Code doesn\'t contain a valid configuration.</string>
+  <string name="otp_increment_counter">Increment</string>
+  <string name="otp_remove_config_title">Remove One-Time-Password for \'%1$s\'</string>
+  <string name="otp_remove_config_message">Are you sure to remove this One-Time-Password configuration from the current credential?</string>
+  <string name="nothing_to_delete">Nothing to delete</string>
+  <string name="otp_copy_configuration_to_clipboard">Copy configuration to clipboard</string>
 
 
 </resources>

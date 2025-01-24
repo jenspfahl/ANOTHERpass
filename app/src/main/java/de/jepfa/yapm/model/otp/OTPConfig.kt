@@ -32,7 +32,7 @@ enum class OTPMode(val uiLabel: Int, val uriName: String) {
 
 enum class OTPAlgorithm(val uiName: String, val uriName: String, val algoHmacName: String) {
 
-    SHA1("SHA-1 (RFC-4226)", "SHA1", "HmacSHA1"),
+    SHA1("SHA-1", "SHA1", "HmacSHA1"),
     SHA256("SHA-256", "SHA256", "HmacSHA256"),
     SHA512("SHA-512", "SHA512", "HmacSHA512");
 
