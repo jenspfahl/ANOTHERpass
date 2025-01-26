@@ -41,6 +41,10 @@ object OtpService {
         otpConfig: OTPConfig,
         timestamp: Date
     ): Password? {
+        if (otpConfig.secret.isEmpty()) {
+            Log.w("OTP", "empty key")
+            return null
+        }
         if (otpConfig.mode == OTPMode.HOTP) {
             return generateHOTP(otpConfig, otpConfig.periodOrCounter.toLong())
         }

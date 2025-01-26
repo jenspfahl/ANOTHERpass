@@ -45,12 +45,12 @@ enum class OTPAlgorithm(val uiName: String, val uriName: String, val algoHmacNam
 }
 
 data class OTPConfig(
-    val mode: OTPMode,
-    val account: String,
-    val issuer: String,
-    val secret: Key,
-    val algorithm: OTPAlgorithm,
-    val digits: Int,
+    var mode: OTPMode,
+    var account: String,
+    var issuer: String,
+    var secret: Key,
+    var algorithm: OTPAlgorithm,
+    var digits: Int,
     var periodOrCounter: Int) {
 
     fun getLabel(): String {
@@ -122,7 +122,7 @@ data class OTPConfig(
             val accountFromLabel = if (labelParts.size > 1) labelParts[1] else null
 
 
-            val secretAsBase64 = uri.getQueryParameter(PARAM_SECRET) ?: return null
+            val secretAsBase32 = uri.getQueryParameter(PARAM_SECRET) ?: return null
             val issuerFromParams = uri.getQueryParameter(PARAM_ISSUER)
 
             val algorithmAsString = uri.getQueryParameter(PARAM_ALGORITHM)
@@ -143,11 +143,13 @@ data class OTPConfig(
                 mode,
                 accountFromLabel ?: label,
                 issuerFromLabel,
-                Key(Base32().decode(secretAsBase64)),
+                stringToBase32Key(secretAsBase32),
                 algorithm,
                 digits,
                 if (mode == OTPMode.HOTP) counter else periodInSec
             )
         }
+
+        fun stringToBase32Key(base32String: String) = Key(Base32().decode(base32String))
     }
 }
