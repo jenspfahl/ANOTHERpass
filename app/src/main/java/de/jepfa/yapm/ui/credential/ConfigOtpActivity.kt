@@ -22,15 +22,15 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncCredential.Companion.EXTRA_CREDENTIAL_OTP_DATA
 import de.jepfa.yapm.model.encrypted.Encrypted
-import de.jepfa.yapm.model.otp.OTPAlgorithm
-import de.jepfa.yapm.model.otp.OTPConfig
-import de.jepfa.yapm.model.otp.OTPConfig.Companion.DEFAULT_OTP_ALGORITHM
-import de.jepfa.yapm.model.otp.OTPConfig.Companion.DEFAULT_OTP_COUNTER
-import de.jepfa.yapm.model.otp.OTPConfig.Companion.DEFAULT_OTP_DIGITS
-import de.jepfa.yapm.model.otp.OTPConfig.Companion.DEFAULT_OTP_MODE
-import de.jepfa.yapm.model.otp.OTPConfig.Companion.DEFAULT_OTP_PERIOD
-import de.jepfa.yapm.model.otp.OTPConfig.Companion.stringToBase32Key
-import de.jepfa.yapm.model.otp.OTPMode
+import de.jepfa.yapm.model.otp.OtpAlgorithm
+import de.jepfa.yapm.model.otp.OtpConfig
+import de.jepfa.yapm.model.otp.OtpConfig.Companion.DEFAULT_OTP_ALGORITHM
+import de.jepfa.yapm.model.otp.OtpConfig.Companion.DEFAULT_OTP_COUNTER
+import de.jepfa.yapm.model.otp.OtpConfig.Companion.DEFAULT_OTP_DIGITS
+import de.jepfa.yapm.model.otp.OtpConfig.Companion.DEFAULT_OTP_MODE
+import de.jepfa.yapm.model.otp.OtpConfig.Companion.DEFAULT_OTP_PERIOD
+import de.jepfa.yapm.model.otp.OtpConfig.Companion.stringToBase32Key
+import de.jepfa.yapm.model.otp.OtpMode
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.secret.AndroidKey
@@ -85,12 +85,12 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
         val otpModeSelectionAdapter = ArrayAdapter(
             this,
             android.R.layout.simple_spinner_dropdown_item,
-            OTPMode.entries
+            OtpMode.entries
                 .map { getString(it.uiLabel)})
         otpModeSelection.adapter = otpModeSelectionAdapter
         otpModeSelection.onItemSelectedListener = object: OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val newOtpMode = OTPMode.entries[position]
+                val newOtpMode = OtpMode.entries[position]
                 if (otpViewer.otpConfig?.mode != newOtpMode) {
                     otpViewer.otpConfig?.mode = newOtpMode
 
@@ -112,12 +112,12 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
         val otpAlgorithmSelectionAdapter = ArrayAdapter(
             this,
             android.R.layout.simple_spinner_dropdown_item,
-            OTPAlgorithm.entries
+            OtpAlgorithm.entries
                 .map { it.uiName})
         otpAlgorithmSelection.adapter = otpAlgorithmSelectionAdapter
         otpAlgorithmSelection.onItemSelectedListener = object: OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                otpViewer.otpConfig?.algorithm = OTPAlgorithm.entries[position]
+                otpViewer.otpConfig?.algorithm = OtpAlgorithm.entries[position]
                 updateOtpAuthTextView()
             }
 
@@ -139,19 +139,19 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
         counterOrPeriodEditText = findViewById(R.id.edit_otp_counter_or_period)
         counterOrPeriodEditText.addTextChangedListener { text ->
             val value = text.toString().toIntOrNull() ?: -1
-            if (otpViewer.otpConfig?.mode == OTPMode.TOTP) {
+            if (otpViewer.otpConfig?.mode == OtpMode.TOTP) {
                 otpViewer.otpConfig?.period = value
             }
-            else if (otpViewer.otpConfig?.mode == OTPMode.HOTP) {
+            else if (otpViewer.otpConfig?.mode == OtpMode.HOTP) {
                 otpViewer.otpConfig?.counter = value
             }
             updateOtpAuthTextView()
 
         }
-        if (otpViewer.otpConfig?.mode == OTPMode.TOTP) {
+        if (otpViewer.otpConfig?.mode == OtpMode.TOTP) {
             otpViewer.otpConfig?.period?.let { counterOrPeriodEditText.setText(it.toString()) }
         }
-        else if (otpViewer.otpConfig?.mode == OTPMode.HOTP) {
+        else if (otpViewer.otpConfig?.mode == OtpMode.HOTP) {
             otpViewer.otpConfig?.counter?.let { counterOrPeriodEditText.setText(it.toString()) }
         }
 
@@ -224,7 +224,7 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
 
         val otpToRestore = savedInstanceState?.getString("OTP")
         if (otpToRestore != null) {
-            val otpConfig = OTPConfig.fromUri(Uri.parse(otpToRestore))
+            val otpConfig = OtpConfig.fromUri(Uri.parse(otpToRestore))
             otpConfig?.let {
                 updateUIFromOTPConfig(it)
             }
@@ -268,27 +268,27 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
 
 
     private fun updateCounterOrPeriodLabels() {
-        if (otpViewer.otpConfig?.mode == OTPMode.HOTP) {
+        if (otpViewer.otpConfig?.mode == OtpMode.HOTP) {
             counterOrPeriodTextView.text = getString(R.string.otp_current_counter)
         }
-        else if (otpViewer.otpConfig?.mode == OTPMode.TOTP) {
+        else if (otpViewer.otpConfig?.mode == OtpMode.TOTP) {
             counterOrPeriodTextView.text = getString(R.string.otp_period_in_seconds)
         }
 
     }
 
     private fun updateCounterOrPeriodContent() {
-        if (otpViewer.otpConfig?.mode == OTPMode.HOTP) {
+        if (otpViewer.otpConfig?.mode == OtpMode.HOTP) {
             counterOrPeriodEditText.setText(otpViewer.otpConfig?.counter.toString())
         }
-        else if (otpViewer.otpConfig?.mode == OTPMode.TOTP) {
+        else if (otpViewer.otpConfig?.mode == OtpMode.TOTP) {
             counterOrPeriodEditText.setText(otpViewer.otpConfig?.period.toString())
 
         }
 
     }
 
-    private fun createEmptyOtpConfig(): OTPConfig? {
+    private fun createEmptyOtpConfig(): OtpConfig? {
 
         val currentCredential = EncCredential.fromIntent(intent)
 
@@ -297,7 +297,7 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
             val issuer = SecretService.decryptCommonString(key, currentCredential.name)
             val account = SecretService.decryptCommonString(key, currentCredential.user)
 
-            return OTPConfig(
+            return OtpConfig(
                 DEFAULT_OTP_MODE,
                 account,
                 issuer,
@@ -340,17 +340,17 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
     }
 
     private fun updateUIFromOTPConfig(
-        otpConfig: OTPConfig
+        otpConfig: OtpConfig
     ) {
 
         otpModeSelection.setSelection(otpConfig.mode.ordinal)
         otpAlgorithmSelection.setSelection(otpConfig.algorithm.ordinal)
 
         sharedSecretEditText.setText(otpConfig.secretAsBase32())
-        if (otpConfig.mode == OTPMode.TOTP) {
+        if (otpConfig.mode == OtpMode.TOTP) {
             counterOrPeriodEditText.setText(otpConfig.period.toString())
         }
-        else if (otpConfig.mode == OTPMode.HOTP) {
+        else if (otpConfig.mode == OtpMode.HOTP) {
             counterOrPeriodEditText.setText(otpConfig.counter.toString())
         }
         digitsEditText.setText(otpConfig.digits.toString())
@@ -362,10 +362,10 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
 
     private fun createOtpConfigFromUri(
         otpUriString: String
-    ): OTPConfig? {
+    ): OtpConfig? {
         try {
             val otpUri = Uri.parse(otpUriString)
-            val otpConfig = OTPConfig.fromUri(otpUri)
+            val otpConfig = OtpConfig.fromUri(otpUri)
             return otpConfig
         } catch (e: Exception) {
             DebugInfo.logException("OTP", "Cannot parse URI $otpUriString", e)

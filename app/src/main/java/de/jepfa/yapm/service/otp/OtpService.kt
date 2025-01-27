@@ -3,8 +3,8 @@ package de.jepfa.yapm.service.otp
 import android.net.Uri
 import android.util.Log
 import de.jepfa.yapm.model.encrypted.OtpData
-import de.jepfa.yapm.model.otp.OTPConfig
-import de.jepfa.yapm.model.otp.OTPMode
+import de.jepfa.yapm.model.otp.OtpConfig
+import de.jepfa.yapm.model.otp.OtpMode
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
@@ -26,7 +26,7 @@ object OtpService {
         obfuscationKey: Key?) : Password? {
 
         val optAuthString = SecretService.decryptCommonString(key, otpData.encOtpAuthUri)
-        val otpConfig = OTPConfig.fromUri(Uri.parse(optAuthString))
+        val otpConfig = OtpConfig.fromUri(Uri.parse(optAuthString))
         if (otpConfig == null) {
             Log.w("OTP", "cannot parse TOTP URI $optAuthString")
             return null
@@ -38,14 +38,14 @@ object OtpService {
 
 
     fun generateOTP(
-        otpConfig: OTPConfig,
+        otpConfig: OtpConfig,
         timestamp: Date
     ): Password? {
         if (!otpConfig.isValid()) {
             Log.w("OTP", "empty config")
             return null
         }
-        if (otpConfig.mode == OTPMode.HOTP) {
+        if (otpConfig.mode == OtpMode.HOTP) {
             return generateHOTP(otpConfig, otpConfig.counter.toLong())
         }
         else {
@@ -55,14 +55,14 @@ object OtpService {
 
     // https://datatracker.ietf.org/doc/html/rfc4226
     private fun generateHOTP(
-        otpConfig: OTPConfig
+        otpConfig: OtpConfig
     ): Password {
         return generateHOTP(otpConfig, otpConfig.counter.toLong())
     }
 
     // https://datatracker.ietf.org/doc/html/rfc6238
     private fun generateTOTP(
-        otpConfig: OTPConfig,
+        otpConfig: OtpConfig,
         timestamp: Date
     ): Password? {
         if (otpConfig.period <= 0) {
@@ -73,7 +73,7 @@ object OtpService {
     }
 
     private fun generateHOTP(
-        otpConfig: OTPConfig,
+        otpConfig: OtpConfig,
         counter: Long
     ): Password {
 

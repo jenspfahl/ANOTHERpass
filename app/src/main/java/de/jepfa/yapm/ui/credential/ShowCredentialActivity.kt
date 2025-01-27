@@ -27,7 +27,7 @@ import com.google.android.material.chip.ChipGroup
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.OtpData
-import de.jepfa.yapm.model.otp.OTPConfig
+import de.jepfa.yapm.model.otp.OtpConfig
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
@@ -206,7 +206,7 @@ class ShowCredentialActivity : SecureActivity() {
 
         val otpToRestore = savedInstanceState?.getString("OTP")
         if (otpToRestore != null) {
-            val otpConfig = OTPConfig.fromUri(Uri.parse(otpToRestore))
+            val otpConfig = OtpConfig.fromUri(Uri.parse(otpToRestore))
             otpConfig?.let {
                 otpViewer.otpConfig = it
                 otpViewer.start()
@@ -553,7 +553,7 @@ class ShowCredentialActivity : SecureActivity() {
             if (otpData != null) {
                 val otpAuthUri = decryptCommonString(key, otpData.encOtpAuthUri)
 
-                otpViewer.otpConfig = OTPConfig.fromUri(Uri.parse(otpAuthUri))
+                otpViewer.otpConfig = OtpConfig.fromUri(Uri.parse(otpAuthUri))
                 otpViewer.start()
                 otpViewer.refreshVisibility()
             }

@@ -8,7 +8,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.core.app.launchActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import de.jepfa.yapm.model.otp.OTPConfig
+import de.jepfa.yapm.model.otp.OtpConfig
 import de.jepfa.yapm.ui.login.LoginActivity
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import org.junit.Assert
@@ -40,7 +40,7 @@ class OtpServiceTest {
             Log.i(TAG, "Creating test vault...")
 
             val hotpUri = Uri.parse("otpauth://hotp/ACME%20Co:john.doe@email.com?secret=HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ&issuer=ACME%20Co&algorithm=SHA1&digits=6&counter=0")
-            val otpConfig = OTPConfig.fromUri(hotpUri)
+            val otpConfig = OtpConfig.fromUri(hotpUri)
 
             if (otpConfig == null) {
                 Assert.fail()
@@ -63,7 +63,7 @@ class OtpServiceTest {
             Log.i(TAG, "Creating test vault...")
 
             val totpUri = Uri.parse("otpauth://totp/ACME%20Co:john.doe@email.com?secret=HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ&issuer=ACME%20Co&algorithm=SHA1&digits=6&period=30")
-            val otpConfig = OTPConfig.fromUri(totpUri)
+            val otpConfig = OtpConfig.fromUri(totpUri)
 
             if (otpConfig == null) {
                 Assert.fail()
@@ -89,13 +89,13 @@ class OtpServiceTest {
         }
     }
 
-    private fun doTestHOTP(otpConfig: OTPConfig, expectedToken: String) {
+    private fun doTestHOTP(otpConfig: OtpConfig, expectedToken: String) {
         val hotp = OtpService.generateOTP(otpConfig, Date())
         println("HOTP for counter ${otpConfig.counter}: $hotp")
         Assert.assertEquals(expectedToken, hotp.toString())
     }
 
-    private fun doTestTOTP(otpConfig: OTPConfig, date: Date, expectedToken: String) {
+    private fun doTestTOTP(otpConfig: OtpConfig, date: Date, expectedToken: String) {
         val totp = OtpService.generateOTP(otpConfig, date)
         println("TOTP for timestamp ${date.time}: $totp")
         Assert.assertEquals(expectedToken, totp.toString())

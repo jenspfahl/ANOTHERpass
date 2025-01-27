@@ -17,39 +17,39 @@ private const val PARAM_DIGITS = "digits"
 private const val PARAM_PERIOD = "period"
 private const val PARAM_COUNTER = "counter"
 
-enum class OTPMode(val uiLabel: Int, val uriName: String) {
+enum class OtpMode(val uiLabel: Int, val uriName: String) {
 
     HOTP(R.string.hotp_name, "hotp"),
     TOTP(R.string.totp_name, "totp");
 
     companion object {
-        fun getValueFrom(uriName: String): OTPMode {
+        fun getValueFrom(uriName: String): OtpMode {
             return entries.first { it.uriName == uriName }
         }
     }
 
 }
 
-enum class OTPAlgorithm(val uiName: String, val uriName: String, val algoHmacName: String) {
+enum class OtpAlgorithm(val uiName: String, val uriName: String, val algoHmacName: String) {
 
     SHA1("SHA-1", "SHA1", "HmacSHA1"),
     SHA256("SHA-256", "SHA256", "HmacSHA256"),
     SHA512("SHA-512", "SHA512", "HmacSHA512");
 
     companion object {
-        fun getValueFrom(uriName: String): OTPAlgorithm {
+        fun getValueFrom(uriName: String): OtpAlgorithm {
             return entries.first { it.uriName == uriName }
         }
     }
 
 }
 
-data class OTPConfig(
-    var mode: OTPMode,
+data class OtpConfig(
+    var mode: OtpMode,
     var account: String,
     var issuer: String,
     var secret: Key,
-    var algorithm: OTPAlgorithm,
+    var algorithm: OtpAlgorithm,
     var digits: Int,
     var period: Int,
     var counter: Int,) {
@@ -62,9 +62,9 @@ data class OTPConfig(
     }
 
     fun toUri(): Uri {
-        val periodOrCounterParam = if (mode == OTPMode.TOTP)
+        val periodOrCounterParam = if (mode == OtpMode.TOTP)
             "$PARAM_PERIOD=$period"
-        else if (mode == OTPMode.HOTP)
+        else if (mode == OtpMode.HOTP)
             "$PARAM_COUNTER=$counter"
         else
             throw IllegalArgumentException("illegal mode: $mode")
@@ -72,8 +72,8 @@ data class OTPConfig(
         return Uri.parse(s)
     }
 
-    fun incCounter(): OTPConfig {
-        if (mode == OTPMode.HOTP) {
+    fun incCounter(): OtpConfig {
+        if (mode == OtpMode.HOTP) {
             counter++
         }
 
@@ -89,10 +89,10 @@ data class OTPConfig(
         if (issuer.isBlank()) {
             return false
         }
-        if (mode == OTPMode.TOTP && period <= 0) {
+        if (mode == OtpMode.TOTP && period <= 0) {
             return false
         }
-        if (mode == OTPMode.HOTP && counter < 0) {
+        if (mode == OtpMode.HOTP && counter < 0) {
             return false
         }
         if (digits <= 0) {
@@ -103,13 +103,13 @@ data class OTPConfig(
     }
 
     companion object {
-        val DEFAULT_OTP_MODE = OTPMode.TOTP
-        val DEFAULT_OTP_ALGORITHM = OTPAlgorithm.SHA1
+        val DEFAULT_OTP_MODE = OtpMode.TOTP
+        val DEFAULT_OTP_ALGORITHM = OtpAlgorithm.SHA1
         val DEFAULT_OTP_COUNTER = 1
         val DEFAULT_OTP_PERIOD = 30
         val DEFAULT_OTP_DIGITS = 6
 
-        fun fromUri(uri: Uri): OTPConfig? {
+        fun fromUri(uri: Uri): OtpConfig? {
 
             if (uri.scheme != OTP_SCHEME) {
                 Log.w("OTP", "Illegal scheme: ${uri.scheme}")
@@ -117,12 +117,12 @@ data class OTPConfig(
             }
 
             val modeAsString = uri.host
-            if (modeAsString != OTPMode.HOTP.uriName && modeAsString != OTPMode.TOTP.uriName) {
+            if (modeAsString != OtpMode.HOTP.uriName && modeAsString != OtpMode.TOTP.uriName) {
                 Log.w("OTP", "Wrong method: $uri")
 
                 return null
             }
-            val mode = OTPMode.getValueFrom(modeAsString)
+            val mode = OtpMode.getValueFrom(modeAsString)
 
             val label = uri.path
             if (label == null) {
@@ -148,7 +148,7 @@ data class OTPConfig(
 
             val algorithmAsString = uri.getQueryParameter(PARAM_ALGORITHM)
             val algorithm = if (algorithmAsString != null)
-                OTPAlgorithm.getValueFrom(algorithmAsString)
+                OtpAlgorithm.getValueFrom(algorithmAsString)
             else
                 DEFAULT_OTP_ALGORITHM
 
@@ -160,7 +160,7 @@ data class OTPConfig(
                 // warn
             }
 
-            return OTPConfig(
+            return OtpConfig(
                 mode,
                 accountFromLabel ?: label,
                 issuerFromLabel,

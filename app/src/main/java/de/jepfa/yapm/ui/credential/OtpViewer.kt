@@ -9,9 +9,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import de.jepfa.yapm.R
-import de.jepfa.yapm.model.otp.OTPConfig
-import de.jepfa.yapm.model.otp.OTPMode
-import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.model.otp.OtpConfig
+import de.jepfa.yapm.model.otp.OtpMode
 import de.jepfa.yapm.service.otp.OtpService
 import de.jepfa.yapm.ui.ProgressCircleAnimation
 import de.jepfa.yapm.ui.SecureActivity
@@ -20,7 +19,7 @@ import de.jepfa.yapm.util.toastText
 import java.util.Date
 
 class OtpViewer(
-    var otpConfig: OTPConfig?,
+    var otpConfig: OtpConfig?,
     private val activity: SecureActivity,
     private val hotpCounterChanged: () -> Unit,
     private var masked: Boolean = false,
@@ -42,7 +41,7 @@ class OtpViewer(
     init {
 
         hotpAdjustCounter.setOnClickListener {
-            if (otpConfig?.mode == OTPMode.HOTP) {
+            if (otpConfig?.mode == OtpMode.HOTP) {
                 adjustHOTPCounter()
             }
         }
@@ -77,7 +76,7 @@ class OtpViewer(
             val hasChanged = updateCurrentOtpValue()
             timerRunner?.let {
                 timer.postDelayed(it, 1000L)
-                if (otpConfig?.mode == OTPMode.TOTP && hasChanged) {
+                if (otpConfig?.mode == OtpMode.TOTP && hasChanged) {
                     startTotpProgressAnimation()
                 }
             }
@@ -86,7 +85,7 @@ class OtpViewer(
         val firstDelay = 1000 - elapsedTimeOfSecond
         timer.postDelayed(timerRunner!!, firstDelay)
 
-        if (otpConfig?.mode == OTPMode.TOTP) {
+        if (otpConfig?.mode == OtpMode.TOTP) {
             startTotpProgressAnimation()
         }
     }
@@ -151,7 +150,7 @@ class OtpViewer(
     }
 
     private fun startTotpProgressAnimation() {
-        if (otpConfig?.mode == OTPMode.HOTP) {
+        if (otpConfig?.mode == OtpMode.HOTP) {
             return
         }
         val periodInMillis = (otpConfig?.period ?: 0) * 1000
@@ -198,7 +197,7 @@ class OtpViewer(
             hideOtpView()
             return
         }
-        if (otpConfig?.mode == OTPMode.HOTP) {
+        if (otpConfig?.mode == OtpMode.HOTP) {
             totpProgressCircle.visibility = View.GONE
             if (masked) {
                 hotpAdjustCounter.visibility = View.INVISIBLE
@@ -207,7 +206,7 @@ class OtpViewer(
                 hotpAdjustCounter.visibility = View.VISIBLE
             }
         }
-        else if (otpConfig?.mode == OTPMode.TOTP) {
+        else if (otpConfig?.mode == OtpMode.TOTP) {
             if (masked) {
                 totpProgressCircle.visibility = View.INVISIBLE
             }

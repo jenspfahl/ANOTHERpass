@@ -146,6 +146,9 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
             ExportMode.PLAIN_CREDENTIAL_RECORD -> {
                 val passwd = decryptPasswd(credential, key, obfuscationKey)
                 val expiresAt = decryptLong(key, credential.timeData.expiresAt)
+                val otpAuth = credential.otpData?.let {
+                    SecretService.decryptCommonString(key, it.encOtpAuthUri)
+                }
 
                 val shortPlainCredential = PlainShareableCredential(
                     credential.uid?.toBase64String(),
@@ -155,6 +158,7 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
                     passwd,
                     SecretService.decryptCommonString(key, credential.website),
                     if (expiresAt != null && expiresAt > 0) expiresAt else null,
+                    if (otpAuth != null) PlainShareableCredential.packOtpAuthUri(otpAuth) else null
                 )
                 val jsonString = VaultExportService.credentialToJson(shortPlainCredential)
                 val encData = SecretService.encryptCommonString(transportKey, jsonString)
