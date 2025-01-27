@@ -59,9 +59,6 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
     private lateinit var counterOrPeriodTextView: TextView
     private lateinit var otpAuthTextView: TextView
 
-    private var lastCounter = DEFAULT_OTP_COUNTER
-    private var lastPeriod = DEFAULT_OTP_PERIOD
-
 
     init {
         enableBack = true
@@ -72,10 +69,10 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        otpViewer = OtpViewer(createEmptyOtpConfig(), this) {
-            counterOrPeriodEditText.setText(otpViewer.otpConfig?.periodOrCounter.toString())
+        otpViewer = OtpViewer(createEmptyOtpConfig(), this, hotpCounterChanged = {
+            counterOrPeriodEditText.setText(otpViewer.otpConfig?.counter.toString())
             updateOtpAuthTextView()
-        }
+        })
 
         qrCodeScannerImageView = findViewById(R.id.imageview_scan_qrcode)
         otpAuthTextView = findViewById(R.id.otpauth_text)
@@ -98,7 +95,7 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
                     otpViewer.otpConfig?.mode = newOtpMode
 
                     updateCounterOrPeriodLabels()
-                    stashLastCounterOrPeriodContent()
+                    updateCounterOrPeriodContent()
                     updateOtpAuthTextView()
                 }
             }
@@ -141,26 +138,34 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
 
         counterOrPeriodEditText = findViewById(R.id.edit_otp_counter_or_period)
         counterOrPeriodEditText.addTextChangedListener { text ->
-            val value = text.toString().toIntOrNull()
-            if (value != null) {
-                otpViewer.otpConfig?.periodOrCounter = value
-                updateOtpAuthTextView()
+            val value = text.toString().toIntOrNull() ?: -1
+            if (otpViewer.otpConfig?.mode == OTPMode.TOTP) {
+                otpViewer.otpConfig?.period = value
             }
+            else if (otpViewer.otpConfig?.mode == OTPMode.HOTP) {
+                otpViewer.otpConfig?.counter = value
+            }
+            updateOtpAuthTextView()
+
         }
-        otpViewer.otpConfig?.periodOrCounter?.let { counterOrPeriodEditText.setText(it.toString()) }
+        if (otpViewer.otpConfig?.mode == OTPMode.TOTP) {
+            otpViewer.otpConfig?.period?.let { counterOrPeriodEditText.setText(it.toString()) }
+        }
+        else if (otpViewer.otpConfig?.mode == OTPMode.HOTP) {
+            otpViewer.otpConfig?.counter?.let { counterOrPeriodEditText.setText(it.toString()) }
+        }
 
         digitsEditText = findViewById(R.id.edit_otp_digits)
         digitsEditText.addTextChangedListener { text ->
-            val value = text.toString().toIntOrNull()
-            if (value != null) {
-                otpViewer.otpConfig?.digits = value
-                updateOtpAuthTextView()
-            }
+            val value = text.toString().toIntOrNull() ?: -1
+            otpViewer.otpConfig?.digits = value
+            updateOtpAuthTextView()
         }
         otpViewer.otpConfig?.digits?.let { digitsEditText.setText(it.toString()) }
 
         val saveButton: Button = findViewById(R.id.button_save)
         saveButton.setOnClickListener {
+
 
             if (sharedSecretEditText.text.isBlank()) {
                 sharedSecretEditText.requestFocus()
@@ -192,6 +197,11 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
                 return@setOnClickListener
             }
 
+            if (otpViewer.otpConfig?.isValid() != true) {
+                toastText(this, R.string.otp_cannot_apply)
+                return@setOnClickListener
+            }
+
             masterSecretKey?.let { key ->
                 val otpToSave = otpViewer.otpConfig
                 if (otpToSave != null) {
@@ -216,7 +226,6 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
         if (otpToRestore != null) {
             val otpConfig = OTPConfig.fromUri(Uri.parse(otpToRestore))
             otpConfig?.let {
-                otpViewer.otpConfig = it
                 updateUIFromOTPConfig(it)
             }
         }
@@ -247,14 +256,14 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
 
     private fun updateOtpAuthTextView() {
         val otpConfig = otpViewer.otpConfig
-        if (otpConfig == null) {
+        if (otpConfig == null || !otpConfig.isValid()) {
             otpAuthTextView.text = ""
         }
         else {
             otpAuthTextView.text = otpConfig.toUri().toString()
         }
 
-        otpViewer.refreshControllerVisibility()
+        otpViewer.refreshVisibility()
     }
 
 
@@ -268,15 +277,12 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
 
     }
 
-    private fun stashLastCounterOrPeriodContent() {
+    private fun updateCounterOrPeriodContent() {
         if (otpViewer.otpConfig?.mode == OTPMode.HOTP) {
-            lastPeriod = counterOrPeriodEditText.text.toString().toIntOrNull() ?: DEFAULT_OTP_PERIOD
-            counterOrPeriodEditText.setText(lastCounter.toString())
+            counterOrPeriodEditText.setText(otpViewer.otpConfig?.counter.toString())
         }
         else if (otpViewer.otpConfig?.mode == OTPMode.TOTP) {
-            lastCounter =
-                counterOrPeriodEditText.text.toString().toIntOrNull() ?: DEFAULT_OTP_COUNTER
-            counterOrPeriodEditText.setText(lastPeriod.toString())
+            counterOrPeriodEditText.setText(otpViewer.otpConfig?.period.toString())
 
         }
 
@@ -297,8 +303,9 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
                 issuer,
                 Key.empty(),
                 DEFAULT_OTP_ALGORITHM,
+                DEFAULT_OTP_DIGITS,
                 DEFAULT_OTP_PERIOD,
-                DEFAULT_OTP_DIGITS
+                DEFAULT_OTP_COUNTER,
                 )
         }
 
@@ -319,8 +326,8 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
                 val otpUriString = SecretService.decryptCommonString(key, otpData.encOtpAuthUri)
                 val otpConfig = createOtpConfigFromUri(otpUriString)
                 if (otpConfig != null) {
-                    otpConfig.issuer = issuer ?: ""
-                    otpConfig.account = account ?: ""
+                    otpConfig.issuer = issuer
+                    otpConfig.account = account
                     updateUIFromOTPConfig(otpConfig)
                 }
                 else {
@@ -336,19 +343,19 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
         otpConfig: OTPConfig
     ) {
 
-        if (otpConfig.mode == OTPMode.HOTP) {
-            lastCounter = otpConfig.periodOrCounter
-
-        } else if (otpConfig.mode == OTPMode.TOTP) {
-            lastPeriod = otpConfig.periodOrCounter
-        }
-
         otpModeSelection.setSelection(otpConfig.mode.ordinal)
         otpAlgorithmSelection.setSelection(otpConfig.algorithm.ordinal)
 
         sharedSecretEditText.setText(otpConfig.secretAsBase32())
-        counterOrPeriodEditText.setText(otpConfig.periodOrCounter.toString())
+        if (otpConfig.mode == OTPMode.TOTP) {
+            counterOrPeriodEditText.setText(otpConfig.period.toString())
+        }
+        else if (otpConfig.mode == OTPMode.HOTP) {
+            counterOrPeriodEditText.setText(otpConfig.counter.toString())
+        }
         digitsEditText.setText(otpConfig.digits.toString())
+
+        otpViewer.otpConfig = otpConfig
 
         updateOtpAuthTextView()
     }
@@ -387,7 +394,7 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
 
         if (id == R.id.menu_copy_otpauth) {
             val otpConfig = otpViewer.otpConfig
-            if (otpConfig != null) {
+            if (otpConfig != null && otpViewer.otpConfig?.isValid() == true) {
                 ClipboardUtil.copy("OTP-Config", otpConfig.toUri().toString(), this, isSensible = true)
                 toastText(this, R.string.copied_to_clipboard)
             }
@@ -401,7 +408,7 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
         if (id == R.id.menu_export_otp) {
 
             val otpConfig = otpViewer.otpConfig
-            if (otpConfig == null) {
+            if (otpConfig == null || otpViewer.otpConfig?.isValid() != true) {
                 toastText(this, R.string.otp_cannot_export)
                 return false
             }

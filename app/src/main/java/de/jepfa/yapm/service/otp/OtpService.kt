@@ -41,12 +41,12 @@ object OtpService {
         otpConfig: OTPConfig,
         timestamp: Date
     ): Password? {
-        if (otpConfig.secret.isEmpty()) {
-            Log.w("OTP", "empty key")
+        if (!otpConfig.isValid()) {
+            Log.w("OTP", "empty config")
             return null
         }
         if (otpConfig.mode == OTPMode.HOTP) {
-            return generateHOTP(otpConfig, otpConfig.periodOrCounter.toLong())
+            return generateHOTP(otpConfig, otpConfig.counter.toLong())
         }
         else {
             return generateTOTP(otpConfig, timestamp)
@@ -54,21 +54,21 @@ object OtpService {
     }
 
     // https://datatracker.ietf.org/doc/html/rfc4226
-    fun generateHOTP(
+    private fun generateHOTP(
         otpConfig: OTPConfig
     ): Password {
-        return generateHOTP(otpConfig, otpConfig.periodOrCounter.toLong())
+        return generateHOTP(otpConfig, otpConfig.counter.toLong())
     }
 
     // https://datatracker.ietf.org/doc/html/rfc6238
-    fun generateTOTP(
+    private fun generateTOTP(
         otpConfig: OTPConfig,
         timestamp: Date
     ): Password? {
-        if (otpConfig.periodOrCounter <= 0) {
+        if (otpConfig.period <= 0) {
             return null
         }
-        val counter = timestamp.time / (otpConfig.periodOrCounter * 1000)
+        val counter = timestamp.time / (otpConfig.period * 1000)
         return generateHOTP(otpConfig, counter)
     }
 

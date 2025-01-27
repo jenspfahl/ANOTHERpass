@@ -51,35 +51,56 @@ data class OTPConfig(
     var secret: Key,
     var algorithm: OTPAlgorithm,
     var digits: Int,
-    var periodOrCounter: Int) {
+    var period: Int,
+    var counter: Int,) {
 
     fun getLabel(): String {
         if (account.isBlank()) {
-            return issuer.encodeURLPath()
+            return issuer
         }
-        return "${issuer.encodeURLPath()}:${account.encodeURLPath()}"
+        return "$issuer:$account"
     }
 
     fun toUri(): Uri {
         val periodOrCounterParam = if (mode == OTPMode.TOTP)
-            "$PARAM_PERIOD=$periodOrCounter"
+            "$PARAM_PERIOD=$period"
         else if (mode == OTPMode.HOTP)
-            "$PARAM_COUNTER=$periodOrCounter"
+            "$PARAM_COUNTER=$counter"
         else
             throw IllegalArgumentException("illegal mode: $mode")
-        val s = "$OTP_SCHEME://${mode.uriName}/${getLabel()}?$PARAM_SECRET=${secretAsBase32()}&$PARAM_ISSUER=${issuer.encodeURLPath()}&$PARAM_ALGORITHM=${algorithm.uriName}&$PARAM_DIGITS=$digits&$periodOrCounterParam"
+        val s = "$OTP_SCHEME://${mode.uriName}/${getLabel().encodeURLPath()}?$PARAM_SECRET=${secretAsBase32()}&$PARAM_ISSUER=${issuer.encodeURLPath()}&$PARAM_ALGORITHM=${algorithm.uriName}&$PARAM_DIGITS=$digits&$periodOrCounterParam"
         return Uri.parse(s)
     }
 
     fun incCounter(): OTPConfig {
         if (mode == OTPMode.HOTP) {
-            periodOrCounter++
+            counter++
         }
 
         return this
     }
 
     fun secretAsBase32(): String = Base32().encodeToString(secret.toByteArray())
+
+    fun isValid(): Boolean {
+        if (secret.isEmpty()) {
+            return false
+        }
+        if (issuer.isBlank()) {
+            return false
+        }
+        if (mode == OTPMode.TOTP && period <= 0) {
+            return false
+        }
+        if (mode == OTPMode.HOTP && counter < 0) {
+            return false
+        }
+        if (digits <= 0) {
+            return false
+        }
+
+        return true
+    }
 
     companion object {
         val DEFAULT_OTP_MODE = OTPMode.TOTP
@@ -131,9 +152,9 @@ data class OTPConfig(
             else
                 DEFAULT_OTP_ALGORITHM
 
-            val digits = uri.getQueryParameter(PARAM_DIGITS)?.toIntOrNull() ?: 6
-            val periodInSec = uri.getQueryParameter(PARAM_PERIOD)?.toIntOrNull() ?: 30
-            val counter = uri.getQueryParameter(PARAM_COUNTER)?.toIntOrNull() ?: 1
+            val digits = uri.getQueryParameter(PARAM_DIGITS)?.toIntOrNull() ?: DEFAULT_OTP_DIGITS
+            val periodInSec = uri.getQueryParameter(PARAM_PERIOD)?.toIntOrNull() ?: DEFAULT_OTP_PERIOD
+            val counter = uri.getQueryParameter(PARAM_COUNTER)?.toIntOrNull() ?: DEFAULT_OTP_COUNTER
 
             if (issuerFromParams != issuerFromLabel) {
                 // warn
@@ -146,8 +167,8 @@ data class OTPConfig(
                 stringToBase32Key(secretAsBase32),
                 algorithm,
                 digits,
-                if (mode == OTPMode.HOTP) counter else periodInSec
-            )
+                periodInSec,
+                counter)
         }
 
         fun stringToBase32Key(base32String: String) = Key(Base32().decode(base32String))

@@ -23,7 +23,7 @@ import java.util.Date
 @LargeTest
 class OtpServiceTest {
 
-    val TAG = LOG_PREFIX + "TOTP"
+    val TAG = LOG_PREFIX + "OTP"
 
     lateinit var anyScenario: ActivityScenario<LoginActivity>
 
@@ -49,7 +49,7 @@ class OtpServiceTest {
 
             Assert.assertEquals(hotpUri, otpConfig.toUri())
 
-            println("TOTP Config: $otpConfig")
+            println("HOTP Config: $otpConfig")
 
             doTestHOTP(otpConfig, "818800")
             doTestHOTP(otpConfig.incCounter(), "320382")
@@ -90,13 +90,13 @@ class OtpServiceTest {
     }
 
     private fun doTestHOTP(otpConfig: OTPConfig, expectedToken: String) {
-        val hotp = OtpService.generateHOTP(otpConfig)
-        println("HOTP for counter ${otpConfig.periodOrCounter}: $hotp")
+        val hotp = OtpService.generateOTP(otpConfig, Date())
+        println("HOTP for counter ${otpConfig.counter}: $hotp")
         Assert.assertEquals(expectedToken, hotp.toString())
     }
 
     private fun doTestTOTP(otpConfig: OTPConfig, date: Date, expectedToken: String) {
-        val totp = OtpService.generateTOTP(otpConfig, date)
+        val totp = OtpService.generateOTP(otpConfig, date)
         println("TOTP for timestamp ${date.time}: $totp")
         Assert.assertEquals(expectedToken, totp.toString())
 

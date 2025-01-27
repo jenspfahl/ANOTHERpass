@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -25,6 +26,8 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.encrypted.OtpData
+import de.jepfa.yapm.model.otp.OTPConfig
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
@@ -37,6 +40,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_PASSWD_WORDS_ON_NL
 import de.jepfa.yapm.service.autofill.AutofillCredentialHolder
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.overlay.DetachHelper
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.decryptLong
 import de.jepfa.yapm.service.secret.SecretService.decryptPassword
@@ -82,6 +86,9 @@ class ShowCredentialActivity : SecureActivity() {
     private lateinit var expandAdditionalInfoImageView: ImageView
     private var optionsMenu: Menu? = null
     private var defaultTextColor: ColorStateList? = null
+
+    private lateinit var otpViewer: OtpViewer
+
 
     init {
         enableBack = true
@@ -176,9 +183,45 @@ class ShowCredentialActivity : SecureActivity() {
             })
         }
 
+        otpViewer = OtpViewer(null, this, hotpCounterChanged = {
+            // store changed HOTP counter
+            val otpAuthUri = otpViewer.otpConfig?.toUri()
+            if (otpAuthUri != null) {
+                masterSecretKey?.let { key ->
+                    credential?.let { current ->
+                        val encUri = SecretService.encryptCommonString(key, otpAuthUri.toString())
+                        current.otpData = OtpData(encUri)
+                        credentialViewModel.update(current, this)
+                    }
+
+                }
+
+            }
+        },
+            masked = PreferenceService.getAsBool(PREF_MASK_PASSWORD, this))
+
+        val otpToRestore = savedInstanceState?.getString("OTP")
+        if (otpToRestore != null) {
+            val otpConfig = OTPConfig.fromUri(Uri.parse(otpToRestore))
+            otpConfig?.let {
+                otpViewer.otpConfig = it
+                otpViewer.start()
+
+                otpViewer.refreshVisibility()
+            }
+        }
+
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        otpViewer.otpConfig?.let {
+            outState.putString("OTP", it.toUri().toString())
+        }
+    }
+
 
     private fun showPasswordStrength() {
         if (credential != null) {
@@ -483,6 +526,7 @@ class ShowCredentialActivity : SecureActivity() {
     override fun onDestroy() {
         super.onDestroy()
         obfuscationKey?.clear()
+        otpViewer.stop()
     }
 
     private fun showObfuscated(credential: EncCredential): Boolean {
@@ -499,6 +543,21 @@ class ShowCredentialActivity : SecureActivity() {
             val website = decryptCommonString(key, credential.website)
             val expiresAt = decryptLong(key, credential.timeData.expiresAt)
             val additionalInfo = decryptCommonString(key, credential.additionalInfo)
+
+            val otpData = credential.otpData
+
+            if (otpData != null) {
+                val otpAuthUri = decryptCommonString(key, otpData.encOtpAuthUri)
+
+                otpViewer.otpConfig = OTPConfig.fromUri(Uri.parse(otpAuthUri))
+                otpViewer.start()
+                otpViewer.refreshVisibility()
+            }
+            else {
+                otpViewer.otpConfig = null
+                otpViewer.stop()
+                otpViewer.refreshVisibility()
+            }
 
             toolBarLayout.title = name
             toolbarChipGroup.removeAllViews()

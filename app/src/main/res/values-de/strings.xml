@@ -970,8 +970,8 @@
     <string name="otp_apply_changes">Übernehmen</string>
     <string name="otp_error_secret_not_in_base32">Das Geheimnis muss Base32-kodiert sein.</string>
     <string name="error_value_greater_zero_required">Der Wert muss größer als 0 sein.</string>
-    <string name="otp_cannot_apply">Diese Konfiguration kann nicht angewendet werden, da sie unvollstängig ist.</string>
-    <string name="otp_cannot_export">Dies Konfiguration kann nicht exportiert werden, da sie unvollständig ist.</string>
+    <string name="otp_cannot_apply">Die Konfiguration kann nicht angewendet werden, da sie unvollstängig ist.</string>
+    <string name="otp_cannot_export">Die Konfiguration kann nicht exportiert werden, da sie unvollständig ist.</string>
     <string name="otp_current_counter">Aktueller Zählerwert:</string>
     <string name="otp_period_in_seconds">Gültigkeitszeitraum in Sekunden:</string>
     <string name="otp_update_hotp_counter_title">Zähler für Einmalpasswort aktualisieren</string>
