@@ -789,6 +789,8 @@
     <string name="command_expires">Filtere Zugangsdaten die ablaufen können</string>
     <string name="command_latest">Zeige zuletzt bearbeitete Zugangsdaten</string>
     <string name="command_veiled">Filtere verschleierte Zugangsdaten</string>
+    <string name="command_otp">Filtere Zugangsdaten mit Einmalpasswörtern</string>
+
 
     <string name="with_email_alias">Deklariere den Benutzernamen als Emailadresse mit einem generischen Alias-Teil</string>
     <string name="title_username_email_alias">Was ist ein Email-Alias?</string>

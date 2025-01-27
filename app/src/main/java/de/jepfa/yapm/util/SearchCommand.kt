@@ -22,6 +22,7 @@ enum class SearchCommand(
     SEARCH_COMMAND_SHOW_EXPIRES("expires", R.string.command_expires, false),
     SEARCH_COMMAND_SHOW_LATEST("latest", R.string.command_latest, false),
     SEARCH_COMMAND_SHOW_VEILED("veiled", R.string.command_veiled, false),
+    SEARCH_COMMAND_SHOW_OTP("onetime", R.string.command_otp, false),
     ;
 
     fun getCmd(): String {

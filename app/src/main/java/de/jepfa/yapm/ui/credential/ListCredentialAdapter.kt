@@ -263,6 +263,11 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                                     filteredList.add(credential)
                                 }
                             }
+                            else if (SearchCommand.SEARCH_COMMAND_SHOW_OTP.applies(charSequence)) {
+                                if (credential.otpData != null) {
+                                    filteredList.add(credential)
+                                }
+                            }
                             else if (SearchCommand.SEARCH_COMMAND_SEARCH_ID.applies(charSequence)) {
                                 val arg = SearchCommand.SEARCH_COMMAND_SEARCH_ID.extractArg(charSequence)
                                 if (exactMatch) {

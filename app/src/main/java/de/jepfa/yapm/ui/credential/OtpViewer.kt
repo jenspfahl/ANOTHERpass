@@ -37,6 +37,8 @@ class OtpViewer(
 
     private var currentOtpValue: String = ""
 
+    private var hideHotpCounterAdjuster = false
+
     init {
 
         hotpAdjustCounter.setOnClickListener {
@@ -201,7 +203,7 @@ class OtpViewer(
             if (masked) {
                 hotpAdjustCounter.visibility = View.INVISIBLE
             }
-            else {
+            else if (!hideHotpCounterAdjuster) {
                 hotpAdjustCounter.visibility = View.VISIBLE
             }
         }
@@ -215,6 +217,11 @@ class OtpViewer(
             hotpAdjustCounter.visibility = View.GONE
         }
         updateCurrentOtpValue()
+    }
+
+    fun hideHotpCounterAdjuster() {
+        hotpAdjustCounter.visibility = View.INVISIBLE
+        this.hideHotpCounterAdjuster = true
     }
 
 

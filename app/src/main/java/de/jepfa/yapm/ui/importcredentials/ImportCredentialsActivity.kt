@@ -4,6 +4,7 @@ import android.net.Uri
 import android.os.Bundle
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.encrypted.OtpData
 import de.jepfa.yapm.model.encrypted.PasswordData
 import de.jepfa.yapm.model.encrypted.TimeData
 import de.jepfa.yapm.model.secret.Password
@@ -119,7 +120,7 @@ class ImportCredentialsActivity : SecureActivity() {
 
             CredentialFileRecord(id,
                 name ?: url?.let { getDomainAsName(it)} ?: "unknown $id",
-                url, user, password, description ?: "", expiresOn)
+                url, user, password, description ?: "", expiresOn, null)
 
         }.filter { it.plainPassword.isNotEmpty() }
 
@@ -161,6 +162,7 @@ class ImportCredentialsActivity : SecureActivity() {
         val encPassword = SecretService.encryptPassword(key, Password(record.plainPassword))
         val encWebsite = SecretService.encryptCommonString(key, record.url ?: "")
         val encExpiresAt = SecretService.encryptLong(key, record.expiresAt?.time ?: 0L)
+        val otpAuthUri = record.otpAuth?.let { SecretService.encryptCommonString(key, it) }
 
         val allowedLabelCountFromOutside = max(0, Constants.MAX_LABELS_PER_CREDENTIAL - labelNames.size)
 
@@ -197,7 +199,7 @@ class ImportCredentialsActivity : SecureActivity() {
                 record.modifiedAt?.time,
                 encExpiresAt,
             ),
-            null,
+            if (otpAuthUri != null) OtpData(otpAuthUri) else null,
         )
     }
 

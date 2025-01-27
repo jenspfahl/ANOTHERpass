@@ -14,6 +14,7 @@ data class CredentialFileRecord(
         val expiresAt: Date?,
         val modifiedAt: Date?,
         val labels: List<String>,
+        val otpAuth: String?,
 ) {
         constructor(
                 id: Int,
@@ -22,6 +23,8 @@ data class CredentialFileRecord(
                 userName: String?,
                 plainPassword: String,
                 description: String,
-                expiresOn: Date?)
-                : this(null, id, name, url, userName, plainPassword, description, expiresOn, null, emptyList())
+                expiresOn: Date?,
+                otpAuth: String?
+                )
+                : this(null, id, name, url, userName, plainPassword, description, expiresOn, null, emptyList(), otpAuth)
 }

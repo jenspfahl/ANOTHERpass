@@ -755,6 +755,8 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="command_expires">Filter inloggegevens die mogelijk verlopen</string>
   <string name="command_latest">Laat recent gewijzigde toegangsgegevens zien</string>
   <string name="command_veiled">Filter verborgen inloggegevens</string>
+  <string name="command_otp">Filter credentials with One-Time-Passwords</string>
+
 
   <string name="with_email_alias">De gebruikersnaam als e-mailadres met een generiek aliasnaam</string>
   <string name="title_username_email_alias">Wat is een e-mailalias?</string>

@@ -65,7 +65,7 @@ object CsvService {
             val writer = CSVWriter(outputWriter)
 
             // adding header to csv
-            val header = arrayOf("name", "url", "username", "password", "description", "labels", "expiresOn")
+            val header = arrayOf("name", "url", "username", "password", "description", "labels", "expiresOn", "otp")
             writer.writeNext(header)
 
             // add data to csv
@@ -81,9 +81,13 @@ object CsvService {
                     .sorted()
                     .joinToString(separator = ",")
                 val expiresAtAsString = if (expiresAt != null && expiresAt > 0) Date(expiresAt).toSimpleDateFormat() else ""
+                val otpAuth = encCredential.otpData?.let {
+                    SecretService.decryptCommonString(secretKey, it.encOtpAuthUri)
+                } ?: ""
+
 
                 val data = arrayOf(name, website, user, password.toRawFormattedPassword().toString(),
-                    additionalInfo, labelsAsString, expiresAtAsString)
+                    additionalInfo, labelsAsString, expiresAtAsString, otpAuth)
                 writer.writeNext(data)
                 password.clear()
             }

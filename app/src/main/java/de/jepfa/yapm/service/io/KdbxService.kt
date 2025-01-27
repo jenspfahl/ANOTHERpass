@@ -61,19 +61,29 @@ object KdbxService {
                         val user = SecretService.decryptCommonString(secretKey, encCredential.user)
                         val password = SecretService.decryptPassword(secretKey, encCredential.passwordData.password)
                         val additionalInfo = SecretService.decryptCommonString(secretKey, encCredential.additionalInfo)
+                        val otpAuth = encCredential.otpData?.let {
+                            SecretService.decryptCommonString(secretKey, it.encOtpAuthUri)
+                        }
 
+                        var fields = EntryFields.of(
+                            BasicField.Title() to EntryValue.Plain(name),
+                            BasicField.Url() to EntryValue.Plain(website),
+                            BasicField.UserName() to EntryValue.Plain(user),
+                            BasicField.Notes() to EntryValue.Plain(additionalInfo),
+                            BasicField.Password() to EntryValue.Encrypted(
+                                EncryptedValue.fromString(password.toRawFormattedPassword().toString())
+                            ),
+                        )
+
+                        if (otpAuth != null) {
+                            fields = fields.plus("otp" to EntryValue.Encrypted(
+                                EncryptedValue.fromString(otpAuth)
+                            ))
+                        }
 
                         Entry(
                             encCredential.uid ?: UUID.randomUUID(),
-                            fields = EntryFields.of(
-                                BasicField.Title() to EntryValue.Plain(name),
-                                BasicField.Url() to EntryValue.Plain(website),
-                                BasicField.UserName() to EntryValue.Plain(user),
-                                BasicField.Notes() to EntryValue.Plain(additionalInfo),
-                                BasicField.Password() to EntryValue.Encrypted(
-                                    EncryptedValue.fromString(password.toRawFormattedPassword().toString())
-                                ),
-                            ),
+                            fields = fields,
                             times = TimeData(
                                 lastModificationTime = if (modifiedAt != null && modifiedAt > 0) Date(modifiedAt).toInstant() else null,
                                 expiryTime = if (expiresAt != null && expiresAt > 0) Date(expiresAt).toInstant() else null,
@@ -142,6 +152,7 @@ object KdbxService {
                                 if (expiresAt?.time == 0L) null else expiresAt,
                                 if (modifiedAt?.time == 0L) null else modifiedAt,
                                 it.tags,
+                                fields["otp"]?.content
                             )
 
                             it.tags.forEach { tag ->

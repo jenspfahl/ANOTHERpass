@@ -797,6 +797,7 @@
     <string name="command_expires">Filter credentials that expire</string>
     <string name="command_latest">Show latest modified credential</string>
     <string name="command_veiled">Filter obfuscated credentials</string>
+    <string name="command_otp">Filter credentials with One-Time-Passwords</string>
 
     <string name="with_email_alias">Declare the username as email address with a generic alias part</string>
     <string name="title_username_email_alias">What is an email alias part?</string>

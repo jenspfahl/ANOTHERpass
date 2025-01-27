@@ -189,7 +189,7 @@ class ShowCredentialActivity : SecureActivity() {
 
 
         if (mode != Mode.NORMAL) {
-
+            otpViewer.hideHotpCounterAdjuster()
             credential = EncCredential.fromIntent(intent)
             credential?.let {
                 updatePasswordView(it)
