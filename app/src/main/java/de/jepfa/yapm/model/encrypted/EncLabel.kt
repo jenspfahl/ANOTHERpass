@@ -1,11 +1,10 @@
 package de.jepfa.yapm.model.encrypted
 
-import android.util.Log
 import com.google.gson.JsonElement
-import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.DebugInfo
 import java.util.*
 
+// DON'T RENAME THE PROPS, THIS WILL BREAK THE VAULT BACKUP FILE FORMAT (see LABELS_TYPE)
 data class EncLabel(
     var id: Int?,
     val uid: UUID?,

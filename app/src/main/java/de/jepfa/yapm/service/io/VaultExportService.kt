@@ -44,7 +44,6 @@ object VaultExportService {
     const val JSON_USERNAME_TEMPLATES = "usernameTemplates"
     const val JSON_APP_SETTINGS = "appSettings"
 
-    val CREDENTIALS_TYPE: Type = object : TypeToken<List<EncCredential>>() {}.type
     val LABELS_TYPE: Type = object : TypeToken<List<EncLabel>>() {}.type
     val USERNAME_TEMPLATES_TYPE: Type = object : TypeToken<List<EncUsernameTemplate>>() {}.type
 
@@ -157,7 +156,36 @@ object VaultExportService {
 
         val credentials = app.credentialRepository.getAllSync()
 
-        val credentialsAsJson = GSON.toJsonTree(credentials, CREDENTIALS_TYPE)
+        val credentialsAsJson = JsonArray()
+        credentials.forEach { credential ->
+            val credentialAsJson = JsonObject()
+            credentialAsJson.addProperty(EncCredential.ATTRIB_ID, credential.id)
+            credential.uid?.let {
+                credentialAsJson.addProperty(EncCredential.ATTRIB_UID, it.toString())
+            }
+            credentialAsJson.addProperty(EncCredential.ATTRIB_NAME, credential.name.toBase64String())
+            credentialAsJson.addProperty(EncCredential.ATTRIB_ADDITIONAL_INFO, credential.additionalInfo.toBase64String())
+            credentialAsJson.addProperty(EncCredential.ATTRIB_USER, credential.user.toBase64String())
+            credentialAsJson.addProperty(EncCredential.ATTRIB_PASSWORD, credential.passwordData.password.toBase64String())
+            credentialAsJson.addProperty(EncCredential.ATTRIB_IS_OBFUSCATED, credential.passwordData.isObfuscated)
+            credential.passwordData.lastPassword?.let {
+                credentialAsJson.addProperty(EncCredential.ATTRIB_LAST_PASSWORD, it.toBase64String())
+            }
+            credential.passwordData.isLastPasswordObfuscated?.let {
+                credentialAsJson.addProperty(EncCredential.ATTRIB_IS_LAST_PASSWORD_OBFUSCATED, it)
+            }
+            credentialAsJson.addProperty(EncCredential.ATTRIB_WEBSITE, credential.website.toBase64String())
+            credentialAsJson.addProperty(EncCredential.ATTRIB_LABELS, credential.labels.toBase64String())
+            credentialAsJson.addProperty(EncCredential.ATTRIB_EXPIRES_AT, credential.timeData.expiresAt.toBase64String())
+            credential.timeData.modifyTimestamp?.let {
+                credentialAsJson.addProperty(EncCredential.ATTRIB_MODIFY_TIMESTAMP, it)
+            }
+            credential.otpData?.encOtpAuthUri?.let {
+                credentialAsJson.addProperty(EncCredential.ATTRIB_OTP_DATA, it.toBase64String())
+            }
+
+            credentialsAsJson.add(credentialAsJson)
+        }
         val encCredentials = SecretService.encryptCommonString(
             masterKeySK,
             credentialsAsJson.toString())

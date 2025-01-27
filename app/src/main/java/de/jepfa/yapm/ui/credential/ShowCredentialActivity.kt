@@ -169,6 +169,25 @@ class ShowCredentialActivity : SecureActivity() {
             }
         }
 
+
+        otpViewer = OtpViewer(null, this, hotpCounterChanged = {
+                // store changed HOTP counter
+                val otpAuthUri = otpViewer.otpConfig?.toUri()
+                if (otpAuthUri != null) {
+                    masterSecretKey?.let { key ->
+                        credential?.let { current ->
+                            val encUri = SecretService.encryptCommonString(key, otpAuthUri.toString())
+                            current.otpData = OtpData(encUri)
+                            credentialViewModel.update(current, this)
+                        }
+
+                    }
+
+                }
+            },
+            masked = PreferenceService.getAsBool(PREF_MASK_PASSWORD, this))
+
+
         if (mode != Mode.NORMAL) {
 
             credential = EncCredential.fromIntent(intent)
@@ -183,22 +202,7 @@ class ShowCredentialActivity : SecureActivity() {
             })
         }
 
-        otpViewer = OtpViewer(null, this, hotpCounterChanged = {
-            // store changed HOTP counter
-            val otpAuthUri = otpViewer.otpConfig?.toUri()
-            if (otpAuthUri != null) {
-                masterSecretKey?.let { key ->
-                    credential?.let { current ->
-                        val encUri = SecretService.encryptCommonString(key, otpAuthUri.toString())
-                        current.otpData = OtpData(encUri)
-                        credentialViewModel.update(current, this)
-                    }
 
-                }
-
-            }
-        },
-            masked = PreferenceService.getAsBool(PREF_MASK_PASSWORD, this))
 
         val otpToRestore = savedInstanceState?.getString("OTP")
         if (otpToRestore != null) {

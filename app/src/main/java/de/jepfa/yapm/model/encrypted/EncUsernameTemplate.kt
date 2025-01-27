@@ -1,10 +1,9 @@
 package de.jepfa.yapm.model.encrypted
 
-import android.util.Log
 import com.google.gson.JsonElement
-import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.DebugInfo
 
+// DON'T RENAME THE PROPS, THIS WILL BREAK THE VAULT BACKUP FILE FORMAT (see USERNAME_TEMPLATES_TYPE)
 data class EncUsernameTemplate(val id: Int?,
                                var username: Encrypted,
                                var description: Encrypted,
