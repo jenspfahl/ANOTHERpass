@@ -72,6 +72,10 @@ data class OtpConfig(
         return Uri.parse(s)
     }
 
+    override fun toString(): String {
+        return toUri().toString()
+    }
+
     fun incCounter(): OtpConfig {
         if (mode == OtpMode.HOTP) {
             counter++
@@ -101,6 +105,7 @@ data class OtpConfig(
 
         return true
     }
+
 
     companion object {
         val DEFAULT_OTP_MODE = OtpMode.TOTP
@@ -169,6 +174,42 @@ data class OtpConfig(
                 digits,
                 periodInSec,
                 counter)
+        }
+
+        fun createFromPacked(packed: String?, name: String, user: String): OtpConfig? {
+            if (packed.isNullOrBlank()) {
+                return null
+            }
+            val splitted = packed.split("_")
+            if (splitted.size != 5) {
+                return null
+            }
+
+            val modeId = splitted[0].toIntOrNull() ?: return null
+            val algorithmId = splitted[1].toIntOrNull() ?: return null
+            val mode = OtpMode.entries.getOrNull(modeId) ?: return null
+            val algorithm = OtpAlgorithm.entries.getOrNull(algorithmId) ?: return null
+            val secret = stringToBase32Key(splitted[2])
+            val digits = splitted[3].toIntOrNull() ?: return null
+            val periodOrCounter = splitted[4].toIntOrNull() ?: return null
+            val otpConfig = OtpConfig(
+                mode,
+                name,
+                user,
+                secret,
+                algorithm,
+                digits,
+                if (mode == OtpMode.TOTP) periodOrCounter else OtpConfig.DEFAULT_OTP_PERIOD,
+                if (mode == OtpMode.HOTP) periodOrCounter else OtpConfig.DEFAULT_OTP_COUNTER,
+            )
+
+            return otpConfig
+        }
+
+        fun packOtpAuthUri(otpAuthUri: String): String? {
+            val otpConfig = fromUri(Uri.parse(otpAuthUri)) ?: return null
+            val counterOrPeriod = if (otpConfig.mode == OtpMode.HOTP) otpConfig.counter else otpConfig.period
+            return "${otpConfig.mode.ordinal}_${otpConfig.algorithm.ordinal}_${otpConfig.secretAsBase32()}_${otpConfig.digits}_${counterOrPeriod}"
         }
 
         fun stringToBase32Key(base32String: String) = Key(Base32().decode(base32String))

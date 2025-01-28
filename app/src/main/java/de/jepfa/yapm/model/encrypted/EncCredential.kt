@@ -109,8 +109,15 @@ data class EncCredential(
         website = other.website
         additionalInfo = other.additionalInfo
         timeData.expiresAt = other.timeData.expiresAt
+        timeData.modifyTimestamp = other.timeData.modifyTimestamp
         passwordData.isObfuscated = other.passwordData.isObfuscated
         passwordData.password = other.passwordData.password
+        if (other.otpData != null) {
+            otpData = other.otpData
+        }
+        else {
+            otpData = null
+        }
     }
 
 

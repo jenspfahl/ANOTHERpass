@@ -953,6 +953,7 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="otp_remove_config_message">Are you sure to remove this One-Time-Password configuration from the current credential?</string>
   <string name="nothing_to_delete">Nothing to delete</string>
   <string name="otp_copy_configuration_to_clipboard">Copy configuration to clipboard</string>
+    <string name="diclaimer_beta_version">This is a pre-version only for testing purposes and may contain bugs!!</string>
 
 
 </resources>

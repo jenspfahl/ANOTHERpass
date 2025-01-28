@@ -987,5 +987,6 @@
     <string name="otp_remove_config_message">Soll diese Einmalpasswort-Konfiguration wirklich von diesen Zugangsdaten entfernt werden?</string>
     <string name="nothing_to_delete">Nichts zum entfernen</string>
     <string name="otp_copy_configuration_to_clipboard">Konfiguration in die Zwischenablage kopieren</string>
+    <string name="diclaimer_beta_version">Dies ist eine Vorab-Version zu Testzwecken und kann Fehler enthalten!!</string>
 
 </resources>

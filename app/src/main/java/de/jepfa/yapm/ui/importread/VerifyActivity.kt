@@ -4,9 +4,11 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
+import com.google.gson.JsonParser
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.encrypted.EncryptedType.Types.*
+import de.jepfa.yapm.model.export.DecryptedExportableCredential
 import de.jepfa.yapm.model.export.EncExportableCredential
 import de.jepfa.yapm.model.export.ExportContainer
 import de.jepfa.yapm.model.export.PlainShareableCredential
@@ -21,6 +23,7 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.credential.DeobfuscationDialog
 import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 
 
 class VerifyActivity : ReadQrCodeOrNfcActivityBase() {
@@ -153,16 +156,35 @@ class VerifyActivity : ReadQrCodeOrNfcActivityBase() {
         val parsedVault = ImportVaultUseCase.parseVaultFileContent(scanned, this)
         if (parsedVault.content != null) {
             ExportContainer.fromJson(parsedVault.content)?.let { exportContainer ->
-                when (exportContainer.c) {
+                val content = exportContainer.c
+                when (content) {
                     is EncExportableCredential -> {
                         verifyResultText.text = getString(R.string.unknown_ecr_scanned)
-                        val ecr = exportContainer.c
+                        val ecr = content
                         getNameFromECR(ecr)?.let { name ->
                             verifyResultText.text = getString(R.string.well_known_ecr_scanned, name)
                         }
                     }
+                    is Encrypted -> {
+                        verifyResultText.text = getString(R.string.unknown_ecr_scanned)
+                        masterSecretKey?.let { key ->
+                            val decryptedExportableCredential = try {
+                                val decryptedExportedCredentialJsonString = SecretService.decryptCommonString(key, content)
+                                val decryptedExportedCredentialJson = JsonParser.parseString(decryptedExportedCredentialJsonString)
+                                DecryptedExportableCredential.fromJson(decryptedExportedCredentialJson)
+                            } catch (e: Exception) {
+                                DebugInfo.logException("ECR", "Cannot parse exported credential", e)
+                                null
+                            }
+                            if (decryptedExportableCredential != null) {
+                                verifyResultText.text =
+                                    getString(R.string.well_known_ecr_scanned, decryptedExportableCredential.n)
+                            }
+                        }
+
+                    }
                     is PlainShareableCredential -> {
-                        val pcr = exportContainer.c
+                        val pcr = content
                         verifyResultText.text = getString(R.string.pcr_scanned, pcr.n)
                     }
                     else -> return@let

@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.text.TextUtils
-import android.util.Log
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
 import de.jepfa.yapm.model.encrypted.EncCredential
@@ -20,7 +19,6 @@ import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.util.Constants
-import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.FileUtil
 import java.lang.reflect.Type
@@ -71,12 +69,16 @@ object VaultExportService {
             .registerTypeAdapter(Password::class.java, PasswordSerializer())
             .create()
 
-    fun credentialToJson(credential: EncExportableCredential): String {
-        return GSON.toJson(ExportContainer(TYPE_ENC_CREDENTIAL_RECORD, credential))
-    }
-
     fun credentialToJson(credential: PlainShareableCredential): String {
         return GSON.toJson(ExportContainer(TYPE_PLAIN_CREDENTIAL_RECORD, credential))
+    }
+
+    fun credentialToJson(credential: DecryptedExportableCredential): String {
+        return GSON.toJson(credential)
+    }
+
+    fun encExportableCredentialToJson(credential: Encrypted): String {
+        return GSON.toJson(ExportContainer(TYPE_ENC_CREDENTIAL_RECORD_V2, credential))
     }
 
     fun createVaultFile(
@@ -225,5 +227,6 @@ object VaultExportService {
 
         return root
     }
+
 
 }

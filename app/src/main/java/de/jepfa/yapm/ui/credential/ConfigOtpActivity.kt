@@ -206,7 +206,7 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
                 val otpToSave = otpViewer.otpConfig
                 if (otpToSave != null) {
                     val encOtpData =
-                        SecretService.encryptCommonString(key, otpToSave.toUri().toString())
+                        SecretService.encryptCommonString(key, otpToSave.toString())
 
                     val data = Intent()
                     data.putEncryptedExtra(EXTRA_CREDENTIAL_OTP_DATA, encOtpData)
@@ -243,7 +243,7 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         otpViewer.otpConfig?.let {
-            outState.putString("OTP", it.toUri().toString())
+            outState.putString("OTP", it.toString())
         }
     }
 
@@ -260,7 +260,7 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
             otpAuthTextView.text = ""
         }
         else {
-            otpAuthTextView.text = otpConfig.toUri().toString()
+            otpAuthTextView.text = otpConfig.toString()
         }
 
         otpViewer.refreshVisibility()
@@ -395,7 +395,7 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
         if (id == R.id.menu_copy_otpauth) {
             val otpConfig = otpViewer.otpConfig
             if (otpConfig != null && otpViewer.otpConfig?.isValid() == true) {
-                ClipboardUtil.copy("OTP-Config", otpConfig.toUri().toString(), this, isSensible = true)
+                ClipboardUtil.copy("OTP-Config", otpConfig.toString(), this, isSensible = true)
                 toastText(this, R.string.copied_to_clipboard)
             }
             else {
@@ -425,7 +425,7 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
             val encQrcHeader = SecretService.encryptCommonString(
                 tempKey,
                 otpConfig.getLabel())
-            val encQrc = SecretService.encryptCommonString(tempKey, otpConfig.toUri().toString())
+            val encQrc = SecretService.encryptCommonString(tempKey, otpConfig.toString())
 
             val intent = Intent(this, QrCodeActivity::class.java)
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_HEADLINE, encHead)

@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 object DebugInfo {
 
+    private var betaDisclaimerShown = false
     private var debug = BuildConfig.DEBUG
 
     private var exceptionLogger = Collections.synchronizedList(LinkedList<String>())
@@ -85,6 +86,12 @@ object DebugInfo {
         val sb = StringBuilder()
         sb.append("\n************ APP INFORMATION ***********\n")
         sb.addFormattedLine("Version", getVersionName(context))
+        if (isBeta(context)) {
+            sb.addFormattedLine("Version", "BETA-" + getVersionName(context))
+        }
+        else {
+            sb.addFormattedLine("Version", getVersionName(context))
+        }
         sb.addFormattedLine("Version Code", getVersionCode(context))
         sb.addFormattedLine("Database Version", YapmDatabase.getVersion())
         sb.addFormattedLine("Vault Id (anonymized)", anonymizedVaultId)
@@ -194,7 +201,7 @@ object DebugInfo {
                 }
             }
         } catch (e: IOException) {
-            DebugInfo.logException("Debug","cannot gather logs", e)
+            logException("Debug","cannot gather logs", e)
         }
         return null
     }
@@ -203,7 +210,20 @@ object DebugInfo {
         try {
             Runtime.getRuntime().exec("logcat -b all -c") // clear logs
         } catch (e: IOException) {
-            DebugInfo.logException("Debug","cannot clear logs", e)
+            logException("Debug","cannot clear logs", e)
         }
+    }
+
+    fun isBeta(context: Context): Boolean {
+        val versionName = getVersionName(context)
+        return versionName.startsWith("rc") || versionName.endsWith("rc")
+    }
+
+    fun isBetaDisclaimerShown(): Boolean {
+        return betaDisclaimerShown
+    }
+
+    fun setBetaDisclaimerShown() {
+        betaDisclaimerShown = true
     }
 }

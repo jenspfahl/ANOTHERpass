@@ -6,8 +6,9 @@ import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.Encrypted
-import de.jepfa.yapm.model.export.EncExportableCredential
+import de.jepfa.yapm.model.export.DecryptedExportableCredential
 import de.jepfa.yapm.model.export.PlainShareableCredential
+import de.jepfa.yapm.model.otp.OtpConfig
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
@@ -79,7 +80,7 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE_HEADER, tempEncName)
             intent.putExtra(QrCodeActivity.EXTRA_COLOR, input.mode.colorId)
 
-            // will be bypassed to NfcActivity
+            // will be forwarded to NfcActivity
             intent.putExtra(NfcActivity.EXTRA_WITH_APP_RECORD, true)
 
             activity.startActivity(intent)
@@ -134,14 +135,37 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
         return when (mode) {
             ExportMode.PLAIN_PASSWD -> {
                 val passwd = decryptPasswd(credential, key, obfuscationKey)
-                val encPasswd = SecretService.encryptPassword(transportKey, passwd)
+                val encForTransportPasswd = SecretService.encryptPassword(transportKey, passwd)
                 passwd.clear()
-                return encPasswd
+                return encForTransportPasswd
             }
             ExportMode.ENC_CREDENTIAL_RECORD -> {
-                val shortEncCredential = EncExportableCredential(credential)
-                val jsonString = VaultExportService.credentialToJson(shortEncCredential)
-                return SecretService.encryptCommonString(transportKey, jsonString)
+                val passwd = decryptPasswd(credential, key, obfuscationKey)
+                val expiresAt = decryptLong(key, credential.timeData.expiresAt)
+                val otpAuth = credential.otpData?.let {
+                    SecretService.decryptCommonString(key, it.encOtpAuthUri)
+                }
+
+                val decryptedExportableCredential = DecryptedExportableCredential(
+                    credential.id!!,
+                    credential.uid?.toBase64String(),
+                    SecretService.decryptCommonString(key, credential.name),
+                    SecretService.decryptCommonString(key, credential.additionalInfo),
+                    SecretService.decryptCommonString(key, credential.user),
+                    passwd,
+                    SecretService.decryptCommonString(key, credential.website),
+                    SecretService.decryptCommonString(key, credential.labels),
+                    if (expiresAt != null && expiresAt > 0) expiresAt else null,
+                    if (otpAuth != null) OtpConfig.packOtpAuthUri(otpAuth) else null,
+                    credential.passwordData.isObfuscated,
+                    credential.timeData.modifyTimestamp,
+                )
+                val jsonString = VaultExportService.credentialToJson(decryptedExportableCredential)
+                val encCredential = SecretService.encryptCommonString(key, jsonString)
+                val encJsonString = VaultExportService.encExportableCredentialToJson(encCredential)
+                val encForTransportData = SecretService.encryptCommonString(transportKey, encJsonString)
+                passwd.clear()
+                return encForTransportData
             }
             ExportMode.PLAIN_CREDENTIAL_RECORD -> {
                 val passwd = decryptPasswd(credential, key, obfuscationKey)
@@ -158,12 +182,12 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
                     passwd,
                     SecretService.decryptCommonString(key, credential.website),
                     if (expiresAt != null && expiresAt > 0) expiresAt else null,
-                    if (otpAuth != null) PlainShareableCredential.packOtpAuthUri(otpAuth) else null
+                    if (otpAuth != null) OtpConfig.packOtpAuthUri(otpAuth) else null
                 )
                 val jsonString = VaultExportService.credentialToJson(shortPlainCredential)
-                val encData = SecretService.encryptCommonString(transportKey, jsonString)
+                val encForTransportData = SecretService.encryptCommonString(transportKey, jsonString)
                 passwd.clear()
-                return encData
+                return encForTransportData
             }
         }
 

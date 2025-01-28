@@ -222,7 +222,7 @@ class ShowCredentialActivity : SecureActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         otpViewer.otpConfig?.let {
-            outState.putString("OTP", it.toUri().toString())
+            outState.putString("OTP", it.toString())
         }
     }
 

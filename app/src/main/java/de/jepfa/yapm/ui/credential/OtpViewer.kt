@@ -15,6 +15,7 @@ import de.jepfa.yapm.service.otp.OtpService
 import de.jepfa.yapm.ui.ProgressCircleAnimation
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.util.ClipboardUtil
+import de.jepfa.yapm.util.isDarkMode
 import de.jepfa.yapm.util.toastText
 import java.util.Date
 
@@ -39,6 +40,10 @@ class OtpViewer(
     private var hideHotpCounterAdjuster = false
 
     init {
+
+        if (isDarkMode(activity)) {
+            totpProgressCircle.setIndicatorColor(activity.getColor(R.color.Gray2))
+        }
 
         hotpAdjustCounter.setOnClickListener {
             if (otpConfig?.mode == OtpMode.HOTP) {

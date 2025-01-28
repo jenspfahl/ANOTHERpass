@@ -120,6 +120,14 @@ class LoginActivity : NfcBaseActivity() {
                 startActivityForResult(intent, createVaultActivityRequestCode)
             }
         }
+
+        if (DebugInfo.isBeta(this) && !DebugInfo.isBetaDisclaimerShown()) {
+            DebugInfo.setBetaDisclaimerShown()
+            AlertDialog.Builder(this)
+                .setMessage(R.string.diclaimer_beta_version)
+                .setPositiveButton(R.string.got_it, null)
+                .show()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
