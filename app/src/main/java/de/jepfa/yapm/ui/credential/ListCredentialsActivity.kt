@@ -11,6 +11,7 @@ import android.database.MatrixCursor
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -55,6 +56,7 @@ import com.google.android.material.navigation.NavigationView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncWebExtension
+import de.jepfa.yapm.model.otp.OtpConfig
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
@@ -400,17 +402,24 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 }
             }
 
+
+            if (!Session.isDenied()) {
+                val serverStateToRestore = savedInstanceState?.getString("ServerRunning")
+                if (serverStateToRestore != null) {
+                    val serverState = serverStateToRestore.toBoolean()
+                    if (serverState) {
+                        startStopServer(start = true, silent = true)
+                    }
+                } else if (serverAutostartEnabled) {
+                    startStopServer(start = true)
+                }
+            }
+
+            reflectServerState()
+
             serverViewSwitch.setOnCheckedChangeListener { _, isChecked ->
                 startStopServer(isChecked)
             }
-
-            if (!Session.isDenied() && serverAutostartEnabled) {
-                serverViewSwitch.performClick()
-            }
-            else {
-                reflectServerState()
-            }
-
 
         }
 
@@ -580,6 +589,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("ServerRunning", serverViewSwitch.isChecked.toString())
+
+    }
+
     private fun ListCredentialsActivity.startAddNewCerdentialFlow() {
         val intent =
             Intent(this@ListCredentialsActivity, EditCredentialActivity::class.java)
@@ -603,38 +618,41 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     private fun startStopServer(start: Boolean, silent: Boolean = false) {
         if (start) {
-            if (!silent) {
-                serverViewStateText = getString(R.string.server_starting)
-                serverViewState.text = serverViewStateText
-                serverViewSwitch.isEnabled = false
+            if (HttpServer.isRunning()) {
+                reflectServerStarted()
+                return
             }
+            serverViewStateText = getString(R.string.server_starting)
+            serverViewState.text = serverViewStateText
+            serverViewSwitch.isEnabled = false
+            
             startAllServersAsync(this, this).asCompletableFuture()
                 .whenComplete { success, e ->
                     Log.i("HTTP", "async server start success: $success")
 
                     CoroutineScope(Dispatchers.Main).launch {
-                        if (!silent) {
-                            serverViewSwitch.isEnabled = true
-                        }
+                        serverViewSwitch.isEnabled = true
+                        
 
                         if (e != null) {
                             Log.w("HTTP", e)
                         }
 
                         if (success == null || !success) {
-                            if (!silent) {
-                                serverViewSwitch.isChecked = false
-                            }
+                            serverViewSwitch.isChecked = false
                             toastText(
                                 this@ListCredentialsActivity,
                                 getString(R.string.failed_to_start_server)
                             )
                         } else {
+                            reflectServerStarted()
+
                             if (!silent) {
-                                reflectServerStarted()
+                                toastText(
+                                    this@ListCredentialsActivity,
+                                    getString(R.string.server_started)
+                                )
                             }
-                            toastText(this@ListCredentialsActivity,
-                                getString(R.string.server_started))
                             HttpServer.requestCredentialHttpCallback =
                                 this@ListCredentialsActivity
                         }
@@ -642,20 +660,18 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 }
         } else {
             if (HttpServer.isRunning()) { // otherwise it is already stopped
-                if (!silent) {
-                    serverViewStateText = getString(R.string.server_stopping)
-                    serverViewState.text = serverViewStateText
-                    serverViewSwitch.isEnabled = false
-                }
+                serverViewStateText = getString(R.string.server_stopping)
+                serverViewState.text = serverViewStateText
+                serverViewSwitch.isEnabled = false
+                
                 wasWifiLost = false
 
                 shutdownAllAsync().asCompletableFuture().whenComplete { success, e ->
                     Log.i("HTTP", "async stop=$success")
 
                     CoroutineScope(Dispatchers.Main).launch {
-                        if (!silent) {
-                            serverViewSwitch.isEnabled = true
-                        }
+                        serverViewSwitch.isEnabled = true
+                        
 
                         HttpCredentialRequestHandler.reset(this@ListCredentialsActivity)
 
@@ -663,21 +679,23 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                             Log.w("HTTP", e)
                         }
                         if (success == null || !success) {
-                            if (!silent) {
-                                serverViewSwitch.isChecked = true
-                            }
+                            serverViewSwitch.isChecked = true
+                            
                             toastText(this@ListCredentialsActivity,
                                 getString(R.string.failed_to_stop_server))
                         } else {
+                            reflectServerStopped()
+
                             if (!silent) {
-                                reflectServerStopped()
+                                toastText(
+                                    this@ListCredentialsActivity,
+                                    getString(R.string.server_stopped_msg)
+                                )
                             }
-                            toastText(this@ListCredentialsActivity,
-                                getString(R.string.server_stopped_msg))
                         }
                     }
                 }
-            } else if (!silent) {
+            } else {
                 reflectServerStopped()
             }
         }

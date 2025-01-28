@@ -502,12 +502,12 @@ object HttpServer {
     fun shutdownAllAsync() : Deferred<Boolean> {
         linkHttpCallback = null
         requestCredentialHttpCallback = null
+        isHttpServerRunning = false
         return CoroutineScope(Dispatchers.IO).async {
             try {
                 Log.i("HTTP", "shutdown all")
 
-                httpServer?.stop()
-                isHttpServerRunning = false
+                httpServer?.stop(gracePeriodMillis = 100, timeoutMillis = 100)
                 Log.i("HTTP", "shutdown done")
 
                 if (httpServer != null) { //server ran before
