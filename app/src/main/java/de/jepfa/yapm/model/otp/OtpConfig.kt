@@ -93,7 +93,7 @@ data class OtpConfig(
         if (issuer.isBlank()) {
             return false
         }
-        if (mode == OtpMode.TOTP && period <= 0) {
+        if (mode == OtpMode.TOTP && (period <= 0 || period > 3600)) {
             return false
         }
         if (mode == OtpMode.HOTP && counter < 0) {

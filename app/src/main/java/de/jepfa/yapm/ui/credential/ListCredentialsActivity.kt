@@ -253,7 +253,10 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         else {
 
             val onLongClickServerDetails = View.OnLongClickListener {
-                val stat = if (HttpServer.isRunning())  "Running" else "Stopped"
+                val stat = if (HttpServer.isRunning())
+                    if (HttpServer.isStopping()) "Stopping" else "Running"
+                else
+                    if (HttpServer.isStarting()) "Starting" else "Stopped"
                 val ip = HttpServer.getIp(this)
                 val port = PreferenceService.getAsString(PreferenceService.PREF_SERVER_PORT, this) ?: HttpServer.DEFAULT_HTTP_SERVER_PORT
                 val waiting = AlertDialog.Builder(this@ListCredentialsActivity)
@@ -294,7 +297,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             }
 
             val onClickServerAddresses: (View) -> Unit = {
-                if (HttpServer.isRunning()) {
+                if (HttpServer.isRunning() && !HttpServer.isStopping()) {
                     var ip = HttpServer.getIp(this)
                     if (ip == NO_IP_ADDRESS_AVAILABLE) {
                         ip = this.getString(R.string.server_no_wifi)
@@ -378,7 +381,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     popup.setOnMenuItemClickListener { item ->
                         when (item.itemId) {
                             R.id.menu_server_link_add -> {
-                                if (!HttpServer.isRunning()) {
+                                if (!HttpServer.isRunning() && !HttpServer.isStarting()) {
                                     toastText(this, "Please start the server first")
                                 } else if (!HttpServer.isWifiEnabled(this)) {
                                     toastText(this, "Please enable Wifi first")
@@ -401,6 +404,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     popup.show()
                 }
             }
+
 
 
             if (!Session.isDenied()) {
@@ -618,7 +622,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     private fun startStopServer(start: Boolean, silent: Boolean = false) {
         if (start) {
-            if (HttpServer.isRunning()) {
+            if (HttpServer.isRunning() && !HttpServer.isStopping()) {
                 reflectServerStarted()
                 return
             }

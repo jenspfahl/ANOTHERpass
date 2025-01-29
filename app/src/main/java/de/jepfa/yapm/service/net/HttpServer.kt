@@ -72,6 +72,8 @@ object HttpServer {
 
     private var httpServer: NettyApplicationEngine? = null
     private var isHttpServerRunning = false
+    private var isHttpServerStarting = false
+    private var isHttpServerStopping = false
 
     var linkHttpCallback: HttpCallback? = null
     var requestCredentialHttpCallback: HttpCallback? = null
@@ -80,6 +82,7 @@ object HttpServer {
         _port: Int, activity: SecureActivity,
         httpServerCallback: HttpServerCallback,
     ): Deferred<Boolean> {
+        isHttpServerStarting = true
         return CoroutineScope(Dispatchers.IO).async {
 
             Log.i("HTTP", "start API server")
@@ -384,15 +387,18 @@ object HttpServer {
 
                 Log.i("HTTP", "launch API server")
                 if (httpServer != null) {
-                    httpServer?.stop()
+                    httpServer?.stop(gracePeriodMillis = 100, timeoutMillis= 100)
                 }
                 httpServer = embeddedServer(Netty, environment)
                 httpServer?.start(wait = false)
                 Log.i("HTTP", "API server started")
+                isHttpServerStarting = false
 
                 isHttpServerRunning = true
                 true
             } catch (e: Exception) {
+                isHttpServerStarting = false
+
                 DebugInfo.logException("HTTP", e.toString())
                 isHttpServerRunning = false
                 false
@@ -458,7 +464,7 @@ object HttpServer {
             // network is available for use
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
-                if (isRunning()) {
+                if (isHttpServerRunning && !isHttpServerStopping) {
                     httpServerCallback.handleOnWifiEstablished()
                 }
             }
@@ -476,14 +482,14 @@ object HttpServer {
             // lost network connection
             override fun onLost(network: Network) {
                 super.onLost(network)
-                if (isRunning()) {
+                if (isHttpServerRunning && !isHttpServerStopping) {
                     httpServerCallback.handleOnWifiUnavailable()
                 }
             }
 
             override fun onUnavailable() {
                 super.onUnavailable()
-                if (isRunning()) {
+                if (isHttpServerRunning && !isHttpServerStopping) {
                     httpServerCallback.handleOnWifiUnavailable()
                 }
             }
@@ -499,15 +505,27 @@ object HttpServer {
         return isHttpServerRunning
     }
 
+    fun isStarting(): Boolean {
+        return isHttpServerStarting
+    }
+
+    fun isStopping(): Boolean {
+        return isHttpServerStopping
+    }
+
     fun shutdownAllAsync() : Deferred<Boolean> {
         linkHttpCallback = null
         requestCredentialHttpCallback = null
         isHttpServerRunning = false
+        isHttpServerStopping = true
+
         return CoroutineScope(Dispatchers.IO).async {
             try {
                 Log.i("HTTP", "shutdown all")
 
-                httpServer?.stop(gracePeriodMillis = 100, timeoutMillis = 100)
+                httpServer?.stop(gracePeriodMillis = 100, timeoutMillis= 100)
+                isHttpServerStopping = false
+
                 Log.i("HTTP", "shutdown done")
 
                 if (httpServer != null) { //server ran before
@@ -520,6 +538,7 @@ object HttpServer {
 
                 true
             } catch (e: Exception) {
+                isHttpServerStopping = false
                 DebugInfo.logException("HTTP", e.toString())
                 false
             }
