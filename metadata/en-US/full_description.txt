@@ -22,6 +22,7 @@ You can also access the vault from your laptop at home, if you use the <a href="
 - export and import credential vault
 - export vault and master key separately (latter analogue if wished)
 - share and outsource credentials
+- one-time-password support (HOTP and TOTP)
 - obfuscate several passwords as additional security layer
 - optional self destruction mode after too many failed login attempts
 - Dark theme support ;-)

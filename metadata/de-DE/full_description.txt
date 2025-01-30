@@ -21,6 +21,7 @@ Mit der <a href="https://anotherpass.jepfa.de/extension">ANOTHERpass Browser-Erw
 - Es werden keine Daten in der Cloud gespeichert, außer der Anwender speichert seine Backups selber in der Cloud
 - Exportieren und Importieren des kompletten Passwort-Tresors als Backup
 - Option um einzelne Zugangsdaten zu exportieren bzw. auszulagern
+- Unterstützung für Einmalpasswörter (HOTP und TOTP)
 - Verschleierung von einzelnen Passwörtern als zusätzlicher Schutz möglich
 - Wahlweise Selbstzerstörungsmodus bei zu vielen gescheiterten Loginversuchen
 - Dark-Theme Support ;-)
