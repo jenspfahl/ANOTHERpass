@@ -314,6 +314,7 @@
     <string name="export_plain_passwd">Exportiere Zugangsdaten-Passwort</string>
     <string name="export_enc_credential_record">Exportiere Zugangsdaten verschlüsselt</string>
     <string name="export_plain_credential_record">Exportiere Zugangsdaten zum Teilen</string>
+    <string name="export_otp_config">Exportiere Einmalpassword-Konfiguration</string>
     <string name="head_export_plain_passwd">Das Zugangsdaten-Passwort von \'%1$s\'</string>
     <string name="sub_export_plain_passwd">Bewahre diesen QR-Code sicher auf, da es ein echtes Passwort enthält!</string>
     <string name="head_export_enc_credential_record">Verschlüsselte Zugangsdaten für \'%1$s\'</string>
@@ -550,13 +551,13 @@
     <string name="whats_new_in_2_0_enable_server">Ja, ich möchte es mal ausprobieren!</string>
     <string name="whats_new_in_2_0_disabled_server">OK, der Zugangsdaten-Server wurde komplett deaktiviert. Du kannst ihn jederzeit wieder über die Einstellungen aktivieren.</string>
 
-    <string name="whats_new_in_2_1">What\'s new in version 2.1</string>
+    <string name="whats_new_in_2_1">Was ist neu in Version 2.1</string>
     <string name="whats_new_in_2_1_bullet_1_head">Unterstützung für Einmalpasswörter</string>
-    <string name="whats_new_in_2_1_bullet_1_text">Jetzt kannst du für alle Zugangsdaten ein zähler- oder zeitbasiertes Einmalpasswort importieren und konfigurieren. Ähnlich wie andere Authentifizierungs-Apps zeigt ANOTHERpass das aktuelle Einmalpasswort zusammen mit dem Anmeldepasswort an. Du kannst die OTP-Konfiguration auch ganz einfach exportieren.</string>
+    <string name="whats_new_in_2_1_bullet_1_text">Jetzt kannst du für alle Zugangsdaten ein zähler- oder zeitbasiertes Einmalpasswort importieren und konfigurieren. Ähnlich wie andere Authentifizierungs-Apps zeigt ANOTHERpass das aktuelle Einmalpasswort zusammen mit dem Anmeldepasswort an. Du kannst die Konfiguration auch ganz einfach exportieren.</string>
     <string name="whats_new_in_2_1_bullet_2_head">Einloggen mit Argon2</string>
-    <string name="whats_new_in_2_1_bullet_2_text">Die moderne Key-Derivation-Function (KDF) namens Argon2 kann jetzt verwendet werden, um das Knacken deiner PIN und deines Master-Passworts noch schwieriger zu machen. Unterstützt werden Argon2ID, I und D.</string>
-    <string name="whats_new_in_2_1_bullet_3_head">Import und Export von und in Keepass-Datenbanken</string>
-    <string name="whats_new_in_2_1_bullet_3_text">Jetzt können deine Zugangsdaten in jedem Keepass-Fork verwendet werden! Exportiere alle Zugangsdaten in eine Keepass-Tresordatei (KDBX seit Version 3). Oder importiere einfach eine beliebige Keepass-Datei in den aktuellen ANOTHERpass-Tresor.</string>
+    <string name="whats_new_in_2_1_bullet_2_text">Eine neue Art der Login-Verschlüsselung namens Argon2 kann jetzt verwendet werden, um das Knacken deiner PIN und deines Master-Passworts noch schwieriger zu machen. Argon2 ist eine moderne sogenannte Key-Derivation-Function (KDF) und erlaubt eine schnellere und sichere Entsperrung des Tresors.</string>
+    <string name="whats_new_in_2_1_bullet_3_head">Import und Export von und als Keepass-Dateien</string>
+    <string name="whats_new_in_2_1_bullet_3_text">Jetzt können deine Zugangsdaten in jedem Keepass-Fork verwendet werden! Exportiere alle Zugangsdaten in eine Keepass-Tresordatei (KDBX, Version 4). Oder importiere einfach eine beliebige Keepass-Datei in den aktuellen ANOTHERpass-Tresor (ab KDBX-Version 3).</string>
     <string name="intro">Starte Intro</string>
     <string name="intro_1_head">Ein etwas anderer Passwortmanager</string>
     <string name="intro_1_subtext">ANOTHERpass bietet eine etwas andere Herangehensweise. Lies hier was das heißt:</string>

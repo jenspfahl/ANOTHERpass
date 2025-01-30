@@ -2,6 +2,7 @@ package de.jepfa.yapm.usecase.credential
 
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
@@ -30,18 +31,28 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
         PLAIN_PASSWD(R.string.export_plain_passwd, Color.RED),
         PLAIN_CREDENTIAL_RECORD(R.string.export_plain_credential_record, Color.RED),
         ENC_CREDENTIAL_RECORD(R.string.export_enc_credential_record),
+        OTP_CONFIG(R.string.export_otp_config, Color.RED),
+
     }
 
     data class Input(val mode: ExportMode, val credential: EncCredential, val obfuscationKey: Key?)
 
     fun openStartExportDialog(credential: EncCredential, obfuscationKey: Key?, activity: SecureActivity) {
-        val listItems = ExportMode.values().map { activity.getString(it.labelId) }.toTypedArray()
+        val listItems = mutableListOf(
+            ExportMode.PLAIN_PASSWD,
+            ExportMode.PLAIN_CREDENTIAL_RECORD,
+            ExportMode.ENC_CREDENTIAL_RECORD
+        )
 
+        credential.otpData?.let { _ ->
+            listItems.add(ExportMode.OTP_CONFIG)
+        }
         AlertDialog.Builder(activity)
             .setIcon(R.drawable.ic_baseline_qr_code_24)
             .setTitle(R.string.export_credential)
-            .setSingleChoiceItems(listItems, -1) { dialogInterface, i ->
-                val mode = ExportMode.values()[i]
+            .setSingleChoiceItems(listItems.map { activity.getString(it.labelId) }.toTypedArray(), -1) { dialogInterface, i ->
+                val mode = ExportMode.entries[i]
+
                 UseCaseBackgroundLauncher(this)
                     .launch(activity, Input(mode, credential, obfuscationKey))
                 dialogInterface.dismiss()
@@ -55,10 +66,19 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
     override suspend fun doExecute(input: Input, activity: SecureActivity): Boolean {
         activity.masterSecretKey?.let{ key ->
             val tempKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, activity)
-            val credentialName = SecretService.decryptCommonString(
+            var credentialName = SecretService.decryptCommonString(
                 key,
                 input.credential.name
             )
+            var otpConfig: OtpConfig? = null
+            input.credential.otpData?.let { otpData ->
+                if (input.mode == ExportMode.OTP_CONFIG) { // implies OTP
+                    val authUri = SecretService.decryptCommonString(key, otpData.encOtpAuthUri)
+                    otpConfig = OtpConfig.fromUri(Uri.parse(authUri))
+                    otpConfig?.let { credentialName = it.getLabel() }
+                }
+            }
+
             val tempEncHeader = SecretService.encryptCommonString(
                 tempKey, getHeaderDesc(input.mode, activity, credentialName)
             )
@@ -70,7 +90,7 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
                 tempKey, getQrCodeHeader(input.mode, credentialName)
             )
 
-            val tempEncQrCode = getQrCodeData(input.mode, input.credential, tempKey, key, input.obfuscationKey)
+            val tempEncQrCode = getQrCodeData(input.mode, input.credential, tempKey, key, input.obfuscationKey, otpConfig)
 
             val intent = Intent(activity, QrCodeActivity::class.java)
             intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, input.credential.id)
@@ -78,7 +98,7 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_SUBTEXT, tempEncSubtext)
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE, tempEncQrCode)
             intent.putEncryptedExtra(QrCodeActivity.EXTRA_QRCODE_HEADER, tempEncName)
-            intent.putExtra(QrCodeActivity.EXTRA_COLOR, input.mode.colorId)
+            intent.putExtra(QrCodeActivity.EXTRA_COLOR, input.mode?.colorId)
 
             // will be forwarded to NfcActivity
             intent.putExtra(NfcActivity.EXTRA_WITH_APP_RECORD, true)
@@ -99,6 +119,7 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
             ExportMode.PLAIN_PASSWD -> credentialName
             ExportMode.ENC_CREDENTIAL_RECORD -> "$credentialName (ECR)"
             ExportMode.PLAIN_CREDENTIAL_RECORD -> "$credentialName (PCR)"
+            ExportMode.OTP_CONFIG -> credentialName
         }
     }
 
@@ -111,7 +132,9 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
             ExportMode.PLAIN_PASSWD -> activity.getString(R.string.head_export_plain_passwd, credentialName)
             ExportMode.ENC_CREDENTIAL_RECORD -> activity.getString(R.string.head_export_enc_credential_record, credentialName)
             ExportMode.PLAIN_CREDENTIAL_RECORD -> activity.getString(R.string.head_export_plain_credential_record, credentialName)
+            ExportMode.OTP_CONFIG -> activity.getString(R.string.otp_config_headline)
         }
+
     }
 
     private fun getSubDesc(
@@ -122,6 +145,7 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
             ExportMode.PLAIN_PASSWD -> activity.getString(R.string.sub_export_plain_passwd)
             ExportMode.ENC_CREDENTIAL_RECORD -> activity.getString(R.string.sub_export_enc_credential_record)
             ExportMode.PLAIN_CREDENTIAL_RECORD -> activity.getString(R.string.sub_export_plain_credential_record)
+            ExportMode.OTP_CONFIG -> activity.getString(R.string.otp_exported_otp_desc)
         }
     }
 
@@ -130,7 +154,8 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
         credential: EncCredential,
         transportKey: SecretKeyHolder,
         key: SecretKeyHolder,
-        obfuscationKey: Key?
+        obfuscationKey: Key?,
+        otpConfig: OtpConfig?,
     ): Encrypted {
         return when (mode) {
             ExportMode.PLAIN_PASSWD -> {
@@ -188,6 +213,12 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
                 val encForTransportData = SecretService.encryptCommonString(transportKey, jsonString)
                 passwd.clear()
                 return encForTransportData
+            }
+            ExportMode.OTP_CONFIG -> {
+                if (otpConfig != null) {
+                    return SecretService.encryptCommonString(transportKey, otpConfig.toString())
+                }
+                else return Encrypted.empty()
             }
         }
 

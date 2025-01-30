@@ -323,6 +323,7 @@
     <string name="export_plain_passwd">Export plain password</string>
     <string name="export_enc_credential_record">Export whole encrypted credential</string>
     <string name="export_plain_credential_record">Export plain credential to share</string>
+    <string name="export_otp_config">Export One-Time-Password configuration</string>
     <string name="head_export_plain_passwd">"The plain password of '%1$s'</string>
     <string name="sub_export_plain_passwd">Keep this QR code safe since it contains a real plain password!</string>
     <string name="head_export_enc_credential_record">"Encrypted Credential Record (ECR) of '%1$s'</string>
@@ -561,11 +562,11 @@
 
     <string name="whats_new_in_2_1">What\'s new in version 2.1</string>
     <string name="whats_new_in_2_1_bullet_1_head">Support for One-Time-Passwords</string>
-    <string name="whats_new_in_2_1_bullet_1_text">Now you can import and configure a counter- or time based one-time password for each credential. Similar to other authenticator apps, ANOTHERpass shows the current one-time password together with the credential password. You can also easily export the OTP-configuration.</string>
+    <string name="whats_new_in_2_1_bullet_1_text">Now you can import and configure a counter- or time based one-time password for each credential. Similar to other authenticator apps, ANOTHERpass shows the current one-time password together with the credential password. You can also easily export the configuration.</string>
     <string name="whats_new_in_2_1_bullet_2_head">Login with Argon2</string>
-    <string name="whats_new_in_2_1_bullet_2_text">A modern Key-Derivation-Function (KDF) called Argon2 can now be used to make it even more difficult to crack you PIN and Master Password. Supported are Argon2ID, I and D.</string>
-    <string name="whats_new_in_2_1_bullet_3_head">Import and export from and to Keepass databases</string>
-    <string name="whats_new_in_2_1_bullet_3_text">Now you can use your credentials in any Keepass fork! Export all your credentials into a Keepass vault file (KDBX since version 3). Or just import any Keepass file into your current ANOTHERpass vault.</string>
+    <string name="whats_new_in_2_1_bullet_2_text">A new method of the login process called Argon2 can now be used to make cracking your PIN and master password even more difficult. Argon2 is a modern key derivation function (KDF) and allows faster and more secure unlocking of the vault.</string>
+    <string name="whats_new_in_2_1_bullet_3_head">Import and export from and to a Keepass file</string>
+    <string name="whats_new_in_2_1_bullet_3_text">Now you can use your credentials in any Keepass fork! Export all your credentials into a Keepass vault file (KDBX version 4). Or just import any Keepass file into your current ANOTHERpass vault (KDBX version 3 at least).</string>
 
     <string name="intro">Show intro</string>
     <string name="intro_1_head">Another way to manage passwords</string>

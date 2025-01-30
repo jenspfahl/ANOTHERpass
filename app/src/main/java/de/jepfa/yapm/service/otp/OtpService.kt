@@ -19,23 +19,6 @@ import kotlin.math.pow
 
 object OtpService {
 
-    fun generateOTP(
-        otpData: OtpData,
-        timestamp: Date,
-        key: SecretKeyHolder,
-        obfuscationKey: Key?) : Password? {
-
-        val optAuthString = SecretService.decryptCommonString(key, otpData.encOtpAuthUri)
-        val otpConfig = OtpConfig.fromUri(Uri.parse(optAuthString))
-        if (otpConfig == null) {
-            Log.w("OTP", "cannot parse TOTP URI $optAuthString")
-            return null
-        }
-
-        return generateTOTP(otpConfig, timestamp)
-    }
-
-
 
     fun generateOTP(
         otpConfig: OtpConfig,
