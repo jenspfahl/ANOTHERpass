@@ -142,7 +142,7 @@
     <string name="button_load_credentials_file">Load credentials file</string>
     <string name="button_import_credentials">Import credentials</string>
 
-    <string name="scan_mk">Scan your master key</string>
+    <string name="scan_mk">Scan your Encrypted Master Key</string>
     <string name="drop_vault">Drop vault (delete all)</string>
     <string name="chooser_select_file_to_import">Select file to import</string>
     <string name="toast_import_vault_from_future_app_version">The selected file was created by a future app version.</string>
@@ -170,7 +170,7 @@
     <string name="change_encryption">Change encryption</string>
     <string name="title_change_encryption">Change vault\'s encryption</string>
     <string name="message_change_encryption">With changing the vault\'s encryption and/or master key all exported vault files cannot be read anymore. It is also recommended to have a fresh backup of your vault and Exported Master Key in case of something goes wrong.</string>
-    <string name="message_change_iterations">By changing the login iterations the Encrypted Master Key will be changed, so you need to export them again.</string>
+    <string name="message_change_iterations">By changing the login process parameters the Encrypted Master Key will be changed, so you need to export them again.</string>
     <string name="change_master_password_explanation">Change your master password by enter your current PIN and generate a new master password. Note, that the Encrypted Master Key will be changed, so you need to export it again. This also effects old vault export files with the old key. You should also export your master password and tokens again.</string>
     <string name="change_encryption_explanation">Change the vault\'s encryption algorithm if you have migrated your vault to a newer device with support for additional encryption algorithms. Note, that the Encrypted Master Key will be changed, so you need to export it again. This also effects old vault export files and exported credentials (ECRs) which might become unreadable.</string>
     <string name="vault">Vault</string>
@@ -272,7 +272,7 @@
 
     <string name="vault_export_info">"Vault (Id = %4$s) exported at %1$s, contains %2$s credentials and %3$s labels"</string>
     <string name="vault_export_info2">"Vault file exported at %1$s, contains totally %2$s credentials and %3$s labels"</string>
-    <string name="scan_masterkey_first">Scan your master key first</string>
+    <string name="scan_masterkey_first">Scan your Encrypted Master Key first!</string>
     <string name="not_an_emk">This is not an Encrypted Master Key</string>
 
     <string name="label_never_used">Not used</string>

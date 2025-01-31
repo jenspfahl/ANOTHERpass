@@ -38,7 +38,7 @@ data class KdfConfig(
     /**
      * Leading empty AA will be removed
      */
-    fun toBase64String(): String {
+    fun toEncodedString(): String {
         val memCostAsBase64Trimmed = if (memCostInMiB != null)
             fromInt(memCostInMiB)
         else
@@ -56,23 +56,27 @@ data class KdfConfig(
         /**
          * Removed leading AA will be considered
          */
-        fun fromBase64String(base64: String): KdfConfig? {
-            var kdf = KeyDerivationFunction.BUILT_IN_PBKDF
-            if (base64.contains(NEW_KDF_ENCODING_DELIMITER)) {
-                val delimiterIndex = base64.indexOf(NEW_KDF_ENCODING_DELIMITER)
-                kdf = KeyDerivationFunction.getById(base64.first().toString())
+        fun fromEncodedString(encodedString: String): KdfConfig? {
+            val kdf: KeyDerivationFunction
+            if (encodedString.contains(NEW_KDF_ENCODING_DELIMITER)) {
+                val delimiterIndex = encodedString.indexOf(NEW_KDF_ENCODING_DELIMITER)
+                kdf = KeyDerivationFunction.getById(encodedString.first().toString())
                 if (kdf.isArgon2()) {
                     // Argon2
-                    val iterationsBase64 = base64.substring(1, delimiterIndex)
+                    val iterationsBase64 = encodedString.substring(1, delimiterIndex)
                     val iterations = toInt(iterationsBase64, MIN_ARGON_ITERATIONS, MAX_ARGON_ITERATIONS) ?: return null
-                    val memCostBase64 = base64.substring(delimiterIndex)
+                    val costIndex = delimiterIndex + 1
+                    if (costIndex >= encodedString.length) {
+                        return null
+                    }
+                    val memCostBase64 = encodedString.substring(costIndex)
                     val memCost = toInt(memCostBase64, MIN_ARGON_MIB, MAX_ARGON_MIB) ?: return null
 
-                    return KdfConfig(KeyDerivationFunction.BUILT_IN_PBKDF, iterations, memCost)
+                    return KdfConfig(kdf, iterations, memCost)
                 }
                 else {
                     // PBKDF in new format
-                    val iterationsBase64 = base64.substring(1, delimiterIndex)
+                    val iterationsBase64 = encodedString.substring(1, delimiterIndex)
                     val iterations = toInt(iterationsBase64, MIN_PBKDF_ITERATIONS, MAX_PBKDF_ITERATIONS) ?: return null
 
                     return KdfConfig(KeyDerivationFunction.BUILT_IN_PBKDF, iterations, null)
@@ -80,7 +84,7 @@ data class KdfConfig(
             }
             else {
                 // read old format / PBKDF only
-                val iterations = toInt(base64, MIN_PBKDF_ITERATIONS, MAX_PBKDF_ITERATIONS) ?: return null
+                val iterations = toInt(encodedString, MIN_PBKDF_ITERATIONS, MAX_PBKDF_ITERATIONS) ?: return null
 
                 return KdfConfig(KeyDerivationFunction.BUILT_IN_PBKDF, iterations, null)
             }

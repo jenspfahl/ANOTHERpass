@@ -141,7 +141,7 @@
     <string name="button_load_credentials_file">Zugangsdatendatei laden</string>
     <string name="button_import_credentials">Zugangsdaten importieren</string>
 
-    <string name="scan_mk">Scanne deinen Masterkey</string>
+    <string name="scan_mk">Scanne deinen verschlüsselten Masterkey</string>
     <string name="drop_vault">Tresor vernichten (alles löschen)</string>
     <string name="chooser_select_file_to_import">Wähle eine Datei zum Importieren aus</string>
     <string name="toast_import_vault_failure">Die ausgewählte Datei kann nicht importiert werden.</string>
@@ -168,7 +168,7 @@
     <string name="change_encryption">Ändere Verschlüsselung</string>
     <string name="title_change_encryption">Ändere Tresorverschlüsselung</string>
     <string name="message_change_encryption">Nach der Änderung der Verschlüsselung und/oder des Masterkeys können alle bisher exportierten Tresor-Dateien nicht mehr gelesen werden. Es wird außerdem empfohlen, ein aktuelles Backup des Tresors und des verschlüsselten Masterkeys für den Notfall zu haben.</string>
-    <string name="message_change_iterations">Nach der Änderung der Login-Iterationen ändert sich der verschlüsselte Masterkey (EMK), d.h. du solltest ihn erneut exportieren.</string>
+    <string name="message_change_iterations">Nach der Änderung der Login-Verschlüsselungsparameter ändert sich der verschlüsselte Masterkey (EMK), d.h. du solltest ihn erneut exportieren.</string>
     <string name="change_master_password_explanation">Ändere dein Masterpasswort, indem du die aktuelle PIN eingibst und ein neues Masterpasswort generierst. Beachte, dass sich der verschlüsselte Masterkey ändert, so dass du ihn erneut exportieren solltest. Das betrifft auch Tresor-Dateien mit verschlüsselten Masterkey.</string>
     <string name="change_encryption_explanation">Ändere den Verschlüsselungsalgorithmus des Tresors, wenn du den Tresor von einem alten Gerät migriert hast und dein neues Gerät zusätzliche Algorithmen unterstützt. Beachte, dass sich der verschlüsselte Masterkey ändert, so dass du ihn erneut exportieren solltest. Das betrifft auch Tresor-Dateien und exportierte Zugangsdaten (ECRs), welche dann nicht mehr gelesen werden können.</string>
     <string name="vault">Tresor</string>

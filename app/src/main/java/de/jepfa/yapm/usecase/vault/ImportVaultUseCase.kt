@@ -292,7 +292,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
 
             val payload = encryptedMK.type?.payload
             if (payload != null) {
-                val kdfConfig = KdfConfig.fromBase64String(payload)
+                val kdfConfig = KdfConfig.fromEncodedString(payload)
                 if (kdfConfig != null) {
                     kdfConfig.persist(activity)
                 }

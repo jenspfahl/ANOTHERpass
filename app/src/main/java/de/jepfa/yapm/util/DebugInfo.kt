@@ -85,7 +85,6 @@ object DebugInfo {
 
         val sb = StringBuilder()
         sb.append("\n************ APP INFORMATION ***********\n")
-        sb.addFormattedLine("Version", getVersionName(context))
         if (isBeta(context)) {
             sb.addFormattedLine("Version", "BETA-" + getVersionName(context))
         }
