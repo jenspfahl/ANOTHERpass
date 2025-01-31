@@ -308,8 +308,7 @@ class ShowCredentialActivity : SecureActivity() {
             if (id == R.id.menu_import_credential) {
                 val input = ImportCredentialUseCase.Input(credential)
                 {
-                    val upIntent = Intent(this, ListCredentialsActivity::class.java)
-                    navigateUpTo(upIntent)
+                    finish()
                 }
                 CoroutineScope(Dispatchers.Main).launch {
                     ImportCredentialUseCase.execute(input, this@ShowCredentialActivity)
@@ -365,8 +364,7 @@ class ShowCredentialActivity : SecureActivity() {
                             credentialViewModel.delete(credential)
                             toastText(this, R.string.credential_deleted)
 
-                            val upIntent = Intent(this, ListCredentialsActivity::class.java)
-                            navigateUpTo(upIntent)
+                            finish()
                         }
                         .setNegativeButton(android.R.string.no, null)
                         .show()

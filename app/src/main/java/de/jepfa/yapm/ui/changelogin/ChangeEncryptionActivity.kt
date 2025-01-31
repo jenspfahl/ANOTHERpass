@@ -252,10 +252,11 @@ class ChangeEncryptionActivity : SecureActivity(), AdapterView.OnItemSelectedLis
                     masterPassword.clear()
 
                     if (output.success) {
-                        val upIntent = Intent(intent)
-                        navigateUpTo(upIntent)
 
                         masterPassword.clear()
+
+                        finish()
+
                         toastText(baseContext, R.string.encryption_changed)
                     }
                     else {

@@ -98,9 +98,6 @@ class ExportVaultActivity : SecureActivity() {
 
                 finish()
 
-                val upIntent = Intent(this, ListCredentialsActivity::class.java)
-                navigateUpTo(upIntent)
-
             }
 
         }

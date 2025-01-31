@@ -220,9 +220,6 @@ class ExportPlainCredentialsActivity : SecureActivity() {
 
                 finish()
 
-                val upIntent = Intent(this, ListCredentialsActivity::class.java)
-                navigateUpTo(upIntent)
-
             }
 
 
