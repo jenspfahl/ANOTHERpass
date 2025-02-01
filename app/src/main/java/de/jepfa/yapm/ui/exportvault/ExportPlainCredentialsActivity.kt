@@ -113,7 +113,7 @@ class ExportPlainCredentialsActivity : SecureActivity() {
                                 { keepassMasterPassword ->
                                     if (keepassMasterPassword != null) {
                                         this.keepassMasterPassword = keepassMasterPassword
-                                        intent.type = "application/x-keepass"
+                                        intent.type = "application/octet-stream"
                                         intent.putExtra(
                                             Intent.EXTRA_TITLE,
                                             ExportPlainCredentialsUseCase.getTakeoutFileName(this, "kdbx")
@@ -199,16 +199,12 @@ class ExportPlainCredentialsActivity : SecureActivity() {
             if (resultCode == RESULT_OK && requestCode == saveAsFile) {
 
 
-                data?.data?.let { uri ->
+                data?.data?.let { destUri ->
                     val intent = Intent(this, FileIOService::class.java)
                     intent.action = FileIOService.ACTION_EXPORT_PLAIN_CREDENTIALS
 
                     if (radioFileFormat.checkedRadioButtonId == R.id.radio_format_csv) {
                         intent.action = FileIOService.ACTION_EXPORT_PLAIN_CREDENTIALS
-
-                        val csvData = CsvService.createCsvExportContent(
-                            credentials, Session.getMasterKeySK()
-                        )
 
 
                         val tempFile = TempFileService.createTempFile(this, "tmp_takeout_${System.currentTimeMillis()}.csv")
@@ -219,6 +215,10 @@ class ExportPlainCredentialsActivity : SecureActivity() {
                             toastText(this, R.string.something_went_wrong)
                             return@observeOnce
                         }
+
+                        val csvData = CsvService.createCsvExportContent(
+                            credentials, Session.getMasterKeySK()
+                        )
 
                         var success = false
                         if (csvData != null) {
@@ -270,7 +270,7 @@ class ExportPlainCredentialsActivity : SecureActivity() {
                     }
 
                     intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                    intent.putExtra(FileIOService.PARAM_FILE_URI, uri)
+                    intent.putExtra(FileIOService.PARAM_FILE_URI, destUri)
 
                     getProgressBar()?.let { progressBar -> showProgressBar(progressBar) }
                     startService(intent)
