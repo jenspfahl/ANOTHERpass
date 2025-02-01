@@ -107,7 +107,7 @@ object KdbxService {
             }
 
             return true
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             DebugInfo.logException("KDBX", "cannot export to KDBX format", e)
             return false
         }

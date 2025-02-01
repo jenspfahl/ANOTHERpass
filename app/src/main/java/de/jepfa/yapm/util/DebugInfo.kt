@@ -199,7 +199,7 @@ object DebugInfo {
                     }
                 }
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             logException("Debug","cannot gather logs", e)
         }
         return null
@@ -208,7 +208,7 @@ object DebugInfo {
     fun clearLogs() {
         try {
             Runtime.getRuntime().exec("logcat -b all -c") // clear logs
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             logException("Debug","cannot clear logs", e)
         }
     }

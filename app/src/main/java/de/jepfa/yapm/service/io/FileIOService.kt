@@ -52,7 +52,7 @@ class FileIOService: IntentService("FileIOService") {
             return try {
                 val fileOutStream = contentResolver.openOutputStream(destUri) ?: return false
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fileOutStream)
-            } catch (e: IOException) {
+            } catch (e: Exception) {
                 DebugInfo.logException("TS", "cannot create file", e)
                 false
             }

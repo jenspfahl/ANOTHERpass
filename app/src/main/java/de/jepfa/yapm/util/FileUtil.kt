@@ -41,7 +41,7 @@ object FileUtil {
 
         try {
             return context.contentResolver.openInputStream(uri)
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             DebugInfo.logException("READFILE", "Cannot read $uri", e)
             return null
         }
@@ -75,7 +75,7 @@ object FileUtil {
                     }
                 }
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             DebugInfo.logException("READFILE", "Cannot read $uri", e)
             return null
         }
@@ -119,7 +119,7 @@ object FileUtil {
 
                 return buffer.toByteArray()
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             DebugInfo.logException("READFILE", "Cannot read $uri", e)
             return null
         }
@@ -135,7 +135,7 @@ object FileUtil {
                     BufferedWriter(osw).use { bw -> bw.write(content) }
                 }
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             DebugInfo.logException("READFILE", "Cannot read $uri", e)
             return false
         }
@@ -149,7 +149,7 @@ object FileUtil {
             context.contentResolver.openOutputStream(uri)?.use { os ->
                 byteStream.writeTo(os)
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             DebugInfo.logException("READFILE", "Cannot read $uri", e)
             return false
         }

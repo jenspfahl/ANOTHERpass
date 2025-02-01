@@ -57,6 +57,7 @@ class OtpViewer(
         }
         otpValueTextView.setOnClickListener(unmasking)
         otpImage.setOnClickListener(unmasking)
+        otpView.setOnClickListener(unmasking)
 
         val copying: (View) -> Boolean = {
             otpConfig?.let {
@@ -70,6 +71,7 @@ class OtpViewer(
         }
         otpValueTextView.setOnLongClickListener(copying)
         otpImage.setOnLongClickListener(copying)
+        otpView.setOnLongClickListener(copying)
 
         if (otpConfig == null) {
             hideOtpView()

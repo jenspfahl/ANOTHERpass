@@ -94,7 +94,7 @@ object CsvService {
 
             writer.close()
             return outputStream.toString()
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             return null
         }
     }
