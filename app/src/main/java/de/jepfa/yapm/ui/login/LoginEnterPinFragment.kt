@@ -189,12 +189,15 @@ class LoginEnterPinFragment : BaseFragment() {
         loginActivity: LoginActivity
     ) {
 
+        pinTextView.isEnabled = false
         loginActivity.getProgressBar()?.let {
 
             UseCaseBackgroundLauncher(LoginUseCase)
                 .launch(loginActivity, LoginData(userPin, masterPasswd))
                 { output ->
                     if (!output.success) {
+                        pinTextView.isEnabled = true
+
                         loginActivity.handleFailedLoginAttempt()
                         pinTextView.error = "${getString(R.string.password_wrong)} ${loginActivity.getLoginAttemptMessage()}"
                         pinTextView.requestFocus()
