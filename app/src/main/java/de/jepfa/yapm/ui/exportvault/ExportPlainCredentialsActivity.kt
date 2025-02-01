@@ -1,6 +1,7 @@
 package de.jepfa.yapm.ui.exportvault
 
 import android.content.Intent
+import android.content.Intent.EXTRA_STREAM
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -9,6 +10,8 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.io.FileIOService
+import de.jepfa.yapm.service.io.KdbxService
+import de.jepfa.yapm.service.io.TempFileService
 import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.AsyncWithProgressBar
@@ -19,8 +22,12 @@ import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.ui.credential.KeepassPasswordDialog
 import de.jepfa.yapm.usecase.vault.ExportPlainCredentialsUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
+import de.jepfa.yapm.util.FileUtil
 import de.jepfa.yapm.util.PermissionChecker
+import de.jepfa.yapm.util.observeOnce
 import de.jepfa.yapm.util.putEncryptedExtra
+import de.jepfa.yapm.util.toastText
+import java.io.ByteArrayOutputStream
 
 class ExportPlainCredentialsActivity : SecureActivity() {
 
@@ -185,46 +192,71 @@ class ExportPlainCredentialsActivity : SecureActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        getProgressBar()?.let { progressBar -> hideProgressBar(progressBar) }
+        credentialViewModel.allCredentials.observeOnce(this) { credentials ->
+            getProgressBar()?.let { progressBar -> hideProgressBar(progressBar) }
 
-        if (resultCode == RESULT_OK && requestCode == saveAsFile) {
+            if (resultCode == RESULT_OK && requestCode == saveAsFile) {
 
 
-            data?.data?.let { uri ->
-                val intent = Intent(this, FileIOService::class.java)
-                intent.action = FileIOService.ACTION_EXPORT_PLAIN_CREDENTIALS
-
-                if (radioFileFormat.checkedRadioButtonId == R.id.radio_format_csv) {
+                data?.data?.let { uri ->
+                    val intent = Intent(this, FileIOService::class.java)
                     intent.action = FileIOService.ACTION_EXPORT_PLAIN_CREDENTIALS
-                }
-                else if (radioFileFormat.checkedRadioButtonId == R.id.radio_format_kdbx) {
-                    intent.action = FileIOService.ACTION_EXPORT_AS_KDBX
 
-                    val tempKey = SecretService.getAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT, this)
+                    if (radioFileFormat.checkedRadioButtonId == R.id.radio_format_csv) {
+                        intent.action = FileIOService.ACTION_EXPORT_PLAIN_CREDENTIALS
+                    } else if (radioFileFormat.checkedRadioButtonId == R.id.radio_format_kdbx) {
+                        intent.action = FileIOService.ACTION_EXPORT_AS_KDBX
 
-                    keepassMasterPassword?.let { keepassMasterPassword ->
-                        val encKeepassPassword =
-                            SecretService.encryptPassword(tempKey, keepassMasterPassword)
-                        keepassMasterPassword.clear()
-                        intent.putEncryptedExtra(
-                            FileIOService.PARAM_KEEPASS_PASSWORD,
-                            encKeepassPassword
-                        )
+
+                        keepassMasterPassword?.let { keepassMasterPassword ->
+
+                            val key = masterSecretKey ?: return@observeOnce
+                            val byteStream = ByteArrayOutputStream()
+                            val success = KdbxService.createKdbxExportContent(
+                                keepassMasterPassword,
+                                credentials,
+                                key,
+                                byteStream,
+                                this
+                            )
+                            keepassMasterPassword.clear()
+                            if (!success) {
+                                toastText(this, R.string.something_went_wrong)
+                                return@observeOnce
+                            }
+
+                            val tempFile = TempFileService.createTempFile(this, "keep.kdbx")
+                            val tempFileUri =
+                                TempFileService.getContentUriFromFile(this, tempFile)
+
+                            if (tempFileUri == null) {
+                                toastText(this, R.string.something_went_wrong)
+                                return@observeOnce
+                            }
+
+                            FileUtil.writeFile(this, tempFileUri, byteStream)
+
+                            intent.putExtra(EXTRA_STREAM, tempFileUri)
+
+
+                        }
                     }
+
+                    intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                    intent.putExtra(FileIOService.PARAM_FILE_URI, uri)
+
+                    getProgressBar()?.let { progressBar -> showProgressBar(progressBar) }
+                    startService(intent)
+
+                    finish()
+
                 }
 
-                intent.putExtra(FileIOService.PARAM_FILE_URI, uri)
-
-                getProgressBar()?.let { progressBar -> showProgressBar(progressBar) }
-                startService(intent)
-
-                finish()
 
             }
-
-
-
         }
+
+        getProgressBar()?.let { progressBar -> hideProgressBar(progressBar) }
     }
 
 
