@@ -111,16 +111,12 @@ class FileIOService: IntentService("FileIOService") {
     private fun exportPlainCredentials(intent: Intent) {
         var message: String
         if (FileUtil.isExternalStorageWritable()) {
-            val uri = intent.getParcelableExtra<Uri>(PARAM_FILE_URI) ?: return
+            val destUri = intent.getParcelableExtra<Uri>(PARAM_FILE_URI) ?: return
 
-            val csvData = CsvService.createCsvExportContent(
-                getApp().credentialRepository.getAllSync(), Session.getMasterKeySK()
-            )
+            val tempUri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM) ?: return
+            val csv = FileUtil.readFile(this, tempUri) ?: return
 
-            var success = false
-            if (csvData != null) {
-                success = CsvService.writeCsvExportFile(this, uri, csvData)
-            }
+            val success = FileUtil.writeFile(this, destUri, csv)
 
             message = if (success) {
                 getString(R.string.csv_file_saved)

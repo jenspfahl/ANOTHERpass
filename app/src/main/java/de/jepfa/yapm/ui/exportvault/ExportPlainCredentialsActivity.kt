@@ -9,6 +9,7 @@ import android.widget.RadioGroup
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.Session
+import de.jepfa.yapm.service.io.CsvService
 import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.service.io.KdbxService
 import de.jepfa.yapm.service.io.TempFileService
@@ -204,6 +205,32 @@ class ExportPlainCredentialsActivity : SecureActivity() {
 
                     if (radioFileFormat.checkedRadioButtonId == R.id.radio_format_csv) {
                         intent.action = FileIOService.ACTION_EXPORT_PLAIN_CREDENTIALS
+
+                        val csvData = CsvService.createCsvExportContent(
+                            credentials, Session.getMasterKeySK()
+                        )
+
+
+                        val tempFile = TempFileService.createTempFile(this, "tmp_takeout_${System.currentTimeMillis()}.csv")
+                        val tempFileUri =
+                            TempFileService.getContentUriFromFile(this, tempFile)
+
+                        if (tempFileUri == null) {
+                            toastText(this, R.string.something_went_wrong)
+                            return@observeOnce
+                        }
+
+                        var success = false
+                        if (csvData != null) {
+                            success = CsvService.writeCsvExportFile(this, tempFileUri, csvData)
+                        }
+
+                        if (!success) {
+                            toastText(this, R.string.something_went_wrong)
+                            return@observeOnce
+                        }
+                        intent.putExtra(EXTRA_STREAM, tempFileUri)
+
                     } else if (radioFileFormat.checkedRadioButtonId == R.id.radio_format_kdbx) {
                         intent.action = FileIOService.ACTION_EXPORT_AS_KDBX
 
@@ -225,7 +252,7 @@ class ExportPlainCredentialsActivity : SecureActivity() {
                                 return@observeOnce
                             }
 
-                            val tempFile = TempFileService.createTempFile(this, "keep.kdbx")
+                            val tempFile = TempFileService.createTempFile(this, "tmp_takeout_${System.currentTimeMillis()}.kdbx")
                             val tempFileUri =
                                 TempFileService.getContentUriFromFile(this, tempFile)
 
