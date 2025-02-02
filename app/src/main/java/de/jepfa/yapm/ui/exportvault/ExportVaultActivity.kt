@@ -106,8 +106,8 @@ class ExportVaultActivity : SecureActivity() {
                         val tmpFileUri =
                             TempFileService.getContentUriFromFile(this, tempFile) ?: return@AsyncWithProgressBar false
 
-                        val includeMasterKey = intent.getBooleanExtra(PARAM_INCLUDE_MK, false)
-                        val includePreferences = intent.getBooleanExtra(PARAM_INCLUDE_PREFS, false)
+                        val includeMasterKey = includeMasterKeySwitch.isChecked
+                        val includePreferences = includePrefsSwitch.isChecked
 
                         val success = createVaultFile(applicationContext, getApp(), includeMasterKey, includePreferences, tmpFileUri)
                         tempFileUri = tmpFileUri

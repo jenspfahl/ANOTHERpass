@@ -137,9 +137,12 @@ object DebugInfo {
         sb.append("\n************ FIRMWARE ************\n")
         sb.addFormattedLine("SDK", Build.VERSION.SDK_INT)
         sb.addFormattedLine("Release", Build.VERSION.RELEASE)
-        sb.addFormattedLine("Incremental", Build.VERSION.INCREMENTAL)
-        sb.addFormattedLine("Codename", Build.VERSION.CODENAME)
-        sb.addFormattedLine("Security patch", Build.VERSION.SECURITY_PATCH)
+
+        if (isDebug) {
+            sb.addFormattedLine("Incremental", Build.VERSION.INCREMENTAL)
+            sb.addFormattedLine("Codename", Build.VERSION.CODENAME)
+            sb.addFormattedLine("Security patch", Build.VERSION.SECURITY_PATCH)
+        }
 
         sb.append("\n************ APP-EXCEPTION-LOG ************\n")
         exceptionLogger.forEach {

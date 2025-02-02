@@ -193,15 +193,19 @@ class ExportPlainCredentialsActivity : SecureActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        credentialViewModel.allCredentials.observeOnce(this) { credentials ->
-            getProgressBar()?.let { progressBar -> hideProgressBar(progressBar) }
 
-            if (resultCode == RESULT_OK && requestCode == saveAsFile) {
+
+        if (resultCode == RESULT_OK && requestCode == saveAsFile) {
+
+            getProgressBar()?.let { progressBar -> showProgressBar(progressBar) }
+
+            credentialViewModel.allCredentials.observeOnce(this) { credentials ->
 
 
                 data?.data?.let { destUri ->
                     val intent = Intent(this, FileIOService::class.java)
                     intent.action = FileIOService.ACTION_EXPORT_PLAIN_CREDENTIALS
+
 
                     if (radioFileFormat.checkedRadioButtonId == R.id.radio_format_csv) {
                         intent.action = FileIOService.ACTION_EXPORT_PLAIN_CREDENTIALS
@@ -212,6 +216,8 @@ class ExportPlainCredentialsActivity : SecureActivity() {
                             TempFileService.getContentUriFromFile(this, tempFile)
 
                         if (tempFileUri == null) {
+                            getProgressBar()?.let { progressBar -> hideProgressBar(progressBar) }
+
                             toastText(this, R.string.something_went_wrong)
                             return@observeOnce
                         }
@@ -226,6 +232,8 @@ class ExportPlainCredentialsActivity : SecureActivity() {
                         }
 
                         if (!success) {
+                            getProgressBar()?.let { progressBar -> hideProgressBar(progressBar) }
+
                             toastText(this, R.string.something_went_wrong)
                             return@observeOnce
                         }
@@ -248,6 +256,8 @@ class ExportPlainCredentialsActivity : SecureActivity() {
                             )
                             keepassMasterPassword.clear()
                             if (!success) {
+                                getProgressBar()?.let { progressBar -> hideProgressBar(progressBar) }
+
                                 toastText(this, R.string.something_went_wrong)
                                 return@observeOnce
                             }
@@ -257,6 +267,8 @@ class ExportPlainCredentialsActivity : SecureActivity() {
                                 TempFileService.getContentUriFromFile(this, tempFile)
 
                             if (tempFileUri == null) {
+                                getProgressBar()?.let { progressBar -> hideProgressBar(progressBar) }
+
                                 toastText(this, R.string.something_went_wrong)
                                 return@observeOnce
                             }
@@ -265,14 +277,12 @@ class ExportPlainCredentialsActivity : SecureActivity() {
 
                             intent.putExtra(EXTRA_STREAM, tempFileUri)
 
-
                         }
                     }
 
                     intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
                     intent.putExtra(FileIOService.PARAM_FILE_URI, destUri)
 
-                    getProgressBar()?.let { progressBar -> showProgressBar(progressBar) }
                     startService(intent)
 
                     finish()
@@ -283,7 +293,6 @@ class ExportPlainCredentialsActivity : SecureActivity() {
             }
         }
 
-        getProgressBar()?.let { progressBar -> hideProgressBar(progressBar) }
     }
 
 
