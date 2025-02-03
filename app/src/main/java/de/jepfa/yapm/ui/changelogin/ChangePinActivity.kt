@@ -25,7 +25,6 @@ class ChangePinActivity : SecureActivity() {
         enableBack = true
     }
 
-    private var showNumberPad = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,11 +101,11 @@ class ChangePinActivity : SecureActivity() {
                 .launch(this, ChangePinUseCase.Input(currentPin, newPin1))
                 { output ->
                     if (output.success) {
-                        val upIntent = Intent(intent)
-                        navigateUpTo(upIntent)
 
                         newPin1.clear()
                         newPin2.clear()
+
+                        finish()
 
                         toastText(baseContext, R.string.pin_changed)
                     }

@@ -4,14 +4,21 @@ import android.net.Uri
 import android.os.Bundle
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.encrypted.OtpData
+import de.jepfa.yapm.model.encrypted.PasswordData
+import de.jepfa.yapm.model.encrypted.TimeData
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.io.CredentialFileRecord
 import de.jepfa.yapm.service.io.CsvService
 import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.service.label.LabelsHolder
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.fromSimpleDateFormat
+import kotlin.math.max
 
 class ImportCredentialsActivity : SecureActivity() {
 
@@ -19,7 +26,7 @@ class ImportCredentialsActivity : SecureActivity() {
     var fileName: String? = null
     var csvContent: List<Map<String, String>>? = null
     var content: String? = null
-    var records: List<ImportCredentialsImportFileAdapter.FileRecord>? = null
+    var records: List<CredentialFileRecord>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -51,7 +58,7 @@ class ImportCredentialsActivity : SecureActivity() {
         recreate()
     }
 
-    fun readContent(csvRecords: List<Map<String, String>>?): List<ImportCredentialsImportFileAdapter.FileRecord>? {
+    fun readContent(csvRecords: List<Map<String, String>>?): List<CredentialFileRecord>? {
 
         if (csvRecords == null) {
             return null
@@ -111,9 +118,9 @@ class ImportCredentialsActivity : SecureActivity() {
             val description = record.value[descriptionKey]
             val expiresOn = record.value[expiresOnKey]?.fromSimpleDateFormat()
 
-            ImportCredentialsImportFileAdapter.FileRecord(id,
+            CredentialFileRecord(id,
                 name ?: url?.let { getDomainAsName(it)} ?: "unknown $id",
-                url, user, password, description ?: "", expiresOn)
+                url, user, password, description ?: "", expiresOn, null)
 
         }.filter { it.plainPassword.isNotEmpty() }
 
@@ -145,33 +152,60 @@ class ImportCredentialsActivity : SecureActivity() {
 
     fun createCredentialFromRecord(
         key: SecretKeyHolder,
-        record: ImportCredentialsImportFileAdapter.FileRecord,
-        labelNames: List<String>
+        record: CredentialFileRecord,
+        labelNames: List<String>,
+        labelsHolder: LabelsHolder,
     ): EncCredential {
         val encName = SecretService.encryptCommonString(key, record.name)
         val encAddInfo = SecretService.encryptCommonString(key, record.description)
         val encUser = SecretService.encryptCommonString(key, record.userName ?: "")
         val encPassword = SecretService.encryptPassword(key, Password(record.plainPassword))
         val encWebsite = SecretService.encryptCommonString(key, record.url ?: "")
-        val encExpiresAt = SecretService.encryptLong(key, record.expiresOn?.time ?: 0L)
-        val encLabels = LabelService.defaultHolder.encryptLabelIds(
+        val encExpiresAt = SecretService.encryptLong(key, record.expiresAt?.time ?: 0L)
+        val otpAuthUri = record.otpAuth?.let { SecretService.encryptCommonString(key, it) }
+
+        val allowedLabelCountFromOutside = max(0, Constants.MAX_LABELS_PER_CREDENTIAL - labelNames.size)
+
+
+        val labelNamesToAdd = HashSet<String>(labelNames)
+        labelNamesToAdd.addAll(record.labels.take(allowedLabelCountFromOutside))
+
+        labelNamesToAdd.forEachIndexed { index, it ->
+            val existingLabel = labelsHolder.lookupByLabelName(it)
+            if (existingLabel == null) {
+                val label = labelsHolder.createNewLabel(it, this, id = -index) // fake ids to find the label in externalHolder
+                labelsHolder.updateLabel(label)
+            }
+        }
+        val encLabels = labelsHolder.encryptLabelIds(
             key,
-            labelNames
+            labelNamesToAdd.toList()
         )
         return EncCredential(
-            null, null,
+            null,
+            null, // record.uuid, -- commented out, to not overwrite existing credentials when importing them back
             encName,
-            encAddInfo,
-            encUser,
-            encPassword,
-            null,
             encWebsite,
+            encUser,
+            encAddInfo,
             encLabels,
-            encExpiresAt,
-            false,
-            null,
-            null
+            PasswordData(
+                encPassword,
+                false,
+                null,
+                null,
+            ),
+            TimeData(
+                record.modifiedAt?.time,
+                encExpiresAt,
+            ),
+            if (otpAuthUri != null) OtpData(otpAuthUri) else null,
         )
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        LabelService.externalHolder.clearAll()
     }
 
 }

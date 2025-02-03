@@ -1,6 +1,7 @@
 package de.jepfa.yapm.model.session
 
 import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.autofill.AutofillCredentialHolder
 import de.jepfa.yapm.service.net.HttpServer
@@ -18,12 +19,17 @@ object Session {
     private var logout_timeout: Long = minutesToMillis(DEFAULT_LOGOUT_TIMEOUT)
 
     private var masterSecretKey: SecretKeyHolder? = null
+    private var masterKeyHash: Key? = null
     private var encMasterPassword: Encrypted? = null
     private var lastUpdated: Long = 0
     private var lockDisabled = false;
 
     fun getMasterKeySK() : SecretKeyHolder? {
         return masterSecretKey
+    }
+
+    fun getMasterKeyHash() : Key? {
+        return masterKeyHash
     }
 
     fun getEncMasterPasswd() : Encrypted? {
@@ -43,9 +49,10 @@ object Session {
         setLogoutTimeout(logoutTimeoutMinutes)
     }
 
-    fun login(secretKey: SecretKeyHolder, encMasterPasswd: Encrypted) {
-        masterSecretKey = secretKey
-        encMasterPassword = encMasterPasswd
+    fun login(secretKey: SecretKeyHolder, masterKeyHash: Key, encMasterPasswd: Encrypted) {
+        this.masterSecretKey = secretKey
+        this.masterKeyHash = masterKeyHash
+        this.encMasterPassword = encMasterPasswd
         touch()
     }
 
@@ -85,6 +92,8 @@ object Session {
         lockDisabled = false;
         masterSecretKey?.destroy()
         masterSecretKey = null
+        masterKeyHash?.clear()
+        masterKeyHash = null
         SecretService.clear()
         AutofillCredentialHolder.clear()
         touch()

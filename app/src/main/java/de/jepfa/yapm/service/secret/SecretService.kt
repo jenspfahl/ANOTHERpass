@@ -12,6 +12,8 @@ import de.jepfa.yapm.model.encrypted.CipherAlgorithm
 import de.jepfa.yapm.model.encrypted.DEFAULT_CIPHER_ALGORITHM
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.encrypted.EncryptedType
+import de.jepfa.yapm.model.kdf.KdfConfig
+import de.jepfa.yapm.model.kdf.KeyDerivationFunction
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
@@ -19,11 +21,11 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_ENCRYPTED_SEED
 import de.jepfa.yapm.service.biometrix.BiometricUtils
-import de.jepfa.yapm.service.secret.PbkdfIterationService.getStoredPbkdfIterations
+import de.jepfa.yapm.service.secret.KdfParameterService.getStoredPbkdfIterations
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 import java.math.BigInteger
 import java.security.*
-import java.security.spec.InvalidKeySpecException
 import java.security.spec.RSAPublicKeySpec
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -102,24 +104,87 @@ object SecretService {
         return Key(bytes)
     }
 
-    fun createSecretKey(data: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
+    /*
+    Generates a key without any slow-down KDF
+     */
+    fun generateSecretKey(data: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
         val sk = SecretKeySpec(data.data.copyOf(cipherAlgorithm.keyLength/8), cipherAlgorithm.keyDerivationAlgorithm)
         return SecretKeyHolder(sk, cipherAlgorithm, null, context)
     }
 
-    fun generateDefaultSecretKey(data: Key, salt: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
-        return generatePBESecretKey(Password(data), salt, PbkdfIterationService.LEGACY_PBKDF_ITERATIONS, cipherAlgorithm, context)
+    /**
+     * Generates a key not used anymore, to be downward compatible
+     */
+    fun generateLegacySecretKey(data: Key, salt: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
+        return generatePBESecretKeyForGivenIterations(Password(data), salt, KdfParameterService.LEGACY_PBKDF_ITERATIONS, cipherAlgorithm, context)
     }
 
-    fun generateStrongSecretKey(password: Password, salt: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
-        return generatePBESecretKey(password, salt, getStoredPbkdfIterations(), cipherAlgorithm, context)
+    /**
+     * Generates a key exclusively used for Master Password Tokens. Uses a KDF with a low number of iterations (not really needed but also not performing significantly down the login process)
+     */
+    fun generateSecretKeyForMPT(data: Key, salt: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
+        return generatePBESecretKeyForGivenIterations(Password(data), salt, KdfParameterService.MPT_PBKDF_ITERATIONS, cipherAlgorithm, context)
     }
 
-    fun generateNormalSecretKey(password: Password, salt: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
-        return generatePBESecretKey(password, salt, 1000, cipherAlgorithm, context)
+    /**
+     * Generates a key exclusively used for obfuscation of passwords and exported master password. Uses a KDF with a very low number of iterations (not really needed but also not performing significantly down the crypt-process)
+     */
+    fun generateSecretKeyForObfuscation(password: Password, salt: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
+        return generatePBESecretKeyForGivenIterations(password, salt, 1000, cipherAlgorithm, context)
     }
 
-    fun generatePBESecretKey(password: Password, salt: Key, iterations: Int, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
+    /**
+     * Generates a key exclusively used to en- and decrypt the master key. Uses a custom KDF configured by the user (either PBKDF with custom iterations or Argon2Id with custom iterations and mem size).
+     */
+    fun generateSecretKeyForMasterKey(combinedPinAndMasterPassword: Password, salt: Key, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
+        val kdfConfig = getStoredKdfConfig(context)
+        if (kdfConfig.isArgon2()) {
+            val argonDerivedKey = Argon2Service.derive(
+                combinedPinAndMasterPassword,
+                salt,
+                kdfConfig,
+            )
+            return generateSecretKey(argonDerivedKey, cipherAlgorithm, context)
+        }
+        else {
+            return generatePBESecretKeyForGivenIterations(
+                combinedPinAndMasterPassword,
+                salt,
+                getStoredPbkdfIterations(),
+                cipherAlgorithm,
+                context
+            )
+        }
+    }
+
+    fun getStoredKdfConfig(context: Context): KdfConfig {
+        val kdfId = PreferenceService.getAsString(PreferenceService.DATA_USED_KDF_ID, context)
+        var kdf = KeyDerivationFunction.BUILT_IN_PBKDF
+        if (kdfId != null) {
+            kdf = KeyDerivationFunction.getById(kdfId)
+        }
+        if (kdf == KeyDerivationFunction.BUILT_IN_PBKDF) {
+            return KdfConfig(
+                kdf,
+                getStoredPbkdfIterations(),
+                null,
+            )
+        }
+        else {
+            // Argon2
+            return KdfConfig(
+                kdf,
+                PreferenceService.getAsInt(PreferenceService.DATA_ARGON2_ITERATIONS, context),
+                PreferenceService.getAsInt(PreferenceService.DATA_ARGON2_MIB, context),
+            )
+        }
+    }
+
+
+    /**
+     * Generates a key with PBKDF and the given iterations
+     */
+    fun generatePBESecretKeyForGivenIterations(password: Password, salt: Key, iterations: Int, cipherAlgorithm: CipherAlgorithm, context: Context): SecretKeyHolder {
         val keySpec = PBEKeySpec(password.toEncodedCharArray(), salt.data, iterations, cipherAlgorithm.keyLength)
         val factory = SecretKeyFactory.getInstance(cipherAlgorithm.keyDerivationAlgorithm)
         try {
@@ -252,7 +317,7 @@ object SecretService {
         message.update(password1.toByteArray())
         message.update(password2.toByteArray())
         val digest = message.digest()
-        val result = digest.map { it.toChar() }.toCharArray()
+        val result = digest.map { it.toInt().toChar() }.toCharArray()
 
         return Password(result)
     }
@@ -356,12 +421,12 @@ object SecretService {
         return try {
             encrypt(secretKeyHolder, type, data)
         } catch (e: KeyStoreNotReadyException) {
-            Log.e(LOG_PREFIX + "SS", "KeyStore not ready, trying again", e)
+            DebugInfo.logException("SS", "KeyStore not ready, trying again", e)
             SystemClock.sleep(3000) // artificial wait before retry
             return try {
                 encrypt(secretKeyHolder, type, data)
             } catch (e: KeyStoreNotReadyException) {
-                Log.e(LOG_PREFIX + "SS", "KeyStore still not ready, trying again", e)
+                DebugInfo.logException("SS", "KeyStore still not ready, trying again", e)
                 SystemClock.sleep(5000) // artificial wait before last retry
                 encrypt(secretKeyHolder, type, data)
             }
@@ -413,11 +478,11 @@ object SecretService {
 
     private fun decryptData(secretKeyHolder: SecretKeyHolder, encrypted: Encrypted): ByteArray {
         if (encrypted.isEmpty()) {
-            Log.e(LOG_PREFIX + "SS", "empty encrypted")
+            DebugInfo.logException("SS", "empty encrypted")
             return FAILED_BYTE_ARRAY
         }
         if (secretKeyHolder.cipherAlgorithm != encrypted.cipherAlgorithm) {
-            Log.e(LOG_PREFIX + "SS", "cipher algorithm mismatch")
+            DebugInfo.logException("SS", "cipher algorithm mismatch")
             return FAILED_BYTE_ARRAY
         }
 
@@ -435,7 +500,7 @@ object SecretService {
             }
             return cipher.doFinal(encryptedData)
         } catch (e: GeneralSecurityException) {
-            Log.e(LOG_PREFIX + "SS", "unable to decrypt", e)
+            DebugInfo.logException("SS", "unable to decrypt", e)
             return FAILED_BYTE_ARRAY
         }
     }
@@ -470,7 +535,7 @@ object SecretService {
         try {
             return factory.getKeySpec(secretKeyHolder.secretKey, KeyInfo::class.java) as KeyInfo
         } catch (e: Exception) {
-            Log.e(LOG_PREFIX + "SS", "Asking for invalid key spec: ${secretKeyHolder.cipherAlgorithm}", e)
+            DebugInfo.logException("SS", "Asking for invalid key spec: ${secretKeyHolder.cipherAlgorithm}", e)
         }
         return null
     }

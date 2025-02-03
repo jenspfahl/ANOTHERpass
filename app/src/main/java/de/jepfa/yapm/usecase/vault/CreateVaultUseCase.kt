@@ -2,10 +2,10 @@ package de.jepfa.yapm.usecase.vault
 
 import android.util.Log
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm
+import de.jepfa.yapm.model.kdf.KdfConfig
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.MasterKeyService
-import de.jepfa.yapm.service.secret.PbkdfIterationService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.usecase.InputUseCase
@@ -16,13 +16,14 @@ import de.jepfa.yapm.util.Constants.LOG_PREFIX
 object CreateVaultUseCase: InputUseCase<CreateVaultUseCase.Input, BaseActivity>() {
 
     data class Input(val loginData: LoginData,
-                     val pbkdfIterations: Int,
+                     val kdfConfig: KdfConfig,
                      val cipherAlgorithm: CipherAlgorithm)
 
     override suspend fun doExecute(input: Input, activity: BaseActivity): Boolean {
 
-        PbkdfIterationService.storePbkdfIterations(input.pbkdfIterations) // before mk encryption!
-        Log.d(LOG_PREFIX + "ITERATIONS", "store iterations=${input.pbkdfIterations}")
+        input.kdfConfig.persist(activity)
+        Log.d(LOG_PREFIX + "ITERATIONS", "store KDF config=${input.kdfConfig}")
+
 
         val salt = SaltService.getSalt(activity)
         val masterKey = MasterKeyService.generateMasterKey(activity)
@@ -31,7 +32,7 @@ object CreateVaultUseCase: InputUseCase<CreateVaultUseCase.Input, BaseActivity>(
             input.loginData.pin,
             input.loginData.masterPassword,
             salt,
-            input.pbkdfIterations,
+            input.kdfConfig,
             input.cipherAlgorithm,
             activity
         )

@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface EncLabelDao {
     @Insert
-    suspend fun insert(encLabel: EncLabelEntity)
+    suspend fun insert(encLabel: EncLabelEntity): Long
 
     @Update
     suspend fun update(encLabel: EncLabelEntity)

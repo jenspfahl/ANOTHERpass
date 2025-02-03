@@ -20,7 +20,6 @@ interface RequestFlows {
     fun startCredentialUiSearchFor(domain: String)
     fun startCredentialSelectionMode()
     fun getSelectedCredentials(): Set<EncCredential>
-    fun stopCredentialSelectionMode()
 
     fun resetUi()
 

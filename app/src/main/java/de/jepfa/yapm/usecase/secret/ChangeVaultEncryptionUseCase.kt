@@ -4,12 +4,12 @@ import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.*
+import de.jepfa.yapm.model.kdf.KdfConfig
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.MasterKeyService
-import de.jepfa.yapm.service.secret.PbkdfIterationService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
@@ -19,23 +19,27 @@ import de.jepfa.yapm.usecase.UseCaseOutput
 import de.jepfa.yapm.usecase.session.LoginUseCase
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 
 object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.Input, SecureActivity>() {
 
     data class Input(val loginData: LoginData,
-                     val pbkdfIterations: Int,
+                     val kdfConfig: KdfConfig,
                      val newCipherAlgorithm: CipherAlgorithm,
                      val generateNewMasterKey: Boolean)
 
     fun openDialog(input: Input, activity: SecureActivity, postHandler: (backgroundResult: UseCaseOutput<Unit>) -> Unit) {
 
         val currentCipherAlgorithm = SecretService.getCipherAlgorithm(activity)
-        val currentIterations = PbkdfIterationService.getStoredPbkdfIterations()
+        val currentKdfConfig = SecretService.getStoredKdfConfig(activity)
 
-        val messageId = if (currentCipherAlgorithm == input.newCipherAlgorithm
-            && !input.generateNewMasterKey
-            && currentIterations != input.pbkdfIterations) {
-            //only iterations has been changed, no need to renew the whole vault but only the master key
+        val messageId = if (onlyNeedsToRecryptMasterSK(
+                input,
+                currentCipherAlgorithm,
+                currentKdfConfig
+            )
+        ) {
+            //only KDF config has been changed, no need to renew the whole vault but only the master key
             R.string.message_change_iterations
         }
         else {
@@ -54,7 +58,15 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
 
     }
 
-     override suspend fun doExecute(input: Input, activity: SecureActivity): Boolean {
+    private fun onlyNeedsToRecryptMasterSK(
+        input: Input,
+        currentCipherAlgorithm: CipherAlgorithm,
+        currentKdfConfig: KdfConfig
+    ) = (currentCipherAlgorithm == input.newCipherAlgorithm
+                && !input.generateNewMasterKey
+                && (currentKdfConfig != input.kdfConfig))
+
+    override suspend fun doExecute(input: Input, activity: SecureActivity): Boolean {
         val salt = SaltService.getSalt(activity)
         val currentCipherAlgorithm = SecretService.getCipherAlgorithm(activity)
 
@@ -63,12 +75,17 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
             checkAndGetMasterPassphraseSK(input.loginData, salt, currentCipherAlgorithm, activity)
                 ?: return false
 
-         val currentIterations = PbkdfIterationService.getStoredPbkdfIterations()
+         val currentKdfConfig = SecretService.getStoredKdfConfig(activity)
+
          if (currentCipherAlgorithm != input.newCipherAlgorithm
              || input.generateNewMasterKey
-             || currentIterations != input.pbkdfIterations) {
+             || currentKdfConfig != input.kdfConfig) {
 
-            val success = if (currentCipherAlgorithm == input.newCipherAlgorithm && !input.generateNewMasterKey) {
+            val success = if (onlyNeedsToRecryptMasterSK(
+                    input,
+                    currentCipherAlgorithm,
+                    currentKdfConfig
+                )) {
                 //only iterations has been changed, no need to renew the whole vault but only the master key
                 renewMasterSK(masterPassphraseSK, input, salt, activity) != null
             }
@@ -90,7 +107,7 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
         cipherAlgorithm: CipherAlgorithm,
         activity: SecureActivity
     ): SecretKeyHolder? {
-        val masterPassphraseSK = MasterKeyService.getMasterPassPhraseSK(
+        val masterPassphraseSK = MasterKeyService.getMasterPassPhraseSecretKey(
             loginData.pin,
             loginData.masterPassword,
             salt,
@@ -100,13 +117,13 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
         val encEncryptedMasterKey =
             PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, activity)
         if (encEncryptedMasterKey == null) {
-            Log.e(LOG_PREFIX + "VaultEnc", "master key not on device")
+            DebugInfo.logException("VaultEnc", "master key not on device")
             return null
         }
 
-        val masterKey = MasterKeyService.getMasterKey(masterPassphraseSK, encEncryptedMasterKey, activity)
+        val masterKey = MasterKeyService.decryptMasterKey(masterPassphraseSK, encEncryptedMasterKey, activity)
         if (masterKey == null) {
-            Log.e(LOG_PREFIX + "VaultEnc", "cannot decrypt master key, pin wrong?")
+            DebugInfo.logException("VaultEnc", "cannot decrypt master key, pin wrong?")
             return null
         }
         masterKey.clear()
@@ -132,16 +149,21 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
                     credential.id,
                     credential.uid,
                     reencryptString(credential.name, oldMasterSK, newMasterSK),
-                    reencryptString(credential.additionalInfo, oldMasterSK, newMasterSK),
-                    reencryptString(credential.user, oldMasterSK, newMasterSK),
-                    reencryptPassword(credential.password, oldMasterSK, newMasterSK),
-                    if (credential.lastPassword != null) reencryptPassword(credential.lastPassword!!, oldMasterSK, newMasterSK) else null,
                     reencryptString(credential.website, oldMasterSK, newMasterSK),
+                    reencryptString(credential.user, oldMasterSK, newMasterSK),
+                    reencryptString(credential.additionalInfo, oldMasterSK, newMasterSK),
                     reencryptString(credential.labels, oldMasterSK, newMasterSK),
-                    reencryptString(credential.expiresAt, oldMasterSK, newMasterSK),
-                    credential.isObfuscated,
-                    credential.isLastPasswordObfuscated,
-                    credential.modifyTimestamp
+                    PasswordData(
+                        reencryptPassword(credential.passwordData.password, oldMasterSK, newMasterSK),
+                        credential.passwordData.isObfuscated,
+                        if (credential.passwordData.lastPassword != null) reencryptPassword(credential.passwordData.lastPassword!!, oldMasterSK, newMasterSK) else null,
+                        credential.passwordData.isLastPasswordObfuscated,
+                    ),
+                    TimeData(
+                        credential.timeData.modifyTimestamp,
+                        reencryptString(credential.timeData.expiresAt, oldMasterSK, newMasterSK),
+                    ),
+                    null,
                 )
                 app.credentialRepository.update(updated)
             }
@@ -214,7 +236,7 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
         val encEncryptedMasterKey =
             PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, activity)
         if (encEncryptedMasterKey == null) {
-            Log.e(LOG_PREFIX + "VaultEnc", "master key not on device")
+            DebugInfo.logException("VaultEnc", "master key not on device")
             return null
         }
 
@@ -228,22 +250,22 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
             MasterKeyService.generateMasterKey(activity)
         }
         else {
-            MasterKeyService.getMasterKey(masterPassphraseSK, encEncryptedMasterKey, activity)
+            MasterKeyService.decryptMasterKey(masterPassphraseSK, encEncryptedMasterKey, activity)
         }
         if (masterKey == null) {
-            Log.e(LOG_PREFIX + "VaultEnc", "stored master key not valid")
+            DebugInfo.logException("VaultEnc", "stored master key not valid")
             return null
         }
 
-        PbkdfIterationService.storePbkdfIterations(input.pbkdfIterations)
-        Log.d(LOG_PREFIX + "ITERATIONS", "store changed iterations=${input.pbkdfIterations}")
+        input.kdfConfig.persist(activity)
+        Log.d(LOG_PREFIX + "ITERATIONS", "store changed iterations=${input.kdfConfig}")
 
         val newEncryptedMasterKey = MasterKeyService.encryptAndStoreMasterKey(
             masterKey,
             input.loginData.pin,
             input.loginData.masterPassword,
             salt,
-            input.pbkdfIterations,
+            input.kdfConfig,
             input.newCipherAlgorithm,
             activity
         )
@@ -252,12 +274,12 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
         PreferenceService.putCurrentDate(PreferenceService.DATA_MK_MODIFIED_AT, activity)
 
         val newMasterPassphraseSK =
-            MasterKeyService.getMasterPassPhraseSK(
+            MasterKeyService.getMasterPassPhraseSecretKey(
                 input.loginData.pin, input.loginData.masterPassword, salt, input.newCipherAlgorithm, activity)
 
         val vaultVersion = PreferenceService.getAsInt(PreferenceService.DATA_VAULT_VERSION, activity)
         val useLegacyGeneration = vaultVersion < Constants.FAST_KEYGEN_VAULT_VERSION
-        return MasterKeyService.getMasterSK(newMasterPassphraseSK, salt, newEncryptedMasterKey, useLegacyGeneration, activity)
+        return MasterKeyService.getMasterSecretKey(newMasterPassphraseSK, salt, newEncryptedMasterKey, useLegacyGeneration, activity)?.first
     }
 
 }

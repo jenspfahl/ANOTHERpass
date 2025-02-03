@@ -11,6 +11,7 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 import java.text.ParsePosition
 import java.util.*
 
@@ -37,7 +38,12 @@ object PreferenceService {
     const val DATA_CIPHER_ALGORITHM = DATA_PREFIX + "cipher_algorithm"
     const val DATA_SALT = DATA_PREFIX + "aslt"
     const val DATA_ENCRYPTED_SEED = DATA_PREFIX + "seed"
+
+    const val DATA_USED_KDF_ID = DATA_PREFIX + "used_kdf_id"
     const val DATA_PBKDF_ITERATIONS = DATA_PREFIX + "pbkdf_iterations"
+    const val DATA_ARGON2_ITERATIONS = DATA_PREFIX + "argon2_iterations"
+    const val DATA_ARGON2_MIB = DATA_PREFIX + "argon2_mib"
+
     const val DATA_ENCRYPTED_MASTER_PASSWORD = DATA_PREFIX + "mpwd"
     const val DATA_ENCRYPTED_MASTER_KEY = DATA_PREFIX + "enmk"
     const val DATA_MASTER_PASSWORD_TOKEN_KEY = DATA_PREFIX + "mpt"
@@ -91,6 +97,8 @@ object PreferenceService {
     const val PREF_SERVER_AUTOSTART = PREF_PREFIX + "server_autostart"
     const val PREF_SERVER_HIDE_PANEL = PREF_PREFIX + "server_hide_panel"
 
+    const val PREF_QUICK_SEARCH_ON_FAB = PREF_PREFIX + "quick_search_on_fab"
+    const val PREF_EXTENDED_SEARCH_BY_DEFAULT = PREF_PREFIX + "extended_search_by_default"
 
     const val DATA_REFRESH_MPT_NOTIFICATION_SHOWED_AT = DATA_PREFIX + "refresh_mpt_notification_showed_at"
     const val DATA_REFRESH_MPT_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "refresh_mpt_notification_showed_as"
@@ -207,7 +215,7 @@ object PreferenceService {
                         prefs.copyTo(encPrefs)
                         prefs.clear()
                     } catch (e: Exception) {
-                        Log.e(LOG_PREFIX + "PREFS", "could not migrate to enc prefs", e)
+                        DebugInfo.logException("PREFS", "could not migrate to enc prefs", e)
                         return
                     }
                 }
@@ -383,7 +391,7 @@ object PreferenceService {
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             )
         } catch (e: Exception) {
-            Log.e(LOG_PREFIX + "PREFS", "cannot create encrypted shared preferences", e)
+            DebugInfo.logException("PREFS", "cannot create encrypted shared preferences", e)
             null
         }
     }
@@ -411,7 +419,7 @@ fun SharedPreferences.set(key: String, value: Any?) {
         is Set<*>? -> edit { it.putStringSet(key, value?.map { it.toString() }?.toSet()) }
         is Boolean -> edit { it.putBoolean(key, value) }
         else -> {
-            Log.e(LOG_PREFIX + "PREFS", "Unsupported Type: $value")
+            DebugInfo.logException("PREFS", "Unsupported Type: $value")
         }
     }
 }

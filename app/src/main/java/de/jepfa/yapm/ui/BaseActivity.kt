@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.ProgressBar
 import androidx.activity.viewModels
@@ -51,6 +52,20 @@ open class BaseActivity : AppCompatActivity() {
             viewProgressBar = findViewById(R.id.progressBar)
         }
         return viewProgressBar
+    }
+
+    fun showProgressBar(progressBar: ProgressBar) {
+        progressBar.visibility = View.VISIBLE
+        window?.setFlags(
+            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+    }
+
+
+    fun hideProgressBar(progressBar: ProgressBar) {
+        progressBar.visibility = View.INVISIBLE
+        window?.clearFlags(
+            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
     }
 
     fun getApp(): YapmApp {

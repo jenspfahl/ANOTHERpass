@@ -22,7 +22,7 @@ object ShowInfoUseCase: BasicUseCase<BaseActivity>() {
         val message = activity.getString(R.string.app_name) + ", Version " + DebugInfo.getVersionName(
             activity
         ) +
-                System.lineSeparator() + " \u00A9 Jens Pfahl 2024" +
+                System.lineSeparator() + " \u00A9 Jens Pfahl 2025" +
                 System.lineSeparator() + System.lineSeparator() +
                 activity.getString(R.string.this_app_is_foss) +
                 System.lineSeparator() + activity.getString(

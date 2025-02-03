@@ -3,14 +3,13 @@ package de.jepfa.yapm.service.io
 import android.content.Context
 import android.net.Uri
 import android.text.TextUtils
-import android.util.Log
 import com.opencsv.CSVReaderHeaderAware
 import com.opencsv.CSVWriter
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.secret.SecretService
-import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.FileUtil
 import de.jepfa.yapm.util.toSimpleDateFormat
 import java.io.ByteArrayOutputStream
@@ -34,7 +33,7 @@ object CsvService {
                 line = reader.readMap()
             }
         } catch (e: Exception) {
-            Log.e(LOG_PREFIX + "CSV", "cannot parse csvfile", e)
+            DebugInfo.logException("CSV", "cannot parse csvfile", e)
             return null
         }
         return resultList
@@ -47,11 +46,11 @@ object CsvService {
             val content: String? = FileUtil.readFile(context, uri)
             if (TextUtils.isEmpty(content)) {
                 //TODO this check seems not to work from time to time
-                Log.e(LOG_PREFIX + "BACKUP", "Empty file created: $uri")
+                DebugInfo.logException("BACKUP", "Empty file created: $uri")
                 success = false
             }
         } catch (e: Exception) {
-            Log.e(LOG_PREFIX + "BACKUP", "Cannot write file $uri", e)
+            DebugInfo.logException("BACKUP", "Cannot write file $uri", e)
         }
         return success
     }
@@ -66,32 +65,36 @@ object CsvService {
             val writer = CSVWriter(outputWriter)
 
             // adding header to csv
-            val header = arrayOf("name", "url", "username", "password", "description", "labels", "expiresOn")
+            val header = arrayOf("name", "url", "username", "password", "description", "labels", "expiresOn", "otp")
             writer.writeNext(header)
 
             // add data to csv
             credentials.forEach { encCredential ->
                 val name = SecretService.decryptCommonString(secretKey, encCredential.name)
                 val website = SecretService.decryptCommonString(secretKey, encCredential.website)
-                val expiresAt = SecretService.decryptLong(secretKey, encCredential.expiresAt)
+                val expiresAt = SecretService.decryptLong(secretKey, encCredential.timeData.expiresAt)
                 val user = SecretService.decryptCommonString(secretKey, encCredential.user)
-                val password = SecretService.decryptPassword(secretKey, encCredential.password)
+                val password = SecretService.decryptPassword(secretKey, encCredential.passwordData.password)
                 val additionalInfo = SecretService.decryptCommonString(secretKey, encCredential.additionalInfo)
                 val labelsAsString = LabelService.defaultHolder.decryptLabelsForCredential(secretKey, encCredential)
                     .map { it.name }
                     .sorted()
                     .joinToString(separator = ",")
                 val expiresAtAsString = if (expiresAt != null && expiresAt > 0) Date(expiresAt).toSimpleDateFormat() else ""
+                val otpAuth = encCredential.otpData?.let {
+                    SecretService.decryptCommonString(secretKey, it.encOtpAuthUri)
+                } ?: ""
+
 
                 val data = arrayOf(name, website, user, password.toRawFormattedPassword().toString(),
-                    additionalInfo, labelsAsString, expiresAtAsString)
+                    additionalInfo, labelsAsString, expiresAtAsString, otpAuth)
                 writer.writeNext(data)
                 password.clear()
             }
 
             writer.close()
             return outputStream.toString()
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             return null
         }
     }

@@ -1,21 +1,27 @@
 package de.jepfa.yapm.model.encrypted
 
-import android.util.Log
 import com.google.gson.JsonElement
-import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 import java.util.*
 
-data class EncLabel(val id: Int?,
-                    val uid: UUID?,
-                    override var name: Encrypted,
-                    var description: Encrypted,
-                    var color: Int?): EncNamed {
+// DON'T RENAME THE PROPS, THIS WILL BREAK THE VAULT BACKUP FILE FORMAT (see LABELS_TYPE)
+data class EncLabel(
+    var id: Int?,
+    val uid: UUID?,
+    override var name: Encrypted,
+    var description: Encrypted,
+    var color: Int?): EncNamed {
+
+    constructor(name: Encrypted, description: Encrypted) :
+            this(null, null, name, description, null)
+
 
     constructor(id: Int?, uid: String?, nameBase64: String, descriptionBase64: String, color: Int?) :
             this(id,
                 uid?.let { UUID.fromString(uid) },
                 Encrypted.fromBase64String(nameBase64),
                 Encrypted.fromBase64String(descriptionBase64), color)
+
 
     fun isPersistent(): Boolean {
         return id != null
@@ -41,7 +47,7 @@ data class EncLabel(val id: Int?,
                     jsonObject.get(ATTRIB_COLOR)?.asInt
                 )
             } catch (e: Exception) {
-                Log.e(LOG_PREFIX + "ENCL", "cannot parse json container", e)
+                DebugInfo.logException("ENCL", "cannot parse json container", e)
                 null
             }
         }

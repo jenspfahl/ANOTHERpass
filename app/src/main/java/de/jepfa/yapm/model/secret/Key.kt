@@ -26,4 +26,10 @@ class Key : Secret {
 
         return f.substring(0, 2) + "-" + f.substring(2, 5) + "-" + f.substring(5, 7)
     }
+
+    companion object {
+        fun empty(): Key {
+            return Key(ByteArray(0))
+        }
+    }
 }

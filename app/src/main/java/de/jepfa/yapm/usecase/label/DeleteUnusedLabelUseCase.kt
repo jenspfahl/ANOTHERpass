@@ -8,7 +8,7 @@ import de.jepfa.yapm.usecase.OutputUseCase
 import de.jepfa.yapm.usecase.UseCaseOutput
 
 
-object DeleteUnusedLabelUseCase: OutputUseCase<String, SecureActivity>() {
+object DeleteUnusedLabelUseCase: OutputUseCase<String, SecureActivity>() { //TODO use Output.errorMessage
 
     override fun execute(activity: SecureActivity): UseCaseOutput<String> {
         val deleteCandidates = LabelService.defaultHolder.getAllLabels()

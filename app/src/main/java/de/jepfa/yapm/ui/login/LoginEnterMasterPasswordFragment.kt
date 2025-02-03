@@ -204,6 +204,7 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
         loginActivity: LoginActivity
     ) {
 
+        masterPasswdTextView.isEnabled = false
         loginActivity.hideKeyboard(masterPasswdTextView)
 
         loginActivity.getProgressBar()?.let {
@@ -212,6 +213,8 @@ class LoginEnterMasterPasswordFragment : BaseFragment() {
                 .launch(loginActivity, LoginData(userPin, masterPassword))
                 { output ->
                     if (!output.success) {
+                        masterPasswdTextView.isEnabled = true
+
                         MasterPasswordService.deleteStoredMasterPassword(loginActivity)
                         loginActivity.handleFailedLoginAttempt()
                         masterPasswdTextView.error = "${getString(R.string.password_wrong)} ${loginActivity.getLoginAttemptMessage()}"

@@ -1,0 +1,7 @@
+* support for One-Time-Passwords (counter- and time based)
+* added Argon2Id as the default Key Derivation Function (changeable)
+* import to and export from Keepass/KDBX files
+* exported encrypted credentials need less space now
+* switch search and add-button (#78)
+* add own app logging as part of the "Report a bug" - feature (#79)
+* smaller improvements and bugfixes

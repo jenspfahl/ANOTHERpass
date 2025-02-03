@@ -49,6 +49,7 @@ Dark theme:
 >* no internet connection needed, all is offline
 >* export and import credential vault
 >* share and outsource single credentials
+>* one-time-password support (HOTP and TOTP)
 >* obfuscate passwords
 >* expiring credentials with notification
 >* self destruction mode

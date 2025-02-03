@@ -12,6 +12,7 @@ import de.jepfa.yapm.service.biometrix.BiometricUtils.isBiometricPromptAvailable
 import de.jepfa.yapm.service.biometrix.BiometricUtils.isBiometricsAvailable
 import de.jepfa.yapm.service.biometrix.BiometricUtils.isPermissionGranted
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 import javax.crypto.Cipher
 
 /*
@@ -34,7 +35,7 @@ class BiometricManagerVX(cipher: Cipher, context: Context): BiometricManagerV23(
                 displayBiometricDialog(description, cancelText, biometricCallback)
             }
         } catch (e: Exception) {
-            Log.e(LOG_PREFIX + "BIOMgr", "couldn't auth", e)
+            DebugInfo.logException("BIOMgr", "couldn't auth", e)
             biometricCallback.onAuthenticationError(context.getString(R.string.unknown_error))
         }
     }

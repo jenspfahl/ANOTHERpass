@@ -45,7 +45,7 @@
                         android:paddingHorizontal="4dp"
                         android:clickable="true"
                         android:layout_gravity="center"
-                        android:src="@drawable/ic_baseline_qr_code_48"
+                        android:src="@drawable/ic_baseline_qr_code_48_red"
                         android:focusable="true" />
 
                     <ImageView
@@ -80,6 +80,10 @@
                 android:layout_marginBottom="8dp"
                 android:text="@string/store_master_password" />
 
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -120,6 +124,10 @@
 
                 </LinearLayout>
             </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
             <include layout="@layout/change_login_iterations_slider" />
 

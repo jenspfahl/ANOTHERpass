@@ -1,17 +1,22 @@
 package de.jepfa.yapm.ui.importread
 
 import android.content.Intent
+import com.google.gson.JsonParser
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.encrypted.Encrypted
+import de.jepfa.yapm.model.export.DecryptedExportableCredential
 import de.jepfa.yapm.model.export.EncExportableCredential
 import de.jepfa.yapm.model.export.ExportContainer
 import de.jepfa.yapm.model.export.PlainShareableCredential
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.credential.ShowCredentialActivity
 import de.jepfa.yapm.usecase.vault.ImportVaultUseCase
+import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.toastText
 
 
-class ImportCredentialActivity : ReadActivityBase() {
+class ImportCredentialActivity : ReadQrCodeOrNfcActivityBase() {
 
     init {
         readPlainTextFromNfc = true
@@ -33,15 +38,30 @@ class ImportCredentialActivity : ReadActivityBase() {
         val parsedVault = ImportVaultUseCase.parseVaultFileContent(scanned, this)
         if (parsedVault.content != null) {
             ExportContainer.fromJson(parsedVault.content)?.let { exportContainer ->
-                when (exportContainer.c) {
+                val content = exportContainer.c
+                when (content) {
                     is EncExportableCredential -> {
-                        val ecr = exportContainer.c
+                        val ecr = content
                         getNameFromECR(ecr)?.let { name ->
                             return ecr.toEncCredential()
                         }
                     }
+                    is Encrypted -> {
+                        masterSecretKey?.let { key ->
+                            val decryptedExportableCredential = try {
+                                val decryptedExportedCredentialJsonString = SecretService.decryptCommonString(key, content)
+                                val decryptedExportedCredentialJson = JsonParser.parseString(decryptedExportedCredentialJsonString)
+                                DecryptedExportableCredential.fromJson(decryptedExportedCredentialJson)
+                            } catch (e: Exception) {
+                                DebugInfo.logException("ECR", "Cannot parse exported credential", e)
+                                null
+                            }
+                            return decryptedExportableCredential?.toEncCredential(key)
+                        }
+
+                    }
                     is PlainShareableCredential -> {
-                        val pcr = exportContainer.c
+                        val pcr = content
                         return createEncCredentialFromPcr(pcr)
                     }
                     else -> return@let

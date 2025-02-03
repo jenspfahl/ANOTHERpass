@@ -2,14 +2,11 @@ package de.jepfa.yapm.ui.webextension
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.SpannableString
 import android.text.TextUtils
 import android.util.Base64
 import android.util.Log
 import android.view.MenuItem
-import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -27,7 +24,7 @@ import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.ServerRequestBottomSheet
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
-import de.jepfa.yapm.ui.importread.ReadActivityBase
+import de.jepfa.yapm.ui.importread.ReadQrCodeOrNfcActivityBase
 import de.jepfa.yapm.usecase.webextension.DeleteWebExtensionUseCase
 import de.jepfa.yapm.util.*
 import io.ktor.http.*
@@ -37,7 +34,7 @@ import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 
-class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
+class AddWebExtensionActivity : ReadQrCodeOrNfcActivityBase(), HttpServer.HttpCallback {
 
     private var currentLockTimeout: Int = 0
     private var currentLogoutTimeout: Int = 0
@@ -285,7 +282,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
         masterSecretKey?.let { key ->
             val providedWebClientId = SecretService.decryptCommonString(key, webExtension.webClientId)
             if (providedWebClientId != webClientId || action != HttpServer.Action.LINKING) {
-                Log.e("HTTP", "Programming error")
+                DebugInfo.logException("HTTP", "Programming error")
                 toastText(this, R.string.something_went_wrong)
                 return toErrorResponse(HttpStatusCode.InternalServerError, "invalid action or unexpected web client")
             }
@@ -307,7 +304,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
                 Log.d("HTTP", "knownClientPubKeyFingerprintHex=$knownClientPubKeyFingerprintHex")
 
                 if (fingerprintToHex != knownClientPubKeyFingerprintHex) {
-                    Log.e("HTTP", "wrong fingerprint")
+                    DebugInfo.logException("HTTP", "wrong fingerprint")
                     return toErrorResponse(HttpStatusCode.BadRequest,"fingerprint mismatch")
                 }
                 Log.i("HTTP", "client public key approved")
@@ -315,7 +312,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
                 val remoteVaultId = message.optString("vaultId")
                 Log.d("HTTP", "remoteVaultId=$remoteVaultId")
                 if (remoteVaultId.isNotBlank() && remoteVaultId != SaltService.getVaultId(this)) {
-                    Log.e("HTTP", "relink vault id mismatch")
+                    DebugInfo.logException("HTTP", "relink vault id mismatch")
                     return toErrorResponse(HttpStatusCode.BadRequest,"relink vault id mismatch")
                 }
 
@@ -328,7 +325,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
 
                 // generate and store server RSA key pair
                 CoroutineScope(Dispatchers.Main).launch {
-                    showProgressBar()
+                    showProgressBar(progressBar)
                 }
 
                 val serverKeyPair = SecretService.generateRsaKeyPair(webExtension.getServerKeyPairAlias(), this, workaroundMode = true)
@@ -357,7 +354,7 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
 
 
                 CoroutineScope(Dispatchers.Main).launch {
-                    hideProgressBar()
+                    hideProgressBar(progressBar)
 
 
                     ServerRequestBottomSheet(
@@ -396,18 +393,5 @@ class AddWebExtensionActivity : ReadActivityBase(), HttpServer.HttpCallback {
         return toErrorResponse(HttpStatusCode.Forbidden, "locked")
     }
 
-    private fun showProgressBar() {
-        progressBar.visibility = View.VISIBLE
-        window?.setFlags(
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-    }
-
-
-    private fun hideProgressBar() {
-        progressBar.visibility = View.INVISIBLE
-        window?.clearFlags(
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-    }
 
 }

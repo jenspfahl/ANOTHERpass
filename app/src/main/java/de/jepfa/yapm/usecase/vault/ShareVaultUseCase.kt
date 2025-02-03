@@ -77,6 +77,7 @@ object ShareVaultUseCase: UseCase<ShareVaultUseCase.Input, Uri?, SecureActivity>
                     context?.let {
                         context.unregisterReceiver(this)
                         PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_EXPORTED_AT, activity)
+
                         val upIntent = Intent(activity.intent)
                         activity.navigateUpTo(upIntent)
                     }

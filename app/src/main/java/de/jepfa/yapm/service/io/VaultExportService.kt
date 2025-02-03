@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.text.TextUtils
-import android.util.Log
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
 import de.jepfa.yapm.model.encrypted.EncCredential
@@ -20,7 +19,6 @@ import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.util.Constants
-import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.FileUtil
 import java.lang.reflect.Type
@@ -44,7 +42,6 @@ object VaultExportService {
     const val JSON_USERNAME_TEMPLATES = "usernameTemplates"
     const val JSON_APP_SETTINGS = "appSettings"
 
-    val CREDENTIALS_TYPE: Type = object : TypeToken<List<EncCredential>>() {}.type
     val LABELS_TYPE: Type = object : TypeToken<List<EncLabel>>() {}.type
     val USERNAME_TEMPLATES_TYPE: Type = object : TypeToken<List<EncUsernameTemplate>>() {}.type
 
@@ -72,12 +69,16 @@ object VaultExportService {
             .registerTypeAdapter(Password::class.java, PasswordSerializer())
             .create()
 
-    fun credentialToJson(credential: EncExportableCredential): String {
-        return GSON.toJson(ExportContainer(TYPE_ENC_CREDENTIAL_RECORD, credential))
-    }
-
     fun credentialToJson(credential: PlainShareableCredential): String {
         return GSON.toJson(ExportContainer(TYPE_PLAIN_CREDENTIAL_RECORD, credential))
+    }
+
+    fun credentialToJson(credential: DecryptedExportableCredential): String {
+        return GSON.toJson(credential)
+    }
+
+    fun encExportableCredentialToJson(credential: Encrypted): String {
+        return GSON.toJson(ExportContainer(TYPE_ENC_CREDENTIAL_RECORD_V2, credential))
     }
 
     fun createVaultFile(
@@ -92,7 +93,7 @@ object VaultExportService {
             val success = writeExportFile(context, uri, jsonData)
             return success
         } catch (e: Exception) {
-            Log.e(LOG_PREFIX + "JSON", "cannot create JSON", e)
+            DebugInfo.logException("JSON", "cannot create JSON", e)
             return false
         }
     }
@@ -105,11 +106,11 @@ object VaultExportService {
             val content: String? = FileUtil.readFile(context, uri)
             if (TextUtils.isEmpty(content)) {
                 //TODO this check seems not to work from time to time
-                Log.e(LOG_PREFIX + "BACKUP", "Empty file created: $uri")
+                DebugInfo.logException("BACKUP", "Empty file created: $uri")
                 success = false
             }
         } catch (e: Exception) {
-            Log.e(LOG_PREFIX + "BACKUP", "Cannot write file $uri", e)
+            DebugInfo.logException("BACKUP", "Cannot write file $uri", e)
         }
         return success
     }
@@ -123,7 +124,7 @@ object VaultExportService {
             root.addProperty(JSON_APP_VERSION_CODE, DebugInfo.getVersionCode(context))
             root.addProperty(JSON_APP_VERSION_NAME, DebugInfo.getVersionName(context))
         } catch (e: PackageManager.NameNotFoundException) {
-            Log.e(LOG_PREFIX + "BACKUPALL", "cannot get version code", e)
+            DebugInfo.logException("BACKUPALL", "cannot get version code", e)
         }
 
         root.addProperty(JSON_CREATION_DATE, Date().time)
@@ -157,7 +158,36 @@ object VaultExportService {
 
         val credentials = app.credentialRepository.getAllSync()
 
-        val credentialsAsJson = GSON.toJsonTree(credentials, CREDENTIALS_TYPE)
+        val credentialsAsJson = JsonArray()
+        credentials.forEach { credential ->
+            val credentialAsJson = JsonObject()
+            credentialAsJson.addProperty(EncCredential.ATTRIB_ID, credential.id)
+            credential.uid?.let {
+                credentialAsJson.addProperty(EncCredential.ATTRIB_UID, it.toString())
+            }
+            credentialAsJson.addProperty(EncCredential.ATTRIB_NAME, credential.name.toBase64String())
+            credentialAsJson.addProperty(EncCredential.ATTRIB_ADDITIONAL_INFO, credential.additionalInfo.toBase64String())
+            credentialAsJson.addProperty(EncCredential.ATTRIB_USER, credential.user.toBase64String())
+            credentialAsJson.addProperty(EncCredential.ATTRIB_PASSWORD, credential.passwordData.password.toBase64String())
+            credentialAsJson.addProperty(EncCredential.ATTRIB_IS_OBFUSCATED, credential.passwordData.isObfuscated)
+            credential.passwordData.lastPassword?.let {
+                credentialAsJson.addProperty(EncCredential.ATTRIB_LAST_PASSWORD, it.toBase64String())
+            }
+            credential.passwordData.isLastPasswordObfuscated?.let {
+                credentialAsJson.addProperty(EncCredential.ATTRIB_IS_LAST_PASSWORD_OBFUSCATED, it)
+            }
+            credentialAsJson.addProperty(EncCredential.ATTRIB_WEBSITE, credential.website.toBase64String())
+            credentialAsJson.addProperty(EncCredential.ATTRIB_LABELS, credential.labels.toBase64String())
+            credentialAsJson.addProperty(EncCredential.ATTRIB_EXPIRES_AT, credential.timeData.expiresAt.toBase64String())
+            credential.timeData.modifyTimestamp?.let {
+                credentialAsJson.addProperty(EncCredential.ATTRIB_MODIFY_TIMESTAMP, it)
+            }
+            credential.otpData?.encOtpAuthUri?.let {
+                credentialAsJson.addProperty(EncCredential.ATTRIB_OTP_DATA, it.toBase64String())
+            }
+
+            credentialsAsJson.add(credentialAsJson)
+        }
         val encCredentials = SecretService.encryptCommonString(
             masterKeySK,
             credentialsAsJson.toString())
@@ -197,5 +227,6 @@ object VaultExportService {
 
         return root
     }
+
 
 }

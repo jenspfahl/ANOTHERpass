@@ -12,8 +12,10 @@ import java.util.*
 class LabelRepository(private val encLabelDao: EncLabelDao) {
 
     @WorkerThread
-    suspend fun insert(encLabel: EncLabel) {
-        encLabelDao.insert(mapToEntity(encLabel))
+    suspend fun insert(encLabel: EncLabel): EncLabel {
+        val id = encLabelDao.insert(mapToEntity(encLabel))
+        encLabel.id = id.toInt()
+        return encLabel
     }
 
     @WorkerThread

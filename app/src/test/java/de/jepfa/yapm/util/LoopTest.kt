@@ -1,4 +1,4 @@
-package de.jepfa.obfusser.util.encrypt
+package de.jepfa.yapm.util
 
 import de.jepfa.yapm.util.Loop
 import de.jepfa.yapm.model.secret.Key

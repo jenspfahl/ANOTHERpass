@@ -9,11 +9,11 @@ import com.google.gson.JsonParser
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Validable
 import de.jepfa.yapm.model.encrypted.*
+import de.jepfa.yapm.model.kdf.KdfConfig
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.service.secret.AndroidKey
-import de.jepfa.yapm.service.secret.PbkdfIterationService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.BaseActivity
@@ -21,6 +21,7 @@ import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.InputUseCase
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -52,7 +53,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
 
             return success
         } catch (e: Exception) {
-            Log.e(LOG_PREFIX + "IMP", "cannot read json", e)
+            DebugInfo.logException("IMP", "cannot read json", e)
             return false
         }
     }
@@ -191,7 +192,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
 
             return ParsedVault(appVersionCode, vaultId, cipherAlgorithm, rawJson)
         } catch (e: Exception) {
-            Log.e(LOG_PREFIX + "JSON", "cannot parse JSON", e)
+            DebugInfo.logException("JSON", "cannot parse JSON", e)
             return ParsedVault(null, null, null, null)
         }
     }
@@ -264,14 +265,14 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
         val cipherAlgorithm = extractCipherAlgorithm(jsonContent)
 
         if (Build.VERSION.SDK_INT < cipherAlgorithm.supportedSdkVersion) {
-            Log.e(LOG_PREFIX + "IMPV", "Unsupported cipher algorithm $cipherAlgorithm")
+            DebugInfo.logException("IMPV", "Unsupported cipher algorithm $cipherAlgorithm")
             return false
         }
 
         val vaultVersion = jsonContent.get(VaultExportService.JSON_VAULT_VERSION)?.asInt
             ?: Constants.INITIAL_VAULT_VERSION
         if (vaultVersion > Constants.CURRENT_VERSION) {
-            Log.e(LOG_PREFIX + "IMPV", "Unsupported vault version $vaultVersion")
+            DebugInfo.logException("IMPV", "Unsupported vault version $vaultVersion")
             return false
         }
         PreferenceService.putString(PreferenceService.DATA_VAULT_VERSION, vaultVersion.toString(), activity)
@@ -291,9 +292,9 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
 
             val payload = encryptedMK.type?.payload
             if (payload != null) {
-                val pbkdfIterations = PbkdfIterationService.fromBase64String(payload)
-                if (pbkdfIterations != null) {
-                    PbkdfIterationService.storePbkdfIterations(pbkdfIterations)
+                val kdfConfig = KdfConfig.fromEncodedString(payload)
+                if (kdfConfig != null) {
+                    kdfConfig.persist(activity)
                 }
                 else {
                     Log.w(LOG_PREFIX + "IMP", "Cannot parse login iterations: $payload")
@@ -357,7 +358,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
                     .filterNotNull()
                     .filter { credentialIdsToOverride.contains(it.id) }
                     .forEach { c ->
-                        c.touchModify()
+                        c.timeData.touchModify()
                         val existingC = app.credentialRepository.findByIdSync(c.id!!)
                         if (existingC == null) {
                             app.credentialRepository.insert(c)
@@ -368,7 +369,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
                                     uid = UUID.randomUUID(),
                                     name = copyName(existingC.name, activity)
                                 )
-                                copyOfExistingC.touchModify()
+                                copyOfExistingC.timeData.touchModify()
                                 app.credentialRepository.insert(copyOfExistingC)
                             }
                             app.credentialRepository.update(c)

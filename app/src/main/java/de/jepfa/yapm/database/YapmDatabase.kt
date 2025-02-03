@@ -16,7 +16,7 @@ import de.jepfa.yapm.database.entity.EncUsernameTemplateEntity
 import de.jepfa.yapm.database.entity.EncWebExtensionEntity
 import java.util.*
 
-const val DB_VERSION = 8
+const val DB_VERSION = 9
 
 @Database(
     entities = [EncCredentialEntity::class, EncLabelEntity::class, EncUsernameTemplateEntity::class, EncWebExtensionEntity::class],
@@ -87,6 +87,11 @@ abstract class YapmDatabase : RoomDatabase() {
                                 database.execSQL("CREATE TABLE IF NOT EXISTS `EncWebExtensionEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `webClientId` TEXT NOT NULL, `title` TEXT NOT NULL, `extensionPublicKey` TEXT NOT NULL, `sharedBaseKey` TEXT NOT NULL, `linked` INTEGER NOT NULL, `enabled` INTEGER NOT NULL, `bypassIncomingRequests` INTEGER NOT NULL, `lastUsedTimestamp` INTEGER)")
                             }
                         }
+                        val migration8to9 = object : Migration(8, 9) {
+                            override fun migrate(database: SupportSQLiteDatabase) {
+                                database.execSQL("ALTER TABLE EncCredentialEntity ADD COLUMN otpData TEXT")
+                            }
+                        }
 
                         INSTANCE = Room.databaseBuilder(
                             context.applicationContext,
@@ -99,7 +104,8 @@ abstract class YapmDatabase : RoomDatabase() {
                             migration4to5,
                             migration5to6,
                             migration6to7,
-                            migration7to8
+                            migration7to8,
+                            migration8to9
                         )
                         .build()
                     }

@@ -107,7 +107,7 @@ fun createLabelChip(
 
             }
             else {
-                val isDarkMode = context.resources.getBoolean(R.bool.dark_mode)
+                val isDarkMode = isDarkMode(context)
                 if (!isDarkMode) {
                     chip.chipBackgroundColor =
                         ColorStateList.valueOf(context.getColor(android.R.color.background_light))
@@ -122,6 +122,8 @@ fun createLabelChip(
     }
     return chip
 }
+
+fun isDarkMode(context: Context) = context.resources.getBoolean(R.bool.dark_mode)
 
 fun linkify(s: SpannableString) {
     Linkify.addLinks(s, Linkify.WEB_URLS)

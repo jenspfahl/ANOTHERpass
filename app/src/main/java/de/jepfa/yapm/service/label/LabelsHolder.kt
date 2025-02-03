@@ -1,16 +1,18 @@
 package de.jepfa.yapm.service.label
 
-import android.util.Log
+import android.content.Context
+import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncLabel
 import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.secret.SecretKeyHolder
-import de.jepfa.yapm.service.label.LabelService.createLabel
+import de.jepfa.yapm.service.label.LabelService.getLabelFromEncLabel
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.label.Label
-import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.random.Random
 
 class LabelsHolder {
 
@@ -24,7 +26,7 @@ class LabelsHolder {
         encLabels
             .forEach { encLabel ->
                 encLabel.id?.let {
-                    val label = createLabel(key, encLabel)
+                    val label = getLabelFromEncLabel(key, encLabel)
                     updateLabel(label)
                 }
             }
@@ -41,6 +43,24 @@ class LabelsHolder {
             nameToLabel[label.name] = label
             idToLabel[labelId] = label
         }
+    }
+
+    fun createNewLabel(labelName: String, context: Context, id: Int? = null): Label {
+        val labelColors = context.resources.getIntArray(R.array.label_colors)
+        labelColors.shuffle() // to get next color by random
+        val allLabelColors = getAllLabels()
+            .map { it.getColor(context) }
+            .toSet()
+        var freeColor = labelColors
+            .filterNot { allLabelColors.contains(it) }
+            .firstOrNull()
+
+        if (freeColor == null) {
+            val randId = Random.nextInt(allLabelColors.size)
+            freeColor = allLabelColors.elementAt(randId)
+        }
+
+        return Label(id, labelName, freeColor, null)
     }
 
     fun removeLabel(label: Label) {
@@ -136,10 +156,8 @@ class LabelsHolder {
 
     fun encryptLabelIds(key: SecretKeyHolder, labelNames: List<String>): Encrypted {
         val ids = labelNames
-            .map {lookupByLabelName(it)}
-            .filterNotNull()
-            .map { it.labelId }
-            .filterNotNull()
+            .mapNotNull { lookupByLabelName(it) }
+            .mapNotNull { it.labelId }
             .toSet()
 
         val idsAsString = idSetToString(ids)
@@ -157,13 +175,22 @@ class LabelsHolder {
                 .filterNotNull()
                 .toSet()
         } catch (e: NumberFormatException) {
-            Log.e(LOG_PREFIX + "LIS", "cannot parse $ids ", e)
+            DebugInfo.logException("LIS", "cannot parse $ids ", e)
             return Collections.emptySet()
         }
     }
 
     private fun idSetToString(ids: Set<Int>): String {
         return ids.joinToString(separator = ID_SEPARATOR)
+    }
+
+    fun copyFrom(sourceHolder: LabelsHolder) {
+        clearAll()
+
+        sourceHolder.getAllLabels().forEach {
+            updateLabel(it)
+        }
+
     }
 
 

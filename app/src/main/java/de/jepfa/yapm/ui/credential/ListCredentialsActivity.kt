@@ -11,6 +11,7 @@ import android.database.MatrixCursor
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -55,6 +56,7 @@ import com.google.android.material.navigation.NavigationView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncWebExtension
+import de.jepfa.yapm.model.otp.OtpConfig
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
@@ -164,6 +166,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private var navMenuVaultVisible = false
 
     private var searchItem: MenuItem? = null
+    private var addCredentialItem: MenuItem? = null
     private var credentialsRecycleView: RecyclerView? = null
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
@@ -250,7 +253,10 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         else {
 
             val onLongClickServerDetails = View.OnLongClickListener {
-                val stat = if (HttpServer.isRunning())  "Running" else "Stopped"
+                val stat = if (HttpServer.isRunning())
+                    if (HttpServer.isStopping()) "Stopping" else "Running"
+                else
+                    if (HttpServer.isStarting()) "Starting" else "Stopped"
                 val ip = HttpServer.getIp(this)
                 val port = PreferenceService.getAsString(PreferenceService.PREF_SERVER_PORT, this) ?: HttpServer.DEFAULT_HTTP_SERVER_PORT
                 val waiting = AlertDialog.Builder(this@ListCredentialsActivity)
@@ -291,7 +297,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             }
 
             val onClickServerAddresses: (View) -> Unit = {
-                if (HttpServer.isRunning()) {
+                if (HttpServer.isRunning() && !HttpServer.isStopping()) {
                     var ip = HttpServer.getIp(this)
                     if (ip == NO_IP_ADDRESS_AVAILABLE) {
                         ip = this.getString(R.string.server_no_wifi)
@@ -375,7 +381,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     popup.setOnMenuItemClickListener { item ->
                         when (item.itemId) {
                             R.id.menu_server_link_add -> {
-                                if (!HttpServer.isRunning()) {
+                                if (!HttpServer.isRunning() && !HttpServer.isStarting()) {
                                     toastText(this, "Please start the server first")
                                 } else if (!HttpServer.isWifiEnabled(this)) {
                                     toastText(this, "Please enable Wifi first")
@@ -399,33 +405,56 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 }
             }
 
+
+
+            if (!Session.isDenied()) {
+                val serverStateToRestore = savedInstanceState?.getString("ServerRunning")
+                if (serverStateToRestore != null) {
+                    val serverState = serverStateToRestore.toBoolean()
+                    if (serverState) {
+                        startStopServer(start = true, silent = true)
+                    }
+                } else if (serverAutostartEnabled) {
+                    startStopServer(start = true)
+                }
+            }
+
+            reflectServerState()
+
             serverViewSwitch.setOnCheckedChangeListener { _, isChecked ->
                 startStopServer(isChecked)
             }
-
-            if (!Session.isDenied() && serverAutostartEnabled) {
-                serverViewSwitch.performClick()
-            }
-            else {
-                reflectServerState()
-            }
-
 
         }
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
         val fab = findViewById<FloatingActionButton>(R.id.fab)
 
+        val quickSearch = PreferenceService.getAsBool(PreferenceService.PREF_QUICK_SEARCH_ON_FAB, this)
+
+        if (quickSearch) {
+            fab.setImageResource(R.drawable.ic_search_white_24dp)
+            updateQuickSearchOnFab(quickSearch)
+        }
+
         listCredentialAdapter = ListCredentialAdapter(this)
         { selected ->
+
             if (HttpCredentialRequestHandler.credentialSelectState == MultipleCredentialSelectState.USER_SELECTING) {
                 fab.setImageResource(R.drawable.baseline_send_to_mobile_24)
+                updateQuickSearchOnFab(false)
             }
             else if (selected.isNotEmpty()) {
                 fab.setImageResource(R.drawable.ic_baseline_delete_24_white)
+                updateQuickSearchOnFab(false)
+            }
+            else if (PreferenceService.getAsBool(PreferenceService.PREF_QUICK_SEARCH_ON_FAB, this)) {
+                fab.setImageResource(R.drawable.ic_search_white_24dp)
+                updateQuickSearchOnFab(true)
             }
             else {
                 fab.setImageResource(R.drawable.ic_add_white_24dp)
+                updateQuickSearchOnFab(false)
             }
         }
         recyclerView.adapter = listCredentialAdapter
@@ -477,7 +506,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 HttpCredentialRequestHandler.credentialSelectState = MultipleCredentialSelectState.USER_COMMITTED
             }
             else if (!selectedCredentials.isNullOrEmpty()) {
-
                 AlertDialog.Builder(this)
                     .setTitle(getString(R.string.title_delete_selected))
                     .setMessage(
@@ -508,26 +536,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     .show()
 
             }
+            else if (quickSearch) {
+                startSearchFor("", commit = false)
+            }
             else {
-                val intent =
-                    Intent(this@ListCredentialsActivity, EditCredentialActivity::class.java)
-
-                val websiteSuggestion = HttpCredentialRequestHandler.getWebsiteSuggestion()
-                if (HttpCredentialRequestHandler.isProgressing() && websiteSuggestion != null) {
-                    val name = websiteSuggestion.first
-                    val domain = websiteSuggestion.second
-                    val user = websiteSuggestion.third
-
-                    intent.action = Constants.ACTION_PREFILLED_FROM_EXTENSION
-                    intent.putExtra("name", name)
-                    intent.putExtra("domain", domain)
-                    intent.putExtra("user", user)
-                }
-                else {
-                    intent.action = this.intent.action
-                }
-                intent.putExtras(this.intent) // forward all extras, especially needed for Autofill
-                startActivityForResult(intent, newOrUpdateCredentialActivityRequestCode)
+                startAddNewCerdentialFlow()
             }
         }
 
@@ -580,40 +593,70 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("ServerRunning", serverViewSwitch.isChecked.toString())
+
+    }
+
+    private fun ListCredentialsActivity.startAddNewCerdentialFlow() {
+        val intent =
+            Intent(this@ListCredentialsActivity, EditCredentialActivity::class.java)
+
+        val websiteSuggestion = HttpCredentialRequestHandler.getWebsiteSuggestion()
+        if (HttpCredentialRequestHandler.isProgressing() && websiteSuggestion != null) {
+            val name = websiteSuggestion.first
+            val domain = websiteSuggestion.second
+            val user = websiteSuggestion.third
+
+            intent.action = Constants.ACTION_PREFILLED_FROM_EXTENSION
+            intent.putExtra("name", name)
+            intent.putExtra("domain", domain)
+            intent.putExtra("user", user)
+        } else {
+            intent.action = this.intent.action
+        }
+        intent.putExtras(this.intent) // forward all extras, especially needed for Autofill
+        startActivityForResult(intent, newOrUpdateCredentialActivityRequestCode)
+    }
+
     private fun startStopServer(start: Boolean, silent: Boolean = false) {
         if (start) {
-            if (!silent) {
-                serverViewStateText = getString(R.string.server_starting)
-                serverViewState.text = serverViewStateText
-                serverViewSwitch.isEnabled = false
+            if (HttpServer.isRunning() && !HttpServer.isStopping()) {
+                reflectServerStarted()
+                return
             }
+            serverViewStateText = getString(R.string.server_starting)
+            serverViewState.text = serverViewStateText
+            serverViewSwitch.isEnabled = false
+            
             startAllServersAsync(this, this).asCompletableFuture()
                 .whenComplete { success, e ->
                     Log.i("HTTP", "async server start success: $success")
 
                     CoroutineScope(Dispatchers.Main).launch {
-                        if (!silent) {
-                            serverViewSwitch.isEnabled = true
-                        }
+                        serverViewSwitch.isEnabled = true
+                        
 
                         if (e != null) {
                             Log.w("HTTP", e)
                         }
 
                         if (success == null || !success) {
-                            if (!silent) {
-                                serverViewSwitch.isChecked = false
-                            }
+                            serverViewSwitch.isChecked = false
                             toastText(
                                 this@ListCredentialsActivity,
                                 getString(R.string.failed_to_start_server)
                             )
                         } else {
+                            reflectServerStarted()
+
                             if (!silent) {
-                                reflectServerStarted()
+                                toastText(
+                                    this@ListCredentialsActivity,
+                                    getString(R.string.server_started)
+                                )
                             }
-                            toastText(this@ListCredentialsActivity,
-                                getString(R.string.server_started))
                             HttpServer.requestCredentialHttpCallback =
                                 this@ListCredentialsActivity
                         }
@@ -621,20 +664,18 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 }
         } else {
             if (HttpServer.isRunning()) { // otherwise it is already stopped
-                if (!silent) {
-                    serverViewStateText = getString(R.string.server_stopping)
-                    serverViewState.text = serverViewStateText
-                    serverViewSwitch.isEnabled = false
-                }
+                serverViewStateText = getString(R.string.server_stopping)
+                serverViewState.text = serverViewStateText
+                serverViewSwitch.isEnabled = false
+                
                 wasWifiLost = false
 
                 shutdownAllAsync().asCompletableFuture().whenComplete { success, e ->
                     Log.i("HTTP", "async stop=$success")
 
                     CoroutineScope(Dispatchers.Main).launch {
-                        if (!silent) {
-                            serverViewSwitch.isEnabled = true
-                        }
+                        serverViewSwitch.isEnabled = true
+                        
 
                         HttpCredentialRequestHandler.reset(this@ListCredentialsActivity)
 
@@ -642,21 +683,23 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                             Log.w("HTTP", e)
                         }
                         if (success == null || !success) {
-                            if (!silent) {
-                                serverViewSwitch.isChecked = true
-                            }
+                            serverViewSwitch.isChecked = true
+                            
                             toastText(this@ListCredentialsActivity,
                                 getString(R.string.failed_to_stop_server))
                         } else {
+                            reflectServerStopped()
+
                             if (!silent) {
-                                reflectServerStopped()
+                                toastText(
+                                    this@ListCredentialsActivity,
+                                    getString(R.string.server_stopped_msg)
+                                )
                             }
-                            toastText(this@ListCredentialsActivity,
-                                getString(R.string.server_stopped_msg))
                         }
                     }
                 }
-            } else if (!silent) {
+            } else {
                 reflectServerStopped()
             }
         }
@@ -720,11 +763,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     override fun getSelectedCredentials(): Set<EncCredential> {
         return listCredentialAdapter?.getSelectedCredentials() ?: emptySet()
     }
-
-    override fun stopCredentialSelectionMode() {
-        listCredentialAdapter?.stopSelectionMode()
-    }
-
 
     private fun reflectServerStarted(msg: String? = null, showIp: Boolean = true) {
         serverViewSwitch.isChecked = true
@@ -820,6 +858,10 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         if (!disclaimerShowed) {
             view.postDelayed({
+                val disclaimerMeanwhileShowed = PreferenceService.getAsBool(PreferenceService.STATE_DISCLAIMER_SHOWED, this)
+                if (disclaimerMeanwhileShowed) {
+                    return@postDelayed
+                }
                 PreferenceService.putBoolean(PreferenceService.STATE_DISCLAIMER_SHOWED, true, this)
 
                 val dialogBuilder = AlertDialog.Builder(this)
@@ -861,9 +903,20 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         inflateActionsMenu(menu, R.menu.menu_main)
         Log.i(LOG_PREFIX + "LST", "onCreateOptionsMenu")
 
-        val searchItem: MenuItem = menu.findItem(R.id.action_search)
+        this.searchItem = menu.findItem(R.id.action_search)
+        this.searchItem?.setOnMenuItemClickListener {
+            startSearchFor("", commit = false)
+            true
+        }
 
-        this.searchItem = searchItem
+        this.addCredentialItem = menu.findItem(R.id.menu_add_credential)
+        this.addCredentialItem?.setOnMenuItemClickListener {
+            startAddNewCerdentialFlow()
+            true
+        }
+
+        updateQuickSearchOnFab(PreferenceService.getAsBool(PreferenceService.PREF_QUICK_SEARCH_ON_FAB, this))
+
         val searchView = MenuItemCompat.getActionView(searchItem) as SearchView
 
         searchView.setOnQueryTextFocusChangeListener { view, focus ->
@@ -909,7 +962,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                searchItem.collapseActionView()
+                searchItem?.collapseActionView()
                 return false
             }
 
@@ -979,6 +1032,17 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         refreshNavigationMenu()
 
         return true
+    }
+
+    private fun updateQuickSearchOnFab(quickSearchEnabled: Boolean) {
+        if (quickSearchEnabled) {
+            searchItem?.setVisible(false)
+            addCredentialItem?.setVisible(true)
+
+        } else {
+            searchItem?.setVisible(true)
+            addCredentialItem?.setVisible(false)
+        }
     }
 
 
@@ -1595,7 +1659,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
                 masterSecretKey?.let { key ->
 
-                    credentialViewModel.clearExpiredCredentials()
+                    credentialViewModel.clearCredentialExpiries()
 
                     credentials.forEach { credential ->
                         LabelService.defaultHolder.updateLabelsForCredential(
@@ -1603,7 +1667,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                             credential
                         )
 
-                        credentialViewModel.updateExpiredCredential(credential, key, this)
+                        credentialViewModel.updateCredentialExpiry(credential, key, this)
                     }
 
                     val expiredCredentialsOnTop = PreferenceService.getAsBool(PREF_EXPIRED_CREDENTIALS_ON_TOP, this)
@@ -1645,7 +1709,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                                             if (expiredCredentialsOnTop && it.isExpired(key)) 1 else 0
                                         },
                                         {
-                                            it.modifyTimestamp
+                                            it.timeData.modifyTimestamp
                                         }
                                     )
                                 ).reversed()
@@ -1750,7 +1814,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         jumpToItemPosition = (credentialsRecycleView?.layoutManager as LinearLayoutManager)
             .findFirstVisibleItemPosition()
         credential.id?.let { id ->
-            credentialViewModel.deleteExpiredCredential(id, this)
+            credentialViewModel.deleteCredentialExpiry(id, this)
         }
         credentialViewModel.delete(credential)
         toastText(this, R.string.credential_deleted)
@@ -1830,9 +1894,14 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             val searchPlate =
                 searchView.findViewById(R.id.search_src_text) as EditText
 
-            searchView.setQuery(searchString, commit)
+            var searchQuery = searchString
+            if (searchString.isEmpty() && PreferenceService.getAsBool(PreferenceService.PREF_EXTENDED_SEARCH_BY_DEFAULT, this)) {
+                searchQuery = "!"
+            }
+            searchView.setQuery(searchQuery, commit)
+
             searchItem.expandActionView()
-            searchPlate.text = SpannableStringBuilder(searchString)
+            searchPlate.text = SpannableStringBuilder(searchQuery)
             searchPlate.selectAll()
             return true
         }

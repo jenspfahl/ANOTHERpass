@@ -1,10 +1,9 @@
 package de.jepfa.yapm.usecase.vault
 
 import android.graphics.drawable.Drawable
-import android.os.Build
-import android.security.keystore.KeyProperties
 import androidx.appcompat.app.AlertDialog
 import de.jepfa.yapm.R
+import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY
 import de.jepfa.yapm.service.PreferenceService.DATA_MPT_CREATED_AT
@@ -14,9 +13,10 @@ import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_DENIED_AT
 import de.jepfa.yapm.service.PreferenceService.STATE_MASTER_PASSWD_TOKEN_COUNTER
 import de.jepfa.yapm.service.PreferenceService.STATE_PREVIOUS_LOGIN_ATTEMPTS
 import de.jepfa.yapm.service.PreferenceService.STATE_PREVIOUS_LOGIN_SUCCEEDED_AT
-import de.jepfa.yapm.service.secret.PbkdfIterationService
+import de.jepfa.yapm.service.secret.MasterKeyService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.service.secret.SecretService.getStoredKdfConfig
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.InputUseCase
 import de.jepfa.yapm.util.*
@@ -50,7 +50,12 @@ object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActi
         sb.addFormattedLine(activity.getString(R.string.vault_id), vaultId)
         sb.addFormattedLine(activity.getString(R.string.vault_version), vaultVersion)
         sb.addFormattedLine(activity.getString(R.string.cipher_name), activity.getString(cipherAlgorithm.uiLabel))
+        sb.addFormattedLine("Key Derivation Function (KDF)", activity.getString(getStoredKdfConfig(activity).kdf.uiLabel))
 
+        if (DebugInfo.isDebug) {
+            sb.addFormattedLine("KDF Config", getStoredKdfConfig(activity))
+            sb.addFormattedLine("Master Key Fingerprint", Session.getMasterKeyHash()?.toShortenedFingerprint())
+        }
         // security level
         var level = activity.getString(R.string.unknown)
         if (SecretService.hasStrongBoxSupport(activity) == true) {
@@ -65,7 +70,6 @@ object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActi
         }
         sb.addFormattedLine(activity.getString(R.string.device_key_storage), level)
 
-        sb.addFormattedLine(activity.getString(R.string.login_iterations), PbkdfIterationService.getStoredPbkdfIterations().toReadableFormat())
         sb.addNewLine()
         sb.addFormattedLine(activity.getString(R.string.credential_count), input.credentialCount)
         sb.addFormattedLine(activity.getString(R.string.label_count), input.labelCount)

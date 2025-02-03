@@ -17,10 +17,18 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.util.Constants.INITIAL_VAULT_VERSION
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import java.io.*
+import java.util.Collections
+import java.util.Date
+import java.util.LinkedList
+import java.util.concurrent.ConcurrentHashMap
 
 object DebugInfo {
 
+    private var betaDisclaimerShown = false
     private var debug = BuildConfig.DEBUG
+
+    private var exceptionLogger = Collections.synchronizedList(LinkedList<String>())
+    private var serverLogger = Collections.synchronizedList(LinkedList<String>())
 
     val isDebug: Boolean
         get() = debug
@@ -28,6 +36,25 @@ object DebugInfo {
     @Synchronized
     fun toggleDebug() {
         debug = !debug
+    }
+
+    fun logException(prefix: String, msg: String, e: Exception? = null) {
+        val dateTime = Date().toSimpleDateTimeFormat()
+
+        val value = if (e != null) {
+            "$dateTime : $LOG_PREFIX$prefix $msg ${e.javaClass.simpleName} ${e.message} ${e.stackTraceToString()}"
+        }
+        else {
+            "$dateTime : $LOG_PREFIX$prefix $msg"
+        }
+        exceptionLogger.add(value)
+
+        Log.e(prefix, msg, e)
+    }
+
+    fun logServer(msg: String) {
+        serverLogger.add(msg)
+        Log.i(SERVER_LOG_PREFIX, msg)
     }
 
     fun getVersionName(context: Context): String {
@@ -58,7 +85,12 @@ object DebugInfo {
 
         val sb = StringBuilder()
         sb.append("\n************ APP INFORMATION ***********\n")
-        sb.addFormattedLine("Version", getVersionName(context))
+        if (isBeta(context)) {
+            sb.addFormattedLine("Version", "BETA-" + getVersionName(context))
+        }
+        else {
+            sb.addFormattedLine("Version", getVersionName(context))
+        }
         sb.addFormattedLine("Version Code", getVersionCode(context))
         sb.addFormattedLine("Database Version", YapmDatabase.getVersion())
         sb.addFormattedLine("Vault Id (anonymized)", anonymizedVaultId)
@@ -83,7 +115,7 @@ object DebugInfo {
         sb.addFormattedLine("Model", Build.MODEL)
         sb.addFormattedLine("Product", Build.PRODUCT)
         sb.addFormattedLine("Hardware", Build.HARDWARE)
-        sb.addFormattedLine("OS Build Id", Build.ID)
+        //sb.addFormattedLine("OS Build Id", Build.ID)
         sb.addFormattedLine("NFC available", NfcService.isNfcAvailable(context))
         sb.addFormattedLine("NFC enabled", NfcService.isNfcEnabled(context))
         sb.addFormattedLine("Has StrongBox support", SecretService.hasStrongBoxSupport(context) ?: "-")
@@ -105,12 +137,21 @@ object DebugInfo {
         sb.append("\n************ FIRMWARE ************\n")
         sb.addFormattedLine("SDK", Build.VERSION.SDK_INT)
         sb.addFormattedLine("Release", Build.VERSION.RELEASE)
-        sb.addFormattedLine("Incremental", Build.VERSION.INCREMENTAL)
-        sb.addFormattedLine("Codename", Build.VERSION.CODENAME)
-        sb.addFormattedLine("Security patch", Build.VERSION.SECURITY_PATCH)
 
-        sb.append("\n************ APP-ERROR-LOG ************\n")
-        val logs = getLogcat(LOG_PREFIX, command = "-v time *:E", null)?.takeLast(1024)
+        if (isDebug) {
+            sb.addFormattedLine("Incremental", Build.VERSION.INCREMENTAL)
+            sb.addFormattedLine("Codename", Build.VERSION.CODENAME)
+            sb.addFormattedLine("Security patch", Build.VERSION.SECURITY_PATCH)
+        }
+
+        sb.append("\n************ APP-EXCEPTION-LOG ************\n")
+        exceptionLogger.forEach {
+            sb.append(it)
+            sb.append(System.lineSeparator())
+        }
+
+        sb.append("\n************ APP-LOGCAT/E-LOG ************\n")
+        val logs = getLogcat("", command = "-b all *:E", null)?.takeLast(4096 * 2)
         sb.append(logs)
 
         return sb.toString()
@@ -121,12 +162,25 @@ object DebugInfo {
     }
 
     fun getServerLog(context: Context): String {
+        val sb = StringBuilder()
+        serverLogger.forEach {
+            sb.append(it)
+            sb.append(System.lineSeparator())
+        }
+        if (sb.isBlank()) {
+            return "no logs available"
+        }
+        else {
+            return sb.toString()
+        }
+
+        /*
         var logs = getLogcat(
             SERVER_LOG_PREFIX,
             command = "-v tag *:I",
             cutoutPrefix = "I/$SERVER_LOG_PREFIX: "
         )
-        return logs ?:"no logs available"
+        return logs ?:"no logs available"*/
     }
 
     private fun getLogcat(filter: String, command: String = "-v time *:I", cutoutPrefix: String? = null): String? {
@@ -148,8 +202,8 @@ object DebugInfo {
                     }
                 }
             }
-        } catch (e: IOException) {
-            Log.e(LOG_PREFIX + "Debug","cannot gather logs", e)
+        } catch (e: Exception) {
+            logException("Debug","cannot gather logs", e)
         }
         return null
     }
@@ -157,8 +211,21 @@ object DebugInfo {
     fun clearLogs() {
         try {
             Runtime.getRuntime().exec("logcat -b all -c") // clear logs
-        } catch (e: IOException) {
-            Log.e(LOG_PREFIX + "Debug","cannot clear logs", e)
+        } catch (e: Exception) {
+            logException("Debug","cannot clear logs", e)
         }
+    }
+
+    fun isBeta(context: Context): Boolean {
+        val versionName = getVersionName(context)
+        return versionName.startsWith("rc") || versionName.endsWith("rc")
+    }
+
+    fun isBetaDisclaimerShown(): Boolean {
+        return betaDisclaimerShown
+    }
+
+    fun setBetaDisclaimerShown() {
+        betaDisclaimerShown = true
     }
 }

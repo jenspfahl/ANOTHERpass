@@ -8,6 +8,8 @@ import androidx.test.core.app.launchActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import de.jepfa.yapm.model.encrypted.CipherAlgorithm
+import de.jepfa.yapm.model.kdf.KdfConfig
+import de.jepfa.yapm.model.kdf.KeyDerivationFunction
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.ui.BaseActivity
@@ -49,7 +51,7 @@ class BruteForceTest {
 
             val input = CreateVaultUseCase.Input(
                 LoginData(pin, masterPassword),
-                1,//PbkdfIterationService.DEFAULT_PBKDF_ITERATIONS,
+                KdfConfig(KeyDerivationFunction.BUILT_IN_PBKDF, KdfParameterService.DEFAULT_PBKDF_ITERATIONS, null),
                 cipherAlgorithm
             )
             runBlocking(Dispatchers.Main) {

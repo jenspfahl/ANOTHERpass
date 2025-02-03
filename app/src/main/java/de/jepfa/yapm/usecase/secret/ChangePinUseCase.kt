@@ -1,6 +1,5 @@
 package de.jepfa.yapm.usecase.secret
 
-import android.util.Log
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.service.PreferenceService
@@ -8,7 +7,7 @@ import de.jepfa.yapm.service.secret.*
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.InputUseCase
 import de.jepfa.yapm.usecase.session.LoginUseCase
-import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 
 object ChangePinUseCase: InputUseCase<ChangePinUseCase.Input, SecureActivity>() {
 
@@ -21,12 +20,12 @@ object ChangePinUseCase: InputUseCase<ChangePinUseCase.Input, SecureActivity>() 
         val salt = SaltService.getSalt(activity)
         val masterPassword = MasterPasswordService.getMasterPasswordFromSession(activity)
         if (masterPassword == null) {
-            Log.e(LOG_PREFIX + TAG, "master password not at Session")
+            DebugInfo.logException(TAG, "master password not at Session")
             return false
         }
 
         val cipherAlgorithm = SecretService.getCipherAlgorithm(activity)
-        val oldMasterPassphraseSK = MasterKeyService.getMasterPassPhraseSK(
+        val oldMasterPassphraseSK = MasterKeyService.getMasterPassPhraseSecretKey(
             input.currentPin,
             masterPassword,
             salt,
@@ -37,24 +36,24 @@ object ChangePinUseCase: InputUseCase<ChangePinUseCase.Input, SecureActivity>() 
         val encEncryptedMasterKey =
             PreferenceService.getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, activity)
         if (encEncryptedMasterKey == null) {
-            Log.e(LOG_PREFIX + TAG, "master key not on device")
+            DebugInfo.logException(TAG, "master key not on device")
             return false
         }
 
-        val masterKey = MasterKeyService.getMasterKey(oldMasterPassphraseSK, encEncryptedMasterKey, activity)
+        val masterKey = MasterKeyService.decryptMasterKey(oldMasterPassphraseSK, encEncryptedMasterKey, activity)
         if (masterKey == null) {
-            Log.e(LOG_PREFIX + TAG, "cannot decrypt master key, pin wrong?")
+            DebugInfo.logException(TAG, "cannot decrypt master key, pin wrong?")
             return false
         }
 
-        val pbkdfIterations = PbkdfIterationService.getStoredPbkdfIterations()
+        val kdfConfig = SecretService.getStoredKdfConfig(activity)
 
         MasterKeyService.encryptAndStoreMasterKey(
             masterKey,
             input.newPin,
             masterPassword,
             salt,
-            pbkdfIterations,
+            kdfConfig,
             cipherAlgorithm,
             activity
         )

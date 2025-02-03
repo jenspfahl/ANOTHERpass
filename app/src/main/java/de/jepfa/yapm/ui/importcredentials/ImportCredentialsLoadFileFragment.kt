@@ -7,18 +7,25 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.MimeTypeMap
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.setPadding
 import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
+import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.io.CsvService
+import de.jepfa.yapm.service.io.KdbxService
+import de.jepfa.yapm.service.label.LabelService
+import de.jepfa.yapm.ui.AsyncWithProgressBar
 import de.jepfa.yapm.ui.BaseFragment
+import de.jepfa.yapm.ui.credential.KeepassPasswordDialog
 import de.jepfa.yapm.util.FileUtil
 import de.jepfa.yapm.util.FileUtil.getFileName
 import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.toastText
+import io.ktor.util.toUpperCasePreservingASCIIRules
 
 class ImportCredentialsLoadFileFragment : BaseFragment() {
 
@@ -211,21 +218,78 @@ class ImportCredentialsLoadFileFragment : BaseFragment() {
                 if (selectedFile != null && FileUtil.isExternalStorageReadable()) {
                     importCredentialsActivity.fileName = getFileName(importCredentialsActivity, selectedFile)
 
-                    val content = FileUtil.readFile(importCredentialsActivity, selectedFile)
-                    if (content == null) {
-                        toastText(importCredentialsActivity, R.string.cannot_read_file)
-                        return
-                    }
-                    val csv = CsvService.parseCsv(content)
-                    if (csv == null || csv.isEmpty()) {
-                        toastText(importCredentialsActivity, R.string.empty_csv_credentials)
-                        return
+                    //detect whether CSV or KDBX is selected
+                    val fileExtension = MimeTypeMap.getFileExtensionFromUrl(selectedFile.toString())
+
+                    if (fileExtension.toUpperCasePreservingASCIIRules() == "KDBX") {//TODO by filetype would be better
+
+                        setColumnsLink.visibility = View.INVISIBLE
+                        val inputStream = FileUtil.openInputStreamFromFile(importCredentialsActivity, selectedFile)
+                        if (inputStream == null) {
+                            toastText(importCredentialsActivity, R.string.cannot_read_file)
+                            return
+                        }
+
+                        LabelService.externalHolder.copyFrom(LabelService.defaultHolder)
+
+
+                        KeepassPasswordDialog.openAskForUnlockPasswordDialog(
+                            importCredentialsActivity
+                        )
+                        {
+                            password ->
+
+                            if (password != null) {
+
+
+                                AsyncWithProgressBar(importCredentialsActivity,
+                                    {
+                                        val records = KdbxService.readKdbxContent(
+                                            password,
+                                            inputStream
+                                        )
+                                        password.clear()
+
+                                        if (records == null) {
+                                            false
+                                        }
+                                        else {
+                                            importCredentialsActivity.records = records
+                                            true
+                                        }
+                                    },
+                                    { success ->
+                                        if (success) {
+                                            findNavController().navigate(R.id.action_importCredentials_LoadFileFragment_to_ImportFileFragment)
+                                        }
+                                        else {
+                                            toastText(importCredentialsActivity, R.string.keepass_password_wrong)
+                                        }
+                                    })
+
+                            }
+                        }
                     }
                     else {
-                        importCredentialsActivity.csvContent = csv
-                        importCredentialsActivity.content = content
 
-                        processCsvContentAndMoveForward(importCredentialsActivity)
+                        setColumnsLink.visibility = View.VISIBLE
+
+                        val content = FileUtil.readFile(importCredentialsActivity, selectedFile)
+                        if (content == null) {
+                            toastText(importCredentialsActivity, R.string.cannot_read_file)
+                            return
+                        }
+
+                        val csv = CsvService.parseCsv(content)
+                        if (csv.isNullOrEmpty()) {
+                            toastText(importCredentialsActivity, R.string.empty_csv_credentials)
+                            return
+                        } else {
+                            importCredentialsActivity.csvContent = csv
+                            importCredentialsActivity.content = content
+
+                            processCsvContentAndMoveForward(importCredentialsActivity)
+                        }
                     }
                 }
             }

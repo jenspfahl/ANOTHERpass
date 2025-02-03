@@ -27,7 +27,7 @@ object ImportCredentialUseCase: InputUseCase<ImportCredentialUseCase.Input, Secu
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
 
-                            existingCredential.backupForRestore()
+                            existingCredential.passwordData.backupForRestore()
                             existingCredential.copyData(input.credential)
 
                             saveAndNavigateBack(isNew = false, activity, existingCredential, input.successHandler)
@@ -72,7 +72,7 @@ object ImportCredentialUseCase: InputUseCase<ImportCredentialUseCase.Input, Secu
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
 
-                            existingCredential.backupForRestore()
+                            existingCredential.passwordData.backupForRestore()
                             existingCredential.copyData(input.credential)
 
                             saveAndNavigateBack(
@@ -105,7 +105,7 @@ object ImportCredentialUseCase: InputUseCase<ImportCredentialUseCase.Input, Secu
         else activity.credentialViewModel.update(credential, activity)
 
         activity.masterSecretKey?.let { key ->
-            activity.credentialViewModel.updateExpiredCredential(credential, key, activity, considerExpiredForThePast = true)
+            activity.credentialViewModel.updateCredentialExpiry(credential, key, activity, considerExpiredForThePast = true)
             val name = SecretService.decryptCommonString(key, credential.name)
             val enrichedName = enrichId(activity, name, credential.id)
             toastText(activity, activity.getString(R.string.credential_imported, enrichedName))

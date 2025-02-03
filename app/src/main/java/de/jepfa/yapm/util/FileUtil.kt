@@ -31,11 +31,28 @@ object FileUtil {
         return Environment.MEDIA_MOUNTED == state || Environment.MEDIA_MOUNTED_READ_ONLY == state
     }
 
+    fun openInputStreamFromFile(context: Context, uri: Uri): InputStream? {
+
+        val size = getFileSize(context, uri)?:0
+        if (size > MAX_FILE_SIZE_MB) {
+            DebugInfo.logException("READFILE", "File too big for $uri")
+            return null
+        }
+
+        try {
+            return context.contentResolver.openInputStream(uri)
+        } catch (e: Exception) {
+            DebugInfo.logException("READFILE", "Cannot read $uri", e)
+            return null
+        }
+
+    }
+
     fun readFile(context: Context, uri: Uri): String? {
 
         val size = getFileSize(context, uri)?:0
         if (size > MAX_FILE_SIZE_MB) {
-            Log.e(LOG_PREFIX + "READFILE", "File too big for $uri")
+            DebugInfo.logException("READFILE", "File too big for $uri")
             return null
         }
 
@@ -58,8 +75,8 @@ object FileUtil {
                     }
                 }
             }
-        } catch (e: IOException) {
-            Log.e(LOG_PREFIX + "READFILE", "Cannot read $uri", e)
+        } catch (e: Exception) {
+            DebugInfo.logException("READFILE", "Cannot read $uri", e)
             return null
         }
 
@@ -102,8 +119,8 @@ object FileUtil {
 
                 return buffer.toByteArray()
             }
-        } catch (e: IOException) {
-            Log.e(LOG_PREFIX + "READFILE", "Cannot read $uri", e)
+        } catch (e: Exception) {
+            DebugInfo.logException("READFILE", "Cannot read $uri", e)
             return null
         }
 
@@ -118,8 +135,22 @@ object FileUtil {
                     BufferedWriter(osw).use { bw -> bw.write(content) }
                 }
             }
-        } catch (e: IOException) {
-            Log.e(LOG_PREFIX + "READFILE", "Cannot read $uri", e)
+        } catch (e: Exception) {
+            DebugInfo.logException("READFILE", "Cannot read $uri", e)
+            return false
+        }
+
+        return true
+    }
+
+    fun writeFile(context: Context, uri: Uri, byteStream: ByteArrayOutputStream): Boolean {
+
+        try {
+            context.contentResolver.openOutputStream(uri)?.use { os ->
+                byteStream.writeTo(os)
+            }
+        } catch (e: Exception) {
+            DebugInfo.logException("READFILE", "Cannot read $uri", e)
             return false
         }
 

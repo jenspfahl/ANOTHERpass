@@ -77,6 +77,7 @@
     <string name="pin_too_short">Die PIN ist zu kurz (minimum 6 Zeichen)</string>
     <string name="pin_not_equal">Wiederholung der PIN nicht gleich</string>
     <string name="password_not_equal">Wiederholung des Passworts nicht gleich</string>
+    <string name="password_too_short">Password ist zu kurz (minimum 6 Zeichen)</string>
     <string name="pin_wrong">Falsche PIN</string>
     <string name="button_create_vault">Tresor erstellen</string>
     <string name="create_vault_explanation_3">Hier siehst du nochmal dein Masterpasswort. Exportiere es als QR-Code oder auf ein NFC-Tag, indem du auf das entsprechende Symbol klickst. Wenn du es als QR-Code exportierst, kannst du es entweder als Bild sichern oder du scannst oder fotografierst den QR-Code direkt vom Gerät ab. Verwahre es an einem sicheren Ort! Du wirst es zusammen mit deiner PIN brauchen, um dich einzuloggen. \nFür einen einfacheren und schnelleren Login kannst du das Masterpasswort auch in der App speichern (geschützt mit einem biometrischem Merkmal wenn unterstützt).</string>
@@ -84,7 +85,7 @@
     <string name="create_vault_summarize_fragment_label">Tresor erstellen 3/3</string>
     <string name="login_explanation_1">Bitte PIN zum Einloggen eingeben</string>
     <string name="login_explanation_2">Scanne dein exportiertes Masterpasswort (EMP) oder Masterpasswort-Token (MPT), indem du auf das QR-Code oder NFC-Symbol klickst. Wenn du es notiert hast, gib es direkt ein.</string>
-    <string name="enter_or_scan_masterpassword">Scanne oder gebe dein Masterpasswort ein</string>
+    <string name="enter_or_scan_masterpassword">Scanne oder gib dein Masterpasswort ein</string>
     <string name="button_login">Login</string>
     <string name="password_required">Passwort erforderlich</string>
     <string name="delete_stored_masterpasswd">Entferne Masterpasswort</string>
@@ -119,10 +120,11 @@
     <string name="include_preferences">Inklusive App-Einstellungen</string>
 
     <string name="export_plain_credentials">Entnehme Zugangsdaten</string>
-    <string name="export_plain_credentials_explanation">Hier kannst du alle Zugangsdaten unverschlüsselt(!!!) als CSV-Datei entnehmen um diese z.B. in anderen Passworttools zu verwenden. Dies ist keine Backupfunktion, verwende \'Exportiere Tresor\' dafür! Beachte: Verschleierte Passwörter werden mit diesem Export nicht automatisch entschleiert! Du musst sie erst entschleiert abspeichern wenn du sie entschleiert exportieren möchtest.</string>
+    <string name="export_plain_credentials_explanation">Hier kannst du alle Zugangsdaten als CSV-Datei (unverschlüsselt!!!) oder Keepass-Datei entnehmen um diese z.B. in anderen Passworttools zu verwenden. Dies ist keine Backupfunktion, verwende \'Exportiere Tresor\' dafür! Beachte: Verschleierte Passwörter werden mit diesem Export nicht automatisch entschleiert! Du musst sie erst entschleiert abspeichern wenn du sie entschleiert exportieren möchtest.</string>
     <string name="button_share_plain_credentials">CSV-Datei teilen</string>
     <string name="button_export_plain_credentials">CSV-Datei speichern</string>
-
+    <string name="button_share_credentials">KDBX-Datei teilen</string>
+    <string name="button_export_credentials">KDBX-Datei speichern</string>
     <string name="too_may_wrong_logins">Zu viele Loginversuche, Masterpasswort wird nun benötigt</string>
     <string name="too_may_wrong_logins_self_destruction">Zu viele Loginversuche, Tresordaten werden nun gelöscht!</string>
 
@@ -133,13 +135,13 @@
     <string name="button_load_vault">Tresor-Datei laden</string>
     <string name="button_import_vault">Tresor importieren</string>
 
-    <string name="import_credentials_load_file_explanation">Wähle eine Datei mit unverschlüsselten Zugangsdaten aus. Zur Zeit werden nur CSV-Dateien unterstützt. Erkannt werden z.B. Zugangsdaten exportiert aus Browsern wie Firefox oder Chrome oder aus Keepass-Varianten.</string>
+    <string name="import_credentials_load_file_explanation">Wähle eine Datei mit Zugangsdaten aus. Zur Zeit werden nur CSV- und KDBX-Dateien unterstützt. Erkannt werden z.B. unverschlüsselte Zugangsdaten exportiert aus Browsern wie Firefox oder Chrome oder Tresor-Dateien von Keepass-Varianten (*.kdbx, ab Version 3).</string>
     <string name="import_credentials_load_file_fragment_label" tools:ignore="TypographyFractions">Zugangsdaten importieren 1/2</string>
     <string name="import_credentials_import_file_fragment_label">Zugangsdaten importieren 2/2</string>
     <string name="button_load_credentials_file">Zugangsdatendatei laden</string>
     <string name="button_import_credentials">Zugangsdaten importieren</string>
 
-    <string name="scan_mk">Scanne deinen Masterkey</string>
+    <string name="scan_mk">Scanne deinen verschlüsselten Masterkey</string>
     <string name="drop_vault">Tresor vernichten (alles löschen)</string>
     <string name="chooser_select_file_to_import">Wähle eine Datei zum Importieren aus</string>
     <string name="toast_import_vault_failure">Die ausgewählte Datei kann nicht importiert werden.</string>
@@ -166,7 +168,7 @@
     <string name="change_encryption">Ändere Verschlüsselung</string>
     <string name="title_change_encryption">Ändere Tresorverschlüsselung</string>
     <string name="message_change_encryption">Nach der Änderung der Verschlüsselung und/oder des Masterkeys können alle bisher exportierten Tresor-Dateien nicht mehr gelesen werden. Es wird außerdem empfohlen, ein aktuelles Backup des Tresors und des verschlüsselten Masterkeys für den Notfall zu haben.</string>
-    <string name="message_change_iterations">Nach der Änderung der Login-Iterationen ändert sich der verschlüsselte Masterkey (EMK), d.h. du solltest ihn erneut exportieren.</string>
+    <string name="message_change_iterations">Nach der Änderung der Login-Verschlüsselungsparameter ändert sich der verschlüsselte Masterkey (EMK), d.h. du solltest ihn erneut exportieren.</string>
     <string name="change_master_password_explanation">Ändere dein Masterpasswort, indem du die aktuelle PIN eingibst und ein neues Masterpasswort generierst. Beachte, dass sich der verschlüsselte Masterkey ändert, so dass du ihn erneut exportieren solltest. Das betrifft auch Tresor-Dateien mit verschlüsselten Masterkey.</string>
     <string name="change_encryption_explanation">Ändere den Verschlüsselungsalgorithmus des Tresors, wenn du den Tresor von einem alten Gerät migriert hast und dein neues Gerät zusätzliche Algorithmen unterstützt. Beachte, dass sich der verschlüsselte Masterkey ändert, so dass du ihn erneut exportieren solltest. Das betrifft auch Tresor-Dateien und exportierte Zugangsdaten (ECRs), welche dann nicht mehr gelesen werden können.</string>
     <string name="vault">Tresor</string>
@@ -252,7 +254,7 @@
     <string name="credential_sort_by">Sortiere Zugangsdaten nach</string>
     <string name="credential_sort_by_name_asc">Name (A..Z)</string>
     <string name="credential_sort_by_name_desc">Name (Z..A)</string>
-    <string name="credential_sort_by_recently_modified">Kürzlich geändert (neuste zuerst)</string>
+    <string name="credential_sort_by_recently_modified">Kürzlich geändert (neuste zuerst)</string>A
     <string name="credential_sort_by_id">Zugangsdaten-ID</string>
     <string name="show_ids">Zeige Zugangsdaten-IDs</string>
     <string name="expired_credentials_on_top">Abgelaufene Zugangsdaten ganz oben</string>
@@ -280,6 +282,7 @@
     <string name="paste_credential_for_autofill">Zugangsdaten für \'%1$s\'</string>
     <string name="backup_file_saved">Tresor-Datei gespeichert</string>
     <string name="csv_file_saved">CSV-Datei gespeichert</string>
+    <string name="kdbx_file_saved">KDBX-Datei gespeichert</string>
     <string name="backup_failed">Fehler beim Erzeugen der Tresor-Datei</string>
     <string name="backup_permission_missing">Berechtigung zum Schreiben des Externen Speichers fehlt</string>
     <string name="qr_code_saved">QR-Code als Bild gespeichert</string>
@@ -311,6 +314,7 @@
     <string name="export_plain_passwd">Exportiere Zugangsdaten-Passwort</string>
     <string name="export_enc_credential_record">Exportiere Zugangsdaten verschlüsselt</string>
     <string name="export_plain_credential_record">Exportiere Zugangsdaten zum Teilen</string>
+    <string name="export_otp_config">Exportiere Einmalpassword-Konfiguration</string>
     <string name="head_export_plain_passwd">Das Zugangsdaten-Passwort von \'%1$s\'</string>
     <string name="sub_export_plain_passwd">Bewahre diesen QR-Code sicher auf, da es ein echtes Passwort enthält!</string>
     <string name="head_export_enc_credential_record">Verschlüsselte Zugangsdaten für \'%1$s\'</string>
@@ -547,6 +551,13 @@
     <string name="whats_new_in_2_0_enable_server">Ja, ich möchte es mal ausprobieren!</string>
     <string name="whats_new_in_2_0_disabled_server">OK, der Zugangsdaten-Server wurde komplett deaktiviert. Du kannst ihn jederzeit wieder über die Einstellungen aktivieren.</string>
 
+    <string name="whats_new_in_2_1">Was ist neu in Version 2.1</string>
+    <string name="whats_new_in_2_1_bullet_1_head">Unterstützung für Einmalpasswörter</string>
+    <string name="whats_new_in_2_1_bullet_1_text">Jetzt kannst du für alle Zugangsdaten ein zähler- oder zeitbasiertes Einmalpasswort importieren und konfigurieren. Ähnlich wie andere Authentifizierungs-Apps zeigt ANOTHERpass das aktuelle Einmalpasswort zusammen mit dem Anmeldepasswort an. Du kannst die Konfiguration auch ganz einfach exportieren.</string>
+    <string name="whats_new_in_2_1_bullet_2_head">Einloggen mit Argon2</string>
+    <string name="whats_new_in_2_1_bullet_2_text">Eine neue Art der Login-Verschlüsselung namens Argon2 kann jetzt verwendet werden, um das Knacken deiner PIN und deines Master-Passworts noch schwieriger zu machen. Argon2 ist eine moderne sogenannte Key-Derivation-Function (KDF) und erlaubt eine schnellere und sichere Entsperrung des Tresors.</string>
+    <string name="whats_new_in_2_1_bullet_3_head">Import und Export von und als Keepass-Dateien</string>
+    <string name="whats_new_in_2_1_bullet_3_text">Jetzt können deine Zugangsdaten in jedem Keepass-Fork verwendet werden! Exportiere alle Zugangsdaten in eine Keepass-Tresordatei (KDBX, Version 4). Oder importiere einfach eine beliebige Keepass-Datei in den aktuellen ANOTHERpass-Tresor (ab KDBX-Version 3).</string>
     <string name="intro">Starte Intro</string>
     <string name="intro_1_head">Ein etwas anderer Passwortmanager</string>
     <string name="intro_1_subtext">ANOTHERpass bietet eine etwas andere Herangehensweise. Lies hier was das heißt:</string>
@@ -624,8 +635,10 @@
     <string name="yes_continue">Ja, fortfahren</string>
     <string name="yes_protect_it">Ja, absichern</string>
     <string name="no_thanks">Nein danke</string>
-    <string name="enter_codeword">Gebe ein Codeword ein</string>
+    <string name="enter_codeword">Gib ein Codeword ein</string>
     <string name="repeat_codeword">Wiederhole das Codeword</string>
+    <string name="enter_password">Gib ein Passwort ein</string>
+    <string name="repeat_password">Wiederhole das Passwort</string>
     <string name="unlock_masterpassword">Entsperre Masterpasswort</string>
     <string name="message_unlock_masterpassword">Das exportierte Masterpasswort (EMP) ist mit einem Codeword geschützt. Gebe es ein um es zu entsperren.</string>
     <string name="small">Klein</string>
@@ -723,7 +736,7 @@
     <string name="credentials_in_file">%1$d Zugangsdaten in Datei gefunden</string>
     <string name="cannot_read_file">Datei kann nicht gelesen werden</string>
     <string name="cannot_parse_csv_credentials">Zugangsdaten konnten nicht gelesen werden</string>
-    <string name="empty_csv_credentials">Diese CSV-Datei sheint leer zu sein oder ist keine CSV-Datei</string>
+    <string name="empty_csv_credentials">Diese CSV-Datei scheint leer zu sein oder ist keine CSV-Datei</string>
     <string name="go_back_to_app">Zurück zur App</string>
     <string name="no_autofill_for_app">Kein Ausfüllen für \'%1$s\'</string>
     <string name="no_autofill_for_current_app">Kein Ausfüllen für diese App</string>
@@ -780,6 +793,8 @@
     <string name="command_expires">Filtere Zugangsdaten die ablaufen können</string>
     <string name="command_latest">Zeige zuletzt bearbeitete Zugangsdaten</string>
     <string name="command_veiled">Filtere verschleierte Zugangsdaten</string>
+    <string name="command_otp">Filtere Zugangsdaten mit Einmalpasswörtern</string>
+
 
     <string name="with_email_alias">Deklariere den Benutzernamen als Emailadresse mit einem generischen Alias-Teil</string>
     <string name="title_username_email_alias">Was ist ein Email-Alias?</string>
@@ -790,7 +805,7 @@
     <string name="username_template_type_desc_both">Beides vorschlagen</string>
     <string name="open_vault">Tresor öffnen</string>
 
-    <string name="define_columns_of_csv_file">Datei kann nicht geladen werden oder einige Felder fehlen? Gib die Spaltennamen der CSV-Datei manuell ein.</string>
+    <string name="define_columns_of_csv_file">CSV-Datei kann nicht geladen werden oder einige Felder fehlen? Gib die Spaltennamen der CSV-Datei manuell ein.</string>
     <string name="define_columns_of_given_csv_file">Datei \'%1$s\' kann nicht geladen werden oder einige Felder fehlen? Gib die Spaltennamen der CSV-Datei manuell ein.</string>
     <string name="not_a_csv_column">Nur Buchstaben, Ziffern, Binde- und Unterstrich erlaubt</string>
     <string name="csv_column_title">CSV-Spaltennamen</string>
@@ -920,4 +935,62 @@
     <string name="device_key_storage_strong_box">Sicherheitschip (SE/StrongBox)</string>
     <string name="device_key_storage_tee">Geschützte Umgebung (TEE)</string>
     <string name="device_key_storage_software">Android OS / Software-basiert</string>
+
+    <string name="choose_takeout_file_format">Wähle das gewünschte Dateiformat:</string>
+    <string name="takeout_file_format_csv">CSV - entschlüsselt!!!</string>
+    <string name="takeout_file_format_kdbx">Keepass/KDBX - verschlüsselt</string>
+    <string name="title_takeout_kdbx_master_password">Bitte ein Masterpasswort setzen</string>
+    <string name="message_takeout_kdbx_master_password">Ein Keepass-Tresor benötigt ein Masterpasswort, welches benötigt wird, um die KDBX-Datei zu öffnen.</string>
+    <string name="keepass_password_wrong">Das eingegebene Passwort ist falsch oder die KDBX-Datei is fehlerhaft!</string>
+    <string name="title_enter_kdbx_master_password">Keepass-Datei öffnen</string>
+    <string name="message_enter_kdbx_master_password">Bitte das Passwort eingeben, um die Keepass-Datei öffnen zu können.</string>
+
+    <string name="pref_title_show_extended_search_commands">Suchbefehle beim Start der Suche vorschlagen</string>
+    <string name="pref_summary_show_extended_search_commands">Alle Suchbefehle vorschlagen, auch wenn Sie nicht mit \'!\' zu tippen beginnen.</string>
+    <string name="pref_title_flip_search_and_add_button">Such-Button mit Action-Button vertauschen</string>
+    <string name="pref_summary_flip_search_and_add_button">Der Action-Button, ursprünglich zum Erstellen neuer Zugangsdaten verwendet, wird durch den Such-Button ersetzt. Aktiviere diese Option, wenn du häufiger nach Zugangsdaten suchst, als neue zu erstellen.</string>
+
+
+    <string name="KDF_PBKDF">PBKDF2 (Built-In)</string>
+    <string name="KDF_ARGON2_ID">Argon2Id</string>
+    <string name="KDF_ARGON2_I">Argon2i</string>
+    <string name="KDF_ARGON2_D">Argon2d</string>
+
+    <string name="KDF_PBKDF_desc">PBKDF2 bietet Standardschutz gegen Brute-Force-Angriffe. Es sollten mindestens 200.000 Iterationen konfiguriert werden. Es wird jedoch empfohlen, eine Argon2-Funktion zu verwenden. Verwende diese Funktion, wenn du mit den anderen Probleme hast.</string>
+    <string name="KDF_ARGON2_ID_desc">Argon2Id bietet den besten Schutz gegen Brute-Force- und Side-Channel-Angriffe und wird daher empfohlen.</string>
+    <string name="KDF_ARGON2_I_desc">Wähle Argon2i, wenn Side-Channel-Angriffe die Hauptbedrohung darstellen.</string>
+    <string name="KDF_ARGON2_D_desc">Wähle Argon2d, wenn maximale Sicherheit auf Kosten des Side-Channel-Risikos erforderlich ist.</string>
+    <string name="login_kdf_chooser">Wähle die Art der Login-Verschlüsselung (Key Derivation Function genannt). Damit wird es noch schwieriger, die PIN und das Master-Passwort mit hohen Rechenressourcen zu knacken (z. B. durch Regierungen). Sie kann auch später geändert werden. Im Zweifel belasse die Voreinstellung.</string>
+    <string name="login_argon2_memcost_desc">Wähle die Größe der Speicherzuweisung der Login-Verschlüsselung aus. Je größer, desto besser.</string>
+    <string name="login_argon2_memcost_unit">Speicherzuweisung in MiB</string>
+    <string name="login_argon2_current_memcost">%1$s MiB Speicherzuweisung</string>
+
+    <string name="configure_one_time_password">Konfiguriere Einmalpasswort</string>
+    <string name="hotp_name">Zählerbasiert (HOTP)</string>
+    <string name="totp_name">Zeitbasiert (TOTP)</string>
+    <string name="otp_scan_qr_code">Scanne den vom Aussteller bereitgestellten QR-Code, um eine Einmalpasswort-Konfiguration zu importieren.</string>
+    <string name="otp_edit_otp_config">Hier kannst du die Details der aktuellen Einmalpasswort-Konfiguration bearbeiten oder ändern. Ändere sie nur, wenn du weißt, was du da tust!</string>
+    <string name="otp_shared_secret_in_base32">Das gemeinsame Geheimnis im Base32-Format:</string>
+    <string name="otp_counter_or_period">Zähler oder Zeitintervall:</string>
+    <string name="otp_count_of_digits">Anzahl der Ziffern:</string>
+    <string name="otp_apply_changes">Übernehmen</string>
+    <string name="otp_error_secret_not_in_base32">Das Geheimnis muss Base32-kodiert sein.</string>
+    <string name="error_value_greater_zero_required">Der Wert muss größer als 0 sein.</string>
+    <string name="otp_cannot_apply">Die Konfiguration kann nicht angewendet werden, da sie unvollstängig ist.</string>
+    <string name="otp_cannot_export">Die Konfiguration kann nicht exportiert werden, da sie unvollständig ist.</string>
+    <string name="otp_current_counter">Aktueller Zählerwert:</string>
+    <string name="otp_period_in_seconds">Gültigkeitszeitraum in Sekunden:</string>
+    <string name="otp_update_hotp_counter_title">Zähler für Einmalpasswort aktualisieren</string>
+    <string name="otp_update_hotp_counter_message">Dieser Zähler sollte mit dem Zähler des Ausstellers synchron sein. Aktueller Zählerwert ist: %1$s</string>
+    <string name="otp_cannot_load_config">Diese Konfiguration kann nicht geladen werden!</string>
+    <string name="otp_config_headline">Konfiguration für Einmalpasswort</string>
+    <string name="otp_exported_otp_desc">Dieser QR-Code enthält alle Daten, die zum Konfigurieren dieses Einmalpasswortes in einem beliebigen Authentifikator erforderlich sind. Er enthält ein gemeinsames Geheimnis, gehe also vorsichtig damit um.</string>
+    <string name="otp_cannot_scann_otp_config">Der gescannte QR-Code enthält keine gültige Konfiguration.</string>
+    <string name="otp_increment_counter">Erhöhen</string>
+    <string name="otp_remove_config_title">Einmalpasswort für \'%1$s\' entfernen</string>
+    <string name="otp_remove_config_message">Soll diese Einmalpasswort-Konfiguration wirklich von diesen Zugangsdaten entfernt werden?</string>
+    <string name="nothing_to_delete">Nichts zum entfernen</string>
+    <string name="otp_copy_configuration_to_clipboard">Konfiguration in die Zwischenablage kopieren</string>
+    <string name="diclaimer_beta_version">Dies ist eine Vorab-Version zu Testzwecken und kann Fehler enthalten!!</string>
+
 </resources>

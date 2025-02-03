@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -25,6 +26,8 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.encrypted.OtpData
+import de.jepfa.yapm.model.otp.OtpConfig
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
@@ -37,6 +40,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_PASSWD_WORDS_ON_NL
 import de.jepfa.yapm.service.autofill.AutofillCredentialHolder
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.service.overlay.DetachHelper
+import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.decryptLong
 import de.jepfa.yapm.service.secret.SecretService.decryptPassword
@@ -82,6 +86,9 @@ class ShowCredentialActivity : SecureActivity() {
     private lateinit var expandAdditionalInfoImageView: ImageView
     private var optionsMenu: Menu? = null
     private var defaultTextColor: ColorStateList? = null
+
+    private lateinit var otpViewer: OtpViewer
+
 
     init {
         enableBack = true
@@ -162,8 +169,27 @@ class ShowCredentialActivity : SecureActivity() {
             }
         }
 
-        if (mode != Mode.NORMAL) {
 
+        otpViewer = OtpViewer(null, this, hotpCounterChanged = {
+                // store changed HOTP counter
+                val otpAuthUri = otpViewer.otpConfig?.toUri()
+                if (otpAuthUri != null) {
+                    masterSecretKey?.let { key ->
+                        credential?.let { current ->
+                            val encUri = SecretService.encryptCommonString(key, otpAuthUri.toString())
+                            current.otpData = OtpData(encUri)
+                            credentialViewModel.update(current, this)
+                        }
+
+                    }
+
+                }
+            },
+            masked = PreferenceService.getAsBool(PREF_MASK_PASSWORD, this))
+
+
+        if (mode != Mode.NORMAL) {
+            otpViewer.hideHotpCounterAdjuster()
             credential = EncCredential.fromIntent(intent)
             credential?.let {
                 updatePasswordView(it)
@@ -176,14 +202,35 @@ class ShowCredentialActivity : SecureActivity() {
             })
         }
 
+
+
+        val otpToRestore = savedInstanceState?.getString("OTP")
+        if (otpToRestore != null) {
+            val otpConfig = OtpConfig.fromUri(Uri.parse(otpToRestore))
+            otpConfig?.let {
+                otpViewer.otpConfig = it
+                otpViewer.start()
+
+                otpViewer.refreshVisibility()
+            }
+        }
+
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        otpViewer.otpConfig?.let {
+            outState.putString("OTP", it.toString())
+        }
+    }
+
+
     private fun showPasswordStrength() {
         if (credential != null) {
             masterSecretKey?.let { key ->
-                val password = decryptPassword(key, credential!!.password)
+                val password = decryptPassword(key, credential!!.passwordData.password)
                 obfuscationKey?.let {
                     password.deobfuscate(it)
                 }
@@ -235,7 +282,7 @@ class ShowCredentialActivity : SecureActivity() {
             menu.findItem(R.id.menu_detach_credential)?.isVisible = false
         }
 
-        menu.findItem(R.id.menu_deobfuscate_password)?.isVisible = credential?.isObfuscated ?: false
+        menu.findItem(R.id.menu_deobfuscate_password)?.isVisible = credential?.passwordData?.isObfuscated ?: false
 
 
         optionsMenu = menu
@@ -261,8 +308,7 @@ class ShowCredentialActivity : SecureActivity() {
             if (id == R.id.menu_import_credential) {
                 val input = ImportCredentialUseCase.Input(credential)
                 {
-                    val upIntent = Intent(this, ListCredentialsActivity::class.java)
-                    navigateUpTo(upIntent)
+                    finish()
                 }
                 CoroutineScope(Dispatchers.Main).launch {
                     ImportCredentialUseCase.execute(input, this@ShowCredentialActivity)
@@ -279,7 +325,7 @@ class ShowCredentialActivity : SecureActivity() {
                 DetachHelper.detachPassword(
                     this,
                     credential.user,
-                    credential.password,
+                    credential.passwordData.password,
                     obfuscationKey,
                     passwordPresentation
                 )
@@ -287,7 +333,7 @@ class ShowCredentialActivity : SecureActivity() {
             }
 
             if (id == R.id.menu_copy_credential) {
-                ClipboardUtil.copyEncPasswordWithCheck(credential.password, obfuscationKey, this)
+                ClipboardUtil.copyEncPasswordWithCheck(credential.passwordData.password, obfuscationKey, this)
                 return true
             }
 
@@ -313,13 +359,12 @@ class ShowCredentialActivity : SecureActivity() {
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
                             credential.id?.let { id ->
-                                credentialViewModel.deleteExpiredCredential(id, this)
+                                credentialViewModel.deleteCredentialExpiry(id, this)
                             }
                             credentialViewModel.delete(credential)
                             toastText(this, R.string.credential_deleted)
 
-                            val upIntent = Intent(this, ListCredentialsActivity::class.java)
-                            navigateUpTo(upIntent)
+                            finish()
                         }
                         .setNegativeButton(android.R.string.no, null)
                         .show()
@@ -353,7 +398,7 @@ class ShowCredentialActivity : SecureActivity() {
 
                             obfuscationKey = deobfuscationKey
                             obfuscationKey?.let {
-                                val passwordForDeobfuscation = decryptPassword(key, credential.password)
+                                val passwordForDeobfuscation = decryptPassword(key, credential.passwordData.password)
                                 passwordForDeobfuscation.deobfuscate(it)
 
                                 var spannedString =
@@ -406,20 +451,33 @@ class ShowCredentialActivity : SecureActivity() {
 
 
                 sb.addFormattedLine(getString(R.string.password_obfuscated),
-                    if (credential.isObfuscated) getString(R.string.yes)
+                    if (credential.passwordData.isObfuscated) getString(R.string.yes)
                     else getString(R.string.no))
 
 
-                credential.modifyTimestamp?.let{
+                credential.timeData.modifyTimestamp?.let{
                     if (it > 1000) // modifyTimestamp is the credential Id after running db migration, assume ids are lower than 1000
                         sb.addFormattedLine(getString(R.string.last_modified), dateTimeToNiceString(it.toDate(), this))
                 }
 
-                AlertDialog.Builder(this)
+                masterSecretKey?.let { key ->
+                    val expiresAt = decryptLong(key, credential.timeData.expiresAt)
+                    if (expiresAt != null && expiresAt != 0L) {
+                        sb.addFormattedLine(
+                            getString(R.string.expires),
+                            dateTimeToNiceString(Date(expiresAt), this)
+                        )
+                    }
+                }
+
+                val builder = AlertDialog.Builder(this)
                     .setTitle(R.string.title_credential_details)
                     .setMessage(sb.toString())
                     .setNegativeButton(R.string.close, null)
-                    .setNeutralButton(R.string.copy_universal_identifier) { _, _ ->
+
+
+                if (credential.uid != null) {
+                    builder.setNeutralButton(R.string.copy_universal_identifier) { _, _ ->
                         credential.uid?.let { uid ->
                             ClipboardUtil.copy(
                                 this.getString(R.string.universal_identifier),
@@ -430,7 +488,9 @@ class ShowCredentialActivity : SecureActivity() {
                         }
                         toastText(this, R.string.universal_identifier_copied)
                     }
-                    .show()
+                }
+
+                builder.show()
 
                 return true
             }
@@ -468,10 +528,11 @@ class ShowCredentialActivity : SecureActivity() {
     override fun onDestroy() {
         super.onDestroy()
         obfuscationKey?.clear()
+        otpViewer.stop()
     }
 
     private fun showObfuscated(credential: EncCredential): Boolean {
-        return credential.isObfuscated && obfuscationKey == null
+        return credential.passwordData.isObfuscated && obfuscationKey == null
     }
 
 
@@ -482,8 +543,23 @@ class ShowCredentialActivity : SecureActivity() {
             val name = enrichId(this, decName, credential.id)
             val user = decryptCommonString(key, credential.user)
             val website = decryptCommonString(key, credential.website)
-            val expiresAt = decryptLong(key, credential.expiresAt)
+            val expiresAt = decryptLong(key, credential.timeData.expiresAt)
             val additionalInfo = decryptCommonString(key, credential.additionalInfo)
+
+            val otpData = credential.otpData
+
+            if (otpData != null) {
+                val otpAuthUri = decryptCommonString(key, otpData.encOtpAuthUri)
+
+                otpViewer.otpConfig = OtpConfig.fromUri(Uri.parse(otpAuthUri))
+                otpViewer.start()
+                otpViewer.refreshVisibility()
+            }
+            else {
+                otpViewer.otpConfig = null
+                otpViewer.stop()
+                otpViewer.refreshVisibility()
+            }
 
             toolBarLayout.title = name
             toolbarChipGroup.removeAllViews()
@@ -580,7 +656,7 @@ class ShowCredentialActivity : SecureActivity() {
             updatePasswordTextView(key, credential, true)
 
             optionsMenu?.findItem(R.id.menu_deobfuscate_password)?.isVisible =
-                credential.isObfuscated
+                credential.passwordData.isObfuscated
 
             if (DebugInfo.isDebug) {
                 titleLayout.setOnLongClickListener {
@@ -609,7 +685,7 @@ class ShowCredentialActivity : SecureActivity() {
         credential: EncCredential,
         allowDeobfuscate: Boolean
     ) {
-        val password = decryptPassword(key, credential.password)
+        val password = decryptPassword(key, credential.passwordData.password)
         if (allowDeobfuscate) {
             obfuscationKey?.let {
                 password.deobfuscate(it) //TODO this seems to cause a change of current item and a credential adapter list reload

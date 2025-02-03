@@ -78,6 +78,7 @@
     <string name="pin_too_short">PIN is too short (6 chars at least)</string>
     <string name="pin_not_equal">PIN repetition not equal</string>
     <string name="password_not_equal">Password repetition not equal</string>
+    <string name="password_too_short">Password is too short (6 chars at least)</string>
     <string name="pin_wrong">Wrong PIN</string>
     <string name="button_create_vault">Create vault</string>
     <string name="create_vault_explanation_3">Here you see again your master password. Export it as QR code or NFC tag by clicking on the corresponding icon or note it on a safe piece of paper. (If you decide to export as QR code you can either download it as image file of just photograph or copy the QR code directly from your phone.) Store it safely. You will need it together with your PIN to login into the vault. \nFor more convenience you may additionally store it on this device for faster login (biometric criteria may be needed).</string>
@@ -120,10 +121,11 @@
     <string name="include_preferences">Include current app settings</string>
 
     <string name="export_plain_credentials">Takeout credentials</string>
-    <string name="export_plain_credentials_explanation">Here you can takeout all plain (decrypted!!!) credentials as CSV file to e.g. import them into other password tools. This feature should not be used for backup purposes! Use \'Export Vault\' instead! Note: Obfuscated passwords are not de-obfuscated with this export! You need to de-obfuscate them first manually if you need them de-obfuscated.</string>
+    <string name="export_plain_credentials_explanation">Here you can takeout all credentials as CSV or Keepass file to e.g. import them into other password tools. This feature should not be used for backup purposes! Use \'Export Vault\' instead! Note: Obfuscated passwords are not de-obfuscated with this export! You need to de-obfuscate them first manually if you need them de-obfuscated.</string>
     <string name="button_share_plain_credentials">Share CSV file</string>
     <string name="button_export_plain_credentials">Save CSV file</string>
-
+    <string name="button_share_credentials">Share KDBX file</string>
+    <string name="button_export_credentials">Save KDBX file</string>
     <string name="too_may_wrong_logins">Too many login attempts, master password is now needed</string>
     <string name="too_may_wrong_logins_self_destruction">Too many login attempts, vault completely deleted</string>
 
@@ -134,13 +136,13 @@
     <string name="button_load_vault">Load vault file</string>
     <string name="button_import_vault">Import vault</string>
 
-    <string name="import_credentials_load_file_explanation">Select a file which contains the unencrypted credentials to import. Currently only CSV-files are supported. Use this to import your credentials e.g. from browsers like Firefox or Chrome or from Keepass variants.</string>
+    <string name="import_credentials_load_file_explanation">Select a file which contains the credentials to import. Currently only CSV- and KDBX files are supported. Use this to import your plain credentials e.g. from browsers like Firefox or Chrome or vault databases from Keepass variants (*.kdbx, starting from version 3).</string>
     <string name="import_credentials_load_file_fragment_label" tools:ignore="TypographyFractions">Import Credentials 1/2</string>
     <string name="import_credentials_import_file_fragment_label">Import Credentials 2/2</string>
     <string name="button_load_credentials_file">Load credentials file</string>
     <string name="button_import_credentials">Import credentials</string>
 
-    <string name="scan_mk">Scan your master key</string>
+    <string name="scan_mk">Scan your Encrypted Master Key</string>
     <string name="drop_vault">Drop vault (delete all)</string>
     <string name="chooser_select_file_to_import">Select file to import</string>
     <string name="toast_import_vault_from_future_app_version">The selected file was created by a future app version.</string>
@@ -168,7 +170,7 @@
     <string name="change_encryption">Change encryption</string>
     <string name="title_change_encryption">Change vault\'s encryption</string>
     <string name="message_change_encryption">With changing the vault\'s encryption and/or master key all exported vault files cannot be read anymore. It is also recommended to have a fresh backup of your vault and Exported Master Key in case of something goes wrong.</string>
-    <string name="message_change_iterations">By changing the login iterations the Encrypted Master Key will be changed, so you need to export them again.</string>
+    <string name="message_change_iterations">By changing the login process parameters the Encrypted Master Key will be changed, so you need to export them again.</string>
     <string name="change_master_password_explanation">Change your master password by enter your current PIN and generate a new master password. Note, that the Encrypted Master Key will be changed, so you need to export it again. This also effects old vault export files with the old key. You should also export your master password and tokens again.</string>
     <string name="change_encryption_explanation">Change the vault\'s encryption algorithm if you have migrated your vault to a newer device with support for additional encryption algorithms. Note, that the Encrypted Master Key will be changed, so you need to export it again. This also effects old vault export files and exported credentials (ECRs) which might become unreadable.</string>
     <string name="vault">Vault</string>
@@ -270,7 +272,7 @@
 
     <string name="vault_export_info">"Vault (Id = %4$s) exported at %1$s, contains %2$s credentials and %3$s labels"</string>
     <string name="vault_export_info2">"Vault file exported at %1$s, contains totally %2$s credentials and %3$s labels"</string>
-    <string name="scan_masterkey_first">Scan your master key first</string>
+    <string name="scan_masterkey_first">Scan your Encrypted Master Key first!</string>
     <string name="not_an_emk">This is not an Encrypted Master Key</string>
 
     <string name="label_never_used">Not used</string>
@@ -287,6 +289,7 @@
     <string name="paste_credential_for_autofill">Credential for \'%1$s\'</string>
     <string name="backup_file_saved">Vault file saved</string>
     <string name="csv_file_saved">CSV file saved</string>
+    <string name="kdbx_file_saved">KDBX file saved</string>
     <string name="backup_failed">Error while creating the backup file</string>
     <string name="backup_permission_missing">Permission to write to external storage is missing</string>
     <string name="qr_code_saved">QR code as image saved</string>
@@ -320,6 +323,7 @@
     <string name="export_plain_passwd">Export plain password</string>
     <string name="export_enc_credential_record">Export whole encrypted credential</string>
     <string name="export_plain_credential_record">Export plain credential to share</string>
+    <string name="export_otp_config">Export One-Time-Password configuration</string>
     <string name="head_export_plain_passwd">"The plain password of '%1$s'</string>
     <string name="sub_export_plain_passwd">Keep this QR code safe since it contains a real plain password!</string>
     <string name="head_export_enc_credential_record">"Encrypted Credential Record (ECR) of '%1$s'</string>
@@ -556,6 +560,14 @@
     <string name="whats_new_in_2_0_enable_server">Yes, i want to give it a try!</string>
     <string name="whats_new_in_2_0_disabled_server">OK, the server capability is completely deactivated. You can enable it again in the Settings.</string>
 
+    <string name="whats_new_in_2_1">What\'s new in version 2.1</string>
+    <string name="whats_new_in_2_1_bullet_1_head">Support for One-Time-Passwords</string>
+    <string name="whats_new_in_2_1_bullet_1_text">Now you can import and configure a counter- or time based one-time password for each credential. Similar to other authenticator apps, ANOTHERpass shows the current one-time password together with the credential password. You can also easily export the configuration.</string>
+    <string name="whats_new_in_2_1_bullet_2_head">Login with Argon2</string>
+    <string name="whats_new_in_2_1_bullet_2_text">A new method of the login process called Argon2 can now be used to make cracking your PIN and master password even more difficult. Argon2 is a modern key derivation function (KDF) and allows faster and more secure unlocking of the vault.</string>
+    <string name="whats_new_in_2_1_bullet_3_head">Import and export from and to a Keepass file</string>
+    <string name="whats_new_in_2_1_bullet_3_text">Now you can use your credentials in any Keepass fork! Export all your credentials into a Keepass vault file (KDBX version 4). Or just import any Keepass file into your current ANOTHERpass vault (KDBX version 3 at least).</string>
+
     <string name="intro">Show intro</string>
     <string name="intro_1_head">Another way to manage passwords</string>
     <string name="intro_1_subtext">ANOTHERpass is another approach of a password manager. See what it means:</string>
@@ -627,6 +639,8 @@
     <string name="no_thanks">No, thanks</string>
     <string name="enter_codeword">Enter a codeword</string>
     <string name="repeat_codeword">Repeat the codeword</string>
+    <string name="enter_password">Enter a password</string>
+    <string name="repeat_password">Repeat the password</string>
     <string name="unlock_masterpassword">Unlock Exported Master Password</string>
     <string name="message_unlock_masterpassword">The Exported Master Password (EMP) is protected with a codeword. Type it to unlock it.</string>
 
@@ -788,6 +802,7 @@
     <string name="command_expires">Filter credentials that expire</string>
     <string name="command_latest">Show latest modified credential</string>
     <string name="command_veiled">Filter obfuscated credentials</string>
+    <string name="command_otp">Filter credentials with One-Time-Passwords</string>
 
     <string name="with_email_alias">Declare the username as email address with a generic alias part</string>
     <string name="title_username_email_alias">What is an email alias part?</string>
@@ -798,7 +813,7 @@
     <string name="username_template_type_desc_both">provide both</string>
     <string name="open_vault">Open vault</string>
 
-    <string name="define_columns_of_csv_file">Cannot load file or fields are missing? Define columns of the file manually.</string>
+    <string name="define_columns_of_csv_file">Cannot load csv file or fields are missing? Define columns of the file manually.</string>
     <string name="define_columns_of_given_csv_file">Cannot load file \'%1$s\' or fields are missing? Define columns of the file manually.</string>
     <string name="not_a_csv_column">only letters, digits, dash and stroke are allowed</string>
     <string name="csv_column_title">CSV columns</string>
@@ -926,5 +941,64 @@
     <string name="device_key_storage_strong_box">Security Chip (SE/StrongBox)</string>
     <string name="device_key_storage_tee">Protected Environment (TEE)</string>
     <string name="device_key_storage_software">Android OS / Software-based</string>
+
+    <string name="choose_takeout_file_format">Choose the desired file format:</string>
+    <string name="takeout_file_format_csv">CSV - decrypted!!!</string>
+    <string name="takeout_file_format_kdbx">Keepass/KDBX - encrypted</string>
+    <string name="title_takeout_kdbx_master_password">Please set a master password</string>
+    <string name="message_takeout_kdbx_master_password">A Keepass vault requires a master password, which is used to open the KDBX file.</string>
+    <string name="keepass_password_wrong">Provided password is wrong or KDBX file is corrupt!</string>
+    <string name="title_enter_kdbx_master_password">Open Keepass file</string>
+    <string name="message_enter_kdbx_master_password">Provide the password to open the given Keepass file.</string>
+
+    <string name="pref_title_show_extended_search_commands">Suggest search commands when start searching</string>
+    <string name="pref_summary_show_extended_search_commands">Suggest all search commands even if you don\'t start typing with \'!\'.</string>
+    <string name="pref_title_flip_search_and_add_button">Flip search button and action button</string>
+    <string name="pref_summary_flip_search_and_add_button">The Action button originally used to create new credentials is replaced by the Search button on the toolbar. Enable this if you need to search for credentials more often than you need to create new ones.</string>
+
+
+    <string name="KDF_PBKDF">PBKDF2 (Built-In)</string>
+    <string name="KDF_ARGON2_ID">Argon2Id</string>
+    <string name="KDF_ARGON2_I">Argon2i</string>
+    <string name="KDF_ARGON2_D">Argon2d</string>
+
+    <string name="KDF_PBKDF_desc">PBKDF2 offers standard protection against brute force attacks. It is still OK with iterations larger than 200000. But it is recommend to use an Argon2-function. Use this function if you encounter problems with the others.</string>
+    <string name="KDF_ARGON2_ID_desc">Argon2Id offers best protection against brute force and side channel attacks and is therefore recommended. </string>
+    <string name="KDF_ARGON2_I_desc">Choose Argon2i if side channel attacks are the primary threat.</string>
+    <string name="KDF_ARGON2_D_desc">Choose Argon2d if you need maximum security at the expense of side channel risk.</string>
+
+    <string name="login_kdf_chooser">Choose a method of the vault login process (called Key Derivation Function). It is used to make it even more difficult to break your PIN and Master Password with high computing resources (e.g. by governments). You can change this later. If in doubt, use the current default.</string>
+
+    <string name="login_argon2_memcost_desc">Select the cost in memory. The more the better.</string>
+    <string name="login_argon2_memcost_unit">Memory allocation in MiB</string>
+    <string name="login_argon2_current_memcost">%1$s MiB memory allocation</string>
+
+    <string name="configure_one_time_password">Configure One-Time-Password</string>
+    <string name="hotp_name">Counter-based (HOTP)</string>
+    <string name="totp_name">Time-based (TOTP)</string>
+    <string name="otp_scan_qr_code">Scan the QR code presented by the issuer to quickly import a One-Time-Password configuration.</string>
+    <string name="otp_edit_otp_config">Here you can edit or change the details of the current One-Time-Password configuration. Do only change it if you know what you are doing!</string>
+    <string name="otp_shared_secret_in_base32">The shared secret in Base32 format:</string>
+    <string name="otp_counter_or_period">Counter or period:</string>
+    <string name="otp_count_of_digits">Count of digits:</string>
+    <string name="otp_apply_changes">Apply</string>
+    <string name="otp_error_secret_not_in_base32">The secret must be Base32-encoded.</string>
+    <string name="error_value_greater_zero_required">A value greater than 0 is required.</string>
+    <string name="otp_cannot_apply">Cannot apply this configuration, since parts are incorrect.</string>
+    <string name="otp_cannot_export">Cannot export this configuration, since parts are incorrect.</string>
+    <string name="otp_current_counter">Current counter value:</string>
+    <string name="otp_period_in_seconds">Renew-Period on seconds:</string>
+    <string name="otp_update_hotp_counter_title">Update One-Time-Password counter</string>
+    <string name="otp_update_hotp_counter_message">This counter should be in sync with the issuer\'s counter. Current counter value is: %1$s</string>
+    <string name="otp_cannot_load_config">Cannot load this configuration!</string>
+    <string name="otp_config_headline">One-Time-Password configuration</string>
+    <string name="otp_exported_otp_desc">This contains all data needed to configure this One-Time-Password in any authenticator. It contains a shared secret, so handle it carefully.</string>
+    <string name="otp_cannot_scann_otp_config">The scanned QR Code doesn\'t contain a valid configuration.</string>
+    <string name="otp_increment_counter">Increment</string>
+    <string name="otp_remove_config_title">Remove One-Time-Password for \'%1$s\'</string>
+    <string name="otp_remove_config_message">Are you sure to remove this One-Time-Password configuration from the current credential?</string>
+    <string name="nothing_to_delete">Nothing to delete</string>
+    <string name="otp_copy_configuration_to_clipboard">Copy configuration to clipboard</string>
+    <string name="diclaimer_beta_version">This is a pre-version only for testing purposes and may contain bugs!!</string>
 
 </resources>

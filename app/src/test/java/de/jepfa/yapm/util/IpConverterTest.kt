@@ -1,4 +1,4 @@
-package de.jepfa.obfusser.util.encrypt
+package de.jepfa.yapm.util
 
 import de.jepfa.yapm.util.IpConverter
 import de.jepfa.yapm.util.IpConverter.PrivateNetworkClassification.*
@@ -60,8 +60,8 @@ class IpConverterTest {
         Assert.assertEquals("@ab", IpConverter.getHandle("10.0.0.1")) //ClassA
         Assert.assertEquals("@abksojn", IpConverter.getHandle("10.255.255.255")) //ClassA max longest handle
 
-        Assert.assertEquals("255.255.255.255", IpConverter.getHandle("255.255.255.255")) // Invalid internal IP
-        Assert.assertEquals("grab", IpConverter.getHandle("grab")) // Invalid internal IP
+        Assert.assertEquals("?", IpConverter.getHandle("255.255.255.255")) // Invalid internal IP
+        Assert.assertEquals("?", IpConverter.getHandle("grab")) // Invalid internal IP
     }
 
 }

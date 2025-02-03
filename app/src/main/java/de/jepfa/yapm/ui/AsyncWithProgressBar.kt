@@ -24,12 +24,12 @@ class AsyncWithProgressBar(
         val activityProgressBar = activity?.getProgressBar()
         if (activityProgressBar != null) {
             progressBar = activityProgressBar
-            showProgressBar()
+            activity?.showProgressBar(progressBar)
             CoroutineScope(Dispatchers.IO).launch {
                 val result = backgroundHandler()
                 CoroutineScope(Dispatchers.Main).launch {
                     postHandler(result)
-                    hideProgressBar()
+                    activity?.hideProgressBar(progressBar)
                 }
             }
         }
@@ -42,17 +42,5 @@ class AsyncWithProgressBar(
         }
     }
 
-    private fun showProgressBar() {
-        progressBar.visibility = View.VISIBLE
-        activity?.window?.setFlags(
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-    }
 
-
-    private fun hideProgressBar() {
-        progressBar.visibility = View.INVISIBLE
-        activity?.window?.clearFlags(
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-    }
 }

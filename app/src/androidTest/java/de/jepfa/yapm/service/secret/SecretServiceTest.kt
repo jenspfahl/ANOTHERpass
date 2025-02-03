@@ -51,8 +51,8 @@ class SecretServiceTest {
         val masterKey = SecretService.generateRandomKey(128, null) // key to crypt credentials
         Log.i(TAG, "masterKey=${masterKey.debugToString()}")
 
-        // store masterKey encrypted with masterPassPhrase --> AES
-        val masterPassPhraseSK = SecretService.generateStrongSecretKey(masterPassPhrase, salt, cipherAlgorithm, context)
+        // store masterKey encrypted with masterPassPhrase, used customized KDF
+        val masterPassPhraseSK = SecretService.generateSecretKeyForMasterKey(masterPassPhrase, salt, cipherAlgorithm, context)
         Log.i(TAG, "masterPassPhraseSK=${masterPassPhraseSK.secretKey.encoded.contentToString()}")
 
         val encMasterKey = SecretService.encryptKey(masterPassPhraseSK, masterKey)
@@ -64,7 +64,7 @@ class SecretServiceTest {
 
         // Credential enc-/decryption with masterKey --> AES
         val credential = Password("9999")
-        val masterKeySK = SecretService.generateDefaultSecretKey(masterKey, salt, cipherAlgorithm, context)
+        val masterKeySK = SecretService.generateSecretKey(masterKey, cipherAlgorithm, context)
         // not needed anymore
         masterKey.clear()
 

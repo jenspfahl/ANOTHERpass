@@ -81,7 +81,7 @@ class ImportVaultLoadFileFragment : BaseFragment() {
                                 content, importVaultActivity, handleBlob = true)
                         }
                     } catch (e: Exception) {
-                        Log.e(LOG_PREFIX + "RESTORE", "cannot import file $selectedFile", e)
+                        DebugInfo.logException("RESTORE", "cannot import file $selectedFile", e)
                     }
                 }
             }

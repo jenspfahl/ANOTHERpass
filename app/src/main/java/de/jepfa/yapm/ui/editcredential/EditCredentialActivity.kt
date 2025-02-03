@@ -194,9 +194,6 @@ class EditCredentialActivity : AutofillPushBackActivityBase(), RequestFlows {
         return emptySet()
     }
 
-    override fun stopCredentialSelectionMode() {
-    }
-
     override fun resetUi() {
     }
 }

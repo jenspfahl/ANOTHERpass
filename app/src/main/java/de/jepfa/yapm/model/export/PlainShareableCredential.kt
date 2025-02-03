@@ -1,22 +1,26 @@
 package de.jepfa.yapm.model.export
 
-import android.util.Log
 import com.google.gson.JsonElement
 import de.jepfa.yapm.model.encrypted.EncCredential
+import de.jepfa.yapm.model.encrypted.OtpData
+import de.jepfa.yapm.model.encrypted.PasswordData
+import de.jepfa.yapm.model.encrypted.TimeData
+import de.jepfa.yapm.model.otp.OtpConfig.Companion.createFromPacked
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.secret.SecretService
-import de.jepfa.yapm.util.Constants.LOG_PREFIX
+import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.toUUIDFromBase64String
 
 
-data class PlainShareableCredential(val ui: String?,
-                                    val n: String,
-                                    val aI: String,
-                                    val u: String,
-                                    val p: Password,
-                                    val w: String,
+data class PlainShareableCredential(val ui: String?, // uid
+                                    val n: String, // name
+                                    val aI: String, // additional info
+                                    val u: String, // user
+                                    val p: Password, // password
+                                    val w: String, // website
                                     val e: Long?, // Date.getTime()
+                                    val o: String? // shortened OTP
 ) {
     fun toEncCredential(key: SecretKeyHolder): EncCredential {
         val encName = SecretService.encryptCommonString(key, n)
@@ -26,24 +30,31 @@ data class PlainShareableCredential(val ui: String?,
         val encWebsite = SecretService.encryptCommonString(key, w)
         val encExpiresAt = if (e != null) SecretService.encryptLong(key, e) else SecretService.encryptLong(key, 0L)
         val encLabels = SecretService.encryptCommonString(key, "")
+        val encOtpAuthUri = createFromPacked(o, n, u)?.let {  SecretService.encryptCommonString(key, it.toString()) }
 
         p.clear()
         return EncCredential(
             null,
             ui?.toUUIDFromBase64String(),
             encName,
-            encAdditionalInfo,
-            encUser,
-            encPasswd,
-            null,
             encWebsite,
+            encUser,
+            encAdditionalInfo,
             encLabels,
-            encExpiresAt,
-            false,
-            null,
-            null
+            PasswordData(
+                encPasswd,
+                false,
+                null,
+                null,
+            ),
+            TimeData(
+                null,
+                encExpiresAt,
+            ),
+            if (encOtpAuthUri != null) OtpData(encOtpAuthUri) else null,
         )
     }
+
 
     companion object {
         const val ATTRIB_UID = "ui"
@@ -53,6 +64,7 @@ data class PlainShareableCredential(val ui: String?,
         const val ATTRIB_PASSWORD = "p"
         const val ATTRIB_WEBSITE = "w"
         const val ATTRIB_EXPIRES_AT = "e"
+        const val ATTRIB_OTP = "o"
 
         fun fromJson(json: JsonElement): PlainShareableCredential? {
             try {
@@ -65,12 +77,14 @@ data class PlainShareableCredential(val ui: String?,
                     Password.fromBase64String(jsonObject.get(ATTRIB_PASSWORD).asString),
                     jsonObject.get(ATTRIB_WEBSITE).asString,
                     jsonObject.get(ATTRIB_EXPIRES_AT)?.asLong,
+                    jsonObject.get(ATTRIB_OTP)?.asString,
                 )
             } catch (e: Exception) {
-                Log.e(LOG_PREFIX + "PCR", "cannot parse json container", e)
+                DebugInfo.logException("PCR", "cannot parse json container", e)
                 return null
             }
         }
+
     }
 }
 

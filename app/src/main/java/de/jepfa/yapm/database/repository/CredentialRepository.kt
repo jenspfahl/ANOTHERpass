@@ -81,6 +81,7 @@ class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
                 entity.expiresAt,
                 entity.isObfuscated,
                 entity.isLastPasswordObfuscated,
+                entity.otpData,
                 entity.modifyTimestamp)
     }
 
@@ -90,14 +91,15 @@ class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
                 encCredential.name,
                 encCredential.additionalInfo,
                 encCredential.user,
-                encCredential.password,
-                encCredential.lastPassword,
+                encCredential.passwordData.password,
+                encCredential.passwordData.lastPassword,
                 encCredential.website,
                 encCredential.labels,
-                encCredential.expiresAt,
-                encCredential.isObfuscated,
-                encCredential.isLastPasswordObfuscated,
-                encCredential.modifyTimestamp ?: encCredential.id?.toLong() ?: 0)
+                encCredential.timeData.expiresAt,
+                encCredential.passwordData.isObfuscated,
+                encCredential.passwordData.isLastPasswordObfuscated,
+                encCredential.otpData?.encOtpAuthUri,
+                encCredential.timeData.modifyTimestamp ?: encCredential.id?.toLong() ?: 0)
     }
 
 }

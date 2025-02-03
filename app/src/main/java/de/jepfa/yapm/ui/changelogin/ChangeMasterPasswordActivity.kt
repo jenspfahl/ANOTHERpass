@@ -202,10 +202,10 @@ class ChangeMasterPasswordActivity : SecureActivity() {
                     LoginData(currentPin, generatedPassword))
                     { output ->
                         if (output.success) {
-                            val upIntent = Intent(intent)
-                            navigateUpTo(upIntent)
 
                             generatedPassword.clear()
+
+                            finish()
 
                             toastText(baseContext, R.string.masterpassword_changed)
                         }

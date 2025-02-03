@@ -16,6 +16,10 @@ class WhatsNewActivity : IntroBaseActivity() {
 
         //TODO new fragment layout for each new minor App version (e.g 1.7.x -> 1.7)
 
+        addSlide(
+            AppIntroCustomLayoutFragment.newInstance(R.layout.fragment_whats_new_in_2_1
+            ))
+
         addSlide(WhatsNew2_0Fragment())
 
         addSlide(

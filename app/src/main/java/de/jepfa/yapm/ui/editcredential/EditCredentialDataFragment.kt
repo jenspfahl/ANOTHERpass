@@ -16,12 +16,12 @@ import androidx.navigation.fragment.findNavController
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncUsernameTemplate
+import de.jepfa.yapm.model.encrypted.PasswordData
+import de.jepfa.yapm.model.encrypted.TimeData
 import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.label.LabelService
-import de.jepfa.yapm.service.net.HttpCredentialRequestHandler
-import de.jepfa.yapm.service.net.RequestFlows
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.service.secret.SecretService.decryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.decryptLong
@@ -29,7 +29,6 @@ import de.jepfa.yapm.service.secret.SecretService.encryptCommonString
 import de.jepfa.yapm.service.secret.SecretService.encryptLong
 import de.jepfa.yapm.service.usernametemplate.UsernameTemplateService
 import de.jepfa.yapm.ui.DropDownList
-import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.SecureFragment
 import de.jepfa.yapm.ui.label.LabelEditViewExtender
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
@@ -388,7 +387,7 @@ class EditCredentialDataFragment : SecureFragment() {
         val name = decryptCommonString(key, current.name)
         val user = decryptCommonString(key, current.user)
         val website = decryptCommonString(key, current.website)
-        val expiresAtAsLong = decryptLong(key, current.expiresAt)
+        val expiresAtAsLong = decryptLong(key, current.timeData.expiresAt)
         val additionalInfo = decryptCommonString(
             key,
             current.additionalInfo
@@ -424,8 +423,8 @@ class EditCredentialDataFragment : SecureFragment() {
         val encName = encryptCommonString(key, name)
         val encAdditionalInfo = encryptCommonString(key, additionalInfo)
         val encUser = encryptCommonString(key, user)
-        val encPassword = editCredentialActivity.current?.password
-            ?: editCredentialActivity.original?.password
+        val encPassword = editCredentialActivity.current?.passwordData?.password
+            ?: editCredentialActivity.original?.passwordData?.password
             ?: SecretService.encryptPassword(key, Password.empty()
         )
         val encWebsite = encryptCommonString(key, website)
@@ -440,19 +439,24 @@ class EditCredentialDataFragment : SecureFragment() {
             editCredentialActivity.currentId,
             editCredentialActivity.original?.uid ?: UUID.randomUUID(),
             encName,
-            encAdditionalInfo,
-            encUser,
-            encPassword,
-            editCredentialActivity.original?.lastPassword,
             encWebsite,
+            encUser,
+            encAdditionalInfo,
             encLabels,
-            encExpiresAt,
-            editCredentialActivity.current?.isObfuscated
-                ?: editCredentialActivity.original?.isObfuscated
-                ?: false,
-            editCredentialActivity.original?.isLastPasswordObfuscated
-                ?: false,
-            null
+            PasswordData(
+                encPassword,
+                editCredentialActivity.current?.passwordData?.isObfuscated
+                    ?: editCredentialActivity.original?.passwordData?.isObfuscated
+                    ?: false,
+                editCredentialActivity.original?.passwordData?.lastPassword,
+                editCredentialActivity.original?.passwordData?.isLastPasswordObfuscated
+                    ?: false,
+                ),
+            TimeData(
+                null,
+                encExpiresAt,
+            ),
+            editCredentialActivity.current?.otpData ?: editCredentialActivity.original?.otpData
         )
         editCredentialActivity.current = credentialToSave
     }
