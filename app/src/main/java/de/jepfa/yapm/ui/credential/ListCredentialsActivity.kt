@@ -858,6 +858,10 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         if (!disclaimerShowed) {
             view.postDelayed({
+                val disclaimerMeanwhileShowed = PreferenceService.getAsBool(PreferenceService.STATE_DISCLAIMER_SHOWED, this)
+                if (disclaimerMeanwhileShowed) {
+                    return@postDelayed
+                }
                 PreferenceService.putBoolean(PreferenceService.STATE_DISCLAIMER_SHOWED, true, this)
 
                 val dialogBuilder = AlertDialog.Builder(this)
