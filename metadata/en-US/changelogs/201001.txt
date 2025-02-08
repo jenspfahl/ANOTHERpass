@@ -1,0 +1,2 @@
+* fix quick access tile on Android 14+
+* smaller improvements

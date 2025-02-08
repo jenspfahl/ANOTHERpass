@@ -1,6 +1,7 @@
 package de.jepfa.yapm.model.otp
 
 import android.net.Uri
+import android.os.Build
 import android.util.Log
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Key
@@ -84,10 +85,18 @@ data class OtpConfig(
         return this
     }
 
-    fun secretAsBase32(): String = Base32().encodeToString(secret.toByteArray())
+    fun secretAsBase32(): String {
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
+            return ""
+        }
+        return Base32().encodeToString(secret.toByteArray())
+    }
 
     fun isValid(): Boolean {
-        if (secret.isEmpty()) {
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
+            return false
+        }
+        if (secret.isEmpty() || !secret.isValid()) {
             return false
         }
         if (issuer.isBlank()) {
@@ -212,6 +221,11 @@ data class OtpConfig(
             return "${otpConfig.mode.ordinal}_${otpConfig.algorithm.ordinal}_${otpConfig.secretAsBase32()}_${otpConfig.digits}_${counterOrPeriod}"
         }
 
-        fun stringToBase32Key(base32String: String) = Key(Base32().decode(base32String))
+        fun stringToBase32Key(base32String: String): Key {
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
+                return Key.empty()
+            }
+            return Key(Base32().decode(base32String))
+        }
     }
 }

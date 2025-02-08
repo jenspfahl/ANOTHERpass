@@ -3,6 +3,7 @@ package de.jepfa.yapm.ui.editcredential
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputFilter.LengthFilter
@@ -469,11 +470,22 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
         if (id == R.id.menu_configure_otp) {
 
-            val intent = Intent(editCredentialActivity, ConfigOtpActivity::class.java)
-            currentCredential.applyExtras(intent)
-            
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
 
-            startForResult.launch(intent)
+                AlertDialog.Builder(editCredentialActivity)
+                    .setTitle(getString(R.string.configure_one_time_password))
+                    .setMessage("Your current Android version doesn't support the required libraries to use OTP. Please update your Android to a newer one.")
+                    .setIcon(R.drawable.otp_24_white)
+                    .show()
+            }
+            else {
+
+                val intent = Intent(editCredentialActivity, ConfigOtpActivity::class.java)
+                currentCredential.applyExtras(intent)
+
+
+                startForResult.launch(intent)
+            }
 
             return true
         }
