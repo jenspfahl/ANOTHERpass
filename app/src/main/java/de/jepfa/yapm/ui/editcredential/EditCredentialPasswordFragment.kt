@@ -18,6 +18,7 @@ import com.google.android.material.tabs.TabLayout
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncCredential.Companion.EXTRA_CREDENTIAL_OTP_DATA
+import de.jepfa.yapm.model.encrypted.Encrypted
 import de.jepfa.yapm.model.encrypted.OtpData
 import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.Password
@@ -370,7 +371,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
         if (saveLastPassword) {
             editCredentialActivity.original?.let { original ->
-                credential.passwordData.backupForRestore(original.passwordData)
+                credential.passwordData.retainPassword(original.passwordData)
             }
         }
         credential.passwordData.password = encPassword
@@ -522,21 +523,18 @@ class EditCredentialPasswordFragment : SecureFragment() {
             }
             return true
         }
-        if (id == R.id.menu_remove_last_password) {
-            masterSecretKey?.let{ key ->
+        if (id == R.id.menu_preserve_last_password) {
+            if (currentCredential.passwordData.isAllowedToRetainLastPassword()) {
+                currentCredential.passwordData.setAllowedToRetainPassword(false)
+                item.isChecked = false
 
-                val lastPasswd = currentCredential.passwordData.lastPassword?.let {
-                    SecretService.decryptPassword(key, it)
-                }
-                if (!lastPasswd.isNullOrBlank() && lastPasswd.isValid()) {
-                    currentCredential.passwordData.lastPassword = null
-                    currentCredential.passwordData.isLastPasswordObfuscated = null
-                    toastText(activity, R.string.previous_password_deleted)
-
-                    updateRestoreLastPasswordMenuItems(editCredentialActivity.current)
-
-                }
             }
+            else {
+                currentCredential.passwordData.setAllowedToRetainPassword(true)
+                item.isChecked = true
+            }
+
+            updateRestoreLastPasswordMenuItems(editCredentialActivity.current)
 
             return true
         }
@@ -552,7 +550,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                     toastText(activity, R.string.nothing_to_restore)
                 }
                 else {
-                    currentCredential.passwordData.restore()
+                    currentCredential.passwordData.restoreRetained()
                     unsetObfuscation(currentCredential)
                     updatePasswordView(lastPasswd, guessPasswordCombinations = true,
                         currentCredential.passwordData.isObfuscated)
@@ -681,7 +679,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
             }
             val showRestoreLastPasswordOption = !lastPasswd.isNullOrBlank() && lastPasswd.isValid()
             optionsMenu?.findItem(R.id.menu_restore_last_password)?.isVisible = showRestoreLastPasswordOption
-            optionsMenu?.findItem(R.id.menu_remove_last_password)?.isVisible = showRestoreLastPasswordOption
+            optionsMenu?.findItem(R.id.menu_preserve_last_password)?.isChecked = currentCredential.passwordData.lastPassword != Encrypted.empty()
 
         }
 

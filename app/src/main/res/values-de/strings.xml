@@ -246,7 +246,7 @@
     <string name="button_continue">Fortsetzen</string>
     <string name="close">Schließen</string>
     <string name="restore_last_password">Vorheriges Passwort wiederherstellen</string>
-    <string name="delete_last_password">Lösche vorheriges Passwort</string>
+    <string name="preserve_last_password">Erhalte vorheriges Passwort</string>
     <string name="previous_password_deleted">Vorheriges Passwort gelöscht. Zum Anwenden speichern.</string>
     <string name="edit_password">Passwort ändern</string>
     <string name="edit_password_message">Hier kann das Passwort manuell geändert werden, was allerdings nicht empfohlen wird. Generierte Passwörter sind meist stärker.</string>
