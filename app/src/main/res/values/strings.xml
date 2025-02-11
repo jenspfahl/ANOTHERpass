@@ -249,7 +249,9 @@
     <string name="message_password_changed">The password has been changed, but you can restore it later if needed. Have you already updated the password out there?</string>
     <string name="button_continue">Continue</string>
     <string name="close">Close</string>
-    <string name="restore_last_password">Restore last password</string>
+    <string name="restore_last_password">Restore previous password</string>
+    <string name="preserve_last_password">Preserve previous password</string>
+    <string name="previous_password_deleted">Previous password deleted. Save to apply.</string>
     <string name="edit_password">Edit password</string>
     <string name="edit_password_message">Here you can change the password manually which is not recommended. Generated passwords are mostly stronger.</string>
     <string name="pref_header_overlay">Password overlay dialog</string>

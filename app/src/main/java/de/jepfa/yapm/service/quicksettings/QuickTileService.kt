@@ -13,14 +13,14 @@ class QuickTileService: TileService() {
     override fun onClick() {
         val launchIntent = packageManager.getLaunchIntentForPackage(APPLICATION_ID)
         if (launchIntent != null) {
-            val intent = PendingIntent.getService(
-                this,
-                1001,
-                launchIntent,
-                PendingIntent.FLAG_IMMUTABLE
-            )
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                startActivityAndCollapse(intent)
+                val pendingIntent = PendingIntent.getActivity(
+                    this,
+                    1001,
+                    launchIntent,
+                    PendingIntent.FLAG_IMMUTABLE
+                )
+                startActivityAndCollapse(pendingIntent)
             }
             else {
                 startActivityAndCollapse(launchIntent)

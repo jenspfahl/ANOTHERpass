@@ -16,22 +16,42 @@ data class PasswordData(
     var isLastPasswordObfuscated: Boolean?
     ) {
 
-    fun backupForRestore() {
-        backupForRestore(this)
+    fun retainPassword() {
+        retainPassword(this)
     }
 
-    fun backupForRestore(other: PasswordData) {
-        lastPassword = other.password
-        isLastPasswordObfuscated = other.isObfuscated
+    fun retainPassword(other: PasswordData) {
+        if (isAllowedToRetainLastPassword()) {
+            lastPassword = other.password
+            isLastPasswordObfuscated = other.isObfuscated
+        }
     }
 
-    fun restore() {
+    fun restoreRetained() {
+        val p = password
+        val o = isObfuscated
         lastPassword?.let {
             password = it
         }
         isLastPasswordObfuscated?.let {
             isObfuscated = it
         }
+        lastPassword = p
+        isLastPasswordObfuscated = o
+    }
+
+    fun isAllowedToRetainLastPassword() = lastPassword != Encrypted.empty()
+
+    fun setAllowedToRetainPassword(allowed: Boolean) {
+        if (allowed && !isAllowedToRetainLastPassword()) {
+            lastPassword = null
+            isLastPasswordObfuscated = null
+        }
+        else {
+           lastPassword = Encrypted.empty()
+           isLastPasswordObfuscated = null
+        }
+
     }
 }
 

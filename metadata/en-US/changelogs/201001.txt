@@ -1,0 +1,3 @@
+* fix quick access tile on Android 14+
+* add option to opt-out from preserving previous credential passwords once changed
+* smaller improvements

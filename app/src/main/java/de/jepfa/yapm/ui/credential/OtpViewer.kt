@@ -73,12 +73,13 @@ class OtpViewer(
         otpImage.setOnLongClickListener(copying)
         otpView.setOnLongClickListener(copying)
 
-        if (otpConfig == null) {
+        if (otpConfig == null || otpConfig?.isValid() == false) {
             hideOtpView()
         }
     }
 
     fun start() {
+
         timerRunner = Runnable {
             val hasChanged = updateCurrentOtpValue()
             timerRunner?.let {

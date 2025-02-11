@@ -185,6 +185,7 @@
             android:label="@string/app_name"
             android:theme="@style/Theme.YetAnotherPasswordManager.NoActionBar"
             android:configChanges="orientation|screenSize"
+            android:launchMode="singleTask"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -205,7 +206,9 @@
             android:label="@string/app_name"
             android:noHistory="false"
             android:windowSoftInputMode="adjustResize"
-            android:configChanges="orientation|screenSize"/>
+            android:configChanges="orientation|screenSize"
+            android:launchMode="singleTask"
+            />
 
         <service
             android:name=".service.overlay.OverlayShowingService"

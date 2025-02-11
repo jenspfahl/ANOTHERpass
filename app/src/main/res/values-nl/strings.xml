@@ -238,6 +238,8 @@ Het scheiden van de gecodeerde hoofdsleutel van het kluisbestand maakt het besta
   <string name="button_continue">Doorgaan</string>
   <string name="close">Sluiten</string>
   <string name="restore_last_password">Herstel laatste wachtwoord</string>
+  <string name="preserve_last_password">Preserve previous password</string>
+  <string name="previous_password_deleted">Previous password deleted. Save to apply.</string>
   <string name="edit_password">Verander wachtwoord</string>
   <string name="edit_password_message">Het wachtwoord kan hier handmatig worden gewijzigd, hoewel dit niet wordt aanbevolen.  Gegenereerde wachtwoorden zijn meestal sterker.</string>
   <string name="pref_header_overlay">Toon wachtwoorden bovenop andere apps</string>

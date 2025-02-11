@@ -3,6 +3,7 @@ package de.jepfa.yapm.ui.editcredential
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputFilter.LengthFilter
@@ -10,7 +11,6 @@ import android.text.InputType
 import android.view.*
 import android.widget.*
 import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SwitchCompat
@@ -371,7 +371,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
         if (saveLastPassword) {
             editCredentialActivity.original?.let { original ->
-                credential.passwordData.backupForRestore(original.passwordData)
+                credential.passwordData.retainPassword(original.passwordData)
             }
         }
         credential.passwordData.password = encPassword
@@ -469,11 +469,22 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
         if (id == R.id.menu_configure_otp) {
 
-            val intent = Intent(editCredentialActivity, ConfigOtpActivity::class.java)
-            currentCredential.applyExtras(intent)
-            
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
 
-            startForResult.launch(intent)
+                AlertDialog.Builder(editCredentialActivity)
+                    .setTitle(getString(R.string.configure_one_time_password))
+                    .setMessage("Your current Android version doesn't support the required libraries to use OTP. Please update your Android to a newer one.")
+                    .setIcon(R.drawable.otp_24_white)
+                    .show()
+            }
+            else {
+
+                val intent = Intent(editCredentialActivity, ConfigOtpActivity::class.java)
+                currentCredential.applyExtras(intent)
+
+
+                startForResult.launch(intent)
+            }
 
             return true
         }
@@ -512,6 +523,21 @@ class EditCredentialPasswordFragment : SecureFragment() {
             }
             return true
         }
+        if (id == R.id.menu_preserve_last_password) {
+            if (currentCredential.passwordData.isAllowedToRetainLastPassword()) {
+                currentCredential.passwordData.setAllowedToRetainPassword(false)
+                item.isChecked = false
+
+            }
+            else {
+                currentCredential.passwordData.setAllowedToRetainPassword(true)
+                item.isChecked = true
+            }
+
+            updateRestoreLastPasswordMenuItems(editCredentialActivity.current)
+
+            return true
+        }
 
         if (id == R.id.menu_restore_last_password) {
 
@@ -524,7 +550,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
                     toastText(activity, R.string.nothing_to_restore)
                 }
                 else {
-                    currentCredential.passwordData.restore()
+                    currentCredential.passwordData.restoreRetained()
                     unsetObfuscation(currentCredential)
                     updatePasswordView(lastPasswd, guessPasswordCombinations = true,
                         currentCredential.passwordData.isObfuscated)
@@ -612,6 +638,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
         }
 
         updateObfuscationMenuItems(editCredentialActivity.current)
+        updateRestoreLastPasswordMenuItems(editCredentialActivity.current)
     }
 
     private fun unsetObfuscation(credential: EncCredential?) {
@@ -639,6 +666,24 @@ class EditCredentialPasswordFragment : SecureFragment() {
         }
 
         itemObfuscatePassword?.let { updateObfuscationRequired(it) }
+    }
+
+    private fun updateRestoreLastPasswordMenuItems(credential: EncCredential?) {
+        if (credential == null) {
+            return
+        }
+
+        masterSecretKey?.let { key ->
+            val lastPasswd = currentCredential.passwordData.lastPassword?.let {
+                SecretService.decryptPassword(key, it)
+            }
+            val showRestoreLastPasswordOption = !lastPasswd.isNullOrBlank() && lastPasswd.isValid()
+            optionsMenu?.findItem(R.id.menu_restore_last_password)?.isVisible = showRestoreLastPasswordOption
+            optionsMenu?.findItem(R.id.menu_preserve_last_password)?.isChecked = currentCredential.passwordData.lastPassword != Encrypted.empty()
+
+        }
+
+
     }
 
 
