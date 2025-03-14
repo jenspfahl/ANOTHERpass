@@ -101,7 +101,7 @@ object ReminderService {
         override val notificationAction = R.string.auto_export_vault
         override val condition = { activity: SecureActivity ->
             AutoBackupService.isAutoBackupConfigured(activity)
-                    && dateOlderThan(DATA_VAULT_AUTO_EXPORTED_AT, DATA_VAULT_MODIFIED_AT, activity, 3 * 60) // 30 minutes TODO
+                    && dateOlderThan(DATA_VAULT_AUTO_EXPORTED_AT, DATA_VAULT_MODIFIED_AT, activity, 30 * 60) // 30 minutes
         }
         override val action = { activity: SecureActivity ->
             val intent = Intent(activity, ListCredentialsActivity::class.java)

@@ -2,9 +2,7 @@ package de.jepfa.yapm.service.io
 
 import android.content.Context
 import android.content.Intent
-import android.database.Cursor
 import android.net.Uri
-import android.provider.MediaStore
 import android.util.Log
 import androidx.documentfile.provider.DocumentFile
 import de.jepfa.yapm.service.PreferenceService
@@ -48,12 +46,11 @@ object AutoBackupService {
         autoExportVault(context) {}
     }
     fun autoExportVault(context: Context, postHandler: (Boolean) -> Unit) {
-        Log.d("IOM", "queue")
         CoroutineScope(Dispatchers.IO).launch {
-            Log.d("IOM", "wait")
             backupFileCreationMutex.withLock {
                 Log.d("IOM", "work")
                 val success = autoExportVaultSync(context)
+                Log.d("IOM", "done")
 
                 CoroutineScope(Dispatchers.Main).launch {
                     if (success)
@@ -62,8 +59,6 @@ object AutoBackupService {
                         toastText(context, "Auto-backup failed!")
 
                     postHandler(success)
-                    Log.d("IOM", "done")
-
                 }
             }
 

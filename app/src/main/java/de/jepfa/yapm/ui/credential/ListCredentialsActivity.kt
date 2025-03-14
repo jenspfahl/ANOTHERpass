@@ -11,7 +11,6 @@ import android.database.MatrixCursor
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -163,6 +162,7 @@ import java.util.UUID
 class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.OnNavigationItemSelectedListener,
     HttpServer.HttpCallback, HttpServer.HttpServerCallback, RequestFlows {
 
+    private var currAutoBackupFileName = ""
     private val saveAutoBackupFile = 67676
     private var serverViewStateText: String = ""
     private lateinit var serverViewSwitch: SwitchCompat
@@ -1358,17 +1358,38 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
         else if (resultCode == RESULT_OK && requestCode == saveAutoBackupFile) {
 
-            data?.data?.let { destUri ->
+            data?.data?.let { newDestUri ->
 
-                AutoBackupService.registerAutoBackupUri(this, destUri)
-                AutoBackupService.autoExportVault(this)
-                DocumentFile.fromSingleUri(this, destUri)?.let {
-                    toastText(this, "Auto-backup configured with ${getFullName(it)}")
+                val newBackupFile = DocumentFile.fromSingleUri(this, newDestUri)
+                if (newBackupFile != null) {
+                    if (currAutoBackupFileName != newBackupFile.name) {
+
+                        AlertDialog.Builder(this)
+                            .setTitle(R.string.auto_export_vault)
+                            .setMessage("Did you intend to change the auto-backup file name from $currAutoBackupFileName to ${newBackupFile.name}?")
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setCancelable(false)
+                            .setPositiveButton(android.R.string.yes) { _, _ ->
+                                registerBackupFileUri(newBackupFile)
+                            }
+                            .setNegativeButton(android.R.string.no) { _, _ ->
+                                newBackupFile.delete()
+                            }
+                            .show()
+                    } else {
+                        registerBackupFileUri(newBackupFile)
+                    }
                 }
             }
 
         }
 
+    }
+
+    private fun registerBackupFileUri(newBackupFile: DocumentFile) {
+        AutoBackupService.registerAutoBackupUri(this, newBackupFile.uri)
+        AutoBackupService.autoExportVault(this)
+        toastText(this, "Auto-backup configured with ${getFullName(newBackupFile)}")
     }
 
     override fun onBackPressed() {
@@ -1762,9 +1783,17 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     configureAutoBackupFileUri(backupFile)
                 }
                 .setNegativeButton("Deactivate") { _, _ ->
-                    //TODO Confirm
-                    PreferenceService.delete(PreferenceService.DATA_VAULT_AUTO_EXPORT_URI, this)
-                    toastText(this, "Auto-backup deactivated")
+                    AlertDialog.Builder(this)
+                        .setTitle(R.string.auto_export_vault)
+                        .setMessage("Are you sure to deactivate this auto-backup configuration?")
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton(android.R.string.yes) { _, _ ->
+                            PreferenceService.delete(PreferenceService.DATA_VAULT_AUTO_EXPORT_URI, this)
+                            toastText(this, "Auto-backup deactivated")
+                        }
+                        .setNegativeButton(android.R.string.no, null)
+                        .show()
+
                 }
                 .setNeutralButton(R.string.close) { dialog, _ ->
                     dialog.cancel()
@@ -1806,7 +1835,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             return fullPathWithoutScheme
         }
         else {
-            return fullPathWithoutScheme + "/" + fileName
+            return "$fullPathWithoutScheme/$fileName"
         }
     }
 
@@ -1817,12 +1846,13 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             intent.addCategory(Intent.CATEGORY_OPENABLE)
             intent.type = "application/json"
             intent.putExtra(EXTRA_INITIAL_URI, backupFile?.uri)
-            if (backupFile != null) {
-                intent.putExtra(Intent.EXTRA_TITLE, backupFile.name?:ShareVaultUseCase.getAutoBackupFileName(this))
+            currAutoBackupFileName = if (backupFile != null) {
+                backupFile.name?:ShareVaultUseCase.getAutoBackupFileName(this)
+            } else {
+                ShareVaultUseCase.getAutoBackupFileName(this)
             }
-            else {
-                intent.putExtra(Intent.EXTRA_TITLE, ShareVaultUseCase.getAutoBackupFileName(this))
-            }
+            intent.putExtra(Intent.EXTRA_TITLE, currAutoBackupFileName)
+
             startActivityForResult(
                 Intent.createChooser(intent, getString(R.string.save_as)),
                 saveAutoBackupFile
