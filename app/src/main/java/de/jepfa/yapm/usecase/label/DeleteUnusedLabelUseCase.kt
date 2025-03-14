@@ -36,7 +36,7 @@ object DeleteUnusedLabelUseCase: OutputUseCase<String, SecureActivity>() { //TOD
             .mapNotNull { it.labelId }
             .toList()
 
-        activity.labelViewModel.deleteByIds(deleteCandidateIds)
+        activity.labelViewModel.deleteByIds(deleteCandidateIds, activity)
 
         return UseCaseOutput(true, activity.getString(R.string.unused_labels_deleted, deleteCandidateIds.size))
     }

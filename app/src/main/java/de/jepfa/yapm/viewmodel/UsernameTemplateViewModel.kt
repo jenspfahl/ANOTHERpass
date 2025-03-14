@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import de.jepfa.yapm.database.repository.UsernameTemplateRepository
 import de.jepfa.yapm.model.encrypted.EncUsernameTemplate
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.io.AutoBackupService
 import de.jepfa.yapm.ui.YapmApp
 import kotlinx.coroutines.launch
 
@@ -19,18 +20,24 @@ class UsernameTemplateViewModel(private val repository: UsernameTemplateReposito
     fun insert(usernameTemplate: EncUsernameTemplate, context: Context) = viewModelScope.launch {
         repository.insert(usernameTemplate)
         PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_MODIFIED_AT, context)
+        AutoBackupService.autoExportVault(context)
     }
 
     fun update(usernameTemplate: EncUsernameTemplate, context: Context) = viewModelScope.launch {
         repository.update(usernameTemplate)
         PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_MODIFIED_AT, context)
+        AutoBackupService.autoExportVault(context)
     }
 
-    fun delete(usernameTemplate: EncUsernameTemplate)  = viewModelScope.launch {
+    fun delete(usernameTemplate: EncUsernameTemplate, context: Context)  = viewModelScope.launch {
         repository.delete(usernameTemplate)
+        PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_MODIFIED_AT, context)
+        AutoBackupService.autoExportVault(context)
     }
-    fun deleteById(id: Int)  = viewModelScope.launch {
+    fun deleteById(id: Int, context: Context)  = viewModelScope.launch {
         repository.deleteById(id)
+        PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_MODIFIED_AT, context)
+        AutoBackupService.autoExportVault(context)
     }
 }
 

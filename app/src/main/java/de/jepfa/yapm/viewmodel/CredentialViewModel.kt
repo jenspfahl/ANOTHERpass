@@ -8,6 +8,7 @@ import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_EXPIRY_DATES
+import de.jepfa.yapm.service.io.AutoBackupService
 import de.jepfa.yapm.service.notification.NotificationService
 import de.jepfa.yapm.service.notification.NotificationService.SCHEDULED_NOTIFICATION_KEY_SEPARATOR
 import de.jepfa.yapm.service.secret.SecretService
@@ -39,17 +40,21 @@ class CredentialViewModel(private val repository: CredentialRepository) : ViewMo
         credential.timeData.touchModify()
         repository.insert(credential)
         PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_MODIFIED_AT, context)
+        AutoBackupService.autoExportVault(context)
     }    
 
     fun update(credential: EncCredential, context: Context) = viewModelScope.launch {
         credential.timeData.touchModify()
         repository.update(credential)
         PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_MODIFIED_AT, context)
+        AutoBackupService.autoExportVault(context)
     }
 
-    fun delete(credential: EncCredential)  = viewModelScope.launch {
+    fun delete(credential: EncCredential, context: Context)  = viewModelScope.launch {
         credential.timeData.touchModify()
         repository.delete(credential)
+        PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_MODIFIED_AT, context)
+        AutoBackupService.autoExportVault(context)
     }
 
     fun hasExpiredCredentials(): Boolean {

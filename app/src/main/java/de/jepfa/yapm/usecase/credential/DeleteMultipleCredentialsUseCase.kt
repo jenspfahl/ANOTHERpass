@@ -11,7 +11,7 @@ object DeleteMultipleCredentialsUseCase: InputUseCase<DeleteMultipleCredentialsU
     override suspend fun doExecute(input: Input, activity: SecureActivity): Boolean {
 
         input.credentials.forEach { credential ->
-            activity.credentialViewModel.delete(credential)
+            activity.credentialViewModel.delete(credential, activity)
         }
         return true
     }

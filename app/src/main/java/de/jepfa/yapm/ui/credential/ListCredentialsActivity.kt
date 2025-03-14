@@ -16,6 +16,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.provider.BaseColumns
+import android.provider.DocumentsContract.EXTRA_INITIAL_URI
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
@@ -46,6 +47,8 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.MenuItemCompat
+import androidx.core.view.setPadding
+import androidx.documentfile.provider.DocumentFile
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -56,7 +59,6 @@ import com.google.android.material.navigation.NavigationView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncWebExtension
-import de.jepfa.yapm.model.otp.OtpConfig
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
@@ -65,15 +67,21 @@ import de.jepfa.yapm.service.PreferenceService.DATA_NAV_MENU_EXPORT_EXPANDED
 import de.jepfa.yapm.service.PreferenceService.DATA_NAV_MENU_IMPORT_EXPANDED
 import de.jepfa.yapm.service.PreferenceService.DATA_NAV_MENU_QUICK_ACCESS_EXPANDED
 import de.jepfa.yapm.service.PreferenceService.DATA_NAV_MENU_VAULT_EXPANDED
+import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_AUTO_EXPORTED_AT
 import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_SUGGEST_CREDENTIALS
 import de.jepfa.yapm.service.PreferenceService.PREF_CREDENTIAL_SORT_ORDER
 import de.jepfa.yapm.service.PreferenceService.PREF_EXPIRED_CREDENTIALS_ON_TOP
+import de.jepfa.yapm.service.PreferenceService.PREF_INCLUDE_MASTER_KEY_IN_AUTO_BACKUP_FILE
+import de.jepfa.yapm.service.PreferenceService.PREF_INCLUDE_MASTER_KEY_IN_BACKUP_FILE
+import de.jepfa.yapm.service.PreferenceService.PREF_INCLUDE_SETTINGS_IN_AUTO_BACKUP_FILE
+import de.jepfa.yapm.service.PreferenceService.PREF_INCLUDE_SETTINGS_IN_BACKUP_FILE
 import de.jepfa.yapm.service.PreferenceService.PREF_LABEL_FILTER_SINGLE_CHOICE
 import de.jepfa.yapm.service.PreferenceService.PREF_NAV_MENU_ALWAYS_COLLAPSED
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_CREDENTIAL_IDS
 import de.jepfa.yapm.service.PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD
 import de.jepfa.yapm.service.PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_RELOAD
 import de.jepfa.yapm.service.autofill.ResponseFiller
+import de.jepfa.yapm.service.io.AutoBackupService
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelFilter.WITH_NO_LABELS_ID
 import de.jepfa.yapm.service.label.LabelService
@@ -123,6 +131,7 @@ import de.jepfa.yapm.usecase.secret.SeedRandomGeneratorUseCase
 import de.jepfa.yapm.usecase.session.LogoutUseCase
 import de.jepfa.yapm.usecase.vault.DropVaultUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
+import de.jepfa.yapm.usecase.vault.ShareVaultUseCase
 import de.jepfa.yapm.usecase.vault.ShowVaultInfoUseCase
 import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.Constants
@@ -130,10 +139,12 @@ import de.jepfa.yapm.util.Constants.ACTION_DELIMITER
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.IpConverter
+import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.PermissionChecker.verifyNotificationPermissions
 import de.jepfa.yapm.util.SearchCommand
 import de.jepfa.yapm.util.addFormattedLine
 import de.jepfa.yapm.util.createAndAddLabelChip
+import de.jepfa.yapm.util.dateTimeToNiceString
 import de.jepfa.yapm.util.toastText
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.RequestConnectionPoint
@@ -152,6 +163,7 @@ import java.util.UUID
 class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.OnNavigationItemSelectedListener,
     HttpServer.HttpCallback, HttpServer.HttpServerCallback, RequestFlows {
 
+    private val saveAutoBackupFile = 67676
     private var serverViewStateText: String = ""
     private lateinit var serverViewSwitch: SwitchCompat
     private lateinit var serverViewDetails: TextView
@@ -220,6 +232,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     return
                 }
             }
+
         }
         // now lets check session
         checkSession = true
@@ -1050,6 +1063,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         super.onNewIntent(intent)
         Log.i(LOG_PREFIX + "LST", "onNewIntent: action=${intent?.action}")
         updateSearchFieldWithAutofillSuggestion(intent)
+        if (intent.action == Constants.ACTION_OPEN_AUTOFILL_DIALOG) {
+            openAutoBackupDialog()
+        }
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
@@ -1340,6 +1356,18 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 updateSearchFieldWithAutofillSuggestion(intent)
             }
         }
+        else if (resultCode == RESULT_OK && requestCode == saveAutoBackupFile) {
+
+            data?.data?.let { destUri ->
+
+                AutoBackupService.registerAutoBackupUri(this, destUri)
+                AutoBackupService.autoExportVault(this)
+                DocumentFile.fromSingleUri(this, destUri)?.let {
+                    toastText(this, "Auto-backup configured with ${getFullName(it)}")
+                }
+            }
+
+        }
 
     }
 
@@ -1500,6 +1528,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 startActivity(intent)
                 return true
             }
+            R.id.auto_export_vault -> {
+
+                openAutoBackupDialog()
+
+                return true
+            }
             R.id.import_credential -> {
                 val intent = Intent(this, ImportCredentialActivity::class.java)
                 startActivity(intent)
@@ -1613,6 +1647,187 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
 
         return true
+    }
+
+    private fun openAutoBackupDialog() {
+        val backupFile = AutoBackupService.getAutoBackupFile(this)
+
+        val dialogBuilder = AlertDialog.Builder(this)
+            .setTitle(R.string.auto_export_vault)
+
+
+
+        val container = LinearLayout(this)
+        container.orientation = LinearLayout.VERTICAL
+
+
+        val messageTextView = TextView(this)
+        messageTextView.text =
+            "Here you can configure a file which is used to automatically backup the vault every time the vault has been changed. The file will be overwritten and always contain the latest vault data."
+        messageTextView.setPadding(32)
+        messageTextView.setTextAppearance(android.R.style.TextAppearance_Theme_Dialog)
+        container.addView(messageTextView)
+
+        if (backupFile != null) {
+            var fileMessage =
+                if (backupFile.canWrite())
+                    "File for auto-backup:\n${getFullName(backupFile)}"
+                else
+                    "File for auto-backup is not accessible! Configure it again!\n${getFullName(backupFile)}"
+
+            if (DebugInfo.isDebug) {
+                fileMessage = fileMessage + System.lineSeparator() + backupFile.uri.toString()
+            }
+
+
+            val currentFileTextView = TextView(this)
+            currentFileTextView.text = fileMessage
+            currentFileTextView.setPadding(32)
+            currentFileTextView.textSize = 18.0F
+            container.addView(currentFileTextView)
+
+
+            val syncContainer = LinearLayout(this)
+            syncContainer.setPadding(32)
+
+            syncContainer.orientation = LinearLayout.HORIZONTAL
+            val lastExportedTextView = TextView(this)
+            lastExportedTextView.text = getLastExportedMessage()
+            lastExportedTextView.textSize = 18.0F
+            syncContainer.addView(lastExportedTextView)
+            container.addView(syncContainer)
+
+
+            if (backupFile.canWrite()) {
+
+                val syncNowButton = ImageView(this)
+                syncNowButton.setImageResource(R.drawable.outline_sync_24)
+                syncNowButton.setPadding(48, 32, 0, 0)
+                syncContainer.addView(syncNowButton)
+
+                syncNowButton.setOnClickListener {
+                    toastText(this, "Auto-backup started")
+                    AutoBackupService.autoExportVault(this) {
+                        lastExportedTextView.text = getLastExportedMessage()
+                    }
+                }
+            }
+        }
+
+
+
+        val includeMasterKeyDefault =
+            PreferenceService.getAsBool(PREF_INCLUDE_MASTER_KEY_IN_BACKUP_FILE, true, this)
+        val includeMasterKeySwitch = SwitchCompat(this)
+        includeMasterKeySwitch.text = getString(R.string.include_enc_masterkey)
+        includeMasterKeySwitch.switchPadding = 32
+        includeMasterKeySwitch.setPadding(64, 32, 64, 16)
+        includeMasterKeySwitch.isChecked = PreferenceService.getAsBool(
+            PREF_INCLUDE_MASTER_KEY_IN_AUTO_BACKUP_FILE, includeMasterKeyDefault, this
+        )
+        includeMasterKeySwitch.setOnClickListener {
+            PreferenceService.putBoolean(
+                PREF_INCLUDE_MASTER_KEY_IN_AUTO_BACKUP_FILE, includeMasterKeySwitch.isChecked, this
+            )
+        }
+
+        container.addView(includeMasterKeySwitch)
+
+        val includePrefsDefault =
+            PreferenceService.getAsBool(PREF_INCLUDE_SETTINGS_IN_BACKUP_FILE, true, this)
+        val includePrefsSwitch = SwitchCompat(this)
+        includePrefsSwitch.text = getString(R.string.include_preferences)
+        includePrefsSwitch.switchPadding = 32
+        includePrefsSwitch.setPadding(64, 16, 64, 32)
+        includePrefsSwitch.isChecked = PreferenceService.getAsBool(
+            PREF_INCLUDE_SETTINGS_IN_AUTO_BACKUP_FILE, includePrefsDefault, this
+        )
+        includePrefsSwitch.setOnClickListener {
+            PreferenceService.putBoolean(
+                PREF_INCLUDE_SETTINGS_IN_AUTO_BACKUP_FILE, includePrefsSwitch.isChecked, this
+            )
+        }
+
+        container.addView(includePrefsSwitch)
+
+
+
+        val scrollView = ScrollView(this)
+        scrollView.addView(container)
+        dialogBuilder.setView(scrollView)
+
+        if (backupFile != null) {
+            dialogBuilder
+                .setPositiveButton("Change") { _, _ ->
+                    configureAutoBackupFileUri(backupFile)
+                }
+                .setNegativeButton("Deactivate") { _, _ ->
+                    //TODO Confirm
+                    PreferenceService.delete(PreferenceService.DATA_VAULT_AUTO_EXPORT_URI, this)
+                    toastText(this, "Auto-backup deactivated")
+                }
+                .setNeutralButton(R.string.close) { dialog, _ ->
+                    dialog.cancel()
+                }
+        } else {
+
+
+            dialogBuilder
+                .setPositiveButton("Configure") { _, _ ->
+                    configureAutoBackupFileUri(null)
+                }
+                .setNeutralButton(R.string.close) { dialog, _ ->
+                    dialog.cancel()
+                }
+        }
+
+        dialogBuilder.show()
+    }
+
+    private fun getLastExportedMessage(): String {
+        val lastExported = PreferenceService.getAsDate(DATA_VAULT_AUTO_EXPORTED_AT, this)
+
+        val lastExportedMessage = if (lastExported != null)
+            "Last auto-backup date:\n${dateTimeToNiceString(lastExported, this)}"
+        else
+            "Last auto-backup date:\nnever"
+        return lastExportedMessage
+    }
+
+    private fun getFullName(backupFile: DocumentFile): String {
+        val fileName = backupFile.name ?: "unknown"
+        val fullPath = backupFile.uri.path ?: return fileName
+        val split = fullPath.split(":").drop(1)
+        if (split.isEmpty()) {
+            return fileName
+        }
+        val fullPathWithoutScheme = split.joinToString(separator = ":")
+        if (fullPathWithoutScheme.endsWith(fileName)) {
+            return fullPathWithoutScheme
+        }
+        else {
+            return fullPathWithoutScheme + "/" + fileName
+        }
+    }
+
+    private fun configureAutoBackupFileUri(backupFile: DocumentFile?) {
+        PermissionChecker.verifyRWStoragePermissions(this)
+        if (PermissionChecker.hasRWStoragePermissions(this)) {
+            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+            intent.addCategory(Intent.CATEGORY_OPENABLE)
+            intent.type = "application/json"
+            intent.putExtra(EXTRA_INITIAL_URI, backupFile?.uri)
+            if (backupFile != null) {
+                intent.putExtra(Intent.EXTRA_TITLE, backupFile.name?:ShareVaultUseCase.getAutoBackupFileName(this))
+            }
+            else {
+                intent.putExtra(Intent.EXTRA_TITLE, ShareVaultUseCase.getAutoBackupFileName(this))
+            }
+            startActivityForResult(
+                Intent.createChooser(intent, getString(R.string.save_as)),
+                saveAutoBackupFile
+            )
+        }
     }
 
     private fun refreshNavigationMenu() {
@@ -1816,7 +2031,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         credential.id?.let { id ->
             credentialViewModel.deleteCredentialExpiry(id, this)
         }
-        credentialViewModel.delete(credential)
+        credentialViewModel.delete(credential, this)
         toastText(this, R.string.credential_deleted)
     }
 

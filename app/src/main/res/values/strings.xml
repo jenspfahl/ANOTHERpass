@@ -109,6 +109,7 @@
     <string name="action_export_masterkey">Export \nmaster key</string>
     <string name="action_export_masterpasswd">Export\nmaster password</string>
     <string name="export_vault">Export vault</string>
+    <string name="auto_export_vault">Auto-backup vault</string>
     <string name="import_vault_as_file">Import vault file</string>
     <string name="message_import_vault_records">You are going to import %1$d credentials and %2$d labels. Existing records may be overridden! Continue?</string>
     <string name="message_import_credential_records">You are going to import %1$d external credentials. They will be created as new records. Continue?</string>
@@ -470,15 +471,15 @@
     <string name="cannot_share_vault">Unable to share the vault file</string>
     <string name="cannot_share_csvfile">Unable to share the csv file</string>
     <string name="hint_store_qr_as_file">Please note if you store sensitive QR codes in your device storage, other apps could access these codes as well.</string>
-    <string name="show_export_vault_reminder">Reminder to export vault</string>
+    <string name="show_export_vault_reminder">Reminder of export vault</string>
     <string name="summary_show_export_vault_reminder">Show a reminder when the vault has changed and needs to be exported.</string>
-    <string name="show_export_mk_reminder">Reminder to export Encrypted Master Key</string>
-    <string name="show_export_mp_reminder">Reminder to export Master Password</string>
-    <string name="show_refresh_mpt_reminder">Reminder to renew Master Password Token</string>
+    <string name="show_export_mk_reminder">Reminder of export Encrypted Master Key</string>
+    <string name="show_export_mp_reminder">Reminder of export Master Password</string>
+    <string name="show_refresh_mpt_reminder">Reminder of renew Master Password Token</string>
     <string name="summary_show_export_mk_reminder">Show a reminder when the Encrypted Master Key has changed and needs to be exported.</string>
     <string name="summary_show_export_mp_reminder">Show a reminder when the Master Password needs to be exported. Note: Without the master password you cannot login!</string>
     <string name="summary_show_refresh_mpt_reminder">Show a reminder when the Master Password Token should be renewed (if created). This can help to reduce the risk of abusing stolen token.</string>
-    <string name="show_biometric_smp_reminder">Reminder to setup biometrics for stored master password</string>
+    <string name="show_biometric_smp_reminder">Reminder of setup biometrics for stored master password</string>
     <string name="summary_show_biometric_smp_reminder">Show a reminder when the stored master password is not protected by a biometric (e.g. a fingerprint) but the device would support it.</string>
     <string name="show_expired_passwords_reminder">Reminder for expired credentials</string>
     <string name="summary_show_expired_passwords_reminder">Show a reminder when any credential is expired.</string>
@@ -488,6 +489,10 @@
 
     <string name="next_reminder">Next reminder</string>
     <string name="last_reminder">Previous reminder</string>
+
+    <string name="auto_export_vault_reminder">Vault could not be exported automatically.</string>
+    <string name="show_auto_export_vault_reminder">Reminder of automatically but failed vault export attempts</string>
+    <string name="summary_show_auto_export_vault_reminder">Show a reminder when the vault could not automatically been exported although configured and becomes out of sync for more than half an hour.</string>
 
     <string name="export_vault_reminder">Vault should be exported after recent modifications.</string>
     <string name="export_mk_reminder">Master key should be exported after recent modifications.</string>

@@ -47,6 +47,9 @@
             android:id="@+id/export_vault"
             android:title="@string/export_vault" />
         <item
+            android:id="@+id/auto_export_vault"
+            android:title="@string/auto_export_vault" />
+        <item
             android:id="@+id/export_plain_credentials"
             android:title="@string/export_plain_credentials" />
     </group>

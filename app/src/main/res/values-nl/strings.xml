@@ -101,6 +101,7 @@ Hoofdsleutel</string>
   <string name="action_export_masterpasswd">Exporteer het
 hoofdwachtwoord</string>
   <string name="export_vault">Export-/back-upkluis</string>
+  <string name="auto_export_vault">Auto-export vault</string>
   <string name="import_vault_as_file">Kluisbestand importeren</string>
   <string name="message_import_vault_records">U staat op het punt %1$d inloggegevens en %2$d categorieën te importeren.  Bestaande gegevens worden overschreven.  Doorgaan?</string>
   <string name="message_import_credential_records">U staat op het punt %1$d inloggegevens te importeren.  Er worden geen bestaande toegangsgegevens overschreven.  Doorgaan?</string>
@@ -459,6 +460,11 @@ Deze waarschuwing kunt u deactiveren onder \'Instellingen/Beveiliging\'.</string
   <string name="expired_credentials_notification_enabled_summary">Je krijgt op het juiste moment een melding, ook als de app gesloten is.  Vanaf Android 13 moet je de app toestemming geven om meldingen te verzenden.</string>
   <string name="next_reminder">Volgende herinnering</string>
   <string name="last_reminder">Laatste herinnering</string>
+
+  <string name="auto_export_vault_reminder">Vault could not be exported automatically.</string>
+  <string name="show_auto_export_vault_reminder">Reminder of automatically but failed vault export attempts</string>
+  <string name="summary_show_auto_export_vault_reminder">Show a reminder when the vault could not automatically been exported although configured and becomes out of sync for more than half an hour.</string>
+
   <string name="export_vault_reminder">Vault is gewijzigd en moet worden geëxporteerd.</string>
   <string name="export_mk_reminder">De hoofdsleutel is gewijzigd en moet worden geëxporteerd.</string>
   <string name="export_mp_reminder">Het hoofdwachtwoord moet worden geëxporteerd!</string>

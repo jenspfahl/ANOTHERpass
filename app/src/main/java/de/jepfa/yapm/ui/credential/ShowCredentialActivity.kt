@@ -361,7 +361,7 @@ class ShowCredentialActivity : SecureActivity() {
                             credential.id?.let { id ->
                                 credentialViewModel.deleteCredentialExpiry(id, this)
                             }
-                            credentialViewModel.delete(credential)
+                            credentialViewModel.delete(credential, this)
                             toastText(this, R.string.credential_deleted)
 
                             finish()
