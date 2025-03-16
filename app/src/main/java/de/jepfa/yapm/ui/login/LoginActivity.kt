@@ -124,7 +124,7 @@ class LoginActivity : NfcBaseActivity() {
         if (DebugInfo.isBeta(this) && !DebugInfo.isBetaDisclaimerShown()) {
             DebugInfo.setBetaDisclaimerShown()
             AlertDialog.Builder(this)
-                .setMessage(R.string.diclaimer_beta_version)
+                .setMessage(R.string.disclaimer_beta_version)
                 .setPositiveButton(R.string.got_it, null)
                 .show()
         }
@@ -425,13 +425,13 @@ class LoginActivity : NfcBaseActivity() {
             .setTitle(getString(R.string.revoke_quick_access))
             .setMessage(getString(R.string.revoke_quick_access_desc))
             .setIcon(android.R.drawable.ic_dialog_alert)
-            .setPositiveButton(android.R.string.yes) { _, _ ->
+            .setPositiveButton(android.R.string.ok) { _, _ ->
                 RemoveStoredMasterPasswordUseCase.execute(this)
                 RevokeMasterPasswordTokenUseCase.execute(this)
                 Session.logout()
                 toastText(this, R.string.quick_access_revoked)
             }
-            .setNegativeButton(android.R.string.no, null)
+            .setNegativeButton(android.R.string.cancel, null)
             .show()
     }
 }

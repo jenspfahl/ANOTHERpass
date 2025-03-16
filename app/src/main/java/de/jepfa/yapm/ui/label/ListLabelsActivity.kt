@@ -91,11 +91,11 @@ class ListLabelsActivity : SecureActivity() {
                 .setTitle(getString(R.string.delete_unused_labels))
                 .setMessage(getString(R.string.message_delete_unused_labels))
                 .setIcon(R.drawable.ic_baseline_label_24)
-                .setPositiveButton(android.R.string.yes) { dialog, _ ->
+                .setPositiveButton(android.R.string.ok) { dialog, _ ->
                     deleteUnusedLabels()
                     dialog.dismiss()
                 }
-                .setNegativeButton(android.R.string.no, null)
+                .setNegativeButton(android.R.string.cancel, null)
                 .show()
             return true
         }

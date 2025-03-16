@@ -207,7 +207,7 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
                     .setTitle(R.string.import_vault_as_file)
                     .setMessage(activity.getString(R.string.message_import_vault_records, credentialsToOverride.size, labelsToOverride.size))
                     .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                    .setPositiveButton(android.R.string.ok) { dialog, whichButton ->
 
                         PreferenceService
                             .getEncrypted(PreferenceService.DATA_ENCRYPTED_MASTER_KEY, activity)
@@ -222,7 +222,7 @@ class ImportVaultFileOverrideVaultFragment : BaseFragment() {
                             }
 
                     }
-                    .setNegativeButton(android.R.string.no, null)
+                    .setNegativeButton(android.R.string.cancel, null)
                     .show()
 
             }

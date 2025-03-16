@@ -30,13 +30,13 @@ object GenerateMasterPasswordTokenUseCase: BasicUseCase<SecureActivity>() {
                     .setTitle(activity.getString(R.string.title_generate_mpt))
                     .setMessage(activity.getString(R.string.message_generate_mpt, mptCounter))
                     .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                    .setPositiveButton(android.R.string.ok) { dialog, whichButton ->
                         UseCaseBackgroundLauncher(GenerateMasterPasswordTokenUseCase)
                             .launch(activity, Unit) {
                                 successHandler()
                             }
                     }
-                    .setNegativeButton(android.R.string.no, null)
+                    .setNegativeButton(android.R.string.cancel, null)
                     .show()
 
         }

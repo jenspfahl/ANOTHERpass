@@ -1366,14 +1366,20 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
                         AlertDialog.Builder(this)
                             .setTitle(R.string.auto_export_vault)
-                            .setMessage("Did you intend to change the auto-backup file name from $currAutoBackupFileName to ${newBackupFile.name}?")
+                            .setMessage(
+                                getString(
+                                    R.string.auto_export_filename_change,
+                                    currAutoBackupFileName,
+                                    newBackupFile.name
+                                ))
                             .setIcon(android.R.drawable.ic_dialog_alert)
                             .setCancelable(false)
-                            .setPositiveButton(android.R.string.yes) { _, _ ->
+                            .setPositiveButton(R.string.yes) { _, _ ->
                                 registerBackupFileUri(newBackupFile)
                             }
-                            .setNegativeButton(android.R.string.no) { _, _ ->
+                            .setNegativeButton(R.string.no) { _, _ ->
                                 newBackupFile.delete()
+                                toastText(this, R.string.cancelled)
                             }
                             .show()
                     } else {
@@ -1389,7 +1395,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private fun registerBackupFileUri(newBackupFile: DocumentFile) {
         AutoBackupService.registerAutoBackupUri(this, newBackupFile.uri)
         AutoBackupService.autoExportVault(this)
-        toastText(this, "Auto-backup configured with ${getFullName(newBackupFile)}")
+        toastText(this, getString(R.string.auto_export_configured, getFullName(newBackupFile)))
     }
 
     override fun onBackPressed() {
@@ -1475,7 +1481,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         .setTitle(getString(R.string.store_masterpasswd))
                         .setMessage(getString(R.string.store_masterpasswd_confirmation))
                         .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                        .setPositiveButton(android.R.string.ok) { dialog, whichButton ->
                             storeMasterPassword(masterPasswd, this,
                                 {
                                     refreshMenuMasterPasswordItem(navigationView.menu)
@@ -1488,7 +1494,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                                     toastText(this, R.string.masterpassword_not_stored)
                                 })
                         }
-                        .setNegativeButton(android.R.string.no, null)
+                        .setNegativeButton(android.R.string.cancel, null)
                         .show()
 
                     return true
@@ -1501,12 +1507,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     .setTitle(getString(R.string.delete_stored_masterpasswd))
                     .setMessage(getString(R.string.delete_stored_masterpasswd_confirmation))
                     .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                    .setPositiveButton(android.R.string.ok) { dialog, whichButton ->
                         RemoveStoredMasterPasswordUseCase.execute(this)
                         refreshMenuMasterPasswordItem(navigationView.menu)
                         toastText(this, R.string.masterpassword_removed)
                     }
-                    .setNegativeButton(android.R.string.no, null)
+                    .setNegativeButton(android.R.string.cancel, null)
                     .show()
 
                 return true
@@ -1609,11 +1615,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     .setTitle(getString(R.string.title_drop_vault))
                     .setMessage(getString(R.string.message_drop_vault))
                     .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                    .setPositiveButton(android.R.string.ok) { dialog, whichButton ->
                         DropVaultUseCase.doubleCheckDropVault(this)
                             {DropVaultUseCase.execute(this)}
                     }
-                    .setNegativeButton(android.R.string.no, null)
+                    .setNegativeButton(android.R.string.cancel, null)
                     .show()
 
                 return true
@@ -1684,7 +1690,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         val messageTextView = TextView(this)
         messageTextView.text =
-            "Here you can configure a file which is used to automatically backup the vault every time the vault has been changed. The file will be overwritten and always contain the latest vault data."
+            getString(R.string.auto_export_explaination)
         messageTextView.setPadding(32)
         messageTextView.setTextAppearance(android.R.style.TextAppearance_Theme_Dialog)
         container.addView(messageTextView)
@@ -1692,12 +1698,15 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         if (backupFile != null) {
             var fileMessage =
                 if (backupFile.canWrite())
-                    "File for auto-backup:\n${getFullName(backupFile)}"
+                    getString(R.string.auto_export_file, getFullName(backupFile))
                 else
-                    "File for auto-backup is not accessible! Configure it again!\n${getFullName(backupFile)}"
+                    getString(R.string.auto_export_file_unaccessible) +
+                            System.lineSeparator() +
+                            getString(R.string.auto_export_file, getFullName(backupFile))
+
 
             if (DebugInfo.isDebug) {
-                fileMessage = fileMessage + System.lineSeparator() + backupFile.uri.toString()
+                fileMessage = fileMessage + System.lineSeparator() + System.lineSeparator() + backupFile.uri.toString()
             }
 
 
@@ -1727,7 +1736,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 syncContainer.addView(syncNowButton)
 
                 syncNowButton.setOnClickListener {
-                    toastText(this, "Auto-backup started")
+                    toastText(this, getString(R.string.auto_export_started))
                     AutoBackupService.autoExportVault(this) {
                         lastExportedTextView.text = getLastExportedMessage()
                     }
@@ -1779,19 +1788,19 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         if (backupFile != null) {
             dialogBuilder
-                .setPositiveButton("Change") { _, _ ->
+                .setPositiveButton(R.string.button_change) { _, _ ->
                     configureAutoBackupFileUri(backupFile)
                 }
-                .setNegativeButton("Deactivate") { _, _ ->
+                .setNegativeButton(getString(R.string.deactivate)) { _, _ ->
                     AlertDialog.Builder(this)
                         .setTitle(R.string.auto_export_vault)
-                        .setMessage("Are you sure to deactivate this auto-backup configuration?")
+                        .setMessage(getString(R.string.auto_export_deactivate_message))
                         .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setPositiveButton(android.R.string.yes) { _, _ ->
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
                             PreferenceService.delete(PreferenceService.DATA_VAULT_AUTO_EXPORT_URI, this)
-                            toastText(this, "Auto-backup deactivated")
+                            toastText(this, getString(R.string.auto_export_deactivated))
                         }
-                        .setNegativeButton(android.R.string.no, null)
+                        .setNegativeButton(android.R.string.cancel, null)
                         .show()
 
                 }
@@ -1802,7 +1811,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
 
             dialogBuilder
-                .setPositiveButton("Configure") { _, _ ->
+                .setPositiveButton(R.string.configure) { _, _ ->
                     configureAutoBackupFileUri(null)
                 }
                 .setNeutralButton(R.string.close) { dialog, _ ->
@@ -1817,14 +1826,14 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         val lastExported = PreferenceService.getAsDate(DATA_VAULT_AUTO_EXPORTED_AT, this)
 
         val lastExportedMessage = if (lastExported != null)
-            "Last auto-backup date:\n${dateTimeToNiceString(lastExported, this)}"
+            getString(R.string.last_auto_export_date) + ":\n" + dateTimeToNiceString(lastExported, this)
         else
-            "Last auto-backup date:\nnever"
+            getString(R.string.last_auto_export_date) + ":\n" + getString(R.string.never)
         return lastExportedMessage
     }
 
     private fun getFullName(backupFile: DocumentFile): String {
-        val fileName = backupFile.name ?: "unknown"
+        val fileName = backupFile.name ?: getString(R.string.unknown)
         val fullPath = backupFile.uri.path ?: return fileName
         val split = fullPath.split(":").drop(1)
         if (split.isEmpty()) {

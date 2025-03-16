@@ -82,7 +82,7 @@ class ImportCredentialsImportFileFragment : BaseFragment() {
                 .setTitle(R.string.import_credentials_file)
                 .setMessage(importCredentialsActivity.getString(R.string.message_import_credential_records, credentialsToImport.size))
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                .setPositiveButton(android.R.string.ok) { _, _ ->
 
                     importCredentialsActivity.masterSecretKey?.let { key ->
 
@@ -120,7 +120,7 @@ class ImportCredentialsImportFileFragment : BaseFragment() {
                     }
 
                 }
-                .setNegativeButton(android.R.string.no, null)
+                .setNegativeButton(android.R.string.cancel, null)
                 .show()
 
 

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.documentfile.provider.DocumentFile
+import de.jepfa.yapm.R
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_AUTO_EXPORTED_AT
 import de.jepfa.yapm.service.PreferenceService.PREF_INCLUDE_MASTER_KEY_IN_AUTO_BACKUP_FILE
@@ -54,9 +55,9 @@ object AutoBackupService {
 
                 CoroutineScope(Dispatchers.Main).launch {
                     if (success)
-                        toastText(context, "Auto-backup done")
+                        toastText(context, R.string.auto_export_done)
                     else
-                        toastText(context, "Auto-backup failed!")
+                        toastText(context, R.string.auto_export_failed)
 
                     postHandler(success)
                 }

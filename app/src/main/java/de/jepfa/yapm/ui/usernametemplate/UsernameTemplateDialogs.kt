@@ -18,7 +18,7 @@ object UsernameTemplateDialogs {
                 .setTitle(R.string.title_delete_username_template)
                 .setMessage(activity.getString(R.string.message_delete_username_template, username))
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                .setPositiveButton(android.R.string.ok) { dialog, whichButton ->
                     UseCaseBackgroundLauncher(DeleteUsernameTemplateUseCase)
                         .launch(activity, usernameTemplate)
                         {
@@ -28,7 +28,7 @@ object UsernameTemplateDialogs {
                         }
 
                 }
-                .setNegativeButton(android.R.string.no, null)
+                .setNegativeButton(android.R.string.cancel, null)
                 .show()
         }
     }

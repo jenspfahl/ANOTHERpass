@@ -166,10 +166,10 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
                                         .setTitle(R.string.title_delete_credential)
                                         .setMessage(listCredentialsActivity.getString(R.string.message_delete_credential, name))
                                         .setIcon(android.R.drawable.ic_dialog_alert)
-                                        .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                                        .setPositiveButton(android.R.string.ok) { dialog, whichButton ->
                                             listCredentialsActivity.deleteCredential(current)
                                         }
-                                        .setNegativeButton(android.R.string.no, null)
+                                        .setNegativeButton(android.R.string.cancel, null)
                                         .show()
                             }
                             true

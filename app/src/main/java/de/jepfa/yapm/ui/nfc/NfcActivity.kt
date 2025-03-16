@@ -108,10 +108,10 @@ class NfcActivity : NfcBaseActivity() {
                             .setTitle(R.string.title_write_nfc_tag)
                             .setMessage(R.string.message_write_nfc_tag)
                             .setIcon(android.R.drawable.ic_dialog_alert)
-                            .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                            .setPositiveButton(android.R.string.ok) { dialog, whichButton ->
                                 writeTag(t, withAppRecord, nfcWriteProtectSwitch.isChecked, nfcProtectCopyingSwitch.isChecked)
                             }
-                            .setNegativeButton(android.R.string.no, null)
+                            .setNegativeButton(android.R.string.cancel, null)
                             .show()
                     }
                     else {
@@ -189,10 +189,10 @@ class NfcActivity : NfcBaseActivity() {
                         .setTitle(R.string.title_write_nfc_tag)
                         .setMessage(R.string.message_make_nfc_tag_write_protected)
                         .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                        .setPositiveButton(android.R.string.ok) { dialog, whichButton ->
                             checkAndWriteTag(data, t, withAppRecord, true)
                         }
-                        .setNegativeButton(android.R.string.no, null)
+                        .setNegativeButton(android.R.string.cancel, null)
                         .show()
                 }
                 else {

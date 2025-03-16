@@ -18,11 +18,11 @@ object RevokeMasterPasswordTokenUseCase: BasicUseCase<BaseActivity>() {
                     .setTitle(activity.getString(R.string.revoke_last_mpt))
                     .setMessage(activity.getString(R.string.message_generate_mpt, mptCounter))
                     .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                    .setPositiveButton(android.R.string.ok) { dialog, whichButton ->
                         execute(activity)
                         successHandler()
                     }
-                    .setNegativeButton(android.R.string.no, null)
+                    .setNegativeButton(android.R.string.cancel, null)
                     .show()
         }
 

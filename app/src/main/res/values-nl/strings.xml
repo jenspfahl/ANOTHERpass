@@ -967,7 +967,22 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="otp_remove_config_message">Are you sure to remove this One-Time-Password configuration from the current credential?</string>
   <string name="nothing_to_delete">Nothing to delete</string>
   <string name="otp_copy_configuration_to_clipboard">Copy configuration to clipboard</string>
-    <string name="diclaimer_beta_version">This is a pre-version only for testing purposes and may contain bugs!!</string>
+  <string name="disclaimer_beta_version">This is a pre-version only for testing purposes and may contain bugs!!</string>
 
+  <string name="auto_export_filename_change">Did you want to change the auto-backup file name from %1$s to %2$s?</string>
+  <string name="auto_export_configured">Auto-backup configured with file %1$s</string>
+  <string name="auto_export_explaination">Here you can configure a target file to which every change to the vault will be automatically exported/backed up. The file will be overwritten and will always contain the latest vault data.</string>    <string name="auto_export_file">File used for auto-backup:\n%1$s</string>
+  <string name="auto_export_file_unaccessible">File used for auto-backup is not accessible anymore! Please configure it again!</string>
+  <string name="auto_export_started">Auto-backup started</string>
+  <string name="auto_export_done">Auto-backup done</string>
+  <string name="auto_export_failed">Auto-backup failed!</string>
+  <string name="auto_export_deactivate_message">Are you sure to deactivate this auto-backup configuration?</string>
+  <string name="auto_export_deactivated">Auto-backup deactivated</string>
+  <string name="last_auto_export_date">Last auto-backup date</string>
+
+  <string name="configure">Configure</string>
+  <string name="deactivate">Deactivate</string>
+  <string name="cancelled">Cancelled</string>
+  <string name="never">never</string>
 
 </resources>

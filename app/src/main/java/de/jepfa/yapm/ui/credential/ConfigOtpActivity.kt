@@ -454,7 +454,7 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
                 .setTitle(getString(R.string.otp_remove_config_title, otpConfig.getLabel()))
                 .setMessage(R.string.otp_remove_config_message)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes) { dialog, _ ->
+                .setPositiveButton(android.R.string.ok) { dialog, _ ->
                     dialog.dismiss()
                     masterSecretKey?.let { key ->
 
@@ -465,7 +465,7 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
                         finish()
                     }
                 }
-                .setNegativeButton(android.R.string.no, null)
+                .setNegativeButton(android.R.string.cancel, null)
                 .show()
 
             return true

@@ -357,7 +357,7 @@ class ShowCredentialActivity : SecureActivity() {
                         .setTitle(R.string.title_delete_credential)
                         .setMessage(getString(R.string.message_delete_credential, name))
                         .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
                             credential.id?.let { id ->
                                 credentialViewModel.deleteCredentialExpiry(id, this)
                             }
@@ -366,7 +366,7 @@ class ShowCredentialActivity : SecureActivity() {
 
                             finish()
                         }
-                        .setNegativeButton(android.R.string.no, null)
+                        .setNegativeButton(android.R.string.cancel, null)
                         .show()
                 }
                 return true

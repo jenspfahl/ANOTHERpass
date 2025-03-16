@@ -108,7 +108,7 @@
     <string name="action_export_masterkey">Exportiere \nMasterkey</string>
     <string name="action_export_masterpasswd">Exportiere \nMasterpasswort</string>
     <string name="export_vault">Exportiere/Backup Tresor</string>
-    <string name="auto_export_vault">Auto-Backup Tresor</string>
+    <string name="auto_export_vault">Automatischer Tresorbackup</string>
     <string name="import_vault_as_file">Importiere Tresor-Datei</string>
     <string name="message_import_vault_records">Du bist dabei %1$d Zugangsdaten und %2$d Kategorien zu importieren. Schon existierende Daten werden überschrieben. Fortsetzen?</string>
     <string name="message_import_credential_records">Du bist dabei %1$d Zugangsdaten zu importieren. Es werden keine existierende Zugangsdaten überschrieben. Fortfahren?</string>
@@ -481,9 +481,9 @@
     <string name="next_reminder">Nächste Erinnerung</string>
     <string name="last_reminder">Letzte Erinnerung</string>
 
-    <string name="auto_export_vault_reminder">Vault could not be exported automatically.</string>
-    <string name="show_auto_export_vault_reminder">Reminder of automatically but failed vault export attempts</string>
-    <string name="summary_show_auto_export_vault_reminder">Show a reminder when the vault could not automatically been exported although configured and becomes out of sync for more than half an hour.</string>
+    <string name="auto_export_vault_reminder">Der Tresor konnte nicht automatisch gesichert/exportiert werden.</string>
+    <string name="show_auto_export_vault_reminder">Erinnerung an automatische, aber fehlgeschlagene Tresor-Sicherungsversuche</string>
+    <string name="summary_show_auto_export_vault_reminder">Erinnerung anzeigen, wenn der Tresor trotz Konfiguration nicht automatisch exportiert/gesichert werden konnte und länger als eine halbe Stunde nicht synchronisiert wurde.</string>
 
     <string name="export_vault_reminder">Tresor wurde geändert und sollte exportiert werden.</string>
     <string name="export_mk_reminder">Masterkey hat sich geändert und sollte exportiert werden.</string>
@@ -998,6 +998,23 @@
     <string name="otp_remove_config_message">Soll diese Einmalpasswort-Konfiguration wirklich von diesen Zugangsdaten entfernt werden?</string>
     <string name="nothing_to_delete">Nichts zum entfernen</string>
     <string name="otp_copy_configuration_to_clipboard">Konfiguration in die Zwischenablage kopieren</string>
-    <string name="diclaimer_beta_version">Dies ist eine Vorab-Version zu Testzwecken und kann Fehler enthalten!!</string>
+    <string name="disclaimer_beta_version">Dies ist eine Vorab-Version zu Testzwecken und kann Fehler enthalten!!</string>
+
+    <string name="auto_export_filename_change">Möchtest du den Dateinamen für die automatische Sicherung von %1$s in %2$s ändern?</string>
+    <string name="auto_export_configured">Automatische Sicherung mit Datei %1$s konfiguriert</string>
+    <string name="auto_export_explaination">Hier kannst du eine Ziel-Datei konfigurieren, in die bei jeder Änderung des Tresors automatisch exportiert/gesichert wird. Die Datei wird überschrieben und enthält immer die neuesten Tresordaten.</string>
+    <string name="auto_export_file">Für die automatische Sicherung verwendete Datei:\n%1$s</string>
+    <string name="auto_export_file_unaccessible">Auf die für die automatische Sicherung verwendete Datei kann nicht mehr zugegriffen werden! Bitte konfiguriere sie erneut!</string>
+    <string name="auto_export_started">Automatische Sicherung gestartet</string>
+    <string name="auto_export_done">Automatische Sicherung beendet</string>
+    <string name="auto_export_failed">Automatische Sicherung fehlgeschlagen!</string>
+    <string name="auto_export_deactivate_message">Möchtest du diese automatische Sicherungskonfiguration wirklich deaktivieren?</string>
+    <string name="auto_export_deactivated">Automatische Sicherung deaktiviert</string>
+    <string name="last_auto_export_date">Datum der letzten automatischen Sicherung</string>
+
+    <string name="configure">Konfigurieren</string>
+    <string name="deactivate">Deaktivieren</string>
+    <string name="cancelled">Abgebrochen</string>
+    <string name="never">Nie</string>
 
 </resources>

@@ -75,7 +75,7 @@ object WebExtensionDialogs {
                 .setTitle(R.string.title_delete_web_extension)
                 .setMessage(activity.getString(R.string.message_delete_web_extension, name))
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes) { _, _ ->
+                .setPositiveButton(android.R.string.ok) { _, _ ->
                     UseCaseBackgroundLauncher(DeleteWebExtensionUseCase)
                         .launch(activity, webExtension)
                         {
@@ -85,7 +85,7 @@ object WebExtensionDialogs {
                         }
 
                 }
-                .setNegativeButton(android.R.string.no, null)
+                .setNegativeButton(android.R.string.cancel, null)
                 .show()
         }
     }
@@ -98,7 +98,7 @@ object WebExtensionDialogs {
                 .setTitle(R.string.delete_disabled_linked_devices_title)
                 .setMessage(R.string.delete_disabled_linked_devices_message)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes) { _, _ ->
+                .setPositiveButton(android.R.string.ok) { _, _ ->
                     UseCaseBackgroundLauncher(DeleteDisabledWebExtensionsUseCase)
                         .launch(activity, Unit)
                         { result ->
@@ -107,7 +107,7 @@ object WebExtensionDialogs {
                         }
 
                 }
-                .setNegativeButton(android.R.string.no, null)
+                .setNegativeButton(android.R.string.cancel, null)
                 .show()
         }
     }
