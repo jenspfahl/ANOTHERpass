@@ -971,8 +971,8 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
 
   <string name="auto_export_filename_change">Did you want to change the auto-backup file name from %1$s to %2$s?</string>
   <string name="auto_export_configured">Auto-backup configured with file %1$s</string>
-  <string name="auto_export_explaination">Here you can configure a target file to which every change to the vault will be automatically exported/backed up. The file will be overwritten and will always contain the latest vault data.</string>    <string name="auto_export_file">File used for auto-backup:\n%1$s</string>
-  <string name="auto_export_file_unaccessible">File used for auto-backup is not accessible anymore! Please configure it again!</string>
+  <string name="auto_export_explanation">Here you can configure a target file to which every change to the vault will be automatically exported/backed up. The file will permanently be overwritten and will always contain the latest vault data.</string>    <string name="auto_export_file">File used for auto-backup:\n%1$s</string>
+  <string name="auto_export_file_inaccessible">File used for auto-backup is not accessible anymore! Please configure it again!</string>
   <string name="auto_export_started">Auto-backup started</string>
   <string name="auto_export_done">Auto-backup done</string>
   <string name="auto_export_failed">Auto-backup failed!</string>

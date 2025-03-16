@@ -1002,9 +1002,9 @@
 
     <string name="auto_export_filename_change">Möchtest du den Dateinamen für die automatische Sicherung von %1$s in %2$s ändern?</string>
     <string name="auto_export_configured">Automatische Sicherung mit Datei %1$s konfiguriert</string>
-    <string name="auto_export_explaination">Hier kannst du eine Ziel-Datei konfigurieren, in die bei jeder Änderung des Tresors automatisch exportiert/gesichert wird. Die Datei wird überschrieben und enthält immer die neuesten Tresordaten.</string>
+    <string name="auto_export_explanation">Hier kannst du eine Ziel-Datei konfigurieren, in die bei jeder Änderung des Tresors automatisch exportiert/gesichert wird. Die Datei wird permanent überschrieben und enthält immer die neuesten Tresordaten.</string>
     <string name="auto_export_file">Für die automatische Sicherung verwendete Datei:\n%1$s</string>
-    <string name="auto_export_file_unaccessible">Auf die für die automatische Sicherung verwendete Datei kann nicht mehr zugegriffen werden! Bitte konfiguriere sie erneut!</string>
+    <string name="auto_export_file_inaccessible">Auf die für die automatische Sicherung verwendete Datei kann nicht mehr zugegriffen werden! Bitte konfiguriere sie erneut!</string>
     <string name="auto_export_started">Automatische Sicherung gestartet</string>
     <string name="auto_export_done">Automatische Sicherung beendet</string>
     <string name="auto_export_failed">Automatische Sicherung fehlgeschlagen!</string>

@@ -1690,7 +1690,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         val messageTextView = TextView(this)
         messageTextView.text =
-            getString(R.string.auto_export_explaination)
+            getString(R.string.auto_export_explanation)
         messageTextView.setPadding(32)
         messageTextView.setTextAppearance(android.R.style.TextAppearance_Theme_Dialog)
         container.addView(messageTextView)
@@ -1700,7 +1700,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 if (backupFile.canWrite())
                     getString(R.string.auto_export_file, getFullName(backupFile))
                 else
-                    getString(R.string.auto_export_file_unaccessible) +
+                    getString(R.string.auto_export_file_inaccessible) +
                             System.lineSeparator() +
                             getString(R.string.auto_export_file, getFullName(backupFile))
 
@@ -1721,7 +1721,10 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             syncContainer.setPadding(32)
 
             syncContainer.orientation = LinearLayout.HORIZONTAL
+            syncContainer.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
             val lastExportedTextView = TextView(this)
+            lastExportedTextView.layoutParams = ViewGroup.LayoutParams(500, ViewGroup.LayoutParams.WRAP_CONTENT)
+
             lastExportedTextView.text = getLastExportedMessage()
             lastExportedTextView.textSize = 18.0F
             syncContainer.addView(lastExportedTextView)
