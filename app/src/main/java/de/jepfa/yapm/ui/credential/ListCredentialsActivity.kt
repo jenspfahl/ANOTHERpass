@@ -486,7 +486,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 val linearLayoutManager = credentialsRecycleView?.layoutManager as LinearLayoutManager
 
                 if (jumpToUuid != null) {
-                    val index = listCredentialAdapter?.currentList?.indexOfFirst { it.uid == jumpToUuid }
+                    val index = listCredentialAdapter?.currentList?.indexOfFirst { it.encCredential?.uid == jumpToUuid }
                     index?.let {
                         linearLayoutManager.scrollToPositionWithOffset(it, 10)
                     }

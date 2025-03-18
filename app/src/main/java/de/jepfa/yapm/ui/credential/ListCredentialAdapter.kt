@@ -1,6 +1,7 @@
 package de.jepfa.yapm.ui.credential
 
 import android.content.Intent
+import android.graphics.Typeface
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -8,7 +9,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.PopupMenu
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -34,18 +37,57 @@ import de.jepfa.yapm.usecase.credential.ExportCredentialUseCase
 import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
+
+data class Group(
+    val name: String,
+    val expanded: Boolean = true,
+    val labelColorRGB: Int? = null,
+    var labelIconResId: Int? = null) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Group
+
+        return name == other.name
+    }
+
+    override fun hashCode(): Int {
+        return name.hashCode()
+    }
+}
+
+
+data class CredentialOrGroup(val encCredential: EncCredential?, val group: Group?) {
+
+    enum class Type {Credential, GroupWithTitle, GroupWithLabel }
+
+    fun getType(): Type {
+        return if (encCredential != null)
+            Type.Credential
+        else if (group?.labelColorRGB != null)
+            Type.GroupWithLabel
+        else
+            Type.GroupWithTitle
+    }
+}
 
 class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity, val multipleSelectionCallback: (Set<EncCredential>) -> Unit) :
-        ListAdapter<EncCredential, ListCredentialAdapter.CredentialViewHolder>(CredentialsComparator()),
+        ListAdapter<CredentialOrGroup, ListCredentialAdapter.CredentialViewHolder>(CredentialsComparator()),
         Filterable {
 
+    private var currSearchString: CharSequence = ""
     private var originList: List<EncCredential> = emptyList()
     private var selectionMode = false
-    private var selected = HashSet<EncCredential>() 
+    private var selected = HashSet<EncCredential>()
+    private val expandedGroups = HashMap<Group, Boolean>()
 
     fun getSelectedCredentials() = HashSet(selected)
-    
+
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CredentialViewHolder {
         val holder = CredentialViewHolder.create(parent)
@@ -65,26 +107,41 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             holder.hideDetachPasswordIcon()
         }
 
+        holder.listenForGroupExpanded { pos, _, imageView, ->
+            val current = getItem(pos)
+
+            val group = current.group ?: return@listenForGroupExpanded
+
+            val expanded = expandedGroups.getOrDefault(group, true)
+
+            expandedGroups[group] = !expanded
+
+            filter.filter(currSearchString)
+        }
+
+
         holder.listenForShowCredential { pos, _ ->
             val current = getItem(pos)
 
+            val credential = current.encCredential ?: return@listenForShowCredential
+
             if (listCredentialsActivity.shouldPushBackAutoFill() || HttpCredentialRequestHandler.isProgressing()) {
-                    if (current.passwordData.isObfuscated) {
+                    if (credential.passwordData.isObfuscated) {
                     DeobfuscationDialog.openDeobfuscationDialogForCredentials(listCredentialsActivity) { deobfuscationKey ->
                         if (deobfuscationKey == null) {
                             return@openDeobfuscationDialogForCredentials
                         }
-                        listCredentialsActivity.pushBackAutofill(current, deobfuscationKey)
+                        listCredentialsActivity.pushBackAutofill(credential, deobfuscationKey)
                     }
                 }
                 else {
-                    listCredentialsActivity.pushBackAutofill(current, null)
+                    listCredentialsActivity.pushBackAutofill(credential, null)
                 }
             }
             else {
                 val intent = Intent(listCredentialsActivity, ShowCredentialActivity::class.java)
 
-                intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, current.id)
+                intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, credential.id)
 
                 listCredentialsActivity.startActivity(intent)
             }
@@ -92,12 +149,13 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
 
         holder.listenForToggleSelection { pos, _ ->
             val current = getItem(pos)
+            val credential = current.encCredential ?: return@listenForToggleSelection
 
-            if (!selected.contains(current)) {
-                selected.add(current)
+            if (!selected.contains(credential)) {
+                selected.add(credential)
             }
             else {
-                selected.remove(current)
+                selected.remove(credential)
             }
             notifyItemChanged(pos)
             multipleSelectionCallback(selected)
@@ -114,7 +172,9 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
 
 
                 val current = getItem(pos)
-                selected.add(current)
+                val credential = current.encCredential ?: return@listenForLongClick false
+
+                selected.add(credential)
 
                 multipleSelectionCallback(selected)
             }
@@ -125,49 +185,57 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         holder.listenForDetachPasswd { pos, _ ->
 
             val current = getItem(pos)
-            DetachHelper.detachPassword(listCredentialsActivity, current.user, current.passwordData.password, null, null)
+            val credential = current.encCredential ?: return@listenForDetachPasswd false
+
+            DetachHelper.detachPassword(listCredentialsActivity, credential.user, credential.passwordData.password, null, null)
         }
 
         holder.listenForCopyPasswd { pos, _ ->
 
             val current = getItem(pos)
-            ClipboardUtil.copyEncPasswordWithCheck(current.passwordData.password, null, listCredentialsActivity)
+            val credential = current.encCredential ?: return@listenForCopyPasswd
+
+            ClipboardUtil.copyEncPasswordWithCheck(credential.passwordData.password, null, listCredentialsActivity)
         }
 
         holder.listenForOpenMenu { position, _, view ->
+
+            val current = getItem(position)
+            val credential = current.encCredential ?: return@listenForOpenMenu
+
             val popup = PopupMenu(listCredentialsActivity, view)
             popup.setOnMenuItemClickListener(object : PopupMenu.OnMenuItemClickListener {
                 override fun onMenuItemClick(item: MenuItem): Boolean {
-                    val current = getItem(position)
+
                     return when (item.itemId) {
                         R.id.menu_export_credential -> {
-                            ExportCredentialUseCase.openStartExportDialog(current, null, listCredentialsActivity)
+                            ExportCredentialUseCase.openStartExportDialog(credential, null, listCredentialsActivity)
                             return true
                         }
                         R.id.menu_change_credential -> {
                             val intent = Intent(listCredentialsActivity, EditCredentialActivity::class.java)
-                            intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, current.id)
+                            intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, credential.id)
 
                             listCredentialsActivity.startActivityForResult(intent, listCredentialsActivity.newOrUpdateCredentialActivityRequestCode)
                             true
                         }
                         R.id.menu_duplicate_credential -> {
                             listCredentialsActivity.masterSecretKey?.let{ key ->
-                                listCredentialsActivity.duplicateCredential(current, key)
+                                listCredentialsActivity.duplicateCredential(credential, key)
                             }
                             true
                         }
                         R.id.menu_delete_credential -> {
                             listCredentialsActivity.masterSecretKey?.let{ key ->
-                                val decName = SecretService.decryptCommonString(key, current.name)
-                                val name = enrichId(listCredentialsActivity, decName, current.id)
+                                val decName = SecretService.decryptCommonString(key, credential.name)
+                                val name = enrichId(listCredentialsActivity, decName, credential.id)
 
                                 AlertDialog.Builder(listCredentialsActivity)
                                         .setTitle(R.string.title_delete_credential)
                                         .setMessage(listCredentialsActivity.getString(R.string.message_delete_credential, name))
                                         .setIcon(android.R.drawable.ic_dialog_alert)
-                                        .setPositiveButton(android.R.string.ok) { dialog, whichButton ->
-                                            listCredentialsActivity.deleteCredential(current)
+                                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                                            listCredentialsActivity.deleteCredential(credential)
                                         }
                                         .setNegativeButton(android.R.string.cancel, null)
                                         .show()
@@ -183,6 +251,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             popup.show()
         }
 
+
         return holder
     }
 
@@ -196,31 +265,51 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
     override fun onBindViewHolder(holder: CredentialViewHolder, position: Int) {
         val current = getItem(position)
         val key = listCredentialsActivity.masterSecretKey
-        if (selectionMode) {
-            holder.credentialSelectionContainerView.visibility = View.VISIBLE
-            if (selected.contains(current)) {
-                holder.credentialSelectedView.setImageDrawable(listCredentialsActivity.getDrawable(R.drawable.outline_check_circle_24))
+
+        holder.credentialSelectionContainerView.visibility = View.GONE
+        current.encCredential?.let { credential ->
+
+            if (selectionMode) {
+                holder.credentialSelectionContainerView.visibility = View.VISIBLE
+                if (selected.contains(credential)) {
+                    holder.credentialSelectedView.setImageDrawable(AppCompatResources.getDrawable(listCredentialsActivity, R.drawable.outline_check_circle_24))
+                }
+                else {
+                    holder.credentialSelectedView.setImageDrawable(AppCompatResources.getDrawable(listCredentialsActivity, R.drawable.outline_circle_24))
+                }
             }
-            else {
-                holder.credentialSelectedView.setImageDrawable(listCredentialsActivity.getDrawable(R.drawable.outline_circle_24))
-            }
+
+        }
+
+        val group = current.group
+        val expanded = expandedGroups.getOrDefault(group, true)
+
+        if (expanded) {
+            holder.groupExpandedImageView.setImageDrawable(AppCompatResources.getDrawable(listCredentialsActivity, R.drawable.ic_baseline_expand_less_24))
         }
         else {
-            holder.credentialSelectionContainerView.visibility = View.GONE
+            holder.groupExpandedImageView.setImageDrawable(AppCompatResources.getDrawable(listCredentialsActivity, R.drawable.ic_baseline_expand_more_24))
         }
+
         holder.bind(key, current, listCredentialsActivity)
     }
 
     override fun getFilter(): Filter {
         return object : Filter() {
+
             override fun performFiltering(charSequence: CharSequence): FilterResults {
 
+                currSearchString = charSequence
                 val key = listCredentialsActivity.masterSecretKey
                 val filterResults = FilterResults()
 
                 if (charSequence.isEmpty()) {
                     // no search query entered
-                    filterResults.values = filterByLabels(key, originList)
+                    val filteredList = filterByLabels(key, originList)
+                    val groupedList = createGroupedList(key, filteredList)
+                    filterResults.values = groupedList
+
+
                 } else {
                     val filteredList: MutableList<EncCredential> = ArrayList<EncCredential>()
 
@@ -389,8 +478,9 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
 
                     }
 
+                    val groupedList = createGroupedList(key, filteredList)
 
-                    filterResults.values = filteredList
+                    filterResults.values = groupedList
                 }
 
                 return filterResults
@@ -399,7 +489,7 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             override fun publishResults(charSequence: CharSequence, filterResults: FilterResults) {
                 val list = filterResults.values
                 if (list is List<*>) {
-                    submitList(list as List<EncCredential>?)
+                    submitList(list as List<CredentialOrGroup>?)
                 }
                 else {
                     // in some cases the filter result is null in Android 13, recreate it
@@ -415,12 +505,52 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         }
     }
 
+    override fun getItemViewType(position: Int): Int {
+        val current = getItem(position)
+        val credential = current.encCredential
+        val group = current.group
+        if (credential == null && group != null) {
+            return current.getType().ordinal + (10000000 * group.name.hashCode())
+        }
+        else {
+            return current.getType().ordinal
+        }
+    }
+
     fun submitOriginList(list: List<EncCredential>) {
         originList = list
         val key = listCredentialsActivity.masterSecretKey
         val filteredList = filterByLabels(key, list)
-        submitList(filteredList)
+        //TODO if grouping enrich group items
+        val groupedList = createGroupedList(key, filteredList)
+        submitList(groupedList)
 
+    }
+
+    private fun createGroupedList(
+        key: SecretKeyHolder?,
+        filteredList: List<EncCredential>
+    ): List<CredentialOrGroup> {
+        val grouped = HashMap<Group, MutableList<EncCredential>>()
+        if (key != null) {
+            filteredList.forEach { credential ->
+                val groupName =
+                    SecretService.decryptCommonString(key, credential.name).first().uppercase()
+                val group = Group(groupName)
+                grouped.getOrPut(group) { mutableListOf() }.add(credential)
+            }
+        }
+        val groups = grouped.keys.sortedBy { it.name }
+        val groupedList = LinkedList<CredentialOrGroup>()
+        groups.forEach { group ->
+            groupedList.add(CredentialOrGroup(null, group))
+            val groupExpanded = expandedGroups.getOrDefault(group, true)
+            if (groupExpanded) {
+                grouped[group]?.map { CredentialOrGroup(it, group) }
+                    ?.let { groupedList.addAll(it.toList()) }
+            }
+        }
+        return groupedList
     }
 
     private fun filterByLabels(key: SecretKeyHolder?, credentials: List<EncCredential>): List<EncCredential> {
@@ -443,6 +573,9 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
     }
 
     class CredentialViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val credentialBarContainerView: ConstraintLayout = itemView.findViewById(R.id.toolbar_container)
+        private val groupBarContainerView: ConstraintLayout = itemView.findViewById(R.id.groupbar_container)
+        val groupExpandedImageView: ImageView = itemView.findViewById(R.id.group_expand)
         private val credentialContainerView: LinearLayout = itemView.findViewById(R.id.credential_container)
         private val credentialItemView: TextView = itemView.findViewById(R.id.credential_name)
         private val credentialDetachImageView: ImageView = itemView.findViewById(R.id.credential_detach)
@@ -454,10 +587,6 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
 
         fun hideCopyPasswordIcon() {
             credentialCopyImageView.visibility = View.GONE
-            // TODO test if we can shrink the toolbar space on demand
-            /*val contraintLayoutSet = ConstraintSet()
-            contraintLayoutSet.clone(credentialToolbarContainerView)
-            contraintLayoutSet.setHorizontalWeight(R.id.toolbar_container, 0.1f)*/
         }
 
         fun hideDetachPasswordIcon() {
@@ -509,6 +638,16 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             }
         }
 
+        fun listenForGroupExpanded(event: (position: Int, type: Int, imageView: ImageView) -> Unit) {
+            groupBarContainerView.setOnClickListener {
+
+                if (adapterPosition == RecyclerView.NO_POSITION) {
+                    return@setOnClickListener
+                }
+                event.invoke(adapterPosition, itemViewType, groupExpandedImageView)
+            }
+        }
+
         fun listenForLongClick(event: (position: Int, type: Int) -> Boolean) {
             credentialContainerView.setOnLongClickListener {
                 if (adapterPosition == RecyclerView.NO_POSITION) {
@@ -518,41 +657,80 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
             }
         }
 
-        fun bind(key: SecretKeyHolder?, credential: EncCredential, activity: SecureActivity) {
+        fun bind(key: SecretKeyHolder?, credentialOrGroup: CredentialOrGroup, activity: SecureActivity) {
 
             credentialLabelContainerGroup.removeAllViews()
 
-            var name = itemView.context.getString(R.string.unknown_placeholder)
-            if (key != null) {
-                name = SecretService.decryptCommonString(key, credential.name)
-                name = enrichId(activity, name, credential.id)
+            val credential = credentialOrGroup.encCredential
+            if (credential != null) {
+                var name = itemView.context.getString(R.string.unknown_placeholder)
+                if (key != null) {
+                    name = SecretService.decryptCommonString(key, credential.name)
+                    name = enrichId(activity, name, credential.id)
 
-                if (credential.isExpired(key)) { // expired
-                    createAndAddLabelChip(
-                        Label(itemView.context.getString(R.string.expired), activity.getColor(R.color.Red), R.drawable.baseline_lock_clock_24),
-                        credentialLabelContainerGroup,
-                        thinner = true,
-                        itemView.context,
-                        outlined = true,
-                    )
-                }
-
-
-                val showLabels = PreferenceService.getAsBool(PREF_SHOW_LABELS_IN_LIST, itemView.context)
-                if (showLabels) {
-                    LabelService.defaultHolder.decryptLabelsForCredential(key, credential).forEachIndexed { idx, label ->
-                        val chip = createAndAddLabelChip(
-                            label,
+                    if (credential.isExpired(key)) { // expired
+                        createAndAddLabelChip(
+                            Label(itemView.context.getString(R.string.expired), activity.getColor(R.color.Red), R.drawable.baseline_lock_clock_24),
                             credentialLabelContainerGroup,
                             thinner = true,
-                            itemView.context)
-                        chip.setOnClickListener {
-                            LabelDialogs.openLabelOverviewDialog(activity, label)
+                            itemView.context,
+                            outlined = true,
+                        )
+                    }
+
+
+                    val showLabels = PreferenceService.getAsBool(PREF_SHOW_LABELS_IN_LIST, itemView.context)
+                    if (showLabels) {
+                        LabelService.defaultHolder.decryptLabelsForCredential(key, credential).forEachIndexed { idx, label ->
+                            val chip = createAndAddLabelChip(
+                                label,
+                                credentialLabelContainerGroup,
+                                thinner = true,
+                                itemView.context)
+                            chip.setOnClickListener {
+                                LabelDialogs.openLabelOverviewDialog(activity, label)
+                            }
                         }
                     }
                 }
+
+                credentialItemView.text = name
+                credentialBarContainerView.visibility = View.VISIBLE
+                groupBarContainerView.visibility = View.GONE
+
             }
-            credentialItemView.text = name
+            else {
+                credentialBarContainerView.visibility = View.GONE
+                groupBarContainerView.visibility = View.VISIBLE
+
+                credentialItemView.visibility = View.VISIBLE
+                credentialItemView.typeface = Typeface.DEFAULT_BOLD
+
+                credentialOrGroup.group?.let { group ->
+                    val labelColorRGB = group.labelColorRGB
+                    if (labelColorRGB != null) {
+                        credentialItemView.visibility = View.GONE
+
+                        createAndAddLabelChip(
+                            Label(
+                                group.name,
+                                activity.getColor(labelColorRGB),
+                                group.labelIconResId
+                            ),
+                            credentialLabelContainerGroup,
+                            context = itemView.context,
+                            outlined = group.labelIconResId != null,
+                            thinner = false,
+                            placedOnAppBar = false,
+                            typeface = Typeface.DEFAULT_BOLD
+                        )
+                    }
+                    else {
+                        credentialItemView.text = group.name
+                    }
+
+                }
+            }
         }
 
 
@@ -565,13 +743,13 @@ class ListCredentialAdapter(val listCredentialsActivity: ListCredentialsActivity
         }
     }
 
-    class CredentialsComparator : DiffUtil.ItemCallback<EncCredential>() {
-        override fun areItemsTheSame(oldItem: EncCredential, newItem: EncCredential): Boolean {
+    class CredentialsComparator : DiffUtil.ItemCallback<CredentialOrGroup>() {
+        override fun areItemsTheSame(oldItem: CredentialOrGroup, newItem: CredentialOrGroup): Boolean {
             return oldItem === newItem
         }
 
-        override fun areContentsTheSame(oldItem: EncCredential, newItem: EncCredential): Boolean {
-            return oldItem.id == newItem.id
+        override fun areContentsTheSame(oldItem: CredentialOrGroup, newItem: CredentialOrGroup): Boolean {
+            return oldItem == newItem
         }
     }
 
