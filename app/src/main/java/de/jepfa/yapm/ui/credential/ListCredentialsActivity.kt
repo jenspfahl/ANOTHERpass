@@ -450,7 +450,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             updateQuickSearchOnFab(quickSearch)
         }
 
-        listCredentialAdapter = ListCredentialAdapter(this)
+        listCredentialAdapter = ListCredentialAdapter(this, recyclerView)
         { selected ->
 
             if (HttpCredentialRequestHandler.credentialSelectState == MultipleCredentialSelectState.USER_SELECTING) {
