@@ -246,6 +246,11 @@ Het scheiden van de gecodeerde hoofdsleutel van het kluisbestand maakt het besta
   <string name="pref_header_overlay">Toon wachtwoorden bovenop andere apps</string>
   <string name="HYPER">Hyper</string>
   <string name="sort_order">Sorteervolgorde</string>
+  <string name="group_by">Group credentials</string>
+  <string name="credential_group_by_none">No grouping</string>
+  <string name="credential_group_by_name">By credential name (first letter)</string>
+  <string name="credential_group_by_label">By label (Credentials with many labels will occur under each single label)</string>
+
   <string name="credential_sort_by">Sorteer toegangsgegevens op</string>
   <string name="credential_sort_by_name_asc">Naam (A..Z)</string>
   <string name="credential_sort_by_name_desc">Naam (Z..A)</string>

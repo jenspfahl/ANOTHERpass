@@ -93,7 +93,6 @@ class ListCredentialAdapter(
     fun getSelectedCredentials() = HashSet(selected)
 
 
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CredentialViewHolder {
         val holder = CredentialViewHolder.create(parent)
 
@@ -103,7 +102,7 @@ class ListCredentialAdapter(
 
 
         if (viewType != CredentialOrGroup.Type.Credential.ordinal) {
-            holder.listenForGroupExpanded { pos, _, imageView, ->
+            holder.listenForGroupExpanded { pos, _, _, ->
                 val current = getItem(pos)
 
                 val credential = current.encCredential
@@ -301,6 +300,10 @@ class ListCredentialAdapter(
         notifyDataSetChanged()
     }
 
+    fun expandAllGroups() {
+        expandedGroups.clear()
+    }
+
 
     override fun onBindViewHolder(holder: CredentialViewHolder, position: Int) {
         val current = getItem(position)
@@ -331,7 +334,14 @@ class ListCredentialAdapter(
             holder.groupExpandedImageView.setImageDrawable(AppCompatResources.getDrawable(listCredentialsActivity, R.drawable.ic_baseline_expand_more_24))
         }
 
-        holder.bind(key, current, listCredentialsActivity)
+        holder.bind(key, current, listCredentialsActivity) { expandOrCollapseGroup ->
+
+            expandedGroups[expandOrCollapseGroup] = !expandedGroups.getOrDefault(group, true)
+            currGroupPos = holder.adapterPosition
+
+            filter.filter(currSearchString)
+
+        }
     }
 
     override fun getFilter(): Filter {
@@ -566,7 +576,7 @@ class ListCredentialAdapter(
         originList = list
         val key = listCredentialsActivity.masterSecretKey
         val filteredList = filterByLabels(key, list)
-        //TODO if grouping enrich group items
+
         val groupedList = createGroupedList(key, filteredList)
         submitList(groupedList)
 
@@ -576,16 +586,38 @@ class ListCredentialAdapter(
         key: SecretKeyHolder?,
         filteredList: List<EncCredential>
     ): List<CredentialOrGroup> {
+        val credentialGrouping = listCredentialsActivity.getPrefGrouping()
+        if (credentialGrouping == CredentialGrouping.NO_GROUPING) {
+            return filteredList.map { CredentialOrGroup(it, null) }
+        }
+
         val grouped = HashMap<Group, MutableList<EncCredential>>()
         if (key != null) {
             filteredList.forEach { credential ->
-                val groupName =
-                    SecretService.decryptCommonString(key, credential.name).first().uppercase()
-                val group = Group(groupName)
-                grouped.getOrPut(group) { mutableListOf() }.add(credential)
+                if (credentialGrouping == CredentialGrouping.BY_CREDENTIAL_NAME) {
+                    val groupName =
+                        SecretService.decryptCommonString(key, credential.name).first().uppercase()
+                    val group = Group(groupName)
+                    grouped.getOrPut(group) { mutableListOf() }.add(credential)
+                }
+                else if (credentialGrouping == CredentialGrouping.BY_LABEL) {
+                    val labels =
+                        LabelService.defaultHolder.decryptLabelsForCredential(key, credential)
+                    labels.forEach { label ->
+                        val group = Group(label.name, labelColorRGB = label.getColor(listCredentialsActivity))
+                        grouped.getOrPut(group) { mutableListOf() }.add(credential)
+                    }
+
+                }
             }
         }
-        val groups = grouped.keys.sortedBy { it.name }
+
+        var groups = grouped.keys.sortedBy { it.name }
+
+        val sortOrder = listCredentialsActivity.getPrefSortOrder()
+        if (sortOrder == CredentialSortOrder.CREDENTIAL_NAME_DESC) {
+            groups = groups.reversed()
+        }
         val groupedList = LinkedList<CredentialOrGroup>()
         groups.forEach { group ->
             groupedList.add(CredentialOrGroup(null, group))
@@ -699,6 +731,14 @@ class ListCredentialAdapter(
                 }
                 event.invoke(adapterPosition, itemViewType, groupExpandedImageView)
             }
+
+            credentialLabelContainerGroup.setOnClickListener {
+
+                if (adapterPosition == RecyclerView.NO_POSITION) {
+                    return@setOnClickListener
+                }
+                event.invoke(adapterPosition, itemViewType, groupExpandedImageView)
+            }
         }
 
         fun listenForLongClick(event: (position: Int, type: Int) -> Boolean) {
@@ -710,7 +750,7 @@ class ListCredentialAdapter(
             }
         }
 
-        fun bind(key: SecretKeyHolder?, credentialOrGroup: CredentialOrGroup, activity: SecureActivity) {
+        fun bind(key: SecretKeyHolder?, credentialOrGroup: CredentialOrGroup, activity: SecureActivity, expandOrCollapse: (Group) -> Unit) {
 
             credentialLabelContainerGroup.removeAllViews()
 
@@ -766,10 +806,11 @@ class ListCredentialAdapter(
                     if (labelColorRGB != null) {
                         credentialItemView.visibility = View.GONE
 
-                        createAndAddLabelChip(
+                        credentialLabelContainerGroup.setPadding(14, 0, 0, 0)
+                        val chip = createAndAddLabelChip(
                             Label(
                                 group.name,
-                                activity.getColor(labelColorRGB),
+                                labelColorRGB,
                                 group.labelIconResId
                             ),
                             credentialLabelContainerGroup,
@@ -779,6 +820,10 @@ class ListCredentialAdapter(
                             placedOnAppBar = false,
                             typeface = Typeface.DEFAULT_BOLD
                         )
+                        chip.setOnClickListener {
+                            //
+                            expandOrCollapse(group)
+                        }
                     }
                     else {
                         credentialItemView.text = group.name

@@ -171,6 +171,7 @@ object PreferenceService {
     const val PREF_ENABLED_WEB_EXTENSIONS_ON_TOP = PREF_PREFIX + "enabled_webextensions_on_top"
 
     const val PREF_CREDENTIAL_SORT_ORDER = PREF_PREFIX + "credential_sort_order"
+    const val PREF_CREDENTIAL_GROUPING  = PREF_PREFIX + "credential_grouping"
     const val PREF_SHOW_CREDENTIAL_IDS = PREF_PREFIX + "show_credential_ids"
     const val PREF_EXPIRED_CREDENTIALS_ON_TOP = PREF_PREFIX + "expired_credentials_on_top"
 

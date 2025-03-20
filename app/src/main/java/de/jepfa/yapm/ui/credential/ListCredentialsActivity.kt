@@ -68,6 +68,7 @@ import de.jepfa.yapm.service.PreferenceService.DATA_NAV_MENU_QUICK_ACCESS_EXPAND
 import de.jepfa.yapm.service.PreferenceService.DATA_NAV_MENU_VAULT_EXPANDED
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_AUTO_EXPORTED_AT
 import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_SUGGEST_CREDENTIALS
+import de.jepfa.yapm.service.PreferenceService.PREF_CREDENTIAL_GROUPING
 import de.jepfa.yapm.service.PreferenceService.PREF_CREDENTIAL_SORT_ORDER
 import de.jepfa.yapm.service.PreferenceService.PREF_EXPIRED_CREDENTIALS_ON_TOP
 import de.jepfa.yapm.service.PreferenceService.PREF_INCLUDE_MASTER_KEY_IN_AUTO_BACKUP_FILE
@@ -1267,6 +1268,36 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
                 return true
             }
+            R.id.menu_group_by -> {
+                val prefGrouping = getPrefGrouping()
+                val listItems = CredentialGrouping.entries.map { getString(it.labelId) }.toTypedArray()
+
+                val view = LinearLayout(this)
+                view.orientation = LinearLayout.HORIZONTAL
+                view.setPadding(54, 16, 64, 16)
+
+                var selectedGrouping = prefGrouping.ordinal
+                AlertDialog.Builder(this)
+                    .setIcon(R.drawable.outline_group_by_24)
+                    .setTitle(R.string.group_by)
+                    .setSingleChoiceItems(listItems, prefGrouping.ordinal) { _, i ->
+                        selectedGrouping = i
+                    }
+                    .setView(view)
+                    .setPositiveButton(android.R.string.ok) { dialog, _ ->
+                        dialog.dismiss()
+
+                        val newGrouping = CredentialGrouping.entries[selectedGrouping]
+                        PreferenceService.putString(PREF_CREDENTIAL_GROUPING, newGrouping.name, this)
+                        refreshCredentials()
+                    }
+                    .setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                        dialog.cancel()
+                    }
+                    .show()
+
+                return true
+            }
             R.id.menu_show_ids -> {
                 PreferenceService.toggleBoolean(PREF_SHOW_CREDENTIAL_IDS, this)
                 refreshMenuShowIdsItem(item)
@@ -1988,6 +2019,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     }
                 }
 
+                listCredentialAdapter?.expandAllGroups()
                 listCredentialAdapter?.submitOriginList(sortedCredentials)
                 filterAgain()
 
@@ -2049,12 +2081,20 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         item.isChecked = showIds
     }
 
-    private fun getPrefSortOrder(): CredentialSortOrder {
+    internal fun getPrefSortOrder(): CredentialSortOrder {
         val sortOrderAsString = PreferenceService.getAsString(PREF_CREDENTIAL_SORT_ORDER, this)
         if (sortOrderAsString != null) {
             return CredentialSortOrder.valueOf(sortOrderAsString)
         }
         return CredentialSortOrder.DEFAULT
+    }
+
+    internal fun getPrefGrouping(): CredentialGrouping {
+        val groupingAsString = PreferenceService.getAsString(PREF_CREDENTIAL_GROUPING, this)
+        if (groupingAsString != null) {
+            return CredentialGrouping.valueOf(groupingAsString)
+        }
+        return CredentialGrouping.DEFAULT
     }
 
     fun duplicateCredential(credential: EncCredential, key: SecretKeyHolder) {

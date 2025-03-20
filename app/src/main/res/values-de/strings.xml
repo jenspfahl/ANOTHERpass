@@ -254,6 +254,11 @@
     <string name="pref_header_overlay">Passwörter über anderen Apps einblenden</string>
     <string name="HYPER">Hyper</string>
     <string name="sort_order">Sortierreihenfolge</string>
+    <string name="group_by">Zugangsdaten gruppieren</string>
+    <string name="credential_group_by_none">Keine Gruppierung</string>
+    <string name="credential_group_by_name">Nach Name der Zugangsdaten (erster Buchstabe)</string>
+    <string name="credential_group_by_label">Nach Kategorie (Zugangsdaten mit mehreren Kategorien werden unter jeder einzelnen Kategorie aufgeführt)</string>
+
     <string name="credential_sort_by">Sortiere Zugangsdaten nach</string>
     <string name="credential_sort_by_name_asc">Name (A..Z)</string>
     <string name="credential_sort_by_name_desc">Name (Z..A)</string>

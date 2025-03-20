@@ -50,6 +50,13 @@
     </item>
 
     <item
+        android:id="@+id/menu_group_by"
+        android:title="@string/group_by"
+        android:icon="@drawable/outline_group_by_24"
+        app:showAsAction="never">
+    </item>
+
+    <item
         android:id="@+id/menu_show_ids"
         android:checkable="true"
         android:title="@string/show_ids"
