@@ -24,6 +24,7 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_COPY_PASSWORD
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_OVERLAY_FEATURE
+import de.jepfa.yapm.service.PreferenceService.PREF_EXPIRED_CREDENTIALS_ON_TOP
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_LABELS_IN_LIST
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
@@ -33,20 +34,22 @@ import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.editcredential.EditCredentialActivity
 import de.jepfa.yapm.ui.label.Label
+import de.jepfa.yapm.ui.label.Label.Companion.DEFAULT_CHIP_COLOR_ID
 import de.jepfa.yapm.ui.label.LabelDialogs
 import de.jepfa.yapm.usecase.credential.ExportCredentialUseCase
 import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 
 data class Group(
     val name: String,
     val expanded: Boolean = true,
     val labelColorRGB: Int? = null,
-    var labelIconResId: Int? = null) {
+    var labelIconResId: Int? = null,
+    var labelOutlined: Boolean? = false,
+    val position: Int = 0
+    ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -102,7 +105,7 @@ class ListCredentialAdapter(
 
 
         if (viewType != CredentialOrGroup.Type.Credential.ordinal) {
-            holder.listenForGroupExpanded { pos, _, _, ->
+            holder.listenForGroupExpanded { pos, _, _ ->
                 val current = getItem(pos)
 
                 val credential = current.encCredential
@@ -115,7 +118,9 @@ class ListCredentialAdapter(
                 expandedGroups[group] = !expanded
                 currGroupPos = pos
 
-                filter.filter(currSearchString)
+                if (currSearchString.isNotEmpty()) {
+                    filter.filter(currSearchString)
+                }
             }
         }
         else {
@@ -303,6 +308,7 @@ class ListCredentialAdapter(
     fun expandAllGroups() {
         expandedGroups.clear()
     }
+
 
 
     override fun onBindViewHolder(holder: CredentialViewHolder, position: Int) {
@@ -541,7 +547,11 @@ class ListCredentialAdapter(
                 if (list is List<*>) {
                     submitList(list as List<CredentialOrGroup>?) {
                         currGroupPos?.let {
-                            (this@ListCredentialAdapter.parentRecyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(it, 10)
+                            val linearLayoutManager =
+                                this@ListCredentialAdapter.parentRecyclerView.layoutManager as LinearLayoutManager
+                            val firstItemView = linearLayoutManager.findViewByPosition(it)
+                            val offset = firstItemView?.top
+                            linearLayoutManager.scrollToPositionWithOffset(it, offset?:10)
                             currGroupPos = null
                         }
                     }
@@ -591,33 +601,62 @@ class ListCredentialAdapter(
             return filteredList.map { CredentialOrGroup(it, null) }
         }
 
+        val expiredOnTop = PreferenceService.getAsBool(PREF_EXPIRED_CREDENTIALS_ON_TOP, listCredentialsActivity)
         val grouped = HashMap<Group, MutableList<EncCredential>>()
         if (key != null) {
             filteredList.forEach { credential ->
-                if (credentialGrouping == CredentialGrouping.BY_CREDENTIAL_NAME) {
+                if (expiredOnTop && credential.isExpired(key)) {
+                    val group = Group(
+                        listCredentialsActivity.getString(R.string.expired),
+                        labelColorRGB = listCredentialsActivity.getColor(R.color.Red),
+                        labelIconResId = R.drawable.baseline_lock_clock_24,
+                        labelOutlined = true,
+                        position = -1
+                    )
+                    grouped.getOrPut(group) { mutableListOf() }.add(credential)
+                }
+                else if (credentialGrouping == CredentialGrouping.BY_CREDENTIAL_NAME) {
                     val groupName =
                         SecretService.decryptCommonString(key, credential.name).first().uppercase()
+                    //TODO groupName all expect letters and digits go to a special group
                     val group = Group(groupName)
                     grouped.getOrPut(group) { mutableListOf() }.add(credential)
                 }
                 else if (credentialGrouping == CredentialGrouping.BY_LABEL) {
                     val labels =
                         LabelService.defaultHolder.decryptLabelsForCredential(key, credential)
-                    labels.forEach { label ->
-                        val group = Group(label.name, labelColorRGB = label.getColor(listCredentialsActivity))
+                    if (labels.isEmpty()) {
+                        val group = Group(
+                            listCredentialsActivity.getString(R.string.without_category),
+                            labelColorRGB = listCredentialsActivity.getColor(DEFAULT_CHIP_COLOR_ID),
+                            labelOutlined = true,
+                            position = 1
+                        )
                         grouped.getOrPut(group) { mutableListOf() }.add(credential)
+                    }
+                    else {
+                        labels.forEach { label ->
+                            val group = Group(
+                                label.name,
+                                labelColorRGB = label.getColor(listCredentialsActivity)
+                            )
+                            grouped.getOrPut(group) { mutableListOf() }.add(credential)
+                        }
                     }
 
                 }
             }
         }
 
-        var groups = grouped.keys.sortedBy { it.name }
 
         val sortOrder = listCredentialsActivity.getPrefSortOrder()
-        if (sortOrder == CredentialSortOrder.CREDENTIAL_NAME_DESC) {
-            groups = groups.reversed()
+        val groups = if (sortOrder == CredentialSortOrder.CREDENTIAL_NAME_DESC) {
+            grouped.keys.sortedWith(compareBy<Group> { it.position }.thenByDescending { it.name })
         }
+        else {
+            grouped.keys.sortedWith(compareBy( { it.position }, { it.name }))
+        }
+
         val groupedList = LinkedList<CredentialOrGroup>()
         groups.forEach { group ->
             groupedList.add(CredentialOrGroup(null, group))
@@ -815,7 +854,7 @@ class ListCredentialAdapter(
                             ),
                             credentialLabelContainerGroup,
                             context = itemView.context,
-                            outlined = group.labelIconResId != null,
+                            outlined = group.labelOutlined == true,
                             thinner = false,
                             placedOnAppBar = false,
                             typeface = Typeface.DEFAULT_BOLD

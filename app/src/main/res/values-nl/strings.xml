@@ -249,7 +249,8 @@ Het scheiden van de gecodeerde hoofdsleutel van het kluisbestand maakt het besta
   <string name="group_by">Group credentials</string>
   <string name="credential_group_by_none">No grouping</string>
   <string name="credential_group_by_name">By credential name (first letter)</string>
-  <string name="credential_group_by_label">By label (Credentials with many labels will occur under each single label)</string>
+  <string name="credential_group_by_label">By category (Credentials with multiple categories will occur under each single category)</string>
+  <string name="without_category">Without category</string>
 
   <string name="credential_sort_by">Sorteer toegangsgegevens op</string>
   <string name="credential_sort_by_name_asc">Naam (A..Z)</string>
@@ -989,5 +990,7 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="deactivate">Deactivate</string>
   <string name="cancelled">Cancelled</string>
   <string name="never">never</string>
+  <string name="expand_all">Expand all</string>
+
 
 </resources>

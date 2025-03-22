@@ -489,11 +489,15 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 if (jumpToUuid != null) {
                     val index = listCredentialAdapter?.currentList?.indexOfFirst { it.encCredential?.uid == jumpToUuid }
                     index?.let {
-                        linearLayoutManager.scrollToPositionWithOffset(it, 10)
+                        val firstItemView = linearLayoutManager.findViewByPosition(it)
+                        val offset = firstItemView?.top
+                        linearLayoutManager.scrollToPositionWithOffset(it, offset?:10)
                     }
                 } else {
                     jumpToItemPosition?.let {
-                        linearLayoutManager.scrollToPositionWithOffset(it, 10)
+                        val firstItemView = linearLayoutManager.findViewByPosition(it)
+                        val offset = firstItemView?.top
+                        linearLayoutManager.scrollToPositionWithOffset(it, offset?:10)
                     }
                 }
                 jumpToItemPosition = null
@@ -1293,6 +1297,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     }
                     .setNegativeButton(android.R.string.cancel) { dialog, _ ->
                         dialog.cancel()
+                    }
+                    .setNeutralButton(R.string.expand_all) { dialog, _ ->
+                        dialog.cancel()
+                        listCredentialAdapter?.expandAllGroups()
+                        refreshCredentials()
                     }
                     .show()
 
