@@ -881,11 +881,11 @@ class ListCredentialAdapter(
 
     class CredentialsComparator : DiffUtil.ItemCallback<CredentialOrGroup>() {
         override fun areItemsTheSame(oldItem: CredentialOrGroup, newItem: CredentialOrGroup): Boolean {
-            return oldItem === newItem
+            return oldItem.group == newItem.group && oldItem.encCredential?.id == newItem.encCredential?.id
         }
 
         override fun areContentsTheSame(oldItem: CredentialOrGroup, newItem: CredentialOrGroup): Boolean {
-            return oldItem.group == newItem.group && oldItem.encCredential?.id == newItem.encCredential?.id
+            return oldItem.group == newItem.group && oldItem.encCredential == newItem.encCredential
         }
     }
 
