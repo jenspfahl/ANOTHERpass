@@ -1298,11 +1298,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     .setNegativeButton(android.R.string.cancel) { dialog, _ ->
                         dialog.cancel()
                     }
-                    .setNeutralButton(R.string.expand_all) { dialog, _ ->
+                   /* .setNeutralButton(R.string.expand_all) { dialog, _ ->
                         dialog.cancel()
                         listCredentialAdapter?.expandAllGroups()
                         refreshCredentials()
-                    }
+                    }*/
                     .show()
 
                 return true

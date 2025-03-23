@@ -109,18 +109,16 @@ class ListCredentialAdapter(
                 val current = getItem(pos)
 
                 val credential = current.encCredential
+
                 if (credential != null) {
                     return@listenForGroupExpanded
                 }
                 val group = current.group ?: return@listenForGroupExpanded
 
-                val expanded = expandedGroups.getOrDefault(group, true)
-                expandedGroups[group] = !expanded
+                expandedGroups[group] = !expandedGroups.getOrDefault(group, true)
                 currGroupPos = pos
 
-                if (currSearchString.isNotEmpty()) {
-                    filter.filter(currSearchString)
-                }
+                filter.filter(currSearchString)
             }
         }
         else {
@@ -764,7 +762,6 @@ class ListCredentialAdapter(
             }
 
             credentialItemView.setOnClickListener {
-
                 if (adapterPosition == RecyclerView.NO_POSITION) {
                     return@setOnClickListener
                 }
@@ -888,7 +885,7 @@ class ListCredentialAdapter(
         }
 
         override fun areContentsTheSame(oldItem: CredentialOrGroup, newItem: CredentialOrGroup): Boolean {
-            return oldItem == newItem
+            return oldItem.group == newItem.group && oldItem.encCredential?.id == newItem.encCredential?.id
         }
     }
 
