@@ -483,27 +483,48 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
 
         listCredentialAdapter?.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                val linearLayoutManager = credentialsRecycleView?.layoutManager as LinearLayoutManager
 
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                jumpToChange()
+            }
+
+            override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
+                jumpToChange()
+            }
+
+            override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+                jumpToChange()
+            }
+
+            override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
+                jumpToChange()
+            }
+
+            private fun jumpToChange() {
+                val linearLayoutManager =
+                    credentialsRecycleView?.layoutManager as LinearLayoutManager
                 if (jumpToUuid != null) {
-                    val index = listCredentialAdapter?.currentList?.indexOfFirst { it.encCredential?.uid == jumpToUuid }
+                    val index =
+                        listCredentialAdapter?.currentList?.indexOfFirst { it.encCredential?.uid == jumpToUuid }
                     index?.let {
-                        val firstItemView = linearLayoutManager.findViewByPosition(it)
-                        val offset = firstItemView?.top
-                        linearLayoutManager.scrollToPositionWithOffset(it, offset?:10)
+                        if (it >= 0) {
+                            val firstItemView = linearLayoutManager.findViewByPosition(it)
+                            val offset = firstItemView?.top
+                            linearLayoutManager.scrollToPositionWithOffset(it, offset ?: 10)
+                            listCredentialAdapter?.markPosition(it)
+                        }
                     }
                 } else {
                     jumpToItemPosition?.let {
                         val firstItemView = linearLayoutManager.findViewByPosition(it)
                         val offset = firstItemView?.top
-                        linearLayoutManager.scrollToPositionWithOffset(it, offset?:10)
+                        linearLayoutManager.scrollToPositionWithOffset(it, offset ?: 10)
                     }
                 }
                 jumpToItemPosition = null
                 jumpToUuid = null
-
             }
+
         })
 
         credentialsRecycleView = recyclerView

@@ -4,10 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.MotionEvent
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.jepfa.yapm.R
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.SecureActivity
 
@@ -28,6 +30,14 @@ class ListUsernameTemplatesActivity : SecureActivity() {
         listUsernameTemplatesAdapter = ListUsernameTemplatesAdapter(this)
         recyclerView.adapter = listUsernameTemplatesAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
+        val showDividers = PreferenceService.getAsBool(PreferenceService.PREF_SHOW_DIVIDERS_IN_LIST, this)
+        if (showDividers) {
+            val dividerItemDecoration = DividerItemDecoration(
+                recyclerView.context,
+                DividerItemDecoration.VERTICAL
+            )
+            recyclerView.addItemDecoration(dividerItemDecoration)
+        }
 
         usernameTemplateViewModel.allUsernameTemplates.observe(this) { usernameTemplates ->
             masterSecretKey?.let { key ->

@@ -9,6 +9,7 @@ import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import de.jepfa.yapm.R
@@ -37,6 +38,14 @@ class ListWebExtensionsActivity : SecureActivity() {
         listWebExtensionsAdapter = ListWebExtensionsAdapter(this)
         recyclerView.adapter = listWebExtensionsAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
+        val showDividers = PreferenceService.getAsBool(PreferenceService.PREF_SHOW_DIVIDERS_IN_LIST, this)
+        if (showDividers) {
+            val dividerItemDecoration = DividerItemDecoration(
+                recyclerView.context,
+                DividerItemDecoration.VERTICAL
+            )
+            recyclerView.addItemDecoration(dividerItemDecoration)
+        }
 
         val prefSortOrder = getPrefSortOrder()
         val enabledOnTop = PreferenceService.getAsBool(PreferenceService.PREF_ENABLED_WEB_EXTENSIONS_ON_TOP, this)

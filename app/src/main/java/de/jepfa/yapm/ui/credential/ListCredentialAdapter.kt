@@ -2,6 +2,7 @@ package de.jepfa.yapm.ui.credential
 
 import android.content.Intent
 import android.graphics.Typeface
+import android.graphics.drawable.ColorDrawable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -96,6 +97,7 @@ class ListCredentialAdapter(
     private var selected = HashSet<EncCredential>()
     private val expandedGroups = HashMap<Group, Boolean>()
     private var currGroupPos: Int? = null
+    private var markedCredentialId: Int? = null
 
     fun getSelectedCredentials() = HashSet(selected)
 
@@ -333,6 +335,16 @@ class ListCredentialAdapter(
             }
 
         }
+
+        if (markedCredentialId != null && current.encCredential?.id == markedCredentialId) {
+            val color = if (isDarkMode(listCredentialsActivity)) R.color.Gray else R.color.Gray3
+            holder.rowContainerGroup.background =
+                ColorDrawable(listCredentialsActivity.getColor(color))
+        }
+        else {
+            holder.rowContainerGroup.background = null
+        }
+
 
         val group = current.group
         val expanded = expandedGroups.getOrDefault(group, true)
@@ -693,6 +705,13 @@ class ListCredentialAdapter(
         }
     }
 
+    fun markPosition(pos: Int) {
+        val current = currentList[pos]
+        markedCredentialId = current.encCredential?.id
+        notifyDataSetChanged()
+    }
+
+
     class CredentialViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val credentialBarContainerView: ConstraintLayout = itemView.findViewById(R.id.toolbar_container)
         private val groupBarContainerView: ConstraintLayout = itemView.findViewById(R.id.groupbar_container)
@@ -704,6 +723,7 @@ class ListCredentialAdapter(
         private val credentialMenuImageView: ImageView = itemView.findViewById(R.id.credential_menu_popup)
         private val credentialLabelContainerGroup: ChipGroup = itemView.findViewById(R.id.label_container)
         val credentialSelectionContainerView: LinearLayout = itemView.findViewById(R.id.selection_container)
+        val rowContainerGroup: ViewGroup = itemView.findViewById(R.id.row_container)
         val credentialSelectedView: ImageView = itemView.findViewById(R.id.selected)
 
         fun hideCopyPasswordIcon() {

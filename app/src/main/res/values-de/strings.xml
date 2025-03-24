@@ -323,7 +323,7 @@
     <string name="export_plain_passwd">Exportiere Zugangsdaten-Passwort</string>
     <string name="export_enc_credential_record">Exportiere Zugangsdaten verschlüsselt</string>
     <string name="export_plain_credential_record">Exportiere Zugangsdaten zum Teilen</string>
-    <string name="export_otp_config">Exportiere Einmalpassword-Konfiguration</string>
+    <string name="export_otp_config">Exportiere Einmalpasswort-Konfiguration</string>
     <string name="head_export_plain_passwd">Das Zugangsdaten-Passwort von \'%1$s\'</string>
     <string name="sub_export_plain_passwd">Bewahre diesen QR-Code sicher auf, da es ein echtes Passwort enthält!</string>
     <string name="head_export_enc_credential_record">Verschlüsselte Zugangsdaten für \'%1$s\'</string>
