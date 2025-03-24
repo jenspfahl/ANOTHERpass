@@ -570,7 +570,7 @@ class ListCredentialAdapter(
 
                     }
 
-                    val groupedList = createGroupedList(key, filteredList)
+                    val groupedList = createGroupedList(key, filteredList, hideCollapsedItems = false)
 
                     filterResults.values = groupedList
                 }
@@ -630,7 +630,8 @@ class ListCredentialAdapter(
 
     private fun createGroupedList(
         key: SecretKeyHolder?,
-        filteredList: List<EncCredential>
+        filteredList: List<EncCredential>,
+        hideCollapsedItems: Boolean = true
     ): List<CredentialOrGroup> {
         val credentialGrouping = listCredentialsActivity.getPrefGrouping()
         if (credentialGrouping == CredentialGrouping.NO_GROUPING) {
@@ -654,7 +655,6 @@ class ListCredentialAdapter(
                 else if (credentialGrouping == CredentialGrouping.BY_CREDENTIAL_NAME) {
                     val groupName =
                         SecretService.decryptCommonString(key, credential.name).first().uppercase()
-                    //TODO groupName all expect letters and digits go to a special group
                     val group = Group(groupName)
                     grouped.getOrPut(group) { mutableListOf() }.add(credential)
                 }
@@ -697,7 +697,7 @@ class ListCredentialAdapter(
         groups.forEach { group ->
             groupedList.add(CredentialOrGroup(null, group))
             val groupExpanded = expandedGroups.getOrDefault(group, true)
-            if (groupExpanded) {
+            if (!hideCollapsedItems || groupExpanded) {
                 grouped[group]?.map { CredentialOrGroup(it, group) }
                     ?.let { groupedList.addAll(it.toList()) }
             }
