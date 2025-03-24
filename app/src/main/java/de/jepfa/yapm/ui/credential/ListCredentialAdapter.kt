@@ -44,7 +44,7 @@ import java.util.*
 
 data class Group(
     val name: String,
-    val expanded: Boolean = true,
+    var expanded: Boolean = true,
     val labelColorRGB: Int? = null,
     var labelIconResId: Int? = null,
     var labelOutlined: Boolean? = false,
@@ -61,6 +61,10 @@ data class Group(
 
     override fun hashCode(): Int {
         return name.hashCode()
+    }
+
+    fun flipExpanded() {
+        expanded = !expanded
     }
 }
 
@@ -116,7 +120,9 @@ class ListCredentialAdapter(
                 val group = current.group ?: return@listenForGroupExpanded
 
                 expandedGroups[group] = !expandedGroups.getOrDefault(group, true)
+                group.flipExpanded()
                 currGroupPos = pos
+                notifyItemChanged(pos)
 
                 filter.filter(currSearchString)
             }
@@ -339,9 +345,10 @@ class ListCredentialAdapter(
         }
 
         holder.bind(key, current, listCredentialsActivity) { expandOrCollapseGroup ->
-
-            expandedGroups[expandOrCollapseGroup] = !expandedGroups.getOrDefault(group, true)
+            expandedGroups[expandOrCollapseGroup] = !expandedGroups.getOrDefault(expandOrCollapseGroup, true)
+            expandOrCollapseGroup.flipExpanded()
             currGroupPos = holder.adapterPosition
+            notifyItemChanged(holder.adapterPosition)
 
             filter.filter(currSearchString)
 
@@ -881,11 +888,15 @@ class ListCredentialAdapter(
 
     class CredentialsComparator : DiffUtil.ItemCallback<CredentialOrGroup>() {
         override fun areItemsTheSame(oldItem: CredentialOrGroup, newItem: CredentialOrGroup): Boolean {
-            return oldItem.group == newItem.group && oldItem.encCredential?.id == newItem.encCredential?.id
+            return oldItem.group?.name == newItem.group?.name
+                    && oldItem.group?.labelIconResId == newItem.group?.labelIconResId
+                    && oldItem.getType() == newItem.getType()
+                    && oldItem.encCredential?.id == newItem.encCredential?.id
         }
 
         override fun areContentsTheSame(oldItem: CredentialOrGroup, newItem: CredentialOrGroup): Boolean {
-            return oldItem.group == newItem.group && oldItem.encCredential == newItem.encCredential
+            return oldItem.group?.expanded == newItem.group?.expanded
+                    && oldItem.encCredential == newItem.encCredential
         }
     }
 
