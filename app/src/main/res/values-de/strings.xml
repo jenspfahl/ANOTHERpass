@@ -1023,5 +1023,6 @@
     <string name="cancelled">Abgebrochen</string>
     <string name="never">Nie</string>
     <string name="expand_all">Alles ausklappen</string>
+    <string name="collapse_all">Alles einklappen</string>
 
 </resources>

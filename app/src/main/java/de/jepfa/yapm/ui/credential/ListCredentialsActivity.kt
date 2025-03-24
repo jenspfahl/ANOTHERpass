@@ -188,6 +188,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private var restoreServerPanel: MenuItem? = null
     private var lastReminderItem: MenuItem? = null
     private var nextReminderItem: MenuItem? = null
+    private var expandAllItem: MenuItem? = null
+    private var collapseAllItem: MenuItem? = null
 
     val newOrUpdateCredentialActivityRequestCode = 1
 
@@ -1047,6 +1049,10 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         nextReminderItem = menu.findItem(R.id.menu_show_next_reminder)
         updateReminderMenuItems()
 
+        expandAllItem = menu.findItem(R.id.menu_group_by_expand_all)
+        collapseAllItem = menu.findItem(R.id.menu_group_by_collapse_all)
+        updateExpandAndCollapseMenuItems()
+
         super.onCreateOptionsMenu(menu)
 
         // update navigation menu items (collapse or not)
@@ -1139,7 +1145,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             }
         }
     }
-
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
@@ -1281,7 +1286,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     .setPositiveButton(android.R.string.ok) { dialog, _ ->
                         dialog.dismiss()
 
-                        val newSortOrder = CredentialSortOrder.values()[selectedSortOrder]
+                        val newSortOrder = CredentialSortOrder.entries[selectedSortOrder]
                         PreferenceService.putString(PREF_CREDENTIAL_SORT_ORDER, newSortOrder.name, this)
                         PreferenceService.putBoolean(PREF_EXPIRED_CREDENTIALS_ON_TOP, checkBox.isChecked, this)
                         refreshCredentials()
@@ -1315,17 +1320,21 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         val newGrouping = CredentialGrouping.entries[selectedGrouping]
                         PreferenceService.putString(PREF_CREDENTIAL_GROUPING, newGrouping.name, this)
                         refreshCredentials()
+                        updateExpandAndCollapseMenuItems()
                     }
                     .setNegativeButton(android.R.string.cancel) { dialog, _ ->
                         dialog.cancel()
                     }
-                   /* .setNeutralButton(R.string.expand_all) { dialog, _ ->
-                        dialog.cancel()
-                        listCredentialAdapter?.expandAllGroups()
-                        refreshCredentials()
-                    }*/
                     .show()
 
+                return true
+            }
+            R.id.menu_group_by_expand_all -> {
+                listCredentialAdapter?.expandAllGroups()
+                return true
+            }
+            R.id.menu_group_by_collapse_all -> {
+                listCredentialAdapter?.collapseAllGroups()
                 return true
             }
             R.id.menu_show_ids -> {
@@ -2180,6 +2189,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private fun updateReminderMenuItems() {
         nextReminderItem?.isVisible = ReminderService.hasNextReminder(this)
         lastReminderItem?.isVisible = ReminderService.hasLastReminder(this)
+    }
+
+    private fun updateExpandAndCollapseMenuItems() {
+        expandAllItem?.isVisible = getPrefGrouping() != CredentialGrouping.NO_GROUPING
+        collapseAllItem?.isVisible = getPrefGrouping() != CredentialGrouping.NO_GROUPING
     }
 
     private fun updateNavigationMenuVisibility(groupResId: Int, itemResId: Int, stringResId: Int, visible: Boolean) {

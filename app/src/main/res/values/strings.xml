@@ -1030,5 +1030,6 @@
     <string name="cancelled">Cancelled</string>
     <string name="never">never</string>
     <string name="expand_all">Expand all</string>
+    <string name="collapse_all">Collapse all</string>
 
 </resources>

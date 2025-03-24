@@ -64,9 +64,6 @@ data class Group(
         return name.hashCode()
     }
 
-    fun flipExpanded() {
-        expanded = !expanded
-    }
 }
 
 
@@ -121,8 +118,9 @@ class ListCredentialAdapter(
                 }
                 val group = current.group ?: return@listenForGroupExpanded
 
-                expandedGroups[group] = !expandedGroups.getOrDefault(group, true)
-                group.flipExpanded()
+                val newState = !expandedGroups.getOrDefault(group, true)
+                expandedGroups[group] = newState
+                group.expanded = newState
                 currGroupPos = pos
                 notifyItemChanged(pos)
 
@@ -312,7 +310,27 @@ class ListCredentialAdapter(
     }
 
     fun expandAllGroups() {
-        expandedGroups.clear()
+        currentList
+            .filter { it.getType() != CredentialOrGroup.Type.Credential }
+            .mapNotNull { it.group }
+            .forEach {
+                it.expanded = true
+                expandedGroups[it] = true
+            }
+        notifyDataSetChanged()
+        filter.filter(currSearchString)
+    }
+
+    fun collapseAllGroups() {
+        currentList
+            .filter { it.getType() != CredentialOrGroup.Type.Credential }
+            .mapNotNull { it.group }
+            .forEach {
+                it.expanded = false
+                expandedGroups[it] = false
+            }
+        notifyDataSetChanged()
+        filter.filter(currSearchString)
     }
 
 
@@ -357,8 +375,9 @@ class ListCredentialAdapter(
         }
 
         holder.bind(key, current, listCredentialsActivity) { expandOrCollapseGroup ->
-            expandedGroups[expandOrCollapseGroup] = !expandedGroups.getOrDefault(expandOrCollapseGroup, true)
-            expandOrCollapseGroup.flipExpanded()
+            val newState = !expandedGroups.getOrDefault(expandOrCollapseGroup, true)
+            expandedGroups[expandOrCollapseGroup] = newState
+            expandOrCollapseGroup.expanded = newState
             currGroupPos = holder.adapterPosition
             notifyItemChanged(holder.adapterPosition)
 

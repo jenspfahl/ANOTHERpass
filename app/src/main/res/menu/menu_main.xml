@@ -56,6 +56,23 @@
         app:showAsAction="never">
     </item>
 
+    <group>
+     <item
+            android:id="@+id/menu_group_by_collapse_all"
+            android:title="@string/collapse_all"
+            android:icon="@drawable/ic_baseline_expand_less_24"
+            app:showAsAction="never">
+        </item>
+
+        <item
+            android:id="@+id/menu_group_by_expand_all"
+            android:title="@string/expand_all"
+            android:icon="@drawable/ic_baseline_expand_more_24"
+            app:showAsAction="never">
+        </item>
+
+    </group>
+
     <item
         android:id="@+id/menu_show_ids"
         android:checkable="true"
