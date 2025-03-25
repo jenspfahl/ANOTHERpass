@@ -165,7 +165,10 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
                         credential.timeData.modifyTimestamp,
                         reencryptString(credential.timeData.expiresAt, oldMasterSK, newMasterSK),
                     ),
-                    null,
+                    credential.otpData?.let {
+                        OtpData(reencryptString(it.encOtpAuthUri, oldMasterSK, newMasterSK))
+                    },
+                    credential.pinned,
                 )
                 app.credentialRepository.update(updated)
             }

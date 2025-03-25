@@ -179,6 +179,8 @@ object VaultExportService {
             credentialAsJson.addProperty(EncCredential.ATTRIB_WEBSITE, credential.website.toBase64String())
             credentialAsJson.addProperty(EncCredential.ATTRIB_LABELS, credential.labels.toBase64String())
             credentialAsJson.addProperty(EncCredential.ATTRIB_EXPIRES_AT, credential.timeData.expiresAt.toBase64String())
+            credentialAsJson.addProperty(EncCredential.ATTRIB_PINNED, credential.pinned)
+
             credential.timeData.modifyTimestamp?.let {
                 credentialAsJson.addProperty(EncCredential.ATTRIB_MODIFY_TIMESTAMP, it)
             }

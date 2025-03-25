@@ -456,7 +456,8 @@ class EditCredentialDataFragment : SecureFragment() {
                 null,
                 encExpiresAt,
             ),
-            editCredentialActivity.current?.otpData ?: editCredentialActivity.original?.otpData
+            editCredentialActivity.current?.otpData ?: editCredentialActivity.original?.otpData,
+            editCredentialActivity.current?.pinned ?: editCredentialActivity.original?.pinned ?: false,
         )
         editCredentialActivity.current = credentialToSave
     }

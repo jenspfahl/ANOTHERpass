@@ -78,7 +78,8 @@ data class EncCredential(
     var labels: Encrypted, // enc(comma-separated labelIds or "")
     val passwordData: PasswordData,
     val timeData: TimeData,
-    var otpData: OtpData?
+    var otpData: OtpData?,
+    var pinned: Boolean,
 ): EncNamed {
 
     constructor(id: Int?,
@@ -94,7 +95,9 @@ data class EncCredential(
                 isObfuscated: Boolean,
                 isLastPasswordObfuscated: Boolean?,
                 otpDataBase64: String?,
-                modifyTimestamp: Long?) :
+                modifyTimestamp: Long?,
+                pinned: Boolean,
+        ) :
             this(
                 id,
                 uid?.let { UUID.fromString(uid) },
@@ -114,6 +117,7 @@ data class EncCredential(
                     if (expiresAtBase64 != null) Encrypted.fromBase64String(expiresAtBase64) else Encrypted.empty(),
                 ),
                 otpDataBase64?.run { OtpData(Encrypted.fromBase64String(otpDataBase64)) },
+                pinned,
             )
 
 
@@ -138,6 +142,7 @@ data class EncCredential(
         else {
             otpData = null
         }
+        pinned = other.pinned
     }
 
 
@@ -156,6 +161,7 @@ data class EncCredential(
         intent.putExtra(EXTRA_CREDENTIAL_IS_LAST_PASSWORD_OBFUSCATED, passwordData.isLastPasswordObfuscated)
         otpData?.let { intent.putEncryptedExtra(EXTRA_CREDENTIAL_OTP_DATA, it.encOtpAuthUri) }
         intent.putExtra(EXTRA_CREDENTIAL_MODIFY_TIMESTAMP, timeData.modifyTimestamp)
+        intent.putExtra(EXTRA_CREDENTIAL_PINNED, pinned)
 
     }
 
@@ -188,6 +194,7 @@ data class EncCredential(
         if (labels != other.labels) return false
         if (timeData.expiresAt != other.timeData.expiresAt) return false
         if (passwordData.isObfuscated != other.passwordData.isObfuscated) return false
+        if (pinned != other.pinned) return false
 
         return true
     }
@@ -203,6 +210,7 @@ data class EncCredential(
         result = 31 * result + labels.hashCode()
         result = 31 * result + timeData.expiresAt.hashCode()
         result = 31 * result + passwordData.isObfuscated.hashCode()
+        result = 31 * result + pinned.hashCode()
         return result
     }
 
@@ -222,6 +230,7 @@ data class EncCredential(
         const val EXTRA_CREDENTIAL_IS_LAST_PASSWORD_OBFUSCATED = "de.jepfa.yapm.ui.credential.isLastPasswordObfuscated"
         const val EXTRA_CREDENTIAL_OTP_DATA = "de.jepfa.yapm.ui.credential.otpData"
         const val EXTRA_CREDENTIAL_MODIFY_TIMESTAMP = "de.jepfa.yapm.ui.credential.modifyTimestamp"
+        const val EXTRA_CREDENTIAL_PINNED = "de.jepfa.yapm.ui.credential.pinned"
 
         const val ATTRIB_ID = "id"
         const val ATTRIB_UID = "uid"
@@ -237,6 +246,7 @@ data class EncCredential(
         const val ATTRIB_IS_LAST_PASSWORD_OBFUSCATED = "isLastPasswordObfuscated"
         const val ATTRIB_OTP_DATA = "otpData"
         const val ATTRIB_MODIFY_TIMESTAMP = "modifyTimestamp"
+        const val ATTRIB_PINNED = "pinned"
 
         fun fromIntent(intent: Intent, createUuid: Boolean = false): EncCredential {
             var id: Int? = null
@@ -258,6 +268,7 @@ data class EncCredential(
                 EXTRA_CREDENTIAL_IS_LAST_PASSWORD_OBFUSCATED, false)
             var modifyTimestamp = intent.getLongExtra(EXTRA_CREDENTIAL_MODIFY_TIMESTAMP, 0)
             val encOtpData = intent.getEncryptedExtra(EXTRA_CREDENTIAL_OTP_DATA)
+            val pinned = intent.getBooleanExtra(EXTRA_CREDENTIAL_PINNED, false)
 
 
             if (uid == null && createUuid) {
@@ -282,7 +293,8 @@ data class EncCredential(
                     modifyTimestamp,
                     encExpiresAt,
                 ),
-                encOtpData?.run { OtpData(encOtpData) }
+                encOtpData?.run { OtpData(encOtpData) },
+                pinned,
             )
         }
 
@@ -303,8 +315,9 @@ data class EncCredential(
                     jsonObject.get(ATTRIB_IS_OBFUSCATED)?.asBoolean ?: false,
                     jsonObject.get(ATTRIB_IS_LAST_PASSWORD_OBFUSCATED)?.asBoolean ?: false,
                     jsonObject.get(ATTRIB_OTP_DATA)?.asString,
-                    jsonObject.get(ATTRIB_MODIFY_TIMESTAMP)?.asLong
-                )
+                    jsonObject.get(ATTRIB_MODIFY_TIMESTAMP)?.asLong,
+                    jsonObject.get(ATTRIB_PINNED)?.asBoolean?:false,
+                    )
             } catch (e: Exception) {
                 DebugInfo.logException("ENCC", "cannot parse json container", e)
                 return null

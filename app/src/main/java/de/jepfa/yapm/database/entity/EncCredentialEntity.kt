@@ -23,7 +23,9 @@ data class EncCredentialEntity (@PrimaryKey(autoGenerate = true) val id: Int?,
                                 var isObfuscated: Boolean,
                                 var isLastPasswordObfuscated: Boolean,
                                 val otpData: String?,
-                                var modifyTimestamp: Long) {
+                                var modifyTimestamp: Long,
+                                var pinned: Boolean,
+    ) {
 
     constructor(id: Int?,
                 uid: UUID?,
@@ -38,7 +40,8 @@ data class EncCredentialEntity (@PrimaryKey(autoGenerate = true) val id: Int?,
                 isObfuscated: Boolean,
                 isLastPasswordObfuscated: Boolean?,
                 otpData: Encrypted?,
-                modifyTimestamp: Long
+                modifyTimestamp: Long,
+                pinned: Boolean,
     ) : this(
         id,
         uid?.let { it.toString() },
@@ -53,6 +56,9 @@ data class EncCredentialEntity (@PrimaryKey(autoGenerate = true) val id: Int?,
         isObfuscated,
         isLastPasswordObfuscated?:false,
         otpData?.toBase64String(),
-        modifyTimestamp)
+        modifyTimestamp,
+        pinned,
+
+        )
 
 }

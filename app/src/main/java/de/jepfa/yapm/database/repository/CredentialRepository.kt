@@ -82,7 +82,9 @@ class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
                 entity.isObfuscated,
                 entity.isLastPasswordObfuscated,
                 entity.otpData,
-                entity.modifyTimestamp)
+                entity.modifyTimestamp,
+                entity.pinned,
+            )
     }
 
     private fun mapToEntity(encCredential: EncCredential): EncCredentialEntity {
@@ -99,7 +101,9 @@ class CredentialRepository(private val encCredentialDao: EncCredentialDao) {
                 encCredential.passwordData.isObfuscated,
                 encCredential.passwordData.isLastPasswordObfuscated,
                 encCredential.otpData?.encOtpAuthUri,
-                encCredential.timeData.modifyTimestamp ?: encCredential.id?.toLong() ?: 0)
+                encCredential.timeData.modifyTimestamp ?: encCredential.id?.toLong() ?: 0,
+                encCredential.pinned,
+            )
     }
 
 }
