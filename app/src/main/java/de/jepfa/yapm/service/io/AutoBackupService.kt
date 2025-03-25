@@ -44,8 +44,11 @@ object AutoBackupService {
     }
 
     fun autoExportVault(context: Context) {
-        autoExportVault(context) {}
+        if (isAutoBackupConfigured(context)) {
+            autoExportVault(context) {}
+        }
     }
+
     fun autoExportVault(context: Context, postHandler: (Boolean) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             backupFileCreationMutex.withLock {
