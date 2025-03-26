@@ -2008,6 +2008,10 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                                             if (expiredCredentialsOnTop && it.isExpired(key)) 0 else 1
                                         },
                                         {
+                                            if (it.pinned) 0 else 1
+                                        },
+
+                                        {
                                             SecretService.decryptCommonString(key, it.name)
                                                 .lowercase()
                                         }

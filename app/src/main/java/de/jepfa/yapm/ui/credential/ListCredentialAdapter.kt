@@ -244,6 +244,23 @@ class ListCredentialAdapter(
                                 return true
                             }
 
+                            R.id.menu_pin_credential -> {
+                                listCredentialsActivity.masterSecretKey?.let{ _ ->
+                                    val newState = !credential.pinned
+                                    credential.pinned = newState
+                                    listCredentialsActivity.credentialViewModel.update(credential, listCredentialsActivity)
+
+                                    if (newState) {
+                                        toastText(listCredentialsActivity, R.string.credential_marked)
+                                    }
+                                    else {
+                                        toastText(listCredentialsActivity, R.string.credential_unmarked)
+                                    }
+                                }
+
+                                return true
+                            }
+
                             R.id.menu_change_credential -> {
                                 val intent = Intent(
                                     listCredentialsActivity,
@@ -296,6 +313,18 @@ class ListCredentialAdapter(
                 })
                 popup.inflate(R.menu.menu_credential_list)
                 popup.setForceShowIcon(true)
+
+                popup.menu.findItem(R.id.menu_pin_credential)?.let { pinItem ->
+                    if (credential.pinned) {
+                        pinItem.title = listCredentialsActivity.getString(R.string.unmark)
+                        pinItem.icon = AppCompatResources.getDrawable(listCredentialsActivity, R.drawable.baseline_star_rate_24)
+                    }
+                    else {
+                        pinItem.title = listCredentialsActivity.getString(R.string.mark)
+                        pinItem.icon = AppCompatResources.getDrawable(listCredentialsActivity, R.drawable.baseline_star_outline_24)
+                    }
+                }
+
                 popup.show()
             }
         }
@@ -446,6 +475,11 @@ class ListCredentialAdapter(
                             }
                             else if (SearchCommand.SEARCH_COMMAND_SHOW_OTP.applies(charSequence)) {
                                 if (credential.otpData != null) {
+                                    filteredList.add(credential)
+                                }
+                            }
+                            else if (SearchCommand.SEARCH_COMMAND_SHOW_MARKED.applies(charSequence)) {
+                                if (credential.pinned) {
                                     filteredList.add(credential)
                                 }
                             }
@@ -652,7 +686,19 @@ class ListCredentialAdapter(
                     )
                     grouped.getOrPut(group) { mutableListOf() }.add(credential)
                 }
-                else if (credentialGrouping == CredentialGrouping.BY_CREDENTIAL_NAME) {
+
+                if (credential.pinned) {
+                    val group = Group(
+                        listCredentialsActivity.getString(R.string.marked),
+                        labelColorRGB = listCredentialsActivity.getColor(R.color.Orange),
+                        labelIconResId = R.drawable.baseline_star_rate_24,
+                        labelOutlined = true,
+                        position = -2
+                    )
+                    grouped.getOrPut(group) { mutableListOf() }.add(credential)
+                }
+
+                if (credentialGrouping == CredentialGrouping.BY_CREDENTIAL_NAME) {
                     val groupName =
                         SecretService.decryptCommonString(key, credential.name).first().uppercase()
                     val group = Group(groupName)
@@ -853,6 +899,16 @@ class ListCredentialAdapter(
                         )
                     }
 
+                    if (credential.pinned) { // expired
+                        createAndAddLabelChip(
+                            Label(itemView.context.getString(R.string.marked), activity.getColor(R.color.Orange), R.drawable.baseline_star_rate_24),
+                            credentialLabelContainerGroup,
+                            thinner = true,
+                            itemView.context,
+                            outlined = true,
+                        )
+                    }
+
 
                     val showLabels = PreferenceService.getAsBool(PREF_SHOW_LABELS_IN_LIST, itemView.context)
                     if (showLabels) {
@@ -867,6 +923,7 @@ class ListCredentialAdapter(
                             }
                         }
                     }
+
                 }
 
                 credentialItemView.text = name

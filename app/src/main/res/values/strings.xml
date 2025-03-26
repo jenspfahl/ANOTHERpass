@@ -45,6 +45,8 @@
     <string name="CIPHER_BLOWFISH_256_desc">This is an alternative encryption with better security but less performance. It is supposed to be harder to crack than AES but therefore slower. Supported by Android 2.3 and higher.</string>
     <string name="CIPHER_CHACHACHA20_256_desc">This is another alternative encryption with around the same security like AES but supposed to be faster. Supported by Android 9 and higher.</string>
 
+    <string name="mark">Mark</string>
+    <string name="unmark">Unmark</string>
     <string name="change">Edit</string>
     <string name="duplicate">Duplicate</string>
     <string name="delete">Delete</string>
@@ -816,6 +818,7 @@
     <string name="command_latest">Show latest modified credential</string>
     <string name="command_veiled">Filter obfuscated credentials</string>
     <string name="command_otp">Filter credentials with One-Time-Passwords</string>
+    <string name="command_marked">Filter marked credentials</string>
 
     <string name="with_email_alias">Declare the username as email address with a generic alias part</string>
     <string name="title_username_email_alias">What is an email alias part?</string>
@@ -1031,5 +1034,10 @@
     <string name="never">never</string>
     <string name="expand_all">Expand all</string>
     <string name="collapse_all">Collapse all</string>
+    <string name="marked">Marked</string>
+
+
+    <string name="credential_marked">Credential marked</string>
+    <string name="credential_unmarked">Credential unmarked</string>
 
 </resources>

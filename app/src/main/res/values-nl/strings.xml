@@ -37,6 +37,9 @@
   <string name="CIPHER_BLOWFISH_128_desc">Dit is een alternatief versleutelingsalgoritme met een goede balans tussen beveiliging en prestaties.  Er wordt gezegd dat het moeilijker te doorbreken is, maar langzamer dan AES.  Ondersteund vanaf Android 2.3.</string>
   <string name="CIPHER_BLOWFISH_256_desc">Dit is een alternatief versleutelingsalgoritme met iets betere beveiliging maar minder prestaties.  Er wordt gezegd dat het moeilijker te doorbreken is, maar langzamer dan AES.  Ondersteund vanaf Android 2.3.</string>
   <string name="CIPHER_CHACHACHA20_256_desc">Dit is een relatief nieuw versleutelingsalgoritme met ongeveer dezelfde beveiliging als AES, maar vermoedelijk hogere prestaties.  Ondersteund vanaf Android 9.</string>
+
+  <string name="mark">Mark</string>
+  <string name="unmark">Unmark</string>
   <string name="change">Bewerking</string>
   <string name="delete">Verwijderen</string>
   <string name="title_delete_credential">Verwijder inloggegevens</string>
@@ -776,6 +779,7 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="command_latest">Laat recent gewijzigde toegangsgegevens zien</string>
   <string name="command_veiled">Filter verborgen inloggegevens</string>
   <string name="command_otp">Filter credentials with One-Time-Passwords</string>
+  <string name="command_marked">Filter marked credentials</string>
 
 
   <string name="with_email_alias">De gebruikersnaam als e-mailadres met een generiek aliasnaam</string>
@@ -992,6 +996,9 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="never">never</string>
   <string name="expand_all">Expand all</string>
   <string name="collapse_all">Collapse all</string>
+  <string name="marked">Marked</string>
 
+  <string name="credential_marked">Credential marked</string>
+  <string name="credential_unmarked">Credential unmarked</string>
 
 </resources>

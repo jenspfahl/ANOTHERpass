@@ -16,6 +16,7 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.MenuCompat
 import androidx.core.view.children
@@ -287,7 +288,27 @@ class ShowCredentialActivity : SecureActivity() {
 
         optionsMenu = menu
 
+        updateItemMenuPinState()
+
         return super.onCreateOptionsMenu(menu)
+    }
+
+    private fun updateItemMenuPinState() {
+        optionsMenu?.findItem(R.id.menu_pin_credential)?.let { pinItem ->
+            if (credential!!.pinned) {
+                pinItem.title = getString(R.string.unmark)
+                pinItem.icon = AppCompatResources.getDrawable(
+                    this,
+                    R.drawable.baseline_star_rate_24
+                )
+            } else {
+                pinItem.title = getString(R.string.mark)
+                pinItem.icon = AppCompatResources.getDrawable(
+                    this,
+                    R.drawable.baseline_star_outline_24
+                )
+            }
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -334,6 +355,24 @@ class ShowCredentialActivity : SecureActivity() {
 
             if (id == R.id.menu_copy_credential) {
                 ClipboardUtil.copyEncPasswordWithCheck(credential.passwordData.password, obfuscationKey, this)
+                return true
+            }
+
+            if (id == R.id.menu_pin_credential) {
+                masterSecretKey?.let{ _ ->
+                    val newState = !credential.pinned
+                    credential.pinned = newState
+                    credentialViewModel.update(credential, this)
+
+                    if (newState) {
+                        toastText(this, R.string.credential_marked)
+                    }
+                    else {
+                        toastText(this, R.string.credential_unmarked)
+                    }
+                    updateItemMenuPinState()
+
+                }
                 return true
             }
 
@@ -575,6 +614,16 @@ class ShowCredentialActivity : SecureActivity() {
             if (credentialExpired) { // expired
                 createAndAddLabelChip(
                     Label(getString(R.string.expired), getColor(R.color.Red), R.drawable.baseline_lock_clock_24),
+                    toolbarChipGroup,
+                    thinner,
+                    this,
+                    outlined = true,
+                    placedOnAppBar = true,
+                )
+            }
+            if (credential.pinned) { // expired
+                createAndAddLabelChip(
+                    Label(getString(R.string.marked), getColor(R.color.Orange), R.drawable.baseline_star_rate_24),
                     toolbarChipGroup,
                     thinner,
                     this,

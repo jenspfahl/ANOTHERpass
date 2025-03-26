@@ -44,6 +44,8 @@
     <string name="CIPHER_BLOWFISH_256_desc">Dies ist ein alternativer Verschlüsselungsalgorithmus mit etwas besserer Sicherheit aber weniger Performance. Er soll schwerer zu brechen aber dafür langsamer als AES sein. Unterstützt ab Android 2.3.</string>
     <string name="CIPHER_CHACHACHA20_256_desc">Dies ist ein relativ neuer Verschlüsselungsalgorithmus mit etwa der gleichen Sicherheit wie AES aber einer angeblich höheren Performance. Unterstützt ab Android 9.</string>
 
+    <string name="mark">Markieren</string>
+    <string name="unmark">Markierung aufheben</string>
     <string name="change">Bearbeiten</string>
     <string name="delete">Löschen</string>
 
@@ -807,6 +809,7 @@
     <string name="command_latest">Zeige zuletzt bearbeitete Zugangsdaten</string>
     <string name="command_veiled">Filtere verschleierte Zugangsdaten</string>
     <string name="command_otp">Filtere Zugangsdaten mit Einmalpasswörtern</string>
+    <string name="command_marked">Filtere markierte Zugangsdaten</string>
 
 
     <string name="with_email_alias">Deklariere den Benutzernamen als Emailadresse mit einem generischen Alias-Teil</string>
@@ -1024,5 +1027,9 @@
     <string name="never">Nie</string>
     <string name="expand_all">Alles ausklappen</string>
     <string name="collapse_all">Alles einklappen</string>
+    <string name="marked">Markiert</string>
+
+    <string name="credential_marked">Zugangsdaten markiert</string>
+    <string name="credential_unmarked">Markierung aufgehoben</string>
 
 </resources>

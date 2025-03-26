@@ -18,6 +18,7 @@ enum class SearchCommand(
     SEARCH_COMMAND_SEARCH_LABEL("tag", R.string.command_tag, true),
     SEARCH_COMMAND_SEARCH_USER("user", R.string.command_user, true),
     SEARCH_COMMAND_SEARCH_WEBSITE("web", R.string.command_web, true),
+    SEARCH_COMMAND_SHOW_MARKED("marked", R.string.command_marked, false),
     SEARCH_COMMAND_SHOW_EXPIRED("expired", R.string.command_expired, false),
     SEARCH_COMMAND_SHOW_EXPIRES("expires", R.string.command_expires, false),
     SEARCH_COMMAND_SHOW_LATEST("latest", R.string.command_latest, false),
