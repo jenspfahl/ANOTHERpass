@@ -29,7 +29,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.autofill.AutofillManager
 import android.widget.AutoCompleteTextView
-import android.widget.CheckBox
 import android.widget.CursorAdapter
 import android.widget.EditText
 import android.widget.ImageView
@@ -76,6 +75,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_INCLUDE_MASTER_KEY_IN_BACKUP
 import de.jepfa.yapm.service.PreferenceService.PREF_INCLUDE_SETTINGS_IN_AUTO_BACKUP_FILE
 import de.jepfa.yapm.service.PreferenceService.PREF_INCLUDE_SETTINGS_IN_BACKUP_FILE
 import de.jepfa.yapm.service.PreferenceService.PREF_LABEL_FILTER_SINGLE_CHOICE
+import de.jepfa.yapm.service.PreferenceService.PREF_MARKED_CREDENTIALS_ON_TOP
 import de.jepfa.yapm.service.PreferenceService.PREF_NAV_MENU_ALWAYS_COLLAPSED
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_CREDENTIAL_IDS
 import de.jepfa.yapm.service.PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD
@@ -1263,17 +1263,38 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 val prefSortOrder = getPrefSortOrder()
                 val listItems = CredentialSortOrder.values().map { getString(it.labelId) }.toTypedArray()
 
-                val view = LinearLayout(this)
-                view.orientation = LinearLayout.HORIZONTAL
-                view.setPadding(54, 16, 64, 16)
+                val onTopView = LinearLayout(this)
+                onTopView.orientation = LinearLayout.VERTICAL
+                onTopView.setPadding(16)
 
-                val checkBox = CheckBox(this)
-                checkBox.isChecked = PreferenceService.getAsBool(PREF_EXPIRED_CREDENTIALS_ON_TOP, this)
-                val desc = TextView(this)
-                desc.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT)
-                desc.text = getString(R.string.expired_credentials_on_top)
-                view.addView(checkBox)
-                view.addView(desc)
+                val expiredOnTopView = LinearLayout(this)
+                expiredOnTopView.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                expiredOnTopView.orientation = LinearLayout.HORIZONTAL
+                expiredOnTopView.setPadding(16)
+                onTopView.addView(expiredOnTopView)
+
+                val expiredOnTopSwitch = SwitchCompat(this)
+                expiredOnTopSwitch.setPadding(0, 0, 16, 0)
+                expiredOnTopSwitch.isChecked = PreferenceService.getAsBool(PREF_EXPIRED_CREDENTIALS_ON_TOP, this)
+                val expiredOnTopDesc = TextView(this)
+                expiredOnTopDesc.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                expiredOnTopDesc.text = getString(R.string.expired_credentials_on_top)
+                expiredOnTopView.addView(expiredOnTopSwitch)
+                expiredOnTopView.addView(expiredOnTopDesc)
+
+                val markedOnTopView = LinearLayout(this)
+                markedOnTopView.orientation = LinearLayout.HORIZONTAL
+                markedOnTopView.setPadding(16)
+                onTopView.addView(markedOnTopView)
+
+                val markedOnTopSwitch = SwitchCompat(this)
+                markedOnTopSwitch.setPadding(0, 0, 16, 0)
+                markedOnTopSwitch.isChecked = PreferenceService.getAsBool(PREF_MARKED_CREDENTIALS_ON_TOP, true, this)
+                val markedOnTopDesc = TextView(this)
+                markedOnTopDesc.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT)
+                markedOnTopDesc.text = getString(R.string.marked_credentials_on_top)
+                markedOnTopView.addView(markedOnTopSwitch)
+                markedOnTopView.addView(markedOnTopDesc)
 
                 var selectedSortOrder = prefSortOrder.ordinal
                 AlertDialog.Builder(this)
@@ -1282,13 +1303,14 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     .setSingleChoiceItems(listItems, prefSortOrder.ordinal) { _, i ->
                        selectedSortOrder = i
                     }
-                    .setView(view)
+                    .setView(onTopView)
                     .setPositiveButton(android.R.string.ok) { dialog, _ ->
                         dialog.dismiss()
 
                         val newSortOrder = CredentialSortOrder.entries[selectedSortOrder]
                         PreferenceService.putString(PREF_CREDENTIAL_SORT_ORDER, newSortOrder.name, this)
-                        PreferenceService.putBoolean(PREF_EXPIRED_CREDENTIALS_ON_TOP, checkBox.isChecked, this)
+                        PreferenceService.putBoolean(PREF_EXPIRED_CREDENTIALS_ON_TOP, expiredOnTopSwitch.isChecked, this)
+                        PreferenceService.putBoolean(PREF_MARKED_CREDENTIALS_ON_TOP, markedOnTopSwitch.isChecked, this)
                         refreshCredentials()
                     }
                     .setNegativeButton(android.R.string.cancel) { dialog, _ ->
@@ -1302,9 +1324,38 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 val prefGrouping = getPrefGrouping()
                 val listItems = CredentialGrouping.entries.map { getString(it.labelId) }.toTypedArray()
 
-                val view = LinearLayout(this)
-                view.orientation = LinearLayout.HORIZONTAL
-                view.setPadding(54, 16, 64, 16)
+                val onTopView = LinearLayout(this)
+                onTopView.orientation = LinearLayout.VERTICAL
+                onTopView.setPadding(16)
+
+                val expiredOnTopView = LinearLayout(this)
+                expiredOnTopView.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                expiredOnTopView.orientation = LinearLayout.HORIZONTAL
+                expiredOnTopView.setPadding(16)
+                onTopView.addView(expiredOnTopView)
+
+                val expiredOnTopSwitch = SwitchCompat(this)
+                expiredOnTopSwitch.setPadding(0, 0, 16, 0)
+                expiredOnTopSwitch.isChecked = PreferenceService.getAsBool(PREF_EXPIRED_CREDENTIALS_ON_TOP, this)
+                val expiredOnTopDesc = TextView(this)
+                expiredOnTopDesc.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                expiredOnTopDesc.text = getString(R.string.expired_credentials_on_top)
+                expiredOnTopView.addView(expiredOnTopSwitch)
+                expiredOnTopView.addView(expiredOnTopDesc)
+
+                val markedOnTopView = LinearLayout(this)
+                markedOnTopView.orientation = LinearLayout.HORIZONTAL
+                markedOnTopView.setPadding(16)
+                onTopView.addView(markedOnTopView)
+
+                val markedOnTopSwitch = SwitchCompat(this)
+                markedOnTopSwitch.setPadding(0, 0, 16, 0)
+                markedOnTopSwitch.isChecked = PreferenceService.getAsBool(PREF_MARKED_CREDENTIALS_ON_TOP, true, this)
+                val markedOnTopDesc = TextView(this)
+                markedOnTopDesc.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT)
+                markedOnTopDesc.text = getString(R.string.marked_credentials_on_top)
+                markedOnTopView.addView(markedOnTopSwitch)
+                markedOnTopView.addView(markedOnTopDesc)
 
                 var selectedGrouping = prefGrouping.ordinal
                 AlertDialog.Builder(this)
@@ -1313,12 +1364,14 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     .setSingleChoiceItems(listItems, prefGrouping.ordinal) { _, i ->
                         selectedGrouping = i
                     }
-                    .setView(view)
+                    .setView(onTopView)
                     .setPositiveButton(android.R.string.ok) { dialog, _ ->
                         dialog.dismiss()
 
                         val newGrouping = CredentialGrouping.entries[selectedGrouping]
                         PreferenceService.putString(PREF_CREDENTIAL_GROUPING, newGrouping.name, this)
+                        PreferenceService.putBoolean(PREF_EXPIRED_CREDENTIALS_ON_TOP, expiredOnTopSwitch.isChecked, this)
+                        PreferenceService.putBoolean(PREF_MARKED_CREDENTIALS_ON_TOP, markedOnTopSwitch.isChecked, this)
                         refreshCredentials()
                         updateExpandAndCollapseMenuItems()
                     }
@@ -1998,6 +2051,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     }
 
                     val expiredCredentialsOnTop = PreferenceService.getAsBool(PREF_EXPIRED_CREDENTIALS_ON_TOP, this)
+                    val markedCredentialsOnTop = PreferenceService.getAsBool(PREF_MARKED_CREDENTIALS_ON_TOP, true,this)
 
                     when (getPrefSortOrder()) {
                         CredentialSortOrder.CREDENTIAL_NAME_ASC -> {
@@ -2008,7 +2062,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                                             if (expiredCredentialsOnTop && it.isExpired(key)) 0 else 1
                                         },
                                         {
-                                            if (it.pinned) 0 else 1
+                                            if (markedCredentialsOnTop && it.pinned) 0 else 1
                                         },
 
                                         {

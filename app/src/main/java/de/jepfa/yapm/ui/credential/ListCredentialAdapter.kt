@@ -26,6 +26,7 @@ import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_COPY_PASSWORD
 import de.jepfa.yapm.service.PreferenceService.PREF_ENABLE_OVERLAY_FEATURE
 import de.jepfa.yapm.service.PreferenceService.PREF_EXPIRED_CREDENTIALS_ON_TOP
+import de.jepfa.yapm.service.PreferenceService.PREF_MARKED_CREDENTIALS_ON_TOP
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_LABELS_IN_LIST
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelService
@@ -673,6 +674,7 @@ class ListCredentialAdapter(
         }
 
         val expiredOnTop = PreferenceService.getAsBool(PREF_EXPIRED_CREDENTIALS_ON_TOP, listCredentialsActivity)
+        val markedOnTop = PreferenceService.getAsBool(PREF_MARKED_CREDENTIALS_ON_TOP, true, listCredentialsActivity)
         val grouped = HashMap<Group, MutableList<EncCredential>>()
         if (key != null) {
             filteredList.forEach { credential ->
@@ -687,7 +689,7 @@ class ListCredentialAdapter(
                     grouped.getOrPut(group) { mutableListOf() }.add(credential)
                 }
 
-                if (credential.pinned) {
+                if (markedOnTop && credential.pinned) {
                     val group = Group(
                         listCredentialsActivity.getString(R.string.marked),
                         labelColorRGB = listCredentialsActivity.getColor(R.color.Orange),

@@ -262,6 +262,8 @@ Het scheiden van de gecodeerde hoofdsleutel van het kluisbestand maakt het besta
   <string name="credential_sort_by_id">Referentie-ID</string>
   <string name="show_ids">Toon identificatie-ID\'s</string>
   <string name="expired_credentials_on_top">Inloggegevens bovenaan</string>
+  <string name="marked_credentials_on_top">Marked credentials on top</string>
+
   <string name="tab_pseudo_phrase">Pseudofrase</string>
   <string name="tab_ordinary">Normaal wachtwoord</string>
   <string name="drop_to_close">SLUIT APP</string>

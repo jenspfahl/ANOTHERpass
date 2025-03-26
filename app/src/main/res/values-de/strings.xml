@@ -269,6 +269,8 @@
     <string name="credential_sort_by_id">Zugangsdaten-ID</string>
     <string name="show_ids">Zeige Zugangsdaten-IDs</string>
     <string name="expired_credentials_on_top">Abgelaufene Zugangsdaten ganz oben</string>
+    <string name="marked_credentials_on_top">Markierte Zugangsdaten ganz oben</string>
+
     <string name="tab_pseudo_phrase">Pseudophrase</string>
     <string name="tab_ordinary">Normales Passwort</string>
     <string name="drop_to_close">APP SCHLIESSEN</string>

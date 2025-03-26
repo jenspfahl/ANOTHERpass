@@ -174,6 +174,7 @@ object PreferenceService {
     const val PREF_CREDENTIAL_GROUPING  = PREF_PREFIX + "credential_grouping"
     const val PREF_SHOW_CREDENTIAL_IDS = PREF_PREFIX + "show_credential_ids"
     const val PREF_EXPIRED_CREDENTIALS_ON_TOP = PREF_PREFIX + "expired_credentials_on_top"
+    const val PREF_MARKED_CREDENTIALS_ON_TOP = PREF_PREFIX + "marked_credentials_on_top"
 
     const val PREF_DARK_MODE = PREF_PREFIX + "dark_mode"
     const val PREF_LANGUAGE = PREF_PREFIX + "language"
