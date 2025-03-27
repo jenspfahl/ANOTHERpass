@@ -153,8 +153,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.asCompletableFuture
 import kotlinx.coroutines.launch
 import org.json.JSONObject
-import java.lang.StringBuilder
 import java.util.UUID
+import androidx.recyclerview.widget.SimpleItemAnimator
+
+
 
 
 /**
@@ -1996,6 +1998,10 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     }
 
     private fun refreshNavigationMenu() {
+        val firstChild = navigationView.getChildAt(0)
+        val rv = firstChild as? RecyclerView
+        rv?.itemAnimator = null
+
         navigationView.menu.clear()
         navigationView.inflateMenu(R.menu.menu_main_drawer)
 
@@ -2027,6 +2033,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         refreshMenuMasterPasswordItem(navigationView.menu)
         refreshRevokeMptItem(navigationView.menu)
         refreshMenuDebugItem(navigationView.menu)
+
 
     }
 
@@ -2256,7 +2263,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     private fun updateNavigationMenuVisibility(groupResId: Int, itemResId: Int, stringResId: Int, visible: Boolean) {
         navigationView.menu.setGroupVisible(groupResId, visible)
-        navigationView.menu.setGroupEnabled(groupResId, visible)
 
         val item = navigationView.menu.findItem(itemResId)
         item.isEnabled = true
