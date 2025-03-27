@@ -1,0 +1,159 @@
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/textview_head"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintVertical_weight="1"
+                android:gravity="center"
+                android:text="@string/whats_new_in_2_2"
+                android:textColor="@color/colorAltAccent"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@id/textview_subtext"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textview_subtext"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintVertical_weight="1"
+                android:gravity="center"
+                android:textSize="16sp"
+                android:paddingHorizontal="15dp"
+                android:text="@string/whats_new_subtext"
+
+                app:layout_constraintBottom_toTopOf="@id/scrollview_bulletpoints"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textview_head" />
+
+
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/scrollview_bulletpoints"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintVertical_weight="6"
+                android:fillViewport="true"
+                app:layout_constraintBottom_toTopOf="@id/textview_space"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textview_subtext">
+
+                <TableLayout
+                    android:id="@+id/textview_bulletpoints"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:stretchColumns="0"
+                    android:shrinkColumns="0"
+                   >
+
+                    <TableRow>
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingVertical="6dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:padding="6dp"
+                                android:text="@string/whats_new_in_2_2_bullet_1_head" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingHorizontal="12dp"
+                                android:text="@string/whats_new_in_2_2_bullet_1_text" />
+                        </LinearLayout>
+                    </TableRow>
+
+                    <TableRow>
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingVertical="6dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:padding="6dp"
+                                android:text="@string/whats_new_in_2_2_bullet_2_head" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingHorizontal="12dp"
+                                android:text="@string/whats_new_in_2_2_bullet_2_text" />
+                        </LinearLayout>
+                    </TableRow>
+
+                    <TableRow>
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingVertical="6dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:padding="6dp"
+                                android:text="@string/whats_new_in_2_2_bullet_3_head" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:paddingHorizontal="12dp"
+                                android:text="@string/whats_new_in_2_2_bullet_3_text" />
+                        </LinearLayout>
+                    </TableRow>
+                    
+
+                    <TableRow android:minHeight="20dp" />
+
+
+                </TableLayout>
+
+            </androidx.core.widget.NestedScrollView>
+
+
+            <TextView
+                android:id="@+id/textview_space"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintVertical_weight="0.5"
+                android:gravity="center"
+                android:textSize="16sp"
+                android:paddingHorizontal="15dp"
+
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/scrollview_bulletpoints" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+

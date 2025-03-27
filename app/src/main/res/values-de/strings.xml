@@ -575,6 +575,15 @@
     <string name="whats_new_in_2_1_bullet_2_text">Eine neue Art der Login-Verschlüsselung namens Argon2 kann jetzt verwendet werden, um das Knacken deiner PIN und deines Master-Passworts noch schwieriger zu machen. Argon2 ist eine moderne sogenannte Key-Derivation-Function (KDF) und erlaubt eine schnellere und sichere Entsperrung des Tresors.</string>
     <string name="whats_new_in_2_1_bullet_3_head">Import und Export von und als Keepass-Dateien</string>
     <string name="whats_new_in_2_1_bullet_3_text">Jetzt können deine Zugangsdaten in jedem Keepass-Fork verwendet werden! Exportiere alle Zugangsdaten in eine Keepass-Tresordatei (KDBX, Version 4). Oder importiere einfach eine beliebige Keepass-Datei in den aktuellen ANOTHERpass-Tresor (ab KDBX-Version 3).</string>
+
+    <string name="whats_new_in_2_2">Was ist neu in Version 2.2</string>
+    <string name="whats_new_in_2_2_bullet_1_head">Automatische Sicherung des Tresors in einer Zieldatei</string>
+    <string name="whats_new_in_2_2_bullet_1_text">Anstatt den Tresor regelmäßig manuell zu exportieren, um eine aktuelle Sicherung zu erhalten, kannst du jetzt eine Zieldatei konfigurieren, in die der Tresor nach jeder Änderung automatisch exportiert wird. Diese Datei ist stets auf dem neuesten Stand und kann lokal oder extern (z.B. auf einem Remote-Laufwerk) gespeichert werden.</string>
+    <string name="whats_new_in_2_2_bullet_2_head">Gruppieren der Zugangsdaten</string>
+    <string name="whats_new_in_2_2_bullet_2_text">Um deine Zugangsdaten besser zu strukturieren, kannst du sie jetzt nach Namen oder Kategorie gruppieren. Dies ist hilfreich, um den Überblick über alle Zugangsdaten zu behalten.</string>
+    <string name="whats_new_in_2_2_bullet_3_head">Bestimmte Zugangsdaten markieren</string>
+    <string name="whats_new_in_2_2_bullet_3_text">Um die wichtigsten Zugangsdaten im Tresor leichter zu finden, können diese jetzt mit einem Stern markieret erden. Markierte Zugangsdaten werden in der Regel oben in der Liste angezeigt, sodass sie schneller gefunden werden können.</string>
+
     <string name="intro">Starte Intro</string>
     <string name="intro_1_head">Ein etwas anderer Passwortmanager</string>
     <string name="intro_1_subtext">ANOTHERpass bietet eine etwas andere Herangehensweise. Lies hier was das heißt:</string>

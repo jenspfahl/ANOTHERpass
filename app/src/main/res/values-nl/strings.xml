@@ -556,6 +556,14 @@ Deze waarschuwing kunt u deactiveren onder \'Instellingen/Beveiliging\'.</string
   <string name="whats_new_in_2_1_bullet_3_head">Import and export from and to a Keepass file</string>
   <string name="whats_new_in_2_1_bullet_3_text">Now you can use your credentials in any Keepass fork! Export all your credentials into a Keepass vault file (KDBX version 4). Or just import any Keepass file into your current ANOTHERpass vault (KDBX version 3 at least).</string>
 
+  <string name="whats_new_in_2_2">What\'s new in version 2.2</string>
+  <string name="whats_new_in_2_2_bullet_1_head">Auto-Backup the vault to a destination file</string>
+  <string name="whats_new_in_2_2_bullet_1_text">Instead of manually exporting the vault from time to time to retain a fresh backup, you can now configure a destination file, which is used to automatically export the vault to, every time it has been changed. This file will keep up-to-date and can be stored either locally or remotely (e.g. a remote drive).</string>
+  <string name="whats_new_in_2_2_bullet_2_head">Group your credentials</string>
+  <string name="whats_new_in_2_2_bullet_2_text">To organise all your credentials in a better way, you now have the option to group them by name or by category. This will be helpful to keep the overview of all of your credentials.</string>
+  <string name="whats_new_in_2_2_bullet_3_head">Mark certain credentials</string>
+  <string name="whats_new_in_2_2_bullet_3_text">To make it easier to find the most important credentials in your vault, you can now mark them with a star. Marked credentials are usually displayed on the top of the list, so you can access them quicker.</string>
+
 
   <string name="intro">Begin met inleiden</string>
   <string name="intro_1_head">Een iets andere wachtwoordbeheerder</string>
