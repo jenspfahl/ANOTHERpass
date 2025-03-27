@@ -118,7 +118,9 @@
 
     </group>
 
-    <group>
+    <group
+        android:checkableBehavior="none"
+        android:id="@+id/group_others">
 
         <item
             android:id="@+id/menu_labels"
@@ -136,6 +138,12 @@
             android:icon="@drawable/baseline_phonelink_24"
             android:title="@string/title_activity_list_web_extensions"
             android:orderInCategory="140"/>
+
+    </group>
+
+    <group
+        android:checkableBehavior="none"
+        android:id="@+id/group_basics">
 
         <item
             android:id="@+id/menu_settings"

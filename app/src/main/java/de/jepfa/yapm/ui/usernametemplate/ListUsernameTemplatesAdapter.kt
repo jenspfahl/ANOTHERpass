@@ -122,11 +122,11 @@ class ListUsernameTemplatesAdapter(private val listUsernameTemplatesActivity: Li
 
     class UsernameTemplatesComparator : DiffUtil.ItemCallback<EncUsernameTemplate>() {
         override fun areItemsTheSame(oldItem: EncUsernameTemplate, newItem: EncUsernameTemplate): Boolean {
-            return oldItem === newItem
+            return oldItem.id == newItem.id
         }
 
         override fun areContentsTheSame(oldItem: EncUsernameTemplate, newItem: EncUsernameTemplate): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem == newItem
         }
     }
 }

@@ -156,11 +156,11 @@ class ListLabelsAdapter(private val listLabelsActivity: ListLabelsActivity) :
 
     class LabelsComparator : DiffUtil.ItemCallback<Label>() {
         override fun areItemsTheSame(oldItem: Label, newItem: Label): Boolean {
-            return oldItem === newItem
+            return oldItem.labelId == newItem.labelId
         }
 
         override fun areContentsTheSame(oldItem: Label, newItem: Label): Boolean {
-            return oldItem.labelId == newItem.labelId
+            return oldItem == newItem
         }
     }
 }

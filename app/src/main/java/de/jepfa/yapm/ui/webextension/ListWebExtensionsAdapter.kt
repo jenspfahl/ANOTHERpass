@@ -64,6 +64,7 @@ class ListWebExtensionsAdapter(private val listWebExtensionsActivity: ListWebExt
                             listWebExtensionsActivity.getString(R.string.device_xx_unlinked, webClientId))
                     }
                 }
+                notifyItemChanged(pos)
             }
         }
 
@@ -72,6 +73,7 @@ class ListWebExtensionsAdapter(private val listWebExtensionsActivity: ListWebExt
             if (!Session.isDenied()) {
                 val current = getItem(pos)
                 WebExtensionDialogs.openDeleteWebExtension(current, listWebExtensionsActivity)
+                notifyItemRemoved(pos)
             }
         }
 
@@ -99,12 +101,7 @@ class ListWebExtensionsAdapter(private val listWebExtensionsActivity: ListWebExt
                 }
                 event.invoke(adapterPosition, itemViewType)
             }
-            webExtensionClientIdTextView.setOnClickListener {
-                if (adapterPosition == RecyclerView.NO_POSITION) {
-                    return@setOnClickListener
-                }
-                event.invoke(adapterPosition, itemViewType)
-            }
+
         }
 
         fun listenForDetailsWebExtension(event: (position: Int, type: Int) -> Unit) {
@@ -163,6 +160,7 @@ class ListWebExtensionsAdapter(private val listWebExtensionsActivity: ListWebExt
             }
             else {
                 webExtensionUnlinkImageView.setImageDrawable(context.getDrawable(R.drawable.baseline_phonelink_24))
+                webExtensionClientIdTextView.paintFlags = 0
             }
             webExtensionClientIdTextView.text = clientId
         }
@@ -179,11 +177,11 @@ class ListWebExtensionsAdapter(private val listWebExtensionsActivity: ListWebExt
 
     class WebExtensionsComparator : DiffUtil.ItemCallback<EncWebExtension>() {
         override fun areItemsTheSame(oldItem: EncWebExtension, newItem: EncWebExtension): Boolean {
-            return oldItem === newItem
+            return oldItem.id == newItem.id
         }
 
         override fun areContentsTheSame(oldItem: EncWebExtension, newItem: EncWebExtension): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem == newItem
         }
     }
 }

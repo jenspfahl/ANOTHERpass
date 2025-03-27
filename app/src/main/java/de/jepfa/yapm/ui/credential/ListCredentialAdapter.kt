@@ -684,7 +684,7 @@ class ListCredentialAdapter(
                         labelColorRGB = listCredentialsActivity.getColor(R.color.Red),
                         labelIconResId = R.drawable.baseline_lock_clock_24,
                         labelOutlined = true,
-                        position = -1
+                        position = -2
                     )
                     grouped.getOrPut(group) { mutableListOf() }.add(credential)
                 }
@@ -695,7 +695,7 @@ class ListCredentialAdapter(
                         labelColorRGB = listCredentialsActivity.getColor(R.color.Orange),
                         labelIconResId = R.drawable.baseline_star_rate_24,
                         labelOutlined = true,
-                        position = -2
+                        position = -1
                     )
                     grouped.getOrPut(group) { mutableListOf() }.add(credential)
                 }

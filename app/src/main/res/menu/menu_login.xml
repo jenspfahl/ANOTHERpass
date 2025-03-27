@@ -10,13 +10,17 @@
         android:title="@string/login_help">
     </item>
 
-    <item
-        android:id="@+id/action_revoke_quick_access"
-        android:icon="@drawable/baseline_accessibility_24"
-        app:showAsAction="never"
-        android:title="@string/revoke_quick_access"
-        android:visible="false">
-    </item>
+    <group
+        android:checkableBehavior="none"
+        android:id="@+id/group_quick_access">
+        <item
+            android:id="@+id/action_revoke_quick_access"
+            android:icon="@drawable/baseline_accessibility_24"
+            app:showAsAction="never"
+            android:title="@string/revoke_quick_access"
+            android:visible="false">
+        </item>
+    </group>
 
     <item
         android:id="@+id/menu_intro"
@@ -47,13 +51,16 @@
         android:title="@string/report_a_bug">
     </item>
 
-    <item
-        android:id="@+id/action_reset_vault"
-        android:icon="@drawable/ic_baseline_replay_24"
-        app:showAsAction="never"
-        android:title="@string/reset_vault">
-    </item>
-
+    <group
+        android:checkableBehavior="none"
+        android:id="@+id/group_reset">
+        <item
+            android:id="@+id/action_reset_vault"
+            android:icon="@drawable/ic_baseline_replay_24"
+            app:showAsAction="never"
+            android:title="@string/reset_vault">
+        </item>
+    </group>
 
     <item
         android:id="@+id/menu_debug"

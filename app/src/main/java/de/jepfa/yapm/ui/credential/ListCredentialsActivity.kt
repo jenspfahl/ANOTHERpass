@@ -939,9 +939,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         toggle.onConfigurationChanged(newConfig)
     }
 
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        inflateActionsMenu(menu, R.menu.menu_main)
+
+        inflateActionsMenu(menu, R.menu.menu_main, showGroupDivider = true)
         Log.i(LOG_PREFIX + "LST", "onCreateOptionsMenu")
 
         this.searchItem = menu.findItem(R.id.action_search)
