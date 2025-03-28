@@ -253,7 +253,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         serverViewDetails = findViewById(R.id.server_view_details)
         serverViewSwitch = findViewById(R.id.server_view_switch)
 
-        val serverCapabilityEnabled= PreferenceService.getAsBool(PreferenceService.PREF_SERVER_CAPABILITIES_ENABLED, true, this)
+        val serverCapabilityEnabled = PreferenceService.getAsBool(PreferenceService.PREF_SERVER_CAPABILITIES_ENABLED, true, this)
         val serverHidePanel= PreferenceService.getAsBool(PreferenceService.PREF_SERVER_HIDE_PANEL, false, this)
         val serverAutostartEnabled = PreferenceService.getAsBool(PreferenceService.PREF_SERVER_AUTOSTART, false, this)
 
@@ -2244,7 +2244,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     }
 
     private fun updateRestoreServerPanelMenuItem() {
-        restoreServerPanel?.isVisible = PreferenceService.getAsBool(PreferenceService.PREF_SERVER_CAPABILITIES_ENABLED, this)
+        restoreServerPanel?.isVisible = PreferenceService.getAsBool(PreferenceService.PREF_SERVER_CAPABILITIES_ENABLED, true, this)
                 && PreferenceService.getAsBool(PreferenceService.PREF_SERVER_HIDE_PANEL, this)
     }
 
