@@ -1014,7 +1014,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
                 val cursor = MatrixCursor(arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_TEXT_2))
                 query?.let { q ->
-                    SearchCommand.values().forEachIndexed { index, command ->
+                    SearchCommand.entries
+                     //   .sortedBy { it.getCmd() }
+                        .forEachIndexed { index, command ->
                         val cmd = command.getCmd()
                         if (cmd.startsWith(q, ignoreCase = true)) {
                             cursor.addRow(arrayOf(index, cmd, command.getDescription(this@ListCredentialsActivity)))

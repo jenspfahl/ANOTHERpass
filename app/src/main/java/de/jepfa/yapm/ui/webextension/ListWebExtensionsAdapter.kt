@@ -73,7 +73,6 @@ class ListWebExtensionsAdapter(private val listWebExtensionsActivity: ListWebExt
             if (!Session.isDenied()) {
                 val current = getItem(pos)
                 WebExtensionDialogs.openDeleteWebExtension(current, listWebExtensionsActivity)
-                notifyItemRemoved(pos)
             }
         }
 

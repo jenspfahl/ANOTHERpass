@@ -385,7 +385,7 @@ class ListCredentialAdapter(
         }
 
         if (markedCredentialId != null && current.encCredential?.id == markedCredentialId) {
-            val color = if (isDarkMode(listCredentialsActivity)) R.color.Gray else R.color.Gray3
+            val color = if (isDarkMode(listCredentialsActivity)) R.color.recently_changed_dark else R.color.recently_changed_light
             holder.rowContainerGroup.background =
                 ColorDrawable(listCredentialsActivity.getColor(color))
         }

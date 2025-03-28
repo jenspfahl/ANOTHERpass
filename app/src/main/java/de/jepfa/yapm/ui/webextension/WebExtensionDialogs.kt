@@ -61,15 +61,9 @@ object WebExtensionDialogs {
 
     }
 
-        fun openDeleteWebExtension(webExtension: EncWebExtension, activity: SecureActivity, finishActivityAfterDelete: Boolean = false) {
+    fun openDeleteWebExtension(webExtension: EncWebExtension, activity: SecureActivity, finishActivityAfterDelete: Boolean = false) {
         activity.masterSecretKey?.let { key ->
-            val name = if (webExtension.title != null) {
-                SecretService.decryptCommonString(key, webExtension.title!!)
-            }
-            else {
-                SecretService.decryptCommonString(key, webExtension.webClientId)
-            }
-            name
+            val name = SecretService.decryptCommonString(key, webExtension.title)
 
             AlertDialog.Builder(activity)
                 .setTitle(R.string.title_delete_web_extension)
