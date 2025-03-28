@@ -176,7 +176,11 @@ class ListCredentialAdapter(
                 } else {
                     selected.remove(credential)
                 }
-                notifyItemChanged(pos)
+                currentList.forEachIndexed { index, credentialOrGroup ->
+                    if (credentialOrGroup.encCredential == credential) {
+                        notifyItemChanged(index)
+                    }
+                }
                 multipleSelectionCallback(selected)
             }
 
@@ -193,6 +197,12 @@ class ListCredentialAdapter(
                     val credential = current.encCredential ?: return@listenForLongClick false
 
                     selected.add(credential)
+
+                    currentList.forEachIndexed { index, credentialOrGroup ->
+                        if (credentialOrGroup.encCredential == credential) {
+                            notifyItemChanged(index)
+                        }
+                    }
 
                     multipleSelectionCallback(selected)
                 }
@@ -711,7 +721,7 @@ class ListCredentialAdapter(
                         LabelService.defaultHolder.decryptLabelsForCredential(key, credential)
                     if (labels.isEmpty()) {
                         val group = Group(
-                            listCredentialsActivity.getString(R.string.without_category),
+                            listCredentialsActivity.getString(R.string.no_label),
                             labelColorRGB = listCredentialsActivity.getColor(DEFAULT_CHIP_COLOR_ID),
                             labelOutlined = true,
                             position = 1

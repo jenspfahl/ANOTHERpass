@@ -252,8 +252,7 @@ Het scheiden van de gecodeerde hoofdsleutel van het kluisbestand maakt het besta
   <string name="group_by">Group credentials</string>
   <string name="credential_group_by_none">No grouping</string>
   <string name="credential_group_by_name">By credential name (first letter)</string>
-  <string name="credential_group_by_label">By category (Credentials with multiple categories will occur under each single category)</string>
-  <string name="without_category">Without category</string>
+  <string name="credential_group_by_label">By label (Credentials with multiple labels will occur under each single label)</string>
 
   <string name="credential_sort_by">Sorteer toegangsgegevens op</string>
   <string name="credential_sort_by_name_asc">Naam (A..Z)</string>
@@ -560,7 +559,7 @@ Deze waarschuwing kunt u deactiveren onder \'Instellingen/Beveiliging\'.</string
   <string name="whats_new_in_2_2_bullet_1_head">Auto-Backup the vault to a destination file</string>
   <string name="whats_new_in_2_2_bullet_1_text">Instead of manually exporting the vault from time to time to retain a fresh backup, you can now configure a destination file, which is used to automatically export the vault to, every time it has been changed. This file will keep up-to-date and can be stored either locally or remotely (e.g. a remote drive).</string>
   <string name="whats_new_in_2_2_bullet_2_head">Group your credentials</string>
-  <string name="whats_new_in_2_2_bullet_2_text">To organise all your credentials in a better way, you now have the option to group them by name or by category. This will be helpful to keep the overview of all of your credentials.</string>
+  <string name="whats_new_in_2_2_bullet_2_text">To organise all your credentials in a better way, you now have the option to group them by name or by label. This will be helpful to keep the overview of all of your credentials.</string>
   <string name="whats_new_in_2_2_bullet_3_head">Mark certain credentials</string>
   <string name="whats_new_in_2_2_bullet_3_text">To make it easier to find the most important credentials in your vault, you can now mark them with a star. Marked credentials are usually displayed on the top of the list, so you can access them quicker.</string>
 

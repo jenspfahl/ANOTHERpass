@@ -16,9 +16,12 @@ import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.util.toastText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlin.time.Duration
 
 object AutoBackupService {
 
@@ -54,6 +57,11 @@ object AutoBackupService {
             backupFileCreationMutex.withLock {
                 Log.d("IOM", "work")
                 val success = autoExportVaultSync(context)
+
+                // artificial sleep to give the system to handle the file write
+                delay(2000)
+
+
                 Log.d("IOM", "done")
 
                 CoroutineScope(Dispatchers.Main).launch {

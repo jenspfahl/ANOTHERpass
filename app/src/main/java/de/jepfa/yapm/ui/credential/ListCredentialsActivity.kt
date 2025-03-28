@@ -1184,13 +1184,13 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 multipleChoiceSwitch.setPadding(64, 32, 64, 32)
 
                 val allLabels = ArrayList<Label>()
-                val noLabel = Label(WITH_NO_LABELS_ID, getString(R.string.no_label), "", null)
+                val noLabel = Label(WITH_NO_LABELS_ID, getString(R.string.no_label), "", null) //TODO make this outlined
                 allLabels.add(noLabel)
                 allLabels.addAll(LabelService.defaultHolder.getAllLabels())
                 val allChips = ArrayList<Chip>(allLabels.size)
 
-                allLabels.forEachIndexed { _, label ->
-                    val chip = createAndAddLabelChip(label, labelsContainer, thinner = false, this)
+                allLabels.forEachIndexed { idx, label ->
+                    val chip = createAndAddLabelChip(label, labelsContainer, thinner = false, outlined = idx == 0, context = this)
                     chip.isClickable = true
                     chip.isCheckable = true
                     chip.isChecked = LabelFilter.isFilterFor(label)
