@@ -56,9 +56,13 @@ object PreferenceService {
     const val DATA_VAULT_IMPORTED_AT = DATA_PREFIX + "vault_imported_at"
 
     const val DATA_VAULT_EXPORTED_AT = DATA_PREFIX + "vault_exported_at"
+    const val DATA_VAULT_AUTO_EXPORTED_AT = DATA_PREFIX + "vault_auto_exported_at"
     const val DATA_VAULT_MODIFIED_AT = DATA_PREFIX + "vault_modified_at"
     const val DATA_VAULT_EXPORT_NOTIFICATION_SHOWED_AT = DATA_PREFIX + "vault_export_notification_showed_at"
     const val DATA_VAULT_EXPORT_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "vault_export_notification_showed_as"
+    const val DATA_VAULT_AUTO_EXPORT_URI = DATA_PREFIX + "vault_auto_export_uri"
+
+    const val PREF_SHOW_AUTO_EXPORT_VAULT_FAILED_REMINDER = PREF_PREFIX + "show_auto_export_vault_failed_reminder"
     const val PREF_SHOW_EXPORT_VAULT_REMINDER = PREF_PREFIX + "show_export_vault_reminder"
 
     const val DATA_MK_EXPORTED_AT = DATA_PREFIX + "mk_exported_at"
@@ -167,14 +171,19 @@ object PreferenceService {
     const val PREF_ENABLED_WEB_EXTENSIONS_ON_TOP = PREF_PREFIX + "enabled_webextensions_on_top"
 
     const val PREF_CREDENTIAL_SORT_ORDER = PREF_PREFIX + "credential_sort_order"
+    const val PREF_CREDENTIAL_GROUPING  = PREF_PREFIX + "credential_grouping"
     const val PREF_SHOW_CREDENTIAL_IDS = PREF_PREFIX + "show_credential_ids"
     const val PREF_EXPIRED_CREDENTIALS_ON_TOP = PREF_PREFIX + "expired_credentials_on_top"
+    const val PREF_MARKED_CREDENTIALS_ON_TOP = PREF_PREFIX + "marked_credentials_on_top"
 
     const val PREF_DARK_MODE = PREF_PREFIX + "dark_mode"
     const val PREF_LANGUAGE = PREF_PREFIX + "language"
 
     const val PREF_INCLUDE_MASTER_KEY_IN_BACKUP_FILE = PREF_PREFIX + "include_master_key_in_backup_file"
     const val PREF_INCLUDE_SETTINGS_IN_BACKUP_FILE = PREF_PREFIX + "include_settings_in_backup_file"
+
+    const val PREF_INCLUDE_MASTER_KEY_IN_AUTO_BACKUP_FILE = PREF_PREFIX + "include_master_key_in_auto_backup_file"
+    const val PREF_INCLUDE_SETTINGS_IN_AUTO_BACKUP_FILE = PREF_PREFIX + "include_settings_in_auto_backup_file"
 
     const val DATA_USED_LABEL_FILTER = DATA_PREFIX + "used_label_filter"
     const val STATE_INTRO_SHOWED = STATE_PREFIX + "intro_showed"

@@ -29,7 +29,8 @@ data class DecryptedExportableCredential(
     val e: Long?, // Date.getTime()
     val o: String?, // shortened OTP
     val v: Boolean, // veiled
-    val m: Long?, // modify timestamp
+    val m: Long?, // modify timestamp,
+    val a: Boolean?, // attached/pinned
 ) {
     fun toEncCredential(key: SecretKeyHolder): EncCredential {
         val encName = SecretService.encryptCommonString(key, n)
@@ -61,6 +62,7 @@ data class DecryptedExportableCredential(
                 encExpiresAt,
             ),
             if (encOtpAuthUri != null) OtpData(encOtpAuthUri) else null,
+            a?:false,
         )
     }
 
@@ -77,6 +79,7 @@ data class DecryptedExportableCredential(
         const val ATTRIB_OTP = "o"
         const val ATTRIB_VEILED = "v"
         const val ATTRIB_MODIFIED_AT = "m"
+        const val ATTRIB_PINNED = "a"
 
         fun fromJson(json: JsonElement): DecryptedExportableCredential? {
             try {
@@ -94,7 +97,9 @@ data class DecryptedExportableCredential(
                     jsonObject.get(ATTRIB_OTP)?.asString,
                     jsonObject.get(ATTRIB_VEILED).asBoolean,
                     jsonObject.get(ATTRIB_MODIFIED_AT)?.asLong,
-                )
+                    jsonObject.get(ATTRIB_PINNED)?.asBoolean,
+
+                    )
             } catch (e: Exception) {
                 DebugInfo.logException("PCR", "cannot parse json container", e)
                 return null

@@ -7,11 +7,13 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
 import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.session.Session
+import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
@@ -36,6 +38,14 @@ class ListLabelsActivity : SecureActivity() {
         listLabelsAdapter = ListLabelsAdapter(this)
         recyclerView.adapter = listLabelsAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
+        val showDividers = PreferenceService.getAsBool(PreferenceService.PREF_SHOW_DIVIDERS_IN_LIST, this)
+        if (showDividers) {
+            val dividerItemDecoration = DividerItemDecoration(
+                recyclerView.context,
+                DividerItemDecoration.VERTICAL
+            )
+            recyclerView.addItemDecoration(dividerItemDecoration)
+        }
 
         labelViewModel.allLabels.observe(this, { labels ->
             masterSecretKey?.let{ key ->
@@ -91,11 +101,11 @@ class ListLabelsActivity : SecureActivity() {
                 .setTitle(getString(R.string.delete_unused_labels))
                 .setMessage(getString(R.string.message_delete_unused_labels))
                 .setIcon(R.drawable.ic_baseline_label_24)
-                .setPositiveButton(android.R.string.yes) { dialog, _ ->
+                .setPositiveButton(android.R.string.ok) { dialog, _ ->
                     deleteUnusedLabels()
                     dialog.dismiss()
                 }
-                .setNegativeButton(android.R.string.no, null)
+                .setNegativeButton(android.R.string.cancel, null)
                 .show()
             return true
         }

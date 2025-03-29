@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
+import android.graphics.Typeface
 import android.net.InetAddresses
 import android.os.Build
 import android.text.SpannableString
@@ -56,8 +57,9 @@ fun createAndAddLabelChip(
     context: Context?,
     outlined: Boolean = false,
     placedOnAppBar: Boolean = false,
+    typeface: Typeface? = null,
     ): Chip {
-    val chip = createLabelChip(label, thinner, context, outlined, placedOnAppBar)
+    val chip = createLabelChip(label, thinner, context, outlined, placedOnAppBar, typeface)
     container.addView(chip)
     return chip
 }
@@ -68,11 +70,13 @@ fun createLabelChip(
     context: Context?,
     outlined: Boolean = false,
     placedOnAppBar: Boolean = false,
+    typeface: Typeface? = null,
 ): Chip {
     val chip = Chip(context)
     chip.text = label.name
     chip.tag = label.labelId
     chip.textAlignment = View.TEXT_ALIGNMENT_CENTER
+    chip.typeface = typeface
     if (thinner) {
         chip.textSize = 12.0f
         chip.chipCornerRadius = 32.0f

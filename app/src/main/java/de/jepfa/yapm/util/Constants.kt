@@ -34,6 +34,7 @@ object Constants {
     const val ACTION_EXCLUDE_FROM_AUTOFILL = "excludeFromAutofill"
     const val ACTION_PAUSE_AUTOFILL = "pauseAutofill"
     const val ACTION_PREFILLED_FROM_EXTENSION = "prefilledFromExtension"
+    const val ACTION_OPEN_AUTOFILL_DIALOG = "openAutofillDialog"
 
 
 

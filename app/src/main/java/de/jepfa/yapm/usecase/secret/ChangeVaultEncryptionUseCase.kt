@@ -9,6 +9,7 @@ import de.jepfa.yapm.model.secret.Key
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.LoginData
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.io.AutoBackupService
 import de.jepfa.yapm.service.secret.MasterKeyService
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.service.secret.SecretService
@@ -20,6 +21,7 @@ import de.jepfa.yapm.usecase.session.LoginUseCase
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.DebugInfo
+import de.jepfa.yapm.util.toastText
 
 object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.Input, SecureActivity>() {
 
@@ -163,7 +165,10 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
                         credential.timeData.modifyTimestamp,
                         reencryptString(credential.timeData.expiresAt, oldMasterSK, newMasterSK),
                     ),
-                    null,
+                    credential.otpData?.let {
+                        OtpData(reencryptString(it.encOtpAuthUri, oldMasterSK, newMasterSK))
+                    },
+                    credential.pinned,
                 )
                 app.credentialRepository.update(updated)
             }
@@ -210,6 +215,7 @@ object ChangeVaultEncryptionUseCase: InputUseCase<ChangeVaultEncryptionUseCase.I
                 input.newCipherAlgorithm.name,
                 activity
             )
+            AutoBackupService.autoExportVault(activity)
 
             return true
 

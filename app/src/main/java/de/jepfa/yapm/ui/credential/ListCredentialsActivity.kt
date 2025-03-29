@@ -11,11 +11,11 @@ import android.database.MatrixCursor
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.provider.BaseColumns
+import android.provider.DocumentsContract.EXTRA_INITIAL_URI
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
@@ -29,7 +29,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.autofill.AutofillManager
 import android.widget.AutoCompleteTextView
-import android.widget.CheckBox
 import android.widget.CursorAdapter
 import android.widget.EditText
 import android.widget.ImageView
@@ -46,6 +45,8 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.MenuItemCompat
+import androidx.core.view.setPadding
+import androidx.documentfile.provider.DocumentFile
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -56,7 +57,6 @@ import com.google.android.material.navigation.NavigationView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncWebExtension
-import de.jepfa.yapm.model.otp.OtpConfig
 import de.jepfa.yapm.model.secret.SecretKeyHolder
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
@@ -65,15 +65,23 @@ import de.jepfa.yapm.service.PreferenceService.DATA_NAV_MENU_EXPORT_EXPANDED
 import de.jepfa.yapm.service.PreferenceService.DATA_NAV_MENU_IMPORT_EXPANDED
 import de.jepfa.yapm.service.PreferenceService.DATA_NAV_MENU_QUICK_ACCESS_EXPANDED
 import de.jepfa.yapm.service.PreferenceService.DATA_NAV_MENU_VAULT_EXPANDED
+import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_AUTO_EXPORTED_AT
 import de.jepfa.yapm.service.PreferenceService.PREF_AUTOFILL_SUGGEST_CREDENTIALS
+import de.jepfa.yapm.service.PreferenceService.PREF_CREDENTIAL_GROUPING
 import de.jepfa.yapm.service.PreferenceService.PREF_CREDENTIAL_SORT_ORDER
 import de.jepfa.yapm.service.PreferenceService.PREF_EXPIRED_CREDENTIALS_ON_TOP
+import de.jepfa.yapm.service.PreferenceService.PREF_INCLUDE_MASTER_KEY_IN_AUTO_BACKUP_FILE
+import de.jepfa.yapm.service.PreferenceService.PREF_INCLUDE_MASTER_KEY_IN_BACKUP_FILE
+import de.jepfa.yapm.service.PreferenceService.PREF_INCLUDE_SETTINGS_IN_AUTO_BACKUP_FILE
+import de.jepfa.yapm.service.PreferenceService.PREF_INCLUDE_SETTINGS_IN_BACKUP_FILE
 import de.jepfa.yapm.service.PreferenceService.PREF_LABEL_FILTER_SINGLE_CHOICE
+import de.jepfa.yapm.service.PreferenceService.PREF_MARKED_CREDENTIALS_ON_TOP
 import de.jepfa.yapm.service.PreferenceService.PREF_NAV_MENU_ALWAYS_COLLAPSED
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_CREDENTIAL_IDS
 import de.jepfa.yapm.service.PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD
 import de.jepfa.yapm.service.PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_RELOAD
 import de.jepfa.yapm.service.autofill.ResponseFiller
+import de.jepfa.yapm.service.io.AutoBackupService
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelFilter.WITH_NO_LABELS_ID
 import de.jepfa.yapm.service.label.LabelService
@@ -123,6 +131,7 @@ import de.jepfa.yapm.usecase.secret.SeedRandomGeneratorUseCase
 import de.jepfa.yapm.usecase.session.LogoutUseCase
 import de.jepfa.yapm.usecase.vault.DropVaultUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
+import de.jepfa.yapm.usecase.vault.ShareVaultUseCase
 import de.jepfa.yapm.usecase.vault.ShowVaultInfoUseCase
 import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.Constants
@@ -130,10 +139,12 @@ import de.jepfa.yapm.util.Constants.ACTION_DELIMITER
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.IpConverter
+import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.PermissionChecker.verifyNotificationPermissions
 import de.jepfa.yapm.util.SearchCommand
 import de.jepfa.yapm.util.addFormattedLine
 import de.jepfa.yapm.util.createAndAddLabelChip
+import de.jepfa.yapm.util.dateTimeToNiceString
 import de.jepfa.yapm.util.toastText
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.RequestConnectionPoint
@@ -142,8 +153,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.asCompletableFuture
 import kotlinx.coroutines.launch
 import org.json.JSONObject
-import java.lang.StringBuilder
 import java.util.UUID
+import androidx.recyclerview.widget.SimpleItemAnimator
+
+
 
 
 /**
@@ -152,6 +165,8 @@ import java.util.UUID
 class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.OnNavigationItemSelectedListener,
     HttpServer.HttpCallback, HttpServer.HttpServerCallback, RequestFlows {
 
+    private var currAutoBackupFileName = ""
+    private val saveAutoBackupFile = 67676
     private var serverViewStateText: String = ""
     private lateinit var serverViewSwitch: SwitchCompat
     private lateinit var serverViewDetails: TextView
@@ -175,6 +190,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private var restoreServerPanel: MenuItem? = null
     private var lastReminderItem: MenuItem? = null
     private var nextReminderItem: MenuItem? = null
+    private var expandAllItem: MenuItem? = null
+    private var collapseAllItem: MenuItem? = null
 
     val newOrUpdateCredentialActivityRequestCode = 1
 
@@ -220,6 +237,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     return
                 }
             }
+
         }
         // now lets check session
         checkSession = true
@@ -235,7 +253,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         serverViewDetails = findViewById(R.id.server_view_details)
         serverViewSwitch = findViewById(R.id.server_view_switch)
 
-        val serverCapabilityEnabled= PreferenceService.getAsBool(PreferenceService.PREF_SERVER_CAPABILITIES_ENABLED, true, this)
+        val serverCapabilityEnabled = PreferenceService.getAsBool(PreferenceService.PREF_SERVER_CAPABILITIES_ENABLED, true, this)
         val serverHidePanel= PreferenceService.getAsBool(PreferenceService.PREF_SERVER_HIDE_PANEL, false, this)
         val serverAutostartEnabled = PreferenceService.getAsBool(PreferenceService.PREF_SERVER_AUTOSTART, false, this)
 
@@ -437,7 +455,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             updateQuickSearchOnFab(quickSearch)
         }
 
-        listCredentialAdapter = ListCredentialAdapter(this)
+        listCredentialAdapter = ListCredentialAdapter(this, recyclerView)
         { selected ->
 
             if (HttpCredentialRequestHandler.credentialSelectState == MultipleCredentialSelectState.USER_SELECTING) {
@@ -469,23 +487,48 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
 
         listCredentialAdapter?.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                val linearLayoutManager = credentialsRecycleView?.layoutManager as LinearLayoutManager
 
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                jumpToChange()
+            }
+
+            override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
+                jumpToChange()
+            }
+
+            override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+                jumpToChange()
+            }
+
+            override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
+                jumpToChange()
+            }
+
+            private fun jumpToChange() {
+                val linearLayoutManager =
+                    credentialsRecycleView?.layoutManager as LinearLayoutManager
                 if (jumpToUuid != null) {
-                    val index = listCredentialAdapter?.currentList?.indexOfFirst { it.uid == jumpToUuid }
+                    val index =
+                        listCredentialAdapter?.currentList?.indexOfFirst { it.encCredential?.uid == jumpToUuid }
                     index?.let {
-                        linearLayoutManager.scrollToPositionWithOffset(it, 10)
+                        if (it >= 0) {
+                            val firstItemView = linearLayoutManager.findViewByPosition(it)
+                            val offset = firstItemView?.top
+                            linearLayoutManager.scrollToPositionWithOffset(it, offset ?: 10)
+                            listCredentialAdapter?.markPosition(it)
+                        }
                     }
                 } else {
                     jumpToItemPosition?.let {
-                        linearLayoutManager.scrollToPositionWithOffset(it, 10)
+                        val firstItemView = linearLayoutManager.findViewByPosition(it)
+                        val offset = firstItemView?.top
+                        linearLayoutManager.scrollToPositionWithOffset(it, offset ?: 10)
                     }
                 }
                 jumpToItemPosition = null
                 jumpToUuid = null
-
             }
+
         })
 
         credentialsRecycleView = recyclerView
@@ -898,9 +941,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         toggle.onConfigurationChanged(newConfig)
     }
 
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        inflateActionsMenu(menu, R.menu.menu_main)
+
+        inflateActionsMenu(menu, R.menu.menu_main, showGroupDivider = true)
         Log.i(LOG_PREFIX + "LST", "onCreateOptionsMenu")
 
         this.searchItem = menu.findItem(R.id.action_search)
@@ -971,7 +1014,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
                 val cursor = MatrixCursor(arrayOf(BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_TEXT_2))
                 query?.let { q ->
-                    SearchCommand.values().forEachIndexed { index, command ->
+                    SearchCommand.entries
+                     //   .sortedBy { it.getCmd() }
+                        .forEachIndexed { index, command ->
                         val cmd = command.getCmd()
                         if (cmd.startsWith(q, ignoreCase = true)) {
                             cursor.addRow(arrayOf(index, cmd, command.getDescription(this@ListCredentialsActivity)))
@@ -1007,6 +1052,10 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         lastReminderItem = menu.findItem(R.id.menu_show_last_reminder)
         nextReminderItem = menu.findItem(R.id.menu_show_next_reminder)
         updateReminderMenuItems()
+
+        expandAllItem = menu.findItem(R.id.menu_group_by_expand_all)
+        collapseAllItem = menu.findItem(R.id.menu_group_by_collapse_all)
+        updateExpandAndCollapseMenuItems()
 
         super.onCreateOptionsMenu(menu)
 
@@ -1050,6 +1099,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         super.onNewIntent(intent)
         Log.i(LOG_PREFIX + "LST", "onNewIntent: action=${intent?.action}")
         updateSearchFieldWithAutofillSuggestion(intent)
+        if (intent.action == Constants.ACTION_OPEN_AUTOFILL_DIALOG) {
+            openAutoBackupDialog()
+        }
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
@@ -1098,7 +1150,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
     }
 
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         if (toggle.onOptionsItemSelected(item)) {
@@ -1133,13 +1184,13 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 multipleChoiceSwitch.setPadding(64, 32, 64, 32)
 
                 val allLabels = ArrayList<Label>()
-                val noLabel = Label(WITH_NO_LABELS_ID, getString(R.string.no_label), "", null)
+                val noLabel = Label(WITH_NO_LABELS_ID, getString(R.string.no_label), "", null) //TODO make this outlined
                 allLabels.add(noLabel)
                 allLabels.addAll(LabelService.defaultHolder.getAllLabels())
                 val allChips = ArrayList<Chip>(allLabels.size)
 
-                allLabels.forEachIndexed { _, label ->
-                    val chip = createAndAddLabelChip(label, labelsContainer, thinner = false, this)
+                allLabels.forEachIndexed { idx, label ->
+                    val chip = createAndAddLabelChip(label, labelsContainer, thinner = false, outlined = idx == 0, context = this)
                     chip.isClickable = true
                     chip.isCheckable = true
                     chip.isChecked = LabelFilter.isFilterFor(label)
@@ -1216,17 +1267,38 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 val prefSortOrder = getPrefSortOrder()
                 val listItems = CredentialSortOrder.values().map { getString(it.labelId) }.toTypedArray()
 
-                val view = LinearLayout(this)
-                view.orientation = LinearLayout.HORIZONTAL
-                view.setPadding(54, 16, 64, 16)
+                val onTopView = LinearLayout(this)
+                onTopView.orientation = LinearLayout.VERTICAL
+                onTopView.setPadding(16)
 
-                val checkBox = CheckBox(this)
-                checkBox.isChecked = PreferenceService.getAsBool(PREF_EXPIRED_CREDENTIALS_ON_TOP, this)
-                val desc = TextView(this)
-                desc.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT)
-                desc.text = getString(R.string.expired_credentials_on_top)
-                view.addView(checkBox)
-                view.addView(desc)
+                val expiredOnTopView = LinearLayout(this)
+                expiredOnTopView.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                expiredOnTopView.orientation = LinearLayout.HORIZONTAL
+                expiredOnTopView.setPadding(16)
+                onTopView.addView(expiredOnTopView)
+
+                val expiredOnTopSwitch = SwitchCompat(this)
+                expiredOnTopSwitch.setPadding(0, 0, 16, 0)
+                expiredOnTopSwitch.isChecked = PreferenceService.getAsBool(PREF_EXPIRED_CREDENTIALS_ON_TOP, this)
+                val expiredOnTopDesc = TextView(this)
+                expiredOnTopDesc.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                expiredOnTopDesc.text = getString(R.string.expired_credentials_on_top)
+                expiredOnTopView.addView(expiredOnTopSwitch)
+                expiredOnTopView.addView(expiredOnTopDesc)
+
+                val markedOnTopView = LinearLayout(this)
+                markedOnTopView.orientation = LinearLayout.HORIZONTAL
+                markedOnTopView.setPadding(16)
+                onTopView.addView(markedOnTopView)
+
+                val markedOnTopSwitch = SwitchCompat(this)
+                markedOnTopSwitch.setPadding(0, 0, 16, 0)
+                markedOnTopSwitch.isChecked = PreferenceService.getAsBool(PREF_MARKED_CREDENTIALS_ON_TOP, true, this)
+                val markedOnTopDesc = TextView(this)
+                markedOnTopDesc.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT)
+                markedOnTopDesc.text = getString(R.string.marked_credentials_on_top)
+                markedOnTopView.addView(markedOnTopSwitch)
+                markedOnTopView.addView(markedOnTopDesc)
 
                 var selectedSortOrder = prefSortOrder.ordinal
                 AlertDialog.Builder(this)
@@ -1235,13 +1307,14 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     .setSingleChoiceItems(listItems, prefSortOrder.ordinal) { _, i ->
                        selectedSortOrder = i
                     }
-                    .setView(view)
+                    .setView(onTopView)
                     .setPositiveButton(android.R.string.ok) { dialog, _ ->
                         dialog.dismiss()
 
-                        val newSortOrder = CredentialSortOrder.values()[selectedSortOrder]
+                        val newSortOrder = CredentialSortOrder.entries[selectedSortOrder]
                         PreferenceService.putString(PREF_CREDENTIAL_SORT_ORDER, newSortOrder.name, this)
-                        PreferenceService.putBoolean(PREF_EXPIRED_CREDENTIALS_ON_TOP, checkBox.isChecked, this)
+                        PreferenceService.putBoolean(PREF_EXPIRED_CREDENTIALS_ON_TOP, expiredOnTopSwitch.isChecked, this)
+                        PreferenceService.putBoolean(PREF_MARKED_CREDENTIALS_ON_TOP, markedOnTopSwitch.isChecked, this)
                         refreshCredentials()
                     }
                     .setNegativeButton(android.R.string.cancel) { dialog, _ ->
@@ -1249,6 +1322,76 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     }
                     .show()
 
+                return true
+            }
+            R.id.menu_group_by -> {
+                val prefGrouping = getPrefGrouping()
+                val listItems = CredentialGrouping.entries.map { getString(it.labelId) }.toTypedArray()
+
+                val onTopView = LinearLayout(this)
+                onTopView.orientation = LinearLayout.VERTICAL
+                onTopView.setPadding(16)
+
+                val expiredOnTopView = LinearLayout(this)
+                expiredOnTopView.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                expiredOnTopView.orientation = LinearLayout.HORIZONTAL
+                expiredOnTopView.setPadding(16)
+                onTopView.addView(expiredOnTopView)
+
+                val expiredOnTopSwitch = SwitchCompat(this)
+                expiredOnTopSwitch.setPadding(0, 0, 16, 0)
+                expiredOnTopSwitch.isChecked = PreferenceService.getAsBool(PREF_EXPIRED_CREDENTIALS_ON_TOP, this)
+                val expiredOnTopDesc = TextView(this)
+                expiredOnTopDesc.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                expiredOnTopDesc.text = getString(R.string.expired_credentials_on_top)
+                expiredOnTopView.addView(expiredOnTopSwitch)
+                expiredOnTopView.addView(expiredOnTopDesc)
+
+                val markedOnTopView = LinearLayout(this)
+                markedOnTopView.orientation = LinearLayout.HORIZONTAL
+                markedOnTopView.setPadding(16)
+                onTopView.addView(markedOnTopView)
+
+                val markedOnTopSwitch = SwitchCompat(this)
+                markedOnTopSwitch.setPadding(0, 0, 16, 0)
+                markedOnTopSwitch.isChecked = PreferenceService.getAsBool(PREF_MARKED_CREDENTIALS_ON_TOP, true, this)
+                val markedOnTopDesc = TextView(this)
+                markedOnTopDesc.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT)
+                markedOnTopDesc.text = getString(R.string.marked_credentials_on_top)
+                markedOnTopView.addView(markedOnTopSwitch)
+                markedOnTopView.addView(markedOnTopDesc)
+
+                var selectedGrouping = prefGrouping.ordinal
+                AlertDialog.Builder(this)
+                    .setIcon(R.drawable.outline_group_by_24)
+                    .setTitle(R.string.group_by)
+                    .setSingleChoiceItems(listItems, prefGrouping.ordinal) { _, i ->
+                        selectedGrouping = i
+                    }
+                    .setView(onTopView)
+                    .setPositiveButton(android.R.string.ok) { dialog, _ ->
+                        dialog.dismiss()
+
+                        val newGrouping = CredentialGrouping.entries[selectedGrouping]
+                        PreferenceService.putString(PREF_CREDENTIAL_GROUPING, newGrouping.name, this)
+                        PreferenceService.putBoolean(PREF_EXPIRED_CREDENTIALS_ON_TOP, expiredOnTopSwitch.isChecked, this)
+                        PreferenceService.putBoolean(PREF_MARKED_CREDENTIALS_ON_TOP, markedOnTopSwitch.isChecked, this)
+                        refreshCredentials()
+                        updateExpandAndCollapseMenuItems()
+                    }
+                    .setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                        dialog.cancel()
+                    }
+                    .show()
+
+                return true
+            }
+            R.id.menu_group_by_expand_all -> {
+                listCredentialAdapter?.expandAllGroups()
+                return true
+            }
+            R.id.menu_group_by_collapse_all -> {
+                listCredentialAdapter?.collapseAllGroups()
                 return true
             }
             R.id.menu_show_ids -> {
@@ -1340,7 +1483,46 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 updateSearchFieldWithAutofillSuggestion(intent)
             }
         }
+        else if (resultCode == RESULT_OK && requestCode == saveAutoBackupFile) {
 
+            data?.data?.let { newDestUri ->
+
+                val newBackupFile = DocumentFile.fromSingleUri(this, newDestUri)
+                if (newBackupFile != null) {
+                    if (currAutoBackupFileName != newBackupFile.name) {
+
+                        AlertDialog.Builder(this)
+                            .setTitle(R.string.auto_export_vault)
+                            .setMessage(
+                                getString(
+                                    R.string.auto_export_filename_change,
+                                    currAutoBackupFileName,
+                                    newBackupFile.name
+                                ))
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setCancelable(false)
+                            .setPositiveButton(R.string.yes) { _, _ ->
+                                registerBackupFileUri(newBackupFile)
+                            }
+                            .setNegativeButton(R.string.no) { _, _ ->
+                                newBackupFile.delete()
+                                toastText(this, R.string.cancelled)
+                            }
+                            .show()
+                    } else {
+                        registerBackupFileUri(newBackupFile)
+                    }
+                }
+            }
+
+        }
+
+    }
+
+    private fun registerBackupFileUri(newBackupFile: DocumentFile) {
+        AutoBackupService.registerAutoBackupUri(this, newBackupFile.uri)
+        AutoBackupService.autoExportVault(this)
+        toastText(this, getString(R.string.auto_export_configured, getFullName(newBackupFile)))
     }
 
     override fun onBackPressed() {
@@ -1426,7 +1608,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         .setTitle(getString(R.string.store_masterpasswd))
                         .setMessage(getString(R.string.store_masterpasswd_confirmation))
                         .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                        .setPositiveButton(android.R.string.ok) { dialog, whichButton ->
                             storeMasterPassword(masterPasswd, this,
                                 {
                                     refreshMenuMasterPasswordItem(navigationView.menu)
@@ -1439,7 +1621,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                                     toastText(this, R.string.masterpassword_not_stored)
                                 })
                         }
-                        .setNegativeButton(android.R.string.no, null)
+                        .setNegativeButton(android.R.string.cancel, null)
                         .show()
 
                     return true
@@ -1452,12 +1634,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     .setTitle(getString(R.string.delete_stored_masterpasswd))
                     .setMessage(getString(R.string.delete_stored_masterpasswd_confirmation))
                     .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                    .setPositiveButton(android.R.string.ok) { dialog, whichButton ->
                         RemoveStoredMasterPasswordUseCase.execute(this)
                         refreshMenuMasterPasswordItem(navigationView.menu)
                         toastText(this, R.string.masterpassword_removed)
                     }
-                    .setNegativeButton(android.R.string.no, null)
+                    .setNegativeButton(android.R.string.cancel, null)
                     .show()
 
                 return true
@@ -1498,6 +1680,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             R.id.export_vault -> {
                 val intent = Intent(this, ExportVaultActivity::class.java)
                 startActivity(intent)
+                return true
+            }
+            R.id.auto_export_vault -> {
+
+                openAutoBackupDialog()
+
                 return true
             }
             R.id.import_credential -> {
@@ -1554,11 +1742,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     .setTitle(getString(R.string.title_drop_vault))
                     .setMessage(getString(R.string.message_drop_vault))
                     .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                    .setPositiveButton(android.R.string.ok) { dialog, whichButton ->
                         DropVaultUseCase.doubleCheckDropVault(this)
                             {DropVaultUseCase.execute(this)}
                     }
-                    .setNegativeButton(android.R.string.no, null)
+                    .setNegativeButton(android.R.string.cancel, null)
                     .show()
 
                 return true
@@ -1615,7 +1803,207 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         return true
     }
 
+    private fun openAutoBackupDialog() {
+        val backupFile = AutoBackupService.getAutoBackupFile(this)
+
+        val dialogBuilder = AlertDialog.Builder(this)
+            .setTitle(R.string.auto_export_vault)
+
+
+
+        val container = LinearLayout(this)
+        container.orientation = LinearLayout.VERTICAL
+
+
+        val messageTextView = TextView(this)
+        messageTextView.text =
+            getString(R.string.auto_export_explanation)
+        messageTextView.setPadding(32)
+        messageTextView.setTextAppearance(android.R.style.TextAppearance_Theme_Dialog)
+        container.addView(messageTextView)
+
+        if (backupFile != null) {
+            var fileMessage =
+                if (backupFile.canWrite())
+                    getString(R.string.auto_export_file, getFullName(backupFile))
+                else
+                    getString(R.string.auto_export_file_inaccessible) +
+                            System.lineSeparator() +
+                            getString(R.string.auto_export_file, getFullName(backupFile))
+
+
+            if (DebugInfo.isDebug) {
+                fileMessage = fileMessage + System.lineSeparator() + System.lineSeparator() + backupFile.uri.toString()
+            }
+
+
+            val currentFileTextView = TextView(this)
+            currentFileTextView.text = fileMessage
+            currentFileTextView.setPadding(32)
+            currentFileTextView.textSize = 18.0F
+            container.addView(currentFileTextView)
+
+
+            val syncContainer = LinearLayout(this)
+            syncContainer.setPadding(32)
+
+            syncContainer.orientation = LinearLayout.HORIZONTAL
+            syncContainer.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            val lastExportedTextView = TextView(this)
+            lastExportedTextView.layoutParams = ViewGroup.LayoutParams(500, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+            lastExportedTextView.text = getLastExportedMessage()
+            lastExportedTextView.textSize = 18.0F
+            syncContainer.addView(lastExportedTextView)
+            container.addView(syncContainer)
+
+
+            if (backupFile.canWrite()) {
+
+                val syncNowButton = ImageView(this)
+                syncNowButton.setImageResource(R.drawable.outline_sync_24)
+                syncNowButton.setPadding(48, 32, 0, 0)
+                syncContainer.addView(syncNowButton)
+
+                syncNowButton.setOnClickListener {
+                    toastText(this, getString(R.string.auto_export_started))
+                    AutoBackupService.autoExportVault(this) {
+                        lastExportedTextView.text = getLastExportedMessage()
+                    }
+                }
+            }
+        }
+
+
+
+        val includeMasterKeyDefault =
+            PreferenceService.getAsBool(PREF_INCLUDE_MASTER_KEY_IN_BACKUP_FILE, true, this)
+        val includeMasterKeySwitch = SwitchCompat(this)
+        includeMasterKeySwitch.text = getString(R.string.include_enc_masterkey)
+        includeMasterKeySwitch.switchPadding = 32
+        includeMasterKeySwitch.setPadding(64, 32, 64, 16)
+        includeMasterKeySwitch.isChecked = PreferenceService.getAsBool(
+            PREF_INCLUDE_MASTER_KEY_IN_AUTO_BACKUP_FILE, includeMasterKeyDefault, this
+        )
+        includeMasterKeySwitch.setOnClickListener {
+            PreferenceService.putBoolean(
+                PREF_INCLUDE_MASTER_KEY_IN_AUTO_BACKUP_FILE, includeMasterKeySwitch.isChecked, this
+            )
+        }
+
+        container.addView(includeMasterKeySwitch)
+
+        val includePrefsDefault =
+            PreferenceService.getAsBool(PREF_INCLUDE_SETTINGS_IN_BACKUP_FILE, true, this)
+        val includePrefsSwitch = SwitchCompat(this)
+        includePrefsSwitch.text = getString(R.string.include_preferences)
+        includePrefsSwitch.switchPadding = 32
+        includePrefsSwitch.setPadding(64, 16, 64, 32)
+        includePrefsSwitch.isChecked = PreferenceService.getAsBool(
+            PREF_INCLUDE_SETTINGS_IN_AUTO_BACKUP_FILE, includePrefsDefault, this
+        )
+        includePrefsSwitch.setOnClickListener {
+            PreferenceService.putBoolean(
+                PREF_INCLUDE_SETTINGS_IN_AUTO_BACKUP_FILE, includePrefsSwitch.isChecked, this
+            )
+        }
+
+        container.addView(includePrefsSwitch)
+
+
+
+        val scrollView = ScrollView(this)
+        scrollView.addView(container)
+        dialogBuilder.setView(scrollView)
+
+        if (backupFile != null) {
+            dialogBuilder
+                .setPositiveButton(R.string.button_change) { _, _ ->
+                    configureAutoBackupFileUri(backupFile)
+                }
+                .setNegativeButton(getString(R.string.deactivate)) { _, _ ->
+                    AlertDialog.Builder(this)
+                        .setTitle(R.string.auto_export_vault)
+                        .setMessage(getString(R.string.auto_export_deactivate_message))
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                            PreferenceService.delete(PreferenceService.DATA_VAULT_AUTO_EXPORT_URI, this)
+                            toastText(this, getString(R.string.auto_export_deactivated))
+                        }
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .show()
+
+                }
+                .setNeutralButton(R.string.close) { dialog, _ ->
+                    dialog.cancel()
+                }
+        } else {
+
+
+            dialogBuilder
+                .setPositiveButton(R.string.configure) { _, _ ->
+                    configureAutoBackupFileUri(null)
+                }
+                .setNeutralButton(R.string.close) { dialog, _ ->
+                    dialog.cancel()
+                }
+        }
+
+        dialogBuilder.show()
+    }
+
+    private fun getLastExportedMessage(): String {
+        val lastExported = PreferenceService.getAsDate(DATA_VAULT_AUTO_EXPORTED_AT, this)
+
+        val lastExportedMessage = if (lastExported != null)
+            getString(R.string.last_auto_export_date) + ":\n" + dateTimeToNiceString(lastExported, this)
+        else
+            getString(R.string.last_auto_export_date) + ":\n" + getString(R.string.never)
+        return lastExportedMessage
+    }
+
+    private fun getFullName(backupFile: DocumentFile): String {
+        val fileName = backupFile.name ?: getString(R.string.unknown)
+        val fullPath = backupFile.uri.path ?: return fileName
+        val split = fullPath.split(":").drop(1)
+        if (split.isEmpty()) {
+            return fileName
+        }
+        val fullPathWithoutScheme = split.joinToString(separator = ":")
+        if (fullPathWithoutScheme.endsWith(fileName)) {
+            return fullPathWithoutScheme
+        }
+        else {
+            return "$fullPathWithoutScheme/$fileName"
+        }
+    }
+
+    private fun configureAutoBackupFileUri(backupFile: DocumentFile?) {
+        PermissionChecker.verifyRWStoragePermissions(this)
+        if (PermissionChecker.hasRWStoragePermissions(this)) {
+            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+            intent.addCategory(Intent.CATEGORY_OPENABLE)
+            intent.type = "application/json"
+            intent.putExtra(EXTRA_INITIAL_URI, backupFile?.uri)
+            currAutoBackupFileName = if (backupFile != null) {
+                backupFile.name?:ShareVaultUseCase.getAutoBackupFileName(this)
+            } else {
+                ShareVaultUseCase.getAutoBackupFileName(this)
+            }
+            intent.putExtra(Intent.EXTRA_TITLE, currAutoBackupFileName)
+
+            startActivityForResult(
+                Intent.createChooser(intent, getString(R.string.save_as)),
+                saveAutoBackupFile
+            )
+        }
+    }
+
     private fun refreshNavigationMenu() {
+        val firstChild = navigationView.getChildAt(0)
+        val rv = firstChild as? RecyclerView
+        rv?.itemAnimator = null
+
         navigationView.menu.clear()
         navigationView.inflateMenu(R.menu.menu_main_drawer)
 
@@ -1648,6 +2036,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         refreshRevokeMptItem(navigationView.menu)
         refreshMenuDebugItem(navigationView.menu)
 
+
     }
 
     private fun refreshCredentials() {
@@ -1671,6 +2060,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     }
 
                     val expiredCredentialsOnTop = PreferenceService.getAsBool(PREF_EXPIRED_CREDENTIALS_ON_TOP, this)
+                    val markedCredentialsOnTop = PreferenceService.getAsBool(PREF_MARKED_CREDENTIALS_ON_TOP, true,this)
 
                     when (getPrefSortOrder()) {
                         CredentialSortOrder.CREDENTIAL_NAME_ASC -> {
@@ -1680,6 +2070,10 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                                         {
                                             if (expiredCredentialsOnTop && it.isExpired(key)) 0 else 1
                                         },
+                                        {
+                                            if (markedCredentialsOnTop && it.pinned) 0 else 1
+                                        },
+
                                         {
                                             SecretService.decryptCommonString(key, it.name)
                                                 .lowercase()
@@ -1731,6 +2125,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     }
                 }
 
+                listCredentialAdapter?.expandAllGroups()
                 listCredentialAdapter?.submitOriginList(sortedCredentials)
                 filterAgain()
 
@@ -1792,12 +2187,20 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         item.isChecked = showIds
     }
 
-    private fun getPrefSortOrder(): CredentialSortOrder {
+    internal fun getPrefSortOrder(): CredentialSortOrder {
         val sortOrderAsString = PreferenceService.getAsString(PREF_CREDENTIAL_SORT_ORDER, this)
         if (sortOrderAsString != null) {
             return CredentialSortOrder.valueOf(sortOrderAsString)
         }
         return CredentialSortOrder.DEFAULT
+    }
+
+    internal fun getPrefGrouping(): CredentialGrouping {
+        val groupingAsString = PreferenceService.getAsString(PREF_CREDENTIAL_GROUPING, this)
+        if (groupingAsString != null) {
+            return CredentialGrouping.valueOf(groupingAsString)
+        }
+        return CredentialGrouping.DEFAULT
     }
 
     fun duplicateCredential(credential: EncCredential, key: SecretKeyHolder) {
@@ -1816,7 +2219,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         credential.id?.let { id ->
             credentialViewModel.deleteCredentialExpiry(id, this)
         }
-        credentialViewModel.delete(credential)
+        credentialViewModel.delete(credential, this)
         toastText(this, R.string.credential_deleted)
     }
 
@@ -1841,7 +2244,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     }
 
     private fun updateRestoreServerPanelMenuItem() {
-        restoreServerPanel?.isVisible = PreferenceService.getAsBool(PreferenceService.PREF_SERVER_CAPABILITIES_ENABLED, this)
+        restoreServerPanel?.isVisible = PreferenceService.getAsBool(PreferenceService.PREF_SERVER_CAPABILITIES_ENABLED, true, this)
                 && PreferenceService.getAsBool(PreferenceService.PREF_SERVER_HIDE_PANEL, this)
     }
 
@@ -1855,9 +2258,13 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         lastReminderItem?.isVisible = ReminderService.hasLastReminder(this)
     }
 
+    private fun updateExpandAndCollapseMenuItems() {
+        expandAllItem?.isVisible = getPrefGrouping() != CredentialGrouping.NO_GROUPING
+        collapseAllItem?.isVisible = getPrefGrouping() != CredentialGrouping.NO_GROUPING
+    }
+
     private fun updateNavigationMenuVisibility(groupResId: Int, itemResId: Int, stringResId: Int, visible: Boolean) {
         navigationView.menu.setGroupVisible(groupResId, visible)
-        navigationView.menu.setGroupEnabled(groupResId, visible)
 
         val item = navigationView.menu.findItem(itemResId)
         item.isEnabled = true

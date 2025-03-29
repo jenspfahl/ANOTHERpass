@@ -25,14 +25,14 @@ object ImportCredentialUseCase: InputUseCase<ImportCredentialUseCase.Input, Secu
                         .setTitle(R.string.import_credential)
                         .setMessage(R.string.credential_already_exists)
                         .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                        .setPositiveButton(android.R.string.ok) { dialog, whichButton ->
 
                             existingCredential.passwordData.retainPassword()
                             existingCredential.copyData(input.credential)
 
                             saveAndNavigateBack(isNew = false, activity, existingCredential, input.successHandler)
                         }
-                        .setNegativeButton(android.R.string.no, null)
+                        .setNegativeButton(android.R.string.cancel, null)
                         .show()
                 }
                 else {
@@ -70,7 +70,7 @@ object ImportCredentialUseCase: InputUseCase<ImportCredentialUseCase.Input, Secu
                         .setTitle(R.string.import_credential)
                         .setMessage(R.string.credential_already_exists)
                         .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+                        .setPositiveButton(android.R.string.ok) { dialog, whichButton ->
 
                             existingCredential.passwordData.retainPassword()
                             existingCredential.copyData(input.credential)
@@ -82,7 +82,7 @@ object ImportCredentialUseCase: InputUseCase<ImportCredentialUseCase.Input, Secu
                                 input.successHandler
                             )
                         }
-                        .setNegativeButton(android.R.string.no, null)
+                        .setNegativeButton(android.R.string.cancel, null)
                         .show()
                 } else {
                     saveAndNavigateBack(

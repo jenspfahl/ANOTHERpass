@@ -53,8 +53,8 @@ class LoginActivity : NfcBaseActivity() {
     var showTagDetectedMessage = false
     var isFromAutofill = false
 
-    val createVaultActivityRequestCode = 1
-    val importVaultActivityRequestCode = 2
+    private val createVaultActivityRequestCode = 1
+    private val importVaultActivityRequestCode = 2
 
     private var resumeAutofillItem: MenuItem? = null
     private var revokeQuickAccessItem: MenuItem? = null
@@ -124,14 +124,14 @@ class LoginActivity : NfcBaseActivity() {
         if (DebugInfo.isBeta(this) && !DebugInfo.isBetaDisclaimerShown()) {
             DebugInfo.setBetaDisclaimerShown()
             AlertDialog.Builder(this)
-                .setMessage(R.string.diclaimer_beta_version)
+                .setMessage(R.string.disclaimer_beta_version)
                 .setPositiveButton(R.string.got_it, null)
                 .show()
         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        inflateActionsMenu(menu, R.menu.menu_login)
+        inflateActionsMenu(menu, R.menu.menu_login, showGroupDivider = true)
 
         val debugItem: MenuItem = menu.findItem(R.id.menu_debug)
         debugItem.isVisible = DebugInfo.isDebug
@@ -216,13 +216,17 @@ class LoginActivity : NfcBaseActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        // this activity is singleTask, so if already in the current task we need to recreate
+        recreate()
+    }
+
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == createVaultActivityRequestCode && resultCode == Activity.RESULT_OK) {
-            recreate()
-        }
-        if (requestCode == importVaultActivityRequestCode && resultCode == Activity.RESULT_OK) {
+        if ((requestCode == importVaultActivityRequestCode || requestCode == createVaultActivityRequestCode) && resultCode == Activity.RESULT_OK) {
             recreate()
         }
     }
@@ -416,8 +420,7 @@ class LoginActivity : NfcBaseActivity() {
     private fun dropAndLogoutVault() {
         DropVaultUseCase.dropVaultData(this)
         Session.logout()
-        val intent = Intent(this, LoginActivity::class.java)
-        startActivity(intent)
+        recreate()
     }
 
     fun showRevokeQuickAccessDialog() {
@@ -425,13 +428,13 @@ class LoginActivity : NfcBaseActivity() {
             .setTitle(getString(R.string.revoke_quick_access))
             .setMessage(getString(R.string.revoke_quick_access_desc))
             .setIcon(android.R.drawable.ic_dialog_alert)
-            .setPositiveButton(android.R.string.yes) { _, _ ->
+            .setPositiveButton(android.R.string.ok) { _, _ ->
                 RemoveStoredMasterPasswordUseCase.execute(this)
                 RevokeMasterPasswordTokenUseCase.execute(this)
                 Session.logout()
                 toastText(this, R.string.quick_access_revoked)
             }
-            .setNegativeButton(android.R.string.no, null)
+            .setNegativeButton(android.R.string.cancel, null)
             .show()
     }
 }

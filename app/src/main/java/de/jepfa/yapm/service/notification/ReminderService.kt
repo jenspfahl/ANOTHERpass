@@ -24,12 +24,14 @@ import de.jepfa.yapm.service.PreferenceService.DATA_MP_EXPORT_NOTIFICATION_SHOWE
 import de.jepfa.yapm.service.PreferenceService.DATA_MP_MODIFIED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_REFRESH_MPT_NOTIFICATION_SHOWED_AS
 import de.jepfa.yapm.service.PreferenceService.DATA_REFRESH_MPT_NOTIFICATION_SHOWED_AT
+import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_AUTO_EXPORTED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_EXPORTED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_EXPORT_NOTIFICATION_SHOWED_AS
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_EXPORT_NOTIFICATION_SHOWED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_MODIFIED_AT
 import de.jepfa.yapm.service.PreferenceService.PREF_REMINDER_DURATION
 import de.jepfa.yapm.service.PreferenceService.PREF_REMINDER_PERIOD
+import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_AUTO_EXPORT_VAULT_FAILED_REMINDER
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_BIOMETRIC_SMP_REMINDER
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_EXPIRED_PASSWORDS_REMINDER
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_EXPORT_MK_REMINDER
@@ -37,6 +39,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_EXPORT_MP_REMINDER
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_EXPORT_VAULT_REMINDER
 import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_REFRESH_MPT_REMINDER
 import de.jepfa.yapm.service.biometrix.BiometricUtils
+import de.jepfa.yapm.service.io.AutoBackupService
 import de.jepfa.yapm.service.secret.MasterPasswordService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
@@ -45,6 +48,7 @@ import de.jepfa.yapm.ui.exportvault.ExportVaultActivity
 import de.jepfa.yapm.usecase.secret.ExportEncMasterKeyUseCase
 import de.jepfa.yapm.usecase.secret.ExportEncMasterPasswordUseCase
 import de.jepfa.yapm.usecase.secret.GenerateMasterPasswordTokenUseCase
+import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.addDays
 import de.jepfa.yapm.util.removeSeconds
 import de.jepfa.yapm.util.toastText
@@ -80,6 +84,28 @@ object ReminderService {
         }
         override val action = { activity: SecureActivity ->
             val intent = Intent(activity, ExportVaultActivity::class.java)
+            activity.startActivity(intent)
+        }
+    }
+
+    object AutoVault: ReminderConfig {
+        override val showIt = { activity: SecureActivity ->
+            PreferenceService.getAsBool(PREF_SHOW_AUTO_EXPORT_VAULT_FAILED_REMINDER, true, activity)
+        }
+        override val doDeactivate: (SecureActivity) -> Unit = { activity: SecureActivity ->
+            PreferenceService.putBoolean(PREF_SHOW_AUTO_EXPORT_VAULT_FAILED_REMINDER, false, activity)
+        }
+        override val dataNotificationShowedAt = DATA_VAULT_EXPORT_NOTIFICATION_SHOWED_AT
+        override val dataNotificationShowedAs = DATA_VAULT_EXPORT_NOTIFICATION_SHOWED_AS
+        override val notificationText = R.string.auto_export_vault_reminder
+        override val notificationAction = R.string.auto_export_vault
+        override val condition = { activity: SecureActivity ->
+            AutoBackupService.isAutoBackupConfigured(activity)
+                    && dateOlderThan(DATA_VAULT_AUTO_EXPORTED_AT, DATA_VAULT_MODIFIED_AT, activity, 30 * 60) // 30 minutes
+        }
+        override val action = { activity: SecureActivity ->
+            val intent = Intent(activity, ListCredentialsActivity::class.java)
+            intent.action = Constants.ACTION_OPEN_AUTOFILL_DIALOG
             activity.startActivity(intent)
         }
     }
@@ -209,6 +235,7 @@ object ReminderService {
         ExpiredPasswords,
         MasterPassword,
         Vault,
+        AutoVault,
         MasterKey,
         StoredMasterPassword ,
         RefreshMasterPasswordToken)
@@ -274,14 +301,15 @@ object ReminderService {
     private fun dateOlderThan(
         dataTargetExportedAtKey: String,
         dataTargetModifiedAtKey: String,
-        context: Context)
+        context: Context,
+        acceptableDelta: Int = 0)
     : Boolean {
         val vaultExportedAt = PreferenceService.getAsDate(dataTargetExportedAtKey, context)?.removeSeconds()
         val vaultModifiedAt = PreferenceService.getAsDate(dataTargetModifiedAtKey, context)?.removeSeconds()
         return dateOlderThan(vaultExportedAt, vaultModifiedAt)
     }
 
-    private fun dateOlderThan(dateA: Date?, dateB: Date?): Boolean {
+    private fun dateOlderThan(dateA: Date?, dateB: Date?, acceptableDeltaInSec: Int = 0): Boolean {
         if (dateA == null && dateB != null) {
             return true
         }
@@ -289,7 +317,8 @@ object ReminderService {
             return false
         }
 
-        return dateA.before(dateB)
+        val diff = dateA.time - dateB.time + (acceptableDeltaInSec * 1000)
+        return diff < 0
 
     }
 

@@ -44,6 +44,8 @@
     <string name="CIPHER_BLOWFISH_256_desc">Dies ist ein alternativer Verschlüsselungsalgorithmus mit etwas besserer Sicherheit aber weniger Performance. Er soll schwerer zu brechen aber dafür langsamer als AES sein. Unterstützt ab Android 2.3.</string>
     <string name="CIPHER_CHACHACHA20_256_desc">Dies ist ein relativ neuer Verschlüsselungsalgorithmus mit etwa der gleichen Sicherheit wie AES aber einer angeblich höheren Performance. Unterstützt ab Android 9.</string>
 
+    <string name="mark">Markieren</string>
+    <string name="unmark">Markierung aufheben</string>
     <string name="change">Bearbeiten</string>
     <string name="delete">Löschen</string>
 
@@ -108,6 +110,7 @@
     <string name="action_export_masterkey">Exportiere \nMasterkey</string>
     <string name="action_export_masterpasswd">Exportiere \nMasterpasswort</string>
     <string name="export_vault">Exportiere/Backup Tresor</string>
+    <string name="auto_export_vault">Automatischer Tresorbackup</string>
     <string name="import_vault_as_file">Importiere Tresor-Datei</string>
     <string name="message_import_vault_records">Du bist dabei %1$d Zugangsdaten und %2$d Kategorien zu importieren. Schon existierende Daten werden überschrieben. Fortsetzen?</string>
     <string name="message_import_credential_records">Du bist dabei %1$d Zugangsdaten zu importieren. Es werden keine existierende Zugangsdaten überschrieben. Fortfahren?</string>
@@ -253,6 +256,11 @@
     <string name="pref_header_overlay">Passwörter über anderen Apps einblenden</string>
     <string name="HYPER">Hyper</string>
     <string name="sort_order">Sortierreihenfolge</string>
+    <string name="group_by">Zugangsdaten gruppieren</string>
+    <string name="credential_group_by_none">Keine Gruppierung</string>
+    <string name="credential_group_by_name">Nach Name der Zugangsdaten (erster Buchstabe)</string>
+    <string name="credential_group_by_label">Nach Kategorie (Zugangsdaten mit mehreren Kategorien werden unter jeder einzelnen Kategorie aufgeführt)</string>
+
     <string name="credential_sort_by">Sortiere Zugangsdaten nach</string>
     <string name="credential_sort_by_name_asc">Name (A..Z)</string>
     <string name="credential_sort_by_name_desc">Name (Z..A)</string>
@@ -260,6 +268,8 @@
     <string name="credential_sort_by_id">Zugangsdaten-ID</string>
     <string name="show_ids">Zeige Zugangsdaten-IDs</string>
     <string name="expired_credentials_on_top">Abgelaufene Zugangsdaten ganz oben</string>
+    <string name="marked_credentials_on_top">Markierte Zugangsdaten ganz oben</string>
+
     <string name="tab_pseudo_phrase">Pseudophrase</string>
     <string name="tab_ordinary">Normales Passwort</string>
     <string name="drop_to_close">APP SCHLIESSEN</string>
@@ -316,7 +326,7 @@
     <string name="export_plain_passwd">Exportiere Zugangsdaten-Passwort</string>
     <string name="export_enc_credential_record">Exportiere Zugangsdaten verschlüsselt</string>
     <string name="export_plain_credential_record">Exportiere Zugangsdaten zum Teilen</string>
-    <string name="export_otp_config">Exportiere Einmalpassword-Konfiguration</string>
+    <string name="export_otp_config">Exportiere Einmalpasswort-Konfiguration</string>
     <string name="head_export_plain_passwd">Das Zugangsdaten-Passwort von \'%1$s\'</string>
     <string name="sub_export_plain_passwd">Bewahre diesen QR-Code sicher auf, da es ein echtes Passwort enthält!</string>
     <string name="head_export_enc_credential_record">Verschlüsselte Zugangsdaten für \'%1$s\'</string>
@@ -480,6 +490,10 @@
     <string name="next_reminder">Nächste Erinnerung</string>
     <string name="last_reminder">Letzte Erinnerung</string>
 
+    <string name="auto_export_vault_reminder">Der Tresor konnte nicht automatisch gesichert/exportiert werden.</string>
+    <string name="show_auto_export_vault_reminder">Erinnerung an automatische, aber fehlgeschlagene Tresor-Sicherungsversuche</string>
+    <string name="summary_show_auto_export_vault_reminder">Erinnerung anzeigen, wenn der Tresor trotz Konfiguration nicht automatisch exportiert/gesichert werden konnte und länger als eine halbe Stunde nicht synchronisiert wurde.</string>
+
     <string name="export_vault_reminder">Tresor wurde geändert und sollte exportiert werden.</string>
     <string name="export_mk_reminder">Masterkey hat sich geändert und sollte exportiert werden.</string>
     <string name="export_mp_reminder">Masterpasswort sollte exportiert werden!</string>
@@ -560,6 +574,15 @@
     <string name="whats_new_in_2_1_bullet_2_text">Eine neue Art der Login-Verschlüsselung namens Argon2 kann jetzt verwendet werden, um das Knacken deiner PIN und deines Master-Passworts noch schwieriger zu machen. Argon2 ist eine moderne sogenannte Key-Derivation-Function (KDF) und erlaubt eine schnellere und sichere Entsperrung des Tresors.</string>
     <string name="whats_new_in_2_1_bullet_3_head">Import und Export von und als Keepass-Dateien</string>
     <string name="whats_new_in_2_1_bullet_3_text">Jetzt können deine Zugangsdaten in jedem Keepass-Fork verwendet werden! Exportiere alle Zugangsdaten in eine Keepass-Tresordatei (KDBX, Version 4). Oder importiere einfach eine beliebige Keepass-Datei in den aktuellen ANOTHERpass-Tresor (ab KDBX-Version 3).</string>
+
+    <string name="whats_new_in_2_2">Was ist neu in Version 2.2</string>
+    <string name="whats_new_in_2_2_bullet_1_head">Automatische Sicherung des Tresors in eine Zieldatei</string>
+    <string name="whats_new_in_2_2_bullet_1_text">Anstatt den Tresor regelmäßig manuell zu exportieren, um eine aktuelle Sicherung zu erhalten, kannst du jetzt eine Zieldatei konfigurieren, in die der Tresor nach jeder Änderung automatisch exportiert wird. Diese Datei ist stets auf dem neuesten Stand und kann lokal oder extern (z.B. auf einem Remote-Laufwerk) gespeichert werden.</string>
+    <string name="whats_new_in_2_2_bullet_2_head">Gruppieren der Zugangsdaten</string>
+    <string name="whats_new_in_2_2_bullet_2_text">Um deine Zugangsdaten besser zu strukturieren, kannst du sie jetzt nach Namen oder Kategorie gruppieren. Dies ist hilfreich, um den Überblick über alle Zugangsdaten zu behalten.</string>
+    <string name="whats_new_in_2_2_bullet_3_head">Bestimmte Zugangsdaten markieren</string>
+    <string name="whats_new_in_2_2_bullet_3_text">Um die wichtigsten Zugangsdaten im Tresor leichter zu finden, können diese jetzt mit einem Stern markiert werden. Markierte Zugangsdaten werden in der Regel oben in der Liste angezeigt, sodass sie schneller gefunden werden können.</string>
+
     <string name="intro">Starte Intro</string>
     <string name="intro_1_head">Ein etwas anderer Passwortmanager</string>
     <string name="intro_1_subtext">ANOTHERpass bietet eine etwas andere Herangehensweise. Lies hier was das heißt:</string>
@@ -733,7 +756,7 @@
     <string name="permission_denied">Berechtigung nicht erteilt!</string>
 
     <string name="import_credentials_file">Importiere Zugangsdaten aus Datei</string>
-    <string name="import_credentials_explanation_labels">Du kannst deine importierten Zugangsdaten kategorisieren um sie leichter wiederzufinden,</string>
+    <string name="import_credentials_explanation_labels">Du kannst deine importierten Zugangsdaten kategorisieren um sie leichter wiederzufinden.</string>
     <string name="start_typing_to_filter_labels">Beginne zu tippen oder drücke die Leertaste um nach Kategorien zu suchen</string>
     <string name="credentials_in_file">%1$d Zugangsdaten in Datei gefunden</string>
     <string name="cannot_read_file">Datei kann nicht gelesen werden</string>
@@ -796,6 +819,7 @@
     <string name="command_latest">Zeige zuletzt bearbeitete Zugangsdaten</string>
     <string name="command_veiled">Filtere verschleierte Zugangsdaten</string>
     <string name="command_otp">Filtere Zugangsdaten mit Einmalpasswörtern</string>
+    <string name="command_marked">Filtere markierte Zugangsdaten</string>
 
 
     <string name="with_email_alias">Deklariere den Benutzernamen als Emailadresse mit einem generischen Alias-Teil</string>
@@ -929,7 +953,7 @@
     <string name="copied_to_clipboard">In die Zwischenablage kopiert</string>
     <string name="delete_disabled_linked_devices_title">Lösche alle deaktivierten Verknüpfungen</string>
     <string name="delete_disabled_linked_devices_message">Sollen wirklich alle deaktivierten Verknüpfungen gelöscht werden?</string>
-    <string name="xx_disabled_links_deleted">%1$s Verknüpfungen entvernt</string>
+    <string name="xx_disabled_links_deleted">%1$s Verknüpfungen entfernt</string>
 
 
     <string name="unknown">Unbekannt</string>
@@ -993,6 +1017,29 @@
     <string name="otp_remove_config_message">Soll diese Einmalpasswort-Konfiguration wirklich von diesen Zugangsdaten entfernt werden?</string>
     <string name="nothing_to_delete">Nichts zum entfernen</string>
     <string name="otp_copy_configuration_to_clipboard">Konfiguration in die Zwischenablage kopieren</string>
-    <string name="diclaimer_beta_version">Dies ist eine Vorab-Version zu Testzwecken und kann Fehler enthalten!!</string>
+    <string name="disclaimer_beta_version">Dies ist eine Vorab-Version zu Testzwecken und kann Fehler enthalten!!</string>
+
+    <string name="auto_export_filename_change">Möchtest du den Dateinamen für die automatische Sicherung von %1$s in %2$s ändern?</string>
+    <string name="auto_export_configured">Automatische Sicherung mit Datei %1$s konfiguriert</string>
+    <string name="auto_export_explanation">Hier kannst du eine Ziel-Datei konfigurieren, in die bei jeder Änderung des Tresors automatisch exportiert/gesichert wird. Die Datei wird permanent überschrieben und enthält immer die neuesten Tresordaten.</string>
+    <string name="auto_export_file">Für die automatische Sicherung verwendete Datei:\n%1$s</string>
+    <string name="auto_export_file_inaccessible">Auf die für die automatische Sicherung verwendete Datei kann nicht mehr zugegriffen werden! Bitte konfiguriere sie erneut!</string>
+    <string name="auto_export_started">Automatische Sicherung gestartet</string>
+    <string name="auto_export_done">Automatische Sicherung beendet</string>
+    <string name="auto_export_failed">Automatische Sicherung fehlgeschlagen!</string>
+    <string name="auto_export_deactivate_message">Möchtest du diese automatische Sicherungskonfiguration wirklich deaktivieren?</string>
+    <string name="auto_export_deactivated">Automatische Sicherung deaktiviert</string>
+    <string name="last_auto_export_date">Datum der letzten automatischen Sicherung</string>
+
+    <string name="configure">Konfigurieren</string>
+    <string name="deactivate">Deaktivieren</string>
+    <string name="cancelled">Abgebrochen</string>
+    <string name="never">Nie</string>
+    <string name="expand_all">Alles ausklappen</string>
+    <string name="collapse_all">Alles einklappen</string>
+    <string name="marked">Markiert</string>
+
+    <string name="credential_marked">Zugangsdaten markiert</string>
+    <string name="credential_unmarked">Markierung aufgehoben</string>
 
 </resources>

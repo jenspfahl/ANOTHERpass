@@ -30,6 +30,15 @@
         app:singleLineTitle="false"
         app:defaultValue="true"/>
 
+    <SwitchPreferenceCompat
+        app:key="YAPM/pref:show_auto_export_vault_failed_reminder"
+        app:title="@string/show_auto_export_vault_reminder"
+        app:summary="@string/summary_show_auto_export_vault_reminder"
+        app:allowDividerBelow="true"
+        app:iconSpaceReserved="false"
+        app:singleLineTitle="false"
+        app:defaultValue="true"/>
+
 
     <SwitchPreferenceCompat
         app:key="YAPM/pref:show_export_mp_reminder"

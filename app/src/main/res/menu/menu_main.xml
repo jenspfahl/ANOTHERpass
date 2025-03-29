@@ -42,46 +42,85 @@
         app:showAsAction="never">
     </item>
 
-    <item
-        android:id="@+id/menu_sort_order"
-        android:title="@string/sort_order"
-        android:icon="@drawable/ic_baseline_sort_24_white"
-        app:showAsAction="never">
-    </item>
+    <group
+        android:checkableBehavior="none"
+        android:id="@+id/group_sorting">
+        <item
+            android:id="@+id/menu_sort_order"
+            android:title="@string/sort_order"
+            android:icon="@drawable/ic_baseline_sort_24_white"
+            app:showAsAction="never">
+        </item>
 
-    <item
-        android:id="@+id/menu_show_ids"
-        android:checkable="true"
-        android:title="@string/show_ids"
-        app:showAsAction="never">
-    </item>
+        <item
+            android:id="@+id/menu_group_by"
+            android:title="@string/group_by"
+            android:icon="@drawable/outline_group_by_24"
+            app:showAsAction="never">
+        </item>
+    </group>
 
-    <item
-        android:id="@+id/menu_show_last_reminder"
-        android:icon="@drawable/outline_notifications_active_last_24"
-        android:title="@string/last_reminder"
-        app:showAsAction="never">
-    </item>
+    <group
+        android:checkableBehavior="none"
+        android:id="@+id/group_expansion">
+     <item
+            android:id="@+id/menu_group_by_collapse_all"
+            android:title="@string/collapse_all"
+            android:icon="@drawable/ic_baseline_expand_less_24"
+            app:showAsAction="never">
+        </item>
 
-    <item
-        android:id="@+id/menu_show_next_reminder"
-        android:icon="@drawable/outline_notifications_active_next_24"
-        android:title="@string/next_reminder"
-        app:showAsAction="never">
-    </item>
+        <item
+            android:id="@+id/menu_group_by_expand_all"
+            android:title="@string/expand_all"
+            android:icon="@drawable/ic_baseline_expand_more_24"
+            app:showAsAction="never">
+        </item>
+
+    </group>
+
+    <group
+        android:checkableBehavior="none"
+        android:id="@+id/group_others">
+        <item
+            android:id="@+id/menu_show_ids"
+            android:checkable="true"
+            android:title="@string/show_ids"
+            app:showAsAction="never">
+        </item>
+
+        <item
+            android:id="@+id/menu_show_server_panel"
+            android:icon="@drawable/outline_dns_24"
+            android:title="@string/restore_server_panel"
+            android:visible="false">
+        </item>
+
+        <item
+            android:id="@+id/menu_resume_autofill"
+            android:title="@string/resume_paused_autofill"
+            android:visible="false">
+        </item>
 
 
-    <item
-        android:id="@+id/menu_resume_autofill"
-        android:title="@string/resume_paused_autofill"
-        android:visible="false">
-    </item>
+    </group>
 
-    <item
-        android:id="@+id/menu_show_server_panel"
-        android:icon="@drawable/outline_dns_24"
-        android:title="@string/restore_server_panel"
-        android:visible="false">
-    </item>
+    <group
+        android:checkableBehavior="none"
+        android:id="@+id/group_reminders">
+        <item
+            android:id="@+id/menu_show_last_reminder"
+            android:icon="@drawable/outline_notifications_active_last_24"
+            android:title="@string/last_reminder"
+            app:showAsAction="never">
+        </item>
+
+        <item
+            android:id="@+id/menu_show_next_reminder"
+            android:icon="@drawable/outline_notifications_active_next_24"
+            android:title="@string/next_reminder"
+            app:showAsAction="never">
+        </item>
+    </group>
 
 </menu>

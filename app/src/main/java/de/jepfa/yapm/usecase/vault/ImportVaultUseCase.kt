@@ -12,6 +12,7 @@ import de.jepfa.yapm.model.encrypted.*
 import de.jepfa.yapm.model.kdf.KdfConfig
 import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.io.AutoBackupService
 import de.jepfa.yapm.service.io.VaultExportService
 import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SaltService
@@ -206,12 +207,14 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
         val stagedEncUsernameTemplates = PreferenceService.getAsString(PreferenceService.TEMP_BLOB_USERNAME_TEMPLATES, activity)
         val stagedEncAppSettings = PreferenceService.getAsString(PreferenceService.TEMP_BLOB_SETTINGS, activity)
 
+        var dataImported = false
         if (stagedEncCredentials != null) {
             val encCredentials = Encrypted.fromBase64String(stagedEncCredentials)
             val jsonCredentialsAsString = SecretService.decryptCommonString(masterSecretKey, encCredentials)
             if (jsonCredentialsAsString != Validable.FAILED_STRING) {
                 val jsonCredentials = JsonParser.parseString(jsonCredentialsAsString).asJsonArray
                 persistCredentials(jsonCredentials, activity)
+                dataImported = true
             }
             PreferenceService.delete(PreferenceService.TEMP_BLOB_CREDENTIALS, activity)
         }
@@ -222,6 +225,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
             if (jsonLabelsAsString != Validable.FAILED_STRING) {
                 val jsonLabels = JsonParser.parseString(jsonLabelsAsString).asJsonArray
                 persistLabels(jsonLabels, activity)
+                dataImported = true
             }
             PreferenceService.delete(PreferenceService.TEMP_BLOB_LABELS, activity)
         }
@@ -232,6 +236,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
             if (jsonUsernameTemplatesAsString != Validable.FAILED_STRING) {
                 val jsonUsernameTemplates = JsonParser.parseString(jsonUsernameTemplatesAsString).asJsonArray
                 persistUsernameTemplates(jsonUsernameTemplates, activity)
+                dataImported = true
             }
             PreferenceService.delete(PreferenceService.TEMP_BLOB_USERNAME_TEMPLATES, activity)
         }
@@ -242,8 +247,14 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
             if (jsonAppSettingsAsString != Validable.FAILED_STRING) {
                 val jsonAppSettings = JsonParser.parseString(jsonAppSettingsAsString).asJsonObject
                 persistAppSettings(jsonAppSettings, activity)
+                dataImported = true
             }
             PreferenceService.delete(PreferenceService.TEMP_BLOB_SETTINGS, activity)
+        }
+
+        if (dataImported) {
+            PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_MODIFIED_AT, activity)
+            AutoBackupService.autoExportVault(activity)
         }
 
     }
@@ -421,6 +432,9 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
                     }
             }
         }
+
+        PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_MODIFIED_AT, activity)
+        AutoBackupService.autoExportVault(activity)
 
         return true
     }

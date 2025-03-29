@@ -7,6 +7,7 @@ import de.jepfa.yapm.model.session.Session
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_MASTER_PASSWORD_TOKEN_KEY
 import de.jepfa.yapm.service.PreferenceService.DATA_MPT_CREATED_AT
+import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_AUTO_EXPORTED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_EXPORTED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_MODIFIED_AT
 import de.jepfa.yapm.service.PreferenceService.STATE_LOGIN_DENIED_AT
@@ -87,6 +88,10 @@ object ShowVaultInfoUseCase: InputUseCase<ShowVaultInfoUseCase.Input, SecureActi
         val vaultExportedAt = PreferenceService.getAsDate(DATA_VAULT_EXPORTED_AT, activity)
         vaultExportedAt?.let {
             sb.addFormattedLine(activity.getString(R.string.vault_exported_at), dateTimeToNiceString(it, activity))
+        }
+        val vaultAutoExportedAt = PreferenceService.getAsDate(DATA_VAULT_AUTO_EXPORTED_AT, activity)
+        vaultAutoExportedAt?.let {
+            sb.addFormattedLine(activity.getString(R.string.last_auto_export_date), dateTimeToNiceString(it, activity))
         }
         val hasMPT = PreferenceService.isPresent(DATA_MASTER_PASSWORD_TOKEN_KEY, activity)
         if (hasMPT) {

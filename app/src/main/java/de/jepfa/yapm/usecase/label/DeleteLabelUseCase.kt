@@ -33,7 +33,7 @@ object DeleteLabelUseCase: InputUseCase<Label, SecureActivity>() {
             }
             LabelService.defaultHolder.removeLabel(label)
             LabelFilter.unsetFilterFor(label)
-            activity.labelViewModel.deleteById(label.labelId)
+            activity.labelViewModel.deleteById(label.labelId, activity)
         }
 
         return true

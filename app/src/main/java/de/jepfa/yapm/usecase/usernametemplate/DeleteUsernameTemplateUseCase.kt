@@ -11,7 +11,7 @@ object DeleteUsernameTemplateUseCase: InputUseCase<EncUsernameTemplate, SecureAc
         val key = activity.masterSecretKey
         val id = usernameTemplate.id
         if (key != null && id != null) {
-            activity.usernameTemplateViewModel.deleteById(id)
+            activity.usernameTemplateViewModel.deleteById(id, activity)
         }
 
         return true

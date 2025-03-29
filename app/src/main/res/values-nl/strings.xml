@@ -37,6 +37,9 @@
   <string name="CIPHER_BLOWFISH_128_desc">Dit is een alternatief versleutelingsalgoritme met een goede balans tussen beveiliging en prestaties.  Er wordt gezegd dat het moeilijker te doorbreken is, maar langzamer dan AES.  Ondersteund vanaf Android 2.3.</string>
   <string name="CIPHER_BLOWFISH_256_desc">Dit is een alternatief versleutelingsalgoritme met iets betere beveiliging maar minder prestaties.  Er wordt gezegd dat het moeilijker te doorbreken is, maar langzamer dan AES.  Ondersteund vanaf Android 2.3.</string>
   <string name="CIPHER_CHACHACHA20_256_desc">Dit is een relatief nieuw versleutelingsalgoritme met ongeveer dezelfde beveiliging als AES, maar vermoedelijk hogere prestaties.  Ondersteund vanaf Android 9.</string>
+
+  <string name="mark">Mark</string>
+  <string name="unmark">Unmark</string>
   <string name="change">Bewerking</string>
   <string name="delete">Verwijderen</string>
   <string name="title_delete_credential">Verwijder inloggegevens</string>
@@ -101,6 +104,7 @@ Hoofdsleutel</string>
   <string name="action_export_masterpasswd">Exporteer het
 hoofdwachtwoord</string>
   <string name="export_vault">Export-/back-upkluis</string>
+  <string name="auto_export_vault">Auto-export vault</string>
   <string name="import_vault_as_file">Kluisbestand importeren</string>
   <string name="message_import_vault_records">U staat op het punt %1$d inloggegevens en %2$d categorieën te importeren.  Bestaande gegevens worden overschreven.  Doorgaan?</string>
   <string name="message_import_credential_records">U staat op het punt %1$d inloggegevens te importeren.  Er worden geen bestaande toegangsgegevens overschreven.  Doorgaan?</string>
@@ -245,6 +249,11 @@ Het scheiden van de gecodeerde hoofdsleutel van het kluisbestand maakt het besta
   <string name="pref_header_overlay">Toon wachtwoorden bovenop andere apps</string>
   <string name="HYPER">Hyper</string>
   <string name="sort_order">Sorteervolgorde</string>
+  <string name="group_by">Group credentials</string>
+  <string name="credential_group_by_none">No grouping</string>
+  <string name="credential_group_by_name">By credential name (first letter)</string>
+  <string name="credential_group_by_label">By label (Credentials with multiple labels will occur under each single label)</string>
+
   <string name="credential_sort_by">Sorteer toegangsgegevens op</string>
   <string name="credential_sort_by_name_asc">Naam (A..Z)</string>
   <string name="credential_sort_by_name_desc">Naam (Z..A)</string>
@@ -252,6 +261,8 @@ Het scheiden van de gecodeerde hoofdsleutel van het kluisbestand maakt het besta
   <string name="credential_sort_by_id">Referentie-ID</string>
   <string name="show_ids">Toon identificatie-ID\'s</string>
   <string name="expired_credentials_on_top">Inloggegevens bovenaan</string>
+  <string name="marked_credentials_on_top">Marked credentials on top</string>
+
   <string name="tab_pseudo_phrase">Pseudofrase</string>
   <string name="tab_ordinary">Normaal wachtwoord</string>
   <string name="drop_to_close">SLUIT APP</string>
@@ -459,6 +470,11 @@ Deze waarschuwing kunt u deactiveren onder \'Instellingen/Beveiliging\'.</string
   <string name="expired_credentials_notification_enabled_summary">Je krijgt op het juiste moment een melding, ook als de app gesloten is.  Vanaf Android 13 moet je de app toestemming geven om meldingen te verzenden.</string>
   <string name="next_reminder">Volgende herinnering</string>
   <string name="last_reminder">Laatste herinnering</string>
+
+  <string name="auto_export_vault_reminder">Vault could not be exported automatically.</string>
+  <string name="show_auto_export_vault_reminder">Reminder of automatically but failed vault export attempts</string>
+  <string name="summary_show_auto_export_vault_reminder">Show a reminder when the vault could not automatically been exported although configured and becomes out of sync for more than half an hour.</string>
+
   <string name="export_vault_reminder">Vault is gewijzigd en moet worden geëxporteerd.</string>
   <string name="export_mk_reminder">De hoofdsleutel is gewijzigd en moet worden geëxporteerd.</string>
   <string name="export_mp_reminder">Het hoofdwachtwoord moet worden geëxporteerd!</string>
@@ -538,6 +554,14 @@ Deze waarschuwing kunt u deactiveren onder \'Instellingen/Beveiliging\'.</string
   <string name="whats_new_in_2_1_bullet_2_text">A new method of the login process called Argon2 can now be used to make cracking your PIN and master password even more difficult. Argon2 is a modern key derivation function (KDF) and allows faster and more secure unlocking of the vault.</string>
   <string name="whats_new_in_2_1_bullet_3_head">Import and export from and to a Keepass file</string>
   <string name="whats_new_in_2_1_bullet_3_text">Now you can use your credentials in any Keepass fork! Export all your credentials into a Keepass vault file (KDBX version 4). Or just import any Keepass file into your current ANOTHERpass vault (KDBX version 3 at least).</string>
+
+  <string name="whats_new_in_2_2">What\'s new in version 2.2</string>
+  <string name="whats_new_in_2_2_bullet_1_head">Auto-Backup the vault to a destination file</string>
+  <string name="whats_new_in_2_2_bullet_1_text">Instead of manually exporting the vault from time to time to retain a fresh backup, you can now configure a destination file, which is used to automatically export the vault to, every time it has been changed. This file will keep up-to-date and can be stored either locally or remotely (e.g. a remote drive).</string>
+  <string name="whats_new_in_2_2_bullet_2_head">Group your credentials</string>
+  <string name="whats_new_in_2_2_bullet_2_text">To organise all your credentials in a better way, you now have the option to group them by name or by label. This will be helpful to keep the overview of all of your credentials.</string>
+  <string name="whats_new_in_2_2_bullet_3_head">Mark certain credentials</string>
+  <string name="whats_new_in_2_2_bullet_3_text">To make it easier to find the most important credentials in your vault, you can now mark them with a star. Marked credentials are usually displayed on the top of the list, so you can access them quicker.</string>
 
 
   <string name="intro">Begin met inleiden</string>
@@ -764,6 +788,7 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="command_latest">Laat recent gewijzigde toegangsgegevens zien</string>
   <string name="command_veiled">Filter verborgen inloggegevens</string>
   <string name="command_otp">Filter credentials with One-Time-Passwords</string>
+  <string name="command_marked">Filter marked credentials</string>
 
 
   <string name="with_email_alias">De gebruikersnaam als e-mailadres met een generiek aliasnaam</string>
@@ -961,7 +986,28 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="otp_remove_config_message">Are you sure to remove this One-Time-Password configuration from the current credential?</string>
   <string name="nothing_to_delete">Nothing to delete</string>
   <string name="otp_copy_configuration_to_clipboard">Copy configuration to clipboard</string>
-    <string name="diclaimer_beta_version">This is a pre-version only for testing purposes and may contain bugs!!</string>
+  <string name="disclaimer_beta_version">This is a pre-version only for testing purposes and may contain bugs!!</string>
 
+  <string name="auto_export_filename_change">Did you want to change the auto-backup file name from %1$s to %2$s?</string>
+  <string name="auto_export_configured">Auto-backup configured with file %1$s</string>
+  <string name="auto_export_explanation">Here you can configure a target file to which every change to the vault will be automatically exported/backed up. The file will permanently be overwritten and will always contain the latest vault data.</string>    <string name="auto_export_file">File used for auto-backup:\n%1$s</string>
+  <string name="auto_export_file_inaccessible">File used for auto-backup is not accessible anymore! Please configure it again!</string>
+  <string name="auto_export_started">Auto-backup started</string>
+  <string name="auto_export_done">Auto-backup done</string>
+  <string name="auto_export_failed">Auto-backup failed!</string>
+  <string name="auto_export_deactivate_message">Are you sure to deactivate this auto-backup configuration?</string>
+  <string name="auto_export_deactivated">Auto-backup deactivated</string>
+  <string name="last_auto_export_date">Last auto-backup date</string>
+
+  <string name="configure">Configure</string>
+  <string name="deactivate">Deactivate</string>
+  <string name="cancelled">Cancelled</string>
+  <string name="never">never</string>
+  <string name="expand_all">Expand all</string>
+  <string name="collapse_all">Collapse all</string>
+  <string name="marked">Marked</string>
+
+  <string name="credential_marked">Credential marked</string>
+  <string name="credential_unmarked">Credential unmarked</string>
 
 </resources>

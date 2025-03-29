@@ -52,6 +52,7 @@ data class PlainShareableCredential(val ui: String?, // uid
                 encExpiresAt,
             ),
             if (encOtpAuthUri != null) OtpData(encOtpAuthUri) else null,
+            false,
         )
     }
 

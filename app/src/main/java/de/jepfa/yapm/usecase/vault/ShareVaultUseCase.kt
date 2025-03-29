@@ -116,6 +116,11 @@ object ShareVaultUseCase: UseCase<ShareVaultUseCase.Input, Uri?, SecureActivity>
         return "anotherpassvault-${vaultId}-${currentDate}.json"
     }
 
+    fun getAutoBackupFileName(context: Context): String {
+        val vaultId = SaltService.getVaultId(context)
+        return "anotherpassvault-${vaultId}.json"
+    }
+
     fun getSubject(context: Context): String {
         val currentDate = Constants.SDF_D_INTERNATIONAL.format(Date())
         val vaultId = SaltService.getVaultId(context)

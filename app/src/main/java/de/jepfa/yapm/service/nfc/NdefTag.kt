@@ -67,8 +67,21 @@ class NdefTag @Throws(FormatException::class) constructor(val tag: Tag, val data
         }
     }
 
-    fun canSetWriteProtection() =  ndef?.canMakeReadOnly() ?: false
-    fun isWriteProtected() = !(ndef?.isWritable ?: false)
+    fun canSetWriteProtection(): Boolean {
+        try {
+            return ndef?.canMakeReadOnly() ?: false
+        } catch (e: Exception) {
+            DebugInfo.logException("NFC", "Cannot determine readonly flag", e)
+            return false
+        }
+    }
+    fun isWriteProtected(): Boolean {
+        try {
+            return !(ndef?.isWritable ?: false)
+        } catch (e: Exception) {
+            DebugInfo.logException("NFC", "Cannot determine writeable flag", e)
+            return false        }
+    }
 
     @Throws(IOException::class, FormatException::class)
     fun writeData(message: NdefMessage, setWriteProtection: Boolean = false): Boolean {

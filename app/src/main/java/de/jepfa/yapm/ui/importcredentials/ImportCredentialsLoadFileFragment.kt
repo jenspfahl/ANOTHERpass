@@ -4,6 +4,7 @@ import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,11 +22,11 @@ import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.ui.AsyncWithProgressBar
 import de.jepfa.yapm.ui.BaseFragment
 import de.jepfa.yapm.ui.credential.KeepassPasswordDialog
+import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.FileUtil
 import de.jepfa.yapm.util.FileUtil.getFileName
 import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.toastText
-import io.ktor.util.toUpperCasePreservingASCIIRules
 
 class ImportCredentialsLoadFileFragment : BaseFragment() {
 
@@ -219,9 +220,8 @@ class ImportCredentialsLoadFileFragment : BaseFragment() {
                     importCredentialsActivity.fileName = getFileName(importCredentialsActivity, selectedFile)
 
                     //detect whether CSV or KDBX is selected
-                    val fileExtension = MimeTypeMap.getFileExtensionFromUrl(selectedFile.toString())
-
-                    if (fileExtension.toUpperCasePreservingASCIIRules() == "KDBX") {//TODO by filetype would be better
+                    val fileExtension = MimeTypeMap.getFileExtensionFromUrl(importCredentialsActivity.fileName)
+                    if (fileExtension.lowercase() == "kdbx") {
 
                         setColumnsLink.visibility = View.INVISIBLE
                         val inputStream = FileUtil.openInputStreamFromFile(importCredentialsActivity, selectedFile)

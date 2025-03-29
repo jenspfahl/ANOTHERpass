@@ -2,6 +2,8 @@ package de.jepfa.yapm.usecase.credential
 
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncLabel
+import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.io.AutoBackupService
 import de.jepfa.yapm.service.label.LabelService
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.usecase.InputUseCase
@@ -54,7 +56,7 @@ object ImportCredentialsUseCase: InputUseCase<ImportCredentialsUseCase.Input, Se
             }
             else {*/
                 credential.uid = null
-                activity.credentialViewModel.insert(credential, activity)
+                activity.getApp().credentialRepository.insert(credential)
             //}
 
 
@@ -63,7 +65,8 @@ object ImportCredentialsUseCase: InputUseCase<ImportCredentialsUseCase.Input, Se
             }
         }
 
-
+        PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_MODIFIED_AT, activity)
+        AutoBackupService.autoExportVault(activity)
 
         return true
     }

@@ -73,7 +73,7 @@ object LabelDialogs {
             .setTitle(R.string.title_delete_label)
             .setMessage(activity.getString(R.string.message_delete_label, label.name))
             .setIcon(android.R.drawable.ic_dialog_alert)
-            .setPositiveButton(android.R.string.yes) { dialog, whichButton ->
+            .setPositiveButton(android.R.string.ok) { _, _ ->
                 UseCaseBackgroundLauncher(DeleteLabelUseCase)
                     .launch(activity, label)
                     {
@@ -84,7 +84,7 @@ object LabelDialogs {
                     }
 
             }
-            .setNegativeButton(android.R.string.no, null)
+            .setNegativeButton(android.R.string.cancel, null)
             .show()
     }
 }

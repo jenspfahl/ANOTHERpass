@@ -111,9 +111,10 @@ open class BaseActivity : AppCompatActivity() {
     }
 
     @SuppressLint("RestrictedApi")
-    fun inflateActionsMenu(menu: Menu, id: Int) {
+    fun inflateActionsMenu(menu: Menu, id: Int, showGroupDivider: Boolean = false) {
         if (menu is MenuBuilder) {
             menu.setOptionalIconsVisible(true)
+            menu.isGroupDividerEnabled = showGroupDivider
         }
         menuInflater.inflate(id, menu)
         if (menu is MenuBuilder) {

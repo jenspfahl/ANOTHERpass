@@ -170,6 +170,7 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
                 val otpAuth = credential.otpData?.let {
                     SecretService.decryptCommonString(key, it.encOtpAuthUri)
                 }
+                val pinned = credential.pinned
 
                 val decryptedExportableCredential = DecryptedExportableCredential(
                     credential.id!!,
@@ -184,6 +185,7 @@ object ExportCredentialUseCase: InputUseCase<ExportCredentialUseCase.Input, Secu
                     if (otpAuth != null) OtpConfig.packOtpAuthUri(otpAuth) else null,
                     credential.passwordData.isObfuscated,
                     credential.timeData.modifyTimestamp,
+                    pinned,
                 )
                 val jsonString = VaultExportService.credentialToJson(decryptedExportableCredential)
                 val encCredential = SecretService.encryptCommonString(key, jsonString)

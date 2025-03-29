@@ -411,6 +411,7 @@ class SettingsActivity : SecureActivity(),
                     PreferenceService.putBoolean(PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD, true, preference.context)
                     true
                 }
+                it.isChecked = PreferenceService.getAsBool(PreferenceService.PREF_SERVER_CAPABILITIES_ENABLED, true, this.context)
             }
 
             findPreference<SwitchPreferenceCompat>(

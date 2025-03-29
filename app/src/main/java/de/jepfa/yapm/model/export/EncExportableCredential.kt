@@ -77,7 +77,8 @@ data class EncExportableCredential(val i: Int?,
                 null,
                 e,
             ),
-            null,
+            null, //not supported, deprecated
+            false, //not supported, deprecated
         )
     }
 

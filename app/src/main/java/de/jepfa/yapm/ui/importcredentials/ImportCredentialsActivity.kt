@@ -200,6 +200,7 @@ class ImportCredentialsActivity : SecureActivity() {
                 encExpiresAt,
             ),
             if (otpAuthUri != null) OtpData(otpAuthUri) else null,
+            false,
         )
     }
 
