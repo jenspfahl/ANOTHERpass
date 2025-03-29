@@ -1,4 +1,5 @@
 * option to enable auto-backup of the vault when changed
 * group credentials by first letter or by categories
 * mark single credentials as favourites
+* highlight recently changed credential
 * a few significant UI and UX improvements
