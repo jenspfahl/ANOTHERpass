@@ -594,7 +594,7 @@
 
     <string name="intro">Show intro</string>
     <string name="intro_1_head">Another way to manage passwords</string>
-    <string name="intro_1_subtext">ANOTHERpass is another approach of a password manager. See what it means:</string>
+    <string name="intro_1_subtext">ANOTHERpass is another way to manage passwords. See what it means:</string>
     <string name="intro_2_head">ANOTHERpass generates easy but strong passwords for you. It uses so called \'Pseudo Phrases\' by default which looks like real words but are still very random and unpredictable. See this random example (click on it to re-generate):</string>
     <string name="intro_3_head">Clever two-factor login</string>
     <string name="intro_3_subtext">There are two factors to login into your vault. One factor is what you know (knowledge) and the other is what you own (ownership): The PIN and the Master Password.</string>
@@ -880,8 +880,9 @@
     <string name="hide_control_panel">Hide server panel</string>
     <string name="show_server_logs">Show server logs</string>
     <string name="open_server_settings">Open server settings</string>
+    <string name="info_about_linked_devices">Info about linked devices</string>
     <string name="delete_disabled_linked_devices">Delete disabled links</string>
-    <string name="last_used_at">Lastly used at: %1$s</string>
+    <string name="last_used_at">Lastly used: %1$s</string>
     <string name="enabled_links_always_on_top">Enabled links always on top</string>
     <string name="credentials_posted">Credentials posted</string>
     <string name="local_vault_unlocked">Linked vault unlocked</string>
@@ -956,6 +957,9 @@
     <string name="linking_details">Linking details for %1$s</string>
     <string name="copy_to_clipboard">Copy to clipboard</string>
     <string name="copied_to_clipboard">Copied to clipboard</string>
+
+    <string name="info_about_linked_devices_message">Please note that linked devices cannot be exported to a vault file and imported back. This is due to the fact that the Private Key is stored in a secure environment and cannot never be read by any application. This is a security feature of Android. You have to re-link your devices if you import a vault file into an empty ANOTHERpass vault. To create a new link, go to the server panel menu and click on \'%1$s\'.</string>
+
     <string name="delete_disabled_linked_devices_title">Delete all disabled linked devices</string>
     <string name="delete_disabled_linked_devices_message">Do you really want to delete all disabled but linked devices?</string>
     <string name="xx_disabled_links_deleted">%1$s disabled links deleted</string>
