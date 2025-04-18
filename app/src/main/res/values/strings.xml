@@ -162,6 +162,7 @@
 
     <string name="help">Online help</string>
     <string name="about">About</string>
+    <string name="feedback">Feedback</string>
     <string name="title_about_the_app">About the app</string>
     <string name="change_pin">Change PIN</string>
     <string name="change_pin_explanation">Change your PIN by enter your current one and a new one repeated. Note, that the Encrypted Master Key will be changed, so you need to export it again. This also effects old vault export files with the old key.</string>
@@ -1052,5 +1053,8 @@
 
     <string name="credential_marked">Credential marked</string>
     <string name="credential_unmarked">Credential unmarked</string>
+    <string name="feedback_message">If you like the app you can give a star on Github. Additionally, or if you don\'t have a Github account, give feedback with the short survey.</string>
+    <string name="feedback_on_github">Open Github</string>
+    <string name="feedback_with_survey">Open survey</string>
 
 </resources>

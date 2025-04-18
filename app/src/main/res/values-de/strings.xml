@@ -160,6 +160,7 @@
     <string name="generate_new_masterkey">Generiere neuen Masterkey (der interne Schlüssel zum Ver- und Entschlüsseln aller Tresordaten wird erneuert)</string>
     <string name="help">Onlinehilfe</string>
     <string name="about">Über</string>
+    <string name="feedback">Feedback</string>
     <string name="title_about_the_app">Über die App</string>
     <string name="change_pin">Ändere PIN</string>
     <string name="change_pin_explanation">Ändere deine PIN, indem du die aktuelle und die neue PIN eingibst. Beachte, dass sich der verschlüsselte Masterkey ändert, so dass du ihn erneut exportieren solltest. Das betrifft auch Tresor-Dateien mit verschlüsselten Masterkey.</string>
@@ -1044,5 +1045,8 @@
 
     <string name="credential_marked">Zugangsdaten markiert</string>
     <string name="credential_unmarked">Markierung aufgehoben</string>
+    <string name="feedback_message">Wenn dir die App gefällt, kannst du auf Github einen Stern vergeben. Zusätzlich oder falls du kein Github-Konto hast, kannst du uns in einer kurzen Umfrage Feedback geben.</string>
+    <string name="feedback_on_github">Github öffnen</string>
+    <string name="feedback_with_survey">Umfrage öffnen</string>
 
 </resources>

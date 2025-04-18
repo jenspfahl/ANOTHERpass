@@ -11,6 +11,7 @@ import android.database.MatrixCursor
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -155,8 +156,7 @@ import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.util.UUID
 import androidx.recyclerview.widget.SimpleItemAnimator
-
-
+import java.util.Locale
 
 
 /**
@@ -1755,6 +1755,28 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             R.id.menu_help -> {
                 val browserIntent = Intent(Intent.ACTION_VIEW, Constants.HOMEPAGE)
                 startActivity(browserIntent)
+                return true
+            }
+
+            R.id.menu_feedback -> {
+                AlertDialog.Builder(this)
+                    .setTitle(R.string.feedback)
+                    .setMessage(getString(R.string.feedback_message))
+                    .setIcon(R.drawable.baseline_favorite_border_24)
+                    .setPositiveButton(getString(R.string.feedback_on_github)) { _, _ ->
+                        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(Constants.FOSS_SITE))
+                        startActivity(browserIntent)
+                    }
+                    .setNegativeButton(getString(R.string.feedback_with_survey)) { _, _ ->
+                        val locale = getApp().getLocale()
+                        val url = Uri.parse("${Constants.FEEDBACK}?lang=${locale.language}")
+                        val browserIntent = Intent(Intent.ACTION_VIEW, url)
+                        startActivity(browserIntent)
+                    }
+                    .setNeutralButton(android.R.string.cancel, null)
+                    .show()
+
+
                 return true
             }
 
