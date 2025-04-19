@@ -100,7 +100,9 @@ object ReminderService {
         override val notificationText = R.string.auto_export_vault_reminder
         override val notificationAction = R.string.auto_export_vault
         override val condition = { activity: SecureActivity ->
+
             AutoBackupService.isAutoBackupConfigured(activity)
+                    && dateOlderThanNow(DATA_VAULT_MODIFIED_AT, activity, 10 * 60) // 10 minutes
                     && dateOlderThan(DATA_VAULT_AUTO_EXPORTED_AT, DATA_VAULT_MODIFIED_AT, activity, 30 * 60) // 30 minutes
         }
         override val action = { activity: SecureActivity ->
@@ -298,15 +300,25 @@ object ReminderService {
         snackBar.show()
     }
 
-    private fun dateOlderThan(
-        dataTargetExportedAtKey: String,
-        dataTargetModifiedAtKey: String,
+    private fun dateOlderThanNow(
+        dateKey: String,
         context: Context,
         acceptableDelta: Int = 0)
     : Boolean {
-        val vaultExportedAt = PreferenceService.getAsDate(dataTargetExportedAtKey, context)?.removeSeconds()
-        val vaultModifiedAt = PreferenceService.getAsDate(dataTargetModifiedAtKey, context)?.removeSeconds()
-        return dateOlderThan(vaultExportedAt, vaultModifiedAt)
+        val date = PreferenceService.getAsDate(dateKey, context)?.removeSeconds()
+        val nowMinusDelta = Date(System.currentTimeMillis() - (acceptableDelta * 1000))
+        return dateOlderThan(date, nowMinusDelta)
+    }
+
+    private fun dateOlderThan(
+        dateAKey: String,
+        dateBKey: String,
+        context: Context,
+        acceptableDelta: Int = 0)
+    : Boolean {
+        val dateA = PreferenceService.getAsDate(dateAKey, context)?.removeSeconds()
+        val dateB = PreferenceService.getAsDate(dateBKey, context)?.removeSeconds()
+        return dateOlderThan(dateA, dateB, acceptableDelta)
     }
 
     private fun dateOlderThan(dateA: Date?, dateB: Date?, acceptableDeltaInSec: Int = 0): Boolean {
