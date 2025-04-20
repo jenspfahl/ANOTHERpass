@@ -505,7 +505,7 @@
 
     <string name="export_vault_reminder">Vault should be exported after recent modifications.</string>
     <string name="export_mk_reminder">Master key should be exported after recent modifications.</string>
-    <string name="export_mp_reminder">Master password should be strongly exported!</string>
+    <string name="export_mp_reminder">Master password should strongly be exported!</string>
     <string name="biometric_smp_reminder">Biometrics should be used for stored master password.</string>
     <string name="show_biometric_smp_howto">How?</string>
     <string name="refresh_mpt_reminder">Master Password Token should be renewed.</string>

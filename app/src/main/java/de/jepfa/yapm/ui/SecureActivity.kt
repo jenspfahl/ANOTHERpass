@@ -108,12 +108,12 @@ abstract class SecureActivity : BaseActivity() {
                     val intent = Intent(activity, LoginActivity::class.java)
                     intent.putExtras(incomingIntent)
                     intent.putExtra(fromSecretChecker, true)
-                    intent.action = activity.intent.action
+                    intent.action = incomingIntent.action
                     if (incomingIntent.getBooleanExtra(fromAutofillOrNotification, false)) {
                         activity.startActivityForResult(intent, loginRequestCode)
                         activity.lock()
                     }
-                    else {
+                    else { //TODO do we need this branch at all? We could always work with startActivityForResult
                         activity.startActivity(intent)
                         activity.finish()  // Why? To restart from the main activity.
                     }
