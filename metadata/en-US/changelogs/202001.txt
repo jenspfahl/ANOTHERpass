@@ -1,0 +1,3 @@
+* Fix Autofill with website suggestions in Chrome and other alternative browsers (#43)
+* Fix auto-backup workflow issues
+* Add feedback menu
