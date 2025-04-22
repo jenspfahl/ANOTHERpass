@@ -581,7 +581,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 startSearchFor("", commit = false)
             }
             else {
-                startAddNewCerdentialFlow()
+                startAddNewCredentialFlow()
             }
         }
 
@@ -640,7 +640,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     }
 
-    private fun ListCredentialsActivity.startAddNewCerdentialFlow() {
+    private fun ListCredentialsActivity.startAddNewCredentialFlow() {
         val intent =
             Intent(this@ListCredentialsActivity, EditCredentialActivity::class.java)
 
@@ -962,7 +962,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         this.addCredentialItem = menu.findItem(R.id.menu_add_credential)
         this.addCredentialItem?.setOnMenuItemClickListener {
-            startAddNewCerdentialFlow()
+            startAddNewCredentialFlow()
             true
         }
 
