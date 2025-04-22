@@ -11,6 +11,7 @@ import android.database.MatrixCursor
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -154,9 +155,6 @@ import kotlinx.coroutines.future.asCompletableFuture
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.util.UUID
-import androidx.recyclerview.widget.SimpleItemAnimator
-
-
 
 
 /**
@@ -583,7 +581,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 startSearchFor("", commit = false)
             }
             else {
-                startAddNewCerdentialFlow()
+                startAddNewCredentialFlow()
             }
         }
 
@@ -642,7 +640,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     }
 
-    private fun ListCredentialsActivity.startAddNewCerdentialFlow() {
+    private fun ListCredentialsActivity.startAddNewCredentialFlow() {
         val intent =
             Intent(this@ListCredentialsActivity, EditCredentialActivity::class.java)
 
@@ -853,6 +851,16 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         toggle.syncState()
     }
 
+    override fun onPause() {
+        super.onPause()
+        Log.i(LOG_PREFIX + "LST", "onPause")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.i(LOG_PREFIX + "LST", "onStop")
+
+    }
     override fun onResume() {
         super.onResume()
         Log.i(LOG_PREFIX + "LST", "onResume")
@@ -954,7 +962,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         this.addCredentialItem = menu.findItem(R.id.menu_add_credential)
         this.addCredentialItem?.setOnMenuItemClickListener {
-            startAddNewCerdentialFlow()
+            startAddNewCredentialFlow()
             true
         }
 
@@ -1432,18 +1440,18 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, receivedIntent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, receivedIntent)
 
-        if (data?.hasExtra(AutofillManager.EXTRA_AUTHENTICATION_RESULT) == true) {
-            setResult(Activity.RESULT_OK, data)
+        if (receivedIntent?.hasExtra(AutofillManager.EXTRA_AUTHENTICATION_RESULT) == true) {
+            setResult(Activity.RESULT_OK, receivedIntent)
             Log.i(LOG_PREFIX + "CFS", "disable forwarded")
             finish()
             return
         }
 
         if (requestCode == SeedRandomGeneratorUseCase.REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            val imageBitmap = data?.extras?.get("data") as Bitmap?
+            val imageBitmap = receivedIntent?.extras?.get("data") as Bitmap?
             if (imageBitmap != null) {
                 UseCaseBackgroundLauncher(SeedRandomGeneratorUseCase)
                     .launch(this, imageBitmap)
@@ -1459,7 +1467,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             }
         }
         else if (requestCode == newOrUpdateCredentialActivityRequestCode && resultCode == Activity.RESULT_OK) {
-            data?.let {
+            receivedIntent?.let {
                 listCredentialAdapter?.stopSelectionMode(withRefresh = false)
                 val credential = EncCredential.fromIntent(it, createUuid = true)
                 jumpToUuid = credential.uid
@@ -1478,14 +1486,20 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             }
         }
         else if (requestCode == SecretChecker.loginRequestCode) {
-            if (intent.getBooleanExtra(SecretChecker.fromAutofillOrNotification, false)) {
-                Log.i(LOG_PREFIX + "LST", "onActivityResult")
-                updateSearchFieldWithAutofillSuggestion(intent)
+            receivedIntent?.let {
+                if (receivedIntent.getBooleanExtra(SecretChecker.fromAutofill, false)) {
+                    Log.i(LOG_PREFIX + "LST", "onActivityResult from autofill")
+                    updateSearchFieldWithAutofillSuggestion(receivedIntent)
+                }
+                if (receivedIntent.getBooleanExtra(SecretChecker.fromNotification, false)) {
+                    Log.i(LOG_PREFIX + "LST", "onActivityResult from notification")
+                    updateSearchFieldWithAutofillSuggestion(receivedIntent)
+                }
             }
         }
         else if (resultCode == RESULT_OK && requestCode == saveAutoBackupFile) {
 
-            data?.data?.let { newDestUri ->
+            receivedIntent?.data?.let { newDestUri ->
 
                 val newBackupFile = DocumentFile.fromSingleUri(this, newDestUri)
                 if (newBackupFile != null) {
@@ -1755,6 +1769,28 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             R.id.menu_help -> {
                 val browserIntent = Intent(Intent.ACTION_VIEW, Constants.HOMEPAGE)
                 startActivity(browserIntent)
+                return true
+            }
+
+            R.id.menu_feedback -> {
+                AlertDialog.Builder(this)
+                    .setTitle(R.string.feedback)
+                    .setMessage(getString(R.string.feedback_message))
+                    .setIcon(R.drawable.baseline_favorite_border_24)
+                    .setPositiveButton(getString(R.string.feedback_on_github)) { _, _ ->
+                        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(Constants.FOSS_SITE))
+                        startActivity(browserIntent)
+                    }
+                    .setNegativeButton(getString(R.string.feedback_with_survey)) { _, _ ->
+                        val locale = getApp().getLocale()
+                        val url = Uri.parse("${Constants.FEEDBACK}?lang=${locale.language}")
+                        val browserIntent = Intent(Intent.ACTION_VIEW, url)
+                        startActivity(browserIntent)
+                    }
+                    .setNeutralButton(android.R.string.cancel, null)
+                    .show()
+
+
                 return true
             }
 

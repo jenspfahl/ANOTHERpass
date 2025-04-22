@@ -1,6 +1,6 @@
 # ANOTHERpass
 
-This Android app is another approach of a password manager. It addresses the problem of having to remember a strong master password, which is more often a weak one because it is created by humans.
+This Android app is another way to manage passwords. It addresses the problem of having to remember a strong master password, which is more often a weak one because it is created by humans.
 
 To avoid weak master passwords, the app generates them! The app requires two factors to unlock the vault, the generated master password (ownership in the sense of a key) and a PIN (knowledge, in the sense of a remembered secret).
 

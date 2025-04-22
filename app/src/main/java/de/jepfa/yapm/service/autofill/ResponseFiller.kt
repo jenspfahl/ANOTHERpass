@@ -37,6 +37,7 @@ import de.jepfa.yapm.util.Constants.ACTION_OPEN_VAULT_FOR_AUTOFILL
 import de.jepfa.yapm.util.Constants.ACTION_PAUSE_AUTOFILL
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.DebugInfo
+import de.jepfa.yapm.util.extractDomain
 import de.jepfa.yapm.util.getAppNameFromPackage
 import java.util.*
 
@@ -169,7 +170,9 @@ object ResponseFiller {
         }
 
         val suggestEverywhere = PreferenceService.getAsBool(PREF_AUTOFILL_EVERYWHERE, context)
-        val fields = identifyFields(structure, suggestEverywhere) ?: return null
+        val fieldsAndWebDomain = identifyFields(structure, suggestEverywhere) ?: return null
+        val fields = fieldsAndWebDomain.first
+        val webDomain = fieldsAndWebDomain.second
         if (fields.getAllFields().isEmpty()) {
             Log.i(LOG_PREFIX + "CFS", "No fields to autofill found")
             return null
@@ -198,7 +201,7 @@ object ResponseFiller {
         val credential = AutofillCredentialHolder.currentCredential
         if (key == null || Session.isDenied() || credential == null) {
             if (allowCreateAuthentication && fields.hasFields()) {
-                return createAuthenticationFillResponse(fields, structure, suggestEverywhere, context)
+                return createAuthenticationFillResponse(fields, structure, suggestEverywhere, webDomain, context)
             }
 
             Log.i(LOG_PREFIX + "CFS", "Not logged in or no credential selected")
@@ -218,6 +221,7 @@ object ResponseFiller {
         Log.d(LOG_PREFIX + "CFS", "passwordfields size: ${fields.getPasswordFields().size}")
         Log.d(LOG_PREFIX + "CFS", "potentialfields size: ${fields.getPotentialFields().size}")
         Log.d(LOG_PREFIX + "CFS", "allfields size: ${fields.getAllFields().size}")
+        Log.d(LOG_PREFIX + "CFS", "webDomain: ${webDomain}")
 
         if (fields.getUserFields().isNotEmpty() && fields.getPasswordFields().isNotEmpty()) {
             val dataset = createUserAndPasswordDataSet(
@@ -257,6 +261,7 @@ object ResponseFiller {
             context.getString(R.string.go_back_to_app),
             ACTION_OPEN_VAULT_FOR_AUTOFILL,
             true,
+            webDomain,
             context)
             .forEach { dataSets.add(it) }
 
@@ -265,12 +270,13 @@ object ResponseFiller {
             context.getString(R.string.lock_items),
             ACTION_CLOSE_VAULT,
             true,
+            webDomain,
             context)
             .forEach { dataSets.add(it) }
 
         if (DebugInfo.isDebug) {
             fields.getAllFields().mapNotNull {
-                createDebugDataSet(it, fields, context)
+                createDebugDataSet(it, fields, webDomain, context)
             }.forEach { dataSets.add(it) }
         }
 
@@ -320,6 +326,7 @@ object ResponseFiller {
         fields: Fields,
         structure: AssistStructure,
         suggestEverywhere: Boolean,
+        webDomain: String?,
         context: Context
     ): FillResponse {
         val responseBuilder = FillResponse.Builder()
@@ -330,20 +337,20 @@ object ResponseFiller {
             createAuthDataSets(structure,
                 fields.getAllFields(),
                 R.drawable.ic_lock_open_gray_24dp,
-                context.getString(R.string.login_required_first), ACTION_OPEN_VAULT_FOR_AUTOFILL, true, context)
+                context.getString(R.string.login_required_first), ACTION_OPEN_VAULT_FOR_AUTOFILL, true, webDomain, context)
                 .forEach { responseBuilder.addDataset(it) }
         }
         else {
             createAuthDataSets(structure,
                 fields.getAllFields(),
                 R.drawable.ic_baseline_list_gray_24,
-                context.getString(R.string.select_credential_for_autofill), ACTION_OPEN_VAULT_FOR_AUTOFILL, true, context)
+                context.getString(R.string.select_credential_for_autofill), ACTION_OPEN_VAULT_FOR_AUTOFILL, true, webDomain, context)
                 .forEach { responseBuilder.addDataset(it) }
         }
 
         if (DebugInfo.isDebug) {
             fields.getAllFields().mapNotNull {
-                createDebugDataSet(it, fields, context)
+                createDebugDataSet(it, fields, webDomain, context)
             }.forEach { responseBuilder.addDataset(it) }
         }
 
@@ -352,7 +359,7 @@ object ResponseFiller {
             createAuthDataSets(
                 structure,
                 fields.getAllFields(), R.drawable.ic_baseline_pause_gray_24,
-                context.getString(R.string.temp_deact_autofill), ACTION_PAUSE_AUTOFILL, true, context
+                context.getString(R.string.temp_deact_autofill), ACTION_PAUSE_AUTOFILL, true, webDomain, context
             ).forEach { responseBuilder.addDataset(it) }
         }
 
@@ -365,6 +372,7 @@ object ResponseFiller {
             message,
             ACTION_EXCLUDE_FROM_AUTOFILL,
             true,
+            webDomain,
             context)
             .forEach { responseBuilder.addDataset(it) }
 
@@ -378,11 +386,12 @@ object ResponseFiller {
     private fun createDebugDataSet(
         it: ViewNode,
         fields: Fields,
+        webDomain: String?,
         context: Context
     ) = createDataSet(
         it,
         R.drawable.ic_baseline_bug_report_gray_24,
-        "aId: ${it.autofillId}, webDomain: ${it.webDomain}, " +
+        "aId: ${it.autofillId}, webDomain: ${it.webDomain} ($webDomain), " +
                 "aHints: ${Arrays.toString(it.autofillHints)}, hint: ${it.hint}, " +
                 "text: ${it.text}, idEntry: ${it.idEntry},, htmlInfoTag: ${it.htmlInfo?.tag}, " +
                 "htmlInfoAttr: ${it.htmlInfo?.attributes}, type: ${it.autofillType}, " +
@@ -393,7 +402,7 @@ object ResponseFiller {
 
     private fun createPendingIntent(context: Context, action: String, actionData: String?): PendingIntent {
         val authIntent = Intent(context, ListCredentialsActivity::class.java)
-        authIntent.putExtra(SecureActivity.SecretChecker.fromAutofillOrNotification, true)
+        authIntent.putExtra(SecureActivity.SecretChecker.fromAutofill, true)
         if (actionData != null) {
             authIntent.action = "$action$ACTION_DELIMITER$actionData" // do it as extra doesn't work (extra gets lost)
         }
@@ -426,28 +435,28 @@ object ResponseFiller {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun identifyFields(structure: AssistStructure, suggestEverywhere: Boolean): Fields? {
+    private fun identifyFields(structure: AssistStructure, suggestEverywhere: Boolean): Pair<Fields, String?>? {
 
         val fields = Fields()
 
         if (structure.windowNodeCount == 0) {
             return null
         }
+        var webDomain: String? = null
         for (i in 0 until structure.windowNodeCount) {
             val windowNode = structure.getWindowNodeAt(i)
             val viewNode = windowNode?.rootViewNode
             if (viewNode != null) {
-                identifyFields(viewNode, fields, suggestEverywhere)
+                identifyFields(viewNode, fields, suggestEverywhere)?.let { webDomain = it }
             }
         }
 
-        return fields
+        return Pair(fields, webDomain)
     }
 
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun identifyFields(node: ViewNode, fields: Fields, suggestEverywhere: Boolean) {
-
+    private fun identifyFields(node: ViewNode, fields: Fields, suggestEverywhere: Boolean): String? {
         /*
         // gonna ignore that since a lot of apps exclude itself from Autofill for unknown reasons
 
@@ -463,7 +472,7 @@ object ResponseFiller {
        // if (suggestEverywhere || (node.autofillType == View.AUTOFILL_TYPE_TEXT
          //   && node.importantForAutofill != View.IMPORTANT_FOR_AUTOFILL_NO)){
 
-            inspectNodeAttributes(node, fields)
+            var webDomain = inspectNodeAttributes(node, fields)
             if (suggestEverywhere) {
                 fields.addPotentialField(node)
             }
@@ -484,16 +493,19 @@ object ResponseFiller {
         for (i in 0 until node.childCount) {
             val child = node.getChildAt(i)
             if (child != null) {
-                identifyFields(child, fields, suggestEverywhere)
+                identifyFields(child, fields, suggestEverywhere)?.let { webDomain = it }
             }
         }
+
+        return webDomain
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun inspectNodeAttributes(
         node: ViewNode,
-        fields: Fields
-    ) {
+        fields: Fields,
+    ): String? {
+
         node.text?.let { identifyField(it.toString(), node, fields) }
         node.hint?.let { identifyField(it, node, fields) }
         node.idEntry?.let { identifyField(it, node, fields) }
@@ -506,6 +518,13 @@ object ResponseFiller {
             if (it.second != null) {
                 identifyField(it.second, node, fields) // this is the value
             }
+        }
+
+        if (node.webDomain?.isNotBlank() == true) {
+            return node.webDomain
+        }
+        else {
+            return null
         }
     }
 
@@ -563,8 +582,8 @@ object ResponseFiller {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun createAuthDataSets(structure: AssistStructure, fields : Set<ViewNode>, iconId: Int, text: String, action: String, withInlinePresentation: Boolean, context: Context): List<Dataset> {
-        return fields.mapNotNull { createAuthDataSet(structure, it, iconId, text, action, context, withInlinePresentation) }
+    private fun createAuthDataSets(structure: AssistStructure, fields : Set<ViewNode>, iconId: Int, text: String, action: String, withInlinePresentation: Boolean, webDomain: String?, context: Context): List<Dataset> {
+        return fields.mapNotNull { createAuthDataSet(structure, it, iconId, text, action, webDomain, context, withInlinePresentation) }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -602,20 +621,21 @@ object ResponseFiller {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun createSearchString(structure: AssistStructure, field: ViewNode, context: Context): String? {
+    private fun createSearchString(structure: AssistStructure, field: ViewNode, webDomain: String?, context: Context): String? {
         val appName = structure.activityComponent.packageName.let { getAppNameFromPackage(it, context) }
-        val webDomain = field.webDomain?.substringBeforeLast(".")?.substringAfterLast(".")
-        return webDomain ?: appName
+        val finalWebDomain = field.webDomain ?: webDomain
+        return finalWebDomain?.let { extractDomain(it) }  ?: appName
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun createDomainString(structure: AssistStructure, field: ViewNode, context: Context): String? {
-        return if (field.webDomain != null) {
+    private fun createDomainString(structure: AssistStructure, field: ViewNode, webDomain: String?, context: Context): String? {
+        val finalWebDomain = field.webDomain ?: webDomain
+        return if (finalWebDomain != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                (field.webScheme ?: "https") + "://" + field.webDomain
+                (field.webScheme ?: "https") + "://" + finalWebDomain
             }
             else {
-                "https" + "://" + field.webDomain
+                "https://$finalWebDomain"
             }
         } else {
             null
@@ -748,14 +768,15 @@ object ResponseFiller {
         iconId : Int,
         text: String,
         action: String,
+        webDomain: String?,
         context: Context,
         withInlinePresentation: Boolean
     ): Dataset? {
         val autofillId = field.autofillId ?: return null
 
         val remoteView = createRemoteView(iconId, text, context)
-        val searchString = createSearchString(structure, field, context)
-        val domainString = createDomainString(structure, field, context)
+        val searchString = createSearchString(structure, field, webDomain, context)
+        val domainString = createDomainString(structure, field, webDomain, context) //TODO add path?
         val pendingIntent = createPendingIntent(context, action, searchString + ACTION_DELIMITER + (domainString?:""))
         val builder = Dataset.Builder(remoteView)
 

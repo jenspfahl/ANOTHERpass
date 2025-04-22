@@ -160,6 +160,7 @@
     <string name="generate_new_masterkey">Generiere neuen Masterkey (der interne Schlüssel zum Ver- und Entschlüsseln aller Tresordaten wird erneuert)</string>
     <string name="help">Onlinehilfe</string>
     <string name="about">Über</string>
+    <string name="feedback">Feedback</string>
     <string name="title_about_the_app">Über die App</string>
     <string name="change_pin">Ändere PIN</string>
     <string name="change_pin_explanation">Ändere deine PIN, indem du die aktuelle und die neue PIN eingibst. Beachte, dass sich der verschlüsselte Masterkey ändert, so dass du ihn erneut exportieren solltest. Das betrifft auch Tresor-Dateien mit verschlüsselten Masterkey.</string>
@@ -875,8 +876,9 @@
     <string name="hide_control_panel">Server-Panel ausblenden</string>
     <string name="show_server_logs">Zeige Server-Logs</string>
     <string name="open_server_settings">Server-Einstellungen öffnen</string>
+    <string name="info_about_linked_devices">Hinweis über Verknüpfungen</string>
     <string name="delete_disabled_linked_devices">Lösche deaktivierten Verknüpfungen</string>
-    <string name="last_used_at">Zuletzt verwendet am: %1$s</string>
+    <string name="last_used_at">Zuletzt verwendet: %1$s</string>
     <string name="enabled_links_always_on_top">Aktivierte Verknüpfungen immer zuerst</string>
     <string name="credentials_posted">Zugangsdaten gesendet</string>
     <string name="local_vault_unlocked">Vernüpfter Tresor entsperrt</string>
@@ -951,6 +953,8 @@
     <string name="linking_details">Verknüpfungsdetails für %1$s</string>
     <string name="copy_to_clipboard">In die Zwischenablage kopieren</string>
     <string name="copied_to_clipboard">In die Zwischenablage kopiert</string>
+
+    <string name="info_about_linked_devices_message">Bitte beachte, dass verknüpfte Geräte nicht in eine Tresordatei exportiert und wieder importiert werden können. Der private Schlüssel wird in einer sicheren Umgebung gespeichert und kann von keiner Anwendung gelesen werden. Dies ist ein Sicherheits-Feature von Android. Du musst deine Geräte erneut verknüpfen, wenn du eine Tresordatei in einen leeren ANOTHERpass-Tresor importiererst. Um eine neue Verknüpfung zu erstellen, öffne das Server-Panel-Menü und klicke auf \'%1$s\'.</string>
     <string name="delete_disabled_linked_devices_title">Lösche alle deaktivierten Verknüpfungen</string>
     <string name="delete_disabled_linked_devices_message">Sollen wirklich alle deaktivierten Verknüpfungen gelöscht werden?</string>
     <string name="xx_disabled_links_deleted">%1$s Verknüpfungen entfernt</string>
@@ -1041,5 +1045,8 @@
 
     <string name="credential_marked">Zugangsdaten markiert</string>
     <string name="credential_unmarked">Markierung aufgehoben</string>
+    <string name="feedback_message">Wenn dir die App gefällt, kannst du auf Github einen Stern vergeben. Zusätzlich oder falls du kein Github-Konto hast, kannst du uns in einer kurzen Umfrage Feedback geben.</string>
+    <string name="feedback_on_github">Github öffnen</string>
+    <string name="feedback_with_survey">Umfrage öffnen</string>
 
 </resources>

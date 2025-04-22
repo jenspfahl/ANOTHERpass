@@ -109,6 +109,11 @@ class ListWebExtensionsActivity : SecureActivity() {
             return false
         }
 
+        if (id == R.id.menu_info_about_web_extensions) {
+            WebExtensionDialogs.openInfoDialog(this)
+            return true
+        }
+
         if (id == R.id.menu_delete_disabled_web_extensions) {
             WebExtensionDialogs.openDeleteDisabledWebExtension(this)
             return true

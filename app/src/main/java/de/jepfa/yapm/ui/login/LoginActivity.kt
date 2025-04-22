@@ -51,7 +51,6 @@ class LoginActivity : NfcBaseActivity() {
 
     var loginAttempts = 0
     var showTagDetectedMessage = false
-    var isFromAutofill = false
 
     private val createVaultActivityRequestCode = 1
     private val importVaultActivityRequestCode = 2
@@ -65,12 +64,13 @@ class LoginActivity : NfcBaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofillOrNotification, false)
+        val isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofill, false)
+        val isFromNotification = intent.getBooleanExtra(SecretChecker.fromNotification, false)
         loginAttempts = PreferenceService.getAsInt(STATE_LOGIN_ATTEMPTS,  this)
 
         super.onCreate(null)
 
-        if (!isFromAutofill && Session.isLoggedOut()) {
+        if (!isFromAutofill && !isFromNotification && Session.isLoggedOut()) {
             val introShowed = PreferenceService.getAsBool(STATE_INTRO_SHOWED, this)
             if (!introShowed) {
                 val intent = Intent(this, IntroActivity::class.java)
@@ -291,7 +291,7 @@ class LoginActivity : NfcBaseActivity() {
         PreferenceService.putCurrentDate(STATE_LOGIN_SUCCEEDED_AT, this)
         PreferenceService.delete(STATE_LOGIN_ATTEMPTS, this)
 
-        val isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofillOrNotification, false)
+        val isFromAutofill = intent.getBooleanExtra(SecretChecker.fromAutofill, false)
         Log.i(LOG_PREFIX + "LST", "login done, fromAutofill=$isFromAutofill")
         if (isFromAutofill) {
             setResult(SecretChecker.loginRequestCode, intent)

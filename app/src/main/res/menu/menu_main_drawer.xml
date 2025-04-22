@@ -166,6 +166,13 @@
         </item>
 
         <item
+            android:id="@+id/menu_feedback"
+            android:icon="@drawable/baseline_favorite_border_24"
+            android:orderInCategory="325"
+            android:title="@string/feedback">
+        </item>
+
+        <item
             android:id="@+id/menu_report_bug"
             android:icon="@drawable/baseline_bug_report_24"
             android:orderInCategory="350"

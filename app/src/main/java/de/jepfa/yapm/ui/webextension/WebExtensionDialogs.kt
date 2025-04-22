@@ -84,6 +84,17 @@ object WebExtensionDialogs {
         }
     }
 
+    fun openInfoDialog(activity: SecureActivity) {
+        activity.masterSecretKey?.let { _ ->
+
+
+            AlertDialog.Builder(activity)
+                .setTitle(R.string.info_about_linked_devices)
+                .setMessage(activity.getString(R.string.info_about_linked_devices_message, activity.getString(R.string.link_new_device)))
+                .show()
+        }
+    }
+
     fun openDeleteDisabledWebExtension(activity: SecureActivity) {
         activity.masterSecretKey?.let { _ ->
 

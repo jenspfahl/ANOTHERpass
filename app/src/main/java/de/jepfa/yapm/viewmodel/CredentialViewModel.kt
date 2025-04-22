@@ -57,6 +57,15 @@ class CredentialViewModel(private val repository: CredentialRepository) : ViewMo
         AutoBackupService.autoExportVault(context)
     }
 
+    fun deleteAll(credentials: Collection<EncCredential>, context: Context)  = viewModelScope.launch {
+        credentials.forEach { credential ->
+            credential.timeData.touchModify()
+            repository.delete(credential)
+        }
+        PreferenceService.putCurrentDate(PreferenceService.DATA_VAULT_MODIFIED_AT, context)
+        AutoBackupService.autoExportVault(context)
+    }
+
     fun hasExpiredCredentials(): Boolean {
         val currMillis = System.currentTimeMillis()
         return credentialIdsAndExpiresAt.values.any { it < currMillis }

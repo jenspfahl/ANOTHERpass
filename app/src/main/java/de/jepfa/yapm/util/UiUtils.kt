@@ -11,6 +11,7 @@ import android.os.Build
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
+import android.util.Log
 import android.util.Patterns
 import android.view.View
 import android.view.ViewGroup
@@ -239,8 +240,15 @@ fun getAppNameFromPackage(packageName: String, context: Context): String? {
 }
 
 fun extractDomain(website: String, withTld: Boolean = false): String {
+
     return try {
-        val host = URL(website).host.lowercase()
+
+        val host = if (website.startsWith("http://") || website.startsWith("https://")) {
+            URL(website).host.lowercase()
+        }
+        else {
+            URL("https://$website").host.lowercase()
+        }
 
         if (isIpAddress(host)) {
             return host
@@ -253,6 +261,7 @@ fun extractDomain(website: String, withTld: Boolean = false): String {
             hostPart
         }
     } catch (e: MalformedURLException) {
+        Log.i("AS", "Cannot extract domain from $website", e)
         website.lowercase()
     }
 }

@@ -1,6 +1,7 @@
 package de.jepfa.yapm.ui
 
 import android.app.Application
+import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import com.yariksoffice.lingver.Lingver
 import de.jepfa.yapm.database.YapmDatabase
@@ -32,13 +33,14 @@ class YapmApp : Application() {
         // first thing after app start is to remove old transport key to get them exchanged / new generated
         SecretService.removeAndroidSecretKey(AndroidKey.ALIAS_KEY_TRANSPORT)
 
-        val prefLang = PreferenceService.getAsString(PreferenceService.PREF_LANGUAGE, this)
-        val locale = getLocale(prefLang)
+        val locale = getLocale()
         Lingver.init(this, locale)
         Locale.getDefault()
     }
 
-    private fun getLocale(language: String?): Locale {
+     fun getLocale(): Locale {
+        val language = PreferenceService.getAsString(PreferenceService.PREF_LANGUAGE, this)
+
         return if (language == null || language == "default") Locale.getDefault()
         else Locale(language)
     }
