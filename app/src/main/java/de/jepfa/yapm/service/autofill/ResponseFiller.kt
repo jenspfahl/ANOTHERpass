@@ -402,7 +402,7 @@ object ResponseFiller {
 
     private fun createPendingIntent(context: Context, action: String, actionData: String?): PendingIntent {
         val authIntent = Intent(context, ListCredentialsActivity::class.java)
-        authIntent.putExtra(SecureActivity.SecretChecker.fromAutofillOrNotification, true)
+        authIntent.putExtra(SecureActivity.SecretChecker.fromAutofill, true)
         if (actionData != null) {
             authIntent.action = "$action$ACTION_DELIMITER$actionData" // do it as extra doesn't work (extra gets lost)
         }

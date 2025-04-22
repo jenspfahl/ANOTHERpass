@@ -1487,8 +1487,12 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         }
         else if (requestCode == SecretChecker.loginRequestCode) {
             receivedIntent?.let {
-                if (receivedIntent.getBooleanExtra(SecretChecker.fromAutofillOrNotification, false)) {
-                    Log.i(LOG_PREFIX + "LST", "onActivityResult")
+                if (receivedIntent.getBooleanExtra(SecretChecker.fromAutofill, false)) {
+                    Log.i(LOG_PREFIX + "LST", "onActivityResult from autofill")
+                    updateSearchFieldWithAutofillSuggestion(receivedIntent)
+                }
+                if (receivedIntent.getBooleanExtra(SecretChecker.fromNotification, false)) {
+                    Log.i(LOG_PREFIX + "LST", "onActivityResult from notification")
                     updateSearchFieldWithAutofillSuggestion(receivedIntent)
                 }
             }

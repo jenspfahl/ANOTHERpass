@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit
 
 abstract class SecureActivity : BaseActivity() {
 
+    @Volatile
     protected var checkSession = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,10 +81,11 @@ abstract class SecureActivity : BaseActivity() {
     object SecretChecker {
 
         const val fromSecretChecker = "fromSecretChecker"
-        const val fromAutofillOrNotification = "fromAutofill"
+        const val fromAutofill = "fromAutofill"
+        const val fromNotification = "fromNotification"
         const val loginRequestCode = 38632
 
-        private val DELTA_LOGIN_ACTIVITY_INTENDED = TimeUnit.SECONDS.toMillis(5)
+        private val DELTA_LOGIN_ACTIVITY_INTENDED = TimeUnit.SECONDS.toMillis(1) // TODO not sure whether we still need this
 
         @Volatile
         private var loginActivityIntended: Long = 0
@@ -109,11 +111,11 @@ abstract class SecureActivity : BaseActivity() {
                     intent.putExtras(incomingIntent)
                     intent.putExtra(fromSecretChecker, true)
                     intent.action = incomingIntent.action
-                    if (incomingIntent.getBooleanExtra(fromAutofillOrNotification, false)) {
+                    if (incomingIntent.getBooleanExtra(fromAutofill, false)) {
                         activity.startActivityForResult(intent, loginRequestCode)
                         activity.lock()
                     }
-                    else { //TODO do we need this branch at all? We could always work with startActivityForResult
+                    else {
                         activity.startActivity(intent)
                         activity.finish()  // Why? To restart from the main activity.
                     }

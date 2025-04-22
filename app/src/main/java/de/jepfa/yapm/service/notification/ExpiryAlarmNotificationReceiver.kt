@@ -68,7 +68,7 @@ class ExpiryAlarmNotificationReceiver : BroadcastReceiver() {
 
     private fun createPendingExpiryIntent(context: Context, credentialId: Int, action: String): PendingIntent {
         val authIntent = Intent(context, ListCredentialsActivity::class.java)
-        authIntent.putExtra(SecureActivity.SecretChecker.fromAutofillOrNotification, true)
+        authIntent.putExtra(SecureActivity.SecretChecker.fromNotification, true)
         authIntent.action = action
         authIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
 
