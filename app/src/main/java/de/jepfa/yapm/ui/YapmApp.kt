@@ -1,7 +1,6 @@
 package de.jepfa.yapm.ui
 
 import android.app.Application
-import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import com.yariksoffice.lingver.Lingver
 import de.jepfa.yapm.database.YapmDatabase
@@ -12,7 +11,10 @@ import de.jepfa.yapm.database.repository.WebExtensionRepository
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SecretService
+import de.jepfa.yapm.util.toastText
+import de.jepfa.yapm.R
 import java.util.*
+import kotlin.system.exitProcess
 
 class YapmApp : Application() {
 
@@ -36,6 +38,12 @@ class YapmApp : Application() {
         val locale = getLocale()
         Lingver.init(this, locale)
         Locale.getDefault()
+
+        if(!SecretService.isDeviceSecure(this)){
+            toastText(this, R.string.secure_device_required)
+
+            exitProcess(1)
+        }
     }
 
      fun getLocale(): Locale {

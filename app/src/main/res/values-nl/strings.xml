@@ -1016,5 +1016,6 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="feedback_message">If you like the app you can give a star on Github. Additionally, or if you don\'t have a Github account, give feedback with the short survey.</string>
   <string name="feedback_on_github">Open Github</string>
   <string name="feedback_with_survey">Open survey</string>
+  <string name="secure_device_required">Stel eerst een veilige ontgrendelingsmethode in voor je apparaat (PIN, wachtwoord, vingerafdruk, …)</string>
 
 </resources>
