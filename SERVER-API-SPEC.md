@@ -2,7 +2,7 @@
 
 From [ANOTHERpass version 2](https://github.com/jenspfahl/ANOTHERpass) onwards, a new server capability is included in the mobile app, to let the app function as a credential server in a local network. Together with the [ANOTHERpass Browser Extension](https://github.com/jenspfahl/anotherpass-browserextension) it is possible to easily and securely use credentials stored in the app by any computer in a local network. This is a very requested feature to use credentials outside of the mobile device.
 
-This server capability of the app can be used by any client, who follows its API. This document is about describing this API.
+This server capability of the app can be used by any client, who follows this API. This document is about describing this API.
 
 ## Limitations
 
@@ -16,13 +16,14 @@ The server capability is designed to serve in local networks only, never as a pu
 * Supported HTTP methods:
     * `OPTIONS` : to tell the client about the supported HTTP methods and headers and application content
     * `POST` : to send requests to the server
+    * `GET` : to to download the vault backup file
 
 
 ### HTTP headers
 
 * `Accept`: "application/json"
 * `Content-Type`: "application/json"
-* `X-WebClientId`: "<webClientId>"
+* `X-WebClientId`: \<webClientId\>
 
 `X-WebClientId` is the only custom header used by the server to identify the calling client. This identifier is generated once by the client during [the linking phase](https://github.com/jenspfahl/anotherpass-browserextension?tab=readme-ov-file#link-extension-with-the-app) and must be a random and unique 6 alphanumeric uppercase char sequence in the format `[A-Z]{3}-[A-Z]{3}` (e.g. `ABC-DEF`). It is the only value transferred in plaintext.
 
@@ -60,12 +61,12 @@ The response body looks similar to the request body. A body is only contained if
  * 204 success, but no content
  * 400 malformed or bad client request
  * 401 app vault is locked
- * 403 request denied by user, client should stop current request
+ * 403 request denied by the user, client should stop current request
  * 404 webClientId unknown or no user interaction
  * 409 conflicting request, current request is rejected until the concurrent request is proceeded
  * 500 error in the server/app
 
-Clients can keep polling if they receive these status codes:
+Clients can keep polling if they receive one of those status codes:
  * 202 --> user should accept the incoming request or perform the requested action
  * 401 --> user should open the app and unlock the vault
 
@@ -76,8 +77,8 @@ Clients should stop polling if they receive:
 
 Clients should stop polling due to an error:
  * 400 --> the client hasn't correctly implemented against this API spec
- * 404 --> due to a misconfiguration related data cannot be found on the server or the app and the client are not linked
- * 500 --> an error in the app/server, please raise a report ticket
+ * 404 --> due to a misconfiguration, related data cannot be found on the server or the app and the client are not linked
+ * 500 --> an error in the app/server, please report an issue in Github
 
 ### Request types and payload structure
 
@@ -117,7 +118,7 @@ And the response like this:
 ```
 {
     "linkedVaultId" : <string, the vault id of the app vault>,
-    "sharedBaseKey": <base64 encoded Base Key, either 128 or 256 bit long depending on the phone>,	
+    "sharedBaseKey": <base64 encoded Base Key, either 128 or 256 bit long depending on the mobile device>,	
     "serverPubKey": {
         "n" : <modulus as base64 of the Public Key of the app>,
         "e" : <exponent as base64 of the Public Key of the app>
@@ -139,7 +140,7 @@ As request looks like this:
 }
 ```
 
-A successful response looks has this pattern:
+A successful response has this pattern:
 
 ```
 {
@@ -154,7 +155,7 @@ All commands initiate a different flow in the app and may enforce user interacti
 
 * `fetch_credential_for_url`
 
-Requires `"website"` as a sibling of the `"command"`-property and asks the user of the app to select a credential for the given website. The app starts a credential search with the website domain name to support the user. User has to select one credential.
+Requires `"website"` as a sibling of the `"command"` - property and asks the user of the app to select a credential for the given website. The app starts a credential search with the website domain name to support the user. User has to select one credential.
 
 Returns the selected credential.
 
@@ -165,8 +166,9 @@ Returns the selected credential.
         "readableUid": <the shortened and readable UUID of the credential>,
         "name": <the name of the credential stored in the app>,
         "password", <the raw password of the credential in plaintext>,
-        "user": <the user of the credential>,
-        "website": <the website information of the credential>
+        "user": <the user of the credential if present>,
+        "website": <the website information of the credential if present>,
+        "opt": <an OTP configuration if present>
     }
     ..
 }
@@ -174,13 +176,13 @@ Returns the selected credential.
 
 * `fetch_credential_for_uid`
 
-Requires `"uid"` as a sibling of the `"command"`-property and tries to fetch the credential with the given UID. No user interaction required.
+Requires `"uid"` as a sibling of the `"command"`- property and tries to fetch the credential with the given UID. No user interaction required.
 
 Returns the related credential as for `fetch_credential_for_url` or 404 if no credential found for this UID.
 
 * `fetch_credentials_for_uids`
 
-Requires `"uids"`-array as a sibling of the `"command"`-property containing all UIDs to fetch. The app tries to fetch all credentials with the given UIDs. No user interaction required.
+Requires `"uids"`-array as a sibling of the `"command"` - property containing all UIDs to fetch. The app tries to fetch all credentials with the given UIDs. No user interaction required.
 
 Returns all related credentials or 404 if no credential found for this UID.
 
@@ -211,16 +213,16 @@ Returns the selected credentials as for `fetch_credentials_for_uids` or 409 if n
 
 * `fetch_all_credentials`
 
-Tries to fetch all (but only unveiled). No user interaction required.
+Tries to fetch all (but only unveiled) credentials. No user interaction required.
 
 Returns all credentials as for `fetch_credentials_for_uids`.
 
 
 * `create_credential_for_url`
 
-Requires `"website"` as a sibling of the `"command"`-property and starts the flow to create a new credential with a suggested name,  and website derived from the received `"website"`. It may also receive a `"user"` from the client to be prefilled in the form.
+Requires `"website"` as a sibling of the `"command"` - property and starts the flow to create a new credential with a suggested name,  and website derived from the received `"website"`. It may also receive a `"user"` from the client to be prefilled in the form.
 
-Returns the created credentials as for `fetch_credential_for_url` or 409 if nothing is created.
+Returns the created credential as for `fetch_credential_for_url` or 409 if nothing is created.
 
 
 * `get_client_key`
@@ -246,23 +248,23 @@ Initiates a download of a backup file of the app vault. Returns the filename and
 }
 ```
 
-The file can now be downloaded once under http://<server>:<port>/<downloadKey>.
+The file can now be downloaded once under http://\<server\>:\<port\>/\<downloadKey\>.
 
-Note! This download is not encrypted by the configured end-to-end-encryption, because of restrictions of the JavaScript Download API used by possible clients like the browser extension. The reason is that a client can not manipulate (like encrypt) a download stream. Usually the backup file is encrypted but contains plain metadata which could be revealed in an untrusted local network.
+Note! This download is not encrypted by the configured end-to-end-encryption, because of restrictions of the Browser Extension JavaScript Download API used by possible clients like the browser extension. The reason is that a client can not manipulate (like encrypt) a download stream. Usually the backup file is encrypted but contains plain metadata which could be revealed in an untrusted local network.
 
 
 #### Client Key for client based encryption
 
-If the client wants to store received credentials, it can take advantage of the clientKey, which is an 128/256 bit long key derived from the apps master key. The clientKey is derived by taking the Webclient-Id, the master key and the vault salt and hashing both together (SHA-256). With that, a key is derived that cannot leak any information about the origin master key, but requires an interaction with the phone app to get. This derived key should only be held in memory of the client, ideally with a TTL. With that, a local encrypted credential storage / vault can be implemented on client side with having the app as the key factor.
+If the client wants to store received credentials, it can take advantage of the clientKey, which is an 128/256 bit long key derived from the apps master key. The clientKey is derived by taking the Webclient-Id, the master key and the vault salt and hashing all together (SHA-256). With that, a key is derived that cannot leak any information about the origin master key, but requires an interaction with the mobile app app to get. **This derived key should only be held in memory of the client, ideally with a TTL!** With that, a local encrypted credential storage / vault can be implemented on client side with having the app as the key factor.
 
 
 ### Request fingerprinting
 
-Shortened fingerprint is a function that takes the first 7 alphanumeric characters of a base64 and converts them into an easy and fast to read fingerprint string with the format `[A-Z]{2}-[A-Z]{3}-[A-Z]{2}`.
+Shortened fingerprint is a function that takes the first 7 alphanumeric characters of a base64 and converts them into an easy and fast to read fingerprint string in the format `[A-Z]{2}-[A-Z]{3}-[A-Z]{2}`.
 
 The fingerprint is derived from:
- * the `"serverPubKey"."n"`-value for the link_app requests
- * or the Base Key and the `"requestIdentifier"`-value, both joined and hashed (`SHA-256(BK + requestIdentifier)`) for the "request_credential" requests.
+ * the `"serverPubKey"."n"` - value for the "link_app" requests
+ * or the Base Key and the `"requestIdentifier"` - value (see above), both joined and hashed (`SHA-256(BK + requestIdentifier)`) for the "request_credential" requests.
 
 The output is encoded as Base64 and the first 7 alphabetic characters are printed out as uppercase in the format `AB-CDE-FG`.
 
