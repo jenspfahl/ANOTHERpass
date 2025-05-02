@@ -1048,5 +1048,6 @@
     <string name="feedback_message">Wenn dir die App gefällt, kannst du auf Github einen Stern vergeben. Zusätzlich oder falls du kein Github-Konto hast, kannst du uns in einer kurzen Umfrage Feedback geben.</string>
     <string name="feedback_on_github">Github öffnen</string>
     <string name="feedback_with_survey">Umfrage öffnen</string>
+    <string name="secure_device_required">Richten Sie zuerst eine sichere Entsperrmethode für Ihr Gerät ein (PIN, Passwort, Fingerabdruck, …)</string>
 
 </resources>
