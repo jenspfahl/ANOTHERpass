@@ -1057,4 +1057,7 @@
     <string name="feedback_on_github">Open Github</string>
     <string name="feedback_with_survey">Open survey</string>
 
+    <string name="secure_device_required">Please set up a secure unlock method for your device first (PIN, Password, Fingerprint, …), to ensure the app works as expected.</string>
+    <string name="open_security_settings">Open Security Settings</string>
+    <string name="exit_app">Exit app</string>
 </resources>

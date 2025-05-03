@@ -107,6 +107,7 @@ object DebugInfo {
         sb.addFormattedLine("Build Timestamp", BuildConfig.BUILD_TIME.toSimpleDateTimeFormat())
         sb.addFormattedLine("Build Type", BuildConfig.BUILD_TYPE)
         sb.addFormattedLine("Debug Mode", isDebug)
+        sb.addFormattedLine("Current Timestamp", Date().toSimpleDateTimeFormat())
 
         sb.append("\n************ DEVICE INFORMATION ***********\n")
         sb.addFormattedLine("Brand", Build.BRAND)
@@ -122,8 +123,7 @@ object DebugInfo {
         sb.addFormattedLine("Has hardware backed TEE", SecretService.hasHardwareTEESupport(context) ?: "-")
         sb.addFormattedLine("Has biometrics support", BiometricUtils.isBiometricsSupported(context))
         sb.addFormattedLine("Has biometrics enrolled", BiometricUtils.hasBiometricsEnrolled(context))
-        val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-        sb.addFormattedLine("Is device lock enabled", keyguardManager.isDeviceSecure)
+        sb.addFormattedLine("Is device lock enabled", SecretService.isDeviceSecure(context))
 
 
         sb.append("\n************ PERMISSIONS ************\n")

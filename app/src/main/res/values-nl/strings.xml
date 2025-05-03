@@ -1017,4 +1017,8 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="feedback_on_github">Open Github</string>
   <string name="feedback_with_survey">Open survey</string>
 
+  <string name="secure_device_required">Stel eerst een veilige ontgrendelingsmethode in voor je apparaat (PIN, wachtwoord, vingerafdruk, …)</string>
+  <string name="open_security_settings">Open Security Settings</string>
+  <string name="exit_app">Exit app</string>
+
 </resources>

@@ -1049,4 +1049,8 @@
     <string name="feedback_on_github">Github öffnen</string>
     <string name="feedback_with_survey">Umfrage öffnen</string>
 
+    <string name="secure_device_required">Bitte richte zuerst eine sichere Entsperrmethode für dein Gerät ein (PIN, Passwort, Fingerabdruck, …). Nur so kann die App richtig funktionieren.</string>
+    <string name="open_security_settings">Sicherheitseinstellunen öffnen</string>
+    <string name="exit_app">App beenden</string>
+
 </resources>
