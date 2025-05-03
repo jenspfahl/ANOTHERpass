@@ -1051,6 +1051,7 @@ object HttpCredentialRequestHandler {
         val user = SecretService.decryptCommonString(key, credential.user)
         val name = SecretService.decryptCommonString(key, credential.name)
         val website = SecretService.decryptCommonString(key, credential.website)
+        val otp = credential.otpData?.let { SecretService.decryptCommonString(key, it.encOtpAuthUri) }
         val uid = credential.uid
 
         if (deobfuscate) {
@@ -1068,6 +1069,7 @@ object HttpCredentialRequestHandler {
         responseCredential.put("password", password.toRawFormattedPassword())
         responseCredential.put("user", user)
         responseCredential.put("website", ensureHttp(website))
+        responseCredential.put("otp", otp ?: "") // in case of null return empty to indicate removed OTP
         password.clear()
         return Pair(name, responseCredential)
     }
