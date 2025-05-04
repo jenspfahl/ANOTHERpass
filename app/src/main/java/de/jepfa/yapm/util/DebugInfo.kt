@@ -9,6 +9,7 @@ import de.jepfa.yapm.database.YapmDatabase
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_VERSION
 import de.jepfa.yapm.service.biometrix.BiometricUtils
+import de.jepfa.yapm.service.io.AutoBackupService
 import de.jepfa.yapm.service.net.HttpServer.SERVER_LOG_PREFIX
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.MasterPasswordService
@@ -102,6 +103,7 @@ object DebugInfo {
         if (vaultImportedAt != null) {
             sb.addFormattedLine("Vault Imported At", dateTimeToNiceString(vaultImportedAt, context))
         }
+        sb.addFormattedLine("Auto Backup Enabled", AutoBackupService.isAutoBackupConfigured(context))
         sb.addFormattedLine("MP stored", MasterPasswordService.isMasterPasswordStored(context))
         sb.addFormattedLine("MP stored with auth", MasterPasswordService.isMasterPasswordStoredWithAuth(context))
         sb.addFormattedLine("Build Timestamp", BuildConfig.BUILD_TIME.toSimpleDateTimeFormat())
