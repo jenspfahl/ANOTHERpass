@@ -78,7 +78,7 @@ class ChangeMasterPasswordActivity : SecureActivity() {
             if (combinations == 0.0) {
                 combinations = ShowPasswordStrengthUseCase.guessPasswordCombinations(generatedPassword)
             }
-            ShowPasswordStrengthUseCase.showPasswordStrength(combinations, R.string.password_strength, this )
+            ShowPasswordStrengthUseCase.showPasswordStrength(generatedPassword.length, combinations, R.string.password_strength, this )
             true
         }
 

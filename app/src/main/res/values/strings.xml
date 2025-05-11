@@ -27,6 +27,7 @@
     <string name="STRONG">Strong</string>
     <string name="ULTRA">Ultra</string>
     <string name="EXTREME">Extreme</string>
+    <string name="HYPER">Hyper</string>
 
 
     <string name="cipher_name">Encryption algorithm</string>
@@ -259,7 +260,6 @@
     <string name="edit_password">Edit password</string>
     <string name="edit_password_message">Here you can change the password manually which is not recommended. Generated passwords are mostly stronger.</string>
     <string name="pref_header_overlay">Password overlay dialog</string>
-    <string name="HYPER">Hyper</string>
     <string name="sort_order">Sort order</string>
     <string name="group_by">Group credentials</string>
     <string name="credential_group_by_none">No grouping</string>
@@ -372,6 +372,7 @@
     <string name="password_strength">Password strength</string>
     <string name="password_strength_from_generator">Password strength (based on generator settings)</string>
     <string name="password_strength_guessed">Password strength (based on current password)</string>
+    <string name="length">Length</string>
     <string name="combinations">Combinations</string>
     <string name="entropy" translatable="false">Entropy</string>
     <string name="years">years</string>

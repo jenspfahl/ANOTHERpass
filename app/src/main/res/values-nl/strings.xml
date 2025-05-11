@@ -24,6 +24,8 @@
   <string name="STRONG">Sterk</string>
   <string name="ULTRA">Ultra</string>
   <string name="EXTREME">Extreem</string>
+  <string name="HYPER">Hyper</string>
+
   <string name="cipher_name">Encryptie algoritme</string>
   <string name="create_vault_cipher_explanation">Kies een versleutelingsalgoritme.  Het kan ook later worden gewijzigd.  Laat bij twijfel de standaardinstelling staan.</string>
   <string name="update_vault_cipher_explanation">Kies een versleutelingsalgoritme.  Het huidige algoritme is %1$s</string>
@@ -248,7 +250,6 @@ Het scheiden van de gecodeerde hoofdsleutel van het kluisbestand maakt het besta
   <string name="edit_password">Verander wachtwoord</string>
   <string name="edit_password_message">Het wachtwoord kan hier handmatig worden gewijzigd, hoewel dit niet wordt aanbevolen.  Gegenereerde wachtwoorden zijn meestal sterker.</string>
   <string name="pref_header_overlay">Toon wachtwoorden bovenop andere apps</string>
-  <string name="HYPER">Hyper</string>
   <string name="sort_order">Sorteervolgorde</string>
   <string name="group_by">Group credentials</string>
   <string name="credential_group_by_none">No grouping</string>
@@ -351,6 +352,7 @@ Deze waarschuwing kunt u deactiveren onder \'Instellingen/Beveiliging\'.</string
   <string name="password_strength">Wachtwoord sterkte</string>
   <string name="password_strength_from_generator">Wachtwoordsterkte (van wachtwoordgenerator)</string>
   <string name="password_strength_guessed">Wachtwoordsterkte (van huidige wachtwoord)</string>
+  <string name="length">Lengte</string>
   <string name="combinations">Combinaties</string>
   <string name="years">Jaren</string>
   <string name="bruteforce_years_pc">Tijd om het wachtwoord te breken met een gewone pc (bij %1$s pogingen per seconde)</string>

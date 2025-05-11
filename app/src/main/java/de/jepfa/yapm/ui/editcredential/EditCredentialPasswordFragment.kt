@@ -65,7 +65,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
         }
     }
 
-    private val PASSPHRASE_STRENGTH_DEFAULT = SecretStrength.STRONG
+    private val PASSPHRASE_STRENGTH_DEFAULT = SecretStrength.ULTRA
     private val PASSWORD_STRENGTH_DEFAULT = SecretStrength.STRONG
 
     private lateinit var currentCredential: EncCredential
@@ -151,11 +151,13 @@ class EditCredentialPasswordFragment : SecureFragment() {
         val radioStrengthStrong: RadioButton = view.findViewById(R.id.radio_strength_strong)
         val radioStrengthSuperStrong: RadioButton = view.findViewById(R.id.radio_strength_super_strong)
         val radioStrengthExtreme: RadioButton = view.findViewById(R.id.radio_strength_extreme)
+        val radioStrengthHyper: RadioButton = view.findViewById(R.id.radio_strength_hyper)
 
         buildRadioButton(radioStrengthNormal, SecretStrength.NORMAL)
         buildRadioButton(radioStrengthStrong, SecretStrength.STRONG)
         buildRadioButton(radioStrengthSuperStrong, SecretStrength.ULTRA)
         buildRadioButton(radioStrengthExtreme, SecretStrength.EXTREME)
+        buildRadioButton(radioStrengthHyper, SecretStrength.HYPER)
 
         switchUpperCaseChar = view.findViewById(R.id.switch_upper_case_char)
         switchAddDigit = view.findViewById(R.id.switch_add_digit)
@@ -320,7 +322,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
             val titleId =
                 if (passwordCombinationsGuessed) R.string.password_strength_guessed
                 else R.string.password_strength_from_generator
-            ShowPasswordStrengthUseCase.showPasswordStrength(combinations, titleId, editCredentialActivity)
+            ShowPasswordStrengthUseCase.showPasswordStrength(generatedPassword.length, combinations, titleId, editCredentialActivity)
         }
         else {
             toastText(activity,R.string.generate_password_first)
@@ -414,6 +416,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
             R.id.radio_strength_strong -> SecretStrength.STRONG
             R.id.radio_strength_super_strong -> SecretStrength.ULTRA
             R.id.radio_strength_extreme -> SecretStrength.EXTREME
+            R.id.radio_strength_hyper -> SecretStrength.HYPER
             else -> PASSPHRASE_STRENGTH_DEFAULT // default
         }
         return PassphraseGeneratorSpec(
@@ -431,6 +434,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
             R.id.radio_strength_strong -> SecretStrength.STRONG
             R.id.radio_strength_super_strong -> SecretStrength.ULTRA
             R.id.radio_strength_extreme -> SecretStrength.EXTREME
+            R.id.radio_strength_hyper -> SecretStrength.HYPER
             else -> PASSWORD_STRENGTH_DEFAULT // default
         }
         return PasswordGeneratorSpec(

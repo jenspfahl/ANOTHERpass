@@ -23,8 +23,8 @@ abstract class GeneratorBase<T : GeneratorSpec>(
 
         const val EXTENDED_SPECIAL_CHARS = "()[]{}<>\"'=%\\~|"
 
-        const val BRUTEFORCE_ATTEMPTS_PENTIUM = 100_000 // per second
-        const val BRUTEFORCE_ATTEMPTS_SUPERCOMP = 1_000_000_000 // per second
+        const val BRUTEFORCE_ATTEMPTS_PENTIUM = 100_000L // per second
+        const val BRUTEFORCE_ATTEMPTS_SUPERCOMP = 1_000_000_000_000L // 1  billion per second
     }
 
     abstract fun generate(spec: T): Password
@@ -35,7 +35,7 @@ abstract class GeneratorBase<T : GeneratorSpec>(
         return log2(combinations)
     }
 
-    fun calcBruteForceWaitingSeconds(combinations: Double, tryPerSec: Int): Double {
+    fun calcBruteForceWaitingSeconds(combinations: Double, tryPerSec: Long): Double {
         return combinations / tryPerSec
     }
 

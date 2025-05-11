@@ -161,6 +161,11 @@ fun Int.toReadableFormat(): String {
     return f.format(this)
 }
 
+fun Long.toReadableFormat(): String {
+    val f = NumberFormat.getInstance(Locale.getDefault(Locale.Category.FORMAT))
+    return f.format(this)
+}
+
 fun Double.toExponentFormat(): String {
     val symbols = DecimalFormatSymbols.getInstance(Locale.getDefault(Locale.Category.FORMAT));
     val f = DecimalFormat("0.0E0", symbols)

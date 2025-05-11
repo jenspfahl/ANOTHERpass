@@ -91,6 +91,7 @@
         <item>@string/STRONG</item>
         <item>@string/ULTRA</item>
         <item>@string/EXTREME</item>
+        <item>@string/HYPER</item>
     </string-array>
 
     <string-array name="default_passwd_strength_values">
@@ -98,6 +99,7 @@
         <item>STRONG</item>
         <item>ULTRA</item>
         <item>EXTREME</item>
+        <item>HYPER</item>
     </string-array>
 
     <integer-array name="label_colors">

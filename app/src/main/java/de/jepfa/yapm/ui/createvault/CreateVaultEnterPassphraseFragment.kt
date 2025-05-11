@@ -60,6 +60,7 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
             generatedPasswdView.setOnLongClickListener {
                 if (combinations > 0) {
                     ShowPasswordStrengthUseCase.showPasswordStrength(
+                        generatedPassword.length,
                         combinations,
                         R.string.password_strength,
                         baseActivity

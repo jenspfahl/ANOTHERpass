@@ -26,6 +26,7 @@
     <string name="STRONG">Stark</string>
     <string name="ULTRA">Ultra</string>
     <string name="EXTREME">Extrem</string>
+    <string name="HYPER">Hyper</string>
 
 
     <string name="cipher_name">Verschlüsselungsalgorithmus</string>
@@ -255,7 +256,6 @@
     <string name="edit_password">Passwort ändern</string>
     <string name="edit_password_message">Hier kann das Passwort manuell geändert werden, was allerdings nicht empfohlen wird. Generierte Passwörter sind meist stärker.</string>
     <string name="pref_header_overlay">Passwörter über anderen Apps einblenden</string>
-    <string name="HYPER">Hyper</string>
     <string name="sort_order">Sortierreihenfolge</string>
     <string name="group_by">Zugangsdaten gruppieren</string>
     <string name="credential_group_by_none">Keine Gruppierung</string>
@@ -364,6 +364,7 @@
     <string name="password_strength">Passwortstärke</string>
     <string name="password_strength_from_generator">Passwortstärke (vom Passwortgenerator)</string>
     <string name="password_strength_guessed">Passwortstärke (vom aktuellen Passwort)</string>
+    <string name="length">Länge</string>
     <string name="combinations">Kombinationen</string>
     <string name="years">Jahre</string>
     <string name="bruteforce_years_pc">Zeit um das Passwort mit einem gewöhnlichem PC zu brechen (bei %1$s Versuchen pro Sekunde)</string>

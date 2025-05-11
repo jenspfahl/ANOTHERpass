@@ -24,12 +24,12 @@ object ShowPasswordStrengthUseCase: InputUseCase<ShowPasswordStrengthUseCase.Inp
 
     override suspend fun doExecute(input: Input, activity: BaseActivity): Boolean {
         val combinations = guessPasswordCombinations(input.password)
-        showPasswordStrength(combinations, input.titleId, activity)
+        showPasswordStrength(input.password.length, combinations, input.titleId, activity)
 
         return true
     }
 
-    fun showPasswordStrength(combinations: Double, titleId: Int, activity: BaseActivity) {
+    fun showPasswordStrength(length: Int, combinations: Double, titleId: Int, activity: BaseActivity) {
         val entropy = passwordGenerator.calcEntropy(combinations)
         val bruteForceWithPentium = passwordGenerator.calcBruteForceWaitingSeconds(
             combinations, GeneratorBase.BRUTEFORCE_ATTEMPTS_PENTIUM
@@ -41,23 +41,32 @@ object ShowPasswordStrengthUseCase: InputUseCase<ShowPasswordStrengthUseCase.Inp
         var strengthLevel =
         if (entropy >= 128) emoji(0x1f606)              // 😆 too strong
             else if (entropy >= 80) emoji(0x1f603)      // 😃 strong
-            else if (entropy >= 65) emoji(0x1f642)      // 🙂 ok
-            else if (entropy >= 50) emoji(0x1f610)      // 😐 weak
+            else if (entropy >= 70) emoji(0x1f642)      // 🙂 ok
+            else if (entropy >= 60) emoji(0x1f610)      // 😐 weak
             else if (entropy >= 28) emoji(0x1f641)      // 🙁 poor
             else emoji(0x1f625)                         // 😥 very poor
 
+        val markerIconLength = "%iconLength%"
         val markerIconCombinations = "%iconCombination%"
         val markerIconEntropy = "%iconEntropy%"
         val markerIconPentium = "%iconPentium%"
         val markerIconSuperComp = "%iconSuperComp%"
 
         val intent = ""
-        val sb = StringBuilder(
-            markerIconCombinations + " " + activity.getString(R.string.combinations) + ": " +
+        val sb = StringBuilder()
+
+        sb.append(
+            markerIconLength + " " + activity.getString(R.string.length) + ": " + length +
                 System.lineSeparator() +
-                System.lineSeparator() +
-                intent + combinations.toReadableFormat() +
                 System.lineSeparator()
+        )
+
+        sb.append(
+            markerIconCombinations + " " + activity.getString(R.string.combinations) + ": " +
+                    System.lineSeparator() +
+                    System.lineSeparator() +
+                    intent + combinations.toReadableFormat() +
+                    System.lineSeparator()
         )
 
         if (combinations >= 1_000_000) {
@@ -69,10 +78,7 @@ object ShowPasswordStrengthUseCase: InputUseCase<ShowPasswordStrengthUseCase.Inp
 
         sb.append(
             System.lineSeparator() +
-                    markerIconEntropy + " " + activity.getString(R.string.entropy) + ": " +
-                    System.lineSeparator() +
-                    System.lineSeparator() +
-                    intent + entropy.toInt() + " " + strengthLevel +
+                    markerIconEntropy + " " + activity.getString(R.string.entropy) + ": " + entropy.toInt() + " " + strengthLevel +
                     System.lineSeparator() +
                     System.lineSeparator() +
                     markerIconPentium + " " +
@@ -117,6 +123,7 @@ object ShowPasswordStrengthUseCase: InputUseCase<ShowPasswordStrengthUseCase.Inp
         val text = sb.toString()
         val span = SpannableString(text)
 
+        replaceIconMarker(activity, text, markerIconLength, R.drawable.password_24, span)
         replaceIconMarker(activity, text, markerIconCombinations, R.drawable.ic_baseline_casino_20, span)
         replaceIconMarker(activity, text, markerIconEntropy, R.drawable.ic_baseline_fitness_center_20, span)
         replaceIconMarker(activity, text, markerIconPentium, R.drawable.ic_baseline_computer_20, span)
