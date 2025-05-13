@@ -42,11 +42,13 @@ import de.jepfa.yapm.usecase.credential.ExportCredentialUseCase
 import de.jepfa.yapm.util.*
 import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import java.util.*
+import kotlin.collections.HashSet
 
 
 data class Group(
     val name: String,
-    var expanded: Boolean = true,
+    var expanded: Boolean = true, // only needed for areContentsTheSame
+    var selected: Boolean = false, // only needed for areContentsTheSame
     val labelColorRGB: Int? = null,
     var labelIconResId: Int? = null,
     var labelOutlined: Boolean? = false,
@@ -73,13 +75,17 @@ data class CredentialOrGroup(val encCredential: EncCredential?, val group: Group
     enum class Type {Credential, GroupWithTitle, GroupWithLabel }
 
     fun getType(): Type {
-        return if (encCredential != null)
+        return if (!isGroupHeader())
             Type.Credential
         else if (group?.labelColorRGB != null)
             Type.GroupWithLabel
         else
             Type.GroupWithTitle
     }
+
+    fun isGroupHeader() = encCredential == null
+
+
 }
 
 class ListCredentialAdapter(
@@ -89,15 +95,17 @@ class ListCredentialAdapter(
         ListAdapter<CredentialOrGroup, ListCredentialAdapter.CredentialViewHolder>(CredentialsComparator()),
         Filterable {
 
+    private var nonGroupedList: MutableSet<CredentialOrGroup> = HashSet()
     private var currSearchString: CharSequence = ""
     private var originList: List<EncCredential> = emptyList()
     private var selectionMode = false
-    private var selected = HashSet<EncCredential>()
+    private var selected = HashSet<CredentialOrGroup>()
+    private val selectedGroups = HashMap<Group, Boolean>()
     private val expandedGroups = HashMap<Group, Boolean>()
     private var currGroupPos: Int? = null
     private var markedCredentialId: Int? = null
 
-    fun getSelectedCredentials() = HashSet(selected)
+    fun getSelectedCredentials() = HashSet(selected.filterNot { it.isGroupHeader() }.map { it.encCredential!! })
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CredentialViewHolder {
@@ -106,6 +114,44 @@ class ListCredentialAdapter(
         if (Session.isDenied()) {
             return holder
         }
+
+        holder.listenForToggleSelection { pos, _ ->
+            val current = getItem(pos)
+            val credential = current.encCredential
+            val group = current.group
+
+            if (credential != null) {
+                if (!selected.contains(current)) {
+                    selected.add(current)
+                } else {
+                    selected.remove(current)
+                }
+                if (group != null) {
+                    val selectedGroup = isAllSelectedOfGroup(group)
+                    selectedGroups[group] = selectedGroup
+                    group.selected = selectedGroup
+                }
+
+            }
+            else if (group != null) { // isGroup
+
+                val selectedGroup = selectedGroups.getOrDefault(group, false)
+
+                if (selectedGroup) {
+                    val groupItems = nonGroupedList.filter { !it.isGroupHeader() && it.group == group }.toSet()
+                    selected.removeAll(groupItems)
+                }
+                else {
+                    val groupItems = nonGroupedList.filter { !it.isGroupHeader() && it.group == group }.toSet()
+                    selected.addAll(groupItems)
+                }
+                selectedGroups[group] = !selectedGroup
+                group.selected = !selectedGroup
+            }
+            notifyDataSetChanged()
+            multipleSelectionCallback(getSelectedCredentials())
+        }
+
 
 
         if (viewType != CredentialOrGroup.Type.Credential.ordinal) {
@@ -167,23 +213,6 @@ class ListCredentialAdapter(
                 }
             }
 
-            holder.listenForToggleSelection { pos, _ ->
-                val current = getItem(pos)
-                val credential = current.encCredential ?: return@listenForToggleSelection
-
-                if (!selected.contains(credential)) {
-                    selected.add(credential)
-                } else {
-                    selected.remove(credential)
-                }
-                currentList.forEachIndexed { index, credentialOrGroup ->
-                    if (credentialOrGroup.encCredential == credential) {
-                        notifyItemChanged(index)
-                    }
-                }
-                multipleSelectionCallback(selected)
-            }
-
             holder.listenForLongClick { pos, _ ->
 
 
@@ -194,17 +223,17 @@ class ListCredentialAdapter(
 
 
                     val current = getItem(pos)
-                    val credential = current.encCredential ?: return@listenForLongClick false
-
-                    selected.add(credential)
-
-                    currentList.forEachIndexed { index, credentialOrGroup ->
-                        if (credentialOrGroup.encCredential == credential) {
-                            notifyItemChanged(index)
-                        }
+                    selected.add(current)
+                    
+                    val group = current.group
+                    if (group != null) {
+                        val selectedGroup = isAllSelectedOfGroup(group)
+                        selectedGroups[group] = selectedGroup
+                        group.selected = selectedGroup
                     }
 
-                    multipleSelectionCallback(selected)
+                    notifyDataSetChanged()
+                    multipleSelectionCallback(getSelectedCredentials())
                 }
 
                 true
@@ -345,7 +374,7 @@ class ListCredentialAdapter(
 
     fun startSelectionMode() {
         selectionMode = true
-        multipleSelectionCallback(selected)
+        multipleSelectionCallback(getSelectedCredentials())
         notifyDataSetChanged()
     }
 
@@ -380,19 +409,28 @@ class ListCredentialAdapter(
         val key = listCredentialsActivity.masterSecretKey
 
         holder.credentialSelectionContainerView.visibility = View.GONE
-        current.encCredential?.let { credential ->
 
-            if (selectionMode) {
-                holder.credentialSelectionContainerView.visibility = View.VISIBLE
-                if (selected.contains(credential)) {
+        if (selectionMode) {
+            holder.credentialSelectionContainerView.visibility = View.VISIBLE
+            if (current.isGroupHeader()) {
+                val selected = selectedGroups.getOrDefault(current.group, false)
+                if (selected) {
                     holder.credentialSelectedView.setImageDrawable(AppCompatResources.getDrawable(listCredentialsActivity, R.drawable.outline_check_circle_24))
                 }
                 else {
                     holder.credentialSelectedView.setImageDrawable(AppCompatResources.getDrawable(listCredentialsActivity, R.drawable.outline_circle_24))
                 }
             }
-
+            else {
+                if (selected.contains(current)) {
+                    holder.credentialSelectedView.setImageDrawable(AppCompatResources.getDrawable(listCredentialsActivity, R.drawable.outline_check_circle_24))
+                }
+                else {
+                    holder.credentialSelectedView.setImageDrawable(AppCompatResources.getDrawable(listCredentialsActivity, R.drawable.outline_circle_24))
+                }
+            }
         }
+
 
         if (markedCredentialId != null && current.encCredential?.id == markedCredentialId) {
             val color = if (isDarkMode(listCredentialsActivity)) R.color.recently_changed_dark else R.color.recently_changed_light
@@ -424,6 +462,13 @@ class ListCredentialAdapter(
             filter.filter(currSearchString)
 
         }
+    }
+
+    private fun isAllSelectedOfGroup(group: Group): Boolean {
+        val allOfGroup = nonGroupedList.filter { !it.isGroupHeader() && it.group == group }
+        val selectedOfGroup = selected.filter { !it.isGroupHeader() && it.group == group }
+        return allOfGroup.size == selectedOfGroup.size
+
     }
 
     override fun getFilter(): Filter {
@@ -678,8 +723,10 @@ class ListCredentialAdapter(
         filteredList: List<EncCredential>,
         hideCollapsedItems: Boolean = true
     ): List<CredentialOrGroup> {
+        nonGroupedList.clear()
         val credentialGrouping = listCredentialsActivity.getPrefGrouping()
         if (credentialGrouping == CredentialGrouping.NO_GROUPING) {
+            nonGroupedList.addAll(filteredList.map { CredentialOrGroup(it, null) })
             return filteredList.map { CredentialOrGroup(it, null) }
         }
 
@@ -754,11 +801,16 @@ class ListCredentialAdapter(
         val groupedList = LinkedList<CredentialOrGroup>()
         groups.forEach { group ->
             groupedList.add(CredentialOrGroup(null, group))
+            nonGroupedList.add(CredentialOrGroup(null, group))
+
             val groupExpanded = expandedGroups.getOrDefault(group, true)
             if (!hideCollapsedItems || groupExpanded) {
                 grouped[group]?.map { CredentialOrGroup(it, group) }
-                    ?.let { groupedList.addAll(it.toList()) }
+                    ?.let { groupedList.addAll(it) }
             }
+            grouped[group]?.map { CredentialOrGroup(it, group) }
+                ?.let { nonGroupedList.addAll(it) }
+
         }
         return groupedList
     }
@@ -776,7 +828,8 @@ class ListCredentialAdapter(
     fun stopSelectionMode(withRefresh: Boolean = true) {
         selectionMode = false
         selected.clear()
-        multipleSelectionCallback(selected)
+        selectedGroups.clear()
+        multipleSelectionCallback(getSelectedCredentials())
         if (withRefresh) {
             notifyDataSetChanged()
         }
@@ -1004,6 +1057,7 @@ class ListCredentialAdapter(
 
         override fun areContentsTheSame(oldItem: CredentialOrGroup, newItem: CredentialOrGroup): Boolean {
             return oldItem.group?.expanded == newItem.group?.expanded
+                    && oldItem.group?.selected == newItem.group?.selected
                     && oldItem.encCredential == newItem.encCredential
         }
     }
