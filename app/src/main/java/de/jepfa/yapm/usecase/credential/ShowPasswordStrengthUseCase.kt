@@ -134,6 +134,13 @@ object ShowPasswordStrengthUseCase: InputUseCase<ShowPasswordStrengthUseCase.Inp
             .setIcon(R.drawable.ic_baseline_fitness_center_24)
             .setMessage(span)
             .setNegativeButton(R.string.close, null)
+            .setNeutralButton(R.string.more_info) { _, _ ->
+                AlertDialog.Builder(activity)
+                    .setTitle(titleId)
+                    .setIcon(R.drawable.ic_baseline_info_24)
+                    .setMessage(R.string.password_strength_info)
+                    .show()
+            }
             .show()
     }
 

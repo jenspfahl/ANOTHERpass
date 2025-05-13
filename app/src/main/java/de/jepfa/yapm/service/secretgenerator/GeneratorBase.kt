@@ -24,7 +24,7 @@ abstract class GeneratorBase<T : GeneratorSpec>(
         const val EXTENDED_SPECIAL_CHARS = "()[]{}<>\"'=%\\~|"
 
         const val BRUTEFORCE_ATTEMPTS_PENTIUM = 100_000L // per second
-        const val BRUTEFORCE_ATTEMPTS_SUPERCOMP = 1_000_000_000_000L // 1  billion per second
+        const val BRUTEFORCE_ATTEMPTS_SUPERCOMP = 100_000_000_000L // 100 billion per second
     }
 
     abstract fun generate(spec: T): Password

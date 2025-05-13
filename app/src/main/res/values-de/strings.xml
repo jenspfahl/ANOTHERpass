@@ -1054,4 +1054,7 @@
     <string name="open_security_settings">Sicherheitseinstellunen öffnen</string>
     <string name="exit_app">App beenden</string>
 
+    <string name="more_info">Mehr Informationen</string>
+    <string name="password_strength_info">Wenn das Passwort als \'Pseudophrase\' generiert wurde, sind die Kombinationen für Brute-Force-Angriffe anders. Da jedoch bei einem gespeicherten Passwort keine Informationen über dessen Generierung vorliegen, werden die Kombinationen wie bei einem normalen Passwort berechnet.</string>
+
 </resources>
