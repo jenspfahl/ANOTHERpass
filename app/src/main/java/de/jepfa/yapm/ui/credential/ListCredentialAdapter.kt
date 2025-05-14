@@ -99,13 +99,13 @@ class ListCredentialAdapter(
     private var currSearchString: CharSequence = ""
     private var originList: List<EncCredential> = emptyList()
     private var selectionMode = false
-    private var selected = HashSet<CredentialOrGroup>()
+    private var selected = HashSet<EncCredential>()
     private val selectedGroups = HashMap<Group, Boolean>()
     private val expandedGroups = HashMap<Group, Boolean>()
     private var currGroupPos: Int? = null
     private var markedCredentialId: Int? = null
 
-    fun getSelectedCredentials() = HashSet(selected.filterNot { it.isGroupHeader() }.map { it.encCredential!! })
+    fun getSelectedCredentials() = HashSet(selected)
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CredentialViewHolder {
@@ -121,32 +121,30 @@ class ListCredentialAdapter(
             val group = current.group
 
             if (credential != null) {
-                if (!selected.contains(current)) {
-                    selected.add(current)
+                if (!selected.contains(credential)) {
+                    selected.add(credential)
                 } else {
-                    selected.remove(current)
+                    selected.remove(credential)
                 }
-                if (group != null) {
-                    val selectedGroup = isAllSelectedOfGroup(group)
-                    selectedGroups[group] = selectedGroup
-                    group.selected = selectedGroup
-                }
+
+                updateSelectedGroups()
 
             }
             else if (group != null) { // isGroup
 
                 val selectedGroup = selectedGroups.getOrDefault(group, false)
-
+                val groupItems = nonGroupedList
+                    .filter { !it.isGroupHeader() && it.group == group }
+                    .mapNotNull { it.encCredential }
+                    .toSet()
                 if (selectedGroup) {
-                    val groupItems = nonGroupedList.filter { !it.isGroupHeader() && it.group == group }.toSet()
                     selected.removeAll(groupItems)
                 }
                 else {
-                    val groupItems = nonGroupedList.filter { !it.isGroupHeader() && it.group == group }.toSet()
                     selected.addAll(groupItems)
                 }
-                selectedGroups[group] = !selectedGroup
-                group.selected = !selectedGroup
+
+                updateSelectedGroups()
             }
             notifyDataSetChanged()
             multipleSelectionCallback(getSelectedCredentials())
@@ -223,14 +221,12 @@ class ListCredentialAdapter(
 
 
                     val current = getItem(pos)
-                    selected.add(current)
-                    
-                    val group = current.group
-                    if (group != null) {
-                        val selectedGroup = isAllSelectedOfGroup(group)
-                        selectedGroups[group] = selectedGroup
-                        group.selected = selectedGroup
+                    val credential = current.encCredential
+                    if (credential != null) {
+                        selected.add(credential)
                     }
+
+                    updateSelectedGroups()
 
                     notifyDataSetChanged()
                     multipleSelectionCallback(getSelectedCredentials())
@@ -372,6 +368,17 @@ class ListCredentialAdapter(
         return holder
     }
 
+    private fun updateSelectedGroups() {
+        nonGroupedList
+            .filter { it.isGroupHeader() }
+            .mapNotNull { it.group }
+            .forEach { group ->
+                val selectedGroup = isAllSelectedOfGroup(group)
+                selectedGroups[group] = selectedGroup
+                group.selected = selectedGroup
+            }
+    }
+
     fun startSelectionMode() {
         selectionMode = true
         multipleSelectionCallback(getSelectedCredentials())
@@ -406,6 +413,7 @@ class ListCredentialAdapter(
 
     override fun onBindViewHolder(holder: CredentialViewHolder, position: Int) {
         val current = getItem(position)
+        val credential = current.encCredential
         val key = listCredentialsActivity.masterSecretKey
 
         holder.credentialSelectionContainerView.visibility = View.GONE
@@ -421,8 +429,8 @@ class ListCredentialAdapter(
                     holder.credentialSelectedView.setImageDrawable(AppCompatResources.getDrawable(listCredentialsActivity, R.drawable.outline_circle_24))
                 }
             }
-            else {
-                if (selected.contains(current)) {
+            else if (credential != null) {
+                if (selected.contains(credential)) {
                     holder.credentialSelectedView.setImageDrawable(AppCompatResources.getDrawable(listCredentialsActivity, R.drawable.outline_check_circle_24))
                 }
                 else {
@@ -466,7 +474,7 @@ class ListCredentialAdapter(
 
     private fun isAllSelectedOfGroup(group: Group): Boolean {
         val allOfGroup = nonGroupedList.filter { !it.isGroupHeader() && it.group == group }
-        val selectedOfGroup = selected.filter { !it.isGroupHeader() && it.group == group }
+        val selectedOfGroup = nonGroupedList.filter { !it.isGroupHeader() && it.group == group && selected.contains(it.encCredential) }
         return allOfGroup.size == selectedOfGroup.size
 
     }
