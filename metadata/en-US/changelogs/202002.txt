@@ -1,0 +1,5 @@
+* Adapt password strength metrics to the last Hyve Systems password report
+* Add additional option to generate even more strong passwords
+* Add group selection for credentials
+* Prepare credential server to send OTP configurations to extensions
+* Smaller improvements and fixes
