@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -70,63 +71,83 @@ class LoginActivity : NfcBaseActivity() {
 
         super.onCreate(null)
 
-        if (!isFromAutofill && !isFromNotification && Session.isLoggedOut()) {
-            val introShowed = PreferenceService.getAsBool(STATE_INTRO_SHOWED, this)
-            if (!introShowed) {
-                val intent = Intent(this, IntroActivity::class.java)
-                startActivity(intent)
-                // don't show WhatsNew when Intro was just showed automatically
-                PreferenceService.putInt(STATE_WHATS_NEW_SHOWED_FOR_VERSION,
-                    DebugInfo.getVersionCodeForWhatsNew(this), this)
-
-            }
-            else {
-                val whatsNewShowedForVersion = PreferenceService.getAsInt(STATE_WHATS_NEW_SHOWED_FOR_VERSION, this)
-                val currentVersion = DebugInfo.getVersionCodeForWhatsNew(this)
-                if (currentVersion > whatsNewShowedForVersion) {
-                    val intent = Intent(this, WhatsNewActivity::class.java)
+        if (!DebugInfo.isDebug && !SecretService.isDeviceSecure(this)) {
+            AlertDialog.Builder(this)
+                .setTitle(android.R.string.dialog_alert_title)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setMessage(R.string.secure_device_required)
+                .setPositiveButton(R.string.open_security_settings) { _, _ ->
+                    val intent = Intent(Settings.ACTION_SECURITY_SETTINGS)
                     startActivity(intent)
+                    finishAffinity()
                 }
-            }
-        }
-
-        if (MasterKeyService.isMasterKeyStored(this)) {
-            setContentView(R.layout.activity_login)
-            nfcAdapter = NfcService.getNfcAdapter(this)
-            readTagFromIntent(intent)
-
+                .setNegativeButton(R.string.exit_app) { _, _ ->
+                    finishAffinity()
+                }
+                .setCancelable(false)
+                .show()
         }
         else {
-            setContentView(R.layout.activity_create_or_import_vault)
-            val buttonCreateVault: Button = findViewById(R.id.button_create_vault)
-            buttonCreateVault.setOnClickListener {
 
-                if (MasterKeyService.isMasterKeyStored(this)) {
-                    toastText(this, R.string.vault_already_created)
-                    return@setOnClickListener
+            if (!isFromAutofill && !isFromNotification && Session.isLoggedOut()) {
+                val introShowed = PreferenceService.getAsBool(STATE_INTRO_SHOWED, this)
+                if (!introShowed) {
+                    val intent = Intent(this, IntroActivity::class.java)
+                    startActivity(intent)
+                    // don't show WhatsNew when Intro was just showed automatically
+                    PreferenceService.putInt(
+                        STATE_WHATS_NEW_SHOWED_FOR_VERSION,
+                        DebugInfo.getVersionCodeForWhatsNew(this), this
+                    )
+
+                } else {
+                    val whatsNewShowedForVersion =
+                        PreferenceService.getAsInt(STATE_WHATS_NEW_SHOWED_FOR_VERSION, this)
+                    val currentVersion = DebugInfo.getVersionCodeForWhatsNew(this)
+                    if (currentVersion > whatsNewShowedForVersion) {
+                        val intent = Intent(this, WhatsNewActivity::class.java)
+                        startActivity(intent)
+                    }
                 }
-
-                val intent = Intent(this@LoginActivity, CreateVaultActivity::class.java)
-                startActivityForResult(intent, importVaultActivityRequestCode)
             }
-            val buttonImportVault: Button = findViewById(R.id.button_import_vault)
-            buttonImportVault.setOnClickListener {
-                if (MasterKeyService.isMasterKeyStored(this)) {
-                    toastText(this, R.string.vault_already_created)
-                    return@setOnClickListener
+
+            if (MasterKeyService.isMasterKeyStored(this)) {
+                setContentView(R.layout.activity_login)
+                nfcAdapter = NfcService.getNfcAdapter(this)
+                readTagFromIntent(intent)
+
+            } else {
+                setContentView(R.layout.activity_create_or_import_vault)
+                val buttonCreateVault: Button = findViewById(R.id.button_create_vault)
+                buttonCreateVault.setOnClickListener {
+
+                    if (MasterKeyService.isMasterKeyStored(this)) {
+                        toastText(this, R.string.vault_already_created)
+                        return@setOnClickListener
+                    }
+
+                    val intent = Intent(this@LoginActivity, CreateVaultActivity::class.java)
+                    startActivityForResult(intent, importVaultActivityRequestCode)
                 }
+                val buttonImportVault: Button = findViewById(R.id.button_import_vault)
+                buttonImportVault.setOnClickListener {
+                    if (MasterKeyService.isMasterKeyStored(this)) {
+                        toastText(this, R.string.vault_already_created)
+                        return@setOnClickListener
+                    }
 
-                val intent = Intent(this@LoginActivity, ImportVaultActivity::class.java)
-                startActivityForResult(intent, createVaultActivityRequestCode)
+                    val intent = Intent(this@LoginActivity, ImportVaultActivity::class.java)
+                    startActivityForResult(intent, createVaultActivityRequestCode)
+                }
             }
-        }
 
-        if (DebugInfo.isBeta(this) && !DebugInfo.isBetaDisclaimerShown()) {
-            DebugInfo.setBetaDisclaimerShown()
-            AlertDialog.Builder(this)
-                .setMessage(R.string.disclaimer_beta_version)
-                .setPositiveButton(R.string.got_it, null)
-                .show()
+            if (DebugInfo.isBeta(this) && !DebugInfo.isBetaDisclaimerShown()) {
+                DebugInfo.setBetaDisclaimerShown()
+                AlertDialog.Builder(this)
+                    .setMessage(R.string.disclaimer_beta_version)
+                    .setPositiveButton(R.string.got_it, null)
+                    .show()
+            }
         }
     }
 

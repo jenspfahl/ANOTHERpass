@@ -821,7 +821,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             serverViewDetails.visibility = ViewGroup.GONE
         }
         serverView.setBackgroundColor(getColor(R.color.colorServer))
-        serverView.setPadding(0, 8, 10, 10)
     }
 
     private fun reflectServerStopped(msg: String? = null) {
@@ -833,7 +832,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             serverViewDetails.text = ""
             serverViewState.setTypeface(null, Typeface.NORMAL)
             serverViewDetails.visibility = ViewGroup.GONE
-            serverView.setPadding(0, 26, 10, 24)
         }
     }
 

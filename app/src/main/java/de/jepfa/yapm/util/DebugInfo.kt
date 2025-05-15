@@ -9,6 +9,7 @@ import de.jepfa.yapm.database.YapmDatabase
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_VERSION
 import de.jepfa.yapm.service.biometrix.BiometricUtils
+import de.jepfa.yapm.service.io.AutoBackupService
 import de.jepfa.yapm.service.net.HttpServer.SERVER_LOG_PREFIX
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.MasterPasswordService
@@ -102,11 +103,13 @@ object DebugInfo {
         if (vaultImportedAt != null) {
             sb.addFormattedLine("Vault Imported At", dateTimeToNiceString(vaultImportedAt, context))
         }
+        sb.addFormattedLine("Auto Backup Enabled", AutoBackupService.isAutoBackupConfigured(context))
         sb.addFormattedLine("MP stored", MasterPasswordService.isMasterPasswordStored(context))
         sb.addFormattedLine("MP stored with auth", MasterPasswordService.isMasterPasswordStoredWithAuth(context))
         sb.addFormattedLine("Build Timestamp", BuildConfig.BUILD_TIME.toSimpleDateTimeFormat())
         sb.addFormattedLine("Build Type", BuildConfig.BUILD_TYPE)
         sb.addFormattedLine("Debug Mode", isDebug)
+        sb.addFormattedLine("Current Timestamp", Date().toSimpleDateTimeFormat())
 
         sb.append("\n************ DEVICE INFORMATION ***********\n")
         sb.addFormattedLine("Brand", Build.BRAND)
@@ -122,8 +125,7 @@ object DebugInfo {
         sb.addFormattedLine("Has hardware backed TEE", SecretService.hasHardwareTEESupport(context) ?: "-")
         sb.addFormattedLine("Has biometrics support", BiometricUtils.isBiometricsSupported(context))
         sb.addFormattedLine("Has biometrics enrolled", BiometricUtils.hasBiometricsEnrolled(context))
-        val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-        sb.addFormattedLine("Is device lock enabled", keyguardManager.isDeviceSecure)
+        sb.addFormattedLine("Is device lock enabled", SecretService.isDeviceSecure(context))
 
 
         sb.append("\n************ PERMISSIONS ************\n")

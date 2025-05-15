@@ -517,14 +517,18 @@ object SecretService {
         return SecretKeyHolder(sk, DEFAULT_CIPHER_ALGORITHM, androidKey, context)
     }
 
+    fun isDeviceSecure(context: Context): Boolean {
+        val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+        return keyguardManager.isDeviceSecure
+    }
+
     fun isDeviceLocked(context: Context): Boolean {
         val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
         return keyguardManager.isDeviceLocked
     }
 
     private fun checkKeyRequiresUserAuthOnInsecureDevice(secretKeyHolder: SecretKeyHolder, context: Context): Boolean {
-        val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-        val deviceRequiresUserAuth = keyguardManager.isDeviceSecure
+        val deviceRequiresUserAuth = isDeviceSecure(context)
         val keyInfo = getKeyInfo(secretKeyHolder)
 
         return keyInfo?.isUserAuthenticationRequired?:false && !deviceRequiresUserAuth
@@ -567,8 +571,7 @@ object SecretService {
                 .setUserAuthenticationRequired(false)
 
             if (androidKey.requireUserAuth && BiometricUtils.isBiometricsAvailable(context)) {
-                val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-                val deviceRequiresUserAuth = keyguardManager.isDeviceSecure
+                val deviceRequiresUserAuth = isDeviceSecure(context)
                 spec
                     .setUserAuthenticationRequired(deviceRequiresUserAuth)
                     .setInvalidatedByBiometricEnrollment(true)

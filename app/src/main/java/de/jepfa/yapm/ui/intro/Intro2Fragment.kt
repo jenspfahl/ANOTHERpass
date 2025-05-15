@@ -43,7 +43,7 @@ class Intro2Fragment : Fragment() {
     private fun generateAndSetExamplePasswd(pseudoPasswdText: TextView) {
         activity?.let { activity ->
             val generatedPassword =
-                passphraseGenerator.generate(PassphraseGeneratorSpec(SecretStrength.NORMAL))
+                passphraseGenerator.generate(PassphraseGeneratorSpec(SecretStrength.ULTRA))
             var spannedString = PasswordColorizer.spannableString(generatedPassword, activity)
             pseudoPasswdText.text = spannedString
         }

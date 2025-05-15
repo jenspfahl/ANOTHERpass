@@ -31,6 +31,7 @@ open class Secret(var data: ByteArray) : Clearable, Validable {
 
     override fun clear() {
         data.fill(0, 0, data.size)
+        data = ByteArray(0)
     }
 
 }

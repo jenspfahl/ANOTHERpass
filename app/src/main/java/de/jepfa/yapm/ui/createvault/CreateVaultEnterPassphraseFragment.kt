@@ -60,6 +60,7 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
             generatedPasswdView.setOnLongClickListener {
                 if (combinations > 0) {
                     ShowPasswordStrengthUseCase.showPasswordStrength(
+                        generatedPassword.length,
                         combinations,
                         R.string.password_strength,
                         baseActivity
@@ -100,7 +101,7 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
                     .setView(input)
                     .setPositiveButton(android.R.string.ok) { dialog, which ->
                         generatedPassword = Password(input.text)
-                        var spannedString = PasswordColorizer.spannableString(generatedPassword, it.context)
+                        val spannedString = PasswordColorizer.spannableString(generatedPassword, it.context)
                         generatedPasswdView.text = spannedString
                     }
                     .setNegativeButton(android.R.string.cancel) { dialog, which ->
@@ -119,7 +120,7 @@ class CreateVaultEnterPassphraseFragment : BaseFragment() {
                    { output ->
                        generatedPassword = output.data.first
                        combinations = output.data.second
-                       var spannedString = PasswordColorizer.spannableString(generatedPassword, getBaseActivity())
+                       val spannedString = PasswordColorizer.spannableString(generatedPassword, getBaseActivity())
                        generatedPasswdView.text = spannedString
                    }
            }
