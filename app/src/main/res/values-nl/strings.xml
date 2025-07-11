@@ -1026,5 +1026,7 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="more_info">More info</string>
   <string name="password_strength_info">If the password was generated as a \'Pseudo Phrase\', the combinations for brute-force attacks are different. However, since there is no information about the generation of a stored password, the combinations are calculated as for an ordinary password.</string>
 
+  <string name="show_number_keyboard_for_login">Use numeric keyboard for PIN</string>
+  <string name="show_common_keyboard_for_login">Use common keyboard for PIN</string>
 
 </resources>

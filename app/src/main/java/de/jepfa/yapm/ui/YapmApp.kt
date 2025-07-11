@@ -1,7 +1,6 @@
 package de.jepfa.yapm.ui
 
 import android.app.Application
-import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import com.yariksoffice.lingver.Lingver
 import de.jepfa.yapm.database.YapmDatabase
