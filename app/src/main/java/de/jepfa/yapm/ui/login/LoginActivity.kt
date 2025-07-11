@@ -319,6 +319,8 @@ class LoginActivity : NfcBaseActivity() {
         }
         else {
             val intent = Intent(this, ListCredentialsActivity::class.java)
+            intent.action = this.intent.action
+            intent.putExtras(this.intent)
             startActivity(intent)
         }
         finish()
