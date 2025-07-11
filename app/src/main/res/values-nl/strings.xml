@@ -634,9 +634,10 @@ Deze waarschuwing kunt u deactiveren onder \'Instellingen/Beveiliging\'.</string
   <string name="title_change_language">taal veranderen</string>
   <string name="pref_language">Taal</string>
   <string name="title_label_details">Categoriedetails</string>
-  <string name="language_en">Engels</string>
-  <string name="language_de">Duits</string>
+  <string name="language_en">Engels (English)</string>
+  <string name="language_de">Duits (Deutsch)</string>
   <string name="language_nl">Nederlands</string>
+  <string name="language_cn">Chinese (中国人)</string>
   <string name="title_missing_overlay_permission">Gebrek aan toestemming</string>
   <string name="head_export_protected_emp">Uw beschermde hoofdwachtwoord</string>
   <string name="message_protect_masterpasswd">Wilt u het geëxporteerde hoofdwachtwoord beveiligen?  Je kunt hem beveiligen met een speciaal gekozen codewoord, wat altijd nodig is als je het hoofdwachtwoord gebruikt.  Dit betekent dat als je ermee wilt inloggen, je dit codewoord (naast je pincode) ook nodig hebt, maar niet als je het hoofdwachtwoord in de app opslaat of een hoofdwachtwoordtoken gebruikt.</string>
