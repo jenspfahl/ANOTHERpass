@@ -1,0 +1,2 @@
+* Add Chinese translation
+* Fix smaller bugs and improve performance
