@@ -89,8 +89,16 @@ object NfcService {
     fun scanNfcTag(fragment: BaseFragment) {
         fragment.getBaseActivity()?.let {
             val intent = Intent(it, NfcActivity::class.java)
+
+            //forward stuff
+            fragment.activity?.intent?.let { activityIntent ->
+                intent.action = activityIntent.action
+                intent.putExtras(activityIntent)
+            }
+
             intent.putExtra(NfcActivity.EXTRA_MODE, NfcActivity.EXTRA_MODE_RO)
             intent.putExtra(NfcActivity.EXTRA_NO_SESSION_CHECK, true)
+
             fragment.startActivityForResult(intent, NfcActivity.ACTION_READ_NFC_TAG)
         }
     }
@@ -98,8 +106,14 @@ object NfcService {
     fun scanNfcTag(activity: BaseActivity) {
 
         val intent = Intent(activity, NfcActivity::class.java)
+
+        //forward stuff
+        intent.action = activity.intent.action
+        intent.putExtras(activity.intent)
+
         intent.putExtra(NfcActivity.EXTRA_MODE, NfcActivity.EXTRA_MODE_RO)
         intent.putExtra(NfcActivity.EXTRA_NO_SESSION_CHECK, true)
+
         activity.startActivityForResult(intent, NfcActivity.ACTION_READ_NFC_TAG)
     }
 

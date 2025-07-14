@@ -61,7 +61,7 @@ class YapmApp : Application() {
             val systemLocales = ArrayList<Locale>()
             for (i in 0..locales.size()) {
                 val locale = locales.get(i)
-                if (locale != null && locale.country.isNotBlank()) {
+                if (locale != null && locale.country.isNotBlank()) { // to get the locales from the device settings
                     systemLocales.add(Locale(locale.language))
                 }
             }

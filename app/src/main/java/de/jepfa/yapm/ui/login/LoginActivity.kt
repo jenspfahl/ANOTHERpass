@@ -239,8 +239,10 @@ class LoginActivity : NfcBaseActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        Log.d("LOGIN", "onNewIntent: $intent")
         // this activity is singleTask, so if already in the current task we need to recreate
-        recreate()
+        finish()
+        startActivity(intent) // forward intent to creation
     }
 
 
