@@ -698,7 +698,7 @@ Deze waarschuwing kunt u deactiveren onder \'Instellingen/Beveiliging\'.</string
   <string name="last_denied_login_attempts">Laatste mislukte inlogpogingen</string>
   <string name="recent_created_mpt">Hoofdwachtwoordtoken #%1$d gegenereerd op</string>
   <string name="last_succeeded_login">"%2$d inlogpoging(en) zijn %1$s afgewezen!!</string>
-  <string name="last_denied_login_attempt">Laatste aanmelding was %1$s</string>
+  <string name="last_successful_login">Laatste aanmelding was %1$s</string>
   <string name="date_today_at">vandaag %1$s</string>
   <string name="date_yesterday_at">gisteren %1$s</string>
   <string name="date_on_date_at">op %1$s %2$s</string>

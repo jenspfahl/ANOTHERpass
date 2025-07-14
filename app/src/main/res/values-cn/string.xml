@@ -718,7 +718,7 @@
     <string name="last_denied_login_attempts">上次拒绝登录尝试</string>
     <string name="recent_created_mpt">主密码令牌 #%1$d 创建于</string>
     <string name="last_succeeded_login">"%2$d 次登录尝试在 %1$s 被拒绝！！</string>
-    <string name="last_denied_login_attempt">上次成功登录在 %1$s</string>
+    <string name="last_successful_login">上次成功登录在 %1$s</string>
 
     <!-- 日期格式 -->
     <string name="date_today_at">今天 %1$s</string>
