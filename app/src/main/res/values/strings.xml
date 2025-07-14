@@ -465,6 +465,7 @@
     <string name="pref_login_summary_off_scan_nfctag">Master password can also be read from NFC tag</string>
     <string name="pref_login_summary_on_scan_nfc_tag">Opens the NFC tag reader immediately if master password is not stored on device and logs in afterwards</string>
     <string name="pref_hide_number_pad_for_login_title">Don\'t provide an option for numeric keyboard for PIN login</string>
+
     <string name="pref_overlay_enable">Enable password overlay dialog feature</string>
     <string name="pref_overlay_summary_enable">Password overlay dialog is shown on top of all apps to easily read and copy-type passwords</string>
     <string name="pref_overlay_transparent_overlay">Transparent password overlay</string>
@@ -672,8 +673,9 @@
 
     <string name="language_default">System default</string>
     <string name="language_en">English</string>
-    <string name="language_de">German</string>
-    <string name="language_nl">Dutch</string>
+    <string name="language_de">German (Deutsch)</string>
+    <string name="language_nl">Dutch (Nederlands)</string>
+    <string name="language_cn">Chinese (中国人)</string>
     <string name="small">Small</string>
     <string name="medium">Medium</string>
     <string name="big">Big</string>
@@ -728,7 +730,7 @@
     <string name="last_denied_login_attempts">Last denied login attempts</string>
     <string name="recent_created_mpt">Master Password Token #%1$d created at</string>
     <string name="last_succeeded_login">"%2$d login attempt(s) was/were denied %1$s!!</string>
-    <string name="last_denied_login_attempt">Last succeeded login was %1$s</string>
+    <string name="last_successful_login">Last succeeded login was %1$s</string>
 
     <string name="date_today_at">today at %1$s</string>
     <string name="date_yesterday_at">yesterday at %1$s</string>
@@ -1064,4 +1066,9 @@
 
     <string name="more_info">More info</string>
     <string name="password_strength_info">If the password was generated as a \'Pseudo Phrase\', the combinations for brute-force attacks are different. However, since there is no information about the generation of a stored password, the combinations are calculated as for an ordinary password.</string>
+
+    <string name="show_number_keyboard_for_login">Use numeric keyboard for PIN</string>
+    <string name="show_common_keyboard_for_login">Use common keyboard for PIN</string>
+
+
 </resources>

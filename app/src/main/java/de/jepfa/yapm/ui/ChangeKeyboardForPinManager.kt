@@ -9,6 +9,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import de.jepfa.yapm.R
 import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.util.toastText
 
 /**
  * List of editText is all PIN views, at least one. First view is which hold the icon
@@ -29,6 +30,12 @@ open class ChangeKeyboardForPinManager(
         else {
             changeImeiButton.setOnClickListener {
                 showNumberPad = !showNumberPad
+                if (showNumberPad) {
+                    toastText(context, context.getString(R.string.show_number_keyboard_for_login))
+                }
+                else {
+                    toastText(context, context.getString(R.string.show_common_keyboard_for_login))
+                }
                 updateShowNumberPad(changeImeiButton, showImei = true, context)
                 PreferenceService.putBoolean(
                     PreferenceService.PREF_SHOW_NUMBER_PAD_FOR_PIN,

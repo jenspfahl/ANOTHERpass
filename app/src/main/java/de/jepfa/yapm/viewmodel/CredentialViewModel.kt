@@ -97,10 +97,13 @@ class CredentialViewModel(private val repository: CredentialRepository) : ViewMo
     }
 
     fun deleteCredentialExpiry(id: Int, context: Context) {
-        Log.i(LOG_PREFIX + "EXP", "remove notification for $id")
-        credentialIdsAndExpiresAt.remove(id)
-        PreferenceService.delete(DATA_EXPIRY_DATES + SCHEDULED_NOTIFICATION_KEY_SEPARATOR + id, null)
-        NotificationService.cancelScheduledNotification(context, id)
+        val previous = credentialIdsAndExpiresAt.remove(id)
+        if (previous != null) {
+            Log.i(LOG_PREFIX + "EXP", "remove notification for $id")
+
+            PreferenceService.delete(DATA_EXPIRY_DATES + SCHEDULED_NOTIFICATION_KEY_SEPARATOR + id, null)
+            NotificationService.cancelScheduledNotification(context, id)
+        }
     }
 
 

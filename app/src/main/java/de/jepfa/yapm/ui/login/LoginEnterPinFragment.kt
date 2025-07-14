@@ -166,11 +166,11 @@ class LoginEnterPinFragment : BaseFragment() {
                 ).show()
 
             }
-            else if (showPreviousLogins == 2 && previousLoginSucceededAt != null) {
+            else if (showPreviousLogins == 2 && lastLoginSucceededAt != null) {
                 Snackbar.make(
                     view,
 
-                    getString(R.string.last_denied_login_attempt, dateTimeToNiceString(previousLoginSucceededAt, context)),
+                    getString(R.string.last_successful_login, dateTimeToNiceString(lastLoginSucceededAt, context)),
                     7_000
                 ).show()
             }

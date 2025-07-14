@@ -94,12 +94,14 @@ class Loop<T>(data: List<T>) {
         key length must at least password length
          */
         fun loopPassword(password: Password, key: Key, forwards: Boolean = true) {
-            password.data.forEachIndexed { index, byte ->
-                val loopCount = key.data[index] * (if (forwards) 1 else -1)
-                loopReplace(DIGITS_LOOP, password, index, byte.toChar(), loopCount)
-                loopReplace(VOCALS_LOOP, password, index, byte.toChar(), loopCount)
-                loopReplace(CONSONANTS_LOOP, password, index, byte.toChar(), loopCount)
-                loopReplace(SPECIAL_CHARS_LOOP, password, index, byte.toChar(), loopCount)
+            if (key.data.size >= password.data.size) {
+                password.data.forEachIndexed { index, byte ->
+                    val loopCount = key.data[index] * (if (forwards) 1 else -1)
+                    loopReplace(DIGITS_LOOP, password, index, byte.toChar(), loopCount)
+                    loopReplace(VOCALS_LOOP, password, index, byte.toChar(), loopCount)
+                    loopReplace(CONSONANTS_LOOP, password, index, byte.toChar(), loopCount)
+                    loopReplace(SPECIAL_CHARS_LOOP, password, index, byte.toChar(), loopCount)
+                }
             }
         }
 

@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.text.InputFilter
 import android.text.InputType
+import android.util.Log
 import android.view.autofill.AutofillManager
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
@@ -24,12 +25,14 @@ import de.jepfa.yapm.service.net.HttpServer
 import de.jepfa.yapm.service.net.HttpServer.DEFAULT_HTTP_SERVER_PORT
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.ui.SecureActivity
+import de.jepfa.yapm.ui.YapmApp
 import de.jepfa.yapm.ui.login.LoginActivity
 import de.jepfa.yapm.usecase.session.LogoutUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.toastText
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 private const val TITLE_TAG = "settingsActivityTitle"
@@ -147,10 +150,12 @@ class SettingsActivity : SecureActivity(),
                     val oldValue = languagePref.value
                     var newValue = value.toString()
 
-                    // get default language if chosen
+                    val context = preference.context
                     if (newValue == "default") {
-                        newValue = preference.context.resources.configuration.locales.get(0).language
+                        newValue = YapmApp.getDefaultLocale(context).language
                     }
+                    Log.d("NLS", "oldValue=$oldValue, newValue=$newValue")
+
                     if (oldValue != newValue) {
                         (activity as? SettingsActivity)?.let { activity ->
                             Lingver.getInstance().setLocale(activity, Locale(newValue))
@@ -158,7 +163,7 @@ class SettingsActivity : SecureActivity(),
                             AlertDialog.Builder(activity)
                                 .setTitle(R.string.title_change_language)
                                 .setMessage(R.string.message_change_language)
-                                .setNeutralButton(R.string.button_restart) { dialog, _ ->
+                                .setNeutralButton(R.string.button_restart) { _, _ ->
                                     LogoutUseCase.execute(activity)
                                     val intent = Intent(activity, LoginActivity::class.java)
                                     activity.startActivity(intent)

@@ -16,7 +16,7 @@ The server capability is designed to serve in local networks only, never as a pu
 * Supported HTTP methods:
     * `OPTIONS` : to tell the client about the supported HTTP methods and headers and application content
     * `POST` : to send requests to the server
-    * `GET` : to to download the vault backup file
+    * `GET` : to download the vault backup file
 
 
 ### HTTP headers

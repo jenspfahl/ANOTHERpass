@@ -634,9 +634,10 @@ Deze waarschuwing kunt u deactiveren onder \'Instellingen/Beveiliging\'.</string
   <string name="title_change_language">taal veranderen</string>
   <string name="pref_language">Taal</string>
   <string name="title_label_details">Categoriedetails</string>
-  <string name="language_en">Engels</string>
-  <string name="language_de">Duits</string>
+  <string name="language_en">Engels (English)</string>
+  <string name="language_de">Duits (Deutsch)</string>
   <string name="language_nl">Nederlands</string>
+  <string name="language_cn">Chinese (中国人)</string>
   <string name="title_missing_overlay_permission">Gebrek aan toestemming</string>
   <string name="head_export_protected_emp">Uw beschermde hoofdwachtwoord</string>
   <string name="message_protect_masterpasswd">Wilt u het geëxporteerde hoofdwachtwoord beveiligen?  Je kunt hem beveiligen met een speciaal gekozen codewoord, wat altijd nodig is als je het hoofdwachtwoord gebruikt.  Dit betekent dat als je ermee wilt inloggen, je dit codewoord (naast je pincode) ook nodig hebt, maar niet als je het hoofdwachtwoord in de app opslaat of een hoofdwachtwoordtoken gebruikt.</string>
@@ -697,7 +698,7 @@ Deze waarschuwing kunt u deactiveren onder \'Instellingen/Beveiliging\'.</string
   <string name="last_denied_login_attempts">Laatste mislukte inlogpogingen</string>
   <string name="recent_created_mpt">Hoofdwachtwoordtoken #%1$d gegenereerd op</string>
   <string name="last_succeeded_login">"%2$d inlogpoging(en) zijn %1$s afgewezen!!</string>
-  <string name="last_denied_login_attempt">Laatste aanmelding was %1$s</string>
+  <string name="last_successful_login">Laatste aanmelding was %1$s</string>
   <string name="date_today_at">vandaag %1$s</string>
   <string name="date_yesterday_at">gisteren %1$s</string>
   <string name="date_on_date_at">op %1$s %2$s</string>
@@ -1026,5 +1027,7 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
   <string name="more_info">More info</string>
   <string name="password_strength_info">If the password was generated as a \'Pseudo Phrase\', the combinations for brute-force attacks are different. However, since there is no information about the generation of a stored password, the combinations are calculated as for an ordinary password.</string>
 
+  <string name="show_number_keyboard_for_login">Use numeric keyboard for PIN</string>
+  <string name="show_common_keyboard_for_login">Use common keyboard for PIN</string>
 
 </resources>

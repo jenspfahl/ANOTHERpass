@@ -239,8 +239,10 @@ class LoginActivity : NfcBaseActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        Log.d("LOGIN", "onNewIntent: $intent")
         // this activity is singleTask, so if already in the current task we need to recreate
-        recreate()
+        finish()
+        startActivity(intent) // forward intent to creation
     }
 
 
@@ -319,6 +321,8 @@ class LoginActivity : NfcBaseActivity() {
         }
         else {
             val intent = Intent(this, ListCredentialsActivity::class.java)
+            intent.action = this.intent.action
+            intent.putExtras(this.intent)
             startActivity(intent)
         }
         finish()

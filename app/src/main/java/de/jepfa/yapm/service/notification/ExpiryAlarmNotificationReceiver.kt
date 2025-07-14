@@ -37,6 +37,7 @@ class ExpiryAlarmNotificationReceiver : BroadcastReceiver() {
         val key = DATA_EXPIRY_DATES + SCHEDULED_NOTIFICATION_KEY_SEPARATOR + id.toString()
         val expiryDateForId =
             expiresAtValues.filterKeys { it == key }
+                .asSequence()
                 .map { it.key }
                 .mapNotNull { PreferenceService.getAsString(it, context) }
                 .mapNotNull { it.toLongOrNull() }
