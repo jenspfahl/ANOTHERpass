@@ -1,30 +1,33 @@
-<b>This is ANOTHER way to manage passwords!</b>
+<b>With ANOTHERpass you don't need to create and remember a long and complex master password!</b>
 
-ANOTHERpass generates easy but strong passwords for you. It uses so called <i>Pseudo Phrases</i> by default which looks like real words but are still very random and unpredictable.
+ANOTHERpass comes with a clever two factor authentication to unlock the vault. These factors are knowledge (a PIN chosen by you) and ownership (the generated master password as a physical token). Instead of remembering a long and complicated master password (or a too weak one!) you just remember the PIN and have your master password or token with you (as QR code or NFC tag). Additionally, for more convenience, you can safely store it on your device using biometrics (e.g. fingerprint).
 
-It also comes with a clever two factor authentication to unlock the vault. These factors are knowledge (a PIN) and ownership (the master password). So instead of remembering a long and complicated master password you just remember the PIN and have your master password with you (as QR code or NFC tag). Additionally you can safely store it on your device using biometrics (e.g. fingerprint).
+ANOTHERpass generates easy but strong passwords for you. It uses so called <i>Pseudo Phrases</i> by default which look like real words but are still very random and unpredictable. Password strength comes with its length (16 - 32 characters)!
 
-You can also access the vault from your laptop at home, if you use the <a href="https://anotherpass.jepfa.de/extension">ANOTHERpass Browser Extension</a>.
+You can also access your credentials in the app from your laptop at home or work, if you use the <a href="https://anotherpass.jepfa.de/extension">ANOTHERpass Browser Extension</a>.
+
+Besides other features, like a powerful credential-search, grouping, import/export from and to several formats like Keepass and CSV, the app also works as a secure authenticator (2FA).
 
 <b>Core features of the app</b>
 
-- easy two factor authentication
-- no complicated master password to memorize, it is just exported
-- easy to read generated passwords
-- strong modern encryption (AES 128/256, Blowfish, Chacha20)
+- easy two factor authentication (PIN and master password as physical token or PIN and biometric for convenient Quick Access)
+- no weak or complicated master password to memorize, you only need to export it (on QR code or NFC tag)
+- easy to read but strong password generator (<i>Pseudo Phrases</i> with flexible length)
+- strong modern encryption, all fully configurable (AES 128/256, Blowfish 128/256, Chacha20, Argon2, PBKDF)
 - uses an integrated security chip or TEE (Trusted Execution Environment) if present
 - Autofill support
 - works with the <a href="https://anotherpass.jepfa.de/extension">ANOTHERpass Browser Extension</a> to share credentials within a local network (e.g. from the app to the desktop PC)
-- biometrics (e.g. fingerprint) to use stored master password
+- fully offline, internet permission is only needed to provide Browser Extension support
+- 2FA support for one-time-passwords (HOTP and TOTP)
+- notification for expired credentials
 - no insecure clipboard function by default
-- show passwords over other apps to type it easily
-- no data is stored in the cloud, except if the user itself backups files in the cloud
-- export and import credential vault
+- option to display passwords over other apps to type them easily
+- (automatic) export and import the credential vault
 - export vault and master key separately (latter analogue if wished)
 - share and outsource credentials
-- one-time-password support (HOTP and TOTP)
-- obfuscate several passwords as additional security layer
-- optional self destruction mode after too many failed login attempts
+- obfuscate important passwords as additional security layer
+- optional self destruction after too many failed login attempts
+- supported languages: english, german, dutch, chinese
 - Dark theme support ;-)
 
 For detailed information see <a href="https://anotherpass.jepfa.de">anotherpass.jepfa.de</a>

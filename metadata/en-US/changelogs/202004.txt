@@ -1,0 +1,1 @@
+* make app build reproducible on F-Droid
