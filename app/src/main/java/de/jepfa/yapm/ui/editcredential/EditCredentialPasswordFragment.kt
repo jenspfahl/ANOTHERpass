@@ -282,11 +282,15 @@ class EditCredentialPasswordFragment : SecureFragment() {
             if (credential.isPersistent()
                 && !generatedPassword.isEqual(originPasswd)
             ) {
+                val messageId = if (credential.passwordData.isAllowedToRetainLastPassword())
+                    R.string.message_password_changed_but_can_restore
+                else
+                    R.string.message_password_changed_no_restore
                 AlertDialog.Builder(editCredentialActivity)
                     .setTitle(R.string.title_change_credential)
-                    .setMessage(R.string.message_password_changed)
+                    .setMessage(messageId)
                     .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setPositiveButton(R.string.yes_continue) { dialog, whichButton ->
+                    .setPositiveButton(R.string.yes_continue) { _, _ ->
                         updateCredential(key, credential, saveLastPassword = true)
                     }
                     .setNegativeButton(android.R.string.cancel, null)

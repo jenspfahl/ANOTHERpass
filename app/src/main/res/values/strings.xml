@@ -251,7 +251,8 @@
     <string name="title_write_nfc_tag">Write NFC tag</string>
     <string name="message_write_nfc_tag">There is data on the NFC tag. Overwrite it?</string>
     <string name="title_read_nfc_tag">Read NFC tag</string>
-    <string name="message_password_changed">The password has been changed, but you can restore it later if needed. Have you already updated the password out there?</string>
+    <string name="message_password_changed_but_can_restore">The password has been changed, but you can restore it later if needed. Have you already updated the password out there?</string>
+    <string name="message_password_changed_no_restore">The password has been changed. Have you already updated the password out there?</string>
     <string name="button_continue">Continue</string>
     <string name="close">Close</string>
     <string name="restore_last_password">Restore previous password</string>

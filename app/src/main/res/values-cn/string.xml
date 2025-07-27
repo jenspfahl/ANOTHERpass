@@ -248,7 +248,8 @@
     <string name="title_write_nfc_tag">写入 NFC 标签</string>
     <string name="message_write_nfc_tag">NFC 标签上有数据。覆盖它吗？</string>
     <string name="title_read_nfc_tag">读取 NFC 标签</string>
-    <string name="message_password_changed">密码已更改，但如果需要，您稍后可以恢复它。您是否已在外更新了密码？</string>
+    <string name="message_password_changed_but_can_restore">密码已更改，但如果需要，您稍后可以恢复它。您是否已在外更新了密码？</string>
+    <string name="message_password_changed_no_restore">密码已更改。您是否已在外更新了密码？</string>
     <string name="button_continue">继续</string>
     <string name="close">关闭</string>
     <string name="restore_last_password">恢复上一个密码</string>

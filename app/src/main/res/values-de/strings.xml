@@ -247,7 +247,8 @@
     <string name="nfc_tag_empty_detected">Leerer NFC-Tag erkannt.</string>
     <string name="title_write_nfc_tag">NFC-Tag beschreiben</string>
     <string name="title_read_nfc_tag">NFC-Tag lesen</string>
-    <string name="message_password_changed">Das Passwort wurde geändert, kann aber später wiederhergestellt werden. Wurde das Passwort \"draußen\" schon angepasst?</string>
+    <string name="message_password_changed_but_can_restore">Das Passwort wurde geändert, kann aber später wiederhergestellt werden. Wurde das Passwort \"draußen\" schon angepasst?</string>
+    <string name="message_password_changed_no_restore">Das Passwort wurde geändert. Wurde das Passwort \"draußen\" schon angepasst?</string>
     <string name="button_continue">Fortsetzen</string>
     <string name="close">Schließen</string>
     <string name="restore_last_password">Vorheriges Passwort wiederherstellen</string>

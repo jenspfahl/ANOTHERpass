@@ -241,7 +241,8 @@ Het scheiden van de gecodeerde hoofdsleutel van het kluisbestand maakt het besta
   <string name="nfc_tag_empty_detected">Lege NFC-tag gedetecteerd.</string>
   <string name="title_write_nfc_tag">Beschrijf NFC-tag</string>
   <string name="title_read_nfc_tag">Lees NFC-tag</string>
-  <string name="message_password_changed">Het wachtwoord is gewijzigd, maar kan later worden hersteld.  Is het wachtwoord ‘buiten’ al aangepast?</string>
+  <string name="message_password_changed_but_can_restore">Het wachtwoord is gewijzigd, maar kan later worden hersteld.  Is het wachtwoord ‘buiten’ al aangepast?</string>
+  <string name="message_password_changed_no_restore">Het wachtwoord is gewijzigd.  Is het wachtwoord ‘buiten’ al aangepast?</string>
   <string name="button_continue">Doorgaan</string>
   <string name="close">Sluiten</string>
   <string name="restore_last_password">Herstel laatste wachtwoord</string>
