@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat
 
 object Constants {
     val HOMEPAGE = Uri.parse("https://anotherpass.jepfa.de")
+    val ONLINE_INTRO_HELP = Uri.parse("https://anotherpass.jepfa.de/what/")
     val ONLINE_HELP = Uri.parse("https://anotherpass.jepfa.de/how/")
     val FEEDBACK = Uri.parse("https://jepfa.de/feedback/index.php/489541")
     val EXTENSION_HOMEPAGE = Uri.parse("https://anotherpass.jepfa.de/extension")

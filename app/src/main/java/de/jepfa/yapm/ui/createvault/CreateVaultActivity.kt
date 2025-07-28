@@ -26,7 +26,7 @@ class CreateVaultActivity : BaseActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         if (id == R.id.action_login_help) {
-            val browserIntent = Intent(Intent.ACTION_VIEW, Constants.ONLINE_HELP)
+            val browserIntent = Intent(Intent.ACTION_VIEW, Constants.ONLINE_INTRO_HELP)
             startActivity(browserIntent)
             return true
         }
