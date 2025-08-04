@@ -107,7 +107,6 @@ object DebugInfo {
         sb.addFormattedLine("MP stored", MasterPasswordService.isMasterPasswordStored(context))
         sb.addFormattedLine("MP stored with auth", MasterPasswordService.isMasterPasswordStoredWithAuth(context))
         sb.addFormattedLine("Build Timestamp", BuildConfig.BUILD_TIME.toSimpleDateTimeFormat())
-        sb.addFormattedLine("Build Signer", if (BuildConfig.BUILD_SIGNED_BY_FDROID) "F-Droid" else "jepfa.de")
         if (isDebug) {
             sb.addFormattedLine("Build Signature", getSignature(context))
         }
