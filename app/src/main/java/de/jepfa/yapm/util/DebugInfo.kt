@@ -108,7 +108,7 @@ object DebugInfo {
         sb.addFormattedLine("MP stored with auth", MasterPasswordService.isMasterPasswordStoredWithAuth(context))
         sb.addFormattedLine("Build Timestamp", BuildConfig.BUILD_TIME.toSimpleDateTimeFormat())
         if (isDebug) {
-            sb.addFormattedLine("Build Signature", getSignature(context))
+            sb.addFormattedLine("Build Signature", getAppSignatureHash(context))
         }
         sb.addFormattedLine("Build Type", BuildConfig.BUILD_TYPE)
         sb.addFormattedLine("Debug Mode", isDebug)
@@ -236,7 +236,7 @@ object DebugInfo {
         betaDisclaimerShown = true
     }
 
-    fun getSignature(context: Context): String? {
+    fun getAppSignatureHash(context: Context): String? {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             val signatureInfo = context.packageManager
                 .getPackageInfo(context.packageName, PackageManager.GET_SIGNING_CERTIFICATES).signingInfo ?: return null

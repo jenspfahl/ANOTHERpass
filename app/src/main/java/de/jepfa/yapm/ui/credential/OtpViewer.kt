@@ -11,6 +11,7 @@ import com.google.android.material.progressindicator.CircularProgressIndicator
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.otp.OtpConfig
 import de.jepfa.yapm.model.otp.OtpMode
+import de.jepfa.yapm.model.secret.Password
 import de.jepfa.yapm.service.otp.OtpService
 import de.jepfa.yapm.ui.ProgressCircleAnimation
 import de.jepfa.yapm.ui.SecureActivity
@@ -107,7 +108,10 @@ class OtpViewer(
             }
             otpView.visibility = View.VISIBLE
             val newTotpValue = totp.toString()
-            otpValueTextView.text = formatOtp(newTotpValue, masked = masked)
+            otpValueTextView.text = totp.toFormattedPassword(
+                formattingStyle = Password.FormattingStyle.IN_WORDS_MULTI_LINE,
+                maskPassword = masked,
+                maskLength = 6)
             val hasChanged = newTotpValue != currentOtpValue
             currentOtpValue = newTotpValue
 
@@ -139,6 +143,7 @@ class OtpViewer(
 
         picker.minValue = 1
         picker.maxValue = 99_999_999
+        picker.wrapSelectorWheel = false
         picker.value = otpConfig?.counter ?: 0
         builder
             .setPositiveButton(android.R.string.ok, { dialog, _ ->
@@ -173,31 +178,6 @@ class OtpViewer(
         anim.duration = periodInMillis.toLong() - elapsedMillisOfPeriod
 
         totpProgressCircle.startAnimation(anim)
-    }
-
-
-    private fun formatOtp(otpString: String, masked: Boolean = false, formatted: Boolean = true): String {
-        if (masked) {
-            return "*".repeat(otpString.length)
-        }
-        if (!formatted) {
-            return otpString
-        }
-        if (otpString.length == 6) {
-            return otpString.substring(0, 3) + " " + otpString.substring(3)
-        }
-        else if (otpString.length == 7) {
-            return otpString.substring(0, 2) + " " + otpString.substring(2, 5) + " " + otpString.substring(5)
-        }
-        else if (otpString.length == 8) {
-            return otpString.substring(0, 4) + " " + otpString.substring(4)
-        }
-        else if (otpString.length == 9) {
-            return otpString.substring(0, 3) + " " + otpString.substring(3, 6) + " " + otpString.substring(6)
-        }
-        else {
-            return otpString
-        }
     }
 
     fun refreshVisibility() {

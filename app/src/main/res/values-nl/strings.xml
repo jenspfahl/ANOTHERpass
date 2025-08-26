@@ -65,7 +65,7 @@
   <string name="button_next">Verder</string>
   <string name="create_vault_enter_passphrase_fragment_label" tools:ignore="TypographyFractions">Maak kluis 1/3</string>
   <string name="create_vault_explanation_2">Kies een pincode of een gemakkelijk te onthouden wachtwoord om de kluis te ontgrendelen telkens wanneer u deze gebruikt.  Het kan letters, cijfers en speciale tekens bevatten.  In vergelijking met het hoofdwachtwoord kan het veel korter zijn (minimaal 6 tekens) en is het daarom gemakkelijk te onthouden.  Maar u kunt ook een complex wachtwoord kiezen om de kluis nog beter te beveiligen.  Onthoud het goed en zorg ervoor dat niemand erachter kan komen!</string>
-  <string name="pin">voer de pincode in</string>
+  <string name="enter_a_pin">voer de pincode in</string>
   <string name="repeat_pin">Herhaal pincode</string>
   <string name="create_vault_enter_pin_fragment_label">Maak kluis 2/3</string>
   <string name="pin_required">Er is een pincode vereist</string>
@@ -268,6 +268,7 @@ Het scheiden van de gecodeerde hoofdsleutel van het kluisbestand maakt het besta
 
   <string name="tab_pseudo_phrase">Pseudofrase</string>
   <string name="tab_ordinary">Normaal wachtwoord</string>
+  <string name="tab_pin">PIN</string>
   <string name="drop_to_close">SLUIT APP</string>
   <string name="drop_to_go_back">TERUG NAAR DE APP</string>
   <string name="vault_export_info">Kluis (Id = %4$s), exporteert %1$s, bevat %2$s inloggegevens en %3$s categorieën</string>
@@ -1030,5 +1031,6 @@ De gefotografeerde afbeelding wordt gehasht en gebruikt als extra entropie om de
 
   <string name="show_number_keyboard_for_login">Use numeric keyboard for PIN</string>
   <string name="show_common_keyboard_for_login">Use common keyboard for PIN</string>
+    <string name="specify_the_length_of_the_pin">Specify the length of the PIN</string>
 
 </resources>

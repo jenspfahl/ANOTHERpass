@@ -73,7 +73,7 @@
     <string name="button_next">Weiter</string>
     <string name="create_vault_enter_passphrase_fragment_label" tools:ignore="TypographyFractions">Tresor erstellen 1/3</string>
     <string name="create_vault_explanation_2">Wähle eine PIN oder ein einprägsames Passwort um den Tresor bei jeder Benutzung zu entsperren. Es darf Buchstaben, Zahlen und Sonderzeichen enthalten. Im Vergleich zum Masterpasswort kann es viel kürzer sein (minimal 6 Zeichen) und ist deshalb einfach zu merken. Du kannst aber auch ein komplexes Passwort wählen, um den Tresor noch besser zu schützen. Merke es dir gut und achte darauf, dass niemand es erfahren kann!</string>
-    <string name="pin">PIN eingeben</string>
+    <string name="enter_a_pin">PIN eingeben</string>
     <string name="repeat_pin">PIN wiederholen</string>
     <string name="create_vault_enter_pin_fragment_label">Tresor erstellen 2/3</string>
     <string name="pin_required">Eine PIN wird benötigt</string>
@@ -274,6 +274,7 @@
 
     <string name="tab_pseudo_phrase">Pseudophrase</string>
     <string name="tab_ordinary">Normales Passwort</string>
+    <string name="tab_pin">PIN</string>
     <string name="drop_to_close">APP SCHLIESSEN</string>
     <string name="drop_to_go_back">ZURÜCK ZUR APP</string>
 
@@ -1061,5 +1062,6 @@
 
     <string name="show_number_keyboard_for_login">Verwende nummerische Tastatur für PIN-Eingabe</string>
     <string name="show_common_keyboard_for_login">Verwende normale Tastatur für PIN-Eingabe</string>
+    <string name="specify_the_length_of_the_pin">Ändere die Länge der PIN</string>
 
 </resources>

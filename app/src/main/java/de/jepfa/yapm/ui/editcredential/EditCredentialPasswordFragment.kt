@@ -15,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SwitchCompat
 import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
 import de.jepfa.yapm.model.encrypted.EncCredential.Companion.EXTRA_CREDENTIAL_OTP_DATA
@@ -35,6 +36,8 @@ import de.jepfa.yapm.service.secretgenerator.passphrase.PassphraseGenerator
 import de.jepfa.yapm.service.secretgenerator.passphrase.PassphraseGeneratorSpec
 import de.jepfa.yapm.service.secretgenerator.password.PasswordGenerator
 import de.jepfa.yapm.service.secretgenerator.password.PasswordGeneratorSpec
+import de.jepfa.yapm.service.secretgenerator.pin.PinGenerator
+import de.jepfa.yapm.service.secretgenerator.pin.PinGeneratorSpec
 import de.jepfa.yapm.ui.SecureFragment
 import de.jepfa.yapm.ui.credential.ConfigOtpActivity
 import de.jepfa.yapm.ui.credential.DeobfuscationDialog
@@ -45,7 +48,10 @@ import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.getEncryptedExtra
 import de.jepfa.yapm.util.toastText
+import kotlin.math.max
 
+
+private const val DEFAULT_PIN_LENGTH = 6
 
 class EditCredentialPasswordFragment : SecureFragment() {
 
@@ -71,6 +77,9 @@ class EditCredentialPasswordFragment : SecureFragment() {
     private lateinit var currentCredential: EncCredential
     private lateinit var editCredentialActivity: EditCredentialActivity
     private lateinit var generatedPasswdView: TextView
+    private lateinit var passParams: LinearLayout
+    private lateinit var pinParams: LinearLayout
+    private lateinit var pinNumberPicker: NumberPicker
     private lateinit var passwdTypeTab: TabLayout
     private lateinit var switchUpperCaseChar: SwitchCompat
     private lateinit var switchAddDigit: SwitchCompat
@@ -83,6 +92,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
     private lateinit var passphraseGenerator: PassphraseGenerator
     private lateinit var passwordGenerator: PasswordGenerator
+    private lateinit var pinGenerator: PinGenerator
 
     private var passwordPresentation = Password.FormattingStyle.DEFAULT
     private var multiLine = false
@@ -102,6 +112,7 @@ class EditCredentialPasswordFragment : SecureFragment() {
         super.onAttach(context)
         passphraseGenerator = PassphraseGenerator(context = context)
         passwordGenerator = PasswordGenerator(context = context)
+        pinGenerator = PinGenerator(context = context)
     }
 
     override fun onCreateView(
@@ -135,6 +146,41 @@ class EditCredentialPasswordFragment : SecureFragment() {
         generatedPasswdView = view.findViewById(R.id.generated_passwd)
         radioStrength = view.findViewById(R.id.radio_strengths)
         passwdTypeTab = view.findViewById(R.id.tab_passwd_type)
+        passParams = view.findViewById(R.id.pass_params)
+        pinParams = view.findViewById(R.id.pin_params)
+        pinNumberPicker = view.findViewById(R.id.pin_number_picker)
+        pinNumberPicker.minValue = 1
+        pinNumberPicker.value = getPinLength()
+        pinNumberPicker.maxValue = 50
+        pinNumberPicker.wrapSelectorWheel = false
+        pinNumberPicker.setOnValueChangedListener { _, _, newVal ->
+            PreferenceService.putInt(PreferenceService.PREF_GENERATED_PIN_LENGTH, newVal, activity)
+        }
+
+        passwdTypeTab.addOnTabSelectedListener(object: OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                if (tab?.position == 2) {
+                    passParams.visibility = View.GONE
+                    pinParams.visibility = View.VISIBLE
+                    pinNumberPicker.value = getPinLength()
+                }
+                else {
+                    passParams.visibility = View.VISIBLE
+                    pinParams.visibility = View.GONE
+                }
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+            }
+        })
+
+
+        tweakTabWeight(0, 0.2f)
+        tweakTabWeight(1, 0.2f)
+        tweakTabWeight(2, 0.1f)
 
         val tab = getPreferedTab()
         if (tab != null) passwdTypeTab.selectTab(tab)
@@ -184,6 +230,10 @@ class EditCredentialPasswordFragment : SecureFragment() {
 
             val filters = arrayOf<InputFilter>(LengthFilter(Constants.MAX_CREDENTIAL_PASSWD_LENGTH))
             input.setFilters(filters)
+
+            //input.selectAll()
+            //input.showSoftInputOnFocus = true
+           // input.requestFocus()
 
             AlertDialog.Builder(editCredentialActivity)
                 .setTitle(R.string.edit_password)
@@ -250,6 +300,23 @@ class EditCredentialPasswordFragment : SecureFragment() {
         }
     }
 
+    private fun getPinLength(): Int {
+        val length = PreferenceService.getAsInt(PreferenceService.PREF_GENERATED_PIN_LENGTH, activity)
+        return if (length > 0) {
+            length
+        } else {
+            DEFAULT_PIN_LENGTH
+        }
+    }
+
+    private fun tweakTabWeight(tabIndex: Int, weight: Float) {
+        val layout =
+            ((passwdTypeTab.getChildAt(0) as LinearLayout).getChildAt(tabIndex) as LinearLayout)
+        val layoutParams = layout.layoutParams as LinearLayout.LayoutParams
+        layoutParams.weight = weight
+        layout.layoutParams = layoutParams
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putBoolean("obfuscatePasswordRequired", obfuscatePasswordRequired)
@@ -313,8 +380,12 @@ class EditCredentialPasswordFragment : SecureFragment() {
     private fun calcPasswordStrength() {
         passwordCombinations = if (isPassphraseSelected()) {
             passphraseGenerator.calcCombinationCount(buildPassphraseGeneratorSpec())
-        } else {
+        } else if (isPasswordSelected()){
             passwordGenerator.calcCombinationCount(buildPasswordGeneratorSpec())
+        } else if (isPinSelected()) {
+            pinGenerator.calcCombinationCount(buildPinGeneratorSpec())
+        } else {
+            null
         }
         passwordCombinationsGuessed = false
     }
@@ -394,15 +465,30 @@ class EditCredentialPasswordFragment : SecureFragment() {
             val spec = buildPassphraseGeneratorSpec()
             return passphraseGenerator.generate(spec)
         }
-        else {
+        else if (isPasswordSelected()) {
             val spec = buildPasswordGeneratorSpec()
             return passwordGenerator.generate(spec)
+        }
+        else if (isPinSelected()) {
+            val spec = buildPinGeneratorSpec()
+            return pinGenerator.generate(spec)
+        }
+        else {
+            throw IllegalStateException("Unknown generator")
         }
 
     }
 
     private fun isPassphraseSelected() : Boolean {
         return passwdTypeTab.selectedTabPosition == 0
+    }
+
+    private fun isPasswordSelected() : Boolean {
+        return passwdTypeTab.selectedTabPosition == 1
+    }
+
+    private fun isPinSelected() : Boolean {
+        return passwdTypeTab.selectedTabPosition == 2
     }
 
     private fun getPreferedTab(): TabLayout.Tab? {
@@ -447,6 +533,12 @@ class EditCredentialPasswordFragment : SecureFragment() {
             noDigits = !switchAddDigit.isChecked,
             noSpecialChars = !switchAddSpecialChar.isChecked,
             useExtendedSpecialChars = PreferenceService.getAsBool(PREF_USE_EXTENDED_SPECIAL_CHARS, null),
+        )
+    }
+
+    private fun buildPinGeneratorSpec(): PinGeneratorSpec {
+        return PinGeneratorSpec(
+            length = pinNumberPicker.value
         )
     }
 

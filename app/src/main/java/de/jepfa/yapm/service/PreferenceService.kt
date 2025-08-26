@@ -129,6 +129,7 @@ object PreferenceService {
     const val PREF_WITH_DIGITS = PREF_PREFIX + "with_digits"
     const val PREF_WITH_SPECIAL_CHARS = PREF_PREFIX + "with_special_chars"
     const val PREF_USE_EXTENDED_SPECIAL_CHARS = PREF_PREFIX + "use_extended_special_chars"
+    const val PREF_GENERATED_PIN_LENGTH = PREF_PREFIX + "generated_pin_length"
 
     const val PREF_FAST_MASTERPASSWD_LOGIN_WITH_QRC = PREF_PREFIX + "fast_mp_login_with_qrc"
     const val PREF_FAST_MASTERPASSWD_LOGIN_WITH_NFC = PREF_PREFIX + "fast_mp_login_with_nfc"

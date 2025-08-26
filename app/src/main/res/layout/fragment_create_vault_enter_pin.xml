@@ -55,7 +55,7 @@
                         android:layout_marginEnd="4dp"
                         android:layout_marginBottom="4dp"
                         android:maxLength="@integer/max_pin_length"
-                        android:hint="@string/pin"
+                        android:hint="@string/enter_a_pin"
                         tools:ignore="TextFields" />
                 </LinearLayout>
 

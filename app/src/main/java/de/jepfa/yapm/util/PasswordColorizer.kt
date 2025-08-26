@@ -51,7 +51,15 @@ object PasswordColorizer {
         val length = spannedString.length
         val stepWidth = getStepWidth(multiLine)
         if (colorizePasswd) {
-            if (raw) {
+            if (password.isNumeric()) {
+                spannedString.setSpan(
+                    ForegroundColorSpan(context.getColor(R.color.colorAltAccent)),
+                    0,
+                    spannedString.length,
+                    Spanned.SPAN_MARK_MARK
+                )
+            }
+            else if (raw) {
                 spannedString.setSpan(
                     ForegroundColorSpan(context.getColor(R.color.colorPrimaryDark)),
                     0,
