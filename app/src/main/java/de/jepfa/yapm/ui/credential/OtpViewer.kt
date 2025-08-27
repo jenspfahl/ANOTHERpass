@@ -12,6 +12,8 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.model.otp.OtpConfig
 import de.jepfa.yapm.model.otp.OtpMode
 import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.PREF_PASSWD_SHOW_FORMATTED
 import de.jepfa.yapm.service.otp.OtpService
 import de.jepfa.yapm.ui.ProgressCircleAnimation
 import de.jepfa.yapm.ui.SecureActivity
@@ -108,10 +110,11 @@ class OtpViewer(
             }
             otpView.visibility = View.VISIBLE
             val newTotpValue = totp.toString()
+            val showFormatted = PreferenceService.getAsBool(PREF_PASSWD_SHOW_FORMATTED, activity)
             otpValueTextView.text = totp.toFormattedPassword(
-                formattingStyle = Password.FormattingStyle.IN_WORDS_MULTI_LINE,
+                formattingStyle = if (showFormatted) Password.FormattingStyle.IN_WORDS_MULTI_LINE else Password.FormattingStyle.RAW,
                 maskPassword = masked,
-                maskLength = 6)
+                useShortMask = true)
             val hasChanged = newTotpValue != currentOtpValue
             currentOtpValue = newTotpValue
 

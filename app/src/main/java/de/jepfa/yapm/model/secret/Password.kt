@@ -109,21 +109,25 @@ class Password: Secret, CharSequence {
             internal fun create(
                 formattingStyle: FormattingStyle,
                 maskPassword: Boolean,
-                maskLength: Int?,
+                useShortMask: Boolean,
                 password: Password
             ): FormattedPassword {
 
-                if (password.isNumeric()) {
-                    return formatNumeric(password, maskPassword, maskLength, formattingStyle)
+                if (maskPassword && useShortMask) {
+                    return FormattedPassword(MASK_CHAR.toString().repeat(6))
+                }
+                val isNumeric = password.isNumeric()
+                if (!maskPassword && isNumeric && password.length < 10 && formattingStyle == FormattingStyle.IN_WORDS_MULTI_LINE) {
+                    return formatNumeric(password)
                 }
 
                 val decoded = password.decodeToCharArray()
 
                 val multiLine = formattingStyle.isMultiLine()
                 val raw = formattingStyle == FormattingStyle.RAW
-                val formattedPasswordLength = if (maskPassword) maskLength?:MASK_LENGTH else decoded.size
+                val formattedPasswordLength = if (maskPassword) MASK_LENGTH else decoded.size
                 val formattedPassword = FormattedPassword()
-                val wordLength = formattedPassword.wordLength
+                val wordLength = if (isNumeric && !maskPassword) 2 else formattedPassword.wordLength
 
                 for (i in 0 until formattedPasswordLength) {
                     if (!raw && i != 0 && i % wordLength == 0) {
@@ -145,72 +149,50 @@ class Password: Secret, CharSequence {
             }
 
 
-            private fun formatNumeric(pin: Password,
-                                      masked: Boolean = false,
-                                      maskLength: Int?,
-                                      formattingStyle: FormattingStyle): FormattedPassword {
-                if (masked) {
-                    return FormattedPassword(MASK_CHAR.toString().repeat(maskLength ?: MASK_LENGTH))
+            private fun formatNumeric(pin: Password): FormattedPassword {
+
+                if (pin.length == 5) {
+                    return FormattedPassword(
+                        pin.subSequence(0, 2),
+                        " ",
+                        pin.subSequence(2, 3),
+                        " ",
+                        pin.subSequence(3, 5)
+                    )
                 }
-                if (formattingStyle == FormattingStyle.RAW) {
-                    return FormattedPassword(pin)
-                }
-                if (formattingStyle == FormattingStyle.IN_WORDS) {
-                    val formatted = FormattedPassword()
-                    pin.data.forEach {
-                        formatted + it.toInt().toChar() + " "
-                    }
-                    return formatted
+                else if (pin.length == 6) {
+                    return FormattedPassword(
+                        pin.subSequence(0, 3),
+                        " ",
+                        pin.subSequence(3, 6)
+                    )
+                } else if (pin.length == 7) {
+                    return FormattedPassword(
+                        pin.subSequence(0, 2),
+                        " ",
+                        pin.subSequence(2, 5),
+                        " ",
+                        pin.subSequence(5, 7)
+                    )
+                } else if (pin.length == 8) {
+                    return FormattedPassword(
+                        pin.subSequence(0, 4),
+                        " ",
+                        pin.subSequence(4, 8)
+                    )
+                } else if (pin.length == 9) {
+                    return FormattedPassword(
+                        pin.subSequence(0, 3),
+                        " ",
+                        pin.subSequence(3, 6),
+                        " ",
+                        pin.subSequence(6, 9)
+                    )
                 }
                 else {
-                    if (pin.length == 6) {
-                        return FormattedPassword(
-                            pin.subSequence(0, 3),
-                            " ",
-                            pin.subSequence(3, 6)
-                        )
-                    } else if (pin.length == 7) {
-                        return FormattedPassword(
-                            pin.subSequence(0, 2),
-                            " ",
-                            pin.subSequence(2, 5),
-                            " ",
-                            pin.subSequence(5, 7)
-                        )
-                    } else if (pin.length == 8) {
-                        return FormattedPassword(
-                            pin.subSequence(0, 4),
-                            " ",
-                            pin.subSequence(4, 8)
-                        )
-                    } else if (pin.length == 9) {
-                        return FormattedPassword(
-                            pin.subSequence(0, 3),
-                            " ",
-                            pin.subSequence(3, 6),
-                            " ",
-                            pin.subSequence(6, 9)
-                        )
-                    }
-                    else if (pin.length == 10) {
-                        return FormattedPassword(
-                            pin.subSequence(0, 5),
-                            " ",
-                            pin.subSequence(4, 10)
-                        )
-                    }
-                    else if (pin.length > 10) {
-                        val approxMiddle = pin.length / 2
-                        return FormattedPassword(
-                            pin.subSequence(0, approxMiddle + 1),
-                            " ",
-                            pin.subSequence(approxMiddle, pin.length)
-                        )
-                    }
-                    else {
-                        return FormattedPassword(pin)
-                    }
+                    return FormattedPassword(pin)
                 }
+
             }
         }
     }
@@ -256,17 +238,17 @@ class Password: Secret, CharSequence {
     }
 
     fun toFormattedPassword() =
-        toFormattedPassword(FormattingStyle.DEFAULT, maskPassword = false)
+        toFormattedPassword(FormattingStyle.DEFAULT, maskPassword = false, useShortMask = false)
 
     fun toFormattedPassword(
         formattingStyle: FormattingStyle,
         maskPassword: Boolean,
-        maskLength: Int? = null
-    ) = FormattedPassword.create(formattingStyle, maskPassword, maskLength, this)
+        useShortMask: Boolean
+    ) = FormattedPassword.create(formattingStyle, maskPassword, useShortMask, this)
 
 
     fun toRawFormattedPassword() =
-        toFormattedPassword(FormattingStyle.RAW, maskPassword = false)
+        toFormattedPassword(FormattingStyle.RAW, maskPassword = false, useShortMask = false)
     
     /**
      * Returns the encoded length of this password.
