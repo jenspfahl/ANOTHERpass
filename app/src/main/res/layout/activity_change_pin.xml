@@ -12,96 +12,108 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/change_pin_explanation"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="@string/change_pin_explanation"
-                android:layout_marginBottom="24dp"/>
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-
-                <LinearLayout
-                    android:id="@+id/view_enter_pin"
+                <TextView
+                    android:id="@+id/change_pin_explanation"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_horizontal">
+                    android:layout_height="match_parent"
+                    android:text="@string/change_pin_explanation"
+                    android:layout_marginBottom="24dp"/>
 
-                    <ImageView
-                        android:id="@+id/imageview_change_imei"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:clickable="true"
-                        android:layout_gravity="center_horizontal"
-                        android:src="@drawable/baseline_123_24"
-                        android:layout_marginBottom="48dp"
-                        android:focusable="true" />
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+
+                    <LinearLayout
+                        android:id="@+id/view_enter_pin"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_horizontal">
+
+                        <ImageView
+                            android:id="@+id/imageview_change_imei"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:clickable="true"
+                            android:layout_gravity="center_horizontal"
+                            android:src="@drawable/baseline_123_24"
+                            android:layout_marginBottom="48dp"
+                            android:focusable="true" />
+
+                        <EditText
+                            android:id="@+id/current_pin"
+                            android:inputType="textPassword"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="4dp"
+                            android:layout_marginRight="4dp"
+                            android:layout_marginBottom="48dp"
+                            android:maxLength="@integer/max_pin_length"
+                            android:hint="@string/current_pin"
+                            tools:ignore="TextFields" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
                     <EditText
-                        android:id="@+id/current_pin"
+                        android:id="@+id/first_new_pin"
                         android:inputType="textPassword"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="4dp"
                         android:layout_marginRight="4dp"
-                        android:layout_marginBottom="48dp"
+                        android:layout_marginBottom="4dp"
                         android:maxLength="@integer/max_pin_length"
-                        android:hint="@string/current_pin"
+                        android:hint="@string/new_pin"
                         tools:ignore="TextFields" />
 
-                </LinearLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
-            </com.google.android.material.textfield.TextInputLayout>
-
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <EditText
-                    android:id="@+id/first_new_pin"
-                    android:inputType="textPassword"
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginRight="4dp"
-                    android:layout_marginBottom="4dp"
-                    android:maxLength="@integer/max_pin_length"
-                    android:hint="@string/new_pin"
-                    tools:ignore="TextFields" />
+                    android:layout_height="wrap_content">
 
-            </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
+                    <EditText
+                        android:id="@+id/second_new_pin"
+                        android:inputType="textPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginLeft="4dp"
+                        android:layout_marginRight="4dp"
+                        android:layout_marginBottom="48dp"
+                        android:maxLength="@integer/max_pin_length"
+                        android:hint="@string/repeat_new_pin"
+                        tools:ignore="TextFields" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <Space
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-
-                <EditText
-                    android:id="@+id/second_new_pin"
-                    android:inputType="textPassword"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginRight="4dp"
-                    android:layout_marginBottom="48dp"
-                    android:maxLength="@integer/max_pin_length"
-                    android:hint="@string/repeat_new_pin"
-                    tools:ignore="TextFields" />
-
-            </com.google.android.material.textfield.TextInputLayout>
+                android:layout_height="0dp"
+                android:layout_weight="1" />
 
             <Button
                 android:id="@+id/button_change"
