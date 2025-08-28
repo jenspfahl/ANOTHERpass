@@ -363,6 +363,24 @@ class ListCredentialAdapter(
 
                 popup.show()
             }
+
+            holder.listenForOpenMenuLongClick { position, _, _ ->
+
+                val current = getItem(position)
+                val credential = current.encCredential ?: return@listenForOpenMenuLongClick false
+
+                val intent = Intent(
+                    listCredentialsActivity,
+                    EditCredentialActivity::class.java
+                )
+                intent.putExtra(EncCredential.EXTRA_CREDENTIAL_ID, credential.id)
+
+                listCredentialsActivity.startActivityForResult(
+                    intent,
+                    listCredentialsActivity.newOrUpdateCredentialActivityRequestCode
+                )
+                true
+            }
         }
 
         return holder
@@ -914,6 +932,15 @@ class ListCredentialAdapter(
                     return@setOnClickListener
                 }
                 event.invoke(adapterPosition, itemViewType, credentialMenuImageView)
+            }
+        }
+
+        fun listenForOpenMenuLongClick(event: (position: Int, type: Int, view: View) -> Boolean) {
+            credentialMenuImageView.setOnLongClickListener {
+                if (adapterPosition == RecyclerView.NO_POSITION) {
+                    return@setOnLongClickListener false
+                }
+                return@setOnLongClickListener event.invoke(adapterPosition, itemViewType, credentialMenuImageView)
             }
         }
 

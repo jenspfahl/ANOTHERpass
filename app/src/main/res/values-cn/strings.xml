@@ -73,7 +73,7 @@
     <string name="button_next">下一步</string>
     <string name="create_vault_enter_passphrase_fragment_label" tools:ignore="TypographyFractions">创建保险库 1/3</string>
     <string name="create_vault_explanation_2">创建一个 PIN 或短密码，用于每次使用时解锁您的保险库。它可以包含字符、数字和其他字符。与主密码相比，它可以更短，因此更容易记住（至少 6 个字符）。您也可以选择复杂的密码以最大程度地保护保险库。请牢记它，不要记在任何地方！</string>
-    <string name="pin">输入 PIN</string>
+    <string name="enter_a_pin">输入 PIN</string>
     <string name="repeat_pin">重复 PIN</string>
     <string name="create_vault_enter_pin_fragment_label">创建保险库 2/3</string>
     <string name="pin_required">需要 PIN</string>
@@ -248,7 +248,8 @@
     <string name="title_write_nfc_tag">写入 NFC 标签</string>
     <string name="message_write_nfc_tag">NFC 标签上有数据。覆盖它吗？</string>
     <string name="title_read_nfc_tag">读取 NFC 标签</string>
-    <string name="message_password_changed">密码已更改，但如果需要，您稍后可以恢复它。您是否已在外更新了密码？</string>
+    <string name="message_password_changed_but_can_restore">密码已更改，但如果需要，您稍后可以恢复它。您是否已在外更新了密码？</string>
+    <string name="message_password_changed_no_restore">密码已更改。您是否已在外更新了密码？</string>
     <string name="button_continue">继续</string>
     <string name="close">关闭</string>
     <string name="restore_last_password">恢复上一个密码</string>
@@ -274,6 +275,8 @@
     <string name="unknown_placeholder" translatable="false">\???</string>
     <string name="tab_pseudo_phrase">伪短语</string>
     <string name="tab_ordinary">普通密码</string>
+    <string name="tab_pin">PIN</string>
+    <string name="specify_the_length_of_the_pin">指定 PIN 的长度</string>
     <string name="drop_to_close">下拉关闭</string>
     <string name="drop_to_remove">下拉移除</string>
     <string name="drop_to_go_back">下拉返回</string>

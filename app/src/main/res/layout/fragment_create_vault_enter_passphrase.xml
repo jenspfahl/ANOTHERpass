@@ -13,77 +13,89 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="@string/create_vault_explanation_1"
-                android:layout_marginBottom="24dp"/>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/switch_use_pseudo_phrase"
-                    android:checked="true"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingHorizontal="24pt"
-                    android:text="@string/use_pseudo_phrase"/>
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/generated_passwd"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"
-                    style="@style/generated_password" />
+                    android:text="@string/create_vault_explanation_1"
+                    android:layout_marginBottom="24dp"/>
 
-
-                <LinearLayout
-                    android:id="@+id/view_seed_manually"
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center"
-                    android:layout_marginHorizontal="16dp">
+                    android:layout_height="wrap_content">
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/switch_use_pseudo_phrase"
+                        android:checked="true"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="24pt"
+                        android:text="@string/use_pseudo_phrase"/>
+
                     <TextView
-                        android:id="@+id/button_seed_manually"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/generated_passwd"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginTop="16dp"
                         android:layout_marginBottom="16dp"
+                        style="@style/generated_password" />
+
+
+                    <LinearLayout
+                        android:id="@+id/view_seed_manually"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_marginHorizontal="16dp">
+                        <TextView
+                            android:id="@+id/button_seed_manually"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginBottom="16dp"
+                            android:textAlignment="center"
+                            android:textSize="12sp"
+                            android:drawablePadding="16dp"
+                            android:text="@string/add_additional_source_of_entropy"
+                            android:height="16dp"
+                            app:drawableEndCompat="@drawable/ic_appintro_arrow"
+                            app:drawableTint="@color/colorAccent" />
+
+                    </LinearLayout>
+
+                    <Button
+                        android:id="@+id/button_generate_passwd"
+                        style="?android:textAppearanceSmall"
+                        android:layout_width="75pt"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="4dp"
+                        android:background="@color/white"
+                        android:text="@string/button_gen_passwd"
                         android:textAlignment="center"
-                        android:textSize="12sp"
-                        android:drawablePadding="16dp"
-                        android:text="@string/add_additional_source_of_entropy"
-                        android:height="16dp"
-                        app:drawableEndCompat="@drawable/ic_appintro_arrow"
-                        app:drawableTint="@color/colorAccent" />
+                        android:textColor="@color/colorAccent"
+                        android:textStyle="normal" />
 
-                </LinearLayout>
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
 
-                <Button
-                    android:id="@+id/button_generate_passwd"
-                    style="?android:textAppearanceSmall"
-                    android:layout_width="75pt"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="4dp"
-                    android:background="@color/white"
-                    android:text="@string/button_gen_passwd"
-                    android:textAlignment="center"
-                    android:textColor="@color/colorAccent"
-                    android:textStyle="normal" />
-
-            </com.google.android.material.textfield.TextInputLayout>
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
 
             <Button
                 android:id="@+id/button_next"

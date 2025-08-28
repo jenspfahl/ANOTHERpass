@@ -8,6 +8,7 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.secret.Password
+import de.jepfa.yapm.model.secret.Password.FormattingStyle
 import de.jepfa.yapm.service.PreferenceService
 import de.jepfa.yapm.service.PreferenceService.PREF_COLORED_PASSWORD
 import java.lang.Integer.min
@@ -44,14 +45,25 @@ object PasswordColorizer {
 
         val multiLine = presentationMode.isMultiLine()
         val raw = presentationMode == PresentationMode.RAW
-        var spannedString = SpannableString(password.toFormattedPassword(presentationMode, maskPassword))
+        val spannedString = SpannableString(password.toFormattedPassword(presentationMode, maskPassword, useShortMask = false))
 
         val colorizePasswd = PreferenceService.getAsBool(PREF_COLORED_PASSWORD, context)
 
         val length = spannedString.length
-        val stepWidth = getStepWidth(multiLine)
+        val isNumeric = password.isNumeric()
+
+        val wordWidth = if (!maskPassword && isNumeric) 2 else WORD_WIDTH
+        val stepWidth = getStepWidth(multiLine, wordWidth)
         if (colorizePasswd) {
-            if (raw) {
+            if (!maskPassword && isNumeric && password.length < 10 && presentationMode == FormattingStyle.IN_WORDS_MULTI_LINE) {
+                spannedString.setSpan(
+                    ForegroundColorSpan(context.getColor(R.color.colorAltAccent)),
+                    0,
+                    spannedString.length,
+                    Spanned.SPAN_MARK_MARK
+                )
+            }
+            else if (raw) {
                 spannedString.setSpan(
                     ForegroundColorSpan(context.getColor(R.color.colorPrimaryDark)),
                     0,
@@ -62,7 +74,7 @@ object PasswordColorizer {
             else {
                 for (i in 0 until length step stepWidth) {
                     val start1 = i
-                    val start2 = ensureLength(start1 + WORD_WIDTH, length)
+                    val start2 = ensureLength(start1 + wordWidth, length)
 
                     spannedString.setSpan(
                         ForegroundColorSpan(context.getColor(R.color.colorAltAccent)),
@@ -72,7 +84,7 @@ object PasswordColorizer {
                     )
 
                     val start3 = ensureLength(start2 + 1, length)
-                    val start4 = ensureLength(start3 + WORD_WIDTH, length)
+                    val start4 = ensureLength(start3 + wordWidth, length)
                     spannedString.setSpan(
                         ForegroundColorSpan(context.getColor(R.color.colorPrimaryDark)),
                         start3,
@@ -92,8 +104,8 @@ object PasswordColorizer {
         return min(index, length)
     }
 
-    private fun getStepWidth(multiLine: Boolean): Int {
-        val stepWidth = (WORD_WIDTH + 1) * 2
+    private fun getStepWidth(multiLine: Boolean, wordWidth: Int): Int {
+        val stepWidth = (wordWidth + 1) * 2
         return if (multiLine) stepWidth else stepWidth + 1
     }
 }

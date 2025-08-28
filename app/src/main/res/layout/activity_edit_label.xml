@@ -11,66 +11,78 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/edit_label_explanation"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="6dp"
-                android:text="@string/label_data_params" />
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <EditText
-                    android:id="@+id/edit_label_name"
+                <TextView
+                    android:id="@+id/edit_label_explanation"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="30dp"
-                    android:hint="@string/hint_edit_label_name"
-                    android:inputType="text"
-                    android:maxLines="1"
-                    android:maxLength="@integer/max_label_name_length"
-                    android:singleLine="true" />
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="6dp"
+                    android:text="@string/label_data_params" />
 
-            </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <EditText
-                    android:id="@+id/edit_label_desc"
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
-                    android:layout_height="135dp"
-                    android:layout_marginBottom="30dp"
-                    android:hint="@string/hint_edit_label_desc"
-                    android:inputType="textMultiLine"
-                    android:maxLines="3"
-                    android:maxLength="@integer/max_label_description_length"
-                    android:singleLine="false" />
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/edit_label_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="30dp"
+                        android:hint="@string/hint_edit_label_name"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:maxLength="@integer/max_label_name_length"
+                        android:singleLine="true" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/edit_label_desc"
+                        android:layout_width="match_parent"
+                        android:layout_height="135dp"
+                        android:layout_marginBottom="30dp"
+                        android:hint="@string/hint_edit_label_desc"
+                        android:inputType="textMultiLine"
+                        android:maxLines="3"
+                        android:maxLength="@integer/max_label_description_length"
+                        android:singleLine="false" />
 
 
-            </com.google.android.material.textfield.TextInputLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/edit_label_color"
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/edit_label_color"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textAlignment="center"
+                    android:layout_marginTop="32dp"
+                    android:text="@string/choose_color"
+                    android:textColor="@color/white"/>
+            </LinearLayout>
+
+            <Space
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:textAlignment="center"
-                android:layout_marginTop="32dp"
-                android:text="@string/choose_color"
-                android:textColor="@color/white"/>
+                android:layout_height="0dp"
+                android:layout_weight="1" />
 
             <Button
                 android:id="@+id/button_save"

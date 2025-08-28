@@ -1765,7 +1765,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             }
 
             R.id.menu_help -> {
-                val browserIntent = Intent(Intent.ACTION_VIEW, Constants.HOMEPAGE)
+                val browserIntent = Intent(Intent.ACTION_VIEW, Constants.ONLINE_HELP)
                 startActivity(browserIntent)
                 return true
             }

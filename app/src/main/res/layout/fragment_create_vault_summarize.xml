@@ -12,125 +12,136 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="@string/create_vault_explanation_3"
-                android:layout_marginBottom="24dp"/>
-
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:orientation="vertical">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:id="@+id/imageview_qrcode"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:paddingHorizontal="4dp"
-                        android:clickable="true"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_baseline_qr_code_48_red"
-                        android:focusable="true" />
-
-                    <ImageView
-                        android:id="@+id/imageview_nfc_tag"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:paddingHorizontal="4dp"
-                        android:clickable="true"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_baseline_nfc_48"
-                        android:focusable="true" />
-
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/generated_passwd"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    style="@style/generated_password"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"/>
-
-            </LinearLayout>
-
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/switch_store_master_password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginBottom="8dp"
-                android:text="@string/store_master_password" />
-
-
-            <com.google.android.material.divider.MaterialDivider
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="20dp">
-
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="@string/create_vault_cipher_explanation"
-                    android:layout_marginHorizontal="8dp"/>
+                    android:text="@string/create_vault_explanation_3"
+                    android:layout_marginBottom="24dp"/>
+
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:orientation="horizontal">
+                    android:orientation="vertical">
 
-                    <androidx.appcompat.widget.AppCompatSpinner
-                        android:id="@+id/cipher_selection"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:spinnerMode="dropdown"
-                        android:dropDownSelector="@color/black" />
+                        android:gravity="center"
+                        android:orientation="horizontal">
 
-                    <ImageView
-                        android:id="@+id/imageview_cipher_selection"
+                        <ImageView
+                            android:id="@+id/imageview_qrcode"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:paddingHorizontal="4dp"
+                            android:clickable="true"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_baseline_qr_code_48_red"
+                            android:focusable="true" />
+
+                        <ImageView
+                            android:id="@+id/imageview_nfc_tag"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:paddingHorizontal="4dp"
+                            android:clickable="true"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_baseline_nfc_48"
+                            android:focusable="true" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/generated_passwd"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:paddingHorizontal="4dp"
-                        android:clickable="true"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_baseline_info_24"
-                        android:focusable="true" />
+                        style="@style/generated_password"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp"/>
 
                 </LinearLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/switch_store_master_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="@string/store_master_password" />
+
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="20dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="@string/create_vault_cipher_explanation"
+                        android:layout_marginHorizontal="8dp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <androidx.appcompat.widget.AppCompatSpinner
+                            android:id="@+id/cipher_selection"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:spinnerMode="dropdown"
+                            android:dropDownSelector="@color/black" />
+
+                        <ImageView
+                            android:id="@+id/imageview_cipher_selection"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:paddingHorizontal="4dp"
+                            android:clickable="true"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_baseline_info_24"
+                            android:focusable="true" />
+
+                    </LinearLayout>
+                </LinearLayout>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <include layout="@layout/change_login_iterations_slider" />
             </LinearLayout>
 
-            <com.google.android.material.divider.MaterialDivider
+            <Space
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <include layout="@layout/change_login_iterations_slider" />
-
+                android:layout_height="0dp"
+                android:layout_weight="1" />
 
             <Button
                 android:id="@+id/button_create_vault"

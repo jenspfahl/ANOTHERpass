@@ -14,6 +14,7 @@ import de.jepfa.yapm.R
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.login.LoginActivity
+import de.jepfa.yapm.usecase.session.LogoutUseCase
 import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.DebugInfo
@@ -77,9 +78,9 @@ class ErrorActivity : AppCompatActivity() {
 
         val buttonRestart = findViewById<Button>(R.id.button_restart)
         buttonRestart.setOnClickListener {
+            finishAffinity()
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
-            finishAffinity()
         }
     }
 

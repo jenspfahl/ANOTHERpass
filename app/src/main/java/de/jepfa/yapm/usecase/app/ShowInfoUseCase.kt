@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.text.SpannableString
 import androidx.appcompat.app.AlertDialog
+import de.jepfa.yapm.BuildConfig
 import de.jepfa.yapm.R
 import de.jepfa.yapm.ui.BaseActivity
 import de.jepfa.yapm.ui.intro.LicencesActivity
@@ -18,11 +19,9 @@ object ShowInfoUseCase: BasicUseCase<BaseActivity>() {
     override fun execute(activity: BaseActivity): Boolean {
         val builder: AlertDialog.Builder = AlertDialog.Builder(activity)
         val icon: Drawable = activity.resources.getDrawable(R.mipmap.ic_logo)
-
-        val message = activity.getString(R.string.app_name) + ", Version " + DebugInfo.getVersionName(
-            activity
-        ) +
-                System.lineSeparator() + " \u00A9 Jens Pfahl 2021 - 2025" +
+        val message = activity.getString(R.string.app_name) + ", Version " + DebugInfo.getVersionName(activity) +
+                System.lineSeparator() + System.lineSeparator() +
+                " \u00A9 Jens Pfahl 2021 - 2025" +
                 System.lineSeparator() + System.lineSeparator() +
                 activity.getString(R.string.this_app_is_foss) +
                 System.lineSeparator() + activity.getString(

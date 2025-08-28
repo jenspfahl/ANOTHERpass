@@ -1,7 +1,7 @@
 package de.jepfa.yapm.util
 
-import android.app.KeyguardManager
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
 import de.jepfa.yapm.BuildConfig
@@ -21,7 +21,7 @@ import java.io.*
 import java.util.Collections
 import java.util.Date
 import java.util.LinkedList
-import java.util.concurrent.ConcurrentHashMap
+
 
 object DebugInfo {
 
@@ -107,6 +107,9 @@ object DebugInfo {
         sb.addFormattedLine("MP stored", MasterPasswordService.isMasterPasswordStored(context))
         sb.addFormattedLine("MP stored with auth", MasterPasswordService.isMasterPasswordStoredWithAuth(context))
         sb.addFormattedLine("Build Timestamp", BuildConfig.BUILD_TIME.toSimpleDateTimeFormat())
+        if (isDebug) {
+            sb.addFormattedLine("Build Signature", getAppSignatureHash(context))
+        }
         sb.addFormattedLine("Build Type", BuildConfig.BUILD_TYPE)
         sb.addFormattedLine("Debug Mode", isDebug)
         sb.addFormattedLine("Current Timestamp", Date().toSimpleDateTimeFormat())
@@ -118,7 +121,9 @@ object DebugInfo {
         sb.addFormattedLine("Model", Build.MODEL)
         sb.addFormattedLine("Product", Build.PRODUCT)
         sb.addFormattedLine("Hardware", Build.HARDWARE)
-        //sb.addFormattedLine("OS Build Id", Build.ID)
+        if (isDebug) {
+            sb.addFormattedLine("OS Build Id", Build.ID)
+        }
         sb.addFormattedLine("NFC available", NfcService.isNfcAvailable(context))
         sb.addFormattedLine("NFC enabled", NfcService.isNfcEnabled(context))
         sb.addFormattedLine("Has StrongBox support", SecretService.hasStrongBoxSupport(context) ?: "-")
@@ -229,5 +234,30 @@ object DebugInfo {
 
     fun setBetaDisclaimerShown() {
         betaDisclaimerShown = true
+    }
+
+    fun getAppSignatureHash(context: Context): String? {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val signatureInfo = context.packageManager
+                .getPackageInfo(context.packageName, PackageManager.GET_SIGNING_CERTIFICATES).signingInfo ?: return null
+
+
+            val sb = StringBuilder()
+            if (signatureInfo.hasMultipleSigners()) {
+                for (apkSignature in signatureInfo.apkContentsSigners) {
+                    sb.append(apkSignature.toByteArray().sha256().toHex(separator = ":"))
+                    sb.append(" ")
+                }
+            }
+            else {
+                for (apkSignature in signatureInfo.signingCertificateHistory) {
+                    sb.append(apkSignature.toByteArray().sha256().toHex(separator = ":"))
+                    sb.append(" ")
+                }
+            }
+            return sb.toString()
+        } else {
+            return null
+        }
     }
 }

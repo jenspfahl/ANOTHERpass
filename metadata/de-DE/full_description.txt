@@ -1,31 +1,34 @@
-<b>Ein etwas anderer Weg um Passwörter zu verwalten</b>
+<b>Mit ANOTHERpass musst du dir kein langes und komplexes Masterpasswort erstellen und merken!</b>
 
-ANOTHERpass generiert leicht zu tippende aber starke Passwörter für dich. Sogenannte <i>Pseudophrasen</i> schauen aus wie echte Wörter, sind aber dennoch zufällig und unvorhersehbar.
+ANOTHERpass bietet eine clevere Zwei-Faktor-Authentifizierung, um den Tresor mit den Zugangsdaten zu entsperren. Diese Faktoren sind Wissen (eine PIN) und Besitz (das Masterpasswort als physisches Token). Anstatt sich ein langes und kompliziertes Masterpasswort zu merken, merkt man sich nur eine PIN und hat das Masterpasswort als QR-Code oder NFC-Tag bei sich. Zusätzlich kann man das Masterpasswort geschützt mit einem biometrischem Merkmal (z.B. Fingerabdruck) auf dem Gerät speichern.
 
-Ebenso verwendet die App eine clevere Zwei-Faktor-Authentifizierung, um den Tresor mit den Zugangsdaten zu entsperren. Diese Faktoren sind Wissen (eine PIN) und Besitz (das Masterpasswort). Anstatt sich ein langes und kompliziertes Masterpasswort zu merken, merkt man sich nur eine PIN und hat das Masterpasswort als QR-Code oder NFC-Tag bei sich. Zusätzlich kann man das Masterpasswort geschützt mit einem biometrischem Merkmal (z.B. Fingerabdruck) auf dem Gerät speichern.
+ANOTHERpass generiert leicht zu tippende aber starke Passwörter für dich. Sogenannte <i>Pseudophrasen</i> schauen aus wie echte Wörter, sind aber dennoch zufällig und unvorhersehbar. Die Passwortstärke hängt von der Länge (16–32 Zeichen) ab!
 
-Mit der <a href="https://anotherpass.jepfa.de/extension">ANOTHERpass Browser-Erweiterung</a> für Firefox und Chrome kann man die Zugangsdaten auch am heimischen Laptop verwenden.
+Mit der <a href="https://anotherpass.jepfa.de/extension">ANOTHERpass Browser-Erweiterung</a> für Firefox und Chrome kann man die Zugangsdaten auch am heimischen Laptop oder auf Arbeit verwenden.
+
+Neben weiteren Funktionen wie einer leistungsstarken Suche, Gruppierung und Import/Export aus und in verschiedene Formate wie Keepass und CSV fungiert die App auch als sichere Authentifizierungs-App (2FA).
+
 
 <b>Kernfunktionen</b>
 
-- Einfache Zwei-Faktor-Authentifizierung
-- Kein kompliziertes Masterpasswort nötig zu merken, es wird einfach exportiert
-- Leicht zu lesende generierte Passwörter
-- Starke Verschlüsselung (AES 128/256, Blowfish, Chacha20)
-- Verwendet einen integrierten Sicherheitschip oder eine TEE (Trusted Execution Environment), falls vorhanden
-- Autofill Unterstützung
+– Einfache Zwei-Faktor-Authentifizierung (PIN und Masterpasswort als physisches Token oder PIN und biometrische Daten für bequemen Schnellzugriff)
+– Kein schwaches oder kompliziertes Masterpasswort zum Merken, du musst es nur exportieren (auf QR-Code oder NFC-Tag)
+– Leicht lesbarer, aber starker Passwortgenerator (<i>Pseudophrasen</i> mit flexibler Länge)
+– Starke, moderne Verschlüsselung, vollständig konfigurierbar (AES 128/256, Blowfish 128/256, Chacha20, Argon2, PBKDF)
+– Verwendet einen integrierten Sicherheitschip oder TEE (Trusted Execution Environment), falls vorhanden
+– AutoFill-Unterstützung
 - Arbeitet mit der <a href="https://anotherpass.jepfa.de/extension">ANOTHERpass Browser-Erweiterung</a> zusammen, um Zugangsdaten innerhalb eines lokalen Netzwerks zu teilen (z.B. von der App zum Desktop-PC)
-- Biometrisches Merkmal (z.B. Fingerabdruck) für gespeichertes Masterpasswort
+– Vollständig offline, eine Internetberechtigung ist nur für die Unterstützung der Browser-Erweiterung erforderlich
+– 2FA-Unterstützung für Einmalkennwörter (HOTP und TOTP)
+– Benachrichtigung bei abgelaufenen Zugangsdaten
 - Unsichere Zwischenablage standardmäßig deaktiviert
 - Passwörter können über anderen Apps angezeigt werden, um Abtippen zu erleichtern
-- Es werden keine Daten in der Cloud gespeichert, außer der Anwender speichert seine Backups selber in der Cloud
-- Exportieren und Importieren des kompletten Passwort-Tresors als Backup
+– (Automatischer) Export und Import des Zugangsdaten-Tresors
+– Separater Export von Tresor und Masterkey (letzterer analog, falls gewünscht)
 - Option um einzelne Zugangsdaten zu exportieren bzw. auszulagern
-- Unterstützung für Einmalpasswörter (HOTP und TOTP)
 - Verschleierung von einzelnen Passwörtern als zusätzlicher Schutz möglich
 - Wahlweise Selbstzerstörungsmodus bei zu vielen gescheiterten Loginversuchen
 - Dark-Theme Support ;-)
-
 
 Für mehr Informationen siehe <a href="https://anotherpass.jepfa.de">anotherpass.jepfa.de</a>
 
