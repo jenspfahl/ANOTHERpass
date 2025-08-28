@@ -29,7 +29,7 @@ android {
         versionCode  202004
         // remove _rc when release
         // e.g. versionName "1.3.0_rc"
-        versionName "2.2.4_rc"
+        versionName "2.2.4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'

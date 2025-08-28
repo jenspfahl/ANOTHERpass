@@ -1,1 +1,3 @@
+* add PIN generator
+* align buttons at the bottom
 * make app build reproducible on F-Droid
