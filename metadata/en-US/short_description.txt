@@ -1,1 +1,2 @@
 Another way to manage passwords
+(password manager and 2FA authenticator)
