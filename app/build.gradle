@@ -26,10 +26,10 @@ android {
         // YY=minor (new features)
         // ZZZ=micro (just bugfixes)
     //  versionCode XXYYZZZ
-        versionCode  202004
+        versionCode  202005
         // remove _rc when release
         // e.g. versionName "1.3.0_rc"
-        versionName "2.2.4"
+        versionName "2.2.5_rc"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
@@ -43,8 +43,9 @@ android {
 
             buildConfigField "java.util.Date", "BUILD_TIME", "new java.util.Date(" + System.currentTimeMillis() + "L)"
 
+            // we generate the license file during debug builds, because the result is unsorted and this avoids reproducible builds, see https://github.com/jenspfahl/ANOTHERpass/issues/94
             afterEvaluate {
-                preBuild.dependsOn "licenseDebugReport"
+                preBuild.dependsOn "licenseReleaseReport"
             }
         }
         release {
@@ -57,9 +58,7 @@ android {
 
             buildConfigField "java.util.Date", "BUILD_TIME", "new java.util.Date(" + buildTimestamp + "L)"
 
-            afterEvaluate {
-                preBuild.dependsOn "licenseReleaseReport"
-            }
+
         }
     }
     compileOptions {
