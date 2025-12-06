@@ -36,6 +36,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
@@ -468,8 +469,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 updateQuickSearchOnFab(false)
                 toggle.isDrawerIndicatorEnabled = false
                 toggle.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_24_white)
-
-
             }
             else if (PreferenceService.getAsBool(PreferenceService.PREF_QUICK_SEARCH_ON_FAB, this)) {
                 fab.setImageResource(R.drawable.ic_search_white_24dp)
@@ -625,11 +624,22 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         )
 
         toggle.setToolbarNavigationClickListener {
-            if (!toggle.isDrawerIndicatorEnabled) {
+            if (listCredentialAdapter?.isSelectionMode() == true) {
                 listCredentialAdapter?.stopSelectionMode()
             }
         }
 
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (listCredentialAdapter?.isSelectionMode() == true) {
+                    listCredentialAdapter?.stopSelectionMode()
+                } else {
+                    this.isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                    this.isEnabled = true
+                }
+            }
+        })
 
         drawerLayout.addDrawerListener(toggle)
         drawerLayout.addDrawerListener(object: DrawerLayout.SimpleDrawerListener() {

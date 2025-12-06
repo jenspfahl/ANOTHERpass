@@ -861,6 +861,8 @@ class ListCredentialAdapter(
         }
     }
 
+    fun isSelectionMode() = selectionMode
+
     fun markPosition(pos: Int) {
         val current = currentList[pos]
         markedCredentialId = current.encCredential?.id
