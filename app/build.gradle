@@ -26,10 +26,10 @@ android {
         // YY=minor (new features)
         // ZZZ=micro (just bugfixes)
     //  versionCode XXYYZZZ
-        versionCode  202004
+        versionCode  202005
         // remove _rc when release
         // e.g. versionName "1.3.0_rc"
-        versionName "2.2.4"
+        versionName "2.2.5"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
@@ -43,8 +43,9 @@ android {
 
             buildConfigField "java.util.Date", "BUILD_TIME", "new java.util.Date(" + System.currentTimeMillis() + "L)"
 
+            // we generate the license file during debug builds, because the result is unsorted and this avoids reproducible builds, see https://github.com/jenspfahl/ANOTHERpass/issues/94
             afterEvaluate {
-                preBuild.dependsOn "licenseDebugReport"
+                preBuild.dependsOn "licenseReleaseReport"
             }
         }
         release {
@@ -57,9 +58,7 @@ android {
 
             buildConfigField "java.util.Date", "BUILD_TIME", "new java.util.Date(" + buildTimestamp + "L)"
 
-            afterEvaluate {
-                preBuild.dependsOn "licenseReleaseReport"
-            }
+
         }
     }
     compileOptions {
@@ -74,8 +73,8 @@ android {
 }
 
 dependencies {
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
-    implementation "androidx.appcompat:appcompat:1.7.0"
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
+    implementation "androidx.appcompat:appcompat:1.7.1"
     implementation "androidx.activity:activity-ktx:1.9.3"
 
     // Dependencies for working with Architecture components
@@ -110,7 +109,7 @@ dependencies {
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$rootProject.coroutines"
 
     // UI
-    implementation "androidx.constraintlayout:constraintlayout:2.2.0"
+    implementation "androidx.constraintlayout:constraintlayout:2.2.1"
     implementation "com.google.android.material:material:1.12.0"
 
     implementation "androidx.preference:preference-ktx:1.2.1"
@@ -121,7 +120,7 @@ dependencies {
 
     implementation 'com.google.android.material:material:1.12.0'
 
-    implementation "androidx.security:security-crypto:1.0.0"
+    implementation "androidx.security:security-crypto:1.1.0"
 
     //AppIntro
     implementation 'com.github.AppIntro:AppIntro:6.1.0'

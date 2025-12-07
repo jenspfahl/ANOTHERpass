@@ -1,0 +1,3 @@
+* show abort indicator if credential multi-select is enabled
+* update crypto dependencies
+* make app build reproducible on F-Droid

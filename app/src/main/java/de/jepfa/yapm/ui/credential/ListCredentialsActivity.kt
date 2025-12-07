@@ -36,6 +36,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
@@ -456,6 +457,9 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         listCredentialAdapter = ListCredentialAdapter(this, recyclerView)
         { selected ->
 
+            toggle.isDrawerIndicatorEnabled = true
+
+
             if (HttpCredentialRequestHandler.credentialSelectState == MultipleCredentialSelectState.USER_SELECTING) {
                 fab.setImageResource(R.drawable.baseline_send_to_mobile_24)
                 updateQuickSearchOnFab(false)
@@ -463,6 +467,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             else if (selected.isNotEmpty()) {
                 fab.setImageResource(R.drawable.ic_baseline_delete_24_white)
                 updateQuickSearchOnFab(false)
+                toggle.isDrawerIndicatorEnabled = false
+                toggle.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_24_white)
             }
             else if (PreferenceService.getAsBool(PreferenceService.PREF_QUICK_SEARCH_ON_FAB, this)) {
                 fab.setImageResource(R.drawable.ic_search_white_24dp)
@@ -616,6 +622,25 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             R.string.navigation_drawer_open,
             R.string.navigation_drawer_close
         )
+
+        toggle.setToolbarNavigationClickListener {
+            if (listCredentialAdapter?.isSelectionMode() == true) {
+                listCredentialAdapter?.stopSelectionMode()
+            }
+        }
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (listCredentialAdapter?.isSelectionMode() == true) {
+                    listCredentialAdapter?.stopSelectionMode()
+                } else {
+                    this.isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                    this.isEnabled = true
+                }
+            }
+        })
+
         drawerLayout.addDrawerListener(toggle)
         drawerLayout.addDrawerListener(object: DrawerLayout.SimpleDrawerListener() {
 
