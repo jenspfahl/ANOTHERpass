@@ -46,7 +46,7 @@ fun enrichId(context: Context, name: String, id: Int?): String {
 
 fun shortenBase64String(base64String: String, length: Int = 8): String {
     return base64String
-        .toLowerCase(Locale.ROOT)
+        .lowercase()
         .replace(Regex("[^0-9a-z]"),"")
         .take(length)
 }

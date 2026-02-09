@@ -1,0 +1,2 @@
+* Minimal supported Android changed from Android 7 to Android 8
+*

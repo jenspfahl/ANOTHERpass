@@ -147,7 +147,7 @@ class LabelsHolder {
     }
 
     fun lookupByLabelName(labelName: String): Label? {
-        return nameToLabel[labelName.toUpperCase(Locale.ROOT)]
+        return nameToLabel[labelName.uppercase()]
     }
 
     fun lookupByLabelId(id: Int): Label? {

@@ -60,7 +60,7 @@ object DebugInfo {
 
     fun getVersionName(context: Context): String {
         val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-        return pInfo.versionName
+        return pInfo.versionName?:""
     }
 
     fun getVersionCode(context: Context): Int {

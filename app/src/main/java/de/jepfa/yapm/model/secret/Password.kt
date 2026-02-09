@@ -282,6 +282,10 @@ class Password: Secret, CharSequence {
         return charArray
     }
 
+    override fun isEmpty(): Boolean {
+        return super<Secret>.isEmpty()
+    }
+
     companion object {
         private const val BASE64_FLAGS = Base64.NO_WRAP or Base64.NO_PADDING
 

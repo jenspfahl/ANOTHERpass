@@ -6,7 +6,7 @@ import java.util.*
 
 open class Secret(var data: ByteArray) : Clearable, Validable {
 
-    fun isEmpty() : Boolean {
+    open fun isEmpty() : Boolean {
         return data.isEmpty()
     }
 

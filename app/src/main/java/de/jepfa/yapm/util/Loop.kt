@@ -108,11 +108,11 @@ class Loop<T>(data: List<T>) {
         private fun loopReplace(loop: Loop<Char>, password: Password,
                                 index: Int, c: Char, loopCount: Int) {
             val isUpperCase = c.isUpperCase()
-            val c1 = c.toLowerCase()
+            val c1 = c.lowercaseChar()
             if (loop.applies(c1)) {
                 var c2 = loop.forwards(c1, loopCount)
                 if (isUpperCase) {
-                    c2 = c2.toUpperCase()
+                    c2 = c2.uppercaseChar()
                 }
                 password.replace(index, c2)
             }

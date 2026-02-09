@@ -30,7 +30,7 @@ class PassphraseGenerator(
         }
 
         if (spec.wordBeginningUpperCase) {
-            buffer.replace(0, buffer.get(0).toUpperCase())
+            buffer.replace(0, buffer.first().uppercaseChar())
         }
 
         if (spec.addDigit) {

@@ -70,7 +70,7 @@ object HttpServer {
     }
 
 
-    private var httpServer: NettyApplicationEngine? = null
+    private var httpServer: EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration>? = null
     private var isHttpServerRunning = false
     private var isHttpServerStarting = false
     private var isHttpServerStopping = false
@@ -87,11 +87,20 @@ object HttpServer {
 
             Log.i("HTTP", "start API server")
             try {
-                val environment = applicationEngineEnvironment {
-                    connector {
-                        port = _port
-                    }
-                    module {
+
+                Log.i("HTTP", "launch API server")
+                if (httpServer != null) {
+                    httpServer?.stopSuspend(gracePeriodMillis = 100, timeoutMillis= 100)
+                }
+
+                httpServer = embeddedServer(Netty,
+                    environment = applicationEnvironment { },
+                    configure = {
+                        connector {
+                            port = _port
+                        }
+                    },
+                    module = {
                         routing {
                             options {
                                 call.response.header(
@@ -383,14 +392,10 @@ object HttpServer {
                             }
                         }
                     }
-                }
 
-                Log.i("HTTP", "launch API server")
-                if (httpServer != null) {
-                    httpServer?.stop(gracePeriodMillis = 100, timeoutMillis= 100)
-                }
-                httpServer = embeddedServer(Netty, environment)
-                httpServer?.start(wait = false)
+
+                )
+
                 Log.i("HTTP", "API server started")
                 isHttpServerStarting = false
 
@@ -523,7 +528,7 @@ object HttpServer {
             try {
                 Log.i("HTTP", "shutdown all")
 
-                httpServer?.stop(gracePeriodMillis = 100, timeoutMillis= 100)
+                httpServer?.stopSuspend(gracePeriodMillis = 100, timeoutMillis= 100)
                 isHttpServerStopping = false
 
                 Log.i("HTTP", "shutdown done")
@@ -788,7 +793,7 @@ object HttpServer {
         return requestCredentialHttpCallback?.handleHttpRequest(action, webClientId, webExtension, message, origin)
     }
 
-    private suspend fun PipelineContext<Unit, ApplicationCall>.respond(
+    private suspend fun RoutingContext.respond(
         webClientId: String,
         text: String,
         response: Pair<HttpStatusCode, JSONObject>
@@ -807,7 +812,7 @@ object HttpServer {
         )
     }
 
-    private suspend fun PipelineContext<Unit, ApplicationCall>.respondFile(
+    private suspend fun RoutingContext.respondFile(
         webClientId: String,
         file: File
     ) {
@@ -821,7 +826,7 @@ object HttpServer {
         call.respondFile(file)
     }
 
-    private suspend fun PipelineContext<Unit, ApplicationCall>.respondError(
+    private suspend fun RoutingContext.respondError(
         webClientId: String?,
         code: HttpStatusCode,
         json: JSONObject,
@@ -840,7 +845,7 @@ object HttpServer {
         )
     }
 
-    private suspend fun PipelineContext<Unit, ApplicationCall>.respondError(
+    private suspend fun RoutingContext.respondError(
         webClientId: String?,
         code: HttpStatusCode,
         msg: String,
