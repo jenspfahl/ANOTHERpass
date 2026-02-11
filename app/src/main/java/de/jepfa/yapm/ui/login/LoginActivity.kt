@@ -8,6 +8,7 @@ import android.provider.Settings
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 import androidx.navigation.fragment.NavHostFragment
@@ -49,6 +50,8 @@ import de.jepfa.yapm.util.toastText
 
 
 class LoginActivity : NfcBaseActivity() {
+
+    private lateinit var rootView: View
 
     var loginAttempts = 0
     var showTagDetectedMessage = false
@@ -113,11 +116,13 @@ class LoginActivity : NfcBaseActivity() {
 
             if (MasterKeyService.isMasterKeyStored(this)) {
                 setContentView(R.layout.activity_login)
+                rootView = findViewById(R.id.login_screen)
                 nfcAdapter = NfcService.getNfcAdapter(this)
                 readTagFromIntent(intent)
 
             } else {
                 setContentView(R.layout.activity_create_or_import_vault)
+                rootView = findViewById(R.id.new_vault_screen)
                 val buttonCreateVault: Button = findViewById(R.id.button_create_vault)
                 buttonCreateVault.setOnClickListener {
 
@@ -140,6 +145,9 @@ class LoginActivity : NfcBaseActivity() {
                     startActivityForResult(intent, createVaultActivityRequestCode)
                 }
             }
+
+            correctInsets(rootView)
+
 
             if (DebugInfo.isBeta(this) && !DebugInfo.isBetaDisclaimerShown()) {
                 DebugInfo.setBetaDisclaimerShown()
