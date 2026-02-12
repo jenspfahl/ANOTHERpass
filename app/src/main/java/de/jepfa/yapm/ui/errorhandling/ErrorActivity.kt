@@ -33,6 +33,7 @@ class ErrorActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_error)
+
         var errorHeaderView = findViewById<TextView>(R.id.error_header)
         var errorTraceView = findViewById<TextView>(R.id.bug_report)
         var userDescription = findViewById<EditText>(R.id.error_user_description)

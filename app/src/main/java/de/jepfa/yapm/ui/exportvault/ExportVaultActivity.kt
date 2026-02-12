@@ -46,6 +46,7 @@ class ExportVaultActivity : SecureActivity() {
         }
 
         setContentView(R.layout.activity_export_vault)
+        correctInsets(findViewById(R.id.export_vault_screen))
 
         includeMasterKeySwitch = findViewById(R.id.switch_include_enc_masterkey)
         includeMasterKeySwitch.isChecked = PreferenceService.getAsBool(

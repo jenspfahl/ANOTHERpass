@@ -49,6 +49,7 @@ class SettingsActivity : SecureActivity(),
         }
 
         setContentView(R.layout.settings_activity)
+        correctInsets(findViewById(R.id.settings_screen))
 
         val openServerSettings = intent.getBooleanExtra("OpenServerSettings", false)
 

@@ -482,6 +482,8 @@ class ConfigOtpActivity : ReadQrCodeOrNfcActivityBase() {
 
     override fun getLayoutId() = R.layout.activity_config_otp
 
+    override fun getRootViewId() = R.id.config_otp_screen
+
     override fun handleScannedData(scanned: String) {
         val otpConfig = createOtpConfigFromUri(scanned)
         if (otpConfig != null) {

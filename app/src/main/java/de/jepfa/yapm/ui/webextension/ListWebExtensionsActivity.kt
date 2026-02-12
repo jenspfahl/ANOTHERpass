@@ -33,6 +33,7 @@ class ListWebExtensionsActivity : SecureActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list_web_extensions)
+        correctInsets(findViewById(R.id.list_web_extensions_screen))
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
         listWebExtensionsAdapter = ListWebExtensionsAdapter(this)

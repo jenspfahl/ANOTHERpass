@@ -57,6 +57,7 @@ class ChangeMasterPasswordActivity : SecureActivity() {
         passwordPresentation = Password.FormattingStyle.createFromFlags(multiLine, formatted)
 
         setContentView(R.layout.activity_change_master_password)
+        correctInsets(findViewById(R.id.change_master_password_screen))
 
         val currentPinTextView: EditText = findViewById(R.id.current_pin)
         val pseudoPhraseSwitch: SwitchCompat = findViewById(R.id.switch_use_pseudo_phrase)

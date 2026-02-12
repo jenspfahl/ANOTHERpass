@@ -45,6 +45,7 @@ class EditLabelActivity : SecureActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_label)
+        correctInsets(findViewById(R.id.edit_label_screen))
 
         labelNameTextView = findViewById(R.id.edit_label_name)
         labelDescTextView = findViewById(R.id.edit_label_desc)

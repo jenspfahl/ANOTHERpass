@@ -24,6 +24,8 @@ class ImportCredentialActivity : ReadQrCodeOrNfcActivityBase() {
 
     override fun getLayoutId(): Int = R.layout.activity_import_credential
 
+    override fun getRootViewId() = R.id.import_credential_screen
+
     override fun handleScannedData(scanned: String) {
         val credential = extractCredential(scanned)
         if (credential == null) {

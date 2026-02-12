@@ -33,6 +33,7 @@ class ListLabelsActivity : SecureActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list_labels)
+        correctInsets(findViewById(R.id.list_labels_screen))
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
         listLabelsAdapter = ListLabelsAdapter(this)

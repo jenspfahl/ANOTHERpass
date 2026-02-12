@@ -50,6 +50,7 @@ class ExportPlainCredentialsActivity : SecureActivity() {
         }
 
         setContentView(R.layout.activity_export_plain_credentials)
+        correctInsets(findViewById(R.id.export_plain_credentials_screen))
 
         val currentPinTextView: EditText = findViewById(R.id.current_pin)
 

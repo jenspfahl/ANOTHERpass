@@ -14,7 +14,7 @@ class IntroActivity : IntroBaseActivity() {
         // Make sure you don't call setContentView!
 
         addSlide(
-            AppIntroCustomLayoutFragment.newInstance(R.layout.fragment_intro_1
+            AppIntroCustomLayoutFragment.newInstance(R.layout.fragment_intro_1,
             ))
 
         addSlide(Intro2Fragment())

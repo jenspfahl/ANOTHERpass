@@ -22,6 +22,7 @@ import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuItemImpl
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewGroupCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.forEach
 import androidx.core.view.updateLayoutParams
@@ -115,7 +116,7 @@ open class BaseActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) { // Android 15+
             window.decorView.setOnApplyWindowInsetsListener { view, insets ->
                 val statusBarInsets = insets.getInsets(WindowInsets.Type.statusBars())
-                view.setBackgroundColor(getColor(R.color.colorPrimaryDark))
+                view.setBackgroundColor(getColor(R.color.black))
 
                 // Adjust padding to avoid overlap
                 view.setPadding(0, statusBarInsets.top, 0, 0)
@@ -123,7 +124,9 @@ open class BaseActivity : AppCompatActivity() {
             }
         } else {
             // For Android 14 and below
-            window.statusBarColor = getColor(R.color.colorPrimaryDark)
+            window.statusBarColor = getColor(R.color.black)
+            WindowCompat.getInsetsController(window, window.decorView)
+                .isAppearanceLightStatusBars = false
         }
     }
 

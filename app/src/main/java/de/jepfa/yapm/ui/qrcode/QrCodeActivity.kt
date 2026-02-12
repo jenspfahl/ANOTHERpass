@@ -50,6 +50,7 @@ class QrCodeActivity : SecureActivity() {
         }
 
         setContentView(R.layout.activity_qr_code)
+        correctInsets(findViewById(R.id.qr_code_screen))
 
         val headTextView: TextView = findViewById(R.id.textview_head)
         val subTextView: TextView = findViewById(R.id.textview_subtext)

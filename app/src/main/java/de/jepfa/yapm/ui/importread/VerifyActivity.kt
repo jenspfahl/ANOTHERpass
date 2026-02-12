@@ -40,6 +40,8 @@ class VerifyActivity : ReadQrCodeOrNfcActivityBase() {
 
     override fun getLayoutId(): Int = R.layout.activity_verify
 
+    override fun getRootViewId() = R.id.verify_screen
+
     override fun handleScannedData(scanned: String) {
         verifyResultText.text = getString(R.string.unknown_qr_code_or_nfc_tag)
         val encrypted = Encrypted.fromEncryptedBase64StringWithCheck(scanned)

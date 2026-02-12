@@ -32,6 +32,7 @@ class EditWebExtensionActivity : SecureActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_web_extension)
+        correctInsets(findViewById(R.id.edit_web_extension_screen))
 
         webClientIdTextView = findViewById(R.id.web_extension_client_id)
         titleTextView = findViewById(R.id.edit_web_extension_title)

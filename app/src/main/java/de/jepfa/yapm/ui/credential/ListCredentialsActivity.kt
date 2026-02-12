@@ -182,7 +182,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     private var searchItem: MenuItem? = null
     private var addCredentialItem: MenuItem? = null
     private var credentialsRecycleView: RecyclerView? = null
-    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var rootView: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var toggle: ActionBarDrawerToggle
     private var resumeAutofillItem: MenuItem? = null
@@ -243,6 +243,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         SecretChecker.getOrAskForSecret(this)
 
         setContentView(R.layout.activity_list_credentials)
+
+        rootView = findViewById(R.id.list_credentials_screen)
+
+        correctInsets(rootView)
+
         val toolbar: Toolbar = findViewById(R.id.list_credentials_toolbar)
         setSupportActionBar(toolbar)
 
@@ -607,7 +612,6 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             true
         }
 
-        drawerLayout = findViewById(R.id.drawer_layout)
         navigationView = findViewById(R.id.nav_drawer_view)
 
         navigationView.setNavigationItemSelectedListener(this)
@@ -617,7 +621,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         toggle = ActionBarDrawerToggle(
             this,
-            drawerLayout,
+            rootView,
             toolbar,
             R.string.navigation_drawer_open,
             R.string.navigation_drawer_close
@@ -641,8 +645,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             }
         })
 
-        drawerLayout.addDrawerListener(toggle)
-        drawerLayout.addDrawerListener(object: DrawerLayout.SimpleDrawerListener() {
+        rootView.addDrawerListener(toggle)
+        rootView.addDrawerListener(object: DrawerLayout.SimpleDrawerListener() {
 
             override fun onDrawerClosed(drawerView: View) {
                 val navMenuAlwaysCollapsed = PreferenceService.getAsBool(
@@ -1563,8 +1567,8 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     }
 
     override fun onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START)
+        if (rootView.isDrawerOpen(GravityCompat.START)) {
+            rootView.closeDrawer(GravityCompat.START)
         }
         else {
             super.onBackPressed()
@@ -1634,7 +1638,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             return false
         }
 
-        drawerLayout.closeDrawer(GravityCompat.START)
+        rootView.closeDrawer(GravityCompat.START)
 
         when (item.itemId) {
             R.id.store_masterpasswd -> {

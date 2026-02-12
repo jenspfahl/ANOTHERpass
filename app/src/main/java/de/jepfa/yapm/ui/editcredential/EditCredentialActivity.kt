@@ -2,15 +2,8 @@ package de.jepfa.yapm.ui.editcredential
 
 import android.app.Activity
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup
-import android.view.WindowInsets
-import androidx.core.view.ViewCompat
-import androidx.core.view.ViewGroupCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.LiveData
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.encrypted.EncCredential
@@ -82,7 +75,7 @@ class EditCredentialActivity : AutofillPushBackActivityBase(), RequestFlows {
         }
         setContentView(R.layout.activity_edit_credential)
 
-        rootView = findViewById(R.id.edit_credential)
+        rootView = findViewById(R.id.edit_credential_screen)
         correctInsets(rootView)
 
         labelViewModel.allLabels.observe(this) { labels ->

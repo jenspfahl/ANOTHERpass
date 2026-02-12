@@ -47,6 +47,7 @@ class NfcActivity : NfcBaseActivity() {
         }
 
         setContentView(R.layout.activity_nfc)
+        correctInsets(findViewById(R.id.nfc_screen))
 
         nfcStatusTextView = findViewById(R.id.read_nfc_status)
         val nfcExplanationTextView: TextView = findViewById(R.id.nfc_explanation)

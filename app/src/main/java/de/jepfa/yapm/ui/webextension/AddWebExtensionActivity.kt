@@ -194,9 +194,9 @@ class AddWebExtensionActivity : ReadQrCodeOrNfcActivityBase(), HttpServer.HttpCa
         super.onDestroy()
     }
 
-    override fun getLayoutId(): Int {
-        return R.layout.activity_add_web_extension
-    }
+    override fun getLayoutId(): Int = R.layout.activity_add_web_extension
+
+    override fun getRootViewId() = R.id.web_extension_screen
 
     override fun handleScannedData(scanned: String) {
         val splitted = scanned.split(":")

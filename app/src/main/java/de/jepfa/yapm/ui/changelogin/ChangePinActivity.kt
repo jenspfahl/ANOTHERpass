@@ -35,6 +35,7 @@ class ChangePinActivity : SecureActivity() {
         }
 
         setContentView(R.layout.activity_change_pin)
+        correctInsets(findViewById(R.id.change_pin_screen))
 
         val currentPinTextView: EditText = findViewById(R.id.current_pin)
         val newPin1TextView: EditText = findViewById(R.id.first_new_pin)

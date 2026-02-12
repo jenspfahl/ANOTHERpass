@@ -60,6 +60,7 @@ class ChangeEncryptionActivity : SecureActivity(), AdapterView.OnItemSelectedLis
         }
 
         setContentView(R.layout.activity_change_encryption)
+        correctInsets(findViewById(R.id.change_vault_screen))
 
         val currentPinTextView: EditText = findViewById(R.id.current_pin)
         val currentEncryptionTextView: TextView = findViewById(R.id.current_encryption_text)
