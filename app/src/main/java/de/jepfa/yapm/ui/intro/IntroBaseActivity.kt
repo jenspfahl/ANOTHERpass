@@ -9,8 +9,8 @@ import de.jepfa.yapm.R
 // Taken from https://github.com/AppIntro/AppIntro
 abstract class IntroBaseActivity : AppIntro() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        super.onCreate(savedInstanceState)
         window.decorView.apply {
             systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN
         }

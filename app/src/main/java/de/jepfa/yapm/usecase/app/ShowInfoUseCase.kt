@@ -21,7 +21,7 @@ object ShowInfoUseCase: BasicUseCase<BaseActivity>() {
         val icon: Drawable = activity.resources.getDrawable(R.mipmap.ic_logo)
         val message = activity.getString(R.string.app_name) + ", Version " + DebugInfo.getVersionName(activity) +
                 System.lineSeparator() + System.lineSeparator() +
-                " \u00A9 Jens Pfahl 2021 - 2025" +
+                " \u00A9 Jens Pfahl 2021 - 2026" +
                 System.lineSeparator() + System.lineSeparator() +
                 activity.getString(R.string.this_app_is_foss) +
                 System.lineSeparator() + activity.getString(
