@@ -90,8 +90,6 @@ open class BaseActivity : AppCompatActivity() {
         StatusAndNavigationBarUtils.correctInsetsAndStatusBar(this, rootView)
     }
 
-
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         if (enableBack && id == android.R.id.home) {
