@@ -10,8 +10,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
-import android.view.WindowInsets
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.ProgressBar
@@ -20,12 +18,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuItemImpl
-import androidx.core.view.ViewCompat
-import androidx.core.view.ViewGroupCompat
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.forEach
-import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
 import de.jepfa.yapm.R
 import de.jepfa.yapm.ui.errorhandling.ExceptionHandler
@@ -93,42 +86,11 @@ open class BaseActivity : AppCompatActivity() {
 
     }
 
-    fun correctInsets(rootView: View) {
-        ViewGroupCompat.installCompatInsetsDispatch(rootView)
-        ViewCompat.setOnApplyWindowInsetsListener(rootView) { v, windowInsets ->
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            // Apply the insets as a margin to the view. This solution sets
-            // only the bottom, left, and right dimensions, but you can apply whichever
-            // insets are appropriate to your layout. You can also update the view padding
-            // if that's more appropriate.
-            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                leftMargin = insets.left
-                topMargin = insets.top
-                bottomMargin = insets.bottom
-                rightMargin = insets.right
-            }
-
-            // Return CONSUMED if you don't want the window insets to keep passing
-            // down to descendant views.
-            WindowInsetsCompat.CONSUMED
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) { // Android 15+
-            window.decorView.setOnApplyWindowInsetsListener { view, insets ->
-                val statusBarInsets = insets.getInsets(WindowInsets.Type.statusBars())
-                view.setBackgroundColor(getColor(R.color.black))
-
-                // Adjust padding to avoid overlap
-                view.setPadding(0, statusBarInsets.top, 0, 0)
-                insets
-            }
-        } else {
-            // For Android 14 and below
-            window.statusBarColor = getColor(R.color.black)
-            WindowCompat.getInsetsController(window, window.decorView)
-                .isAppearanceLightStatusBars = false
-        }
+    fun correctInsetsAndStatusBar(rootView: View) {
+        StatusAndNavigationBarUtils.correctInsetsAndStatusBar(this, rootView)
     }
+
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId

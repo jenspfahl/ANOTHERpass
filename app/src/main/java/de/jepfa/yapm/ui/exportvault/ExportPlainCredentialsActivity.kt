@@ -13,20 +13,16 @@ import de.jepfa.yapm.service.io.CsvService
 import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.service.io.KdbxService
 import de.jepfa.yapm.service.io.TempFileService
-import de.jepfa.yapm.service.secret.AndroidKey
-import de.jepfa.yapm.service.secret.SecretService
 import de.jepfa.yapm.ui.AsyncWithProgressBar
 import de.jepfa.yapm.ui.ChangeKeyboardForPinManager
 import de.jepfa.yapm.ui.SecureActivity
 import de.jepfa.yapm.ui.UseCaseBackgroundLauncher
-import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.ui.credential.KeepassPasswordDialog
 import de.jepfa.yapm.usecase.vault.ExportPlainCredentialsUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.FileUtil
 import de.jepfa.yapm.util.PermissionChecker
 import de.jepfa.yapm.util.observeOnce
-import de.jepfa.yapm.util.putEncryptedExtra
 import de.jepfa.yapm.util.toastText
 import java.io.ByteArrayOutputStream
 
@@ -50,7 +46,7 @@ class ExportPlainCredentialsActivity : SecureActivity() {
         }
 
         setContentView(R.layout.activity_export_plain_credentials)
-        correctInsets(findViewById(R.id.export_plain_credentials_screen))
+        correctInsetsAndStatusBar(findViewById(R.id.export_plain_credentials_screen))
 
         val currentPinTextView: EditText = findViewById(R.id.current_pin)
 

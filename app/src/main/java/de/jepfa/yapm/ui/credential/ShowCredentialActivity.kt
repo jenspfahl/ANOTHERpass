@@ -98,7 +98,7 @@ class ShowCredentialActivity : SecureActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_show_credential)
-        correctInsets(findViewById(R.id.show_credential_screen))
+        correctInsetsAndStatusBar(findViewById(R.id.show_credential_screen))
 
         val toolbar: Toolbar = findViewById(R.id.activity_credential_detail_toolbar)
         setSupportActionBar(toolbar)

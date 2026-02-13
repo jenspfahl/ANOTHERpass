@@ -4,10 +4,8 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -33,7 +31,7 @@ class ListWebExtensionsActivity : SecureActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list_web_extensions)
-        correctInsets(findViewById(R.id.list_web_extensions_screen))
+        correctInsetsAndStatusBar(findViewById(R.id.list_web_extensions_screen))
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
         listWebExtensionsAdapter = ListWebExtensionsAdapter(this)

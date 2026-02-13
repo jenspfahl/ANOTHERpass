@@ -30,7 +30,7 @@ class ImportVaultActivity : SecureActivity() {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_import_vault)
-        correctInsets(findViewById(R.id.import_vault_screen))
+        correctInsetsAndStatusBar(findViewById(R.id.import_vault_screen))
 
         if (isOverrideMode()) {
             checkSession = true

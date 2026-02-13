@@ -15,7 +15,7 @@ class CreateVaultActivity : BaseActivity() {
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_vault)
-        correctInsets(findViewById(R.id.create_vault_screen))
+        correctInsetsAndStatusBar(findViewById(R.id.create_vault_screen))
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

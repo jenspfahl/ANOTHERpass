@@ -2,7 +2,6 @@ package de.jepfa.yapm.ui.nfc
 
 import android.nfc.NfcAdapter
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
@@ -18,7 +17,6 @@ import de.jepfa.yapm.service.nfc.NdefTag
 import de.jepfa.yapm.service.nfc.NfcService
 import de.jepfa.yapm.service.secret.AndroidKey
 import de.jepfa.yapm.service.secret.SecretService
-import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.getEncryptedExtra
 import de.jepfa.yapm.util.toastText
@@ -47,7 +45,7 @@ class NfcActivity : NfcBaseActivity() {
         }
 
         setContentView(R.layout.activity_nfc)
-        correctInsets(findViewById(R.id.nfc_screen))
+        correctInsetsAndStatusBar(findViewById(R.id.nfc_screen))
 
         nfcStatusTextView = findViewById(R.id.read_nfc_status)
         val nfcExplanationTextView: TextView = findViewById(R.id.nfc_explanation)

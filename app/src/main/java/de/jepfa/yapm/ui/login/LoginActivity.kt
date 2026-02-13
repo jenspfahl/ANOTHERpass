@@ -146,7 +146,7 @@ class LoginActivity : NfcBaseActivity() {
                 }
             }
 
-            correctInsets(rootView)
+            correctInsetsAndStatusBar(rootView)
 
 
             if (DebugInfo.isBeta(this) && !DebugInfo.isBetaDisclaimerShown()) {

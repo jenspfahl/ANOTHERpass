@@ -39,7 +39,7 @@ class ImportCredentialsActivity : SecureActivity() {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_import_credentials)
-        correctInsets(findViewById(R.id.import_credentials_screen))
+        correctInsetsAndStatusBar(findViewById(R.id.import_credentials_screen))
 
         //TODO all calls of initLabels() is to refresh the holder when new Labels are inserted to ths model to obtain the id for future lookups
         labelViewModel.allLabels.observe(this) { labels ->

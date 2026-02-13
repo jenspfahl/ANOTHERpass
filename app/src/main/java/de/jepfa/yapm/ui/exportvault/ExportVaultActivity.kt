@@ -15,7 +15,6 @@ import de.jepfa.yapm.service.io.FileIOService
 import de.jepfa.yapm.service.io.FileIOService.Companion.ACTION_EXPORT_VAULT
 import de.jepfa.yapm.service.io.FileIOService.Companion.PARAM_FILE_URI
 import de.jepfa.yapm.service.io.FileIOService.Companion.PARAM_INCLUDE_MK
-import de.jepfa.yapm.service.io.FileIOService.Companion.PARAM_INCLUDE_PREFS
 import de.jepfa.yapm.service.io.TempFileService
 import de.jepfa.yapm.service.io.VaultExportService.createVaultFile
 import de.jepfa.yapm.ui.AsyncWithProgressBar
@@ -46,7 +45,7 @@ class ExportVaultActivity : SecureActivity() {
         }
 
         setContentView(R.layout.activity_export_vault)
-        correctInsets(findViewById(R.id.export_vault_screen))
+        correctInsetsAndStatusBar(findViewById(R.id.export_vault_screen))
 
         includeMasterKeySwitch = findViewById(R.id.switch_include_enc_masterkey)
         includeMasterKeySwitch.isChecked = PreferenceService.getAsBool(

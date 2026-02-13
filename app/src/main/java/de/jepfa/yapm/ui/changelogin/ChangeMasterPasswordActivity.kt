@@ -1,6 +1,5 @@
 package de.jepfa.yapm.ui.changelogin
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputType
@@ -24,7 +23,6 @@ import de.jepfa.yapm.usecase.secret.GenerateMasterPasswordUseCase
 import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.DebugInfo
-import de.jepfa.yapm.util.PasswordColorizer
 import de.jepfa.yapm.util.PasswordColorizer.spannableObfusableAndMaskableString
 import de.jepfa.yapm.util.toastText
 
@@ -57,7 +55,7 @@ class ChangeMasterPasswordActivity : SecureActivity() {
         passwordPresentation = Password.FormattingStyle.createFromFlags(multiLine, formatted)
 
         setContentView(R.layout.activity_change_master_password)
-        correctInsets(findViewById(R.id.change_master_password_screen))
+        correctInsetsAndStatusBar(findViewById(R.id.change_master_password_screen))
 
         val currentPinTextView: EditText = findViewById(R.id.current_pin)
         val pseudoPhraseSwitch: SwitchCompat = findViewById(R.id.switch_use_pseudo_phrase)

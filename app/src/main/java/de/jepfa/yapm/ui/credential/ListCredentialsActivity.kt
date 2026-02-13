@@ -246,7 +246,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
 
         rootView = findViewById(R.id.list_credentials_screen)
 
-        correctInsets(rootView)
+        correctInsetsAndStatusBar(rootView)
 
         val toolbar: Toolbar = findViewById(R.id.list_credentials_toolbar)
         setSupportActionBar(toolbar)

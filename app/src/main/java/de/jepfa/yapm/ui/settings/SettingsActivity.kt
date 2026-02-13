@@ -32,7 +32,6 @@ import de.jepfa.yapm.usecase.vault.LockVaultUseCase
 import de.jepfa.yapm.util.ClipboardUtil
 import de.jepfa.yapm.util.toastText
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 private const val TITLE_TAG = "settingsActivityTitle"
@@ -49,7 +48,7 @@ class SettingsActivity : SecureActivity(),
         }
 
         setContentView(R.layout.settings_activity)
-        correctInsets(findViewById(R.id.settings_screen))
+        correctInsetsAndStatusBar(findViewById(R.id.settings_screen))
 
         val openServerSettings = intent.getBooleanExtra("OpenServerSettings", false)
 

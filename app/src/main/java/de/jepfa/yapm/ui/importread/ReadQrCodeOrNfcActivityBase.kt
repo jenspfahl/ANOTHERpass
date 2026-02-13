@@ -37,7 +37,7 @@ abstract class ReadQrCodeOrNfcActivityBase : NfcBaseActivity() {
         }
 
         setContentView(getLayoutId())
-        correctInsets(findViewById(getRootViewId()))
+        correctInsetsAndStatusBar(findViewById(getRootViewId()))
 
         val scanQrCodeImageView = findViewById<ImageView>(R.id.imageview_scan_qrcode)
         scanQrCodeImageView.setOnClickListener {

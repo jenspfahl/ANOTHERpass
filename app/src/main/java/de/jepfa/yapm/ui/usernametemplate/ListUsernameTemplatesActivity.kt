@@ -25,7 +25,7 @@ class ListUsernameTemplatesActivity : SecureActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list_username_templates)
-        correctInsets(findViewById(R.id.list_username_template_screen))
+        correctInsetsAndStatusBar(findViewById(R.id.list_username_template_screen))
 
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
         listUsernameTemplatesAdapter = ListUsernameTemplatesAdapter(this)

@@ -76,7 +76,7 @@ class EditCredentialActivity : AutofillPushBackActivityBase(), RequestFlows {
         setContentView(R.layout.activity_edit_credential)
 
         rootView = findViewById(R.id.edit_credential_screen)
-        correctInsets(rootView)
+        correctInsetsAndStatusBar(rootView)
 
         labelViewModel.allLabels.observe(this) { labels ->
             masterSecretKey?.let { key ->

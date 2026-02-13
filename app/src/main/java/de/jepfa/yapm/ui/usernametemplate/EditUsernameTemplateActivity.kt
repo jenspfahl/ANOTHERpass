@@ -36,7 +36,7 @@ class EditUsernameTemplateActivity : SecureActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_username_template)
-        correctInsets(findViewById(R.id.edit_username_template_screen))
+        correctInsetsAndStatusBar(findViewById(R.id.edit_username_template_screen))
 
         templateUsernameTextView = findViewById(R.id.edit_username_template_username)
         templateDescriptionTextView = findViewById(R.id.edit_username_template_description)

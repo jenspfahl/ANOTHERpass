@@ -3,6 +3,7 @@ package de.jepfa.yapm.ui.qrcode
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -13,8 +14,8 @@ import com.google.zxing.RGBLuminanceSource
 import com.google.zxing.common.HybridBinarizer
 import com.journeyapps.barcodescanner.*
 import com.journeyapps.barcodescanner.CaptureActivity
-import androidx.activity.enableEdgeToEdge
 import de.jepfa.yapm.R
+import de.jepfa.yapm.ui.StatusAndNavigationBarUtils
 import de.jepfa.yapm.util.DebugInfo
 import de.jepfa.yapm.util.FileUtil
 import de.jepfa.yapm.util.PermissionChecker
@@ -40,6 +41,11 @@ class CaptureActivity: CaptureActivity() {
         val toggleFlash: ImageView = findViewById(R.id.flash_light)
         val scanImageView: ImageView = findViewById(R.id.scan_image)
         scannerView = findViewById<View>(R.id.zxing_barcode_scanner) as DecoratedBarcodeView
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            val height = StatusAndNavigationBarUtils.getStatusBarHeight(this)
+            findViewById<View>(R.id.barcode_scanner_icons).setPadding(0, height, 0, 0)
+        }
 
         back.setOnClickListener {
             finish()
@@ -75,8 +81,8 @@ class CaptureActivity: CaptureActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.decorView.apply {
-            systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            StatusAndNavigationBarUtils.correctInsetsAndStatusBar(this, window.decorView, correctTop = false)
         }
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
