@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import de.jepfa.yapm.R
 import de.jepfa.yapm.service.secret.SaltService
 import de.jepfa.yapm.ui.BaseActivity
+import de.jepfa.yapm.ui.StatusAndNavigationBarUtils
 import de.jepfa.yapm.ui.login.LoginActivity
 import de.jepfa.yapm.usecase.session.LogoutUseCase
 import de.jepfa.yapm.util.ClipboardUtil
@@ -33,10 +34,11 @@ class ErrorActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_error)
+        StatusAndNavigationBarUtils.correctInsetsAndStatusBar(this, findViewById(R.id.error_screen))
 
-        var errorHeaderView = findViewById<TextView>(R.id.error_header)
-        var errorTraceView = findViewById<TextView>(R.id.bug_report)
-        var userDescription = findViewById<EditText>(R.id.error_user_description)
+        val errorHeaderView = findViewById<TextView>(R.id.error_header)
+        val errorTraceView = findViewById<TextView>(R.id.bug_report)
+        val userDescription = findViewById<EditText>(R.id.error_user_description)
         fromErrorCatcher = intent.getBooleanExtra(EXTRA_FROM_ERROR_CATCHER, false)
         var errorText = intent.getCharSequenceExtra(EXTRA_EXCEPTION)?.toString() ?: ""
 

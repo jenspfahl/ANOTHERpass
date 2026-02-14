@@ -30,7 +30,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:text="@string/create_vault_explanation_1"
-                    android:layout_marginBottom="24dp"/>
+                    android:layout_marginBottom="36dp"/>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
@@ -48,8 +48,8 @@
                         android:id="@+id/generated_passwd"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginBottom="16dp"
+                        android:layout_marginTop="32dp"
+                        android:layout_marginBottom="32dp"
                         style="@style/generated_password" />
 
 
@@ -65,7 +65,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:layout_marginTop="16dp"
-                            android:layout_marginBottom="16dp"
+                            android:layout_marginBottom="32dp"
                             android:textAlignment="center"
                             android:textSize="12sp"
                             android:drawablePadding="16dp"
@@ -82,7 +82,7 @@
                         android:layout_width="75pt"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginTop="16dp"
                         android:background="@color/white"
                         android:text="@string/button_gen_passwd"
                         android:textAlignment="center"

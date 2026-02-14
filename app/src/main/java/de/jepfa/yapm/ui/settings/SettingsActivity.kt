@@ -188,7 +188,7 @@ class SettingsActivity : SecureActivity(),
             findPreference<SwitchPreferenceCompat>(
                 PreferenceService.PREF_OLD_STATUS_BAR_COLOR)?.let {
                 it.setOnPreferenceChangeListener { preference, _ ->
-                    PreferenceService.putBoolean(PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_RELOAD, true, preference.context)
+                    PreferenceService.putBoolean(PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD, true, preference.context)
                     true
                 }
             }

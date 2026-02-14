@@ -1,12 +1,11 @@
 package de.jepfa.yapm.ui
 
 import android.app.Activity
-import android.content.Context
 import android.graphics.Color
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.annotation.ColorInt
 import androidx.core.view.ViewCompat
@@ -14,12 +13,11 @@ import androidx.core.view.ViewGroupCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isGone
-import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
 import de.jepfa.yapm.R
 import de.jepfa.yapm.service.PreferenceService
-import de.jepfa.yapm.service.PreferenceService.PREF_NAV_MENU_ALWAYS_COLLAPSED
 import de.jepfa.yapm.service.PreferenceService.PREF_OLD_STATUS_BAR_COLOR
+
 
 // Inspired by - https://stackoverflow.com/a/79286757
 // Posted by Shouheng Wang, modified by community. See post 'Timeline' for change history
@@ -36,17 +34,15 @@ object StatusAndNavigationBarUtils {
 
             if (v.layoutParams is ViewGroup.MarginLayoutParams) {
                 v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                    leftMargin = insets.left
                     topMargin = if (correctTop) insets.top else topMargin
                     bottomMargin = if (correctBottom) insets.bottom else bottomMargin
-                    rightMargin = insets.right
                 }
             }
             else {
                 v.setPaddingRelative(
-                    insets.left,
+                    0,
                     if (correctTop) insets.top else 0,
-                    insets.right,
+                    0,
                     if (correctBottom) insets.bottom else 0
                 )
             }
@@ -68,7 +64,7 @@ object StatusAndNavigationBarUtils {
 
     fun setStatusBarColor(activity: Activity, @ColorInt color: Int): View? {
         transparentStatusBar(activity.window)
-        return applyStatusBarColor(activity.window, color)
+        return applyStatusBarColor(activity, color)
     }
 
     fun transparentStatusBar(window: Window) {
@@ -80,8 +76,8 @@ object StatusAndNavigationBarUtils {
         window.statusBarColor = Color.TRANSPARENT
     }
 
-    private fun applyStatusBarColor(window: Window, color: Int): View? {
-        val parent = window.decorView
+    private fun applyStatusBarColor(activity: Activity, color: Int): View? {
+        val parent = activity.window.decorView
         if (parent !is ViewGroup) return null
         var fakeStatusBarView = parent.findViewWithTag<View?>(TAG_STATUS_BAR)
         if (fakeStatusBarView != null) {
@@ -90,20 +86,20 @@ object StatusAndNavigationBarUtils {
             }
             fakeStatusBarView.setBackgroundColor(color)
             fakeStatusBarView.updateLayoutParams {
-                height = getStatusBarHeight(window.context)
+                height = getStatusBarHeight(activity)
             }
         } else {
-            fakeStatusBarView = createStatusBarView(window.context, color)
+            fakeStatusBarView = createStatusBarView(activity, color)
             parent.addView(fakeStatusBarView)
         }
         return fakeStatusBarView
     }
 
-    private fun createStatusBarView(context: Context, color: Int): View {
-        val statusBarView = View(context)
+    private fun createStatusBarView(activity: Activity, color: Int): View {
+        val statusBarView = View(activity)
         statusBarView.setLayoutParams(
             ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, getStatusBarHeight(context)
+                ViewGroup.LayoutParams.MATCH_PARENT, getStatusBarHeight(activity)
             )
         )
         statusBarView.setBackgroundColor(color)
@@ -111,8 +107,13 @@ object StatusAndNavigationBarUtils {
         return statusBarView
     }
 
-    fun getStatusBarHeight(context: Context): Int {
-        val resources = context.resources
+    fun getStatusBarHeight(activity: Activity): Int {
+        val windowInsets: WindowInsets? = activity.window.decorView.getRootWindowInsets()
+        if (windowInsets != null) {
+            return windowInsets.getInsets(WindowInsets.Type.statusBars()).top
+        }
+
+        val resources = activity.resources
         val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
         return resources.getDimensionPixelSize(resourceId)
     }
