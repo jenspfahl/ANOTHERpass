@@ -432,6 +432,7 @@
     <string name="pref_general_show_labels">在概览列表中显示标签</string>
     <string name="pref_general_show_dividers">在概览列表中显示分隔线</string>
     <string name="pref_general_nav_menu_always_collapsed">始终以折叠的菜单树开始</string>
+    <string name="pref_general_old_status_bar_color">Use old status bar style</string>
     <string name="pref_general_show_formatted_passwords">显示格式化的密码</string>
     <string name="pref_general_summary_show_formatted_passwords">显示按单词分隔的密码，并使用强调高亮颜色以提高可读性</string>
     <string name="pref_general_colorize_passwords">为显示的密码着色</string>

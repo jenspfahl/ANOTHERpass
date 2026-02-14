@@ -105,12 +105,7 @@ class ShowCredentialActivity : SecureActivity() {
 
         titleLayout = findViewById(R.id.collapsing_toolbar_layout_title)
         toolbarChipGroup = findViewById(R.id.toolbar_chip_group)
-        titleLayout.post {
-            // this is important to ensure labels are faded out when collapsing the app bar
-            val layoutParams = toolbar.layoutParams as CollapsingToolbarLayout.LayoutParams
-            layoutParams.height = titleLayout.height
-            toolbar.layoutParams = layoutParams
-        }
+
 
         val idExtra = intent.getIntExtra(EncCredential.EXTRA_CREDENTIAL_ID, -1)
         mode = when (intent.getStringExtra(EXTRA_MODE)) {

@@ -417,6 +417,7 @@ Deze waarschuwing kunt u deactiveren onder \'Instellingen/Beveiliging\'.</string
   <string name="pref_general_show_labels">Toon categorieën in overzichtslijst</string>
   <string name="pref_general_show_dividers">Toon scheidslijnen in overzichtslijst</string>
   <string name="pref_general_nav_menu_always_collapsed">Begin altijd met de menuboom samengevouwen</string>
+  <string name="pref_general_old_status_bar_color">Use old status bar style</string>
   <string name="pref_general_show_formatted_passwords">Wachtwoorden opmaken</string>
   <string name="pref_general_summary_show_formatted_passwords">Formatteert wachtwoorden gescheiden als woorden en verschillende kleuren om de leesbaarheid te vergroten</string>
   <string name="pref_general_colorize_passwords">Gebruik verschillende kleuren</string>

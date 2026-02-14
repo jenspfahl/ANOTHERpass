@@ -3,6 +3,7 @@ package de.jepfa.yapm.ui
 import android.app.Activity
 import android.content.Context
 import android.graphics.Color
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
@@ -16,6 +17,9 @@ import androidx.core.view.isGone
 import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
 import de.jepfa.yapm.R
+import de.jepfa.yapm.service.PreferenceService
+import de.jepfa.yapm.service.PreferenceService.PREF_NAV_MENU_ALWAYS_COLLAPSED
+import de.jepfa.yapm.service.PreferenceService.PREF_OLD_STATUS_BAR_COLOR
 
 // Inspired by - https://stackoverflow.com/a/79286757
 // Posted by Shouheng Wang, modified by community. See post 'Timeline' for change history
@@ -47,15 +51,18 @@ object StatusAndNavigationBarUtils {
                 )
             }
 
+            val oldStatusBarColor = PreferenceService.getAsBool(PREF_OLD_STATUS_BAR_COLOR, false, activity)
+
+            val statusBarColor = activity.getColor(if (oldStatusBarColor) R.color.colorPrimaryDark else R.color.black)
+
+            setStatusBarColor(activity, statusBarColor)
+            activity.window.statusBarColor = statusBarColor
+            WindowCompat.getInsetsController(activity.window, activity.window.decorView).isAppearanceLightStatusBars = false
+            WindowCompat.getInsetsController(activity.window, activity.window.decorView).isAppearanceLightNavigationBars = false
+
             WindowInsetsCompat.CONSUMED
         }
 
-        val statusBarColor = activity.getColor(R.color.black)
-
-        setStatusBarColor(activity, statusBarColor)
-        activity.window.statusBarColor = statusBarColor
-        WindowCompat.getInsetsController(activity.window, activity.window.decorView).isAppearanceLightStatusBars = false
-        WindowCompat.getInsetsController(activity.window, activity.window.decorView).isAppearanceLightNavigationBars = false
     }
 
 
@@ -82,6 +89,9 @@ object StatusAndNavigationBarUtils {
                 fakeStatusBarView.visibility = View.VISIBLE
             }
             fakeStatusBarView.setBackgroundColor(color)
+            fakeStatusBarView.updateLayoutParams {
+                height = getStatusBarHeight(window.context)
+            }
         } else {
             fakeStatusBarView = createStatusBarView(window.context, color)
             parent.addView(fakeStatusBarView)

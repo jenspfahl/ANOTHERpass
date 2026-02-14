@@ -146,6 +146,7 @@ object PreferenceService {
     const val PREF_SHOW_LABELS_IN_LIST = PREF_PREFIX + "show_labels_in_list"
     const val PREF_SHOW_DIVIDERS_IN_LIST = PREF_PREFIX + "show_dividers_in_list"
     const val PREF_NAV_MENU_ALWAYS_COLLAPSED = PREF_PREFIX + "nav_menu_always_collapsed"
+    const val PREF_OLD_STATUS_BAR_COLOR = PREF_PREFIX + "old_status_bar_color"
     const val PREF_COLORIZE_MP_QRCODES = PREF_PREFIX + "colorize_mp_qrcodes"
     const val PREF_QRCODES_WITH_HEADER = PREF_PREFIX + "qrcodes_with_header"
     const val PREF_LABEL_FILTER_SINGLE_CHOICE = PREF_PREFIX + "label_filter_single_choice"
