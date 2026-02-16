@@ -2,6 +2,7 @@ package de.jepfa.yapm.ui
 
 import android.app.Activity
 import android.graphics.Color
+import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
@@ -109,7 +110,7 @@ object StatusAndNavigationBarUtils {
 
     fun getStatusBarHeight(activity: Activity): Int {
         val windowInsets: WindowInsets? = activity.window.decorView.getRootWindowInsets()
-        if (windowInsets != null) {
+        if (windowInsets != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             return windowInsets.getInsets(WindowInsets.Type.statusBars()).top
         }
 
