@@ -240,8 +240,24 @@
             </intent-filter>
         </service>
 
+        <service android:name=".service.credentialprovider.PasskeyProviderService"
+            android:enabled="true"
+            android:exported="true"
+            android:label="ANOTHERpass Credential Provider"
+            android:icon="@mipmap/ic_launcher"
+            android:permission="android.permission.BIND_CREDENTIAL_PROVIDER_SERVICE"
+            tools:targetApi="upside_down_cake">
+            <intent-filter>
+                <action android:name="android.service.credentials.CredentialProviderService"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.credentials.provider"
+                android:resource="@xml/provider"/>
+        </service>
 
-</application>
+
+
+    </application>
 
     <queries>
         <intent>
