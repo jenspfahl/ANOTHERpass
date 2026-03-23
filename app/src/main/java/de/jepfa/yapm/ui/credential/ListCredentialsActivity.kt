@@ -21,6 +21,7 @@ import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
@@ -44,10 +45,22 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.MenuItemCompat
 import androidx.core.view.setPadding
+import androidx.credentials.CreatePasswordRequest
+import androidx.credentials.CreatePasswordResponse
+import androidx.credentials.CreatePublicKeyCredentialRequest
+import androidx.credentials.CreatePublicKeyCredentialResponse
+import androidx.credentials.provider.AuthenticationResult
+import androidx.credentials.provider.CallingAppInfo
+import androidx.credentials.provider.PendingIntentHandler
+import androidx.credentials.webauthn.AuthenticatorAttestationResponse
+import androidx.credentials.webauthn.FidoPublicKeyCredential
+import androidx.credentials.webauthn.PublicKeyCredentialCreationOptions
 import androidx.documentfile.provider.DocumentFile
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -83,6 +96,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_CREDENTIAL_IDS
 import de.jepfa.yapm.service.PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD
 import de.jepfa.yapm.service.PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_RELOAD
 import de.jepfa.yapm.service.autofill.ResponseFiller
+import de.jepfa.yapm.service.credentialprovider.PasskeyProviderService
 import de.jepfa.yapm.service.io.AutoBackupService
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelFilter.WITH_NO_LABELS_ID
@@ -155,6 +169,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.asCompletableFuture
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import java.security.KeyPairGenerator
+import java.security.MessageDigest
+import java.security.spec.ECGenParameterSpec
 import java.util.UUID
 
 
@@ -1150,6 +1167,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         super.onDestroy()
     }
 
+    @SuppressLint("NewApi")
     private fun updateSearchFieldWithAutofillSuggestion(intent: Intent?, refreshCredentials: Boolean = false) {
         if (!Session.isDenied()) {
             intent?.action?.let { action ->
@@ -1181,9 +1199,153 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                         }
                     }
                 }
+                else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+                    && action.startsWith(Constants.ACTION_CREATE_PASSKEY)) {
+                    val request =
+                        PendingIntentHandler.retrieveProviderCreateCredentialRequest(intent)
+
+                    val accountId = intent.getStringExtra(PasskeyProviderService.EXTRA_KEY_ACCOUNT_ID)
+                    if (request != null && request.callingRequest is CreatePublicKeyCredentialRequest) {
+                        val publicKeyRequest: CreatePublicKeyCredentialRequest =
+                            request.callingRequest as CreatePublicKeyCredentialRequest
+                        createPasskey(
+                            publicKeyRequest.requestJson,
+                            request.callingAppInfo,
+                            publicKeyRequest.clientDataHash,
+                            accountId
+                        )
+                    }
+                }
+                else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+                    && action.startsWith(Constants.ACTION_CREATE_PASSWORD)) {
+                    val createRequest = PendingIntentHandler.retrieveProviderCreateCredentialRequest(intent)
+                    val accountId = intent.getStringExtra(PasskeyProviderService.EXTRA_KEY_ACCOUNT_ID)
+
+                    if (createRequest == null) {
+                        return
+                    }
+
+                    val request: CreatePasswordRequest = createRequest.callingRequest as CreatePasswordRequest
+
+// Fetch the ID and password from the request and save it in your database
+                   /* mDatabase.addNewPassword(
+                        PasswordInfo(
+                            request.id,
+                            request.password,
+                            createRequest.callingAppInfo.packageName
+                        )
+                    )*/
+
+// Set the final response back
+                    val result = Intent()
+                    val response = CreatePasswordResponse()
+                    PendingIntentHandler.setCreateCredentialResponse(result, response)
+                    setResult(Activity.RESULT_OK, result)
+                    finish()
+
+                }
             }
         }
     }
+
+    @SuppressLint("RestrictedApi")
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+    fun createPasskey(
+        requestJson: String,
+        callingAppInfo: CallingAppInfo?,
+        clientDataHash: ByteArray?,
+        accountId: String?
+    ) {
+        val request = PublicKeyCredentialCreationOptions(requestJson)
+
+        val biometricPrompt = BiometricPrompt(
+            this,
+            { }, // Pass in your own executor
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    super.onAuthenticationError(errorCode, errString)
+                    finish()
+                }
+
+                override fun onAuthenticationFailed() {
+                    super.onAuthenticationFailed()
+                    finish()
+                }
+
+                @SuppressLint("RestrictedApi")
+                @RequiresApi(Build.VERSION_CODES.P)
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    super.onAuthenticationSucceeded(result)
+
+                    // Generate a credentialId
+                    val credentialId = ByteArray(32)
+                    SecretService.getSecureRandom(this@ListCredentialsActivity).nextBytes(credentialId)
+
+                    // Generate a credential key pair
+                    val spec = ECGenParameterSpec("secp256r1")
+                    val keyPairGen = KeyPairGenerator.getInstance("EC")
+                    keyPairGen.initialize(spec)
+                    val keyPair = keyPairGen.genKeyPair()
+
+                    // Save passkey in your database as per your own implementation
+
+                    // Create AuthenticatorAttestationResponse object to pass to
+                    // FidoPublicKeyCredential
+
+                    val response = AuthenticatorAttestationResponse(
+                        requestOptions = request,
+                        credentialId = credentialId,
+                        credentialPublicKey = keyPair.public.encoded,
+                        origin = appInfoToOrigin(callingAppInfo!!),
+                        up = true,
+                        uv = true,
+                        be = true,
+                        bs = true,
+                        packageName = callingAppInfo.packageName
+                    )
+
+                    val credential = FidoPublicKeyCredential(
+                        rawId = credentialId,
+                        response = response,
+                        authenticatorAttachment = "", // Add your authenticator attachment
+                    )
+                    val result = Intent()
+
+                    val createPublicKeyCredResponse =
+                        CreatePublicKeyCredentialResponse(credential.json())
+
+                    // Set the CreateCredentialResponse as the result of the Activity
+                    PendingIntentHandler.setCreateCredentialResponse(
+                        result,
+                        createPublicKeyCredResponse
+                    )
+                    setResult(RESULT_OK, result)
+                    finish()
+                }
+            }
+        )
+
+        val promptInfo = BiometricPrompt.PromptInfo.Builder()
+            .setTitle("Use your screen lock")
+            .setNegativeButtonText("negative")
+            .setSubtitle("Create passkey for ${request.rp.name}")
+            .setAllowedAuthenticators(
+                BiometricManager.Authenticators.BIOMETRIC_STRONG
+                /* or BiometricManager.Authenticators.DEVICE_CREDENTIAL */
+            )
+            .build()
+        biometricPrompt.authenticate(promptInfo)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.P)
+    fun appInfoToOrigin(info: CallingAppInfo): String {
+        val cert = info.signingInfo.apkContentsSigners[0].toByteArray()
+        val md = MessageDigest.getInstance("SHA-256")
+        val certHash = md.digest(cert)
+        // This is the format for origin
+        return "android:apk-key-hash:${Base64.encodeToString(certHash, Base64.NO_WRAP)}"
+    }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
@@ -1566,6 +1728,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         toastText(this, getString(R.string.auto_export_configured, getFullName(newBackupFile)))
     }
 
+    //TODO https://developer.android.com/guide/navigation/custom-back/predictive-back-gesture?utm_source=android-studio-app&utm_medium=app
     override fun onBackPressed() {
         if (rootView.isDrawerOpen(GravityCompat.START)) {
             rootView.closeDrawer(GravityCompat.START)

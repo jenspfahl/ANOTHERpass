@@ -38,6 +38,8 @@ object Constants {
     const val ACTION_PAUSE_AUTOFILL = "pauseAutofill"
     const val ACTION_PREFILLED_FROM_EXTENSION = "prefilledFromExtension"
     const val ACTION_OPEN_AUTOFILL_DIALOG = "openAutofillDialog"
+    const val ACTION_CREATE_PASSKEY = "createPasskey"
+    const val ACTION_CREATE_PASSWORD = "createPassword"
 
 
 

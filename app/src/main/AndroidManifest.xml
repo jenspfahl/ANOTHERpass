@@ -252,7 +252,7 @@
             </intent-filter>
             <meta-data
                 android:name="android.credentials.provider"
-                android:resource="@xml/provider"/>
+                android:resource="@xml/credential_provider"/>
         </service>
 
 
