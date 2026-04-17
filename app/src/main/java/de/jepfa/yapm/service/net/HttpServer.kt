@@ -78,337 +78,329 @@ object HttpServer {
     var linkHttpCallback: HttpCallback? = null
     var requestCredentialHttpCallback: HttpCallback? = null
 
-    fun startApiServerAsync(
+
+
+    suspend fun startApiServerAsync(
         _port: Int, activity: SecureActivity,
         httpServerCallback: HttpServerCallback,
-    ): Deferred<Boolean> {
+    ): Boolean {
         isHttpServerStarting = true
-        return CoroutineScope(Dispatchers.IO).async {
 
-            Log.i("HTTP", "start API server")
-            try {
+        Log.i("HTTP", "start API server")
+        try {
 
-                Log.i("HTTP", "launch API server")
-                if (httpServer != null) {
-                    httpServer?.stopSuspend(gracePeriodMillis = 100, timeoutMillis= 100)
-                }
+            Log.i("HTTP", "launch API server")
+            if (httpServer != null) {
+                httpServer?.stopSuspend(gracePeriodMillis = 100, timeoutMillis= 100)
+            }
 
-                httpServer = embeddedServer(Netty,
-                    environment = applicationEnvironment { },
-                    configure = {
-                        connector {
-                            port = _port
+            httpServer = embeddedServer(Netty, port = _port) {
+                routing {
+                    options {
+                        call.response.header(
+                            "Access-Control-Allow-Origin",
+                            "*"
+                        )
+                        call.response.header(
+                            "Access-Control-Allow-Headers",
+                            "X-WebClientId,Content-Type"
+                        )
+
+                        call.respond(
+                            status = HttpStatusCode.OK,
+                            message = ""
+                        )
+                    }
+                    get("/") {
+
+                        serverLog(
+                            origin = call.request.origin,
+                            msg = "GET request received, ignored",
+                        )
+
+                        call.respondText(
+                            text = "Download the ANOTHERpass browser extension to use the app as a credential server. It can be downloaded <a href=\"https://anotherpass.jepfa.de/extension/\">here</a>.",
+                            contentType = ContentType("text", "html"),
+                        )
+
+                    }
+                    get("/{downloadKey}") {
+
+                        call.response.header(
+                            "Access-Control-Allow-Origin",
+                            "*"
+                        )
+
+                        if (SecretService.isDeviceLocked(activity)) {
+                            respondError(
+                                null,
+                                HttpStatusCode.Unauthorized,
+                                "device locked",
+                            )
+                            return@get
                         }
-                    },
-                    module = {
-                        routing {
-                            options {
-                                call.response.header(
-                                    "Access-Control-Allow-Origin",
-                                    "*"
-                                )
-                                call.response.header(
-                                    "Access-Control-Allow-Headers",
-                                    "X-WebClientId,Content-Type"
-                                )
 
-                                call.respond(
-                                    status = HttpStatusCode.OK,
-                                    message = ""
+                        if (Session.isDenied()) {
+                            respondError(
+                                null,
+                                HttpStatusCode.Unauthorized,
+                                "no active session",
+                            )
+                            shutdownAllAsync()
+                            return@get
+                        }
+
+                        val downloadKey = call.parameters["downloadKey"]
+
+                        if (!downloadKey.isNullOrEmpty()) {
+
+                            Log.i("HTTP", "download request for $downloadKey")
+
+                            if (downloadKey != latestDownloadKey) {
+                                respondError(
+                                    null,
+                                    HttpStatusCode.NotFound,
+                                    "Unknown file to download"
                                 )
                             }
-                            get("/") {
+                            else {
 
-                                serverLog(
-                                    origin = call.request.origin,
-                                    msg = "GET request received, ignored",
+                                val webClientId = downloadKey.substringBefore("_")
+                                val file = TempFileService.unholdVaultBackupFile()
+
+                                Log.i(
+                                    "HTTP",
+                                    "continuing download request for $webClientId and ${file?.name}"
                                 )
 
-                                call.respondText(
-                                    text = "Download the ANOTHERpass browser extension to use the app as a credential server. It can be downloaded <a href=\"https://anotherpass.jepfa.de/extension/\">here</a>.",
-                                    contentType = ContentType("text", "html"),
-                                )
+                                if (file != null) {
 
-                            }
-                            get("/{downloadKey}") {
-
-                                call.response.header(
-                                    "Access-Control-Allow-Origin",
-                                    "*"
-                                )
-
-                                if (SecretService.isDeviceLocked(activity)) {
-                                    respondError(
-                                        null,
-                                        HttpStatusCode.Unauthorized,
-                                        "device locked",
-                                    )
-                                    return@get
-                                }
-
-                                if (Session.isDenied()) {
-                                    respondError(
-                                        null,
-                                        HttpStatusCode.Unauthorized,
-                                        "no active session",
-                                    )
-                                    shutdownAllAsync()
-                                    return@get
-                                }
-
-                                val downloadKey = call.parameters["downloadKey"]
-
-                                if (!downloadKey.isNullOrEmpty()) {
-
-                                    Log.i("HTTP", "download request for $downloadKey")
-
-                                    if (downloadKey != latestDownloadKey) {
-                                        respondError(
-                                            null,
-                                            HttpStatusCode.NotFound,
-                                            "Unknown file to download"
-                                        )
-                                    }
-                                    else {
-
-                                        val webClientId = downloadKey.substringBefore("_")
-                                        val file = TempFileService.unholdVaultBackupFile()
-
-                                        Log.i(
-                                            "HTTP",
-                                            "continuing download request for $webClientId and ${file?.name}"
-                                        )
-
-                                        if (file != null) {
-
-                                            respondFile(webClientId, file)
-                                        } else {
-                                            respondError(
-                                                webClientId,
-                                                HttpStatusCode.NotFound,
-                                                "No file to download"
-                                            )
-                                        }
-                                    }
-                                }
-                                else {
-                                    respondError(
-                                        null,
-                                        HttpStatusCode.BadRequest,
-                                        "Missing download key"
-                                    )
-                                }
-                            }
-                            post("/") {
-                                var webClientId: String? = null
-                                try {
-                                    call.response.header(
-                                        "Access-Control-Allow-Origin",
-                                        "*"
-                                    )
-
-                                    webClientId = call.request.headers["X-WebClientId"]
-
-                                    serverLog(
-                                        webClientId = webClientId,
-                                        origin = call.request.origin,
-                                        msg = "POST request received",
-                                    )
-
-                                    if (SecretService.isDeviceLocked(activity)) {
-                                        respondError(
-                                            null,
-                                            HttpStatusCode.Unauthorized,
-                                            "device locked",
-                                        )
-                                        return@post
-                                    }
-
-                                    if (Session.isDenied()) {
-                                        respondError(
-                                            null,
-                                            HttpStatusCode.Unauthorized,
-                                            "no active session",
-                                        )
-                                        shutdownAllAsync()
-                                        return@post
-                                    }
-
-                                    httpServerCallback.handleOnIncomingRequest(webClientId)
-
-                                    if (webClientId == null) {
-                                        //fail
-                                        respondError(
-                                            null,
-                                            HttpStatusCode.BadRequest,
-                                            "X-WebClientId header missing",
-                                        )
-                                        return@post
-                                    }
-                                    if (!checkWebClientIdFormat(webClientId)) {
-                                        //fail
-                                        respondError(
-                                            null,
-                                            HttpStatusCode.BadRequest,
-                                            "X-WebClientId malformed",
-                                        )
-                                        return@post
-                                    }
-
-                                    val masterKey = activity.masterSecretKey
-                                    if (masterKey == null) {
-                                        respondError(
-                                            webClientId,
-                                            HttpStatusCode.Unauthorized,
-                                            "Locked",
-                                        )
-                                        return@post
-                                    }
-
-                                    val webExtension =
-                                        activity.getApp().webExtensionRepository.getAllSync()
-                                            .find {
-                                                SecretService.decryptCommonString(
-                                                    masterKey,
-                                                    it.webClientId
-                                                ) == webClientId
-                                            }
-                                    if (webExtension == null) {
-                                        respondError(
-                                            webClientId,
-                                            HttpStatusCode.NotFound,
-                                            "webClientId is unknown",
-                                        )
-                                        return@post
-                                    }
-                                    Log.d("HTTP", "checking WebExtensionId: ${webExtension.id}")
-
-                                    if (!webExtension.enabled) {
-                                        respondError(
-                                            webClientId,
-                                            HttpStatusCode.Forbidden,
-                                            "webClientId is blocked",
-                                        )
-                                        return@post
-                                    }
-                                    Log.d("HTTP", "handling WebExtensionId: ${webExtension.id}")
-
-                                    val body = call.receive<String>()
-
-                                    Log.d("HTTP", "requesting web extension: $webClientId")
-
-                                    val sharedBaseOrLinkingSessionKey = SecretService.decryptKey(masterKey, webExtension.sharedBaseKey)
-                                    if (!sharedBaseOrLinkingSessionKey.isValid()) {
-                                        Log.w("HTTP", "No configured base key")
-                                        respondError(
-                                            webClientId,
-                                            HttpStatusCode.BadRequest,
-                                            "No base key",
-                                        )
-                                        return@post
-                                    }
-
-                                    val payload = JSONObject(body)
-
-
-                                    val requestTransportKey = extractRequestTransportKey(
-                                        sharedBaseOrLinkingSessionKey,
-                                        webExtension,
-                                        payload.optString("encOneTimeKey")
-                                    )
-                                    if (requestTransportKey == null) {
-                                        respondError(
-                                            webClientId,
-                                            HttpStatusCode.BadRequest,
-                                            "Cannot derive request transport key",
-                                        )
-                                        return@post
-                                    }
-
-                                    val message = unwrapBody(
-                                        requestTransportKey,
-                                        payload,
-                                        activity
-                                    )
-                                    if (message == null) {
-                                        respondError(
-                                            webClientId,
-                                            HttpStatusCode.BadRequest,
-                                            "Cannot parse message",
-                                        )
-                                        return@post
-                                    }
-
-                                    val response = handleAction(call.request.origin, webExtension, webClientId, message)
-                                    if (response == null) {
-                                        respondError(
-                                            webClientId,
-                                            HttpStatusCode.InternalServerError,
-                                            "Missing action listener",
-                                        )
-                                        return@post
-                                    }
-
-                                    if (response.first != HttpStatusCode.OK) {
-                                        respondError(
-                                            webClientId,
-                                            response.first,
-                                            response.second,
-                                        )
-                                        return@post
-                                    }
-
-                                    val responseKeys = createResponseTransportKey(sharedBaseOrLinkingSessionKey, requestTransportKey, masterKey, webExtension, activity)
-                                    if (responseKeys == null) {
-                                        respondError(
-                                            webClientId,
-                                            HttpStatusCode.BadRequest,
-                                            "Cannot provide a valid response",
-                                        )
-                                        return@post
-                                    }
-
-                                    val text = wrapBody(
-                                        responseKeys,
-                                        masterKey,
-                                        webExtension,
-                                        response.second,
-                                        activity
-                                    )
-
-                                    respond(webClientId, text, response)
-
-                                    webExtension.touch()
-                                    activity.webExtensionViewModel.save(webExtension, activity)
-                                } catch (e: Exception) {
-                                    DebugInfo.logException("HTTP", "Something went wrong!!!", e)
+                                    respondFile(webClientId, file)
+                                } else {
                                     respondError(
                                         webClientId,
-                                        HttpStatusCode.InternalServerError,
-                                        "Unexpected error during handling post request: ${e.message ?: e.toString()}",
+                                        HttpStatusCode.NotFound,
+                                        "No file to download"
                                     )
-                                    return@post
                                 }
                             }
                         }
+                        else {
+                            respondError(
+                                null,
+                                HttpStatusCode.BadRequest,
+                                "Missing download key"
+                            )
+                        }
                     }
+                    post("/") {
+                        var webClientId: String? = null
+                        try {
+                            call.response.header(
+                                "Access-Control-Allow-Origin",
+                                "*"
+                            )
+
+                            webClientId = call.request.headers["X-WebClientId"]
+
+                            serverLog(
+                                webClientId = webClientId,
+                                origin = call.request.origin,
+                                msg = "POST request received",
+                            )
+
+                            if (SecretService.isDeviceLocked(activity)) {
+                                respondError(
+                                    null,
+                                    HttpStatusCode.Unauthorized,
+                                    "device locked",
+                                )
+                                return@post
+                            }
+
+                            if (Session.isDenied()) {
+                                respondError(
+                                    null,
+                                    HttpStatusCode.Unauthorized,
+                                    "no active session",
+                                )
+                                shutdownAllAsync()
+                                return@post
+                            }
+
+                            httpServerCallback.handleOnIncomingRequest(webClientId)
+
+                            if (webClientId == null) {
+                                //fail
+                                respondError(
+                                    null,
+                                    HttpStatusCode.BadRequest,
+                                    "X-WebClientId header missing",
+                                )
+                                return@post
+                            }
+                            if (!checkWebClientIdFormat(webClientId)) {
+                                //fail
+                                respondError(
+                                    null,
+                                    HttpStatusCode.BadRequest,
+                                    "X-WebClientId malformed",
+                                )
+                                return@post
+                            }
+
+                            val masterKey = activity.masterSecretKey
+                            if (masterKey == null) {
+                                respondError(
+                                    webClientId,
+                                    HttpStatusCode.Unauthorized,
+                                    "Locked",
+                                )
+                                return@post
+                            }
+
+                            val webExtension =
+                                activity.getApp().webExtensionRepository.getAllSync()
+                                    .find {
+                                        SecretService.decryptCommonString(
+                                            masterKey,
+                                            it.webClientId
+                                        ) == webClientId
+                                    }
+                            if (webExtension == null) {
+                                respondError(
+                                    webClientId,
+                                    HttpStatusCode.NotFound,
+                                    "webClientId is unknown",
+                                )
+                                return@post
+                            }
+                            Log.d("HTTP", "checking WebExtensionId: ${webExtension.id}")
+
+                            if (!webExtension.enabled) {
+                                respondError(
+                                    webClientId,
+                                    HttpStatusCode.Forbidden,
+                                    "webClientId is blocked",
+                                )
+                                return@post
+                            }
+                            Log.d("HTTP", "handling WebExtensionId: ${webExtension.id}")
+
+                            val body = call.receive<String>()
+
+                            Log.d("HTTP", "requesting web extension: $webClientId")
+
+                            val sharedBaseOrLinkingSessionKey = SecretService.decryptKey(masterKey, webExtension.sharedBaseKey)
+                            if (!sharedBaseOrLinkingSessionKey.isValid()) {
+                                Log.w("HTTP", "No configured base key")
+                                respondError(
+                                    webClientId,
+                                    HttpStatusCode.BadRequest,
+                                    "No base key",
+                                )
+                                return@post
+                            }
+
+                            val payload = JSONObject(body)
 
 
-                )
+                            val requestTransportKey = extractRequestTransportKey(
+                                sharedBaseOrLinkingSessionKey,
+                                webExtension,
+                                payload.optString("encOneTimeKey")
+                            )
+                            if (requestTransportKey == null) {
+                                respondError(
+                                    webClientId,
+                                    HttpStatusCode.BadRequest,
+                                    "Cannot derive request transport key",
+                                )
+                                return@post
+                            }
 
-                Log.i("HTTP", "API server started")
-                isHttpServerStarting = false
+                            val message = unwrapBody(
+                                requestTransportKey,
+                                payload,
+                                activity
+                            )
+                            if (message == null) {
+                                respondError(
+                                    webClientId,
+                                    HttpStatusCode.BadRequest,
+                                    "Cannot parse message",
+                                )
+                                return@post
+                            }
 
-                isHttpServerRunning = true
-                true
-            } catch (e: Exception) {
-                isHttpServerStarting = false
+                            val response = handleAction(call.request.origin, webExtension, webClientId, message)
+                            if (response == null) {
+                                respondError(
+                                    webClientId,
+                                    HttpStatusCode.InternalServerError,
+                                    "Missing action listener",
+                                )
+                                return@post
+                            }
 
-                DebugInfo.logException("HTTP", e.toString())
-                isHttpServerRunning = false
-                false
+                            if (response.first != HttpStatusCode.OK) {
+                                respondError(
+                                    webClientId,
+                                    response.first,
+                                    response.second,
+                                )
+                                return@post
+                            }
+
+                            val responseKeys = createResponseTransportKey(sharedBaseOrLinkingSessionKey, requestTransportKey, masterKey, webExtension, activity)
+                            if (responseKeys == null) {
+                                respondError(
+                                    webClientId,
+                                    HttpStatusCode.BadRequest,
+                                    "Cannot provide a valid response",
+                                )
+                                return@post
+                            }
+
+                            val text = wrapBody(
+                                responseKeys,
+                                masterKey,
+                                webExtension,
+                                response.second,
+                                activity
+                            )
+
+                            respond(webClientId, text, response)
+
+                            webExtension.touch()
+                            activity.webExtensionViewModel.save(webExtension, activity)
+                        } catch (e: Exception) {
+                            DebugInfo.logException("HTTP", "Something went wrong!!!", e)
+                            respondError(
+                                webClientId,
+                                HttpStatusCode.InternalServerError,
+                                "Unexpected error during handling post request: ${e.message ?: e.toString()}",
+                            )
+                            return@post
+                        }
+                    }
+                }
             }
+
+            httpServer?.startSuspend()
+
+            Log.i("HTTP", "API server started")
+            isHttpServerStarting = false
+            isHttpServerRunning = true
+            return true
+        } catch (e: Exception) {
+            isHttpServerStarting = false
+
+            DebugInfo.logException("HTTP", e.toString())
+            isHttpServerRunning = false
+            return false
         }
+
     }
 
     fun startAllServersAsync(
@@ -430,10 +422,9 @@ object HttpServer {
 
             var httpServerPort = PreferenceService.getAsInt(PreferenceService.PREF_SERVER_PORT, activity)
             if (httpServerPort <= 0) httpServerPort = DEFAULT_HTTP_SERVER_PORT
-            val startApiServerAsync = startApiServerAsync(httpServerPort, activity, httpServerCallback)
-            Log.i("HTTP", "awaiting start")
 
-            val (successApiServer) = awaitAll(startApiServerAsync)
+            Log.i("HTTP", "awaiting start")
+            val successApiServer = startApiServerAsync(httpServerPort, activity, httpServerCallback)
             Log.i("HTTP", "successApiServer = $successApiServer")
 
             monitorWifiEnablement(activity, httpServerCallback)
@@ -528,7 +519,7 @@ object HttpServer {
             try {
                 Log.i("HTTP", "shutdown all")
 
-                httpServer?.stopSuspend(gracePeriodMillis = 100, timeoutMillis= 100)
+                httpServer?.stop(gracePeriodMillis = 100, timeoutMillis= 100)
                 isHttpServerStopping = false
 
                 Log.i("HTTP", "shutdown done")
