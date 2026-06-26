@@ -1,4 +1,4 @@
-<b>Mit ANOTHERpass musst du dir kein langes und komplexes Masterpasswort erstellen und merken!</b>
+<b>Mit ANOTHERpass musst du kein langes und komplexes Masterpasswort erstellen und dir merken!</b>
 
 ANOTHERpass bietet eine clevere Zwei-Faktor-Authentifizierung, um den Tresor mit den Zugangsdaten zu entsperren. Diese Faktoren sind Wissen (eine PIN) und Besitz (das Masterpasswort als physisches Token). Anstatt sich ein langes und kompliziertes Masterpasswort zu merken, merkt man sich nur eine PIN und hat das Masterpasswort als QR-Code oder NFC-Tag bei sich. Zusätzlich kann man das Masterpasswort geschützt mit einem biometrischem Merkmal (z.B. Fingerabdruck) auf dem Gerät speichern.
 

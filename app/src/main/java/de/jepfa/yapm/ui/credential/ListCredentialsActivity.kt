@@ -55,7 +55,6 @@ import androidx.credentials.CreatePasswordRequest
 import androidx.credentials.CreatePasswordResponse
 import androidx.credentials.CreatePublicKeyCredentialRequest
 import androidx.credentials.CreatePublicKeyCredentialResponse
-import androidx.credentials.provider.AuthenticationResult
 import androidx.credentials.provider.CallingAppInfo
 import androidx.credentials.provider.PendingIntentHandler
 import androidx.credentials.webauthn.AuthenticatorAttestationResponse
@@ -96,6 +95,7 @@ import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_CREDENTIAL_IDS
 import de.jepfa.yapm.service.PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD
 import de.jepfa.yapm.service.PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_RELOAD
 import de.jepfa.yapm.service.autofill.ResponseFiller
+import de.jepfa.yapm.service.biometrix.BiometricUtils
 import de.jepfa.yapm.service.credentialprovider.PasskeyProviderService
 import de.jepfa.yapm.service.io.AutoBackupService
 import de.jepfa.yapm.service.label.LabelFilter
@@ -1204,7 +1204,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     val request =
                         PendingIntentHandler.retrieveProviderCreateCredentialRequest(intent)
 
-                    val accountId = intent.getStringExtra(PasskeyProviderService.EXTRA_KEY_ACCOUNT_ID)
+                    val accountId = intent.getStringExtra(PasskeyProviderService.EXTRA_REQUEST_JSON)
                     if (request != null && request.callingRequest is CreatePublicKeyCredentialRequest) {
                         val publicKeyRequest: CreatePublicKeyCredentialRequest =
                             request.callingRequest as CreatePublicKeyCredentialRequest
@@ -1219,7 +1219,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                 else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
                     && action.startsWith(Constants.ACTION_CREATE_PASSWORD)) {
                     val createRequest = PendingIntentHandler.retrieveProviderCreateCredentialRequest(intent)
-                    val accountId = intent.getStringExtra(PasskeyProviderService.EXTRA_KEY_ACCOUNT_ID)
+                    val accountId = intent.getStringExtra(PasskeyProviderService.EXTRA_REQUEST_JSON)
 
                     if (createRequest == null) {
                         return
@@ -1258,24 +1258,32 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     ) {
         val request = PublicKeyCredentialCreationOptions(requestJson)
 
+        if (!BiometricUtils.hasBiometricsEnrolled(this)) {
+            toastText(this, "No biometrics!!")
+            return
+        }
+
         val biometricPrompt = BiometricPrompt(
             this,
-            { }, // Pass in your own executor
+            ContextCompat.getMainExecutor(this),
             object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                     super.onAuthenticationError(errorCode, errString)
+                    Log.d("PK", "error $errorCode $errString")
                     finish()
                 }
 
                 override fun onAuthenticationFailed() {
                     super.onAuthenticationFailed()
+                    Log.d("PK", "failed")
+
                     finish()
                 }
 
-                @SuppressLint("RestrictedApi")
-                @RequiresApi(Build.VERSION_CODES.P)
+              //  @SuppressLint("RestrictedApi")
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
+                    Log.d("PK", "success")
 
                     // Generate a credentialId
                     val credentialId = ByteArray(32)
@@ -1329,11 +1337,10 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             .setTitle("Use your screen lock")
             .setNegativeButtonText("negative")
             .setSubtitle("Create passkey for ${request.rp.name}")
-            .setAllowedAuthenticators(
-                BiometricManager.Authenticators.BIOMETRIC_STRONG
-                /* or BiometricManager.Authenticators.DEVICE_CREDENTIAL */
-            )
+            .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
             .build()
+        Log.d("PK", "prompt")
+
         biometricPrompt.authenticate(promptInfo)
     }
 

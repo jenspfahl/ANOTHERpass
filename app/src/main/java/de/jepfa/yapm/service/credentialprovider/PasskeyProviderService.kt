@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.CancellationSignal
 import android.os.OutcomeReceiver
 import android.provider.ContactsContract.Directory.PACKAGE_NAME
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.credentials.exceptions.ClearCredentialException
 import androidx.credentials.exceptions.CreateCredentialException
@@ -21,7 +22,6 @@ import androidx.credentials.provider.BeginGetCredentialResponse
 import androidx.credentials.provider.CreateEntry
 import androidx.credentials.provider.CredentialProviderService
 import androidx.credentials.provider.ProviderClearCredentialStateRequest
-import de.jepfa.yapm.BuildConfig.APPLICATION_ID
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.util.Constants
 import de.jepfa.yapm.util.toastText
@@ -50,7 +50,7 @@ class PasskeyProviderService: CredentialProviderService() {
         cancellationSignal: CancellationSignal,
         callback: OutcomeReceiver<BeginCreateCredentialResponse, CreateCredentialException>,
     ) {
-        val response: BeginCreateCredentialResponse? = processCreateCredentialRequest(request)
+        val response = processCreateCredentialRequest(request)
         if (response != null) {
             callback.onResult(response)
         } else {
@@ -68,6 +68,7 @@ class PasskeyProviderService: CredentialProviderService() {
                 // Request is password type
                 return handleCreatePasswordQuery(request)
             }
+            else -> Log.w("PK", "Unknown request: $request")
         }
         // Request not supported
         return null
@@ -84,7 +85,7 @@ class PasskeyProviderService: CredentialProviderService() {
         createEntries.add(
             CreateEntry(
                 "PassKey TODO",
-                createNewPendingIntent("PERSONAL_ACCOUNT_ID", Constants.ACTION_CREATE_PASSKEY)
+                createNewPendingIntent(request.requestJson, Constants.ACTION_CREATE_PASSKEY)
             )
         )
 
@@ -102,21 +103,21 @@ class PasskeyProviderService: CredentialProviderService() {
         createEntries.add(
             CreateEntry(
                 "Password TODO",
-                createNewPendingIntent("FAMILY_ACCOUNT_ID", Constants.ACTION_CREATE_PASSWORD)
+                createNewPendingIntent(request.type, Constants.ACTION_CREATE_PASSWORD)
             )
         )
 
         return BeginCreateCredentialResponse(createEntries)
     }
 
-    private fun createNewPendingIntent(accountId: String, action: String): PendingIntent {
+    private fun createNewPendingIntent(requestJson: String, action: String): PendingIntent {
         val intent = Intent(this, ListCredentialsActivity::class.java)
             .setPackage(PACKAGE_NAME).setAction(action)
 
         // Add your local account ID as an extra to the intent, so that when
         // user selects this entry, the credential can be saved to this
         // account
-        intent.putExtra(EXTRA_KEY_ACCOUNT_ID, accountId)
+        intent.putExtra(EXTRA_REQUEST_JSON, requestJson)
 
         return PendingIntent.getActivity(
             applicationContext, UNIQUE_REQ_CODE,
@@ -129,7 +130,7 @@ class PasskeyProviderService: CredentialProviderService() {
     }
 
     companion object {
-        const val EXTRA_KEY_ACCOUNT_ID = "keyAccountId"
+        const val EXTRA_REQUEST_JSON = "requestJson"
         const val UNIQUE_REQ_CODE = 666
     }
 
