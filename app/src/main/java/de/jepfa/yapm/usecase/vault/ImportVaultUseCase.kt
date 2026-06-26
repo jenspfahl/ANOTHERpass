@@ -265,9 +265,8 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
     private fun failsafeParseRawData(fileContent: String): JsonObject {
         val gson = Gson()
 
-        // Create a JsonReader and set it to lenient mode
         val reader = JsonReader(StringReader(fileContent)).apply {
-            isLenient = true // Enable lenient parsing
+            isLenient = true // be less strict with leftovers at the end (#101)
         }
 
         return gson.fromJson(reader, JsonObject::class.java)
