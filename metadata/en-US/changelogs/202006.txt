@@ -1,0 +1,2 @@
+* fix #101 read corrupt autobackup vault files
+and save with truncation

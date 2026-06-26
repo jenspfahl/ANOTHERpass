@@ -3,9 +3,11 @@ package de.jepfa.yapm.usecase.vault
 import android.content.Context
 import android.os.Build
 import android.util.Log
+import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import com.google.gson.stream.JsonReader
 import de.jepfa.yapm.R
 import de.jepfa.yapm.model.Validable
 import de.jepfa.yapm.model.encrypted.*
@@ -26,6 +28,7 @@ import de.jepfa.yapm.util.DebugInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.StringReader
 import java.util.*
 
 object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity>() {
@@ -65,7 +68,7 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
     fun parseVaultFileContent(content: String, context: Context, handleBlob: Boolean = false): ParsedVault {
         try {
             val masterKeySK = Session.getMasterKeySK()
-            val rawJson = JsonParser.parseString(content).asJsonObject
+            val rawJson = failsafeParseRawData(content)
 
             val appVersionCode = rawJson.get(VaultExportService.JSON_APP_VERSION_CODE)?.asInt
             val vaultId = rawJson.get(VaultExportService.JSON_VAULT_ID)?.asString
@@ -257,6 +260,16 @@ object ImportVaultUseCase: InputUseCase<ImportVaultUseCase.Input, SecureActivity
             AutoBackupService.autoExportVault(activity)
         }
 
+    }
+
+    private fun failsafeParseRawData(fileContent: String): JsonObject {
+        val gson = Gson()
+
+        val reader = JsonReader(StringReader(fileContent)).apply {
+            isLenient = true // be less strict with leftovers at the end (#101)
+        }
+
+        return gson.fromJson(reader, JsonObject::class.java)
     }
 
     private fun readAndImport(
