@@ -130,7 +130,7 @@ object FileUtil {
     fun writeFile(context: Context, uri: Uri, content: String): Boolean {
 
         try {
-            context.contentResolver.openOutputStream(uri)?.use { os ->
+            context.contentResolver.openOutputStream(uri, "wt")?.use { os ->
                 OutputStreamWriter(os).use { osw ->
                     BufferedWriter(osw).use { bw -> bw.write(content) }
                 }
@@ -146,7 +146,7 @@ object FileUtil {
     fun writeFile(context: Context, uri: Uri, byteStream: ByteArrayOutputStream): Boolean {
 
         try {
-            context.contentResolver.openOutputStream(uri)?.use { os ->
+            context.contentResolver.openOutputStream(uri, "wt")?.use { os ->
                 byteStream.writeTo(os)
             }
         } catch (e: Exception) {
