@@ -391,7 +391,7 @@ object ResponseFiller {
     ) = createDataSet(
         it,
         R.drawable.ic_baseline_bug_report_gray_24,
-        "aId: ${it.autofillId}, webDomain: ${it.webDomain} ($webDomain), " +
+        "package: ${it.idPackage} aId: ${it.autofillId}, webDomain: ${it.webDomain} ($webDomain), " +
                 "aHints: ${Arrays.toString(it.autofillHints)}, hint: ${it.hint}, " +
                 "text: ${it.text}, idEntry: ${it.idEntry},, htmlInfoTag: ${it.htmlInfo?.tag}, " +
                 "htmlInfoAttr: ${it.htmlInfo?.attributes}, type: ${it.autofillType}, " +
@@ -623,8 +623,13 @@ object ResponseFiller {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createSearchString(structure: AssistStructure, field: ViewNode, webDomain: String?, context: Context): String? {
         val appName = structure.activityComponent.packageName.let { getAppNameFromPackage(it, context) }
-        val finalWebDomain = field.webDomain ?: webDomain
+        val finalWebDomain = validWebDomainOrNull(field.webDomain) ?: validWebDomainOrNull(webDomain)
         return finalWebDomain?.let { extractDomain(it) }  ?: appName
+    }
+
+    private fun validWebDomainOrNull(webDomain: String?): String? {
+        return if (webDomain.isNullOrBlank() || webDomain.startsWith("file://")) null
+        else webDomain
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -777,6 +782,7 @@ object ResponseFiller {
         val remoteView = createRemoteView(iconId, text, context)
         val searchString = createSearchString(structure, field, webDomain, context)
         val domainString = createDomainString(structure, field, webDomain, context) //TODO add path?
+        Log.d(LOG_PREFIX + "CFS", "searchString=$searchString, domainString=$domainString")
         val pendingIntent = createPendingIntent(context, action, searchString + ACTION_DELIMITER + (domainString?:""))
         val builder = Dataset.Builder(remoteView)
 
