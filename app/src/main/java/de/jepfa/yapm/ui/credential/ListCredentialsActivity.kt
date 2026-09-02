@@ -965,7 +965,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     .setIcon(android.R.drawable.ic_dialog_alert)
 
 
-                val masterPasswordAlreadyExported = !ReminderService.MasterPassword.condition(this)
+                val masterPasswordAlreadyExported = !ReminderService.MasterPasswordShouldBeExported.condition(this)
                 if (masterPasswordAlreadyExported) {
                     dialogBuilder.setPositiveButton(R.string.got_it, null)
                 }
@@ -2056,13 +2056,17 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         container.addView(messageTextView)
 
         if (backupFile != null) {
-            var fileMessage =
-                if (backupFile.canWrite())
-                    getString(R.string.auto_export_file, getFullName(backupFile))
-                else
-                    getString(R.string.auto_export_file_inaccessible) +
-                            System.lineSeparator() +
-                            getString(R.string.auto_export_file, getFullName(backupFile))
+            var fileMessage: String
+            var color: Int? = null
+            if (backupFile.canWrite()) {
+                fileMessage = getString(R.string.auto_export_file, getFullName(backupFile))
+            } else {
+                fileMessage = getString(R.string.auto_export_file_inaccessible) +
+                        System.lineSeparator() +
+                        System.lineSeparator() +
+                        getString(R.string.auto_export_file, getFullName(backupFile))
+                color = R.color.colorAccentShadow
+            }
 
 
             if (DebugInfo.isDebug) {
@@ -2074,6 +2078,7 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
             currentFileTextView.text = fileMessage
             currentFileTextView.setPadding(32)
             currentFileTextView.textSize = 18.0F
+            color?.let { currentFileTextView.setTextColor(getColor(it)) }
             container.addView(currentFileTextView)
 
 
@@ -2196,11 +2201,11 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
     }
 
     private fun getFullName(backupFile: DocumentFile): String {
-        val fileName = backupFile.name ?: getString(R.string.unknown)
-        val fullPath = backupFile.uri.path ?: return fileName
+        val fileName = backupFile.name ?: ""
+        val fullPath = backupFile.uri.path ?: return getString(R.string.unknown)
         val split = fullPath.split(":").drop(1)
         if (split.isEmpty()) {
-            return fileName
+            return getString(R.string.unknown)
         }
         val fullPathWithoutScheme = split.joinToString(separator = ":")
         if (fullPathWithoutScheme.endsWith(fileName)) {

@@ -25,6 +25,8 @@ import de.jepfa.yapm.service.PreferenceService.DATA_MP_MODIFIED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_REFRESH_MPT_NOTIFICATION_SHOWED_AS
 import de.jepfa.yapm.service.PreferenceService.DATA_REFRESH_MPT_NOTIFICATION_SHOWED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_AUTO_EXPORTED_AT
+import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_AUTO_EXPORT_NOTIFICATION_SHOWED_AS
+import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_AUTO_EXPORT_NOTIFICATION_SHOWED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_EXPORTED_AT
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_EXPORT_NOTIFICATION_SHOWED_AS
 import de.jepfa.yapm.service.PreferenceService.DATA_VAULT_EXPORT_NOTIFICATION_SHOWED_AT
@@ -68,9 +70,10 @@ object ReminderService {
         val action: (SecureActivity) -> Unit
     }
 
-    object Vault: ReminderConfig {
+    object VaultShouldBeExported: ReminderConfig {
         override val showIt = { activity: SecureActivity ->
             PreferenceService.getAsBool(PREF_SHOW_EXPORT_VAULT_REMINDER, activity)
+                    && !AutoBackupService.isAutoBackupConfigured(activity)
         }
         override val doDeactivate: (SecureActivity) -> Unit = { activity: SecureActivity ->
             PreferenceService.putBoolean(PREF_SHOW_EXPORT_VAULT_REMINDER, false, activity)
@@ -88,15 +91,15 @@ object ReminderService {
         }
     }
 
-    object AutoVault: ReminderConfig {
+    object AutoExportVaultFailed: ReminderConfig {
         override val showIt = { activity: SecureActivity ->
             PreferenceService.getAsBool(PREF_SHOW_AUTO_EXPORT_VAULT_FAILED_REMINDER, true, activity)
         }
         override val doDeactivate: (SecureActivity) -> Unit = { activity: SecureActivity ->
             PreferenceService.putBoolean(PREF_SHOW_AUTO_EXPORT_VAULT_FAILED_REMINDER, false, activity)
         }
-        override val dataNotificationShowedAt = DATA_VAULT_EXPORT_NOTIFICATION_SHOWED_AT
-        override val dataNotificationShowedAs = DATA_VAULT_EXPORT_NOTIFICATION_SHOWED_AS
+        override val dataNotificationShowedAt = DATA_VAULT_AUTO_EXPORT_NOTIFICATION_SHOWED_AT
+        override val dataNotificationShowedAs = DATA_VAULT_AUTO_EXPORT_NOTIFICATION_SHOWED_AS
         override val notificationText = R.string.auto_export_vault_reminder
         override val notificationAction = R.string.auto_export_vault
         override val condition = { activity: SecureActivity ->
@@ -112,7 +115,7 @@ object ReminderService {
         }
     }
 
-    object MasterKey: ReminderConfig {
+    object MasterKeyShouldBeExported: ReminderConfig {
         override val showIt = { activity: SecureActivity ->
             PreferenceService.getAsBool(PREF_SHOW_EXPORT_MK_REMINDER, activity)
         }
@@ -132,7 +135,7 @@ object ReminderService {
         }
     }
 
-    object MasterPassword: ReminderConfig {
+    object MasterPasswordShouldBeExported: ReminderConfig {
         override val showIt = { activity: SecureActivity ->
             PreferenceService.getAsBool(PREF_SHOW_EXPORT_MP_REMINDER, activity)
         }
@@ -154,7 +157,7 @@ object ReminderService {
         }
     }
 
-    object StoredMasterPassword: ReminderConfig {
+    object BiometricsShouldBeUsed: ReminderConfig {
         override val showIt = { activity: SecureActivity ->
             PreferenceService.getAsBool(PREF_SHOW_BIOMETRIC_SMP_REMINDER, activity)
         }
@@ -178,7 +181,7 @@ object ReminderService {
         }
     }
 
-    object RefreshMasterPasswordToken: ReminderConfig {
+    object MasterPasswordTokenShouldBeRenewed: ReminderConfig {
         override val showIt = { activity: SecureActivity ->
             PreferenceService.getAsInt(PREF_SHOW_REFRESH_MPT_REMINDER, activity) != 0
         }
@@ -234,13 +237,13 @@ object ReminderService {
     }
 
     private val configs = listOf(
+        AutoExportVaultFailed,
+        VaultShouldBeExported,
         ExpiredPasswords,
-        MasterPassword,
-        Vault,
-        AutoVault,
-        MasterKey,
-        StoredMasterPassword ,
-        RefreshMasterPasswordToken)
+        MasterPasswordShouldBeExported,
+        MasterKeyShouldBeExported,
+        BiometricsShouldBeUsed,
+        MasterPasswordTokenShouldBeRenewed)
 
 
     private fun checkAndShowReminder(config: ReminderConfig, view: View, activity: SecureActivity, showNow: Boolean = false): Boolean {

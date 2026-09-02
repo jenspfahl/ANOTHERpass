@@ -60,6 +60,8 @@ object PreferenceService {
     const val DATA_VAULT_MODIFIED_AT = DATA_PREFIX + "vault_modified_at"
     const val DATA_VAULT_EXPORT_NOTIFICATION_SHOWED_AT = DATA_PREFIX + "vault_export_notification_showed_at"
     const val DATA_VAULT_EXPORT_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "vault_export_notification_showed_as"
+    const val DATA_VAULT_AUTO_EXPORT_NOTIFICATION_SHOWED_AT = DATA_PREFIX + "vault_auto_export_notification_showed_at"
+    const val DATA_VAULT_AUTO_EXPORT_NOTIFICATION_SHOWED_AS = DATA_PREFIX + "vault_auto_export_notification_showed_as"
     const val DATA_VAULT_AUTO_EXPORT_URI = DATA_PREFIX + "vault_auto_export_uri"
 
     const val PREF_SHOW_AUTO_EXPORT_VAULT_FAILED_REMINDER = PREF_PREFIX + "show_auto_export_vault_failed_reminder"
