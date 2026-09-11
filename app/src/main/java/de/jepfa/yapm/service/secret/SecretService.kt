@@ -26,6 +26,7 @@ import de.jepfa.yapm.util.Constants.LOG_PREFIX
 import de.jepfa.yapm.util.DebugInfo
 import java.math.BigInteger
 import java.security.*
+import java.security.spec.ECGenParameterSpec
 import java.security.spec.RSAPublicKeySpec
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -207,6 +208,13 @@ object SecretService {
     fun buildRsaPublicKey(modulus: BigInteger, exponent: BigInteger): PublicKey {
         val spec = RSAPublicKeySpec(modulus, exponent)
         return KeyFactory.getInstance(KeyProperties.KEY_ALGORITHM_RSA).generatePublic(spec);
+    }
+
+    fun generatePasskeyKeyPair(): KeyPair {
+        val spec = ECGenParameterSpec("secp256r1")
+        val keyPairGen = KeyPairGenerator.getInstance("EC")
+        keyPairGen.initialize(spec)
+        return keyPairGen.genKeyPair()
     }
 
     /**

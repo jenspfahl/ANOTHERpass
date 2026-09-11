@@ -228,7 +228,8 @@ fun ensureHttp(s: String): String {
     }
 }
 
-fun getAppNameFromPackage(packageName: String, context: Context): String? {
+fun getAppNameFromPackage(packageName: String?, context: Context): String? {
+    if (packageName == null) return null
     val pm: PackageManager = context.packageManager
     val ai: ApplicationInfo? = try {
         pm.getApplicationInfo(packageName, 0)

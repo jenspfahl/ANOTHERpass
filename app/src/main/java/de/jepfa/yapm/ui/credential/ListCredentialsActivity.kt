@@ -45,8 +45,6 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
-import androidx.biometric.BiometricManager
-import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.MenuItemCompat
@@ -95,8 +93,6 @@ import de.jepfa.yapm.service.PreferenceService.PREF_SHOW_CREDENTIAL_IDS
 import de.jepfa.yapm.service.PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_ACTIVITY_RELOAD
 import de.jepfa.yapm.service.PreferenceService.STATE_REQUEST_CREDENTIAL_LIST_RELOAD
 import de.jepfa.yapm.service.autofill.ResponseFiller
-import de.jepfa.yapm.service.biometrix.BiometricUtils
-import de.jepfa.yapm.service.credentialprovider.PasskeyProviderService
 import de.jepfa.yapm.service.io.AutoBackupService
 import de.jepfa.yapm.service.label.LabelFilter
 import de.jepfa.yapm.service.label.LabelFilter.WITH_NO_LABELS_ID
@@ -169,9 +165,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.asCompletableFuture
 import kotlinx.coroutines.launch
 import org.json.JSONObject
-import java.security.KeyPairGenerator
 import java.security.MessageDigest
-import java.security.spec.ECGenParameterSpec
 import java.util.UUID
 
 
@@ -1204,22 +1198,18 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
                     val request =
                         PendingIntentHandler.retrieveProviderCreateCredentialRequest(intent)
 
-                    val accountId = intent.getStringExtra(PasskeyProviderService.EXTRA_REQUEST_JSON)
                     if (request != null && request.callingRequest is CreatePublicKeyCredentialRequest) {
-                        val publicKeyRequest: CreatePublicKeyCredentialRequest =
-                            request.callingRequest as CreatePublicKeyCredentialRequest
+                        val publicKeyRequest = request.callingRequest as CreatePublicKeyCredentialRequest
                         createPasskey(
                             publicKeyRequest.requestJson,
                             request.callingAppInfo,
                             publicKeyRequest.clientDataHash,
-                            accountId
                         )
                     }
                 }
                 else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
                     && action.startsWith(Constants.ACTION_CREATE_PASSWORD)) {
                     val createRequest = PendingIntentHandler.retrieveProviderCreateCredentialRequest(intent)
-                    val accountId = intent.getStringExtra(PasskeyProviderService.EXTRA_REQUEST_JSON)
 
                     if (createRequest == null) {
                         return
@@ -1254,94 +1244,60 @@ class ListCredentialsActivity : AutofillPushBackActivityBase(), NavigationView.O
         requestJson: String,
         callingAppInfo: CallingAppInfo?,
         clientDataHash: ByteArray?,
-        accountId: String?
     ) {
-        val request = PublicKeyCredentialCreationOptions(requestJson)
+        val creationOptions = PublicKeyCredentialCreationOptions(requestJson)
 
-        if (!BiometricUtils.hasBiometricsEnrolled(this)) {
-            toastText(this, "No biometrics!!")
-            return
-        }
+        //TODO start a flow to find or create an EncCredential where to add/update the passkey
+        startSearchFor(creationOptions.rp.name, true)
 
-        val biometricPrompt = BiometricPrompt(
-            this,
-            ContextCompat.getMainExecutor(this),
-            object : BiometricPrompt.AuthenticationCallback() {
-                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                    super.onAuthenticationError(errorCode, errString)
-                    Log.d("PK", "error $errorCode $errString")
-                    finish()
-                }
 
-                override fun onAuthenticationFailed() {
-                    super.onAuthenticationFailed()
-                    Log.d("PK", "failed")
 
-                    finish()
-                }
+        //TODO move this into a separate service
+        val credentialId = SecretService.generateRandomKey(32, this@ListCredentialsActivity)
+        val keyPair = SecretService.generatePasskeyKeyPair()
 
-              //  @SuppressLint("RestrictedApi")
-                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                    super.onAuthenticationSucceeded(result)
-                    Log.d("PK", "success")
+        // TODO Save passkey at the selected EncCredential
+        //creationOptions.rp.name
+        //creationOptions.user.name
 
-                    // Generate a credentialId
-                    val credentialId = ByteArray(32)
-                    SecretService.getSecureRandom(this@ListCredentialsActivity).nextBytes(credentialId)
 
-                    // Generate a credential key pair
-                    val spec = ECGenParameterSpec("secp256r1")
-                    val keyPairGen = KeyPairGenerator.getInstance("EC")
-                    keyPairGen.initialize(spec)
-                    val keyPair = keyPairGen.genKeyPair()
-
-                    // Save passkey in your database as per your own implementation
-
-                    // Create AuthenticatorAttestationResponse object to pass to
-                    // FidoPublicKeyCredential
-
-                    val response = AuthenticatorAttestationResponse(
-                        requestOptions = request,
-                        credentialId = credentialId,
-                        credentialPublicKey = keyPair.public.encoded,
-                        origin = appInfoToOrigin(callingAppInfo!!),
-                        up = true,
-                        uv = true,
-                        be = true,
-                        bs = true,
-                        packageName = callingAppInfo.packageName
-                    )
-
-                    val credential = FidoPublicKeyCredential(
-                        rawId = credentialId,
-                        response = response,
-                        authenticatorAttachment = "", // Add your authenticator attachment
-                    )
-                    val result = Intent()
-
-                    val createPublicKeyCredResponse =
-                        CreatePublicKeyCredentialResponse(credential.json())
-
-                    // Set the CreateCredentialResponse as the result of the Activity
-                    PendingIntentHandler.setCreateCredentialResponse(
-                        result,
-                        createPublicKeyCredResponse
-                    )
-                    setResult(RESULT_OK, result)
-                    finish()
-                }
-            }
+        val attestationResponse = AuthenticatorAttestationResponse(
+            requestOptions = creationOptions,
+            credentialId = credentialId.data,
+            credentialPublicKey = keyPair.public.encoded,
+            origin = appInfoToOrigin(callingAppInfo!!),
+            clientDataHash = clientDataHash,
+            up = true,
+            uv = true,
+            be = true,
+            bs = true,
+            packageName = callingAppInfo.packageName,
         )
 
-        val promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("Use your screen lock")
-            .setNegativeButtonText("negative")
-            .setSubtitle("Create passkey for ${request.rp.name}")
-            .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
-            .build()
-        Log.d("PK", "prompt")
+        val credential = FidoPublicKeyCredential(
+            rawId = credentialId.data,
+            response = attestationResponse,
+            authenticatorAttachment = "", // Add your authenticator attachment
+        )
 
-        biometricPrompt.authenticate(promptInfo)
+        toastText(this@ListCredentialsActivity, credential.json())
+        Log.d("PK", credential.json())
+        Log.d("PK", attestationResponse.clientJson.toString(4))
+        Log.d("PK", attestationResponse.json().toString(4))
+
+
+
+        val result = Intent()
+
+        val createPublicKeyCredResponse =
+            CreatePublicKeyCredentialResponse(credential.json())
+
+        PendingIntentHandler.setCreateCredentialResponse(
+            result,
+            createPublicKeyCredResponse
+        )
+        setResult(RESULT_OK, result)
+        finish()
     }
 
     @RequiresApi(Build.VERSION_CODES.P)

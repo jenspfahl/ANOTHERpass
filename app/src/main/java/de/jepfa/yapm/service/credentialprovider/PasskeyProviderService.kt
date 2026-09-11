@@ -22,8 +22,10 @@ import androidx.credentials.provider.BeginGetCredentialResponse
 import androidx.credentials.provider.CreateEntry
 import androidx.credentials.provider.CredentialProviderService
 import androidx.credentials.provider.ProviderClearCredentialStateRequest
+import androidx.credentials.webauthn.PublicKeyCredentialCreationOptions
 import de.jepfa.yapm.ui.credential.ListCredentialsActivity
 import de.jepfa.yapm.util.Constants
+import de.jepfa.yapm.util.getAppNameFromPackage
 import de.jepfa.yapm.util.toastText
 
 
@@ -34,6 +36,7 @@ class PasskeyProviderService: CredentialProviderService() {
         cancellationSignal: CancellationSignal,
         callback: OutcomeReceiver<Void?, ClearCredentialException>
     ) {
+        //TODO
         toastText(this, "clear creds")
     }
 
@@ -42,6 +45,7 @@ class PasskeyProviderService: CredentialProviderService() {
         cancellationSignal: CancellationSignal,
         callback: OutcomeReceiver<BeginGetCredentialResponse, GetCredentialException>
     ) {
+        //TODO
         toastText(this, "get creds")
     }
 
@@ -58,7 +62,7 @@ class PasskeyProviderService: CredentialProviderService() {
         }
     }
 
-    fun processCreateCredentialRequest(request: BeginCreateCredentialRequest): BeginCreateCredentialResponse? {
+    private fun processCreateCredentialRequest(request: BeginCreateCredentialRequest): BeginCreateCredentialResponse? {
         when (request) {
             is BeginCreatePublicKeyCredentialRequest -> {
                 // Request is passkey type
@@ -78,14 +82,13 @@ class PasskeyProviderService: CredentialProviderService() {
         request: BeginCreatePublicKeyCredentialRequest
     ): BeginCreateCredentialResponse {
 
-        // Adding two create entries - one for storing credentials to the 'Personal'
-        // account, and one for storing them to the 'Family' account. These
-        // accounts are local to this sample app only.
+        val creationOptions = PublicKeyCredentialCreationOptions(request.requestJson)
+
         val createEntries: MutableList<CreateEntry> = mutableListOf()
         createEntries.add(
             CreateEntry(
-                "PassKey TODO",
-                createNewPendingIntent(request.requestJson, Constants.ACTION_CREATE_PASSKEY)
+                 creationOptions.rp.name, // or getAppNameFromPackage(request.callingAppInfo?.packageName, this)
+                createNewPendingIntent(Constants.ACTION_CREATE_PASSKEY, REQ_CODE_FOR_CREATE_PASSKEY)
             )
         )
 
@@ -102,25 +105,21 @@ class PasskeyProviderService: CredentialProviderService() {
         // accounts are local to this sample app only.
         createEntries.add(
             CreateEntry(
-                "Password TODO",
-                createNewPendingIntent(request.type, Constants.ACTION_CREATE_PASSWORD)
+                getAppNameFromPackage(request.callingAppInfo?.packageName, this) ?: "",
+                createNewPendingIntent(Constants.ACTION_CREATE_PASSWORD, REQ_CODE_FOR_CREATE_PASSWORD)
             )
         )
 
         return BeginCreateCredentialResponse(createEntries)
     }
 
-    private fun createNewPendingIntent(requestJson: String, action: String): PendingIntent {
+    private fun createNewPendingIntent(action: String, requestCode: Int): PendingIntent {
         val intent = Intent(this, ListCredentialsActivity::class.java)
-            .setPackage(PACKAGE_NAME).setAction(action)
-
-        // Add your local account ID as an extra to the intent, so that when
-        // user selects this entry, the credential can be saved to this
-        // account
-        intent.putExtra(EXTRA_REQUEST_JSON, requestJson)
+            .setPackage(PACKAGE_NAME)
+            .setAction(action)
 
         return PendingIntent.getActivity(
-            applicationContext, UNIQUE_REQ_CODE,
+            applicationContext, requestCode,
             intent,
             (
                     PendingIntent.FLAG_MUTABLE
@@ -130,8 +129,8 @@ class PasskeyProviderService: CredentialProviderService() {
     }
 
     companion object {
-        const val EXTRA_REQUEST_JSON = "requestJson"
-        const val UNIQUE_REQ_CODE = 666
+        const val REQ_CODE_FOR_CREATE_PASSKEY = 100_000_000
+        const val REQ_CODE_FOR_CREATE_PASSWORD = 500_000_000
     }
 
 }
