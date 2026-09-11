@@ -155,3 +155,5 @@ dependencies {
     implementation("io.ktor:ktor-network-tls-certificates:3.4.0")
 
 }
+
+android.buildFeatures.buildConfig=true
