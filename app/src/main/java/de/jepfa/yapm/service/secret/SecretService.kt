@@ -510,9 +510,8 @@ object SecretService {
      */
     fun getAndroidSecretKey(androidKey: AndroidKey, context: Context): SecretKeyHolder {
         androidKeyStore.load(null)
-        val entry: KeyStore.Entry? = androidKeyStore.getEntry(androidKey.alias, null)
-
-        val sk = (entry as? KeyStore.SecretKeyEntry)?.secretKey ?: initAndroidSecretKey(androidKey, context)
+        val sk = androidKeyStore.getKey(androidKey.alias, null) as? SecretKey
+            ?: initAndroidSecretKey(androidKey, context)
 
         return SecretKeyHolder(sk, DEFAULT_CIPHER_ALGORITHM, androidKey, context)
     }
